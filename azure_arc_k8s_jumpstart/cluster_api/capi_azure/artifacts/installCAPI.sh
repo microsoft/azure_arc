@@ -24,11 +24,11 @@ echo ""
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
   export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
-  export AZURE_LOCATION="Azure region" # Name of the Azure datacenter location. For example: "eastus2"
-  export AZURE_RESOURCE_GROUP="<Azure resource group name>" # Name of the Azure resource group name. For example: "Arc-CAPI-Demo"
-  export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal. A GUID suffix will be added automatically.
+  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus2"
+  export AZURE_RESOURCE_GROUP="<Azure resource group name>"# Name of the Azure resource group name. For example: "Arc-CAPI-Demo"
+  export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal. A GUID suffix will be added automatically. Do not change!
   export AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the Azure Arc-enabled Kubernetes cluster resource name. Do not change!
-  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*').  Do not change!
+  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'). Do not change!
   export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
   export AZURE_TENANT_ID="<Azure tenant id>"
   export AZURE_CLIENT_ID="<Azure SPN application client id>"
