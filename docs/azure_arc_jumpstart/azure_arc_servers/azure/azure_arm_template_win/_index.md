@@ -173,7 +173,7 @@ Various options are available to connect to _Arc-Data-Client_ VM, depending on t
 
 By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
 
-- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+- Open the _Arc-Win-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
   ![Screenshot showing Arc-App-Client NSG with blocked RDP](./05.png)
 
