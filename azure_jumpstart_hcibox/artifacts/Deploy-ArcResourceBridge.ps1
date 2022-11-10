@@ -27,6 +27,32 @@ $adcred = New-Object -TypeName System.Management.Automation.PSCredential -Argume
 # Install AZ Resource Bridge and prerequisites
 Write-Host "Now Preparing to Install Azure Arc Resource Bridge"
 
+if ($env:deployAKSHCI -eq $false) {
+    Write-Header "Install latest versions of Nuget and PowershellGet"
+    Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+        Enable-PSRemoting -Force
+        Install-PackageProvider -Name NuGet -Force 
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Install-Module -Name PowershellGet -Force
+    }
+
+    # Install necessary AZ modules and initialize akshci on each node
+    Write-Header "Install necessary AZ modules"
+
+    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+        Write-Host "Installing Required Modules"
+        
+        $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
+        foreach ($ModuleName in $ModuleNames){
+            if (!(Get-InstalledModule -Name $ModuleName -ErrorAction Ignore)){
+                Install-Module -Name $ModuleName -Force -AcceptLicense 
+            }
+        }
+        Import-Module Az.Accounts
+        Import-Module Az.Resources
+        Import-Module AzureAD
+    }
+}
 # Install Required Modules
 foreach ($VM in $SDNConfig.HostList) { 
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
