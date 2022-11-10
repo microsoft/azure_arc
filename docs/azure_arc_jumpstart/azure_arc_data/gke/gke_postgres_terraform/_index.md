@@ -161,7 +161,7 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
 
 Read the below explanation to get familiar with the automation and deployment flow.
 
-- User creates the terraform variables file (.tfvars) and export the Custom Location RP OID variable. The variable values are used throughout the deployment.
+- User creates the terraform variables file (_terraform.tfvars_) and export the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) OID variable. The variable values are used throughout the deployment.
 
 - User deploys the Terraform plan which will deploy a GKE cluster and compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and the PostgreSQL database service.
 
@@ -194,7 +194,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 ## Terraform variables
 
-- Before running the Terraform plan, create a terraform.tfvars file in the root of the terraform folder and supply some values for your environment.
+- Before running the Terraform plan, create the _terraform.tfvars_ file in the root of the terraform folder and supply some values for your environment.
 
    ```HCL
     gcp_project_id           = "azure-arc-demo-277620"
@@ -250,9 +250,9 @@ Read the below explanation to get familiar with the automation and deployment fl
   - **_`templateBaseUrl`_** - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`
   - **_`MY_IP`_** - Your Client IP
 
-### Custom Location RP OID variable
+### Azure Custom Location Resource Provider (RP) and the Object ID (OID) environment variable
 
-- You also need to get the Custom Location RP OID to export it as an environment variable:
+- You will also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) OID and export it as an environment variable:
 
   > **NOTE: You need permissions to list all the service principals.**
 

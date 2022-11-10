@@ -164,32 +164,67 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Linux Login & Post Deployment
 
-- Now that the Linux Server VM is created, it is time to log in to it. If you have not chosen to deploy Azure Bastion in the ARM template, SSH to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot Azure VM public IP address](./05.png)
+- [SSH](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/#connecting-directly-with-ssh) - available after configuring access to port 22 on the _Arc-Linux-Demo-NSG_, or by enabling [Just-in-Time access (JIT)](ttps://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/#connecting-directly-with-ssh#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with SSH
 
-    ![Screenshot Azure VM Bastion connectivity](./06.png)
+By design, port ssh is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound ssh.
+
+- Open the _Arc-Linux-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-App-Client NSG with blocked ssh](./05.png)
+
+  ![Screenshot showing adding a new inbound security rule](./06.png)
+
+- Specify the IP address that you will be connecting from and select SSH as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./07.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./08.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./09.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./10.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing SSH on the client VM](./11.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./12.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
 - Let the script to run its course and **do not close** the SSH session, this will be done for you once completed.
 
-    ![Screenshot script output](./07.png)
+    ![Screenshot script output](./13.png)
 
-    ![Screenshot script output](./08.png)
+    ![Screenshot script output](./14.png)
 
-    ![Screenshot script output](./09.png)
+    ![Screenshot script output](./15.png)
 
 - Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-    ![Screenshot Azure Arc resource on the Azure portal](./10.png)
+    ![Screenshot Azure Arc resource on the Azure portal](./16.png)
 
-    ![Screenshot details of Azure Arc-enabled server on Azure portal](./11.png)
+    ![Screenshot details of Azure Arc-enabled server on Azure portal](./17.png)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot how to delete resource group](./12.png)
+![Screenshot how to delete resource group](./18.png)

@@ -100,33 +100,33 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment Option 2: ARM template with Azure CLI
 
-The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
+The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include your public SSH key, the Ubuntu OS username as well as the appId, password and tenant generated from the service principal creation.  
 
-- To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
+To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
 
-  ```shell
-  az group create --name <Name of the Azure resource group> --location <Azure Region>
-  az deployment group create \
-  --resource-group <Name of the Azure resource group> \
-  --name <The name of this deployment> \
-  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-  --parameters <The *azuredeploy.parameters.json* parameters file location>
-  ```
+```shell
+az group create --name <Name of the Azure resource group> --location <Azure Region>
+az deployment group create \
+--resource-group <Name of the Azure resource group> \
+--name <The name of this deployment> \
+--template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+--parameters <The *azuredeploy.parameters.json* parameters file location>
+```
 
-  For example:
+For example:
 
-  ```shell
-  az group create --name Arc-K3s-Demo --location "East US 2"
-  az deployment group create \
-  --resource-group Arc-K3s-Demo \
-  --name arck3sdemo01 \
-  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-  --parameters azuredeploy.parameters.json
-  ```
+```shell
+az group create --name Arc-K3s-Demo --location "East US 2"
+az deployment group create \
+--resource-group Arc-K3s-Demo \
+--name arck3sdemo01 \
+--template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+--parameters azuredeploy.parameters.json
+```
 
-  Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
+Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
 
-  ![Screenshot showing Azure resource group](./03.png)
+![Screenshot showing Azure resource group](./03.png)
 
 ## Logging
 
