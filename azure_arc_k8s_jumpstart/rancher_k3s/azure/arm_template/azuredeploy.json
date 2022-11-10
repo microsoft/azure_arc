@@ -16,22 +16,10 @@
                 "description": "Username for the Virtual Machine."
             }
         },
-        "authenticationType": {
-            "type": "string",
-            "defaultValue": "password",
-            "allowedValues": [
-                "sshPublicKey",
-                "password"
-            ],
-            "metadata": {
-                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
-            }
-        },
-        "adminPasswordOrKey": {
+        "sshRSAPublicKey": {
             "type": "securestring",
-            "defaultValue": "arcdemo123!!",
             "metadata": {
-                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password."
             }
         },
         "appId": {
@@ -54,15 +42,15 @@
         },
         "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "20_04-lts-gen2",
             "allowedValues": [
-                "18.04-LTS"
+                "20_04-lts-gen2"
             ],
             "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
-        "location": {
+        "azureLocation": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
@@ -71,16 +59,9 @@
         },
         "VmSize": {
             "type": "string",
-            "defaultValue": "Standard_D4s_v3",
+            "defaultValue": "Standard_D4s_v4",
             "metadata": {
                 "description": "The size of the VM"
-            }
-        },
-        "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "Arc-K3s-Demo-VNET",
-            "metadata": {
-                "description": "Name of the VNET"
             }
         },
         "subnetName": {
@@ -90,49 +71,68 @@
                 "description": "Name of the subnet in the virtual network"
             }
         },
-        "networkSecurityGroupName": {
+        "githubAccount": {
             "type": "string",
-            "defaultValue": "Arc-K3s-Demo-NSG",
             "metadata": {
-                "description": "Name of the Network Security Group"
-            }
+                "description": "Target GitHub account"
+            },
+            "defaultValue": "microsoft"
         },
-        "myIpAddress": {
+        "githubBranch": {
             "type": "string",
             "metadata": {
-                "description": "Your IP address"
-            }
+                "description": "Target GitHub branch"
+            },
+            "defaultValue": "main"
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the Ubuntu VM"
+            },
+            "defaultValue": false
+        },
+        "bastionSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure Bastion subnet IP prefix"
+            },
+            "defaultValue": "172.16.2.64/26"
+        },
+        "guid": {
+            "type": "string",
+            "metadata": {
+                "description": "Random GUID for cluster names"
+            },
+            "defaultValue": "[substring(newGuid(),0,4)]"
         }
     },
     "variables": {
-        "vmName": "[concat(parameters('vmName'))]",
-        "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
-        "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/')]",
+        "vmName": "[concat(parameters('vmName'),'-',parameters('guid'))]",
+        "virtualNetworkName": "[concat(parameters('vmName'),'-VNET-',parameters('guid'))]",
+        "publicIpAddressName": "[concat(parameters('vmName'),'-PIP-',parameters('guid'))]",
+        "networkInterfaceName": "[concat(parameters('vmName'),'-NIC-',parameters('guid'))]",
+        "networkSecurityGroupsName": "[concat(parameters('vmName'),'-NSG-',parameters('guid'))]",
+        "osDiskTypeName": "[concat(parameters('vmName'),'-OSDisk-',parameters('guid'))]",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16",
-        "linuxConfiguration": {
-            "disablePasswordAuthentication": false,
-            "ssh": {
-                "publicKeys": [
-                    {
-                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-                        "keyData": "[parameters('adminPasswordOrKey')]"
-                    }
-                ]
-            }
+        "addressPrefix": "172.16.0.0/16",
+        "subnetAddressPrefix": "172.16.1.0/24",
+        "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2022-05-01",
             "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupsName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -144,22 +144,20 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupsName'))]"
                 }
             }
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-02-01",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('networkSecurityGroupsName')]",
+            "location": "[parameters('azureLocation')]",
             "properties": {
                 "securityRules": [
                     {
@@ -169,88 +167,10 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_6443",
-                        "properties": {
-                            "priority": 1002,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "6443"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_80",
-                        "properties": {
-                            "priority": 1003,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "80"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_8080",
-                        "properties": {
-                            "priority": 1004,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "8080"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_443",
-                        "properties": {
-                            "priority": 1005,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "443"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_kubelet",
-                        "properties": {
-                            "priority": 1006,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "10250"
-                        }
-                    },
-                    {
-                        "name": "allow_traefik_lb_external",
-                        "properties": {
-                            "priority": 1007,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "32323"
                         }
                     }
                 ]
@@ -258,9 +178,9 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2022-05-01",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('azureLocation')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -275,30 +195,36 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2022-05-01",
             "name": "[variables('publicIpAddressName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2022-08-01",
             "name": "[variables('vmName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -308,7 +234,7 @@
                 },
                 "storageProfile": {
                     "osDisk": {
-                        "name": "[concat(variables('vmName'),'-OSDisk')]",
+                        "name": "[variables('osDiskTypeName')]",
                         "caching": "ReadWrite",
                         "createOption": "fromImage",
                         "managedDisk": {
@@ -317,7 +243,7 @@
                     },
                     "imageReference": {
                         "publisher": "Canonical",
-                        "offer": "UbuntuServer",
+                        "offer": "0001-com-ubuntu-server-focal",
                         "sku": "[parameters('ubuntuOSVersion')]",
                         "version": "latest"
                     }
@@ -332,16 +258,25 @@
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPasswordOrKey')]",
-                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('sshRSAPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/installscript_k3s')]",
-            "apiVersion": "2019-07-01",
-            "location": "[parameters('location')]",
+            "apiVersion": "2022-08-01",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
@@ -354,8 +289,10 @@
                     "timestamp": 123456789
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
-                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh" ]
+                    "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', variables('vmName'), ' ', parameters('azureLocation'), ' ', variables('templateBaseUrl'))]",
+                    "fileUris": [
+                        "[uri(variables('templateBaseUrl'), 'scripts/installK3s.sh')]"
+                    ]
                 }
             }
         }
