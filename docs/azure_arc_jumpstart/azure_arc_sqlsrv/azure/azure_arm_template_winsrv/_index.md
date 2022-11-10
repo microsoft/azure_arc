@@ -168,16 +168,16 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 ## Windows Login & Post Deployment
 
-Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
+Various options are available to connect to _Arc-SQL-Demo_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-App-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/#connect-using-just-in-time-accessjit).
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-App-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/#connect-using-just-in-time-access-jit).
 - [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 ### Connecting directly with RDP
 
 By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
 
-- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+- Open the _Arc-SQL-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
   ![Screenshot showing Arc-App-Client NSG with blocked RDP](./nsg_rules.png)
 
@@ -197,7 +197,7 @@ By design, port 3389 is not allowed on the network security group. Therefore, yo
 
   ![Screenshot showing connecting to the VM using Bastion](./sql_vm_bastion.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _Arc-SQL-Demo_ with Azure Bastion.**
 
 ### Connect using just-in-time access (JIT)
 
