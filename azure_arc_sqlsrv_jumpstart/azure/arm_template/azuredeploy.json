@@ -85,7 +85,7 @@
         "resourceTags": {
             "type": "object",
             "defaultValue": {
-                "Project": "remove_ip_address_parameter_servers"
+                "Project": "jumpstart_azure_arc_servers"
             }
         },
         "githubAccount": {
@@ -93,14 +93,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "sebassem"
+            "defaultValue": "microsoft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "remove_ip_address_parameter_servers"
+            "defaultValue": "main"
         },
         "deployBastion": {
             "type": "bool",
