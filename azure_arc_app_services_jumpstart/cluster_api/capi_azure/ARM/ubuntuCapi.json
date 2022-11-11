@@ -219,16 +219,9 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2022-05-01",
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]"
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2021-05-01",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "condition": "[parameters('deployBastion')]",
-            "location": "[parameters('azureLocation')]",
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
