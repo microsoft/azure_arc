@@ -29,6 +29,9 @@ param deployAKSHCI bool = true
 @description('Option to deploy Resource Bridge with HCIBox')
 param deployResourceBridge bool = true
 
+@description('Public DNS to use for the domain')
+param natDNS string = '1.1.1.1'
+
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
 
@@ -82,6 +85,7 @@ module hostDeployment 'host/host.bicep' = {
     registerCluster: registerCluster
     deployAKSHCI: deployAKSHCI
     deployResourceBridge: deployResourceBridge
+    natDNS: natDNS
     location: location
   }
 }
