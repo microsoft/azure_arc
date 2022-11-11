@@ -52,6 +52,12 @@ if ($env:deployAKSHCI -eq $false) {
         Import-Module Az.Resources
         Import-Module AzureAD
     }
+
+    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+        Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
+        Initialize-MocNode
+        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+    }
 }
 # Install Required Modules
 foreach ($VM in $SDNConfig.HostList) { 
