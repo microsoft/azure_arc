@@ -10,11 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) and [SQL Managed Instance](https://docs.microsoft.com/azure/azure-arc/data/managed-instance-overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
 
-By the end of this scenario, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
-
-![Deployed Architecture](./01.png)
-
-> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
+By the end of this scenario, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services.
 
 ## Prerequisites
 
@@ -32,22 +28,18 @@ By the end of this scenario, you will have a Microk8s Kubernetes cluster deploye
 
 - [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with a RBAC role is required:
 
-  - "Contributor" - Required for provisioning Azure resources
-  - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
-  - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
-  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
+  - "Owner" - Required for provisioning Azure resources, interact with Azure Arc-enabled data services billing, monitoring metrics, logs management and creating role assignment for the Monitoring Metrics Publisher role.
 
-    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
+    SP_CLIENT_ID=$(az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/$subscriptionId --query appId -o tsv)
+    SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv)
+
     ```
 
     For example:
@@ -55,10 +47,7 @@ By the end of this scenario, you will have a Microk8s Kubernetes cluster deploye
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
+    SP_CLIENT_ID=$(az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Owner" --scopes /subscriptions/$subscriptionId --query appId -o tsv)
     ```
 
     Output should look like this:
@@ -72,8 +61,6 @@ By the end of this scenario, you will have a Microk8s Kubernetes cluster deploye
     }
     ```
 
-    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
-
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Architecture (In a nutshell)
@@ -82,7 +69,7 @@ From the [Microk8s GitHub repo](https://github.com/ubuntu/microk8s):
 
 _"Microk8s is a single-package, fully conformant, lightweight Kubernetes that works on 42 flavors of Linux. Perfect for Developer workstations, IoT, Edge & CI/CD. MicroK8s tracks upstream and releases beta, RC and final bits the same day as upstream K8s."_
 
-in this scenario, we automate the installation of Microk8s on an Ubuntu 18.04 VM running on Azure using a few simple commands to install from the [Snap Store](https://snapcraft.io/microk8s), before proceeding to onboard it as an Azure Arc-enabled Kubernetes Cluster.
+in this scenario, we automate the installation of Microk8s on an Ubuntu 20.04 VM running on Azure using a few simple commands to install from the [Snap Store](https://snapcraft.io/microk8s), before proceeding to onboard it as an Azure Arc-enabled Kubernetes Cluster.
 
 Once our K8s Cluster is onboarded, we proceed to create a [Custom Location](https://docs.microsoft.com/azure/azure-arc/kubernetes/custom-locations), and deploy an Azure Arc Data Controller in [Directly Connected mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity#connectivity-modes).
 
@@ -90,7 +77,7 @@ Once our K8s Cluster is onboarded, we proceed to create a [Custom Location](http
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
+- User is editing the ARM template parameters file (1-time edit) and export the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) Object ID (OID) variable to use it as a parameter. These parameters values are being used throughout the deployment.
 
 - Main [_azuredeploy_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.json) ARM template will initiate **five** linked ARM templates:
 
@@ -121,6 +108,22 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
   - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
 
+- You will also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) Object ID (OID) and export it as an environment variable:
+
+  > **NOTE: You need permissions to list all the service principals.**
+
+  #### Option 1: Bash
+
+  ```bash
+  customLocationRPOID=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
+
+  #### Option 2: PowerShell
+
+  ```powershell
+  $customLocationRPOID=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
+
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/microk8s/azure/arm_template) and run the below command:
 
   ```shell
@@ -129,7 +132,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   --resource-group <Name of the Azure resource group> \
   --name <The name of this deployment> \
   --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.json \
-  --parameters <The *azuredeploy.parameters.json* parameters file location>
+  --parameters <The *azuredeploy.parameters.json* parameters file location> \
+  --parameters customLocationRPOID="$customLocationRPOID"
   ```
 
   > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the `azuredeploy.parameters.json` file**
@@ -142,35 +146,58 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   --resource-group Arc-Data-Microk8s \
   --name arcdatademo \
   --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.json \
+  --parameters customLocationRPOID="$customLocationRPOID" \
   --parameters azuredeploy.parameters.json
   --parameters templateBaseUrl="https://raw.githubusercontent.com/your--github--handle/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/"
   ```
 
   > **NOTE: The deployment time for this scenario can take ~15-20min**
 
-  ![Deployment time](./02.png)
+  ![Deployment time](./01.png)
 
 - Once Azure resources have been provisioned, you will be able to see it in the Azure portal. At this point, the resource group should have **13 various Azure resources deployed**.
 
-  ![ARM template deployment completed](./03.png)
+  ![ARM template deployment completed](./02.png)
 
-  ![New Azure resource group with all resources](./04.png)
+  ![New Azure resource group with all resources](./03.png)
 
 ## Windows Login & Post Deployment
 
 - Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
 
-  ![Client VM public IP](./05.png)
+  ![Client VM public IP](./04.png)
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script run it's course and **do not close** the PowerShell session, this will be done for you once completed.
 
-  ![PowerShell logon script run](./01.gif)
+  ![PowerShell logon script run](./05.png)
+
+  ![PowerShell logon script run](./06.png)
+
+  ![PowerShell logon script run](./07.png)
+
+  ![PowerShell logon script run](./08.png)
+
+  ![PowerShell logon script run](./09.png)
+
+  ![PowerShell logon script run](./10.png)
+
+  ![PowerShell logon script run](./11.png)
+
+  ![PowerShell logon script run](./12.png)
+
+  ![PowerShell logon script run](./13.png)
+
+  ![PowerShell logon script run](./14.png)
+
+  ![PowerShell logon script run](./15.png)
+
+  ![PowerShell logon script run](./16.png)
 
   Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and the SQL Managed Instance will be deployed on the cluster and be ready to use:
 
-  ![Wallpaper Change](./06.png)
+  ![PowerShell logon script run](./17.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
 
@@ -182,15 +209,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - **Azure Arc-enabled SQL Managed Instance** - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
-  ![Addtional Azure resources in the resource group](./07.png)
+  ![Addtional Azure resources in the resource group](./18.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the _Azure Data CLI_, the _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./08.png)
+  ![Screenshot showing Azure Data Studio shortcut](./19.png)
+
+  ![Azure Data Studio shortcut](./20.png)
 
 - Additionally, the SQL Managed Instance connection will be configured within Data Studio, as well as the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will be restored automatically for you.
 
-  ![Configured SQL Managed Instance connection](./09.png)
+  ![Configured SQL Managed Instance connection](./21.png)
 
 ## Cluster extensions
 
@@ -204,10 +233,10 @@ In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were
 
   In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./10.png)
+  ![Azure Arc-enabled Kubernetes resource](./22.png)
 
   And we see the installed extensions:
-  ![Azure Arc-enabled Kubernetes Cluster Extensions settings](./11.png)
+  ![Azure Arc-enabled Kubernetes Cluster Extensions settings](./23.png)
 
 ## Operations
 
@@ -217,15 +246,13 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance **primary** endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
 
-  ![Open SqlQueryStress](./12.png)
+  ![Open SqlQueryStress](./24.png)
 
-  ![SQLMI Endpoints text file](./13.png)
-
-> **NOTE: Secondary SQL Managed Instance endpoint will be available only when using the HA deployment model ("Business Critical").**
+  ![SQLMI Endpoints text file](./25.png)
 
 - To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
-  ![SqlQueryStress connected](./14.png)
+  ![SqlQueryStress connected](./26.png)
 
 - To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
 
@@ -235,9 +262,9 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
 
-  ![SqlQueryStress settings](./15.png)
+  ![SqlQueryStress settings](./27.png)
 
-  ![SqlQueryStress running](./16.png)
+  ![SqlQueryStress running](./28.png)
 
 ### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
 
@@ -245,36 +272,32 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
 - Now that you have the _SqlQueryStress_ stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
 
-  ![Grafana desktop shortcut](./17.png)
-
-- [Optional] The IP address for this instance represents the Kubernetes _LoadBalancer_ external IP that was provision as part of Azure Arc-enabled data services. Use the _```kubectl get svc -n arc```_ command to view the _metricsui_ external service IP address.
-
-  ![metricsui Kubernetes service](./18.png)
+  ![Grafana desktop shortcut](./29.png)
 
 - To log in, use the same username and password that is in the _SQLMI Endpoints_ text file desktop shortcut.
 
-  ![Grafana username and password](./19.png)
+  ![Grafana username and password](./30.png)
 
 - Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
 
-  ![Grafana dashboards](./20.png)
+  ![Grafana dashboards](./31.png)
 
-  ![Grafana "SQL Managed Instance Metrics" dashboard](./21.png)
+  ![Grafana "SQL Managed Instance Metrics" dashboard](./32.png)
 
 - Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
 
-  ![Last 5 minutes time range](./22.png)
+  ![Last 5 minutes time range](./33.png)
 
 - You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
 
-  ![Increased load activity](./23.png)
+  ![Increased load activity](./34.png)
 
-  ![Increased load activity](./24.png)
+  ![Increased load activity](./35.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./25.png)
+  ![Delete Azure resource group](./36.png)
 
 <!-- ## Known Issues -->
