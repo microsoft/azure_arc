@@ -1423,20 +1423,24 @@
                       "multiSelect": true,
                       "quote": "'",
                       "delimiter": ",",
-                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces' and resourceGroup == '{ResourceGroup}'\r\n| project id",
+                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
                       "crossComponentResources": [
-                        "{Subscription}"
+                        "value::selected"
+                      ],
+                      "value": [
+                        "value::all"
                       ],
                       "typeSettings": {
                         "resourceTypeFilter": {
                           "microsoft.operationalinsights/workspaces": true
                         },
-                        "additionalResourceOptions": [],
+                        "additionalResourceOptions": [
+                          "value::all"
+                        ],
                         "showDefault": false
                       },
                       "queryType": 1,
-                      "resourceType": "microsoft.resourcegraph/resources",
-                      "value": null
+                      "resourceType": "microsoft.resourcegraph/resources"
                     },
                     {
                       "id": "4f3a03fd-9968-4ee7-b6bc-d04d3bbe14a8",
