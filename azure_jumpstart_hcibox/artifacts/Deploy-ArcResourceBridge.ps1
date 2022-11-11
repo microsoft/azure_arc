@@ -13,11 +13,12 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+$csv_path = "C:\ClusterStorage\S2D_vDISK1"
 
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"
@@ -59,20 +60,14 @@ if ($env:deployAKSHCI -eq $false) {
         Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
     }
 }
-# Install Required Modules
+
+# Install Az CLI and extensions on each node
 foreach ($VM in $SDNConfig.HostList) { 
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
     }
 }
-$csv_path = "C:\ClusterStorage\S2D_vDISK1"
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        Install-PackageProvider -Name NuGet -Force 
-        # Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
-    }
-}
+
 foreach ($VM in $SDNConfig.HostList) {
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         $ErrorActionPreference = "SilentlyContinue"
