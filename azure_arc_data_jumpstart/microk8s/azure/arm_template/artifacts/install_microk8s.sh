@@ -50,7 +50,7 @@ sudo apt-get update
 sudo apt install snapd
 
 # Installing microk8s from specific snap channel
-sudo snap install microk8s --classic --channel=1.18/stable
+sudo snap install microk8s --classic --channel=1.24/stable
 
 # Use kubectl from microk8s
 sudo snap alias microk8s.kubectl kubectl
@@ -58,6 +58,7 @@ sudo snap alias microk8s.kubectl kubectl
 # Enable microk8s features
 sudo microk8s status --wait-ready
 sudo microk8s enable dns storage dashboard
+# sudo microk8s enable kube-ovn --force
 
 echo "###########################################################################"
 echo "Microk8s specific configurations..." 
