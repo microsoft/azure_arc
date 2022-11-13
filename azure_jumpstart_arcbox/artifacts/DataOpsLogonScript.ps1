@@ -257,9 +257,13 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 Get-Job -name arcbox | Remove-Job
 write-host "Successfully deployed Azure Arc Data Controllers"
 
+Stop-Transcript
+
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
+
+Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log -Append
 
 Write-Header "Deploying App"
 # Deploy App
