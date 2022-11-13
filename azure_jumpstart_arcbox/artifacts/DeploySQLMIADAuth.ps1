@@ -90,6 +90,8 @@ $filename = "SQLMIEndpoints.txt"
 $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
+Stop-Transcript
+
 foreach ($sqlInstance in $sqlInstances) {
 
     Start-Job -Name arcbox -ScriptBlock {
@@ -298,6 +300,8 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 }
 
 Get-Job -name arcbox | Remove-Job
+
+Start-Transcript -Path "$Env:ArcBoxLogsDir\DeploySQLMIADAuth.log" -Append
 
 Write-Header "Generating endpoints file"
 foreach ($sqlInstance in $sqlInstances){
