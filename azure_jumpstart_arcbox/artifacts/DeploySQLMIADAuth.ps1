@@ -82,6 +82,8 @@ catch {
     New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
 }
 
+Stop-Transcript
+
 # Deploying Active Directory connector and Azure Arc SQL MI
 Write-Header "Deploying Active Directory connector"
 
@@ -89,8 +91,6 @@ Write-Header "Deploying Active Directory connector"
 $filename = "SQLMIEndpoints.txt"
 $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
-
-Stop-Transcript
 
 foreach ($sqlInstance in $sqlInstances) {
 
