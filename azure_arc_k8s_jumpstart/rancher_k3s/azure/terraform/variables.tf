@@ -9,11 +9,13 @@ variable "azure_vm_name" {
 variable "admin_username" {
   type        = string
   description = "Username for the Virtual Machine."
+  default     = "arcdemo"
 }
 
 variable "ssh_rsa_public_key" {
   type        = string
   description = "SSH Key for the Virtual Machine. SSH key is recommended over password."
+  sensitive   = true
 }
 
 variable "client_id" {
