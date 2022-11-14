@@ -13,11 +13,12 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+$csv_path = "C:\ClusterStorage\S2D_vDISK1"
 
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"
@@ -27,20 +28,46 @@ $adcred = New-Object -TypeName System.Management.Automation.PSCredential -Argume
 # Install AZ Resource Bridge and prerequisites
 Write-Host "Now Preparing to Install Azure Arc Resource Bridge"
 
-# Install Required Modules
+if ($env:deployAKSHCI -eq $false) {
+    Write-Header "Install latest versions of Nuget and PowershellGet"
+    Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+        Enable-PSRemoting -Force
+        Install-PackageProvider -Name NuGet -Force 
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Install-Module -Name PowershellGet -Force
+    }
+
+    # Install necessary AZ modules and initialize akshci on each node
+    Write-Header "Install necessary AZ modules"
+
+    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+        Write-Host "Installing Required Modules"
+        
+        $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
+        foreach ($ModuleName in $ModuleNames){
+            if (!(Get-InstalledModule -Name $ModuleName -ErrorAction Ignore)){
+                Install-Module -Name $ModuleName -Force -AcceptLicense 
+            }
+        }
+        Import-Module Az.Accounts
+        Import-Module Az.Resources
+        Import-Module AzureAD
+    }
+
+    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+        Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
+        Initialize-MocNode
+        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+    }
+}
+
+# Install Az CLI and extensions on each node
 foreach ($VM in $SDNConfig.HostList) { 
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
     }
 }
-$csv_path = "C:\ClusterStorage\S2D_vDISK1"
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        Install-PackageProvider -Name NuGet -Force 
-        # Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
-    }
-}
+
 foreach ($VM in $SDNConfig.HostList) {
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         $ErrorActionPreference = "SilentlyContinue"
@@ -66,6 +93,16 @@ $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $location = "eastus"
 $custom_location_name = "hcibox-rb-cl"
+$cloudServiceIP = $SDNConfig.AKSCloudSvcidr.Substring(0, $SDNConfig.AKSCloudSvcidr.IndexOf('/'))
+
+if ($env:deployAKSHCI -eq "false") {
+    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+        $vnet = New-MocNetworkSetting -Name $using:SDNConfig.AKSvnetname -vswitchName $using:SDNConfig.AKSvSwitchName -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP
+        Set-MocConfig -workingDir $using:csv_path\ResourceBridge -vnet $vnet -imageDir $using:csv_path\imageStore -skipHostLimitChecks -cloudConfigLocation $using:csv_path\cloudStore -catalog aks-hci-stable-catalogs-ext -ring stable -CloudServiceIP $using:cloudServiceIP -createAutoConfigContainers $false
+        Install-Moc
+    }
+}
+
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
 }
