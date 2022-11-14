@@ -101,11 +101,11 @@ The only thing you need to do before executing the Terraform plan is to create t
 
 - Run the ```terraform apply --auto-approve``` command and wait for the plan to finish.
 
-    ![Screenshot showing terraform apply completed](./03.png)
+    ![Screenshot showing terraform apply completed](./04.png)
 
 Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
 
-![Screenshot showing Azure resource group](./04.png)
+![Screenshot showing Azure resource group](./05.png)
 
 ## Logging
 
@@ -115,7 +115,7 @@ For ease of troubleshooting and tracking, a deployment log will be created autom
 cat /home/<USER>/jumpstart_logs/installK3s.log
 ```
 
-![Screenshot showing the installK3s log file](./04.png)
+![Screenshot showing the installK3s log file](./06.png)
 
 > **NOTE: For enhanced security posture, SSH (22) port are not open by default in this scenario. You will need to create a network security group (NSG) rule to allow network access to port 22, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
@@ -123,4 +123,4 @@ cat /home/<USER>/jumpstart_logs/installK3s.log
 
 To delete environment, simply just delete the Azure resource group.
 
-![Screenshot showing Delete Azure resource group](./05.png)
+![Screenshot showing Delete Azure resource group](./07.png)
