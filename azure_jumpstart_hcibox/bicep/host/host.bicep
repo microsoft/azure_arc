@@ -42,6 +42,9 @@ param workspaceName string
 @description('The base URL used for accessing artifacts and automation artifacts.')
 param templateBaseUrl string
 
+@description('Option to disable automatic cluster registration. Setting this to false will also disable deploying AKS and Resource bridge')
+param registerCluster bool = true
+
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
@@ -50,6 +53,9 @@ param deployAKSHCI bool = true
 
 @description('Option to deploy Resource Bridge with HCIBox')
 param deployResourceBridge bool = true
+
+@description('Public DNS to use for the domain')
+param natDNS string = '1.1.1.1'
 
 var bastionName = 'HCIBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -241,7 +247,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge}' 
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS}' 
     }
   }
 }
