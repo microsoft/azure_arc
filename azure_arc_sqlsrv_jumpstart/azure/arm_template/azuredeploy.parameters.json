@@ -14,9 +14,6 @@
     "adminPassword": {
       "value": "<Windows VM admin password>"
     },
-    "myIpAddress": {
-      "value": "<your IP address>"
-    },
     "logAnalyticsWorkspaceName": {
       "value": "<your unique Log Analytics workspace name>"
     },
