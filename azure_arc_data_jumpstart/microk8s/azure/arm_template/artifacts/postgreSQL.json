@@ -136,7 +136,7 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "port": "15432"
+                "port": "31111"
               }
             },
             "storage": {
