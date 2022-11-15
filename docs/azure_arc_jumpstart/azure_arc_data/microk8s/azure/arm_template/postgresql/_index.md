@@ -223,7 +223,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing Azure Data Studio PostgresSQL connection](./21.png)
 
-  > **NOTE: Due to the use of Kubernetes NodePort in this scenario, the default PostgreSQL connection endpoint port number (5432) was changed to 31111.**
+  > **NOTE: Due to the use of Kubernetes _NodePort_ service in this scenario, the default PostgreSQL connection endpoint port number (5432) was changed to 31111.**
 
 ## Cluster extensions
 
