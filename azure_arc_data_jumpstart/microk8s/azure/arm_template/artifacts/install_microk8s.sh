@@ -43,6 +43,9 @@ echo "##########################################################################
 echo "Installing snap and Microk8s..." 
 echo "###########################################################################"
 
+# Set Microk8s deployment environment variables
+export MICROK8S_VERSION="1.2.4" # Do not change!
+
 # Sync packages
 sudo apt-get update
 
@@ -50,7 +53,7 @@ sudo apt-get update
 sudo apt install snapd
 
 # Installing microk8s from specific snap channel
-sudo snap install microk8s --classic --channel=1.24/stable
+sudo snap install microk8s --classic --channel=${MICROK8S_VERSION}/stable
 
 # Use kubectl from microk8s
 sudo snap alias microk8s.kubectl kubectl
