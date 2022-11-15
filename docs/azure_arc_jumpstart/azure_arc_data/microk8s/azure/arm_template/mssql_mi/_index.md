@@ -250,6 +250,8 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
   ![Screenshot showing SQLMI Endpoints text file](./25.png)
 
+  > **NOTE: The default port was changed from 1443 to 31111.**
+
 - To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
   ![Screenshot showing SqlQueryStress connected](./26.png)
