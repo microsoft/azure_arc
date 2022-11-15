@@ -95,18 +95,18 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/azuredeploy.parameters.example.json) (ensure to set `deploySQLMI` to _**true**_):
 
-  - `sshRSAPublicKey` - Your SSH public key - sample syntax: `ssh-rsa AAAAB3N...NDOCE7U3DLBISw==\n`.
-  - `spnClientId` - Your Azure service principal id.
-  - `spnClientSecret` - Your Azure service principal secret.
-  - `spnTenantId` - Your Azure tenant id.
-  - `windowsAdminUsername` - Client Windows VM Administrator name.
-  - `windowsAdminPassword` - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - `myIpAddress` - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the Client Windows VM and Microk8s VM.
-  - `logAnalyticsWorkspaceName` - Unique name for log analytics workspace deployment.
-  - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
-  - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
-  - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [_microsoft/azure_arc_](https://github.com/microsoft/azure_arc) GitHub repository, but you can point this to your forked repo as well.
-  - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
+  - _`sshRSAPublicKey`_ - Your SSH public key - sample syntax: `ssh-rsa AAAAB3N...NDOCE7U3DLBISw==\n`.
+  - _`spnClientId`_ - Your Azure service principal id.
+  - _`spnClientSecret`_ - Your Azure service principal secret.
+  - _`spnTenantId`_ - Your Azure tenant id.
+  - _`windowsAdminUsername`_ - Client Windows VM Administrator name.
+  - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`myIpAddress`_ - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the Client Windows VM and Microk8s VM.
+  - _`logAnalyticsWorkspaceName`_ - Unique name for log analytics workspace deployment.
+  - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
+  - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
+  - _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [_microsoft/azure_arc_](https://github.com/microsoft/azure_arc) GitHub repository, but you can point this to your forked repo as well.
+  - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion.
 
 - You will also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) Object ID (OID) and export it as an environment variable:
 
