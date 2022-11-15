@@ -132,7 +132,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   --resource-group <Name of the Azure resource group> \
   --name <The name of this deployment> \
   --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.json \
-  --parameters <The *azuredeploy.parameters.json* parameters file location> \
+  --parameters <The _azuredeploy.parameters.json_ parameters file location> \
   --parameters customLocationRPOID="$customLocationRPOID"
   ```
 
