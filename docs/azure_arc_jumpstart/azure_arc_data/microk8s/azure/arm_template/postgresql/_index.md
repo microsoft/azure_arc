@@ -221,7 +221,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL connection](./21.png)
+  ![Screenshot showing Azure Data Studio PostgreSQL connection](./21.png)
 
   > **NOTE: Due to the use of Kubernetes _NodePort_ service in this scenario, the default PostgreSQL connection endpoint port number (5432) was changed to 31111.**
 
