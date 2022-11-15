@@ -107,7 +107,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `logAnalyticsWorkspaceName` - Unique name for log analytics workspace deployment.
   - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to _**false**_.
   - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL, for this data controller only scenario we leave it set to _**false**_.
-  - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [_microsoft/azure_arc_](https://github.com/microsoft/azure_arc) GitHub repository, but you can point this to your forked repo as well.
   - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
 
 - You will also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) Object ID (OID) and export it as an environment variable:
