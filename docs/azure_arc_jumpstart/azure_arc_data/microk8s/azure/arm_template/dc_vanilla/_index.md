@@ -155,47 +155,47 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   > **NOTE: The deployment time for this scenario can take ~15-20min**
 
-  ![Deployment time](./01.png)
+  ![Screenshot showing deployment time](./01.png)
 
 - Once Azure resources have been provisioned, you will be able to see it in the Azure portal. At this point, the resource group should have **13 various Azure resources deployed**.
 
-  ![ARM template deployment completed](./02.png)
+  ![Screenshot showing ARM template deployment completed](./02.png)
 
-  ![New Azure resource group with all resources](./03.png)
+  ![Screenshot showing new Azure resource group with all resources](./03.png)
 
 ## Windows Login & Post Deployment
 
 - Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
 
-  ![Client VM public IP](./04.png)
+  ![Screenshot showing Client VM public IP](./04.png)
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script run it's course and **do not close** the PowerShell session, this will be done for you once completed.
 
-  ![PowerShell logon script run](./05.png)
+  ![Screenshot showing PowerShell logon script run](./05.png)
 
-  ![PowerShell logon script run](./06.png)
+  ![Screenshot showing PowerShell logon script run](./06.png)
 
-  ![PowerShell logon script run](./07.png)
+  ![Screenshot showing PowerShell logon script run](./07.png)
 
-  ![PowerShell logon script run](./08.png)
+  ![Screenshot showing PowerShell logon script run](./08.png)
 
-  ![PowerShell logon script run](./09.png)
+  ![Screenshot showing PowerShell logon script run](./09.png)
 
-  ![PowerShell logon script run](./10.png)
+  ![Screenshot showing PowerShell logon script run](./10.png)
 
-  ![PowerShell logon script run](./11.png)
+  ![Screenshot showing PowerShell logon script run](./11.png)
 
-  ![PowerShell logon script run](./12.png)
+  ![Screenshot showing PowerShell logon script run](./12.png)
 
-  ![PowerShell logon script run](./13.png)
+  ![Screenshot showing PowerShell logon script run](./13.png)
 
-  ![PowerShell logon script run](./14.png)
+  ![Screenshot showing PowerShell logon script run](./14.png)
 
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and the Azure Arc Data Controller will have been deployed on the cluster and be ready for use:
 
-  ![Wallpaper Change](./15.png)
+  ![Screenshot showing Wallpaper Change](./15.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **16 various Azure resources deployed**. The important ones to notice are:
 
@@ -205,13 +205,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - **Azure Arc Data Controller** - The data controller that is now deployed on the Kubernetes cluster.
 
-  ![Addtional Azure resources in the resource group](./16.png)
+  ![Screenshot showing addtional Azure resources in the resource group](./16.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the _Azure Data CLI_, the _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./17.png)
+  ![Screenshot showing Azure Data Studio shortcut](./17.png)
 
-  ![Azure Data Studio shortcut](./18.png)
+  ![Screenshot showing Azure Data Studio shortcut](./18.png)
 
 ## Cluster extensions
 
@@ -225,15 +225,15 @@ In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were
 
   In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./19.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./19.png)
 
   And we see the installed extensions:
-  ![Azure Arc-enabled Kubernetes Cluster Extensions settings](./20.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes Cluster Extensions settings](./20.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./21.png)
+  ![Screenshot showing how to delete Azure resource group](./21.png)
 
 <!-- ## Known Issues -->
