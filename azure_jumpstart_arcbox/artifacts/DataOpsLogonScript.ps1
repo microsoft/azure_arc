@@ -169,6 +169,7 @@ foreach ($cluster in $clusters) {
         #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
+Stop-Transcript
 
 ################################################
 # - Deploying data services on CAPI cluster
@@ -256,8 +257,6 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 
 Get-Job -name arcbox | Remove-Job
 write-host "Successfully deployed Azure Arc Data Controllers"
-
-Stop-Transcript
 
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
