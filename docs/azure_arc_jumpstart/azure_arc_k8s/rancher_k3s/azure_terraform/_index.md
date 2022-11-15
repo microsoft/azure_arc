@@ -75,6 +75,10 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
   az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
+- [Generate SSH Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) (or use existing ssh key)
+
+> **NOTE: Default file location for public key: Windows - (C:\Users\WINUSER/.ssh\id_rsa.pub), Linux - (~/.ssh/id_rsa.pub)**
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
