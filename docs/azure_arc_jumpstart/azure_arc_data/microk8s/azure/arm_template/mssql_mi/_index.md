@@ -221,6 +221,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing configured SQL Managed Instance connection](./21.png)
 
+  > **NOTE: Due to the use of Kubernetes NodePort in this scenario, the default SQL connection endpoint port number (1443) was changed to 31111.**
+
 ## Cluster extensions
 
 In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were deployed:
@@ -249,8 +251,6 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
   ![Screenshot showing how to open SqlQueryStress](./24.png)
 
   ![Screenshot showing SQLMI Endpoints text file](./25.png)
-
-  > **NOTE: The default port was changed from 1443 to 31111.**
 
 - To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
