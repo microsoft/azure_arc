@@ -169,9 +169,6 @@
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
-          },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
           },
@@ -244,9 +241,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
           },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
