@@ -307,21 +307,28 @@ Write-Header "Generating endpoints file"
 foreach ($sqlInstance in $sqlInstances){
 
 # Retrieving SQL MI connection endpoint
+Write-Host "Retrieving SQL MI connection endpoint"
 $sqlMIName = $sqlInstance.instanceName
 $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.primary}'
 $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.secondary}'
 write-host "`n"
 
 # Get public ip of the SQLMI endpoint
+Write-Host "Getting public Ip address of the primary SQLMI endpoint"
+write-host "`n"
 $sqlmiIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 
 # Get public ip of the secondary SQLMI endpoint
+Write-Host "Getting public Ip address of the secondary SQLMI endpoint"
+write-host "`n"
 $sqlmiSecondaryIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig  "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
 
 # Write endpoint information in the file
 
+Write-Host "Write endpoint information in the endpoints file"
+write-host "`n"
 $SQLInstanceName = $sqlInstance.context.toupper()
 
 Start-Sleep -Seconds 5
