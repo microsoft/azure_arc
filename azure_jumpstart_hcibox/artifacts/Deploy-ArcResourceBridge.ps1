@@ -36,29 +36,12 @@ if ($env:deployAKSHCI -eq $false) {
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
         Install-Module -Name PowershellGet -Force
     }
+}
 
-    # Install necessary AZ modules and initialize akshci on each node
-    Write-Header "Install necessary AZ modules"
-
-    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
-        Write-Host "Installing Required Modules"
-        
-        $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
-        foreach ($ModuleName in $ModuleNames){
-            if (!(Get-InstalledModule -Name $ModuleName -ErrorAction Ignore)){
-                Install-Module -Name $ModuleName -Force -AcceptLicense 
-            }
-        }
-        Import-Module Az.Accounts
-        Import-Module Az.Resources
-        Import-Module AzureAD
-    }
-
-    Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
-        Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
-        Initialize-MocNode
-        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
-    }
+Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+    Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
+    Initialize-MocNode
+    Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
 }
 
 # Install Az CLI and extensions on each node
