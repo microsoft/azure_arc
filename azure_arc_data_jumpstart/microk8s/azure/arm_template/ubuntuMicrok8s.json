@@ -2,9 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmName": {
+    "myIpAddress": {
       "type": "string",
-      "defaultValue": "Arc-Data-Microk8s-K8s",
+      "metadata": {
+        "description": "Your public IP address, used to RDP to the client VM"
+      }
+    },
+    "vmMicrok8sName": {
+      "type": "string",
       "metadata": {
         "description": "The name of you Virtual Machine."
       }
@@ -24,10 +29,12 @@
     },
     "ubuntuOSVersion": {
       "type": "string",
-      "defaultValue": "18.04-LTS",
-      "allowedValues": [ "18.04-LTS" ],
+      "defaultValue": "20_04-lts-gen2",
+      "allowedValues": [
+        "20_04-lts-gen2"
+      ],
       "metadata": {
-        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
       }
     },
     "azureLocation": {
@@ -121,9 +128,9 @@
     }
   },
   "variables": {
-    "vmName": "[concat(parameters('vmName'))]",
-    "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
-    "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+    "vmMicrok8sName": "[concat(parameters('vmMicrok8sName'))]",
+    "publicIpAddressName": "[concat(parameters('vmMicrok8sName'), '-PIP' )]",
+    "networkInterfaceName": "[concat(parameters('vmMicrok8sName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
     "osDiskType": "Premium_LRS",
     "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
@@ -200,7 +207,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2019-03-01",
-      "name": "[variables('vmName')]",
+      "name": "[variables('vmMicrok8sName')]",
       "location": "[parameters('azureLocation')]",
       "tags": "[parameters('resourceTags')]",
       "dependsOn": [
@@ -212,7 +219,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "name": "[concat(variables('vmName'),'-OSDisk')]",
+            "name": "[concat(variables('vmMicrok8sName'),'-OSDisk')]",
             "caching": "ReadWrite",
             "createOption": "fromImage",
             "managedDisk": {
@@ -221,7 +228,7 @@
           },
           "imageReference": {
             "publisher": "Canonical",
-            "offer": "UbuntuServer",
+            "offer": "0001-com-ubuntu-server-focal",
             "sku": "[parameters('ubuntuOSVersion')]",
             "version": "latest"
           }
@@ -234,7 +241,7 @@
           ]
         },
         "osProfile": {
-          "computerName": "[variables('vmName')]",
+          "computerName": "[variables('vmMicrok8sName')]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
@@ -252,11 +259,11 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'/installscript_Microk8s')]",
+      "name": "[concat(variables('vmMicrok8sName'),'/installscript_Microk8s')]",
       "apiVersion": "2019-07-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmMicrok8sName'))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
@@ -265,7 +272,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {},
         "protectedSettings": {
-          "commandToExecute": "[concat('bash install_microk8s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
+          "commandToExecute": "[concat('bash install_microk8s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmMicrok8sName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/install_microk8s.sh')]"
           ]
