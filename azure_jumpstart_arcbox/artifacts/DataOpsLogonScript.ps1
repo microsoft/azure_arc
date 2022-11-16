@@ -249,7 +249,7 @@ foreach ($cluster in $clusters) {
     }
 
     while ($(Get-Job -Name $cluster).State -eq 'Running') {
-        Receive-Job -Name arcbox -WarningAction SilentlyContinue
+        Receive-Job -Name $cluster -WarningAction SilentlyContinue
         Start-Sleep -Seconds 5
     }
 
