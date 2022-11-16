@@ -184,7 +184,7 @@ foreach ($cluster in $clusters) {
     Start-Job -Name $cluster -ScriptBlock {
         $cluster = $using:cluster
         $context = $cluster.context
-        #Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
+        Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
         az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
@@ -245,30 +245,20 @@ foreach ($cluster in $clusters) {
         Write-Host "`n"
         Remove-Item "$Env:ArcBoxDir\dataController-$context-stage.parameters.json" -Force
 
-        #Stop-Transcript
+        Stop-Transcript
     }
 
+}
+foreach ($cluster in $clusters) {
     while ($(Get-Job -Name $cluster).State -eq 'Running') {
         $context = $cluster.context
         Receive-Job -Name $cluster -WarningAction SilentlyContinue | out-file -Append -FilePath "$Env:ArcBoxLogsDir\DataController-$context.log"
         Start-Sleep -Seconds 5
     }
-
     Get-Job -name $cluster | Remove-Job
 write-host "Successfully deployed Azure Arc Data Controllers"
-
 }
 
-<#while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 5
-}
-
-Get-Job -name arcbox | Remove-Job
-write-host "Successfully deployed Azure Arc Data Controllers"
-
-
-#>
 Stop-Transcript
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
