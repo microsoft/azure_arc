@@ -2,6 +2,30 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "arcDataClusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Arc Data Cluster Name"
+      }
+    },
+    "vmMicrok8sName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of Microk8s Virtual Machine."
+      }
+    },
+    "customLocationRPOID": {
+      "type": "string",
+      "metadata": {
+        "description": "Custom Location Resource Provider Object ID"
+      }
+    },
+    "myIpAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Your public IP address, used to RDP to the client VM"
+      }
+    },
     "vmName": {
       "type": "string",
       "defaultValue": "Arc-Data-Client",
@@ -316,7 +340,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -arcDataClusterName ', parameters('arcDataClusterName'), ' -customLocationRPOID ', parameters('customLocationRPOID'), ' -vmMicrok8sName ', parameters('vmMicrok8sName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     },
@@ -346,7 +370,6 @@
       }
     }
   ],
-
   "outputs": {
     "adminUsername": {
       "type": "string",

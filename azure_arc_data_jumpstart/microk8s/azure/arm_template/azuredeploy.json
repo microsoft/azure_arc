@@ -16,6 +16,19 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
       }
     },
+    "myIpAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
+      }
+    },
+    "vmMicrok8sName": {
+      "type": "string",
+      "defaultValue": "arc-data-microk8s-k8s",
+      "metadata": {
+        "description": "The name of the Microk8s Virtual Machine."
+      }
+    },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
@@ -79,15 +92,28 @@
       "metadata": {
         "description": "the Azure Bastion host name"
       }
+    },
+    "guid": {
+      "type": "string",
+      "metadata": {
+        "description": "Random GUID for cluster names"
+      },
+      "defaultValue": "[substring(newGuid(),0,4)]"
+    },
+    "customLocationRPOID": {
+      "type": "string",
+      "metadata": {
+        "description": "Custom Location Resource Provider Object ID"
+      }
     }
   },
   "variables": {
+    "arcDataClusterName": "[concat('Arc-Data-Microk8s','-',parameters('guid'))]",
     "microk8sTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuMicrok8s.json')]",
     "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
-    // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-Microk8s-VNet",
     "subnetName": "Arc-Data-Microk8s-Subnet",
     "addressPrefix": "172.16.0.0/16",
@@ -132,7 +158,10 @@
       "comments": "Deploys a single node Ubuntu VM with Microk8s installed",
       "apiVersion": "2019-10-01",
       "name": "ubuntuMicrok8sDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "VNETDeployment"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -140,6 +169,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "vmMicrok8sName": {
+            "value": "[parameters('vmMicrok8sName')]"
+            },
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
@@ -181,7 +213,10 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "VNETDeployment"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -189,6 +224,15 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "arcDataClusterName": {
+            "value": "[variables('arcDataClusterName')]"
+          },
+          "vmMicrok8sName": {
+            "value": "[parameters('vmMicrok8sName')]"
+            },
+          "customLocationRPOID": {
+            "value": "[parameters('customLocationRPOID')]"
+          },
           "windowsAdminUsername": {
             "value": "[parameters('windowsAdminUsername')]"
           },
