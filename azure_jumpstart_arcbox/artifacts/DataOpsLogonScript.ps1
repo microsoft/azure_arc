@@ -250,7 +250,7 @@ foreach ($cluster in $clusters) {
 
     while ($(Get-Job -Name $cluster).State -eq 'Running') {
         $context = $cluster.context
-        Receive-Job -Name $cluster -WarningAction SilentlyContinue | out-file -Append -FilePath -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
+        Receive-Job -Name $cluster -WarningAction SilentlyContinue | out-file -Append -FilePath "$Env:ArcBoxLogsDir\DataController-$context.log"
         Start-Sleep -Seconds 5
     }
 
