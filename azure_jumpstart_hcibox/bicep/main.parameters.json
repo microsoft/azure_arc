@@ -30,7 +30,7 @@
             "value": true
         },
         "deployAKSHCI": {
-            "value": false
+            "value": true
         }
     }
 }
