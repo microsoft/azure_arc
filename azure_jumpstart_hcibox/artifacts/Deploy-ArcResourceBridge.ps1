@@ -153,4 +153,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
 }
 $ErrorActionPreference = "Continue"
+
+# Set env variable deployResourceBridge to true (in case the script was run manually)
+[System.Environment]::SetEnvironmentVariable('deployResourceBridge', 'true',[System.EnvironmentVariableTarget]::Machine)
 Stop-Transcript
