@@ -47,13 +47,7 @@ Write-Header "Install necessary AZ modules plus AksHCI module and initialize aks
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
-    
-    $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
-    foreach ($ModuleName in $ModuleNames){
-        if (!(Get-InstalledModule -Name $ModuleName -ErrorAction Ignore)){
-            Install-Module -Name $ModuleName -Force -AcceptLicense 
-        }
-    }
+    Install-Module -Name AksHci -Force -AcceptLicense
     Import-Module Az.Accounts
     Import-Module Az.Resources
     Import-Module AzureAD
