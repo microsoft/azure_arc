@@ -258,8 +258,6 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 Get-Job -name arcbox | Remove-Job
 write-host "Successfully deployed Azure Arc Data Controllers"
 
-Stop-Transcript
-
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
@@ -350,3 +348,5 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
+
+Stop-Transcript
