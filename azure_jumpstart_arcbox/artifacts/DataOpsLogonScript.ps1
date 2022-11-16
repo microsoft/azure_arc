@@ -169,8 +169,8 @@ foreach ($cluster in $clusters) {
         #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
-Stop-Transcript
 
+Stop-Transcript
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
@@ -181,7 +181,7 @@ $kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.Wind
 
 Write-Header "Deploying Azure Arc Data Controller"
 foreach ($cluster in $clusters) {
-    Start-Job -Name $cluster -ScriptBlock {
+    Start-Job -Name arcbox -ScriptBlock {
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
@@ -249,17 +249,17 @@ foreach ($cluster in $clusters) {
     }
 
 }
-foreach ($cluster in $clusters) {
-    while ($(Get-Job -Name $cluster).State -eq 'Running') {
-        $context = $cluster.context
-        Receive-Job -Name $cluster -WarningAction SilentlyContinue | out-file -Append -FilePath "$Env:ArcBoxLogsDir\DataController-$context.log"
-        Start-Sleep -Seconds 5
-    }
-    Get-Job -name $cluster | Remove-Job
-write-host "Successfully deployed Azure Arc Data Controllers"
+
+while ($(Get-Job -Name arcbox).State -eq 'Running') {
+    Receive-Job -Name arcbox -WarningAction SilentlyContinue
+    Start-Sleep -Seconds 5
 }
 
+Get-Job -name arcbox | Remove-Job
+write-host "Successfully deployed Azure Arc Data Controllers"
+
 Stop-Transcript
+
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
