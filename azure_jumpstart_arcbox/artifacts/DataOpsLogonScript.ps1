@@ -181,7 +181,7 @@ $kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.Wind
 
 Write-Header "Deploying Azure Arc Data Controller"
 foreach ($cluster in $clusters) {
-    Start-Job -Name arcbox -ScriptBlock {
+    Start-Job -Name $cluster -ScriptBlock {
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
@@ -248,9 +248,17 @@ foreach ($cluster in $clusters) {
         Stop-Transcript
     }
 
+    while ($(Get-Job -Name $cluster).State -eq 'Running') {
+        Receive-Job -Name arcbox -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 5
+    }
+
+    Get-Job -name arcbox | Remove-Job
+write-host "Successfully deployed Azure Arc Data Controllers"
+
 }
 
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
+<#while ($(Get-Job -Name arcbox).State -eq 'Running') {
     Receive-Job -Name arcbox -WarningAction SilentlyContinue
     Start-Sleep -Seconds 5
 }
@@ -258,8 +266,9 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 Get-Job -name arcbox | Remove-Job
 write-host "Successfully deployed Azure Arc Data Controllers"
 
-Stop-Transcript
 
+#>
+Stop-Transcript
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
