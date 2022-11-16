@@ -103,7 +103,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to _**false**_.
@@ -145,29 +144,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot showing the Client VM public IP](./03.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with RDP
 
-    ![Screenshot showing connecting using Azure Bastion](./04.png)
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client NSG with blocked RDP](./03.png)
+
+  ![Screenshot showing adding a new inbound security rule](./04.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./05.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./06.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./07.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./08.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./09.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./10.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Arc Data Controller will be deployed on the cluster and be ready to use.
-
-    ![Screenshot showing the PowerShell logon script run](./05.png)
-
-    ![Screenshot showing the PowerShell logon script run](./06.png)
-
-    ![Screenshot showing the PowerShell logon script run](./07.png)
-
-    ![Screenshot showing the PowerShell logon script run](./08.png)
-
-    ![Screenshot showing the PowerShell logon script run](./09.png)
-
-    ![Screenshot showing the PowerShell logon script run](./10.png)
 
     ![Screenshot showing the PowerShell logon script run](./11.png)
 
@@ -193,7 +215,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot showing the PowerShell logon script run](./22.png)
 
-    ![Screenshot showing the post-run desktop](./23.png)
+    ![Screenshot showing the PowerShell logon script run](./23.png)
+
+    ![Screenshot showing the PowerShell logon script run](./24.png)
+
+    ![Screenshot showing the PowerShell logon script run](./25.png)
+
+    ![Screenshot showing the PowerShell logon script run](./26.png)
+
+    ![Screenshot showing the PowerShell logon script run](./27.png)
+
+    ![Screenshot showing the PowerShell logon script run](./28.png)
+
+    ![Screenshot showing the post-run desktop](./29.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **11 various Azure resources deployed**. The important ones to notice are:
 
@@ -203,13 +237,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - _Azure Arc Data Controller_ - The data controller that is now deployed on the Kubernetes cluster.
 
-    ![Screenshot showing additional Azure resources in the resource group](./24.png)
+    ![Screenshot showing additional Azure resources in the resource group](./30.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./25.png)
+  ![Screenshot showing Azure Data Studio shortcut](./31.png)
 
-  ![Screenshot showing Azure Data Studio extensions](./26.png)
+  ![Screenshot showing Azure Data Studio extensions](./32.png)
 
 ## Cluster extensions
 
@@ -221,12 +255,12 @@ In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were insta
 
 In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./27.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./33.png)
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./28.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./34.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./29.png)
+    ![Screenshot showing Azure resource group deletion](./35.png)

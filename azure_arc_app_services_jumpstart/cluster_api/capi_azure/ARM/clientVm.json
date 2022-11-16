@@ -219,7 +219,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]"
     },
@@ -234,7 +234,7 @@
         "protocol": "TCP",
         "access": "Allow",
         "direction": "Inbound",
-        "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
+        "sourceAddressPrefix": "[parameters('bastionSubnetPrefix')]",
         "sourcePortRange": "*",
         "destinationAddressPrefix": "*",
         "destinationPortRange": "3389"
