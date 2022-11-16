@@ -92,4 +92,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     kubectl get pods -A
 }
 
+# Set env variable deployAKSHCI to true (in case the script was run manually)
+[System.Environment]::SetEnvironmentVariable('deployAKSHCI', 'true',[System.EnvironmentVariableTarget]::Machine)
+
 Stop-Transcript
