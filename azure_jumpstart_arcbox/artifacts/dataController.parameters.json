@@ -56,13 +56,13 @@
         "value": "Always"
       },
       "dockerImageTag": {
-        "value": "v1.13.0_2022-11-08"
+        "value": "v1.12.0_2022-10-11"
       },
       "dockerRegistry": {
         "value": "mcr.microsoft.com"
       },
       "dockerRepository": {
-        "value": "arcdata/preview"
+        "value": "arcdata"
       },
       "dataStorageClass": {
         "value": "managed-premium"
