@@ -268,6 +268,15 @@ Write-Header "Deploying App"
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
 
+# Enable metrics autoUpload
+foreach($cluster in $clusters){
+
+$Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
+az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+
+}
+
 # Disable Edge 'First Run' Setup
 $edgePolicyRegistryPath = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
 $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
