@@ -314,13 +314,13 @@ $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kub
 write-host "`n"
 
 # Get public ip of the SQLMI endpoint
-Write-Host "Getting public Ip address of the primary SQLMI endpoint"
+Write-Host "Getting public Ip address of the primary SQLMI endpoint of $sqlMIName"
 write-host "`n"
 $sqlmiIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 
 # Get public ip of the secondary SQLMI endpoint
-Write-Host "Getting public Ip address of the secondary SQLMI endpoint"
+Write-Host "Getting public Ip address of the secondary SQLMI endpoint of $sqlMIName"
 write-host "`n"
 $sqlmiSecondaryIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig  "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
