@@ -160,6 +160,8 @@ Write-Header "Deploying SQLMI & PostgreSQL"
 Write-Header "Enabling metrics and logs auto-upload"
 
 $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $connectedClusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
+$Env:WORKSPACE_ID = $workspaceId
+$Env:WORKSPACE_SHARED_KEY = $workspaceKey
 az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
 az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-metrics true
 az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-logs true
