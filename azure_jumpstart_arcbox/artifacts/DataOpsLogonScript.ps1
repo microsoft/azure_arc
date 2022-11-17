@@ -211,7 +211,7 @@ foreach ($cluster in $clusters) {
 
         Start-Sleep -Seconds 20
 
-        # Deploying Azure Arc Data Controller on the capi cluster
+        # Deploying the Azure Arc Data Controller
 
         $context = $cluster.context
         $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
@@ -264,18 +264,20 @@ Write-Header "Deploying SQLMI"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log -Append
 
+# Enable metrics autoUpload
+Write-Header "Enabling auto metrics upload"
+
+foreach($cluster in $clusters){
+    SET WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
+    az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
+    }
+
 Write-Header "Deploying App"
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
-
-# Enable metrics autoUpload
-foreach($cluster in $clusters){
-
-$Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
-az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
-
-}
 
 # Disable Edge 'First Run' Setup
 $edgePolicyRegistryPath = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
