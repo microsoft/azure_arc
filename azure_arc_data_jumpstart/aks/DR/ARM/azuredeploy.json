@@ -16,12 +16,6 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
-    "myIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address"
-      }
-    },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
@@ -275,9 +269,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
