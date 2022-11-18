@@ -23,9 +23,6 @@
       "windowsAdminPassword": {
         "value": "ArcPassword123!!"
       },
-      "myIpAddress": {
-        "value": "192.168.10.10"
-      },
       "logAnalyticsWorkspaceName": {
         "value": "la-arc-test-1"
       },
