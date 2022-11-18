@@ -266,8 +266,9 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log -Append
 
 # Enable metrics autoUpload
 Write-Header "Enabling metrics and logs auto-upload"
-$Env:WORKSPACE_ID = $workspaceId
-$Env:WORKSPACE_SHARED_KEY = $workspaceKey
+$Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+
 
 foreach($cluster in $clusters){
     $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
