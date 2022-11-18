@@ -93,7 +93,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template that will initiate the entire automation for this scenario.
 
-- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/azuredeploy.parameters.example.json) (ensure to set `deploySQLMI` to _**true**_):
+- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.example.json) (ensure to set _`deploySQLMI`_ to _**true**_):
 
   - _`sshRSAPublicKey`_ - Your SSH public key - sample syntax: `ssh-rsa AAAAB3N...NDOCE7U3DLBISw==\n`.
   - _`spnClientId`_ - Your Azure service principal id.
@@ -101,7 +101,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id.
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name.
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the Client Windows VM and Microk8s VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for log analytics workspace deployment.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
   - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
@@ -163,27 +162,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-  ![Screenshot showing Client VM public IP](./04.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+
+### Connecting directly with RDP
+
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client NSG with blocked RDP](./04.png)
+
+  ![Screenshot showing adding a new inbound security rule](./05.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./06.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./07.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./08.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./09.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./10.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./11.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script run it's course and **do not close** the PowerShell session, this will be done for you once completed.
-
-  ![Screenshot showing PowerShell logon script run](./05.png)
-
-  ![Screenshot showing PowerShell logon script run](./06.png)
-
-  ![Screenshot showing PowerShell logon script run](./07.png)
-
-  ![Screenshot showing PowerShell logon script run](./08.png)
-
-  ![Screenshot showing PowerShell logon script run](./09.png)
-
-  ![Screenshot showing PowerShell logon script run](./10.png)
-
-  ![Screenshot showing PowerShell logon script run](./11.png)
 
   ![Screenshot showing PowerShell logon script run](./12.png)
 
@@ -195,9 +219,23 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing PowerShell logon script run](./16.png)
 
+  ![Screenshot showing PowerShell logon script run](./17.png)
+
+  ![Screenshot showing PowerShell logon script run](./18.png)
+
+  ![Screenshot showing PowerShell logon script run](./19.png)
+
+  ![Screenshot showing PowerShell logon script run](./20.png)
+
+  ![Screenshot showing PowerShell logon script run](./21.png)
+
+  ![Screenshot showing PowerShell logon script run](./22.png)
+
+  ![Screenshot showing PowerShell logon script run](./23.png)
+
   Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and the SQL Managed Instance will be deployed on the cluster and be ready to use:
 
-  ![Screenshot showing Wallpaper Change](./17.png)
+  ![Screenshot showing Wallpaper Change](./24.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
 
@@ -209,17 +247,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - **Azure Arc-enabled SQL Managed Instance** - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing addtional Azure resources in the resource group](./18.png)
+  ![Screenshot showing addtional Azure resources in the resource group](./25.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the _Azure Data CLI_, the _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./19.png)
+  ![Screenshot showing Azure Data Studio shortcut](./26.png)
 
-  ![Screenshot showing Azure Data Studio shortcut](./20.png)
+  ![Screenshot showing Azure Data Studio shortcut](./27.png)
 
 - Additionally, the SQL Managed Instance connection will be configured within Data Studio, as well as the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will be restored automatically for you.
 
-  ![Screenshot showing configured SQL Managed Instance connection](./21.png)
+  ![Screenshot showing configured SQL Managed Instance connection](./28.png)
 
   > **NOTE: Due to the use of Kubernetes _NodePort_ service in this scenario, the default SQL connection endpoint port number (1443) was changed to 31111.**
 
@@ -235,10 +273,10 @@ In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were
 
   In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./22.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./29.png)
 
   And we see the installed extensions:
-  ![Screenshot showing Azure Arc-enabled Kubernetes Cluster Extensions settings](./23.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes Cluster Extensions settings](./30.png)
 
 ## Operations
 
@@ -248,13 +286,13 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance **primary** endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
 
-  ![Screenshot showing how to open SqlQueryStress](./24.png)
+  ![Screenshot showing how to open SqlQueryStress](./31.png)
 
-  ![Screenshot showing SQLMI Endpoints text file](./25.png)
+  ![Screenshot showing SQLMI Endpoints text file](./32.png)
 
 - To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
-  ![Screenshot showing SqlQueryStress connected](./26.png)
+  ![Screenshot showing SqlQueryStress connected](./33.png)
 
 - To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
 
@@ -264,9 +302,9 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
 
-  ![Screenshot showing SqlQueryStress settings](./27.png)
+  ![Screenshot showing SqlQueryStress settings](./34.png)
 
-  ![Screenshot showing SqlQueryStress running](./28.png)
+  ![Screenshot showing SqlQueryStress running](./35.png)
 
 ### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
 
@@ -274,32 +312,32 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
 - Now that you have the _SqlQueryStress_ stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
 
-  ![Screenshot showing Grafana desktop shortcut](./29.png)
+  ![Screenshot showing Grafana desktop shortcut](./36.png)
 
 - To log in, use the same username and password that is in the _SQLMI Endpoints_ text file desktop shortcut.
 
-  ![Screenshot showing Grafana username and password](./30.png)
+  ![Screenshot showing Grafana username and password](./37.png)
 
 - Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
 
-  ![Screenshot showing Grafana dashboards](./31.png)
+  ![Screenshot showing Grafana dashboards](./38.png)
 
-  ![Screenshot showing Grafana "SQL Managed Instance Metrics" dashboard](./32.png)
+  ![Screenshot showing Grafana "SQL Managed Instance Metrics" dashboard](./39.png)
 
 - Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
 
-  ![Screenshot showing last 5 minutes time range](./33.png)
+  ![Screenshot showing last 5 minutes time range](./40.png)
 
 - You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
 
-  ![Screenshot showing increased load activity](./34.png)
+  ![Screenshot showing increased load activity](./41.png)
 
-  ![Screenshot showing increased load activity](./35.png)
+  ![Screenshot showing increased load activity](./42.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Screenshot showing how to delete Azure resource group](./36.png)
+  ![Screenshot showing how to delete Azure resource group](./43.png)
 
 <!-- ## Known Issues -->

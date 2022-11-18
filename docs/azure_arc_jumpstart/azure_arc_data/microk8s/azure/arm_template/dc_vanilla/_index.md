@@ -95,7 +95,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template that will initiate the entire automation for this scenario.
 
-- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/azuredeploy.parameters.example.json).
+- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/azuredeploy.parameters.example.json).
 
   - _`sshRSAPublicKey`_ - Your SSH public key - sample syntax: `ssh-rsa AAAAB3N...NDOCE7U3DLBISw==\n`.
   - _`spnClientId`_ - Your Azure service principal id.
@@ -103,7 +103,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id.
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name.
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the Client Windows VM and Microk8s VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for log analytics workspace deployment.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to _**false**_.
   - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller only scenario we leave it set to _**false**_.
@@ -165,27 +164,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-  ![Screenshot showing Client VM public IP](./04.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+
+### Connecting directly with RDP
+
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client NSG with blocked RDP](./05.png)
+
+  ![Screenshot showing adding a new inbound security rule](./05.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./06.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./07.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./08.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./09.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./10.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./11.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script run it's course and **do not close** the PowerShell session, this will be done for you once completed.
-
-  ![Screenshot showing PowerShell logon script run](./05.png)
-
-  ![Screenshot showing PowerShell logon script run](./06.png)
-
-  ![Screenshot showing PowerShell logon script run](./07.png)
-
-  ![Screenshot showing PowerShell logon script run](./08.png)
-
-  ![Screenshot showing PowerShell logon script run](./09.png)
-
-  ![Screenshot showing PowerShell logon script run](./10.png)
-
-  ![Screenshot showing PowerShell logon script run](./11.png)
 
   ![Screenshot showing PowerShell logon script run](./12.png)
 
@@ -193,9 +217,23 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing PowerShell logon script run](./14.png)
 
+  ![Screenshot showing PowerShell logon script run](./15.png)
+
+  ![Screenshot showing PowerShell logon script run](./16.png)
+
+  ![Screenshot showing PowerShell logon script run](./17.png)
+
+  ![Screenshot showing PowerShell logon script run](./18.png)
+
+  ![Screenshot showing PowerShell logon script run](./19.png)
+
+  ![Screenshot showing PowerShell logon script run](./20.png)
+
+  ![Screenshot showing PowerShell logon script run](./21.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and the Azure Arc Data Controller will have been deployed on the cluster and be ready for use:
 
-  ![Screenshot showing Wallpaper Change](./15.png)
+  ![Screenshot showing Wallpaper Change](./22.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **16 various Azure resources deployed**. The important ones to notice are:
 
@@ -205,13 +243,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - **Azure Arc Data Controller** - The data controller that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing addtional Azure resources in the resource group](./16.png)
+  ![Screenshot showing addtional Azure resources in the resource group](./23.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the _Azure Data CLI_, the _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./17.png)
+  ![Screenshot showing Azure Data Studio shortcut](./24.png)
 
-  ![Screenshot showing Azure Data Studio shortcut](./18.png)
+  ![Screenshot showing Azure Data Studio shortcut](./25.png)
 
 ## Cluster extensions
 
@@ -225,15 +263,15 @@ In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were
 
   In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./19.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./26.png)
 
   And we see the installed extensions:
-  ![Screenshot showing Azure Arc-enabled Kubernetes Cluster Extensions settings](./20.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes Cluster Extensions settings](./27.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Screenshot showing how to delete Azure resource group](./21.png)
+  ![Screenshot showing how to delete Azure resource group](./28.png)
 
 <!-- ## Known Issues -->

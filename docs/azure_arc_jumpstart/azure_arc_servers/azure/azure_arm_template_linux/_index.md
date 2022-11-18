@@ -175,7 +175,7 @@ By design, port ssh is not allowed on the network security group. Therefore, you
 
 - Open the _Arc-Linux-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing Arc-App-Client NSG with blocked ssh](./05.png)
+  ![Screenshot showing Arc-Linux-Demo-NSG with blocked ssh](./05.png)
 
   ![Screenshot showing adding a new inbound security rule](./06.png)
 
@@ -193,7 +193,7 @@ By design, port ssh is not allowed on the network security group. Therefore, you
 
   ![Screenshot showing connecting to the VM using Bastion](./10.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
 
 ### Connect using just-in-time access (JIT)
 

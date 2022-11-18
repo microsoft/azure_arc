@@ -170,6 +170,7 @@ foreach ($cluster in $clusters) {
     }
 }
 
+Stop-Transcript
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
@@ -261,6 +262,8 @@ Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
 
+Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log -Append
+
 Write-Header "Deploying App"
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
@@ -345,3 +348,5 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
+
+Stop-Transcript

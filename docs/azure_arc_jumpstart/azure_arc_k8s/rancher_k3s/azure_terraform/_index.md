@@ -75,15 +75,18 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
   az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
+- [Generate SSH Key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) (or use existing ssh key)
+
+> **NOTE: Default file location for public key: Windows - (C:\Users\WINUSER/.ssh\id_rsa.pub), Linux - (~/.ssh/id_rsa.pub)**
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-1. User edits the tfvars and vars.sh script to match the environment.
+1. User edits the tfvars script to match the environment.
 2. User runs ```terraform init``` to download the required terraform providers.
 3. User access the bootstrap VM created by the terraform plan and connects the K3s cluster to Azure Arc using the SPN credentials.
 4. User verifies the Arc-enabled Kubernetes cluster.
-5. User deploys a sample application.
 
 ## Deployment
 
@@ -91,78 +94,37 @@ The only thing you need to do before executing the Terraform plan is to create t
 
 - Navigate to the [terraform folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/terraform) and fill in the terraform.tfvars file with the values for your environment.
 
-- Retrieve your Azure subscription ID using the ```az account list``` command.
+    ![Screenshot showing terraform tfvars](./01.png)
 
-- The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform/scripts/vars.sh) to match the Azure service principal you created as well as the location and VM name that matches your environment.
+    For example:
+    ![Screenshot showing terraform tfvars example](./02.png)
 
 - Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
-    ![terraform init](./01.png)
+    ![Screenshot showing terraform init](./03.png)
 
 - Run the ```terraform apply --auto-approve``` command and wait for the plan to finish.
 
-    ![terraform apply completed](./02.png)
+    ![Screenshot showing terraform apply completed](./04.png)
 
-## Connecting to Azure Arc
+Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
 
-> **NOTE: The VM bootstrap includes the log in process to Azure as well deploying the needed Azure Arc CLI extensions - no action items on you there!**
+![Screenshot showing Azure resource group](./05.png)
 
-- SSH to the VM using the created Azure Public IP and your username/password.
+## Logging
 
-    ![Azure VM public IP](./03.png)
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
 
-- Check the cluster is up and running using the ```kubectl get nodes -o wide```
+```shell
+cat /home/<USER>/jumpstart_logs/installK3s.log
+```
 
-    ![k3s cluster nodes](./04.png)
+![Screenshot showing the installK3s log file](./06.png)
 
-- Using the Azure service principal you've created, run the below command to connect the cluster to Azure Arc.
+> **NOTE: For enhanced security posture, SSH (22) port are not open by default in this scenario. You will need to create a network security group (NSG) rule to allow network access to port 22, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
-    ```shell
-    az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure resource group name> --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-    ```
+## Cleanup
 
-    For example:
+To delete environment, simply just delete the Azure resource group.
 
-    ```shell
-    az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-    ```
-
-    ![Successful azconnctedk8s command](./05.png)
-
-    ![Azure Arc-enabled Kubernetes cluster in an Azure resource group](./06.png)
-
-    ![Azure Arc-enabled Kubernetes cluster in an Azure resource group](./07.png)
-
-## K3s External Access
-
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was [made available](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform/deployment/hello-kubernetes.yaml) for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes).
-
-- Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG).
-
-    ![Azure Network Security Group (NSG) rule](./08.png)
-
-    ![hello-kubernetes.yaml file](./09.png)
-
-- To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created.
-
-    ![kubectl apply -f hello-kubernetes.yaml command](./10.png)
-
-    ![kubectl get pods command](./11.png)
-
-    ![kubectl get svc command](./12.png)
-
-- In your browser, enter the *cluster_public_ip:32323* which will bring up the *hello-world* application.
-
-    ![hello-kubernetes application in a web browser](./13.png)
-
-## Delete the deployment
-
-- The most straightforward way is to delete the cluster is via the Azure Portal, just select cluster and delete it.
-
-    ![Delete Azure Arc-enabled Kubernetes cluster](./14.png)
-
-- If you want to nuke the entire environment, just delete the Azure resource group or alternatively, you can use the ```terraform destroy --auto-approve``` command.
-
-    ![Delete Azure resource group](./15.png)
-
-    ![terraform destroy](./16.png)
+![Screenshot showing Delete Azure resource group](./07.png)

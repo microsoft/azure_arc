@@ -194,6 +194,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploymentcomplete.png)
 
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
+
 ## Deployment Option 2: ARM template with Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
@@ -228,6 +230,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az deployment group create](./azdeploy.png)
 
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
+
 ## Deployment Option 3: Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
@@ -261,6 +265,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az group create --name "<resource-group-name>"  --location "<preferred-location>"
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
 
 ## Deployment Option 4: Terraform Deployment
 
@@ -318,6 +324,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Example output from `terraform apply "infra.out"`:
 
   ![terraform plan](./terraform_apply.png)
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
 
 ## Start post-deployment automation
 
