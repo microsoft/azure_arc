@@ -67,4 +67,10 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Set-ClusterQuorum -Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
 }
 
+# Install Az CLI and extensions on each node
+foreach ($VM in $SDNConfig.HostList) { 
+    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
+        $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
+    }
+}
 Stop-Transcript
