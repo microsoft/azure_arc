@@ -70,7 +70,17 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Install Az CLI and extensions on each node
 foreach ($VM in $SDNConfig.HostList) { 
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
+        # Install Chocolatey
+        Write-Verbose "Installing Chocolatey"
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        Start-Sleep -Seconds 10
+
+        Write-Verbose "Installing Az CLI"
+        $expression = "choco install azure-cli -y"
+        Invoke-Expression $expression
+
+        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
+        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     }
 }
 Stop-Transcript
