@@ -68,7 +68,7 @@ $clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 3 -osType linux
+    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 3 -osType linux -linuxNodeVmSize Standard_D4s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
@@ -80,8 +80,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
 }
 
 # Deploy data services
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"
@@ -124,7 +122,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl ge
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
-                        --cluster-name $using:clusterName `
+                        --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
@@ -143,8 +141,8 @@ Write-Host "`n"
 
 # Configuring Azure Arc Custom Location on the cluster 
 Write-Header "Configuring Azure Arc Custom Location"
-$connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $Env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $Env:resourceGroup --query id -o tsv
+$connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
 az customlocation create --name "jumpstart-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
