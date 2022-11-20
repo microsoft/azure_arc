@@ -123,6 +123,7 @@
 
     # AKS and Resource bridge variables
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
+    AKSDataSvcsworkloadClusterName       = "hcibox-aks-datasvcs"
     AKSvnetname                          = "akshcivnet"
     AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"

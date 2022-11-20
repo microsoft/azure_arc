@@ -29,6 +29,9 @@ param deployAKSHCI bool = true
 @description('Option to deploy Resource Bridge with HCIBox')
 param deployResourceBridge bool = true
 
+@description('Option to deploy Data services with HCIBox')
+param deployDataSvcs bool = true
+
 @description('Public DNS to use for the domain')
 param natDNS string = '1.1.1.1'
 
@@ -84,6 +87,7 @@ module hostDeployment 'host/host.bicep' = {
     deployBastion: deployBastion
     registerCluster: registerCluster
     deployAKSHCI: deployAKSHCI
+    deployDataSvcs: deployDataSvcs
     deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
