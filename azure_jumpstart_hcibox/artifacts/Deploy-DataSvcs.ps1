@@ -79,6 +79,109 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     kubectl get pods -A
 }
 
+# Deploy data services
+Write-Header "Az CLI Login"
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+# Making extension install dynamic
+Write-Header "Installing Azure CLI extensions"
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+az extension add --name arcdata --system
+
+# Installing Azure Data Studio extensions
+Write-Header "Installing Azure Data Studio extensions"
+$Env:argument1="--install-extension"
+$Env:argument2="microsoft.azcli"
+$Env:argument3="Microsoft.arc"
+
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+
+# Create Azure Data Studio desktop shortcut
+Write-Header "Creating Azure Data Studio Desktop Shortcut"
+$TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
+Write-Host "`n"
+Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Installing the Azure Arc-enabled data services cluster extension
+Write-Host "Installing the Azure Arc-enabled data services cluster extension"
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name $using:clusterName `
+                        --resource-group $Env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+
+Write-Host "`n"
+
+Do {
+    Write-Host "Waiting for bootstrapper pod, hold tight..."
+    Start-Sleep -Seconds 20
+    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+} while ($podStatus -eq "Nope")
+Write-Host "Bootstrapper pod is ready!"
+Write-Host "`n"
+
+# Configuring Azure Arc Custom Location on the cluster 
+Write-Header "Configuring Azure Arc Custom Location"
+$connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $Env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $Env:resourceGroup --query id -o tsv
+Start-Sleep -Seconds 20
+az customlocation create --name "jumpstart-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+
+# Deploying Azure Arc Data Controller
+Write-Header "Deploying Azure Arc Data Controller"
+
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+
+$dataControllerParams = "$Env:HCIBoxDir\dataController.parameters.json"
+
+(Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage',$Env:subscriptionId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$Env:spnClientId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage',$Env:spnTenantId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage',$Env:spnClientSecret | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
+
+az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:HCIBoxDir\dataController.json" --parameters "$Env:HCIBoxDir\dataController.parameters.json"
+Write-Host "`n"
+
+Do {
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 45
+    $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+} while ($dcStatus -eq "Nope")
+Write-Host "Azure Arc data controller is ready!"
+Write-Host "`n"
+
+
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deployDataSvcs', 'true',[System.EnvironmentVariableTarget]::Machine)
 

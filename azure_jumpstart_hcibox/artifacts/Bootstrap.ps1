@@ -122,6 +122,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -Ou
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressUI.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HCIBoxSDNDir\Single-NC.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxSDNDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxDir\dataController.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxDir\dataController.parameters.json
+
 
 # Replace password and DNS placeholder
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
