@@ -51,8 +51,8 @@ param deployBastion bool = false
 @description('Option to deploy AKS-HCI with HCIBox')
 param deployAKSHCI bool = true
 
-@description('Option to deploy AKS-HCI with HCIBox')
-param deployDataSvcs bool = true
+@description('Option to deploy SQL MI with HCIBox')
+param deploySQLMI bool = true
 
 @description('Option to deploy Resource Bridge with HCIBox')
 param deployResourceBridge bool = true
@@ -250,7 +250,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployDataSvcs ${deployDataSvcs} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS}' 
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deploySQLMI ${deploySQLMI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS}' 
     }
   }
 }

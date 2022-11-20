@@ -181,6 +181,6 @@ Write-Host "`n"
 
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
-[System.Environment]::SetEnvironmentVariable('deployDataSvcs', 'true',[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true',[System.EnvironmentVariableTarget]::Machine)
 
 Stop-Transcript
