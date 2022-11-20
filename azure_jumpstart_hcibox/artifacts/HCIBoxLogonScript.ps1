@@ -74,7 +74,14 @@ if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true)) {
 }
 
 # deploy Data services
-if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true) -and ($env:deployDataSvcs -eq $true)) {
+if (($env:registerCluster -eq $true) -and ($env:deployDataSvcs -eq $true)) {
+    Write-Header "Deploying Data services"
+    & "$Env:HCIBoxDir\Deploy-DataSvcs.ps1"
+}
+
+if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $false) -and ($env:deployDataSvcs -eq $true)) {
+    Write-Header "Deploying AKS"
+    & "$Env:HCIBoxDir\Deploy-AKS.ps1"
     Write-Header "Deploying Data services"
     & "$Env:HCIBoxDir\Deploy-DataSvcs.ps1"
 }

@@ -63,12 +63,12 @@ for($i = 0; $i -lt $prefixLen; $i++)
     $namingPrefix += [char]$rand.Next(97,122)
 }
 $clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
-[System.Environment]::SetEnvironmentVariable('AKSClusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKS-DataSvcs-ClusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 3 -osType linux -linuxNodeVmSize Standard_D4s_v3
+    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 3 -osType linux -nodeVmSize Standard_D4s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
