@@ -117,26 +117,34 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
-az k8s-extension create --name arc-data-services `
-    --extension-type microsoft.arcdataservices `
-    --cluster-type connectedClusters `
-    --cluster-name $clusterName `
-    --resource-group $Env:resourceGroup `
-    --auto-upgrade false `
-    --scope cluster `
-    --release-namespace arc `
-    --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+    $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
+    az k8s-extension create --name arc-data-services `
+        --extension-type microsoft.arcdataservices `
+        --cluster-type connectedClusters `
+        --cluster-name $clusterName `
+        --resource-group $Env:resourceGroup `
+        --auto-upgrade false `
+        --scope cluster `
+        --release-namespace arc `
+        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
-Write-Host "`n"
+    Write-Host "`n"
 
-Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight..."
-    Start-Sleep -Seconds 20
-    $podStatus = $(if (kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($podStatus -eq "Nope")
-Write-Host "Bootstrapper pod is ready!"
-Write-Host "`n"
+    Do {
+        Write-Host "Waiting for bootstrapper pod, hold tight..."
+        Start-Sleep -Seconds 20
+        $podStatus = $(if (kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($podStatus -eq "Nope")
+    Write-Host "Bootstrapper pod is ready!"
+    Write-Host "`n"
+}
+
+Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
+    Copy-VMFile AdminCenter -SourcePath "C:\HCIBoxDir\dataController.json" -DestinationPath "C:\vhd\dataController.json" -FileSource Host
+    Copy-VMFile AdminCenter -SourcePath "C:\HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\vhd\dataController.parameters.json" -FileSource Host
+
+}
 
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
@@ -146,14 +154,15 @@ Start-Sleep -Seconds 20
 az customlocation create --name "jumpstart-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
-Write-Header "Deploying Azure Arc Data Controller"
+Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+    Write-Header "Deploying Azure Arc Data Controller"
 
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+    $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 
-$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+    $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$Env:HCIBoxDir\dataController.parameters.json"
+    $dataControllerParams = "C:\vhd\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
@@ -167,16 +176,18 @@ $dataControllerParams = "$Env:HCIBoxDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
-az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:HCIBoxDir\dataController.json" --parameters "$Env:HCIBoxDir\dataController.parameters.json"
-Write-Host "`n"
+    az deployment group create --resource-group $Env:resourceGroup --template-file "C:\vhd\dataController.json" --parameters "C:\vhd\dataController.parameters.json"
+    Write-Host "`n"
 
-Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 45
-    $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($dcStatus -eq "Nope")
-Write-Host "Azure Arc data controller is ready!"
-Write-Host "`n"
+    Do {
+        Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+        Start-Sleep -Seconds 45
+        $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($dcStatus -eq "Nope")
+    Write-Host "Azure Arc data controller is ready!"
+    Write-Host "`n"
+}
+
 
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
