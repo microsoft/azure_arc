@@ -117,7 +117,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
     $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     az k8s-extension create --name arc-data-services `
         --extension-type microsoft.arcdataservices `
@@ -148,7 +148,7 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.
 
 
 # Configuring Azure Arc Custom Location on the cluster
-Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
     Write-Header "Configuring Azure Arc Custom Location"
     $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
