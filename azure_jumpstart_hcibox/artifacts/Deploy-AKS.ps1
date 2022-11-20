@@ -75,7 +75,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
     Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred -Region "eastus"
     Write-Host "Ready to Install AKS on HCI Cluster"
-    Install-AksHci 
+    Install-AksHci
 }
 
 # Create new AKS target cluster and connect it to Azure
