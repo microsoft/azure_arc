@@ -45,7 +45,7 @@ in this scenario, you will create and configure an Azure Automation account and 
 
     > **NOTE: Ensure that the server you will use for this scenario is running an [OS supported by Update Management](https://docs.microsoft.com/azure/automation/update-management/overview#supported-operating-systems)and meets the [system requirements](https://docs.microsoft.com/azure/automation/update-management/overview#system-requirements).**
 
-- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.42.0 or later. Use ```az --version``` to check your current installed version.
 
 ## Configuring Update Management
 

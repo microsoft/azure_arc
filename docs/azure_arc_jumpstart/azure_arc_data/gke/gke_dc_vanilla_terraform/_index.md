@@ -35,7 +35,7 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-- [Install or update Azure CLI to version 2.40.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 or higher](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -53,7 +53,7 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
 
 - [Install Terraform 1.0 or higher](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with a RBAC role is required:
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal Role-based access control (RBAC) is required:
 
   - "Owner" - Required for provisioning Azure resources, interact with Azure Arc-enabled data services billing, monitoring metrics, and logs management and creating role assignment for the Monitoring Metrics Publisher role.
 
