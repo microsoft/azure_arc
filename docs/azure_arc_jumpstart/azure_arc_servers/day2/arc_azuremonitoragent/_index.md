@@ -96,7 +96,7 @@ As mentioned, this deployment will leverage ARM templates.
 
     ```shell
     az deployment group create --resource-group <Name of the Azure resource group> \
-    --template-file <The ama-*-template.json template file location> \
+    --template-file <The ama-**template.json template file location> \
     --parameters <The ama-template.parameters.json template file location>
     ```
 

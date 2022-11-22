@@ -151,7 +151,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
-- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources*- deployed.
+- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources** deployed.
 
     ![ARM template deployment completed](./01.png)
 
@@ -204,7 +204,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/aks/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start its run.
 
-- Let the script run its course and **do not close*- the PowerShell session as this will be done for you once completed. Once the script will finish its run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Logic App will be deployed on the cluster and ready to use.
+- Let the script run its course and **do not close** the PowerShell session as this will be done for you once completed. Once the script will finish its run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Logic App will be deployed on the cluster and ready to use.
 
     > **NOTE: As you will notice from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
 
@@ -256,9 +256,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - Since this scenario is deploying both the app service plan and a sample Logic App application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
-  - **Azure Arc-enabled Kubernetes cluster*- - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
-  - **Custom location*- - Provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
+  - **Custom location** - Provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
   - [**App Service Kubernetes Environment**](https://docs.microsoft.com/azure/app-service/overview-arc-integration#app-service-kubernetes-environment) - The App Service Kubernetes environment resource is required before apps may be created. It enables configuration common to apps in the custom location, such as the default DNS suffix.
 
@@ -274,7 +274,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Additional Azure resources in the resource group](./33.png)
 
-- In this scenario, **a sample Jumpstart Azure Logic App*- was deployed. To view the deployed Logic App, simply click the Azure Logic App resource.
+- In this scenario, **a sample Jumpstart Azure Logic App** was deployed. To view the deployed Logic App, simply click the Azure Logic App resource.
 
   ![Azure Logic App resource](./34.png)
 
