@@ -42,7 +42,7 @@ Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
 }
 
 # Install necessary AZ modules and initialize akshci on each node
-Write-Header "Install necessary AZ modules plus AksHCI module and initialize akshci on each node"
+Write-Header "Install necessary AZ modules, AZ CLI extensions, plus AksHCI module and initialize akshci on each node"
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
@@ -52,7 +52,8 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Import-Module AzureAD
     Import-Module AksHci
     Initialize-AksHciNode
-    Write-Header "Installing Azure CLI extensions"
+    Write-Host "Installing Azure CLI"
+    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
     az config set extension.use_dynamic_install=yes_without_prompt
     az extension add --name arcdata --system
 }
@@ -70,7 +71,7 @@ $clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 3 -osType linux -nodeVmSize Standard_D4s_v3
+    New-AksHciCluster -name $using:clusterName -nodePoolName sqlminodepool -nodecount 3 -osType linux -nodeVmSize Standard_D4s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
@@ -82,10 +83,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 }
 
 # Deploy data services
-
+<#Write-Header "Installing Azure Data Studio extensions"
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     # Installing Azure Data Studio extensions
-    Write-Header "Installing Azure Data Studio extensions"
     $Env:argument1 = "--install-extension"
     $Env:argument2 = "microsoft.azcli"
     $Env:argument3 = "Microsoft.arc"
@@ -113,7 +113,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     $Shortcut.TargetPath = $TargetFile
     $Shortcut.Save()
 }
-
+#>
 
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
@@ -148,8 +148,9 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.
 
 
 # Configuring Azure Arc Custom Location on the cluster
+Write-Header "Configuring Azure Arc Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
-    Write-Header "Configuring Azure Arc Custom Location"
+
     $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
     Start-Sleep -Seconds 20
