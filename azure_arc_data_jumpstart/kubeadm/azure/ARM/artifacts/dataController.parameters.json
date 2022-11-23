@@ -83,7 +83,7 @@
       "value": 30080
     },
     "apiVersion": {
-      "value": "2022-03-01-preview"
+      "value": "2022-06-15-preview"
     },
     "infrastructure": {
       "value": "azure"
