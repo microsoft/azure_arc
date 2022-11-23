@@ -417,11 +417,10 @@
                       "type": 5,
                       "description": "Select at least one workspace that contains continuous export data based on the selected subscriptions",
                       "isRequired": true,
-                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
+                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces' and resourceGroup == '{ResourceGroup}'\r\n| project id",
                       "crossComponentResources": [
-                        "value::all"
+                        "{Subscription}"
                       ],
-                      "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspace>",
                       "typeSettings": {
                         "resourceTypeFilter": {
                           "microsoft.operationalinsights/workspaces": true
@@ -430,7 +429,8 @@
                         "showDefault": false
                       },
                       "queryType": 1,
-                      "resourceType": "microsoft.resourcegraph/resources"
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": null
                     },
                     {
                       "id": "71c18150-396c-4f92-a41f-18125550ec3d",
@@ -439,15 +439,20 @@
                       "label": "Azure Arc-enabled server",
                       "type": 5,
                       "isRequired": true,
-                      "value": "ArcBox-CentOS",
+                      "query": "resources\r\n| where type == \"microsoft.hybridcompute/machines\" and resourceGroup == '{ResourceGroup}'\r\n| project name",
+                      "crossComponentResources": [
+                        "{Subscription}"
+                      ],
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
                       },
-                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu-01\", \"label\":\"ArcBox-Ubuntu-01\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu-02\", \"label\":\"ArcBox-Ubuntu-02\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n]",
                       "timeContext": {
                         "durationMs": 86400000
-                      }
+                      },
+                      "queryType": 1,
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": null
                     },
                     {
                       "id": "f21caac6-fae7-44b5-ba4f-a2d3593953b0",
@@ -1618,7 +1623,7 @@
                         "{Workspace}"
                       ],
                       "value": [
-                        "ArcBox-SQL"
+                        null
                       ],
                       "typeSettings": {
                         "additionalResourceOptions": [
