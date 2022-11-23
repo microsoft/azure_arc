@@ -66,6 +66,10 @@ echo ""
 echo "######################################################################################"
 echo "Create Kubeadm Cluster Master Node..." 
 
+# Set Kubeadm deployment environment variables
+export KUBEADM_VERSION="1.24.6" # Do not change!
+export AZURE_DISK_CSI_VERSION="1.22.0" # Do not change!
+
 sudo apt update
 sudo apt -y install curl apt-transport-https </dev/null
 
@@ -74,7 +78,7 @@ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt update
-sudo apt -y install vim git curl wget kubelet=1.25.2-00 kubectl=1.25.2-00 kubeadm=1.25.2-00 containerd </dev/null
+sudo apt -y install vim git curl wget kubelet=${KUBEADM_VERSION}-00 kubectl=${KUBEADM_VERSION}-00 kubeadm=${KUBEADM_VERSION}-00 containerd </dev/null
 
 
 sudo apt-mark hold kubelet kubeadm kubectl
@@ -159,7 +163,7 @@ nodeRegistration:
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
-kubernetesVersion: v1.25.2
+kubernetesVersion: v${KUBEADM_VERSION}
 controlPlaneEndpoint: "${hostname}.${location}.cloudapp.azure.com:6443"
 apiServer:
   extraArgs:
@@ -202,7 +206,7 @@ echo "##########################################################################
 echo "Install Cloud Provider Azure..." 
 
 # Install cloud provider azure
-sudo helm install --repo https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo cloud-provider-azure --generate-name --set cloudControllerManager.imageRepository=mcr.microsoft.com/oss/kubernetes --set cloudControllerManager.imageName=azure-cloud-controller-manager --set cloudControllerManager.imageTag=v1.25.1 --set cloudNodeManager.imageRepository=mcr.microsoft.com/oss/kubernetes --set cloudNodeManager.imageName=azure-cloud-node-manager --set cloudNodeManager.imageTag=v1.25.1  --set cloudControllerManager.cloudConfig=/etc/kubernetes/azure.json --set cloudNodeManager.waitRoutes=true --kubeconfig "/home/${adminUsername}/.kube/config"
+sudo helm install --repo https://raw.githubusercontent.com/kubernetes-sigs/cloud-provider-azure/master/helm/repo cloud-provider-azure --generate-name --set cloudControllerManager.imageRepository=mcr.microsoft.com/oss/kubernetes --set cloudControllerManager.imageName=azure-cloud-controller-manager --set cloudControllerManager.imageTag=v${KUBEADM_VERSION} --set cloudNodeManager.imageRepository=mcr.microsoft.com/oss/kubernetes --set cloudNodeManager.imageName=azure-cloud-node-manager --set cloudNodeManager.imageTag=v${KUBEADM_VERSION}  --set cloudControllerManager.cloudConfig=/etc/kubernetes/azure.json --set cloudNodeManager.waitRoutes=true --kubeconfig "/home/${adminUsername}/.kube/config"
 
 echo ""
 echo "######################################################################################"
@@ -227,7 +231,7 @@ sudo -u $adminUsername kubectl apply -f "/home/${adminUsername}/cloud-config-sec
 # Install Azure Disk CSI Driver
 sudo helm repo add azuredisk-csi-driver https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/master/charts
 sudo helm repo update azuredisk-csi-driver
-sudo helm install azuredisk-csi-driver azuredisk-csi-driver/azuredisk-csi-driver --namespace kube-system --set node.cloudConfigSecretName=azure-cloud-provider --set node.cloudConfigSecretNamesapce=kube-system --set controller.cloudConfigSecretName=azure-cloud-provider --set controller.cloudConfigSecretNamesapce=kube-system --version v1.22.0 --kubeconfig "/home/${adminUsername}/.kube/config"
+sudo helm install azuredisk-csi-driver azuredisk-csi-driver/azuredisk-csi-driver --namespace kube-system --set node.cloudConfigSecretName=azure-cloud-provider --set node.cloudConfigSecretNamesapce=kube-system --set controller.cloudConfigSecretName=azure-cloud-provider --set controller.cloudConfigSecretNamesapce=kube-system --version v${AZURE_DISK_CSI_VERSION} --kubeconfig "/home/${adminUsername}/.kube/config"
 
 # Create the sc
 cat <<EOF > "/home/${adminUsername}/storage-class.yaml"
