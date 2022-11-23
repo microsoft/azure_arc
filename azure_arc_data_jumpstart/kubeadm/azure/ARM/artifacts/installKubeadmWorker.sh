@@ -53,6 +53,9 @@ echo ""
 echo "######################################################################################"
 echo "Create Kubeadm Cluster Worker Node..." 
 
+# Set Kubeadm deployment environment variables
+export KUBEADM_VERSION="1.24.6" # Do not change!
+
 sudo apt update
 sudo apt -y install curl apt-transport-https </dev/null
 
@@ -60,7 +63,7 @@ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt update
-sudo apt -y install vim git curl wget kubelet kubeadm kubectl containerd </dev/null
+sudo apt -y install vim git curl wget kubelet=${KUBEADM_VERSION}-00 kubectl=${KUBEADM_VERSION}-00 kubeadm=${KUBEADM_VERSION}-00 containerd </dev/null
 
 sudo apt-mark hold kubelet kubeadm kubectl
 
