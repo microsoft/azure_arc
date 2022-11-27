@@ -67,7 +67,7 @@ echo "##########################################################################
 echo "Create Kubeadm Cluster Master Node..." 
 
 # Set Kubeadm deployment environment variables
-export KUBEADM_VERSION="1.24.6" # Do not change!
+export KUBEADM_VERSION="1.24.8" # Do not change!
 export AZURE_DISK_CSI_VERSION="1.22.0" # Do not change!
 
 sudo apt update
