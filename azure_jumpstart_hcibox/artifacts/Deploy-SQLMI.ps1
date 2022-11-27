@@ -54,6 +54,11 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Initialize-AksHciNode
     Write-Host "Installing Azure CLI"
     $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+}
+
+Start-Sleep -Seconds 10
+
+Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
     az config set extension.use_dynamic_install=yes_without_prompt
     az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
     az extension add --name arcdata --system
@@ -118,7 +123,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     az k8s-extension create --name arc-data-services `
         --extension-type microsoft.arcdataservices `
