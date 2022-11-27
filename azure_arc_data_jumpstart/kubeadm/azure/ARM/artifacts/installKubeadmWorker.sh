@@ -54,7 +54,7 @@ echo "##########################################################################
 echo "Create Kubeadm Cluster Worker Node..." 
 
 # Set Kubeadm deployment environment variables
-export KUBEADM_VERSION="1.24.6" # Do not change!
+export KUBEADM_VERSION="1.24.8" # Do not change!
 
 sudo apt update
 sudo apt -y install curl apt-transport-https </dev/null
