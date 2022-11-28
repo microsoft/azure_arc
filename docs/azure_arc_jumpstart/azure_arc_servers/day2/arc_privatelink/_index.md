@@ -6,7 +6,7 @@ weight: 11
 description: >
 ---
 
-## Use Azure Private Link to securely connect networks to Azure Arc
+## Use Azure Private Link to securely connect networks to Azure Arc-enabled servers
 
 The following Jumpstart scenario will guide you on how to use [Azure Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure using a VPN. [This feature](https://docs.microsoft.com/azure/azure-arc/servers/private-link-security) allows you to connect privately to Azure Arc without opening up public network access but rather using private endpoints over a VPN or ExpressRoute connection, ensuring that all traffic is being sent to Azure privately.
 
