@@ -65,13 +65,13 @@
         "value": "arcdata"
       },
       "dataStorageClass": {
-        "value": "managed-premium"
+        "value": "default"
       },
       "dataStorageSize": {
         "value": "15Gi"
       },
       "logsStorageClass": {
-        "value": "managed-premium"
+        "value": "default"
       },
       "logsStorageSize": {
         "value": "10Gi"
