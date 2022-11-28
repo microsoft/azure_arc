@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Deploy an Azure PostgreSQL Deployment on GKE using a Terraform plan
+## Deploy an Azure Arc-enabled PostgreSQL Deployment on GKE using a Terraform plan
 
 The following scenario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
