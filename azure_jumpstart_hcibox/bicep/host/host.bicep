@@ -55,7 +55,7 @@ param deployAKSHCI bool = true
 param deployResourceBridge bool = true
 
 @description('Public DNS to use for the domain')
-param natDNS string = '1.1.1.1'
+param natDNS string = '8.8.8.8'
 
 var bastionName = 'HCIBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
