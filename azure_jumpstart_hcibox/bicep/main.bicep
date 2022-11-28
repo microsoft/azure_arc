@@ -47,6 +47,9 @@ param deployBastion bool = false
 @description('Location to deploy resources')
 param location string = resourceGroup().location
 
+@description('Custom Location object Id')
+param customLocationObjectId string = ''
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -91,5 +94,6 @@ module hostDeployment 'host/host.bicep' = {
     deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
+    customLocationObjectId: customLocationObjectId
   }
 }

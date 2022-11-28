@@ -53,6 +53,16 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Import-Module AksHci
     Initialize-AksHciNode
 }
+# Initializing variables
+$subId = $env:subscriptionId
+$rg = $env:resourceGroup
+$spnClientId = $env:spnClientId
+$spnSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$adminUsername = $env:adminUsername
+$adminPassword = $env:adminPassword
+$workspaceName = $env:workspaceName
+$customLocationObjectId = $env:customLocationObjectId
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
@@ -78,39 +88,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     kubectl get pods -A
 }
 
-# Deploy data services
-<#Write-Header "Installing Azure Data Studio extensions"
-Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
-    # Installing Azure Data Studio extensions
-    $Env:argument1 = "--install-extension"
-    $Env:argument2 = "microsoft.azcli"
-    $Env:argument3 = "Microsoft.arc"
-
-    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
-    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
-
-    # Create Azure Data Studio desktop shortcut
-    Write-Header "Creating Azure Data Studio Desktop Shortcut"
-    $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
-    $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-    $Shortcut.TargetPath = $TargetFile
-    $Shortcut.Save()
-
-    # Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
-    Write-Host "`n"
-    Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
-    Write-Host "`n"
-    $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
-    $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-    $Shortcut.TargetPath = $TargetFile
-    $Shortcut.Save()
-}
-#>
-
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
 foreach ($VM in $SDNConfig.HostList) {
@@ -119,18 +96,20 @@ foreach ($VM in $SDNConfig.HostList) {
         $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
         $ErrorActionPreference = "Continue"
         az config set extension.use_dynamic_install=yes_without_prompt
-        az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+        az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
         az extension add --name arcdata --system
     }
 }
 
+# Deploying the Arc Data Controller
+Write-Host "Deploying the Arc Data Controller"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
+    #$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     az k8s-extension create --name arc-data-services `
         --extension-type microsoft.arcdataservices `
         --cluster-type connectedClusters `
-        --cluster-name $clusterName `
-        --resource-group $Env:resourceGroup `
+        --cluster-name $using:clusterName `
+        --resource-group $using:rg `
         --auto-upgrade false `
         --scope cluster `
         --release-namespace arc `
@@ -150,40 +129,46 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Downloading ARM templates for Azure Arc Data Controller
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxKVDir\dataController.json
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxKVDir\dataController.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:HCIBoxKVDir\sqlmi.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:HCIBoxKVDir\sqlmi.parameters.json
+
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.json" -DestinationPath "C:\VHD\sqlmi.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.parameters.json" -DestinationPath "C:\VHD\sqlmi.parameters.json" -FileSource Host
 
 
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
 
-    $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
-    $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
+    $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
+    az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations
+    $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $using:rg --query id -o tsv
     Start-Sleep -Seconds 20
-    az customlocation create --name "jumpstart-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+    az customlocation create --name "jumpstart-cl" --resource-group $using:rg --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
     Write-Header "Deploying Azure Arc Data Controller"
 
-    $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+    $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $using:rg --query id -o tsv)
 
-    $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-    $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+    $workspaceId = $(az resource show --resource-group $using:rg --name $using:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $using:rg --workspace-name $using:workspaceName --query primarySharedKey -o tsv)
 
     $dataControllerParams = "C:\VHD\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $using:rg | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $using:adminUsername | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:adminPassword | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $Env:spnClientId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $Env:spnTenantId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $Env:spnClientSecret | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $using:subId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $using:spnClientId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $using:spnTenantId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $using:spnSecret | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
-    az deployment group create --resource-group $Env:resourceGroup --template-file "C:\VHD\dataController.json" --parameters "C:\VHD\dataController.parameters.json"
+    az deployment group create --resource-group $using:rg --template-file "C:\VHD\dataController.json" --parameters "C:\VHD\dataController.parameters.json"
     Write-Host "`n"
 
     Do {
@@ -193,6 +178,87 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc data controller is ready!"
     Write-Host "`n"
+}
+
+# Deploying the Azure Arc-enabled SQL Managed Instance
+Write-Host "Deploying the Azure Arc-enabled SQL Managed Instance"
+Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
+    $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
+    $sqlInstanceName = "jumpstart-sql"
+    
+    # Deploying Azure Arc SQL Managed Instance
+    Write-Host "`n"
+    Write-Host "Deploying Azure Arc SQL Managed Instance"
+    Write-Host "`n"
+    
+    $dataControllerId = $(az resource show --resource-group $using:rg --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+    $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $using:rg --query id -o tsv)
+    
+    ################################################
+    # Localize ARM template
+    ################################################
+    $ServiceType = "LoadBalancer"
+    $readableSecondaries = $ServiceType
+    
+    # Resource Requests
+    $vCoresRequest = "2"
+    $memoryRequest = "4Gi"
+    $vCoresLimit = "4"
+    $memoryLimit = "8Gi"
+    
+    # Storage
+    $StorageClassName = "default"
+    $dataStorageSize = "5Gi"
+    $logsStorageSize = "5Gi"
+    $dataLogsStorageSize = "5Gi"
+    
+    # High Availability
+    $replicas = 3 # Deploy SQL MI "Business Critical" tier
+    #######################################################
+    
+    $SQLParams = "C:\VHD\SQLMI.parameters.json"
+    
+    (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $using:rg | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $using:subId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $using:adminUsername | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $using:adminPassword | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'memoryRequest-stage', $memoryRequest | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage', $vCoresLimit | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'memoryLimit-stage', $memoryLimit | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstanceName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'port-stage' , 11433 | Set-Content -Path $SQLParams
+    
+    az deployment group create --resource-group $using:rg --template-file "C:\VHD\SQLMI.json" --parameters "C:\VHD\SQLMI.parameters.json"
+    Write-Host "`n"
+    
+    Do {
+        Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Start-Sleep -Seconds 45
+        $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($dcStatus -eq "Nope")
+    Write-Host "Azure Arc SQL Managed Instance is ready!"
+    Write-Host "`n"
+    
+    # Downloading demo database and restoring onto SQL MI
+    $podname = "jumpstart-sql-0"
+    Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+    kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+    Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+    kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminUsername -P $using:adminPassword -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+    
+    
 }
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)

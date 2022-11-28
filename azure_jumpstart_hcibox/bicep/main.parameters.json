@@ -34,6 +34,9 @@
         },
         "deploySQLMI": {
             "value": "false"
+        },
+        "customLocationObjectId":{
+            "value": ""
         }
     }
 }
