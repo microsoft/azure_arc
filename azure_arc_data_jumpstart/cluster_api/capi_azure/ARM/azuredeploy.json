@@ -101,7 +101,13 @@
         "description": "Random GUID for cluster names"
       },
       "defaultValue": "[substring(newGuid(),0,4)]"
-    }    
+    },
+    "customLocationRPOID": {
+      "type": "string",
+      "metadata": {
+        "description": "Custom Location Resource Provider Object ID"
+      }
+    }
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/')]",
@@ -266,7 +272,10 @@
           },
           "capiArcDataClusterName" : {
             "value": "[variables('capiArcDataClusterName')]"
-          }          
+          },
+          "customLocationRPOID": {
+            "value": "[parameters('customLocationRPOID')]"
+          }
         }
       }
     },
