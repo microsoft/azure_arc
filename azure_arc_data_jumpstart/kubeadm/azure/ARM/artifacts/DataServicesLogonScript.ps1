@@ -2,8 +2,6 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
-$connectedClusterName = "$Env:ArcK8sClusterName-$suffix"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -79,7 +77,7 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/stag
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config"
 
 # Downloading 'installKubeadm.log' log file
 Write-Host "Downloading 'installKubeadm.log' log file"
@@ -116,7 +114,7 @@ $workspaceResourceId= az resource show --resource-group $Env:resourceGroup `
                                        --resource-type "Microsoft.OperationalInsights/workspaces" `
                                        --query id -o tsv
 
-az connectedk8s connect --name $connectedClusterName `
+az connectedk8s connect --name $Env:ArcK8sClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
                         --tags "Project=jumpstart_azure_arc_data_services" `
@@ -128,12 +126,11 @@ Write-Host "Install Container Insights extension..."
 Write-Host "`n"
 
 az k8s-extension create --name "azuremonitor-containers" `
-                        --cluster-name $connectedClusterName `
+                        --cluster-name $Env:ArcK8sClusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureMonitor.Containers `
                         --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
 
 Start-Sleep -Seconds 10
 
@@ -145,7 +142,7 @@ Write-Host "Installing Azure Arc-enabled data services extension"
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
-                        --cluster-name $connectedClusterName `
+                        --cluster-name $Env:ArcK8sClusterName `
                         --resource-group $Env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
@@ -159,28 +156,31 @@ Do {
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
 
-$connectedClusterId = az connectedk8s show --name $connectedClusterName `
+$connectedClusterId = az connectedk8s show --name $Env:ArcK8sClusterName `
                                            --resource-group $Env:resourceGroup `
                                            --query id -o tsv
 
 $extensionId = az k8s-extension show --name arc-data-services `
                                      --cluster-type connectedClusters `
-                                     --cluster-name $connectedClusterName `
+                                     --cluster-name $Env:ArcK8sClusterName `
                                      --resource-group $Env:resourceGroup `
                                      --query id -o tsv
 
 Start-Sleep -Seconds 20
 
 # Create Custom Location
-$SP_OID=$(az ad sp show --id $Env:spnClientId --query id -o tsv)
-az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid $SP_OID --features cluster-connect custom-locations
-$customlocationName = "jumpstart-cl-$suffix"
+az connectedk8s enable-features -n $Env:ArcK8sClusterName `
+                                -g $Env:resourceGroup `
+                                --custom-locations-oid $Env:customLocationRPOID `
+                                --features cluster-connect custom-locations
+
+$customLocationName = "$Env:ArcK8sClusterName-cl"
+
 az customlocation create --name $customlocationName `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $connectedClusterId `
-                         --cluster-extension-ids $extensionId `
-                         --kubeconfig $Env:KUBECONFIG
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
