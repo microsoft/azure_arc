@@ -63,19 +63,18 @@ The following steps walk through using the connected cluster functionality using
   ```shell
   CLUSTER_NAME=<cluster-name>
   RESOURCE_GROUP=<resource-group-name>
-  ARM_ID_CLUSTER=$(az connectedk8s show -n $CLUSTER_NAME -g $RESOURCE_GROUP --query id -o tsv)
   ```
 
-- Second, obtain the *objectId* of your Azure Active Directory user account
+- Second, obtain the *user principal name and ID* of your Azure Active Directory user account
 
   ```shell
-  AAD_ENTITY_OBJECT_ID=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+  AAD_ENTITY=$(az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
   ```
 
 - Finally, create the ClusterRoleBinding using the following:
 
   ```shell
-  kubectl create clusterrolebinding jumpstart-user-binding --clusterrole cluster-admin --user=$AAD_ENTITY_OBJECT_ID
+  while ID= read -r line; do  kubectl create clusterrolebinding jumpstart-binding-$line --clusterrole cluster-admin --user=$line; done <<< "$AAD_ENTITY"
   ```
 
 ## Access Cluster
