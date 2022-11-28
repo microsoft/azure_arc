@@ -77,7 +77,7 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.json" -De
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.parameters.json" -DestinationPath "C:\VHD\sqlmi.parameters.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
 
-# Install SQLMI management tools
+# Install Azure Data Studio
 Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     Write-Host "Installing Azure Data Studio"
     Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
@@ -94,16 +94,6 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     Write-Host "Creating Azure Data Studio Desktop Shortcut"
     $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
     $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Azure Data Studio.lnk"
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-    $Shortcut.TargetPath = $TargetFile
-    $Shortcut.Save()
-    Write-Host "`n"
-    Write-Host "Installing Microsoft SQL Server Management Studio (SSMS)"
-    Write-Host "`n"
-    choco install ssms /y
-    $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
-    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
     $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
     $Shortcut.TargetPath = $TargetFile
