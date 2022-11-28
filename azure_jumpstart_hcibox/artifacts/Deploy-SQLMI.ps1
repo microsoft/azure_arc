@@ -64,6 +64,52 @@ $adminPassword = $env:adminPassword
 $workspaceName = $env:workspaceName
 $customLocationObjectId = $env:customLocationObjectId
 
+# Downloading artifacts for Azure Arc Data Controller
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxKVDir\dataController.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxKVDir\dataController.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:HCIBoxKVDir\sqlmi.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:HCIBoxKVDir\sqlmi.parameters.json
+Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable") -OutFile $Env:HCIBoxKVDir\azuredatastudio.zip
+
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.json" -DestinationPath "C:\VHD\sqlmi.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.parameters.json" -DestinationPath "C:\VHD\sqlmi.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
+
+# Install SQLMI management tools
+Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+    Write-Host "Installing Azure Data Studio"
+    Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
+    Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
+    Write-Host "Installing Azure Data Studio extensions"
+    $Env:argument1 = "--install-extension"
+    $Env:argument2 = "microsoft.azcli"
+    $Env:argument3 = "Microsoft.arc"
+
+    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+
+    # Create Azure Data Studio desktop shortcut
+    Write-Host "Creating Azure Data Studio Desktop Shortcut"
+    $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Azure Data Studio.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+    Write-Host "`n"
+    Write-Host "Installing Microsoft SQL Server Management Studio (SSMS)"
+    Write-Host "`n"
+    choco install ssms /y
+    $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
+    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+}
+
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
 $prefixLen = 5
@@ -125,18 +171,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Bootstrapper pod is ready!"
     Write-Host "`n"
 }
-
-# Downloading ARM templates for Azure Arc Data Controller
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxKVDir\dataController.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxKVDir\dataController.parameters.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:HCIBoxKVDir\sqlmi.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:HCIBoxKVDir\sqlmi.parameters.json
-
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.json" -DestinationPath "C:\VHD\sqlmi.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.parameters.json" -DestinationPath "C:\VHD\sqlmi.parameters.json" -FileSource Host
-
 
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
