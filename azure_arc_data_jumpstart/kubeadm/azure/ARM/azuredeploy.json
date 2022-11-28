@@ -94,9 +94,23 @@
         "metadata": {
           "description": "the Azure Bastion host name"
         }
+      },
+      "guid": {
+        "type": "string",
+        "metadata": {
+          "description": "Random GUID for cluster names"
+        },
+        "defaultValue": "[substring(newGuid(),0,4)]"
+      },
+      "customLocationRPOID": {
+        "type": "string",
+        "metadata": {
+          "description": "Custom Location Resource Provider Object ID"
+        }
       }
     },
     "variables": {
+      "ArcK8sClusterName": "[concat('Arc-DataSvc-Kubeadm','-',parameters('guid'))]",
       "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/kubeadm/azure/ARM/')]",
       "kubeadmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuKubeadm.json')]",
       "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
@@ -219,6 +233,12 @@
             },
             "windowsAdminPassword": {
               "value": "[parameters('windowsAdminPassword')]"
+            },
+            "customLocationRPOID": {
+              "value": "[parameters('customLocationRPOID')]"
+            },
+            "ArcK8sClusterName": {
+              "value": "[variables('ArcK8sClusterName')]"
             },
             "spnClientId": {
               "value": "[parameters('spnClientId')]"
