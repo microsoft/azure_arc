@@ -472,6 +472,49 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $Shortcut.Save()
 }
 
+Write-Host "Generating endpoints file"
+write-host "`n"
+
+# Retrieving SQL MI connection endpoint
+$sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+$sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
+write-host "`n"
+
+# Get public ip of the SQLMI endpoint
+$sqlmiIpaddress = kubectl get svc -n arc "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+
+# Get public ip of the secondary SQLMI endpoint
+$sqlmiSecondaryIpaddress = kubectl get svc -n arc "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
+
+# Write endpoint information in the file
+
+$SQLInstanceName = $sqlInstance.context.toupper()
+
+Start-Sleep -Seconds 5
+
+Add-Content $Endpoints "======================================================================"
+Add-Content $Endpoints ""
+Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
+$sqlmiEndPoint | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
+$sqlmiSecondaryEndPoint | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance SQL login username:"
+$using:adminUsername | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance SQL login password:"
+$using:adminPassword | Add-Content $Endpoints
+Add-Content $Endpoints ""
+
+Add-Content $Endpoints "======================================================================"
+Add-Content $Endpoints ""
+
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)
 
