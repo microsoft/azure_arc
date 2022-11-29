@@ -58,7 +58,7 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
 
 The following steps walk through using the Cluster Connect functionality using Azure Active Directory (AAD); however, it can also be done using a service account token.  The benefit of using AAD authentication is that your current, logged-in user from the Azure CLI will be used and you won't have to obtain a service account token from your cluster.
 
-- First, get values for the cluster name and resource group name in your terminal
+- First, get values for the cluster name and resource group name in your terminal.
 
   ```shell
   CLUSTER_NAME=<cluster-name>
