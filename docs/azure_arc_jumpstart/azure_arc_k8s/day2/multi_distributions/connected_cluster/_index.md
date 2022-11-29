@@ -32,10 +32,14 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Ensure you are logged in to the Azure CLI 
+- Ensure you are logged in to the Azure CLI or PowerShell
 
   ```shell
   az login
+  ```
+
+  ```powershell
+  Connect-AzAccount
   ```
 
 - [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
@@ -48,6 +52,10 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
 
   ```shell
   az extension add --name connectedk8s
+  ```
+
+  ```powershell
+  
   ```
 
 - As mentioned, this scenario starts at the point where you already have an Azure Arc connected cluster.
@@ -65,10 +73,19 @@ The following steps walk through using the Cluster Connect functionality using A
   RESOURCE_GROUP=<resource-group-name>
   ```
 
+  ```powershell
+  $CLUSTER_NAME = <cluster name>
+  $RESOURCE_GROUP = <resource_group>
+  ```
+
 - Second, obtain the _user principal name and ID_ of your AAD user account.
 
   ```shell
   AAD_ENTITY=$(az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
+  ```
+
+  ```powershell
+  $AAD_ENTITY = (az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
   ```
 
 - Finally, create the Kubernetes _ClusterRoleBinding_ using the following:
@@ -77,11 +94,20 @@ The following steps walk through using the Cluster Connect functionality using A
   while ID= read -r line; do  kubectl create clusterrolebinding jumpstart-binding-$line --clusterrole cluster-admin --user=$line; done <<< "$AAD_ENTITY"
   ```
 
+  ```powershell
+  foreach($line in $AAD_ENTITY)
+  { kubectl create clusterrolebinding jumpstart-binding-$line --clusterrole cluster-admin --user=$line }
+  ```
+
 ## Access Cluster
 
 From your terminal, run the following command to establish the proxy to the cluster.  Note that the specific port number that's used may differ from the screenshot below.
 
   ```shell
+  az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
+  ```
+
+  ```powershell
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
 
