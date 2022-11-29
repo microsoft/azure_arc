@@ -85,7 +85,7 @@ From your terminal, run the following command to establish the proxy to the clus
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
 
-  ![Proxy established](./02.png)
+  ![Screenshot showing proxy established](./02.png)
 
 ## Run Kubectl Commands
 
