@@ -87,7 +87,7 @@ From your terminal, run the following command to establish the proxy to the clus
 
   ![Screenshot showing proxy established](./02.png)
 
-## Run Kubectl Commands
+## Run kubectl commands
 
 With the proxy established, in another terminal session run a kubectl.
 
