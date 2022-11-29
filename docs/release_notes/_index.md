@@ -610,7 +610,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [New Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/)
 
-### Azure Arc-enabled machine learning scenarios
+#### Azure Arc-enabled machine learning scenarios
 
 - [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
 
@@ -666,7 +666,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [New Scenario: Deploy Azure Logic App on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_logic_app_arm_template/)
 
-### Azure Arc-enabled machine learning scenarios
+#### Azure Arc-enabled machine learning scenarios
 
 - [New Scenario: Train, Deploy and call inference on an image classification model - MNIST dataset from Azure Blob Storage](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_ml/aks/aks_blob_mnist_arm_template/)
 
@@ -932,7 +932,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 ### February 2021
 
-### Azure Arc Jumpstart YouTube channel demos
+#### Azure Arc Jumpstart YouTube channel demos
 
 In this milestone, we launched our new YouTube channel.
 
