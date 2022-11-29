@@ -2683,7 +2683,7 @@ function New-SDNS2DCluster {
 function Test-InternetConnect {
     $testIP = $SDNConfig.natDNS
     $ErrorActionPreference = "Stop"  
-    $intConnect = Test-NetConnection -ComputerName $testip -Port 80
+    $intConnect = Test-NetConnection -ComputerName $testip -Port 53
 
     if (!$intConnect.TcpTestSucceeded) {
         throw "Unable to connect to DNS by pinging $SDNConfig.natDNS - Network access to this IP is required."
