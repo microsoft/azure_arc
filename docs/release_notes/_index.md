@@ -11,15 +11,69 @@ weight: 5
 
 ## 2022
 
+### November 2022
+
+#### Release highlights
+
+- One Azure Arc-enabled servers updated scenario
+- 3 Azure Arc-enabled Kubernetes updated scenarios
+- 6 Azure Arc-enabled data services updated scenarios
+- Security enhancements across Azure Arc-enabled servers, SQL Server, data services, and app services scenarios
+- ArcBox usability enhancements
+- [Enhancement: Optimized language for SSH public key prerequisite #1542](https://github.com/microsoft/azure_arc/issues/1542)
+
+#### Azure Arc-enabled servers
+
+- [Updated scenario: Use Azure Private Link to securely connect networks to Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_privatelink/)
+- [Enhancement: Secure access to Client VM - Servers jumpstart scenarios #1513](https://github.com/microsoft/azure_arc/issues/1513)
+
+#### Azure Arc-enabled SQL server
+
+- [Enhancement: Secure access to Client VM - Servers jumpstart scenarios #1513](https://github.com/microsoft/azure_arc/issues/1513)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Updated scenario: Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/)
+- [Updated scenario: Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_terraform/)
+- [Updated scenario: Deploy Rancher k3s on a VMware vSphere VM and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/vmware_terraform/)
+- [Enhancement: Switch from k3sup to upstream Rancher K3s installation in Azure Arc-enabled Kubernetes scenarios #1490](https://github.com/microsoft/azure_arc/issues/1490)
+
+#### Azure Arc-enabled data services
+
+- [Updated scenario: Deploy an Azure Arc Data Controller (Vanilla) on GKE using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_dc_vanilla_terraform/)
+- [Updated scenario: Deploy an Azure Arc-enabled SQL Managed Instance on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
+- [Updated scenario: Deploy an Azure Arc-enabled PostgreSQL Deployment on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_terraform/)
+- [Updated scenario: Deploy a vanilla Azure Arc Data Controller on a Microk8s Kubernetes cluster in an Azure VM using ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/)
+- [Updated scenario: Deploy Azure Arc-enabled SQL Managed Instance on a Microk8s Kubernetes cluster in an Azure VM using ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/)
+- [Updated scenario: Deploy Azure Arc-enabled PostgreSQL on a Microk8s Kubernetes cluster in an Azure VM using ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql/)
+- [Enhancement: Azure Arc-enabled data services - November release #1544](https://github.com/microsoft/azure_arc/issues/1544)
+- [Enhancement: Secure access to Client VM - Data services jumpstart scenarios #1507](https://github.com/microsoft/azure_arc/issues/1507)
+- [Enhancement: Custom Location RP OID update for Azure Arc-enabled data services Kubeadm-based scenario #1547](https://github.com/microsoft/azure_arc/issues/1547)
+- [Bug fix: Data services Jumpstart (Postgres) fails for microk8s #1456](https://github.com/microsoft/azure_arc/issues/1456)
+
+#### Azure Arc-enabled app services
+
+- [Enhancement: Secure access to Client VM - App services jumpstart scenarios #1500](https://github.com/microsoft/azure_arc/issues/1500)
+
+#### Jumpstart ArcBox
+
+- [Enhancement: ArcBox for DataOps logs separation #1536](https://github.com/microsoft/azure_arc/issues/1536)
+- [Bug fix: ArcBox - Workbook missing data in some tabs (review queries and parameters) #1508](https://github.com/microsoft/azure_arc/issues/1508)
+
+#### Jumpstart HCIBox
+
+- [README update: Jumpstart HCIBox - hardcoded azure location for registration #1474](https://github.com/microsoft/azure_arc/issues/1474)
+- [README update: Screenshot in HCIBox guide incorrectly highlights the wrong vcpu family #1487](https://github.com/microsoft/azure_arc/issues/1487)
+
 ### October 2022
 
 #### Release highlights
 
 - Jumpstart ArcBox for DataOps general availability - [Blog post](https://aka.ms/ArcBoxDataOpsBlog)
 - Jumpstart HCI public preview - [Blog post](https://aka.ms/JumpstartHCIBoxBlog)
+- New Azure Arc-enabled servers scenarios
 - Removing CentOS 8 Stream from ArcBox
 - Switch from k3sup to upstream Rancher K3s installation
-- New Azure Arc-enabled servers scenarios
 
 #### Azure Arc-enabled servers
 
