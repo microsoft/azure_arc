@@ -44,7 +44,7 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
   az --version
   ```
 
-- [Install or update to the latest version of the *connectedk8s* CLI extension](https://learn.microsoft.com/azure/azure-arc/kubernetes/cluster-connect?tabs=azure-cli).
+- [Install or update to the latest version of the _connectedk8s_ CLI extension](https://learn.microsoft.com/azure/azure-arc/kubernetes/cluster-connect?tabs=azure-cli).
 
   ```shell
   az extension add --name connectedk8s
