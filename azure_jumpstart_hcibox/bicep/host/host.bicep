@@ -58,7 +58,7 @@ param deploySQLMI bool = true
 param deployResourceBridge bool = true
 
 @description('Public DNS to use for the domain')
-param natDNS string = '1.1.1.1'
+param natDNS string = '8.8.8.8'
 
 @description('Custom Location object Id')
 param customLocationObjectId string = ''
