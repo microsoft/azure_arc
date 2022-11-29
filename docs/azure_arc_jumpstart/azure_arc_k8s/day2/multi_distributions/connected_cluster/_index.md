@@ -95,7 +95,7 @@ With the proxy established, in another terminal session run a kubectl.
   kubectl get nodes
   ```
 
-  ![Running kubectl command](./03.png)
+  ![Screenshot showing a running kubectl command](./03.png)
 
 If you already have a workload running on your cluster, you can view it using other kubectl commands, like the following screenshot illustrates:
 
