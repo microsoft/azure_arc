@@ -89,7 +89,7 @@ From your terminal, run the following command to establish the proxy to the clus
 
 ## Run kubectl commands
 
-With the proxy established, in another terminal session run a kubectl.
+With the proxy established, in another terminal session run a kubectl command.
 
   ```shell
   kubectl get nodes
