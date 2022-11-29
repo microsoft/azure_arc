@@ -2,7 +2,7 @@
 type: docs
 title: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
 linkTitle: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
-weight: 4
+weight: 5
 description: >
 ---
 
