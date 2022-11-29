@@ -103,7 +103,7 @@ If you already have a workload running on your cluster, you can view it using ot
 
 ## Close Proxy Connection
 
-In your terminal, press *CTRL+C* to close the proxy session.
+In your terminal, use the _CTRL+C_ key combination to close the proxy session.
 
   ![Screenshot showing closing Proxy to the connected cluster](./05.png)
 
