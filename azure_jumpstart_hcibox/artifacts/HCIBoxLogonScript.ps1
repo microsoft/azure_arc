@@ -74,14 +74,7 @@ if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true)) {
 }
 
 # deploy Data services
-if (($env:registerCluster -eq $true) -and ($env:deploySQLMI -eq $true)) {
-    Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
-    & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"
-}
-
-if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $false) -and ($env:deploySQLMI -eq $true)) {
-    Write-Header "Deploying AKS"
-    & "$Env:HCIBoxDir\Deploy-AKS.ps1"
+if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true) -and ($env:deploySQLMI -eq $true)) {
     Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
     & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"
 }
