@@ -65,7 +65,7 @@ The following steps walk through using the Cluster Connect functionality using A
   RESOURCE_GROUP=<resource-group-name>
   ```
 
-- Second, obtain the *user principal name and ID* of your Azure Active Directory user account
+- Second, obtain the _user principal name and ID_ of your AAD user account.
 
   ```shell
   AAD_ENTITY=$(az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
