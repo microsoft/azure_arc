@@ -71,7 +71,7 @@ The following steps walk through using the Cluster Connect functionality using A
   AAD_ENTITY=$(az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
   ```
 
-- Finally, create the ClusterRoleBinding using the following:
+- Finally, create the Kubernetes _ClusterRoleBinding_ using the following:
 
   ```shell
   while ID= read -r line; do  kubectl create clusterrolebinding jumpstart-binding-$line --clusterrole cluster-admin --user=$line; done <<< "$AAD_ENTITY"
