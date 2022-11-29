@@ -52,7 +52,7 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
 
 - As mentioned, this scenario starts at the point where you already have an Azure Arc connected cluster.
 
-    ![Existing Azure Arc connected cluster](./01.png)
+    ![Screenshot showing existing Azure Arc connected cluster](./01.png)
 
 ## Azure Arc Kubernetes Connected Cluster Configuration
 
