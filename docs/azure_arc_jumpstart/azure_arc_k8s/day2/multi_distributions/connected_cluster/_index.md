@@ -54,10 +54,6 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
   az extension add --name connectedk8s
   ```
 
-  ```powershell
-  
-  ```
-
 - As mentioned, this scenario starts at the point where you already have an Azure Arc connected cluster.
 
     ![Screenshot showing existing Azure Arc connected cluster](./01.png)
