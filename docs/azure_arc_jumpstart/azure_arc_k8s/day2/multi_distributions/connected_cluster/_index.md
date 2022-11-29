@@ -99,7 +99,7 @@ With the proxy established, in another terminal session run a kubectl.
 
 If you already have a workload running on your cluster, you can view it using other kubectl commands, like the following screenshot illustrates:
 
-  ![Example kubectl command](./04.png)
+  ![Screenshot showing an example kubectl command](./04.png)
 
 ## Close Proxy Connection
 
