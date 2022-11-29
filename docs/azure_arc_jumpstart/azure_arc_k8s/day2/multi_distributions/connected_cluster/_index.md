@@ -105,6 +105,6 @@ If you already have a workload running on your cluster, you can view it using ot
 
 In your terminal, press *CTRL+C* to close the proxy session.
 
-  ![Closing Proxy to connected cluster](./05.png)
+  ![Screenshot showing closing Proxy to the connected cluster](./05.png)
 
 With the proxy session now closed, access to the cluster using kubectl via the proxy is disabled.
