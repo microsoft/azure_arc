@@ -64,7 +64,8 @@ $adminPassword = $env:adminPassword
 $workspaceName = $env:workspaceName
 $customLocationObjectId = $env:customLocationObjectId
 
-# Downloading artifacts for Azure Arc Data Controller
+# Downloading artifacts for Azure Arc Data services
+Write-Header "Downloading artifacts for Azure Arc Data services"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxKVDir\dataController.json
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxKVDir\dataController.parameters.json
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:HCIBoxKVDir\sqlmi.json
@@ -76,29 +77,6 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.json" -DestinationPath "C:\VHD\sqlmi.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmi.parameters.json" -DestinationPath "C:\VHD\sqlmi.parameters.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
-
-# Install Azure Data Studio
-Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
-    Write-Host "Installing Azure Data Studio"
-    Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
-    Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
-    Write-Host "Installing Azure Data Studio extensions"
-    $Env:argument1 = "--install-extension"
-    $Env:argument2 = "microsoft.azcli"
-    $Env:argument3 = "Microsoft.arc"
-
-    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
-    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
-
-    # Create Azure Data Studio desktop shortcut
-    Write-Host "Creating Azure Data Studio Desktop Shortcut"
-    $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
-    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Azure Data Studio.lnk"
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-    $Shortcut.TargetPath = $TargetFile
-    $Shortcut.Save()
-}
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
@@ -180,17 +158,17 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 
     $dataControllerParams = "C:\VHD\dataController.parameters.json"
 
-(Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $using:rg | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $using:adminUsername | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:adminPassword | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $using:subId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $using:spnClientId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $using:spnTenantId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $using:spnSecret | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $using:rg | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $using:adminUsername | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:adminPassword | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $using:subId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $using:spnClientId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $using:spnTenantId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $using:spnSecret | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
     az deployment group create --resource-group $using:rg --template-file "C:\VHD\dataController.json" --parameters "C:\VHD\dataController.parameters.json"
     Write-Host "`n"
@@ -283,6 +261,29 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
     kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminUsername -P $using:adminPassword -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
     
     
+}
+
+# Install Azure Data Studio
+Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+    Write-Host "Installing Azure Data Studio"
+    Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
+    Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
+    Write-Host "Installing Azure Data Studio extensions"
+    $Env:argument1 = "--install-extension"
+    $Env:argument2 = "microsoft.azcli"
+    $Env:argument3 = "Microsoft.arc"
+
+    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+    & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+
+    # Create Azure Data Studio desktop shortcut
+    Write-Host "Creating Azure Data Studio Desktop Shortcut"
+    $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\Azure Data Studio.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
 }
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
