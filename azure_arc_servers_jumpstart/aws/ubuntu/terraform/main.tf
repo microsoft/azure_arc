@@ -97,7 +97,7 @@ resource "aws_instance" "default" {
     inline = [
       "sudo apt-get install -y python-ctypes",
       "sudo chmod +x /tmp/install_arc_agent.sh",
-      "/tmp/install_arc_agent.sh",
+      "sudo /tmp/install_arc_agent.sh",
     ]
   }
 }
@@ -119,7 +119,7 @@ data "template_file" "user_data" {
 }
 
 data "aws_iam_role" "ssmIamRoleAzureArc" {
-  name = "AWSServiceRoleForAmazonSSM"
+  name = "AmazonSSMRoleForInstancesQuickSetup"
 }
 
 // A variable for extracting the external ip of the instance
