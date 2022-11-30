@@ -116,7 +116,7 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "port": "11443"
+                "port": 11443
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]"
