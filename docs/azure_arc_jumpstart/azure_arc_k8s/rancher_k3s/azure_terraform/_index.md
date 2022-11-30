@@ -104,7 +104,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 The only thing you need to do before executing the Terraform plan is to create the tfvars file which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.
 
-- Navigate to the [terraform folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/terraform) and fill in the terraform.tfvars file with the values for your environment.
+- Navigate to the [terraform folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform) and fill in the terraform.tfvars file with the values for your environment.
 
     ![Screenshot showing terraform tfvars](./01.png)
 
