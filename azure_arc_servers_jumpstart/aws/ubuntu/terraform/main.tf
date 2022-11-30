@@ -73,6 +73,7 @@ resource "aws_instance" "default" {
   vpc_security_group_ids      = [aws_security_group.ingress-all.id]
   subnet_id                   = aws_subnet.subnet1.id
   user_data                   = data.template_file.user_data.rendered
+  iam_instance_profile        = data.aws_iam_role.ssmIamRoleAzureArc.name
   tags = {
     Name = var.hostname
   }
@@ -115,6 +116,10 @@ data "template_file" "user_data" {
     hostname = var.hostname
     }
   )
+}
+
+data "aws_iam_role" "ssmIamRoleAzureArc" {
+  name = "AWSServiceRoleForAmazonSSM"
 }
 
 // A variable for extracting the external ip of the instance
