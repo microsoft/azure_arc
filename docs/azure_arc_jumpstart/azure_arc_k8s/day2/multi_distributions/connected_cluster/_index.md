@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
-linkTitle: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
+title: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster via service account token authentication"
+linkTitle: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster via service account token authentication"
 weight: 5
 description: >
 ---
