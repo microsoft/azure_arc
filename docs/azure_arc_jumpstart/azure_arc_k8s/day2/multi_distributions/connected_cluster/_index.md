@@ -6,7 +6,7 @@ weight: 5
 description: >
 ---
 
-## Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster
+## Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster via service account token authentication
 
 The following Jumpstart scenario will guide you through how to use the [Cluster Connect](https://docs.microsoft.com/azure/azure-arc/kubernetes/cluster-connect) capability of an Azure Arc connected Kubernetes cluster to manage and connect to the cluster securely without opening inbound firewall ports.
 
