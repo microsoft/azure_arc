@@ -26,17 +26,15 @@ The following Jumpstart scenario will guide you through how to use the [Cluster 
 
 ## Prerequisites
 
-- Clone the Azure Arc Jumpstart repository
-
-    ```shell
-    git clone https://github.com/microsoft/azure_arc.git
-    ```
-
 - Ensure you are logged in to the Azure CLI or PowerShell
+
+  #### Option 1: Bash
 
   ```shell
   az login
   ```
+
+  #### Option 2: PowerShell
 
   ```powershell
   Connect-AzAccount
@@ -64,21 +62,28 @@ The following steps walk through using the Cluster Connect functionality using A
 
 - First, get values for the cluster name and resource group name in your terminal.
 
-Bash:
+  #### Option 1: Bash
+
   ```shell
   CLUSTER_NAME=<cluster-name>
   RESOURCE_GROUP=<resource-group-name>
   ```
 
-PowerShell:
+  #### Option 2: PowerShell
+
   ```powershell
   $CLUSTER_NAME = <cluster name>
   $RESOURCE_GROUP = <resource_group>
+
 - Second, obtain the _user principal name and ID_ of your AAD user account.
+
+  #### Option 1: Bash
 
   ```shell
   AAD_ENTITY=$(az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
   ```
+
+  #### Option 2: PowerShell
 
   ```powershell
   $AAD_ENTITY = (az ad signed-in-user show --query "[id, userPrincipalName]" -o tsv)
@@ -86,9 +91,13 @@ PowerShell:
 
 - Finally, create the Kubernetes _ClusterRoleBinding_ using the following:
 
+  #### Option 1: Bash
+
   ```shell
   while ID= read -r line; do  kubectl create clusterrolebinding jumpstart-binding-$line --clusterrole cluster-admin --user=$line; done <<< "$AAD_ENTITY"
   ```
+
+  #### Option 2: PowerShell
 
   ```powershell
   foreach($line in $AAD_ENTITY)
@@ -99,10 +108,14 @@ PowerShell:
 
 From your terminal, run the following command to establish the proxy to the cluster.  Note that the specific port number that's used may differ from the screenshot below.
 
+  #### Option 1: Bash
+
   ```shell
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
 
+  #### Option 2: PowerShell
+  
   ```powershell
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
