@@ -108,15 +108,7 @@ The following steps walk through using the Cluster Connect functionality using A
 
 From your terminal, run the following command to establish the proxy to the cluster.  Note that the specific port number that's used may differ from the screenshot below.
 
-  #### Option 1: Bash
-
   ```shell
-  az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
-  ```
-
-  #### Option 2: PowerShell
-  
-  ```powershell
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
 
