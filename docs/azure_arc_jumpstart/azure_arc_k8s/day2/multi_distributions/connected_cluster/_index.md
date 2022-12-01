@@ -70,11 +70,10 @@ Bash:
   RESOURCE_GROUP=<resource-group-name>
   ```
 
+PowerShell:
   ```powershell
   $CLUSTER_NAME = <cluster name>
   $RESOURCE_GROUP = <resource_group>
-  ```
-
 - Second, obtain the _user principal name and ID_ of your AAD user account.
 
   ```shell
