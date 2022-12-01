@@ -154,7 +154,7 @@ Write-Header "Configuring Azure Arc Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
 
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
-    az connectedk8s enable-features -n $using:clusterName -g $using:rg --features cluster-connect custom-locations
+    az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $using:rg --query id -o tsv
     Start-Sleep -Seconds 20
     az customlocation create --name $using:customLocation --resource-group $using:rg --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
