@@ -64,6 +64,7 @@ The following steps walk through using the Cluster Connect functionality using A
 
 - First, get values for the cluster name and resource group name in your terminal.
 
+Bash:
   ```shell
   CLUSTER_NAME=<cluster-name>
   RESOURCE_GROUP=<resource-group-name>
