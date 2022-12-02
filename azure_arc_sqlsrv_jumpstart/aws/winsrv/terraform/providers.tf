@@ -3,12 +3,12 @@
 #
 
 terraform {
-  required_version = "~> 0.12"
+  required_version = ">= 1.3.5"
   required_providers {
-    aws     = "~> 3.4"
-    local   = "~> 1.4"
-    http    = "~> 1.2.0"
-    azurerm = "~> 2.25.0"
+    aws     = ">= 4.42.0"
+    local   = ">= 2.2.3"
+    http    = ">= 3.2.1"
+    azurerm = ">= 3.33.0"
   }
 }
 
