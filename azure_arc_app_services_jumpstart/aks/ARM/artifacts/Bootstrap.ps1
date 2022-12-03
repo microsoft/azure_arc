@@ -105,7 +105,7 @@ workflow ClientTools_01
                         }
                     }
                 }
-                choco install azure-cli -y --version="2.40.0"                
+                choco install 'azure-cli' -y --version='2.40.0'
         }
 
 ClientTools_01 | Format-Table
