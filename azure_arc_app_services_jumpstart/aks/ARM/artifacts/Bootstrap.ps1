@@ -105,10 +105,11 @@ workflow ClientTools_01
                         }
                     }
                 }
-                choco install 'azure-cli' -y --version='2.40.0'
         }
 
 ClientTools_01 | Format-Table
+
+choco install 'azure-cli' -y --version='2.40.0'
 
 Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2135274" -OutFile "C:\Temp\FuncCLI.msi"
 Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\FuncCLI.msi /quiet'
