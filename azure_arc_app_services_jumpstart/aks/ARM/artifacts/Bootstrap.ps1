@@ -73,9 +73,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1" 
 
 # Installing tools
+choco install azure-cli --version=2.40.0 -y 
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
             #Run commands in parallel.
             Parallel 
                 {
@@ -102,7 +103,7 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                        }                        
+                        }
                     }
                 }
         }
@@ -123,5 +124,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content C:\Temp\Bootstrap.log -Force
