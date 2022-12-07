@@ -37,9 +37,11 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 Write-Header "Install latest versions of Nuget and PowershellGet"
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     Enable-PSRemoting -Force
+    $ProgressPreference = "SilentlyContinue"
     Install-PackageProvider -Name NuGet -Force 
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
     Install-Module -Name PowershellGet -Force
+    $ProgressPreference = "Continue"
 }
 
 # Install necessary AZ modules and initialize akshci on each node
@@ -47,12 +49,14 @@ Write-Header "Install necessary AZ modules plus AksHCI module and initialize aks
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
+    $ProgressPreference = "SilentlyContinue"
     Install-Module -Name AksHci -Force -AcceptLicense
     Import-Module Az.Accounts
     Import-Module Az.Resources
     Import-Module AzureAD
     Import-Module AksHci
     Initialize-AksHciNode
+    $ProgressPreference = "Continue"
 }
 
 # Generate unique name for workload cluster
