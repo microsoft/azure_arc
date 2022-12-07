@@ -37,9 +37,11 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 Write-Header "Install latest versions of Nuget and PowershellGet"
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     Enable-PSRemoting -Force
+    $ProgressPreference = "SilentlyContinue"
     Install-PackageProvider -Name NuGet -Force 
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
     Install-Module -Name PowershellGet -Force
+    $ProgressPreference = "Continue"
 }
 
 # Install necessary AZ modules and initialize akshci on each node
@@ -47,18 +49,14 @@ Write-Header "Install necessary AZ modules plus AksHCI module and initialize aks
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
-    
-    $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
-    foreach ($ModuleName in $ModuleNames){
-        if (!(Get-InstalledModule -Name $ModuleName -ErrorAction Ignore)){
-            Install-Module -Name $ModuleName -Force -AcceptLicense 
-        }
-    }
+    $ProgressPreference = "SilentlyContinue"
+    Install-Module -Name AksHci -Force -AcceptLicense
     Import-Module Az.Accounts
     Import-Module Az.Resources
     Import-Module AzureAD
     Import-Module AksHci
     Initialize-AksHciNode
+    $ProgressPreference = "Continue"
 }
 
 # Generate unique name for workload cluster
@@ -97,5 +95,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     kubectl get nodes
     kubectl get pods -A
 }
+
+# Set env variable deployAKSHCI to true (in case the script was run manually)
+[System.Environment]::SetEnvironmentVariable('deployAKSHCI', 'true',[System.EnvironmentVariableTarget]::Machine)
 
 Stop-Transcript
