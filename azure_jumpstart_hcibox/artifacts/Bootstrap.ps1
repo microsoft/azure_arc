@@ -10,8 +10,10 @@ param (
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
     [string]$templateBaseUrl,
+    [string]$registerCluster,
     [string]$deployAKSHCI,
-    [string]$deployResourceBridge
+    [string]$deployResourceBridge,
+    [string]$natDNS
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -29,6 +31,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating HCIBox path
 Write-Output "Creating HCIBox paths"
@@ -116,8 +120,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFil
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HCIBoxSDNDir\Single-NC.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxSDNDir\LogInstructions.txt
 
-# Replace password placeholder
+# Replace password and DNS placeholder
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
+(Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-natDNS%',$natDNS | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

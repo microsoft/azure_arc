@@ -194,6 +194,9 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the HCIBox Log Analytics workspace
   - _`deployBastion`_ - Option to deploy Azure Bastion which used to connect to the _HCIBox-Client_ VM instead of normal RDP.
+  - _`registerCluster`_ - Option to automatically register the cluster; set to true by default
+  - _`deployAKSHCI`_ - Option to automatically deploy and configure AKS on HCI; set to true by default
+  - _`registerCluster`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
@@ -343,7 +346,7 @@ HCIBox comes pre-configured with [Azure Kubernetes Service on Azure Stack HCI](h
 
 ### Advanced Configurations
 
-HCIBox provides a full Azure Stack HCI sandbox experience with minimal configuration required by the user. Some advanced users may be interested in changing HCIBox's default settings. Many advanced settings can be configured by modifying the values in the [_HCIBox-Config.psd1_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_hcibox/artifacts/HCIBox-Config.psd1) PowerShell file. If you wish to make changes to this file, you must fork the Jumpstart repo and make the changes in your fork, then set the optional _githubAccount_ and _githubBranch_ deployment template parameters to point to your fork.
+HCIBox provides a full Azure Stack HCI sandbox experience with minimal configuration required by the user. Some users may be interested in changing HCIBox's default configuration. Many advanced settings can be configured by modifying the values in the [_HCIBox-Config.psd1_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_hcibox/artifacts/HCIBox-Config.psd1) PowerShell file. If you wish to make changes to this file, you must fork the Jumpstart repo and make the changes in your fork, then set the optional _githubAccount_ and _githubBranch_ deployment template parameters to point to your fork.
 
   > **NOTE: Advanced configuration deployments are not supported by the Jumpstart team. Changes made to the _HCIBox-Config.psd1_ file may result in failures at any point in HCIBox deployment. Make changes to this file only if you understand the implications of the change.**
 
