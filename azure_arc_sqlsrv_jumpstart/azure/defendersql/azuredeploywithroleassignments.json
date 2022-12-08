@@ -1,0 +1,241 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sshRSAPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "RSA public key used for securing SSH access to ArcBox resources"
+      }
+    },
+    "spnClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure service principal client id"
+      }
+    },
+    "spnClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Azure service principal client secret"
+      }
+    },
+    "spnTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD tenant id for your service principal"
+      }
+    },
+    "windowsAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for Windows account"
+      }
+    },
+    "windowsAdminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+      },
+      "allowedValues": [
+        "Full",
+        "ITPro",
+        "DevOps"
+      ],
+      "defaultValue": "Full"
+    },
+    "githubAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "microsoft"
+    },
+    "githubBranch": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": true
+    },
+    "githubUser": {
+      "type": "string",
+      "metadata": {
+        "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
+      },
+      "defaultValue": "microsoft"
+    },
+    "principalId": {
+      "type": "string",
+      "metadata": {
+        "description": "The principal to assign the role to"
+      }
+    },
+    "securityAdminRoleGuid": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "contributorRoleGuid": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "securityReaderRoleGuid": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "monitoringMetricsRoleGuid": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "userAccessAdministratorRoleGuid": {
+      "type": "string",
+      "defaultValue": "[newGuid()]"
+    },
+    "epochTime": {
+      "type": "int",
+      "defaultValue": "[dateTimeToEpoch(dateTimeAdd(utcNow(), 'P0Y'))]"
+    }
+  },
+  "variables": {
+    "RoleDeploymentName": "[concat('Deployment-ArcBox-Roles-', parameters('flavor'), '_', parameters('epochTime'))]",
+    "rgLocation": "[resourceGroup().location]",
+    "SecurityAdminRoleName": "[parameters('securityAdminRoleGuid')]",
+    "ContributorRoleName": "[parameters('contributorRoleGuid')]",
+    "SecurityReaderRoleName": "[parameters('securityReaderRoleGuid')]",
+    "MonitoringMetricsRoleName": "[parameters('monitoringMetricsRoleGuid')]",
+    "UserAccessAdministratorRoleName": "[parameters('userAccessAdministratorRoleGuid')]",
+    "SecurityAdmin": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'fb1c8493-542b-48eb-b624-b4c8fea62acd')]",
+    "Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+    "SecurityReader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '39bc4728-0917-49c7-9d2c-d95423bc2eb4')]",
+    "MonitoringMetricsPublisher": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '3913510d-42f4-4e42-8a64-420c390055eb')]",
+    "UserAccessAdministrator": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[variables('RoleDeploymentName')]",
+      "subscriptionId": "[subscription().subscriptionId]",
+      "location": "[variables('rgLocation')]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[variables('SecurityAdminRoleName')]",
+              "properties": {
+                "roleDefinitionId": "[variables('SecurityAdmin')]",
+                "principalId": "[parameters('principalId')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[variables('ContributorRoleName')]",
+              "properties": {
+                "roleDefinitionId": "[variables('Contributor')]",
+                "principalId": "[parameters('principalId')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[variables('SecurityReaderRoleName')]",
+              "properties": {
+                "roleDefinitionId": "[variables('SecurityReader')]",
+                "principalId": "[parameters('principalId')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[variables('MonitoringMetricsRoleName')]",
+              "properties": {
+                "roleDefinitionId": "[variables('MonitoringMetricsPublisher')]",
+                "principalId": "[parameters('principalId')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2018-09-01-preview",
+              "name": "[variables('UserAccessAdministratorRoleName')]",
+              "properties": {
+                "roleDefinitionId": "[variables('UserAccessAdministrator')]",
+                "principalId": "[parameters('principalId')]"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[concat('Deployment-ArcBox-', parameters('flavor'), '_', parameters('epochTime'))]",
+      "dependsOn": [
+        "[variables('RoleDeploymentName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/ARM/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          }
+        }
+      }
+    }
+  ]
+}
