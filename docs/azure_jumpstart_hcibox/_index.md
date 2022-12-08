@@ -196,7 +196,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - _`deployBastion`_ - Option to deploy Azure Bastion which used to connect to the _HCIBox-Client_ VM instead of normal RDP.
   - _`registerCluster`_ - Option to automatically register the cluster; set to true by default
   - _`deployAKSHCI`_ - Option to automatically deploy and configure AKS on HCI; set to true by default
-  - _`registerCluster`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
+  - _`deployResourceBridge`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
