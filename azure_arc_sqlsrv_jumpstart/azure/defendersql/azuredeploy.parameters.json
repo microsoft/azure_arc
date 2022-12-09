@@ -25,6 +25,9 @@
         },
         "githubUser": {
             "value": "microsoft"
+        },
+        "githubBranch": {
+            "value": "main"
         }
     }
 }

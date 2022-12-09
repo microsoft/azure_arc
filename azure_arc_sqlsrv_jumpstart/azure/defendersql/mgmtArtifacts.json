@@ -36,18 +36,6 @@
         "description": "SKU, leave default pergb2018"
       }
     },
-    "templateBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
-      }
-    },
-    "flavor": {
-      "type": "string",
-      "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
-      }
-    },
     "deployBastion": {
       "type": "bool",
       "metadata": {
@@ -83,7 +71,6 @@
       "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
@@ -136,7 +123,6 @@
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
         "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('bastionNetworkSecurityGroupName'))]"
       ],
       "properties": {
@@ -146,107 +132,6 @@
           ]
         },
         "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-05-01",
-      "name": "[parameters('networkSecurityGroupName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "allow_k8s_80",
-            "properties": {
-              "priority": 1003,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "80"
-            }
-          },
-          {
-            "name": "allow_k8s_8080",
-            "properties": {
-              "priority": 1004,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "8080"
-            }
-          },
-          {
-            "name": "allow_k8s_443",
-            "properties": {
-              "priority": 1005,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "443"
-            }
-          },
-          {
-            "name": "allow_k8s_kubelet",
-            "properties": {
-              "priority": 1006,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "10250"
-            }
-          },
-          {
-            "name": "allow_traefik_lb_external",
-            "properties": {
-              "priority": 1007,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "32323"
-            }
-          },
-          {
-            "name": "allow_SQLMI_traffic",
-            "properties": {
-              "priority": 1008,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "11433 "
-            }
-          },
-          {
-            "name": "allow_Postgresql_traffic",
-            "properties": {
-              "priority": 1009,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "15432"
-            }
-          }
-        ]
       }
     },
     {
@@ -383,7 +268,6 @@
       "apiVersion": "2015-11-01-preview",
       "location": "[parameters('location')]",
       "name": "[variables('Updates').name]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
@@ -421,7 +305,6 @@
       "apiVersion": "2015-11-01-preview",
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
@@ -471,7 +354,6 @@
       "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
       "apiVersion": "2020-08-01",
       "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[parameters('workspaceName')]",
@@ -479,32 +361,6 @@
       ],
       "properties": {
         "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "name": "policyDeployment",
-      "dependsOn": [
-        "[parameters('workspaceName')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('policyTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "azureLocation": {
-            "value": "[parameters('location')]"
-          },
-          "logAnalyticsWorkspace": {
-            "value": "[parameters('workspaceName')]"
-          },
-          "flavor": {
-            "value": "[parameters('flavor')]"
-          }
-        }
       }
     },
     {
