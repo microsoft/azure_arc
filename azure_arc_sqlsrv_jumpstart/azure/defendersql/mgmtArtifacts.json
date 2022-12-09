@@ -288,7 +288,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
