@@ -125,18 +125,6 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
-      "name": "stagingStorageAccountDeployment",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('mgmtStagingStorageUrl')]",
-          "contentVersion": "1.0.0.0"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
       "name": "mgmtArtifactsAndPolicyDeployment",
       "properties": {
         "mode": "Incremental",
