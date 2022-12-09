@@ -72,8 +72,7 @@
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_sqlsrv_jumpstart/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/defendersql/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/defendersql/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'azure/defendersql/mgmtStagingStorage.json')]"
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/defendersql/mgmtArtifacts.json')]"
   },
   "resources": [
     {
