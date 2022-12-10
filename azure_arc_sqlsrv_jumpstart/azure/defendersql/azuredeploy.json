@@ -130,9 +130,6 @@
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
           }
