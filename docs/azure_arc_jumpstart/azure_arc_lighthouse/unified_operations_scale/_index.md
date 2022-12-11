@@ -35,7 +35,7 @@ After you finish the onboarding process you will have a central management tenan
 
 Once you have centralized all operations in Azure using Lighthouse and Azure's Operations and Management tools, you can stretch these services to run across on-premises, other clouds, or the edge.
 
-With Azure Arc, your on-premises and other cloud deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters, or data services can be treated as first-class citizens of Azure.  As with any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign RBAC, and can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Microsoft Sentinel, or Azure Automation.
+With Azure Arc, your on-premises and other cloud deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters, or data services can be treated as first-class citizens of Azure.  As with any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign Role-based access control (RBAC), and can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Microsoft Sentinel, or Azure Automation.
 
 ![Azure Lighthouse and Azure Arc Diagram](./02.png)
 

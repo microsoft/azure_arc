@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "myIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Your public IP address, used to RDP to the client VM"
-      }
-    },    
     "addsDomainName": {
       "type": "string",
       "defaultValue": "jumpstart.local",
@@ -106,14 +100,14 @@
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
       }
-    },   
+    },
     "deployBastion": {
       "type": "bool",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "defaultValue" : false
-    }    
+      "defaultValue": false
+    }
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
@@ -130,8 +124,8 @@
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
-            "[variables('nsgRef')]"
-         ],
+        "[variables('nsgRef')]"
+      ],
       "properties": {
         "ipConfigurations": [
           {
@@ -141,16 +135,16 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress":"[parameters('addsPrivateIPAddress')]"
+              "privateIPAddress": "[parameters('addsPrivateIPAddress')]"
             }
           }
         ],
         "networkSecurityGroup": {
           "id": "[variables('nsgRef')]"
-        }       
+        }
       }
     },
-     {
+    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2021-11-01",
       "name": "[variables('vmName')]",
@@ -158,7 +152,7 @@
       "tags": "[parameters('resourceTags')]",
       "dependsOn": [
         "[variables('networkInterfaceRef')]"
-        ],
+      ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -206,7 +200,7 @@
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ],
-     "properties": {
+      "properties": {
         "publisher": "Microsoft.Compute",
         "type": "CustomScriptExtension",
         "typeHandlerVersion": "1.10",
@@ -223,23 +217,23 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2021-08-01",
       "name": "[parameters('networkSecurityGroupName')]",
-      "location": "[parameters('azureLocation')]",
+      "location": "[parameters('azureLocation')]"
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+      "apiVersion": "2022-05-01",
+      "condition": "[parameters('deployBastion')]",
+      "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
+      "name": "[concat(parameters('networkSecurityGroupName'),'/allow_RDP_3389')]",
       "properties": {
-        "securityRules": [
-          {
-            "name": "allow_RDP_3389",
-            "properties": {
-              "priority": 1001,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "[if(parameters('deployBastion'),parameters('bastionSubnetPrefix'), parameters('myIpAddress'))]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "3389"
-            }
-          }
-        ]
+        "priority": 1001,
+        "protocol": "TCP",
+        "access": "Allow",
+        "direction": "Inbound",
+        "sourceAddressPrefix": "[parameters('bastionSubnetPrefix')]",
+        "sourcePortRange": "*",
+        "destinationAddressPrefix": "*",
+        "destinationPortRange": "3389"
       }
     }
   ],

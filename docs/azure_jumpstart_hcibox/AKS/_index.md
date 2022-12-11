@@ -26,7 +26,7 @@ Azure Stack HCI can provide host infrastructure for [Azure Kubernetes Service cl
 
   ![Screenshot showing running GitOps script](./deploying_gitops.png)
 
-- Once this script completes you will have a "Hello-Arc" icon on your desktop. Open this link to see the Hello Arc application deployed on your cluster.
+- Once this script completes you will have a "Hello-Arc" icon on desktop of AdminCenter computer. Open this link to see the Hello Arc application deployed on your cluster.
 
   ![Screenshot showing Hello Arc link](./hello_arc_desktop.png)
 

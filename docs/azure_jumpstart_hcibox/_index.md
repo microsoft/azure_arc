@@ -117,7 +117,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.ResourceConnector --wait
   ```
 
-- Create Azure service principal (SP). To deploy HCIBox, an Azure service principal assigned with the _Owner_ role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
+- Create Azure service principal (SP). To deploy HCIBox, an Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
   - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
 
@@ -196,7 +196,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - _`deployBastion`_ - Option to deploy Azure Bastion which used to connect to the _HCIBox-Client_ VM instead of normal RDP.
   - _`registerCluster`_ - Option to automatically register the cluster; set to true by default
   - _`deployAKSHCI`_ - Option to automatically deploy and configure AKS on HCI; set to true by default
-  - _`registerCluster`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
+  - _`deployResourceBridge`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
