@@ -418,7 +418,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
 - Open Hyper-V and access the Azure Arc-enabled servers
-  - **Username: arcdemo**
+  - **Username: administrator**
   - **Password: ArcDemo123!!**
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
