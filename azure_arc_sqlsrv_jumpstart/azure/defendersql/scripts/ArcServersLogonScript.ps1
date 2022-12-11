@@ -66,7 +66,7 @@ $Env:AZCOPY_BUFFER_GB=4
 
 # Other ArcBox flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
+azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" --recursive=true --check-length=false --log-level=ERROR
 
 # Create the nested VMs
 Write-Header "Create Hyper-V VMs"
@@ -186,6 +186,13 @@ if(-not $hasPermission) {
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 }
+
+# Enable defender for cloud
+Set-AzSecurityPricing -Name "SqlServerVirtualMachines" -PricingTier "Standard" -Subscription $Env:subscriptionId
+
+# Test Defender for SQL
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\testDefenderForSQL.ps1 -saPassword $nestedWindowsPassword } -Credential $winCreds
+
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
