@@ -131,12 +131,18 @@ $extensionId = az k8s-extension show --name arc-data-services `
 Start-Sleep -Seconds 20
 
 # Create Custom Location
-az customlocation create --name "$Env:capiArcDataClusterName-cl" `
+az connectedk8s enable-features -n $connectedClusterName `
+                                -g $Env:resourceGroup `
+                                --custom-locations-oid $Env:customLocationRPOID `
+                                --features cluster-connect custom-locations
+
+$customLocationName = "$connectedClusterName-cl"
+
+az customlocation create --name $customlocationName `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $connectedClusterId `
-                         --cluster-extension-ids $extensionId `
-                         --kubeconfig $Env:KUBECONFIG
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
