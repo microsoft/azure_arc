@@ -36,13 +36,13 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with an RBAC Contributor role is required:
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with an Role-based access control (RBAC) _Contributor_ role is required:
 
   - "Contributor" - Required for provisioning Azure resources
 

@@ -28,13 +28,13 @@ in this scenario, a [Rancher K3s](https://rancher.com/docs/k3s/latest/en/), sing
     git clone https://github.com/microsoft/azure_arc.git
     ```
   
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with "Contributor" RBAC role is required for provisioning Azure resources
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with "Contributor" Role-based access control (RBAC) is required for provisioning Azure resources
 
     To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 

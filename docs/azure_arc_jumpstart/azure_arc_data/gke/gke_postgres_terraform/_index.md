@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Deploy an Azure PostgreSQL Deployment on GKE using a Terraform plan
+## Deploy an Azure Arc-enabled PostgreSQL Deployment on GKE using a Terraform plan
 
 The following scenario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
@@ -36,7 +36,7 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-- [Install or update Azure CLI to version 2.40.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -54,7 +54,7 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
 
 - [Install Terraform 1.0 or higher](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with a RBAC role is required:
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal Role-based access control (RBAC) is required:
 
   - "Owner" - Required for provisioning Azure resources, interact with Azure Arc-enabled data services billing, monitoring metrics, and logs management and creating role assignment for the Monitoring Metrics Publisher role.
 

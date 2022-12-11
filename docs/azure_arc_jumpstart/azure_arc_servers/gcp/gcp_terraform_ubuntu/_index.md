@@ -18,13 +18,27 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key)
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
+
+  ```shell
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```
 
 - [Create free Google Cloud account]((https://cloud.google.com/free))
 
@@ -38,7 +52,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
 
     ![Screenshot showing how to enable billing on GCP account](./03.png)
 
-    ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
+    **Disclaimer - To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
 - Create Azure service principal (SP)
 
@@ -125,13 +139,13 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     ![Screenshot of GCP console showing enabling Compute Engine API](./07.png)
 
-- Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/ubuntu/terraform*](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform) directory.
+- Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [_azure_arc_servers_jumpstart/gcp/ubuntu/terraform_](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform) directory.
 
     ![Screenshot of GCP cloud console showing creation of service account](./08.png)
 
     ![Screenshot of GCP cloud console showing creation of service account](./09.png)
 
-- Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/main.tf) to use a key with a different path.
+- Finally, make sure your SSH keys are available in _~/.ssh_ and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [_main.tf_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/main.tf) to use a key with a different path.
 
 ## Deployment
 
@@ -167,7 +181,7 @@ The only thing you need to do before executing the Terraform plan is to create t
 
 - SSH the VM using the ```ssh arcdemo@x.x.x.x``` where x.x.x.x is the host ip.
 
-- Provide values to the environment variables to match your environment in the file [*vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/scripts/vars.sh). Export the variables by copying and pasting the contents of the file
+- Provide values to the environment variables to match your environment in the file [_vars.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/scripts/vars.sh). Export the variables by copying and pasting the contents of the file
 
     ![Screenshot showing export of environment variables from vars.sh](./15.png)
 

@@ -18,7 +18,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -175,7 +175,7 @@ By design, port ssh is not allowed on the network security group. Therefore, you
 
 - Open the _Arc-Linux-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing Arc-App-Client NSG with blocked ssh](./05.png)
+  ![Screenshot showing Arc-Linux-Demo-NSG with blocked ssh](./05.png)
 
   ![Screenshot showing adding a new inbound security rule](./06.png)
 
@@ -193,7 +193,7 @@ By design, port ssh is not allowed on the network security group. Therefore, you
 
   ![Screenshot showing connecting to the VM using Bastion](./10.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
 
 ### Connect using just-in-time access (JIT)
 

@@ -224,10 +224,20 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
   ```shell
-  ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
   ```
 
 ## Deployment Option 1: Azure portal
@@ -239,6 +249,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy02.png)
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy03.png)
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/devops/#basic-troubleshooting).**
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -275,6 +287,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az deployment group create](./az_deploy.png)
 
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/devops/#basic-troubleshooting).**
+
 ## Deployment Option 3: Azure Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
@@ -310,6 +324,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az group create --name "<resource-group-name>"  --location "<preferred-location>"
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/devops/#basic-troubleshooting).**
 
 ## Deployment Option 4: HashiCorp Terraform Deployment
 
@@ -372,6 +388,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Example output from `terraform apply "infra.out"`:
 
   ![terraform plan](./terraform_apply.png)
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/devops/#basic-troubleshooting).**
 
 ## Start post-deployment automation
 

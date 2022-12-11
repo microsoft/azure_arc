@@ -22,15 +22,29 @@ By the end of this scenario, you will have a CAPI Kubernetes cluster deployed wi
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
+  ```shell
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```
+
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple Role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
@@ -86,7 +100,7 @@ in this scenario and as part of the automation flow (described below), a [Ranche
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
+- User is editing the ARM template parameters file (1-time edit) and export the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) Object ID (OID) variable to use it as a parameter. These parameters values are being used throughout the deployment.
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json) will initiate the deployment of the linked ARM templates:
 
@@ -110,13 +124,26 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and K3s Rancher VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   - _`bastionHostName`_ - Azure Bastion host name.
+
+- You will also need to get the Azure Custom Location Resource Provider (RP) Object ID (OID) and export it as an environment variable. This is required to enable [Custom Location](https://learn.microsoft.com/azure/azure-arc/platform/conceptual-custom-locations) on your cluster.
+
+  > **NOTE: You need permissions to list all the service principals.**
+  #### Option 1: Bash
+  ```bash
+  customLocationRPOID=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
+
+  #### Option 2: PowerShell
+
+  ```powershell
+  $customLocationRPOID=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM) and run the below command:
 
@@ -126,7 +153,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
-    --parameters <The *azuredeploy.parameters.json- parameters file location>
+    --parameters <The _azuredeploy.parameters.json_ parameters file location> \
+    --parameters customLocationRPOID="$customLocationRPOID"
     ```
 
     > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _azuredeploy.parameters.json_ file**
@@ -139,6 +167,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --resource-group Arc-Data-Demo \
     --name arcdatademo \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
+    --parameters customLocationRPOID="$customLocationRPOID" \
     --parameters azuredeploy.parameters.json
     ```
 
@@ -154,29 +183,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot showing Client VM public IP](./04.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure_dc_vanilla_arm_template/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure_dc_vanilla_arm_template/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure_dc_vanilla_arm_template/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with RDP
 
-    ![Screenshot showing connecting using Azure Bastion](./05.png)
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client-NSG with blocked RDP](./04.png)
+
+  ![Screenshot showing adding a new inbound security rule](./05.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./06.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./07.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./08.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./09.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./10.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./11.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Arc Data Controller will be deployed on the cluster and be ready to use.
-
-    ![Screenshot showing the PowerShell logon script run](./06.png)
-
-    ![Screenshot showing the PowerShell logon script run](./07.png)
-
-    ![Screenshot showing the PowerShell logon script run](./08.png)
-
-    ![Screenshot showing the PowerShell logon script run](./09.png)
-
-    ![Screenshot showing the PowerShell logon script run](./10.png)
-
-    ![Screenshot showing the PowerShell logon script run](./11.png)
 
     ![Screenshot showing the PowerShell logon script run](./12.png)
 
@@ -194,7 +246,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot showing the PowerShell logon script run](./19.png)
 
-    ![Screenshot showing the post-run desktop](./20.png)
+    ![Screenshot showing the PowerShell logon script run](./20.png)
+
+    ![Screenshot showing the PowerShell logon script run](./21.png)
+
+    ![Screenshot showing the PowerShell logon script run](./22.png)
+
+    ![Screenshot showing the PowerShell logon script run](./23.png)
+
+    ![Screenshot showing the PowerShell logon script run](./24.png)
+
+    ![Screenshot showing the PowerShell logon script run](./25.png)
+
+    ![Screenshot showing the post-run desktop](./26.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -202,13 +266,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing additional Azure resources in the resource group](./21.png)
+  ![Screenshot showing additional Azure resources in the resource group](./27.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-    ![Screenshot showing Azure Data Studio shortcut](./22.png)
+    ![Screenshot showing Azure Data Studio shortcut](./28.png)
 
-    ![Screenshot showing Azure Data Studio extensions](./23.png)
+    ![Screenshot showing Azure Data Studio extensions](./29.png)
 
 ## Cluster extensions
 
@@ -224,9 +288,9 @@ In this scenario, four Azure Arc-enabled Kubernetes cluster extensions were inst
 
 - In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./24.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./30.png)
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./25.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./31.png)
 
 ### Exploring logs from the Client virtual machine
 
@@ -238,10 +302,10 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 | _C:\Temp\DataServicesLogonScript.log_ | Output of _DataServicesLogonScript.ps1_ which configures Azure Arc-enabled data services baseline capability. |
 | _C:\Temp\installCAPI.log_ | Output from the custom script extension which runs on _Arc-Data-CAPI-MGMT_ and configures the Cluster API for Azure cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuCapi.json_ then review this log. |
 
-![Screenshot showing the Temp folder with deployment logs](./26.png)
+![Screenshot showing the Temp folder with deployment logs](./32.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./27.png)
+    ![Screenshot showing Azure resource group deletion](./33.png)

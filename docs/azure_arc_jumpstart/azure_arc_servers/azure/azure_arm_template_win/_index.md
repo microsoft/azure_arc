@@ -18,7 +18,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -193,7 +193,7 @@ By design, port 3389 is not allowed on the network security group. Therefore, yo
 
   ![Screenshot showing connecting to the VM using Bastion](./10.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
 
 ### Connect using just-in-time access (JIT)
 

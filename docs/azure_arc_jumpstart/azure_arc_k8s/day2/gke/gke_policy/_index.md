@@ -20,7 +20,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -68,7 +68,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
 
 * Create Azure service principal (SP)
 
-    > **NOTE: This guide assumes you will be working with a service principal assigned with the 'Contributor' role as described below. If you want to further limit the RBAC scope of your service Principal, you can assign it with the 'Policy Insights Data Writer (Preview)' role the Azure Arc-enabled Kubernetes cluster as described [here](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/governance/policy/concepts/policy-for-kubernetes.md#install-azure-policy-add-on-for-azure-arc-enabled-kubernetes-preview).**
+    > **NOTE: This guide assumes you will be working with a service principal assigned with the 'Contributor' role as described below. If you want to further limit the Role-based access control (RBAC) scope of your service Principal, you can assign it with the 'Policy Insights Data Writer (Preview)' role the Azure Arc-enabled Kubernetes cluster as described [here](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/governance/policy/concepts/policy-for-kubernetes.md#install-azure-policy-add-on-for-azure-arc-enabled-kubernetes-preview).**
 
 * To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in Azure Cloud Shell).
 

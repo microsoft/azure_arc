@@ -22,15 +22,29 @@ By the end of this scenario, you will have an ARO cluster deployed with an Azure
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
+  ```shell
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```
+
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple Role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
@@ -122,7 +136,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and aro cluster.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to _**false**_.
   - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this scenario we leave it set to _**false**_.
@@ -165,29 +178,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot showing the Client VM public IP](./05.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_arm_template/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_arm_template/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_arm_template/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with RDP
 
-    ![Screenshot showing connecting using Azure Bastion](./06.png)
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client-NSG with blocked RDP](./05.png)
+
+  ![Screenshot showing adding a new inbound security rule](./06.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./07.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./08.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./09.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./10.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./11.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./12.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aro/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and PostgreSQL will be deployed on the cluster and be ready to use.
-
-  ![Screenshot showing the PowerShell logon script run](./07.png)
-
-  ![Screenshot showing the PowerShell logon script run](./08.png)
-
-  ![Screenshot showing the PowerShell logon script run](./09.png)
-
-  ![Screenshot showing the PowerShell logon script run](./10.png)
-
-  ![Screenshot showing the PowerShell logon script run](./11.png)
-
-  ![Screenshot showing the PowerShell logon script run](./12.png)
 
   ![Screenshot showing the PowerShell logon script run](./13.png)
 
@@ -227,7 +263,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./31.png)
 
-  ![Screenshot showing the post-run desktop](./32.png)
+  ![Screenshot showing the PowerShell logon script run](./32.png)
+
+  ![Screenshot showing the PowerShell logon script run](./33.png)
+
+  ![Screenshot showing the PowerShell logon script run](./34.png)
+
+  ![Screenshot showing the PowerShell logon script run](./35.png)
+
+  ![Screenshot showing the PowerShell logon script run](./36.png)
+
+  ![Screenshot showing the PowerShell logon script run](./37.png)
+
+  ![Screenshot showing the post-run desktop](./38.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
@@ -239,17 +287,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - _Azure Arc-enabled PostgreSQL_ - The PostgreSQL instance that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing additional Azure resources in the resource group](./33.png)
+  ![Screenshot showing additional Azure resources in the resource group](./39.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./34.png)
+  ![Screenshot showing Azure Data Studio shortcut](./40.png)
 
-  ![Screenshot showing Azure Data Studio extensions](./35.png)
+  ![Screenshot showing Azure Data Studio extensions](./41.png)
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL connection](./36.png)
+  ![Screenshot showing Azure Data Studio PostgresSQL connection](./42.png)
 
 ## Cluster extensions
 
@@ -261,12 +309,12 @@ In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were insta
 
 In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./37.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./43.png)
 
-![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./38.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./44.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./39.png)
+    ![Screenshot showing Azure resource group deletion](./45.png)

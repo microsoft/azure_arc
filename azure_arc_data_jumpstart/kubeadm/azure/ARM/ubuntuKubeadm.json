@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to RDP to the client VM"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "Arc-Data-Kubeadm-MGMT",
@@ -172,24 +166,11 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2022-05-01",
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "securityRules": [
-                    {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1000,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
-                        }
-                    },
                     {
                         "name": "kubeadmWeb",
                         "properties": {
@@ -204,6 +185,23 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2022-05-01",
+            "name": "[concat(parameters('networkSecurityGroupName'),'/allow_SSH_22')]",
+            "condition": "[parameters('deployBastion')]",
+            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
+            "properties": {
+                "priority": 1002,
+                "protocol": "TCP",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "22"
             }
         },
         {
