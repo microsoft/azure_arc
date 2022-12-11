@@ -199,12 +199,13 @@ rules:
   - apiextensions.k8s.io
   resourceNames:
   - activedirectoryconnectors.arcdata.microsoft.com
+  - sqlmanagedinstancemonitoringprofiles.arcdata.microsoft.com
   - datacontrollers.arcdata.microsoft.com
   - exporttasks.tasks.arcdata.microsoft.com
   - failovergroups.sql.arcdata.microsoft.com
   - kafkas.arcdata.microsoft.com
   - monitors.arcdata.microsoft.com
-  - otelcollectors.arcdata.microsoft.com
+  - telemetrycollectors.arcdata.microsoft.com
   - postgresqls.arcdata.microsoft.com
   - sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
   - sqlmanagedinstances.sql.arcdata.microsoft.com
@@ -328,11 +329,11 @@ spec:
         kubernetes.io/os: linux
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.12.0_2022-10-11
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.13.0_2022-11-08
         imagePullPolicy: Always
         args:
         - -image
-        - mcr.microsoft.com/arcdata/arc-bootstrapper:v1.12.0_2022-10-11
+        - mcr.microsoft.com/arcdata/arc-bootstrapper:v1.13.0_2022-11-08
         - -policy
         - Always
         - -chart

@@ -171,12 +171,13 @@ rules:
   - apiextensions.k8s.io
   resourceNames:
   - activedirectoryconnectors.arcdata.microsoft.com
+  - sqlmanagedinstancemonitoringprofiles.arcdata.microsoft.com
   - datacontrollers.arcdata.microsoft.com
   - exporttasks.tasks.arcdata.microsoft.com
   - failovergroups.sql.arcdata.microsoft.com
   - kafkas.arcdata.microsoft.com
   - monitors.arcdata.microsoft.com
-  - otelcollectors.arcdata.microsoft.com
+  - telemetrycollectors.arcdata.microsoft.com
   - postgresqls.arcdata.microsoft.com
   - sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
   - sqlmanagedinstances.sql.arcdata.microsoft.com
