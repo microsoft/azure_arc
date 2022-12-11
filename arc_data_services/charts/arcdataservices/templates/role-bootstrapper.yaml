@@ -70,8 +70,9 @@ rules:
   - arcdata.microsoft.com
   resources:
   - activedirectoryconnectors
+  - sqlmanagedinstancemonitoringprofiles
   - monitors
-  - otelcollectors
+  - telemetrycollectors
   - telemetryrouters
   - kafkas
   verbs:
@@ -85,11 +86,12 @@ rules:
   - arcdata.microsoft.com
   resources:
   - activedirectoryconnectors
+  - sqlmanagedinstancemonitoringprofiles
   - datacontrollers
   - exporttasks
   - kafkas
   - monitors
-  - otelcollectors
+  - telemetrycollectors
   - telemetryrouters
   - postgresqls
   - sqlmanagedinstances
@@ -106,11 +108,12 @@ rules:
   - arcdata.microsoft.com
   resources:
   - activedirectoryconnectors/status
+  - sqlmanagedinstancemonitoringprofiles/status
   - datacontrollers/status
   - exporttasks/status
   - kafkas/status
   - monitors/status
-  - otelcollectors/status
+  - telemetrycollectors/status
   - telemetryrouters/status
   - postgresqls/status
   - sqlmanagedinstances/status
