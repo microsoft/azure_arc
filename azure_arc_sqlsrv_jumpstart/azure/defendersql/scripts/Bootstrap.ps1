@@ -7,7 +7,6 @@ param (
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$azureLocation,
-    [string]$stagingStorageAccountName,
     [string]$workspaceName,
     [string]$githubUser,
     [string]$templateBaseUrl,
@@ -26,7 +25,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
@@ -57,7 +55,7 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 $ErrorActionPreference = 'SilentlyContinue'
 
 # Copy PowerShell Profile and Reload
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
 
 # Extending C:\ partition to the maximum size
@@ -96,12 +94,10 @@ foreach ($app in $appsToInstall)
 
 Write-Header "Fetching GitHub Artifacts"
 
-# All flavors
 Write-Host "Fetching Artifacts for All Flavors"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile $Env:ArcBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 
-# ITPro
 Write-Host "Fetching Artifacts for Arc SQL Server"
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgent.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgent.ps1
@@ -109,7 +105,7 @@ Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgent
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcBoxIconDir\arcsql.ico
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
-
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1
 
 Write-Header "Configuring Logon Scripts"
 
