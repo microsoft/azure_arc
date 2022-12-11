@@ -191,6 +191,7 @@ if(-not $hasPermission) {
 Set-AzSecurityPricing -Name "SqlServerVirtualMachines" -PricingTier "Standard" -Subscription $Env:subscriptionId
 
 # Test Defender for SQL
+Copy-VMFile ArcBox-SQL -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1 " -DestinationPath C:\ArcBox\testDefenderForSQL.ps1 -CreateFullPath -FileSource Host
 Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\testDefenderForSQL.ps1 -saPassword $nestedWindowsPassword } -Credential $winCreds
 
 
