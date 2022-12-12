@@ -45,54 +45,6 @@
                 }
             },
             {
-                "name": "(ArcBox) ALSANCHTEST Deploy Linux Log Analytics agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
-                "flavors": [
-                    "Full",
-                    "ITPro"
-                ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                "parameters": {
-                    "logAnalytics": {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
-                    }
-                }
-            },
-            {
-                "name": "(ArcBox) Deploy Windows Log Analytics agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
-                "flavors": [
-                    "Full",
-                    "ITPro"
-                ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                "parameters": {
-                    "logAnalytics": {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
-                    }
-                }
-            },
-            {
-                "name": "(ArcBox) Deploy Linux Dependency Agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43",
-                "flavors": [
-                    "Full",
-                    "ITPro"
-                ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                "parameters": {}
-            },
-            {
-                "name": "(ArcBox) Deploy Windows Dependency Agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4",
-                "flavors": [
-                    "Full",
-                    "ITPro"
-                ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                "parameters": {}
-            },
-            {
                 "name": "(ArcBox) Tag resources",
                 "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
                 "flavors": [
@@ -146,19 +98,15 @@
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2020-10-01-preview",
-            "name": "[guid(variables('policies')[copyIndex()].name, resourceGroup().id)]",
-            "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "name": "[guid(variables('policies')[0].name, resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[0].flavors, parameters('flavor'))]",
             "dependsOn": [
-                "[variables('policies')[copyIndex()].name]"
+                "[variables('policies')[0].name]"
             ],
             "properties": {
-                "roleDefinitionId": "[variables('policies')[copyIndex()].roleDefinition]",
-                "principalId": "[if(contains(variables('policies')[copyIndex()].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', copyIndex())))]",
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[0]]",
+                "principalId": "[if(contains(variables('policies')[0].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
                 "principalType": "ServicePrincipal"
-            },
-            "copy": {
-                "name": "roleAssignmentCopy",
-                "count": "[length(variables('policies'))]"
             }
         }
     ]
