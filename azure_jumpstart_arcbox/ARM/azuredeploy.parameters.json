@@ -3,25 +3,25 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sshRSAPublicKey": {
-            "value": "<your RSA public key>"
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPmmphzD9hS2VzGlpwvXzk2eps4FuZuiTplfCSdoQTnjjvSTsPWpHj+bIligH9r/OLVorBC+DLBp93zUdJCSTFzaNKKDi9UlI1jjjG9bH8S/nZfSdKEwvpSqJTeBFWwQERJ/domSzFUFjUWRKyHlimv755KTxFIw0iJX41vSR8Ms9Vl+Gpa9Q5MAdz+2c2ftuOIGw50cs9OqYCmcBNGvOgVtl4vaJAJgnppeMqP8xxlBWJWVODQD+jE5BrFJPHji85PTDFE8/iycRezmLQaFxevx1LiLSKbD8DBcZxen51n1bR0lVSbG1k+C01TrKuts4u6tnvt2s6lSmAcpP7RzJn/l5seUQtWlO/hgpFu7phGSRd8H2fmKFk3j4TUb+h9t61KmOlMkY+qwmjGriQ+rYvEgVD3IBceGP4xIv0HhVfSJicCCEnZb4EIQJGVvXOaXIhTGcqVeN3HBYv0wMhmlg8QIvc/LX6VU3YZ7rn0W/C5K7b5IlWxJLY4G2l916btAkaNVszdETfHyx0OAEwNQf28QTnxbw0l72w2I9VZU6VdL2VZFGSF3rEHWmrJsbjkDj3QR0yPlCFOGewuH7PdE+d31hsz/JdS65DjQXnJq4tfGSF2Re9X6l0UrSTWrQtx+ZRna045wpwUIy+E/Y8VIEw6ZSUC00RDzl4QC0pvCH7AQ== alsanch@microsoft.com"
         },
         "spnClientId": {
-            "value": "<your service principal client id>"
+            "value": "7c72fb61-63f0-42c0-8493-900392909c77"
         },
         "spnClientSecret": {
-            "value": "<your service principal secret>"
+            "value": "TMK8Q~x3nZCUMB2HaCGY57UroSIaZVa1GB3YAaAX"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "fcb37c32-4a1a-48b1-a187-a23349d6a5a4"
         },
         "windowsAdminUsername": {
-            "value": "arcdemo"
+            "value": "alejandro"
         },
         "windowsAdminPassword": {
-            "value": "ArcPassword123!!"
+            "value": "Password1Password1"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "<your unique Log Analytics workspace name>"
+            "value": "la-arcbox"
         },
         "flavor": {
             "value": "Full"
@@ -30,7 +30,13 @@
             "value": false
         },
         "githubUser": {
-            "value": "microsoft"
+            "value": "alsanch"
+        },       
+        "githubBranch": {
+            "value": "arcbox_ama_migration"
+        },       
+        "githubAccount": {
+            "value": "alsanch"
         }
     }
 }
