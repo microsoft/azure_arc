@@ -98,7 +98,7 @@
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2020-10-01-preview",
-            "name": "[guid(variables('policies')[0].name, resourceGroup().id)]",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[0], resourceGroup().id)]",
             "condition": "[contains(variables('policies')[0].flavors, parameters('flavor'))]",
             "dependsOn": [
                 "[variables('policies')[0].name]"
@@ -106,6 +106,62 @@
             "properties": {
                 "roleDefinitionId": "[variables('policies')[0].roleDefinition[0]]",
                 "principalId": "[if(contains(variables('policies')[0].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[1], resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[0].flavors, parameters('flavor'))]",
+            "dependsOn": [
+                "[variables('policies')[0].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[1]]",
+                "principalId": "[if(contains(variables('policies')[0].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition[2], resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[0].flavors, parameters('flavor'))]",
+            "dependsOn": [
+                "[variables('policies')[0].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition[2]]",
+                "principalId": "[if(contains(variables('policies')[0].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[1].name, variables('policies')[1].roleDefinition, resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[1].flavors, parameters('flavor'))]",
+            "dependsOn": [
+                "[variables('policies')[1].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[1].roleDefinition]",
+                "principalId": "[if(contains(variables('policies')[1].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[1].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[guid(variables('policies')[2].name, variables('policies')[2].roleDefinition, resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[2].flavors, parameters('flavor'))]",
+            "dependsOn": [
+                "[variables('policies')[2].name]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('policies')[2].roleDefinition]",
+                "principalId": "[if(contains(variables('policies')[2].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[2].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', 0)))]",
                 "principalType": "ServicePrincipal"
             }
         }
