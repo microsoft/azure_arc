@@ -1,0 +1,16 @@
+{%- assign spec = content.spec -%}
+{%- assign status = content.status -%}
+{%- assign parentResource = spec.parentResource -%}
+
+{
+  "properties": {
+    "k8sRaw": {
+    {% if status != nil %}
+      "status": {{ status }},
+    {% endif %}
+      "spec": {{ spec }}
+    },
+    "basicLoginInformation": null,
+    {% if parentResource != nil %} "dataControllerId": {{ parentResource | HydrateReference | json }} {% endif %}
+  }
+}
