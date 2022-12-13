@@ -119,7 +119,6 @@ resource "aws_instance" "windows" {
   vpc_security_group_ids      = [aws_security_group.allow_rdp_winrm.id]
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.subnet1.id
-  get_password_data           = "true"
   user_data                   = data.template_file.user_data.rendered
 
   provisioner "file" {
