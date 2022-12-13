@@ -23,7 +23,14 @@ $certdns = "hcibox.devops.com"
 
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+if ($host.Name -match 'ISE') {throw "Running this script in PowerShell ISE is not supported"}
+
+try {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
+catch {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
