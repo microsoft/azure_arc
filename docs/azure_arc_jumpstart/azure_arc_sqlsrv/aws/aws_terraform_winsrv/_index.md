@@ -27,7 +27,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=1.3.5](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure service principal  (SP)
 
