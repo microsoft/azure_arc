@@ -188,12 +188,19 @@ if(-not $hasPermission) {
     $shortcut.Save()
 }
 
+
 # Enable defender for cloud
+Write-Header "Enabling defender for cloud for SQL Server"
 az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
+# Set defender for cloud log analytics workspace
+Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+az security workspace-setting create -n $env:workspaceName --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+
 # Test Defender for SQL
+Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
 Copy-VMFile ArcBox-SQL -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1 " -DestinationPath C:\ArcBox\testDefenderForSQL.ps1 -CreateFullPath -FileSource Host
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\testDefenderForSQL.ps1 -saPassword $nestedWindowsPassword } -Credential $winCreds
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\testDefenderForSQL.ps1} -Credential $winCreds
 
 
 # Changing to Jumpstart ArcBox wallpaper
