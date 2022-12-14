@@ -348,42 +348,4 @@ if($result.ProvisioningState -eq "Failed")
 
 Write-Host "SQL Server - Azure Arc resources should show up in resource group in less than 1 minute."
 
-# Get the resource group
-Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
-
-Write-Host "Enabling Log Analytics Solutions"
-$solutions = "Security", "Updates", "SQLAssessment"
-foreach ($solution in $solutions) {
-    Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $resourceGroup -WorkspaceName $workspaceName -IntelligencePackName $solution -Enabled $true -Verbose
-}
-
-# Get the workspace ID and Key
-$workspaceId = $(Get-AzOperationalInsightsWorkspace -Name $workspaceName -ResourceGroupName $resourceGroup).CustomerId.Guid
-$workspaceKey = $(Get-AzOperationalInsightsWorkspaceSharedKey -Name $workspaceName -ResourceGroupName $resourceGroup).PrimarySharedKey
-
-$Setting = @{ "workspaceId" = $workspaceId }
-$protectedSetting = @{ "workspaceKey" = $workspaceKey }
-New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-
-$nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
-
-Write-Host "Create SQL Azure Assessment"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip"
-Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-$Env:PSModulePath = $Env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
-Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
-$SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-Add-SQLAssessmentTask -SQLServerName $Env:COMPUTERNAME -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $Env:USERNAME -ScheduledTaskPassword $SecureString
-
-$name = "Recurring HealthService Restart"
-$repeat = (New-TimeSpan -Minutes 10)
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
-$duration = (New-TimeSpan -Days 1)
-$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
-Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -RunLevel Highest -User $nestedWindowsUsername -Password $nestedWindowsPassword -Settings $settings
-Start-Sleep -Seconds 3
-Start-ScheduledTask -TaskName $name
-
 Stop-Transcript
