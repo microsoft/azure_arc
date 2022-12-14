@@ -383,7 +383,7 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "5022 "
             }
-          },
+          }
         ]
       }
     },
