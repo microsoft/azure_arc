@@ -65,7 +65,7 @@
             }
         },
         "apiVersion": {
-            "value": "2022-06-15-preview"
+            "value": "2022-03-01-preview"
         },
         "pricingTier": {
             "value": "pricingTier-stage"
