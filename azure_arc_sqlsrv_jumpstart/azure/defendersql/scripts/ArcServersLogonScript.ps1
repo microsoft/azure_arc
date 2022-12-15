@@ -195,7 +195,7 @@ az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
 # Set defender for cloud log analytics workspace
 Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-az security workspace-setting create -n $env:workspaceName --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"

@@ -2,8 +2,8 @@
 do
 {
     Start-Sleep(20) # Wait for agent to isntall all modules
-    $moduleFile = (Get-ChildItem -Path “$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\” -File SqlAdvancedThreatProtectionShell.psm1 -Recurse).FullName
-}while ($true = [System.IO.File]::Exists($moduleFile))
+    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse).FullName
+}while ($true -ne [System.IO.File]::Exists($moduleFile))
 
 # Verify if modules are installed. If not wait until it is available
 Import-Module $moduleFile
