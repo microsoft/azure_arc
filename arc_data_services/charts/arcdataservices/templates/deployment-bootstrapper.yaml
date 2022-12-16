@@ -40,8 +40,6 @@ spec:
           runAsGroup: 1000700001
       imagePullSecrets:
       - name: {{ .Values.systemDefaultValues.imagePullSecret }}
-      nodeSelector:
-        kubernetes.io/os: linux
       securityContext:
         fsGroup: 1000700001
-      serviceAccountName: sa-arc-bootstrapper
+      serviceAccountName: {{ include "runtimeServiceAccount" . }}
