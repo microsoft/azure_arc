@@ -1,0 +1,13 @@
+{{ if eq .Values.connectionMode "direct" }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: azure-extension-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  extension-name: {{ .Release.Name }}
+  identity-is-enabled: {{ if .Values.Azure.Identity.isEnabled }} {{ .Values.Azure.Identity.isEnabled | quote }} {{ end }}
+  identity-type: {{ .Values.Azure.Identity.Type }}
+
+{{ end }}
