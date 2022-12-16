@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "value": "la-ama-jumpstart" // Name for your Log Analytics workspace
+    },
+    "vmName": {
+      "value": "Arc-Win-Demo" // Name of your Azure Arc-enabled Server to enable AMA extension on
+    },
+    "grafanaName": {
+      "value": "grafana-ama-jumpstart" // Name of your Azure Managed Grafana instance
+    },
+    "grafanaAdminprincipalId": {
+      "value": "<objectid>" // ObjectId of AAD user added as Grafana Admin
+    }
+  }
+}

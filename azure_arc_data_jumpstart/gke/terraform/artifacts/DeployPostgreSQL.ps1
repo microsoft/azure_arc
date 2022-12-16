@@ -1,14 +1,17 @@
 Start-Transcript -Path C:\Temp\deployPostgreSQL.log
 
 # Deployment environment variables
+$Env:TempDir = "$Env:TempDir"
 $controllerName = "jumpstart-dc"
 
 # Deploying Deploying Azure Arc-enabled PostgreSQL
+Write-Host "`n"
 Write-Host "Deploying Azure Arc-enabled PostgreSQL"
 Write-Host "`n"
 
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$customLocationName = (Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType Microsoft.ExtendedLocation/customLocations).Name
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -22,7 +25,7 @@ $coordinatorCoresLimit = "4"
 $coordinatorMemoryLimit = "8Gi"
 
 # Storage
-$StorageClassName = "local-ssd"
+$StorageClassName = "premium-rwo"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $backupsStorageSize = "5Gi"
@@ -31,7 +34,7 @@ $backupsStorageSize = "5Gi"
 $numWorkers = 1
 ################################################
 
-$PSQLParams = "C:\Temp\postgreSQL.parameters.json"
+$PSQLParams = "$Env:TempDir\postgreSQL.parameters.json"
 
 (Get-Content -Path $PSQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $PSQLParams
@@ -51,7 +54,9 @@ $PSQLParams = "C:\Temp\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\postgreSQL.json" --parameters "C:\Temp\postgreSQL.parameters.json"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "$Env:TempDir\postgreSQL.json" `
+                           --parameters "$Env:TempDir\postgreSQL.parameters.json"
 Write-Host "`n"
 
 # Ensures postgres container is initiated and ready to accept restores
@@ -62,6 +67,10 @@ $pgWorkerPodName = "jumpstartps-0"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Azure Arc-enabled PostgreSQL is ready!"
+Write-Host "`n"
 
 Start-Sleep -Seconds 60
 
@@ -76,7 +85,7 @@ kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -d adv
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "C:\Temp\settingsTemplate.json"
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving PostgreSQL connection endpoint
 $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'

@@ -1,0 +1,174 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location of your Azure Arc-enabled server."
+            }
+        },
+        "arcEnabledServer": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your Azure Arc-enabled server."
+            }
+        },
+        "osType": {
+            "type": "string",
+            "metadata": {
+                "description": "Operating System of your Azure Arc-enabled server: Windows or Linux."
+            }
+        },
+        "maintenanceConfigName": {
+            "type": "string",
+            "defaultValue": "Jumpstart-Maintenance-Configuration",
+            "metadata": {
+                "description": "This is name of the maintenance config being created."
+            }
+        },
+        "maintenanceScope": {
+            "type": "string",
+            "defaultValue": "InGuestPatch",
+            "metadata": {
+                "description": "Gets or sets maintenanceScope of the configuration."
+            }
+        },
+        "maintenanceAssignment": {
+            "type": "string",
+            "defaultValue": "maintenanceAssignment",
+            "metadata": {
+                "description": "Name of the maintenance assignment"
+            }
+        },
+        "maintenanceTimeZone": {
+            "type": "string",
+            "defaultValue": "Romance Standard Time",
+            "metadata": {
+                "description": "Timezone of the maintenance configuration"
+            }
+        },
+        "baseTime": {
+            "type": "string",
+            "defaultValue": "[utcNow('u')]"
+        }
+    },
+    "variables": {
+        "AzureConnectedMachineResourceAdministrator": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'cd570a14-e51a-42ad-bac8-bafd67325302')]",
+        "PolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
+        "PolicyAssignmentName": "[guid(variables('PolicyDefinitionID'), parameters('osType'))]",
+        "PolicyAssignmentDisplayName": "(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers",
+        "add1Day": "[dateTimeAdd(parameters('baseTime'), 'P1D', 'yyyy-MM-dd hh:mm')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('PolicyAssignmentName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "policyDefinitionId": "[variables('PolicyDefinitionID')]",
+                "notScopes": [],
+                "description": "",
+                "displayName": "[variables('PolicyAssignmentDisplayName')]",
+                "enforcementMode": "Default",
+                "metadata": {},
+                "nonComplianceMessages": [],
+                "parameters": {
+                    "osType": {
+                        "value": "[parameters('osType')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[guid(concat(variables('PolicyAssignmentName'),resourceGroup().id))]",
+            "properties": {
+                "roleDefinitionId": "[variables('AzureConnectedMachineResourceAdministrator')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('PolicyAssignmentName')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('PolicyAssignmentName'))]"
+            ]
+        },
+        {
+            "apiVersion": "2021-09-01-preview",
+            "type": "Microsoft.Maintenance/maintenanceConfigurations",
+            "name": "[parameters('maintenanceConfigName')]",
+            "location": "[parameters('location')]",
+            "tags": {},
+            "properties": {
+                "maintenanceScope": "[parameters('maintenanceScope')]",
+                "installPatches": {
+                    "linuxParameters": {
+                        "classificationsToInclude": [
+                            "Critical",
+                            "Security"
+                        ],
+                        "packageNameMasksToExclude": null,
+                        "packageNameMasksToInclude": null
+                    },
+                    "windowsParameters": {
+                        "classificationsToInclude": [
+                            "Critical",
+                            "Security"
+                        ],
+                        "kbNumbersToExclude": null,
+                        "kbNumbersToInclude": null
+                    },
+                    "rebootSetting": "RebootIfRequired"
+                },
+                "extensionProperties": {
+                    "InGuestPatchMode": "User"
+                },
+                "maintenanceWindow": {
+                    "startDateTime": "[variables('add1Day')]",
+                    "duration": "03:55",
+                    "timeZone": "[parameters('maintenanceTimeZone')]",
+                    "expirationDateTime": null,
+                    "recurEvery": "1Day"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-08-01",
+            "name": "[concat('jumpstart-', uniqueString(resourceGroup().name))]",
+            "resourceGroup": "[resourceGroup().name]",
+            "subscriptionId": "[subscription().subscriptionId]",
+            "dependsOn": [
+                "[concat('Microsoft.Maintenance/maintenanceConfigurations/', parameters('maintenanceConfigName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "resources": [
+                        {
+                            "apiVersion": "2021-09-01-preview",
+                            "type": "Microsoft.Maintenance/configurationAssignments",
+                            "name": "[parameters('maintenanceAssignment')]",
+                            "location": "[parameters('location')]",
+                            "scope": "[concat('Microsoft.HybridCompute/machines/', parameters('arcEnabledServer'))]",
+                            "tags": {},
+                            "properties": {
+                                "maintenanceConfigurationId": "[resourceId('Microsoft.Maintenance/maintenanceConfigurations/', parameters('maintenanceConfigName'))]"
+                            }
+                        }
+                    ]
+                },
+                "parameters": {}
+            },
+            "tags": {}
+        }
+    ]
+}
