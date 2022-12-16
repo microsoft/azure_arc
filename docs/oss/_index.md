@@ -2,7 +2,7 @@
 type: docs
 title: "Open-Source Commitment"
 linkTitle: "Open-Source Commitment"
-weight: 7
+weight: 8
 ---
 
 # Azure Arc Jumpstart commitment to open-source software

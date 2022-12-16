@@ -24,11 +24,12 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
   'Full'
   'ITPro'
   'DevOps'
+  'DataOps'
 ])
 param flavor string = 'Full'
 
@@ -44,11 +45,21 @@ param deployBastion bool = false
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string = 'microsoft'
 
+@description('Active directory domain services domain name')
+param addsDomainName string = 'jumpstart.local'
+
+@description('Random GUID for cluster names')
+param guid string = substring(newGuid(),0,4)
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
 var location = resourceGroup().location
+var capiArcDataClusterName = 'ArcBox-CAPI-Data-${guid}'
+var k3sArcDataClusterName = 'ArcBox-K3s-${guid}'
+var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
+var aksDrArcDataClusterName = 'ArcBox-AKS-DR-Data-${guid}'
 
-module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
+module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuCAPIDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
@@ -62,7 +73,11 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     deployBastion: deployBastion
     azureLocation: location
     flavor: flavor
+    capiArcDataClusterName : capiArcDataClusterName
   }
+  dependsOn: [
+    updateVNetDNSServers
+  ]
 }
 
 module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
@@ -78,6 +93,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
     azureLocation: location
+    vmName : k3sArcDataClusterName
   }
 }
 
@@ -97,7 +113,14 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubUser: githubUser
     location: location
+    k3sArcClusterName : k3sArcDataClusterName
+    capiArcDataClusterName : capiArcDataClusterName
+    aksArcClusterName : aksArcDataClusterName
+    aksdrArcClusterName : aksDrArcDataClusterName
   }
+  dependsOn: [
+    updateVNetDNSServers
+  ]
 }
 
 module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
@@ -116,3 +139,55 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
   }
 }
+
+module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
+  name: 'addsVmDeployment'
+  params: {
+    windowsAdminUsername : windowsAdminUsername
+    windowsAdminPassword : windowsAdminPassword
+    addsDomainName: addsDomainName
+    deployBastion: deployBastion
+    templateBaseUrl: templateBaseUrl
+    azureLocation: location
+  }
+  dependsOn:[
+    mgmtArtifactsAndPolicyDeployment
+  ]
+}
+
+module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'){
+  name: 'updateVNetDNSServers'
+  params: {
+    workspaceName: logAnalyticsWorkspaceName
+    flavor: flavor
+    deployBastion: deployBastion
+    location: location
+    dnsServers: [
+    '10.16.2.100'
+    '168.63.129.16'
+    ]
+  }
+  dependsOn: [
+    addsVmDeployment
+    mgmtArtifactsAndPolicyDeployment
+  ]
+}
+
+module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
+  name: 'aksDeployment'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    spnClientId: spnClientId
+    spnClientSecret: spnClientSecret
+    location: location
+    aksClusterName : aksArcDataClusterName
+    drClusterName : aksDrArcDataClusterName
+  }
+  dependsOn: [
+    updateVNetDNSServers
+    stagingStorageAccountDeployment
+    mgmtArtifactsAndPolicyDeployment
+  ]
+}
+
+output clientVmLogonUserName string = flavor == 'DataOps' ? '${windowsAdminUsername}@${addsDomainName}' : ''

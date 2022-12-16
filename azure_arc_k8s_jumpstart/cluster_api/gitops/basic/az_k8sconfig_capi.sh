@@ -23,7 +23,6 @@ echo "Installing Azure CLI"
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Installing required Azure Arc CLI extensions
-# Installing required Azure Arc CLI extensions
 az extension add --name connectedk8s
 az extension add --name k8s-configuration
 
@@ -49,17 +48,32 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx ingress-nginx/ingress-nginx -n $namespace
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace $namespace
 
-# Create GitOps config
-echo "Creating GitOps config"
+# Create GitOps config for Hello-Arc app
+echo "Creating GitOps config for Hello-Arc app"
 az k8s-configuration flux create \
 --cluster-name $arcClusterName \
 --resource-group $resourceGroup \
---name cluster-config \
+--name config-helloarc \
 --namespace $namespace \
 --cluster-type connectedClusters \
---scope cluster \
+--scope namespace \
 --url $appClonedRepo \
 --branch main --sync-interval 3s \
---kustomization name=app path=./artifacts/hello-arc/yaml
+--kustomization name=app path=./hello-arc/yaml
+
+# Create GitOps config for Hello-Arc Ingress
+echo "Creating GitOps config for Hello-Arc Ingress"
+az k8s-configuration flux create \
+--cluster-name $arcClusterName \
+--resource-group $resourceGroup \
+--name config-helloarc-ingress \
+--namespace $namespace \
+--cluster-type connectedClusters \
+--scope namespace \
+--url $appClonedRepo \
+--branch main \
+--kustomization name=ingress path=./hello-arc/ingress

@@ -56,7 +56,7 @@ Write-Host "`n"
 
 $response = kubectl version --output json | ConvertFrom-Json
 $version = $response.serverVersion.gitVersion
-kubectl apply -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$version"
+kubectl apply -f "https://github.com/weaveworks/scope/releases/download/v1.13.2/k8s-scope.yaml?k8s-version=$version"
 Do {
 	$podsPending = kubectl get pods -n weave --field-selector=status.phase!=Running -o jsonpath="{.items[*].metadata.name}"
    Start-Sleep -Seconds 5

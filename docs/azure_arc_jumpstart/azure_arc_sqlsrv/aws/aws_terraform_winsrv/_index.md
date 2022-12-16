@@ -19,7 +19,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
     ```shell
     az --version
@@ -27,7 +27,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=1.3.5](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure service principal  (SP)
 
