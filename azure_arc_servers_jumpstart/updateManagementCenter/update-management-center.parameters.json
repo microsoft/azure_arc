@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "<Location of your Azure Arc-enabled server>" // Location of your Azure Arc-enabled server
+        },
+        "arcEnabledServer": {
+            "value": "<Name of your Azure Arc-enabled server>" // Name of your Azure Arc-enabled server
+        },
+        "osType": {
+            "value": "<Operating System of your Azure Arc-enabled server: Windows or Linux>" // Operating System of your Azure Arc-enabled server: Windows or Linux
+        },
+        "maintenanceTimeZone": {
+            "value": "<Timezone of the maintenance configuration>" // Timezone of the maintenance configuration
+        }
+    }
+}
