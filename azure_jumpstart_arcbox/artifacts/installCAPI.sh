@@ -57,6 +57,15 @@ export AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[
 az -v
 echo ""
 
+echo "Registering resource providers"
+
+sudo -u $adminUsername az provider register --namespace Microsoft.Kubernetes --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.KubernetesConfiguration --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.ExtendedLocation --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.AzureArcData --wait
+
+echo ""
+
 # Installing snap
 sudo apt install snapd
 
@@ -72,11 +81,12 @@ sudo snap install kubectl --classic
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.2.1" # Do not change!
+export CLUSTERCTL_VERSION="1.3.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.5.0" # Do not change!
-export KUBERNETES_VERSION="1.24.4" # Do not change!
-export AZURE_DISK_CSI_DRIVER_VERSION="1.22.0" # Do not change!
+export CAPI_PROVIDER_VERSION="1.6.0" # Do not change!
+export KUBERNETES_VERSION="1.25.4" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.25.0" # Do not change!
+export K3S_VERSION="1.25.4+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -104,21 +114,21 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Installing Rancher K3s single node cluster using k3sup
+# Installing Rancher K3s cluster (single control plane)
 echo ""
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo k3sup install --local --context arcboxcapimgmt --k3s-extra-args '--no-deploy traefik'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
+sudo kubectl config rename-context default arcboxcapimgmt --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config-mgmt
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
-export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl config set-context arcboxcapimgmt
 
 # Installing clusterctl
@@ -145,7 +155,7 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -223,8 +233,6 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-export guid=$(echo $RANDOM | md5sum | head -c 4; echo;)
-export capiArcDataClusterName=$(echo "${capiArcDataClusterName}"-"${guid}")
 sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox' --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions

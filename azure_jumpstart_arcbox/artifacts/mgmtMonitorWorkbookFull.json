@@ -367,7 +367,7 @@
               {
                 "type": 1,
                 "content": {
-                  "json": "## Azure Arc enabled servers"
+                  "json": "## Azure Arc-enabled servers"
                 },
                 "name": "text - 8"
               },
@@ -417,11 +417,10 @@
                       "type": 5,
                       "description": "Select at least one workspace that contains continuous export data based on the selected subscriptions",
                       "isRequired": true,
-                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
+                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces' and resourceGroup == '{ResourceGroup}'\r\n| project id",
                       "crossComponentResources": [
-                        "value::all"
+                        "{Subscription}"
                       ],
-                      "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspace>",
                       "typeSettings": {
                         "resourceTypeFilter": {
                           "microsoft.operationalinsights/workspaces": true
@@ -430,24 +429,30 @@
                         "showDefault": false
                       },
                       "queryType": 1,
-                      "resourceType": "microsoft.resourcegraph/resources"
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": null
                     },
                     {
                       "id": "71c18150-396c-4f92-a41f-18125550ec3d",
                       "version": "KqlParameterItem/1.0",
                       "name": "ArcServer",
-                      "label": "Azure Arc Enabled Server",
+                      "label": "Azure Arc-enabled server",
                       "type": 5,
                       "isRequired": true,
-                      "value": "ArcBox-CentOS",
+                      "query": "resources\r\n| where type == \"microsoft.hybridcompute/machines\" and resourceGroup == '{ResourceGroup}'\r\n| project name",
+                      "crossComponentResources": [
+                        "{Subscription}"
+                      ],
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
                       },
-                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu\", \"label\":\"ArcBox-Ubuntu\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-CentOS\", \"label\":\"ArcBox-CentOS\", \"group\":\"Select\" }\r\n]",
                       "timeContext": {
                         "durationMs": 86400000
-                      }
+                      },
+                      "queryType": 1,
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": null
                     },
                     {
                       "id": "f21caac6-fae7-44b5-ba4f-a2d3593953b0",
@@ -524,7 +529,7 @@
                   "version": "KqlItem/1.0",
                   "query": "InsightsMetrics\r\n| where TimeGenerated {TimeRange}\r\n| where Computer =~ \"{ArcServer}\"\r\n| where Namespace == 'Processor' and Name == 'UtilizationPercentage'\r\n| summarize Average = round(avg(Val), 2),P95th = round(percentile(Val, 95), 2) by bin(TimeGenerated, totimespan('00:14:24'))",
                   "size": 0,
-                  "title": "Azure Arc enabled servers - CPU Utilization %",
+                  "title": "Azure Arc-enabled servers - CPU Utilization %",
                   "timeContext": {
                     "durationMs": 86400000
                   },
@@ -547,7 +552,7 @@
                   "version": "KqlItem/1.0",
                   "query": "InsightsMetrics\r\n    | where Namespace == 'Memory' and Name == 'AvailableMB'\r\n    | where TimeGenerated {TimeRange}\r\n| where Computer =~ \"{ArcServer}\"\r\n| summarize Average = round(avg(Val), 2),P5th = round(percentile(Val, 5), 2),P10th = round(percentile(Val, 10), 2) by bin(TimeGenerated, totimespan('00:14:24'))\r\n    | top 10 by P5th asc",
                   "size": 0,
-                  "title": "Azure Arc enabled servers - Available Memory MB",
+                  "title": "Azure Arc-enabled servers - Available Memory MB",
                   "timeContext": {
                     "durationMs": 86400000
                   },
@@ -567,7 +572,7 @@
               {
                 "type": 1,
                 "content": {
-                  "json": "## Azure Arc enabled Kubernetes"
+                  "json": "## Azure Arc-enabled Kubernetes"
                 },
                 "name": "text - 9"
               },
@@ -686,7 +691,7 @@
                       "id": "7aa94d19-4c5b-40e2-b14f-e29736a8f90c",
                       "version": "KqlParameterItem/1.0",
                       "name": "resource",
-                      "label": "Azure Arc enabled K8S cluster",
+                      "label": "Azure Arc-enabled Kubernetes cluster",
                       "type": 5,
                       "isRequired": true,
                       "query": " Resources\r\n  | where type =~ 'microsoft.kubernetes/connectedclusters'\r\n  | project id",
@@ -1139,7 +1144,7 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Pod Restart Trend",
+                  "title": "Azure Arc-enabled Kubernetes - Pod Restart Trend",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1162,7 +1167,7 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Container restart trend",
+                  "title": "Azure Arc-enabled Kubernetes - Container restart trend",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1202,7 +1207,7 @@
                       "splitBy": null
                     }
                   ],
-                  "title": "Azure Arc enabled kubernetes - Pod Count",
+                  "title": "Azure Arc-enabled Kubernetes - Pod Count",
                   "gridSettings": {
                     "rowLimit": 10000
                   }
@@ -1239,7 +1244,7 @@
                       "aggregation": 4
                     }
                   ],
-                  "title": "Azure Arc enabled Kubernetes - Pod status",
+                  "title": "Azure Arc-enabled Kubernetes - Pod status",
                   "gridSettings": {
                     "rowLimit": 10000
                   }
@@ -1255,7 +1260,7 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Container Status for Pods",
+                  "title": "Azure Arc-enabled Kubernetes - Container Status for Pods",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
@@ -1406,7 +1411,7 @@
                       "splitBy": null
                     }
                   ],
-                  "title": "Azure Arc enabled kubernetes cluster - Node CPU usage %",
+                  "title": "Azure Arc-enabled Kubernetes cluster - Node CPU usage %",
                   "gridSettings": {
                     "rowLimit": 10000
                   }
@@ -1438,7 +1443,7 @@
                       "splitBy": null
                     }
                   ],
-                  "title": "Azure Arc enabled kubernetes cluster - Node memory working set %",
+                  "title": "Azure Arc-enabled Kubernetes cluster - Node memory working set %",
                   "gridSettings": {
                     "rowLimit": 10000
                   }
@@ -1549,7 +1554,7 @@
                 "type": 3,
                 "content": {
                   "version": "KqlItem/1.0",
-                  "query": "Resources \r\n| where resourceGroup == \"{ResourceGroup}\"\r\n| extend type = case(\r\ntype contains 'microsoft.netapp/netappaccounts', 'NetApp Accounts',\r\ntype contains \"microsoft.compute\", \"Azure Compute\",\r\ntype contains \"microsoft.logic\", \"LogicApps\",\r\ntype contains 'microsoft.keyvault/vaults', \"Key Vaults\",\r\ntype contains 'microsoft.storage/storageaccounts', \"Storage Accounts\",\r\ntype contains 'microsoft.compute/availabilitysets', 'Availability Sets',\r\ntype contains 'microsoft.operationalinsights/workspaces', 'Azure Monitor Resources',\r\ntype contains 'microsoft.operationsmanagement', 'Operations Management Resources',\r\ntype contains 'microsoft.insights', 'Azure Monitor Resources',\r\ntype contains 'microsoft.desktopvirtualization/applicationgroups', 'WVD Application Groups',\r\ntype contains 'microsoft.desktopvirtualization/workspaces', 'WVD Workspaces',\r\ntype contains 'microsoft.desktopvirtualization/hostpools', 'WVD Hostpools',\r\ntype contains 'microsoft.recoveryservices/vaults', 'Backup Vaults',\r\ntype contains 'microsoft.web', 'App Services',\r\ntype contains 'microsoft.managedidentity/userassignedidentities','Managed Identities',\r\ntype contains 'microsoft.storagesync/storagesyncservices', 'Azure File Sync',\r\ntype contains 'microsoft.hybridcompute/machines', 'Azure Arc enabled servers ',\r\ntype contains 'Microsoft.EventHub', 'Event Hub',\r\ntype contains 'Microsoft.EventGrid', 'Event Grid',\r\ntype contains 'Microsoft.Sql', 'SQL Resources',\r\ntype contains 'Microsoft.HDInsight/clusters', 'HDInsight Clusters',\r\ntype contains 'microsoft.devtestlab', 'DevTest Labs Resources',\r\ntype contains 'microsoft.containerinstance', 'Container Instances Resources',\r\ntype contains 'microsoft.portal/dashboards', 'Azure Dashboards',\r\ntype contains 'microsoft.containerregistry/registries', 'Container Registry',\r\ntype contains 'microsoft.automation', 'Automation Resources',\r\ntype contains 'sendgrid.email/accounts', 'SendGrid Accounts',\r\ntype contains 'microsoft.datafactory/factories', 'Data Factory',\r\ntype contains 'microsoft.databricks/workspaces', 'Databricks Workspaces',\r\ntype contains 'microsoft.machinelearningservices/workspaces', 'Machine Learnings Workspaces',\r\ntype contains 'microsoft.alertsmanagement/smartdetectoralertrules', 'Azure Monitor Resources',\r\ntype contains 'microsoft.apimanagement/service', 'API Management Services',\r\ntype contains 'microsoft.dbforpostgresql', 'PostgreSQL Resources',\r\ntype contains 'microsoft.scheduler/jobcollections', 'Scheduler Job Collections',\r\ntype contains 'microsoft.visualstudio/account', 'Azure DevOps Organization',\r\ntype contains 'microsoft.network/', 'Network Resources',\r\ntype contains 'microsoft.migrate/' or type contains 'microsoft.offazure', 'Azure Migrate Resources',\r\ntype contains 'microsoft.servicebus/namespaces', 'Service Bus Namespaces',\r\ntype contains 'microsoft.classic', 'ASM Obsolete Resources',\r\ntype contains 'microsoft.resources/templatespecs', 'Template Spec Resources',\r\ntype contains 'microsoft.virtualmachineimages', 'VM Image Templates',\r\ntype contains 'microsoft.documentdb', 'CosmosDB DB Resources',\r\ntype contains 'microsoft.alertsmanagement/actionrules', 'Azure Monitor Resources',\r\ntype contains 'microsoft.kubernetes/connectedclusters', 'Azure Arc enabled Kubernetes',\r\ntype contains 'microsoft.purview', 'Purview Resources',\r\ntype contains 'microsoft.security', 'Security Resources',\r\ntype contains 'microsoft.cdn', 'CDN Resources',\r\ntype contains 'microsoft.devices','IoT Resources',\r\ntype contains 'microsoft.datamigration', 'Data Migraiton Services',\r\ntype contains 'microsoft.cognitiveservices', 'Congitive Services',\r\ntype contains 'microsoft.customproviders', 'Custom Providers',\r\ntype contains 'microsoft.appconfiguration', 'App Services',\r\ntype contains 'microsoft.search', 'Search Services',\r\ntype contains 'microsoft.maps', 'Maps',\r\ntype contains 'microsoft.containerservice/managedclusters', 'AKS',\r\ntype contains 'microsoft.signalrservice', 'SignalR',\r\ntype contains 'microsoft.resourcegraph/queries', 'Resource Graph Queries',\r\ntype contains 'microsoft.batch', 'MS Batch',\r\ntype contains 'microsoft.analysisservices', 'Analysis Services',\r\ntype contains 'microsoft.synapse/workspaces', 'Synapse Workspaces',\r\ntype contains 'microsoft.synapse/workspaces/sqlpools', 'Synapse SQL Pools',\r\ntype contains 'microsoft.kusto/clusters', 'ADX Clusters',\r\ntype contains 'microsoft.resources/deploymentscripts', 'Deployment Scripts',\r\ntype contains 'microsoft.aad/domainservices', 'AD Domain Services',\r\ntype contains 'microsoft.labservices/labaccounts', 'Lab Accounts',\r\ntype contains 'microsoft.automanage/accounts', 'Automanage Accounts',\r\ntype contains 'microsoft.extendedlocation/customlocations', 'Azure Arc Custom Locations',\r\ntype contains 'microsoft.azurearcdata/postgresinstances', 'Azure Arc-enabled PostgresSQL',\r\ntype contains 'microsoft.azurearcdata/sqlmanagedinstances', 'Azure Arc-enabled SQL Managed Instance',\r\ntype contains 'microsoft.azurearcdata/datacontrollers', 'Azure Arc-enabled data controller',\r\ntype contains 'microsoft.azurearcdata/sqlserverinstances', 'Azure Arc enabled SQL server',\r\nstrcat(\"Not Translated: \", type))\r\n| summarize count() by type",
+                  "query": "Resources \r\n| where resourceGroup == \"{ResourceGroup}\"\r\n| extend type = case(\r\ntype contains 'microsoft.netapp/netappaccounts', 'NetApp Accounts',\r\ntype contains \"microsoft.compute\", \"Azure Compute\",\r\ntype contains \"microsoft.logic\", \"LogicApps\",\r\ntype contains 'microsoft.keyvault/vaults', \"Key Vaults\",\r\ntype contains 'microsoft.storage/storageaccounts', \"Storage Accounts\",\r\ntype contains 'microsoft.compute/availabilitysets', 'Availability Sets',\r\ntype contains 'microsoft.operationalinsights/workspaces', 'Azure Monitor Resources',\r\ntype contains 'microsoft.operationsmanagement', 'Operations Management Resources',\r\ntype contains 'microsoft.insights', 'Azure Monitor Resources',\r\ntype contains 'microsoft.desktopvirtualization/applicationgroups', 'WVD Application Groups',\r\ntype contains 'microsoft.desktopvirtualization/workspaces', 'WVD Workspaces',\r\ntype contains 'microsoft.desktopvirtualization/hostpools', 'WVD Hostpools',\r\ntype contains 'microsoft.recoveryservices/vaults', 'Backup Vaults',\r\ntype contains 'microsoft.web', 'App Services',\r\ntype contains 'microsoft.managedidentity/userassignedidentities','Managed Identities',\r\ntype contains 'microsoft.storagesync/storagesyncservices', 'Azure File Sync',\r\ntype contains 'microsoft.hybridcompute/machines', 'Azure Arc-enabled servers ',\r\ntype contains 'Microsoft.EventHub', 'Event Hub',\r\ntype contains 'Microsoft.EventGrid', 'Event Grid',\r\ntype contains 'Microsoft.Sql', 'SQL Resources',\r\ntype contains 'Microsoft.HDInsight/clusters', 'HDInsight Clusters',\r\ntype contains 'microsoft.devtestlab', 'DevTest Labs Resources',\r\ntype contains 'microsoft.containerinstance', 'Container Instances Resources',\r\ntype contains 'microsoft.portal/dashboards', 'Azure Dashboards',\r\ntype contains 'microsoft.containerregistry/registries', 'Container Registry',\r\ntype contains 'microsoft.automation', 'Automation Resources',\r\ntype contains 'sendgrid.email/accounts', 'SendGrid Accounts',\r\ntype contains 'microsoft.datafactory/factories', 'Data Factory',\r\ntype contains 'microsoft.databricks/workspaces', 'Databricks Workspaces',\r\ntype contains 'microsoft.machinelearningservices/workspaces', 'Machine Learnings Workspaces',\r\ntype contains 'microsoft.alertsmanagement/smartdetectoralertrules', 'Azure Monitor Resources',\r\ntype contains 'microsoft.apimanagement/service', 'API Management Services',\r\ntype contains 'microsoft.dbforpostgresql', 'PostgreSQL Resources',\r\ntype contains 'microsoft.scheduler/jobcollections', 'Scheduler Job Collections',\r\ntype contains 'microsoft.visualstudio/account', 'Azure DevOps Organization',\r\ntype contains 'microsoft.network/', 'Network Resources',\r\ntype contains 'microsoft.migrate/' or type contains 'microsoft.offazure', 'Azure Migrate Resources',\r\ntype contains 'microsoft.servicebus/namespaces', 'Service Bus Namespaces',\r\ntype contains 'microsoft.classic', 'ASM Obsolete Resources',\r\ntype contains 'microsoft.resources/templatespecs', 'Template Spec Resources',\r\ntype contains 'microsoft.virtualmachineimages', 'VM Image Templates',\r\ntype contains 'microsoft.documentdb', 'CosmosDB DB Resources',\r\ntype contains 'microsoft.alertsmanagement/actionrules', 'Azure Monitor Resources',\r\ntype contains 'microsoft.kubernetes/connectedclusters', 'Azure Arc-enabled Kubernetes',\r\ntype contains 'microsoft.purview', 'Purview Resources',\r\ntype contains 'microsoft.security', 'Security Resources',\r\ntype contains 'microsoft.cdn', 'CDN Resources',\r\ntype contains 'microsoft.devices','IoT Resources',\r\ntype contains 'microsoft.datamigration', 'Data Migraiton Services',\r\ntype contains 'microsoft.cognitiveservices', 'Congitive Services',\r\ntype contains 'microsoft.customproviders', 'Custom Providers',\r\ntype contains 'microsoft.appconfiguration', 'App Services',\r\ntype contains 'microsoft.search', 'Search Services',\r\ntype contains 'microsoft.maps', 'Maps',\r\ntype contains 'microsoft.containerservice/managedclusters', 'AKS',\r\ntype contains 'microsoft.signalrservice', 'SignalR',\r\ntype contains 'microsoft.resourcegraph/queries', 'Resource Graph Queries',\r\ntype contains 'microsoft.batch', 'MS Batch',\r\ntype contains 'microsoft.analysisservices', 'Analysis Services',\r\ntype contains 'microsoft.synapse/workspaces', 'Synapse Workspaces',\r\ntype contains 'microsoft.synapse/workspaces/sqlpools', 'Synapse SQL Pools',\r\ntype contains 'microsoft.kusto/clusters', 'ADX Clusters',\r\ntype contains 'microsoft.resources/deploymentscripts', 'Deployment Scripts',\r\ntype contains 'microsoft.aad/domainservices', 'AD Domain Services',\r\ntype contains 'microsoft.labservices/labaccounts', 'Lab Accounts',\r\ntype contains 'microsoft.automanage/accounts', 'Automanage Accounts',\r\ntype contains 'microsoft.extendedlocation/customlocations', 'Azure Arc Custom Locations',\r\ntype contains 'microsoft.azurearcdata/postgresinstances', 'Azure Arc-enabled PostgresSQL',\r\ntype contains 'microsoft.azurearcdata/sqlmanagedinstances', 'Azure Arc-enabled SQL Managed Instance',\r\ntype contains 'microsoft.azurearcdata/datacontrollers', 'Azure Arc-enabled Data Controller',\r\ntype contains 'microsoft.azurearcdata/sqlserverinstances', 'Azure Arc-enabled SQL Server',\r\nstrcat(\"Not Translated: \", type))\r\n| summarize count() by type",
                   "size": 1,
                   "title": "Resource Count by Type",
                   "queryType": 1,
@@ -2475,7 +2480,7 @@
                         "{Workspace}"
                       ],
                       "value": [
-                        "ArcBox-SQL"
+                        null
                       ],
                       "typeSettings": {
                         "additionalResourceOptions": [
@@ -3382,7 +3387,7 @@
                     {
                       "type": 1,
                       "content": {
-                        "json": "# Microsoft Defender for Cloud Agent Monitoring\n\nTo consider an Azure Arc enabled-server *monitored* by Azure Defender it need to meet the following criteria:\n1. Have the Log Analytics agent installed\n2. The Log Analytics agent needs to be reporting to its Log Analytics workspace.\n3. The *Microsoft Defender for Cloud for servers* plan needs to be enabled on both, the machine's Azure subscription and the Log Analytics workspace the agent is reporting to.\n\nThis section will help you visualize machines which are protected by Azure Defender and have an agent installed, but which do not properly report to their workspace."
+                        "json": "# Microsoft Defender for Cloud Agent Monitoring\n\nTo consider an Azure Arc-enabled server *monitored* by Azure Defender it need to meet the following criteria:\n1. Have the Log Analytics agent installed\n2. The Log Analytics agent needs to be reporting to its Log Analytics workspace.\n3. The *Microsoft Defender for Cloud for servers* plan needs to be enabled on both, the machine's Azure subscription and the Log Analytics workspace the agent is reporting to.\n\nThis section will help you visualize machines which are protected by Azure Defender and have an agent installed, but which do not properly report to their workspace."
                       },
                       "name": "text - 1"
                     },

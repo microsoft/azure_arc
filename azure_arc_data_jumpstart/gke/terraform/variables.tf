@@ -39,11 +39,6 @@ variable "admin_password" {
   default     = "ArcDemo1234567!!"
 }
 
-variable "gke_cluster_node_count" {
-  description = "GKE cluster number of worker nodes"
-  type        = number
-}
-
 variable "windows_username" {
   description = "Windows Server Client compute instance VM administrator username"
   type        = string
@@ -62,7 +57,7 @@ variable "AZDATA_USERNAME" {
 }
 
 variable "AZDATA_PASSWORD" {
-  description = "Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)"
+  description = "Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)"
   type        = string
 }
 
@@ -118,6 +113,12 @@ variable "deploy_SQLMI" {
   default     = false
 }
 
+variable "SQLMIHA" {
+  description = "High availability architecture in SQL"
+  type        = bool
+  default     = false
+}
+
 variable "deploy_PostgreSQL" {
   description = "Flag for deploying Postgres Server Group"
   type        = bool
@@ -128,4 +129,20 @@ variable "templateBaseUrl" {
   description = "Git repo base URL for downloading artifacts for Client VM bootstrap script"
   type        = string
   default     = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/"
+}
+
+variable "MY_IP" {
+  description = "Your Client IP"
+  type        = string
+}
+
+variable "USE_GKE_GCLOUD_AUTH_PLUGIN" {
+  description = "gke gcloud auth plugin"
+  type        = bool
+  default     = true
+}
+
+variable "CL_OID" {
+  description = "Custom Location RP OID"
+  type        = string
 }

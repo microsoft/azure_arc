@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "value": "<name of your Log Analytics workspace>" // Name for your Log Analytics workspace
+    },
+    "vmName": {
+      "value": "<name of your Azure Arc-enabled Server>" // Name of your existing Azure Arc-enabled Server to enable AMA extension on
+    },
+    "grafanaName": {
+      "value": "<name of your azuremanaged grafana instance>" // Name of your Azure Managed Grafana instance
+    },
+    "grafanaAdminprincipalId": {
+      "value": "<objectId of aad user added as grafana admin>" // Id of AAD user/group added as Grafana Admin
+    }
+  }
+}

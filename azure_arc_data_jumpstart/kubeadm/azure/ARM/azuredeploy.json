@@ -1,0 +1,323 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "windowsAdminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "Username for Windows account"
+        }
+      },
+      "windowsAdminPassword": {
+        "type": "securestring",
+        "minLength": 12,
+        "maxLength": 123,
+        "metadata": {
+          "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+        }
+      },
+      "sshRSAPublicKey": {
+        "type": "securestring",
+        "metadata": {
+          "description": "RSA public key used for securing SSH access to Azure resources"
+        }
+      },
+      "spnClientId": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure service principal client id"
+        }
+      },
+      "spnClientSecret": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Azure service principal client secret"
+        }
+      },
+      "spnTenantId": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure AD tenant id for your service principal"
+        }
+      },
+      "logAnalyticsWorkspaceName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name for your log analytics workspace"
+        }
+      },
+      "deploySQLMI": {
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+          "description": "SQL Managed Instance deployment"
+        }
+      },
+      "SQLMIHA": {
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+          "description": "SQL Managed Instance high-availability deployment"
+        }
+      },
+      "deployPostgreSQL": {
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+          "description": "PostgreSQL deployment"
+        }
+      },
+      "githubAccount": {
+        "type": "string",
+        "metadata": {
+          "description": "Target GitHub account"
+        },
+        "defaultValue": "microsoft"
+      },
+      "githubBranch": {
+        "type": "string",
+        "metadata": {
+          "description": "Target GitHub branch"
+        },
+        "defaultValue": "main"
+      },
+      "deployBastion": {
+        "type": "bool",
+        "metadata": {
+          "description": "Choice to deploy Bastion to connect to the client VM"
+        },
+        "defaultValue": false
+      },
+      "bastionHostName": {
+        "type": "string",
+        "defaultValue": "Arc-Data-Demo-Bastion",
+        "metadata": {
+          "description": "the Azure Bastion host name"
+        }
+      },
+      "guid": {
+        "type": "string",
+        "metadata": {
+          "description": "Random GUID for cluster names"
+        },
+        "defaultValue": "[substring(newGuid(),0,4)]"
+      },
+      "customLocationRPOID": {
+        "type": "string",
+        "metadata": {
+          "description": "Custom Location Resource Provider Object ID"
+        }
+      }
+    },
+    "variables": {
+      "ArcK8sClusterName": "[concat('Arc-DataSvc-Kubeadm','-',parameters('guid'))]",
+      "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/kubeadm/azure/ARM/')]",
+      "kubeadmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuKubeadm.json')]",
+      "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+      "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
+      "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
+      "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+      // Virtual Network configuration
+      "virtualNetworkName": "Arc-Data-VNet",
+      "subnetName": "Arc-Data-Subnet",
+      "subnetName2": "Arc-Data-Kubeadm-Subnet",
+      "addressPrefix": "172.16.0.0/16",
+      "subnetAddressPrefix": "172.16.1.0/24",
+      "subnetAddressPrefix2": "172.16.2.0/24",
+      "bastionSubnetPrefix": "172.16.3.64/26",
+      "bastionSubnetName": "AzureBastionSubnet",
+      "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
+      "hostname": "[concat('lbarck8s', uniquestring(resourceGroup().id))]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deployments",
+        "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+        "apiVersion": "2021-04-01",
+        "name": "VNETDeployment",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('VNETUrl')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "virtualNetworkName": {
+              "value": "[variables('virtualNetworkName')]"
+            },
+            "subnetName": {
+              "value": "[variables('subnetName')]"
+            },
+            "subnetName2": {
+              "value": "[variables('subnetName2')]"
+            },
+            "bastionSubnetName": {
+              "value": "[variables('bastionSubnetName')]"
+            },
+            "addressPrefix": {
+              "value": "[variables('addressPrefix')]"
+            },
+            "subnetAddressPrefix": {
+              "value": "[variables('subnetAddressPrefix')]"
+            },
+            "subnetAddressPrefix2": {
+              "value": "[variables('subnetAddressPrefix2')]"
+            },
+            "bastionSubnetPrefix": {
+              "value": "[variables('bastionSubnetPrefix')]"
+            },
+            "deployBastion": {
+              "value": "[parameters('deployBastion')]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "comments": "Deploy the Kubeadm environment",
+        "apiVersion": "2021-04-01",
+        "name": "ubuntuKubeadmDeployment",
+        "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('kubeadmTemplateUrl')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "sshRSAPublicKey": {
+              "value": "[parameters('sshRSAPublicKey')]"
+            },
+            "spnClientId": {
+              "value": "[parameters('spnClientId')]"
+            },
+            "spnClientSecret": {
+              "value": "[parameters('spnClientSecret')]"
+            },
+            "spnTenantId": {
+              "value": "[parameters('spnTenantId')]"
+            },
+            "stagingStorageAccountName": {
+              "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+            },
+            "templateBaseUrl": {
+              "value": "[variables('templateBaseUrl')]"
+            },
+            "hostname": {
+              "value": "[variables('hostname')]"
+            },
+            "bastionSubnetPrefix": {
+              "value": "[variables('bastionSubnetPrefix')]"
+            },
+            "deployBastion": {
+              "value": "[parameters('deployBastion')]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "comments": "Deploys the Client Windows VM",
+        "apiVersion": "2021-04-01",
+        "name": "clientVmDeployment",
+        "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('clientVmTemplateUrl')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "windowsAdminUsername": {
+              "value": "[parameters('windowsAdminUsername')]"
+            },
+            "windowsAdminPassword": {
+              "value": "[parameters('windowsAdminPassword')]"
+            },
+            "customLocationRPOID": {
+              "value": "[parameters('customLocationRPOID')]"
+            },
+            "ArcK8sClusterName": {
+              "value": "[variables('ArcK8sClusterName')]"
+            },
+            "spnClientId": {
+              "value": "[parameters('spnClientId')]"
+            },
+            "spnClientSecret": {
+              "value": "[parameters('spnClientSecret')]"
+            },
+            "spnTenantId": {
+              "value": "[parameters('spnTenantId')]"
+            },
+            "stagingStorageAccountName": {
+              "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+            },
+            "workspaceName": {
+              "value": "[parameters('logAnalyticsWorkspaceName')]"
+            },
+            "virtualNetworkName": {
+              "value": "[variables('virtualNetworkName')]"
+            },
+            "subnetName": {
+              "value": "[variables('subnetName')]"
+            },
+            "deploySQLMI": {
+              "value": "[parameters('deploySQLMI')]"
+            },
+            "SQLMIHA": {
+              "value": "[parameters('SQLMIHA')]"
+            },
+            "deployPostgreSQL": {
+              "value": "[parameters('deployPostgreSQL')]"
+            },
+            "templateBaseUrl": {
+              "value": "[variables('templateBaseUrl')]"
+            },
+            "bastionSubnetPrefix": {
+              "value": "[variables('bastionSubnetPrefix')]"
+            },
+            "deployBastion": {
+              "value": "[parameters('deployBastion')]"
+            },
+            "bastionHostName": {
+              "value": "[parameters('bastionHostName')]"
+            },
+            "bastionSubnetRef": {
+              "value": "[variables('bastionSubnetRef')]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "comments": "Storage Account used for staging kubectl config and staging scripts",
+        "apiVersion": "2021-04-01",
+        "name": "stagingStorageAccountDeployment",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('mgmtStagingStorageUrl')]",
+            "contentVersion": "1.0.0.0"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
+        "apiVersion": "2021-04-01",
+        "name": "logAnalyticsDeployment",
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri": "[variables('logAnalyticsUrl')]",
+            "contentVersion": "1.0.0.0"
+          },
+          "parameters": {
+            "workspaceName": {
+              "value": "[parameters('logAnalyticsWorkspaceName')]"
+            }
+          }
+        }
+      }
+    ]
+  }
