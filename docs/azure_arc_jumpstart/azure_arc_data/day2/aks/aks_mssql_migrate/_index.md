@@ -20,15 +20,29 @@ By the end of this scenario, you will have an AKS cluster deployed with an Azure
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
+  ```shell
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```
+
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple Role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
@@ -101,7 +115,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this Azure Arc-enabled SQL Managed Instance scenario we will set it to _**true**_.
   - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, set this to either _**true**_ or _**false**_.
@@ -142,29 +155,52 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot showing the Client VM public IP](./03.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_migrate/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Data-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_migrate/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_migrate/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with RDP
 
-    ![Screenshot showing connecting using Azure Bastion](./04.png)
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-Data-Client-NSG with blocked RDP](./03.png)
+
+  ![Screenshot showing adding a new inbound security rule](./04.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./05.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./06.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./07.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM. Please make sure to use User Principal Name of the domain user i.e. **arcdemo@jupstart.local** to login to Client VM through Bastion. Login will fail if using **jumpstart\arcdemo** format.
+
+  ![Screenshot showing connecting to the VM using Bastion](./08.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./09.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./10.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/Migration/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and SQL Managed Instance will be deployed on the cluster and be ready to use.
-
-  ![Screenshot showing the PowerShell logon script run](./05.png)
-
-  ![Screenshot showing the PowerShell logon script run](./06.png)
-
-  ![Screenshot showing the PowerShell logon script run](./07.png)
-
-  ![Screenshot showing the PowerShell logon script run](./08.png)
-
-  ![Screenshot showing the PowerShell logon script run](./09.png)
-
-  ![Screenshot showing the PowerShell logon script run](./10.png)
 
   ![Screenshot showing the PowerShell logon script run](./11.png)
 
@@ -188,7 +224,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./21.png)
 
-  ![Screenshot showing the post-run desktop](./22.png)
+  ![Screenshot showing the PowerShell logon script run](./22.png)
+
+  ![Screenshot showing the PowerShell logon script run](./23.png)
+
+  ![Screenshot showing the PowerShell logon script run](./24.png)
+
+  ![Screenshot showing the PowerShell logon script run](./25.png)
+
+  ![Screenshot showing the PowerShell logon script run](./26.png)
+
+  ![Screenshot showing the PowerShell logon script run](./27.png)
+
+  ![Screenshot showing the post-run desktop](./28.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
@@ -200,17 +248,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - _Azure Arc-enabled SQL Managed Instance_ - The SQL Managed Instances that are now deployed on the Kubernetes clusters.
 
-    ![Screenshot showing additional Azure resources in the resource group](./23.png)
+    ![Screenshot showing additional Azure resources in the resource group](./29.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./24.png)
+  ![Screenshot showing Azure Data Studio shortcut](./30.png)
 
-  ![Screenshot showing Azure Data Studio extensions](./25.png)
+  ![Screenshot showing Azure Data Studio extensions](./31.png)
 
 - Additionally, the SQL Managed Instances connection and the SQL instance on the nested VM will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation on the source SQL instance on the client VM.
 
-  ![Screenshot showing Azure Data Studio SQL MI and nested SQL Server connection](./26.png)
+  ![Screenshot showing Azure Data Studio SQL MI and nested SQL Server connection](./32.png)
 
 ## Cluster extensions
 
@@ -222,9 +270,9 @@ In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were insta
 
 In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./27.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./33.png)
 
-![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./28.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./34.png)
 
 ## Operations
 
@@ -232,29 +280,29 @@ In order to view these cluster extensions, click on the Azure Arc-enabled Kubern
 
 - As part of the automation, the script will also create a new text file and a desktop shortcut named "SQLMI Endpoints" that includes the SQL endpoint for the Azure Azure Arc-enabled SQL Managed Instance.
 
-  ![Screenshot showing the Azure Arc-enabled SQL Managed Instance endpoint URLs text file](./29.png)
+  ![Screenshot showing the Azure Arc-enabled SQL Managed Instance endpoint URLs text file](./35.png)
 
 - To connect to the source SQL instance on the nested VM, you can find the connection details in the Azure Data Studio.
 
-  ![Screenshot showing the source SQL instance connection details](./30.png)
+  ![Screenshot showing the source SQL instance connection details](./36.png)
 
-  ![Screenshot showing the source SQL instance connection details](./31.png)
+  ![Screenshot showing the source SQL instance connection details](./37.png)
 
 - Open Microsoft SQL Server Management Studio (SSMS) which is installed automatically for you as part of the bootstrap Jumpstart scenario and use the primary endpoint IP address for the Azure Arc-enabled SQL Managed Instance and login to the primary DB instance using the username and password provided in the text file mentioned above.
 
-  ![Screenshot showing opening SQL Server Management Studio from the start menu](./32.png)
+  ![Screenshot showing opening SQL Server Management Studio from the start menu](./38.png)
 
 - Use the username and password you entered when provisioned the environment and select “SQL Server Authentication”. Alternatively, you can retrieve the username and password using the _`$env:AZDATA_USERNAME`_ and _`$env:AZDATA_PASSWORD`_ commands.
 
-  ![Screenshot showing logging into the SQL Server Management Studio](./33.png)
+  ![Screenshot showing logging into the SQL Server Management Studio](./39.png)
 
 - Connect to the source SQL instance as well using the connection details you got from the Azure Data Studio.
 
-  ![Screenshot showing the SQL Server Management Studio after login](./34.png)
+  ![Screenshot showing the SQL Server Management Studio after login](./40.png)
 
-  ![Screenshot showing logging into the SQL Server Management Studio](./35.png)
+  ![Screenshot showing logging into the SQL Server Management Studio](./41.png)
 
-  ![Screenshot showing the two SQL instances connected](./36.png)
+  ![Screenshot showing the two SQL instances connected](./42.png)
 
 - Expand the source SQL instance and navigate to the _AdventureWorks_ database and execute the following query, use the same username and password as the previous step.
 
@@ -265,15 +313,15 @@ In order to view these cluster extensions, click on the Azure Arc-enabled Kubern
     GO
   ```
 
-  ![Screenshot showing starting a new query](./37.png)
+  ![Screenshot showing starting a new query](./43.png)
 
-  ![Screenshot showing the success message after backing up the AdventureWorks database](./38.png)
+  ![Screenshot showing the success message after backing up the AdventureWorks database](./44.png)
 
 - You can perform the same steps to backup the _AdventureWorks_ database from Azure Data Studio.
 
-  ![Screenshot showing starting a new query in Azure Data Studio](./39.png)
+  ![Screenshot showing starting a new query in Azure Data Studio](./45.png)
 
-  ![Screenshot showing the success message after backing up the AdventureWorks database in Azure Data Studio](./40.png)
+  ![Screenshot showing the success message after backing up the AdventureWorks database in Azure Data Studio](./46.png)
 ### Migrate the _AdventureWorks_ database from the source SQL instance to the Azure Arc-enabled SQL Managed Instance
 
 - To migrate the backup we created, open a new PowerShell ISE session and use the following PowerShell snippet to:
@@ -293,18 +341,18 @@ kubectl cp ./AdventureWorksLT2019.bak jumpstart-sql-0:var/opt/mssql/data/Adventu
 kubectl exec jumpstart-sql-0 -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorksLT2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorksLT2019.bak' WITH MOVE 'AdventureWorksLT2012_Data' TO '/var/opt/mssql/data/AdventureWorksLT2012.mdf', MOVE 'AdventureWorksLT2012_Log' TO '/var/opt/mssql/data/AdventureWorksLT2012_log.ldf'"
  ```
 
-  ![Screenshot showing PowerShell script to restore the backup](./41.png)
+  ![Screenshot showing PowerShell script to restore the backup](./47.png)
 
 - Navigate to the Azure Arc-enabled SQL Managed Instance in the Microsoft SQL Server Management Studio (SSMS) and you can see that the _AdventureWorks_ database has been restored successfully.
 
-  ![Screenshot showing the restored database](./42.png)
+  ![Screenshot showing the restored database](./48.png)
 
 - You can also see the migrated database on Azure Data Studio.
 
-  ![Screenshot showing the restored database in Azure Data Studio](./43.png)
+  ![Screenshot showing the restored database in Azure Data Studio](./49.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./44.png)
+    ![Screenshot showing Azure resource group deletion](./50.png)

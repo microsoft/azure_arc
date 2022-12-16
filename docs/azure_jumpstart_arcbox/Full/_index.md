@@ -25,7 +25,7 @@ ArcBox is a solution that provides an easy to deploy sandbox for all things Azur
 
 ![ArcBox servers diagram](./servers.png)
 
-ArcBox includes five Azure Arc-enabled server resources that are hosted using nested virtualization in Azure. As part of the deployment, a Hyper-V host (_ArcBox-Client_) is deployed with five guest virtual machines. These machines, _ArcBox-Win2k22_, _ArcBox-Win2k19_, _ArcBox-SQL_, _ArcBox-CentOS_, and _ArcBox-Ubuntu_ are connected as Azure Arc-enabled servers via the ArcBox automation.
+ArcBox includes five Azure Arc-enabled server resources that are hosted using nested virtualization in Azure. As part of the deployment, a Hyper-V host (_ArcBox-Client_) is deployed with five guest virtual machines. These machines, _ArcBox-Win2k22_, _ArcBox-Win2k19_, _ArcBox-SQL_, _ArcBox-Ubuntu-01_, and _ArcBox-Ubuntu-02_ are connected as Azure Arc-enabled servers via the ArcBox automation.
 
 ### Azure Arc-enabled Kubernetes
 
@@ -73,13 +73,12 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     - Windows Server 2022 VM - onboarded as Azure Arc-enabled server
     - Windows Server 2019 VM - onboarded as Azure Arc-enabled server
     - Windows VM running SQL Server - onboarded as Azure Arc-enabled SQL Server (as well as Azure Arc-enabled server)
-    - Ubuntu VM - onboarded as Azure Arc-enabled server
-    - CentOS VM - onboarded as Azure Arc-enabled server
+    - 2 x Ubuntu VMs - onboarded as Azure Arc-enabled servers
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.40.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -124,26 +123,14 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.OperationsManagement --wait
   ```
 
-- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
+- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
-  - "Contributor" - Required for provisioning Azure resources
-  - "Security admin" - Required for installing Microsoft Defender for Cloud Azure-Arc enabled Kubernetes extension and dismiss alerts
-  - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
-  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
-  - **(optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
-
-    > **NOTE: In the event a Service Principal with Owner cannot be created, the SQL Server can be onboarded to Azure Arc post deployment by following the [Azure Arc-enabled SQL Server onboarding](#azure-arc-enabled-sql-server-onboarding) steps below.**
-
-    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
+  - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
 
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
@@ -151,11 +138,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBoxSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look similar to this:
@@ -168,15 +151,47 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+  
+  - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install Azure PowerShell modules.
+
+    ```PowerShell
+    $account = Connect-AzAccount
+    $spn = New-AzADServicePrincipal -DisplayName "<Unique SPN name>" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
+    echo "SPN App id: $($spn.AppId)"
+    echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
+    ```
+
+    For example:
+
+    ```PowerShell
+    $account = Connect-AzAccount
+    $spn = New-AzADServicePrincipal -DisplayName "JumpstartArcBoxSPN" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
+    echo "SPN App id: $($spn.AppId)"
+    echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
+    ```
+
+    Output should look similar to this:
+
+    ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**.
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
   ```shell
-  ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
   ```
 
 ## Deployment Option 1: Azure portal
@@ -188,6 +203,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ![Screenshot showing Azure portal deployment of ArcBox](./portaldeployinprogress.png)
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploymentcomplete.png)
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -223,6 +240,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az deployment group create](./azdeploy.png)
 
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
+
 ## Deployment Option 3: Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
@@ -257,6 +276,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
+
 ## Deployment Option 4: Terraform Deployment
 
 - Clone the Azure Arc Jumpstart repository
@@ -276,7 +297,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
   spn_client_secret = "fakeSecretValue123458125712ahjeacjh"
   spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
-  user_ip_address   = "99.88.99.88"
   client_admin_ssh  = "C:/Temp/rsa.pub"
   deployment_flavor = "Full"
   ```
@@ -287,7 +307,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`spn_client_id`_** - Your Azure service principal id
   - **_`spn_client_secret`_** - Your Azure service principal secret
   - **_`spn_tenant_id`_** - Your Azure tenant id
-  - **_`user_ip_address`_** - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
   - **_`deployment_flavor`_** - Use the value "Full" to specify that you want to deploy the full version of ArcBox
   - _`client_admin_username`_ - Admin username for Windows & Linux VMs
@@ -315,6 +334,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Example output from `terraform apply "infra.out"`:
 
   ![terraform plan](./terraform_apply.png)
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
 
 ## Start post-deployment automation
 
@@ -385,7 +406,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - During deployment, a check is performed to determine whether or not the Service Principal being used has permissions of _'Microsoft.Authorization/roleAssignments/write'_ on the target resource group. This permission can be found in the Azure built-in roles of Owner, User Access Administrator, or you may have a custom RBAC role which provides this permission. If the Service Principal has been granted the rights to change the role assignments on the resource group, the Azure Arc-enabled SQL Server can be automatically onboarded as part of the port-deployment automation.
 
-- In the event that the Service Principal does *not* have _'Microsoft.Authorization/roleAssignments/write'_ on the target resource group, and icon will created on the _ArcBox-Client_ desktop, which will allow you to onboard the Azure Arc-enabled SQL Server after the post-deployment automation is complete. To start the onboarding process in this scenario, simply click the _'Onboard SQL Server'_ icon on the desktop. This process should take around 10-15 minutes to complete.
+- In the event that the Service Principal does **not** have _'Microsoft.Authorization/roleAssignments/write'_ on the target resource group, and icon will created on the _ArcBox-Client_ desktop, which will allow you to onboard the Azure Arc-enabled SQL Server after the post-deployment automation is complete. To start the onboarding process in this scenario, simply click the _'Onboard SQL Server'_ icon on the desktop. This process should take around 10-15 minutes to complete.
 
   ![Screenshot showing ArcBox-Client](./sql_manual_onboard_icon.png)
 
@@ -514,7 +535,7 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
 
 Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_, _ArcBox-CAPI-MGMT_ or _ArcBox-K3s_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 
-| Logfile | Description |
+| Log file | Description |
 | ------- | ----------- |
 | _C:\ArcBox\Logs\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _ArcBox-Client_. |
 | _C:\ArcBox\Logs\ArcServersLogonScript.log_ | Output of _ArcServersLogonScript.ps1_ which configures the Hyper-V host and guests and onboards the guests as Azure Arc-enabled servers. |
@@ -556,8 +577,6 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
   ![Screenshot showing az login error](./az_login_error.png)
 
+- You might randomly get a similar error in the _InstallCAPI.log_ to `Error from server (InternalError): error when creating "template.yaml": Internal error occurred: failed calling webhook "default.azuremachinetemplate.infrastructure.cluster.x-k8s.io": failed to call webhook: Post "https://capz-webhook-service.capz-system.svc:443/mutate-infrastructure-cluster-x-k8s-io-v1beta1-azuremachinetemplate?timeout=10s": EOF`. This is an issue we are currently investigating. To resolve please redeploy ArcBox.
+
 If you are still having issues deploying ArcBox, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on GitHub and include a detailed description of your issue, the Azure region you are deploying to, the flavor of ArcBox you are trying to deploy. Inside the _C:\ArcBox\Logs_ folder you can also find instructions for uploading your logs to an Azure storage account for review by the Jumpstart team.
-
-## Known issues
-
-- Azure Arc-enabled SQL Server assessment report not always visible in Azure portal.

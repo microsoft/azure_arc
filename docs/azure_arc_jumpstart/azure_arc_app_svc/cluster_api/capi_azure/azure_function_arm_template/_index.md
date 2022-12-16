@@ -22,15 +22,29 @@ By the end of this scenario, you will have a CAPI Kubernetes cluster deployed wi
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
 
-- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
+  ```shell
+  ssh-keygen -t rsa -b 4096
+  ```
+
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
+
+  ```shell
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```
+
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple Role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
@@ -106,7 +120,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and CAPI cluster nodes.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deployAppService`_ - Boolean that sets whether or not to deploy App Service plan and a Web App. For this scenario, we leave it set to _**false**_.
   - _`deployFunction`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Function application. For this scenario, we leave it set to _**true**_.
@@ -152,31 +165,54 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-App-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot showing the Client VM public IP](./03.png)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-App-Client-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
-  
-    ![Screenshot showing connection to the Client VM using Bastion](./04.png)
+### Connecting directly with RDP
+
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-App-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-App-Client NSG with blocked RDP](./03.png)
+
+  ![Screenshot showing adding a new inbound security rule](./04.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./05.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./06.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./07.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./08.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./09.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./10.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
     > **NOTE: As you will notices from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
-
-    ![Screenshot showing PowerShell logon script run](./05.png)
-
-    ![Screenshot showing PowerShell logon script run](./06.png)
-
-    ![Screenshot showing PowerShell logon script run](./07.png)
-
-    ![Screenshot showing PowerShell logon script run](./08.png)
-
-    ![Screenshot showing PowerShell logon script run](./09.png)
-
-    ![Screenshot showing PowerShell logon script run](./10.png)
 
     ![Screenshot showing PowerShell logon script run](./11.png)
 
@@ -200,9 +236,21 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot showing PowerShell logon script run](./21.png)
 
+    ![Screenshot showing PowerShell logon script run](./22.png)
+
+    ![Screenshot showing PowerShell logon script run](./23.png)
+
+    ![Screenshot showing PowerShell logon script run](./24.png)
+
+    ![Screenshot showing PowerShell logon script run](./25.png)
+
+    ![Screenshot showing PowerShell logon script run](./26.png)
+
+    ![Screenshot showing PowerShell logon script run](./27.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the sample web application deployed on the cluster will be ready.
 
-    ![Screenshot showing desktop wallpaper change](./22.png)
+    ![Screenshot showing desktop wallpaper change](./28.png)
 
   - **Custom location** - Provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
@@ -216,41 +264,41 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Storage Account - The storage account deployed in this scenario is used for hosting the [queue storage](https://docs.microsoft.com/azure/storage/queues/storage-queues-introduction) where the Azure Function will be sending messages to that can be leveraged later in an application event-driven architecture.
 
-  ![Screenshot showing additional Azure resources in the resource group](./23.png)
+  ![Screenshot showing additional Azure resources in the resource group](./29.png)
 
 - In this scenario, **a sample Jumpstart Azure Function application** was deployed. To open the deployed Function application in your web browser, simply click the Azure Function resource and the created URL or the Browse button.
 
-  ![Screenshot showing the Azure Function URL](./24.png)
+  ![Screenshot showing the Azure Function URL](./30.png)
 
-  ![Screenshot showing the Azure Function open in a web browser](./25.png)
+  ![Screenshot showing the Azure Function open in a web browser](./31.png)
 
 - To demonstrate the messaging queuing element and to show how messages are stored in the queue storage, the Azure Function deployment script also generates 10 sample messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the new queue and the stored messages.
 
-  ![Screenshot showing the Azure storage account](./26.png)
+  ![Screenshot showing the Azure storage account](./32.png)
 
-  ![Screenshot showing the Azure storage queue](./27.png)
+  ![Screenshot showing the Azure storage queue](./33.png)
 
-  ![Screenshot showing Azure Function messages in storage queue](./28.png)
+  ![Screenshot showing Azure Function messages in storage queue](./34.png)
 
 - Alternatively, you can view the same queue storage using the Azure Storage Explorer client application installed automatically in the Client VM or using the Azure Storage Browser portal-based view.
 
-  ![Screenshot showing Azure Storage Explorer client application storage queue](./29.png)
+  ![Screenshot showing Azure Storage Explorer client application storage queue](./35.png)
 
-  ![Screenshot showing Azure Storage Explorer portal-based view](./30.png)
+  ![Screenshot showing Azure Storage Explorer portal-based view](./36.png)
 
-  ![Screenshot showing Azure Storage Explorer portal-based view storage queue](./31.png)
+  ![Screenshot showing Azure Storage Explorer portal-based view storage queue](./37.png)
 
 - To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder that includes invoke URL was created for you. Copy the URL and open it in your web browser while adding the message text to it using the _`?name=<Something>`_ syntax, for example, _`?name=Bilbo`_.
 
-  ![Screenshot showing the funcUrl.txt file](./32.png)
+  ![Screenshot showing the funcUrl.txt file](./38.png)
 
-  ![Screenshot showing invoke URL](./33.png)
+  ![Screenshot showing invoke URL](./39.png)
 
-  ![Screenshot showing invoke URL in web browser](./34.png)
+  ![Screenshot showing invoke URL in web browser](./40.png)
 
 - Go back to the storage queue and see the new added message.
 
-  ![Screenshot showing the new message in the storage queue](./35.png)
+  ![Screenshot showing the new message in the storage queue](./41.png)
 
 ## Cluster extensions
 
@@ -258,12 +306,12 @@ In this scenario, the Azure Arc-enabled app services cluster extension was deplo
 
 - In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./36.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./42.png)
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes cluster extensions settings](./37.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes cluster extensions settings](./43.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./38.png)
+  ![Delete Azure resource group](./44.png)

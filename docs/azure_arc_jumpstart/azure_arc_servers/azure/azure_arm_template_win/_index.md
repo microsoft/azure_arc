@@ -18,7 +18,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -114,9 +114,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fazure%2Fwindows%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-  ![Screenshot showing Azure portal deployment](./01.jpg)
+  ![Screenshot showing Azure portal deployment](./01.png)
 
-  ![Screenshot showing Azure portal deployment](./02.jpg)
+  ![Screenshot showing Azure portal deployment](./02.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -158,19 +158,54 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![Screenshot ARM template output](./03.jpg)
+    ![Screenshot ARM template output](./03.png)
 
-    ![Screenshot resources in resource group](./04.jpg)
+    ![Screenshot resources in resource group](./04.png)
 
 ## Windows Login & Post Deployment
 
-- Now that the Windows Server VM is created, it is time to log in to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
+Various options are available to connect to _Arc-Data-Client_ VM, depending on the parameters you supplied during deployment.
 
-    ![Screenshot Azure VM public IP address](./05.jpg)
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_win/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Win-Demo-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_win/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_win/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+### Connecting directly with RDP
 
-    ![Screenshot Azure VM Bastion connectivity](./06.jpg)
+By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Arc-Win-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Arc-App-Client NSG with blocked RDP](./05.png)
+
+  ![Screenshot showing adding a new inbound security rule](./06.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  ![Screenshot showing all inbound security rule](./07.png)
+
+  ![Screenshot showing all NSG rules after opening RDP](./08.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./09.png)
+
+### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./10.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
+
+### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./11.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./12.png)
+
+### Post Deployment
 
 - At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
@@ -178,22 +213,22 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: The script run time is ~1-2min long.**
 
-    ![Screenshot script output](./07.jpg)
+    ![Screenshot script output](./13.png)
 
-    ![Screenshot script output](./08.jpg)
+    ![Screenshot script output](./14.png)
 
-    ![Screenshot script output](./09.jpg)
+    ![Screenshot script output](./15.png)
 
-    ![Screenshot script output](./10.jpg)
+    ![Screenshot script output](./16.png)
 
 - Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-![Screenshot Azure Arc-enabled server on resource group](./11.jpg)
+![Screenshot Azure Arc-enabled server on resource group](./17.png)
 
-![Screenshot Azure Arc-enabled server details](./12.jpg)
+![Screenshot Azure Arc-enabled server details](./18.png)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot delete resource group](./13.jpg)
+![Screenshot delete resource group](./19.png)

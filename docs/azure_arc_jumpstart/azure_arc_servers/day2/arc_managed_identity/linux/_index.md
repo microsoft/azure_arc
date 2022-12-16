@@ -112,7 +112,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
     ![Screenshot showing the created secret](./06.png)
 
-## Add RBAC role assignments for the managed identity
+## Add Role-based access control (RBAC) role assignments for the managed identity
 
 By default, the managed identity on an Azure Arc-enabled server will have no access to Azure resources. The steps below will show how to use standard RBAC assignments to give the required access.
 
