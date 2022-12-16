@@ -1,0 +1,69 @@
+{% comment %}
+TODO: Before HAIKU add capability to merge two objects, we have to map each individual object in the top level of spec.
+We are adding loginRef into Custom Resource Spec in order for k8 bridge to create the secret in the Kubernetes cluster.
+What we want here is to merge k8sRaw.spec with loginRef together to become a larger spec.
+However, Liquid template does not support merging objects. In order for it to work, I have to list them one by one.
+{% endcomment%}
+
+{%- assign resource = content.properties -%}
+{%- assign sku = content.sku -%}
+
+{%- assign keytab = resource.activeDirectoryInformation.keytabInformation | KubernetesSecret: secretName:'keytab-secret', isData:true -%}
+{%- assign loginPassword = resource.basicLoginInformation | KubernetesSecret: secretName:'login-secret' -%}
+{%- assign docker = resource.k8sRaw.spec.docker -%}
+{%- assign services = resource.k8sRaw.spec.services -%}
+{%- assign scheduling = resource.k8sRaw.spec.scheduling -%}
+{%- assign storage = resource.k8sRaw.spec.storage -%}
+{%- assign dev = resource.k8sRaw.spec.dev -%}
+{%- assign readableSecondaries = resource.k8sRaw.spec.readableSecondaries -%}
+{%- assign syncSecondaryToCommit = resource.k8sRaw.spec.syncSecondaryToCommit -%}
+{%- assign replicas = resource.k8sRaw.spec.replicas -%}
+
+{%- assign preferredPrimaryReplicaSpec = resource.k8sRaw.spec.preferredPrimaryReplicaSpec -%}
+{%- assign backup = resource.k8sRaw.spec.backup -%}
+{%- assign settings = resource.k8sRaw.spec.settings -%}
+
+{%- assign securityActiveDirectory = resource.k8sRaw.spec.security.activeDirectory -%}
+{%- assign serviceCertificateSecret = resource.k8sRaw.spec.security.serviceCertificateSecret -%}
+{%- assign update = resource.k8sRaw.spec.update -%}
+
+{%- assign licenseType = resource.licenseType -%}
+
+{
+  "spec": {
+    {% if docker != nil %} "docker": {{ docker }}, {% endif %}
+    {% if services != nil %} "services": {{ services }}, {% endif %}
+    "security": {
+      {% if securityActiveDirectory != nil %}
+        "activeDirectory": {
+          {% if securityActiveDirectory.connector != nil %} "connector": {{ securityActiveDirectory.connector }}, {% endif %}
+          {% if securityActiveDirectory.accountName != nil %} "accountName": {{ securityActiveDirectory.accountName | json }}, {% endif %}
+          {% if securityActiveDirectory.keytabSecret != nil  %}
+            "keytabSecret": {{ securityActiveDirectory.keytabSecret | json }},
+          {% elsif keytab != nil %}
+            "keytabSecret": {{ keytab.Name | json }},
+          {% endif %}
+          {% if securityActiveDirectory.encryptionTypes != nil %} "encryptionTypes": {{ securityActiveDirectory.encryptionTypes | json }}, {% endif %}
+        },
+      {% endif %}
+      {% if serviceCertificateSecret != nil %} "serviceCertificateSecret": {{ serviceCertificateSecret | json }}, {% endif %}
+      {% if resource.k8sRaw.spec.security.adminLoginSecret != nil %}
+        "adminLoginSecret": {{ resource.k8sRaw.spec.security.adminLoginSecret | json }}
+      {% elsif loginPassword != nil %}
+        "adminLoginSecret": {{ loginPassword.Name | json }}
+      {% endif %}
+    },
+    {% if scheduling != nil %} "scheduling": {{ scheduling }}, {% endif %}
+    {% if storage != nil %} "storage": {{ storage }}, {% endif %}
+    {% if dev != nil %} "dev": {{ dev }}, {% endif %}
+    {% if readableSecondaries != nil %} "readableSecondaries": {{ readableSecondaries }}, {% endif %}
+    {% if syncSecondaryToCommit != nil %} "syncSecondaryToCommit": {{ syncSecondaryToCommit }}, {% endif %}
+    {% if replicas != nil %} "replicas": {{ replicas }}, {% endif %}
+    {% if sku != nil and sku.tier != nil %} "tier": "{{ sku.tier }}", {% endif %}
+    {% if update != nil %} "update": {{ update }}, {% endif %}
+    {% if preferredPrimaryReplicaSpec != nil %} "preferredPrimaryReplicaSpec": {{ preferredPrimaryReplicaSpec }}, {% endif %}
+    {% if backup != nil %} "backup": {{ backup }}, {% endif %}
+    {% if settings != nil %} "settings": {{ settings }}, {% endif %}
+    {% if licenseType != nil %} "licenseType": "{{ licenseType }}" {% endif %}
+  }
+}

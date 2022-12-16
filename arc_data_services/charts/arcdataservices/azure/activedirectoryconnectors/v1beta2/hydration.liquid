@@ -1,0 +1,34 @@
+{%- assign spec = content.spec -%}
+{%- assign activeDirectory = spec.activeDirectory -%}
+{%- assign dns = spec.dns -%}
+{%- assign status = content.status -%}
+
+{
+  "properties": {
+  {% if status != nil %}
+    "status": {{ status }},
+  {% endif %}
+    "spec": {
+      "activeDirectory": {
+      {% if activeDirectory.domainControllers != nil %}
+        "domainControllers": {{ activeDirectory.domainControllers }},
+      {% else %}
+        "domainControllers": {},
+      {% endif %}
+      {% if activeDirectory.netbiosDomainName != nil %}
+        "netbiosDomainName": {{ activeDirectory.netbiosDomainName | json}},
+      {% endif %}
+      {% if activeDirectory.serviceAccountProvisioning != nil %}
+        "serviceAccountProvisioning": {{ activeDirectory.serviceAccountProvisioning | json}},
+      {% endif %}
+      {% if activeDirectory.ouDistinguishedName != nil %}
+        "ouDistinguishedName": {{ activeDirectory.ouDistinguishedName | json}},
+      {% endif %}
+      {% if activeDirectory.realm != nil %}
+        "realm": {{ activeDirectory.realm | json }}
+      {% endif %}
+      },
+      "dns": {{ dns }}
+    }
+  }
+}
