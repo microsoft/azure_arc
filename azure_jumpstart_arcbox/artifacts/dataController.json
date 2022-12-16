@@ -165,7 +165,9 @@
                 "connectionMode": "[parameters('connectionMode')]",
                 "location": "[parameters('location')]",
                 "resourceGroup": "[parameters('resourceGroup')]",
-                "subscription": "[parameters('subscriptionId')]"
+                "subscription": "[parameters('subscriptionId')]",
+                "autoUploadMetrics": "true",
+                "autoUploadLogs": "true"
               },
               "controller": {
                 "displayName": "[parameters('controllerName')]",
@@ -191,29 +193,29 @@
             "namespace": "[parameters('namespace')]",
             "name": "datacontroller"
           },
-          "status":{
-            "observedGeneration":1,
-            "azure":{
-               "uploadStatus":{
-                  "metrics":{
-                     "status":{
-                        "message":"",
-                        "state":""
-                     }
-                  },
-                  "logs":{
-                     "status":{
-                        "message":"",
-                        "state":""
-                     }
-                  },
-                  "usage":{
-                     "status":{
-                        "message":"",
-                        "state":""
-                     }
+          "status": {
+            "observedGeneration": 1,
+            "azure": {
+              "uploadStatus": {
+                "metrics": {
+                  "status": {
+                    "message": "",
+                    "state": ""
                   }
-               }
+                },
+                "logs": {
+                  "status": {
+                    "message": "",
+                    "state": ""
+                  }
+                },
+                "usage": {
+                  "status": {
+                    "message": "",
+                    "state": ""
+                  }
+                }
+              }
             }
           }
         }

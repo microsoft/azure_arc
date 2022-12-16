@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to RDP to the client VM"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "Arc-Data-CAPI-MGMT",
@@ -15,7 +9,7 @@
                 "description": "The name of you Virtual Machine."
             }
         },
-        "ArcK8sClusterName": {
+        "capiArcDataClusterName": {
             "type": "string",
             "defaultValue": "Arc-DataSvc-CAPI",
             "metadata": {
@@ -117,15 +111,15 @@
             }
         },
         "templateBaseUrl": {
-        "type": "string",
-        "metadata": {
-            "description": "Base URL for ARM template"
+            "type": "string",
+            "metadata": {
+                "description": "Base URL for ARM template"
             }
         },
         "bastionSubnetPrefix": {
             "type": "string",
             "metadata": {
-                "description": "description"
+                "description": "Azure Bastion subnet IP prefix"
             }
         },
         "deployBastion": {
@@ -186,25 +180,25 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2022-05-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('azureLocation')]",
+            "location": "[parameters('azureLocation')]"
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2022-05-01",
+            "name": "[concat(parameters('networkSecurityGroupName'),'/allow_SSH_22')]",
+            "condition": "[parameters('deployBastion')]",
+            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1001,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
-                        }
-                    }
-                ]
+                "priority": 1001,
+                "protocol": "TCP",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "22"
             }
         },
         {
@@ -235,7 +229,7 @@
                     }
                 ]
             }
-        },        
+        },
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2021-05-01",
@@ -320,7 +314,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('capiArcDataClusterName'), ' ',parameters('templateBaseUrl'))]",
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
                     ]

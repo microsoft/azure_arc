@@ -17,6 +17,9 @@ $env:azureLocation="${azureLocation}"
 $env:deploySQLMI="${deploySQLMI}"
 $env:deployPostgreSQL="${deployPostgreSQL}"
 $env:templateBaseUrl="${templateBaseUrl}"
+$env:USE_GKE_GCLOUD_AUTH_PLUGIN="${USE_GKE_GCLOUD_AUTH_PLUGIN}"
+$env:CL_OID="${CL_OID}"
+$env:SQLMIHA="${SQLMIHA}"
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $env:adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('gcpCredentialsFilename', $env:gcpCredentialsFilename,[System.EnvironmentVariableTarget]::Machine)
@@ -36,3 +39,6 @@ $env:templateBaseUrl="${templateBaseUrl}"
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', $env:deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $env:deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $env:templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('USE_GKE_GCLOUD_AUTH_PLUGIN', $env:USE_GKE_GCLOUD_AUTH_PLUGIN,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('CL_OID', $env:CL_OID,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SQLMIHA', $env:SQLMIHA,[System.EnvironmentVariableTarget]::Machine)
