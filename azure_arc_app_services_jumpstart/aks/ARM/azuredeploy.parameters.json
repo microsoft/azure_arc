@@ -23,6 +23,9 @@
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
+        "deployContainerApps": {
+            "value": true
+        },
         "deployAppService": {
             "value": false
         },
@@ -36,7 +39,7 @@
             "value": false
         },
         "adminEmail": {
-            "value": "<youremail@email.com>"
+            "value": "youremail@email.com"
         },
         "deployBastion": {
             "value": false
