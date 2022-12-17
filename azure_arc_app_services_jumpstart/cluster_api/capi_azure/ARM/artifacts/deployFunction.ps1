@@ -23,7 +23,14 @@ Write-Host "Creating the new Azure Function application in the Kubernetes enviro
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "$Env:capiArcAppClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
-az functionapp create --resource-group $Env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 4 --runtime dotnet
+
+az functionapp create --resource-group $Env:resourceGroup `
+--name $functionAppName `
+--custom-location $customLocationId `
+--storage-account $storageAccountName `
+--functions-version 4 `
+--runtime dotnet `
+--runtime-version 6
 
 Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
