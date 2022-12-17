@@ -26,8 +26,11 @@
         "logAnalyticsWorkspaceName": {
             "value": "Arc-AppSvc-LA"
         },
-        "deployAppService": {
+        "deployContainerApps": {
             "value": true
+        },
+        "deployAppService": {
+            "value": false
         },
         "deployFunction": {
             "value": false
