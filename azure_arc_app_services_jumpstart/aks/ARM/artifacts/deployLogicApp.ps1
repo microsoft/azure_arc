@@ -47,7 +47,7 @@ Do {
     } while ($logProcessorStatus -eq "Nope")
 
 # Deploy Logic App code
-Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled Logic App.`n"
+Write-Host "Packaging sample Logic App code and deploying to Azure Arc-enabled Logic App.`n"
 7z a c:\Temp\logicAppCode.zip c:\Temp\logicAppCode\*
 az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 
