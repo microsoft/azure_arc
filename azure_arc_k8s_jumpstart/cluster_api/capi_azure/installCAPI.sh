@@ -275,8 +275,8 @@ EOF
   tput sgr0
   echo ""
 
-  # Onboarding the cluster as an Azure Arc enabled Kubernetes cluster
-  echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+  # Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster
+  echo "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
   echo ""
   rm -rf ~/.azure/AzureArcCharts
 
