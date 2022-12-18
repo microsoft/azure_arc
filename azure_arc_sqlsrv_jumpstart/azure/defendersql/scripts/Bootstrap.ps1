@@ -100,11 +100,8 @@ Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions
 
 Write-Host "Fetching Artifacts for Arc SQL Server"
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgent.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgent.ps1
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQLSP.ps1
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcBoxIconDir\arcsql.ico
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1
 
 Write-Header "Configuring Logon Scripts"

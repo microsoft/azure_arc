@@ -25,6 +25,7 @@ az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.HybridConnectivity --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace Microsoft.OperationsManagement --wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
