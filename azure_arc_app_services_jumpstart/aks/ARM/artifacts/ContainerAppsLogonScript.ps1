@@ -82,7 +82,6 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying Azure App environment
 Write-Host "Deploying Application Platform extension"
@@ -130,14 +129,14 @@ $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-
 Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
-az containerapp connected-env create --resource-group $resourceGroup --name $connectedEnvironmentName --custom-location $customLocationId
+az containerapp connected-env create --resource-group $Env:resourceGroup --name $connectedEnvironmentName --custom-location $customLocationId
 
 Write-Host "`n"
 Write-Host "Creating the products api container app"
 Write-Host "`n"
 az containerapp create `
     --name 'products' `
-    --resource-group $resourceGroup `
+    --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
     --environment-type connected `
     --enable-dapr true `
@@ -165,7 +164,7 @@ Write-Host "Creating the inventory api container app"
 Write-Host "`n"
 az containerapp create `
     --name 'inventory' `
-    --resource-group $resourceGroup `
+    --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
     --environment-type connected `
     --enable-dapr true `
@@ -192,7 +191,7 @@ Write-Host "Creating the store api container app"
 Write-Host "`n"
 az containerapp create `
     --name 'store' `
-    --resource-group $resourceGroup `
+    --resource-group $Env:resourceGroup `
     --environment $connectedEnvironmentName `
     --environment-type connected `
     --enable-dapr true `
