@@ -82,6 +82,7 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $namespace; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying Azure App environment
 Write-Host "Deploying Application Platform extension"
@@ -130,6 +131,12 @@ Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 az containerapp connected-env create --resource-group $Env:resourceGroup --name $connectedEnvironmentName --custom-location $customLocationId
+
+Do {
+    Write-Host "Waiting for Connected Environment to become available."
+    Start-Sleep -Seconds 15
+    $appenv = $(if(kubectl get pods -n $namespace | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($appenv -eq "Nope")
 
 Write-Host "`n"
 Write-Host "Creating the products api container app"
