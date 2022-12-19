@@ -1,0 +1,111 @@
+# Replace these placeholder:
+# - {{RUNTIME_SERVICE_ACCOUNT}}: runtime service account for Azure Arc-enabled Data Services
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: arcdata-runtime-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - persistentvolumeclaims
+  - secrets
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  - persistentvolumeclaims
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  - tasks.sql.arcdata.microsoft.com
+  - tasks.arcdata.microsoft.com
+  - arcdata.microsoft.com
+  resources:
+  - "*"
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - update
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests
+  verbs:
+  - create
+  - delete
+  - get
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests/status
+  verbs:
+  - patch
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: arcdata-runtime-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{RUNTIME_SERVICE_ACCOUNT}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: arcdata-runtime-role
