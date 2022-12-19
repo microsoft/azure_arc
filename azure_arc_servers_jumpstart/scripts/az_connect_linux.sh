@@ -20,7 +20,7 @@ elif INST="$( which zypper )" > /dev/null 2>&1; then
    sudo zypper ref
    sudo zypper update -y
 else
-   echo "No package manager found, check Azure Arc enabled servers supported OS" >&2
+   echo "No package manager found, check Azure Arc-enabled servers supported OS" >&2
    exit 1
 fi
 

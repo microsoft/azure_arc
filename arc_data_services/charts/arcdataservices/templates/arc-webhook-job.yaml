@@ -23,4 +23,4 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.systemDefaultValues.imagePullSecret }}
       restartPolicy: Never
-      serviceAccountName: sa-arc-webhook-job
+      serviceAccountName: {{ include "installerServiceAccount" . | default "sa-arc-webhook-job" }}

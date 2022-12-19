@@ -12,7 +12,7 @@ Write-Host "`n"
 Write-Host "Creating local Azure Function application project"
 Write-Host "`n"
 Push-Location C:\Temp
-func init JumpstartFunctionProj --dotnet --version 3.1
+func init JumpstartFunctionProj --dotnet --version 4
 Push-Location C:\Temp\JumpstartFunctionProj
 dotnet new globaljson --sdk-version 3.1.415
 func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
@@ -23,7 +23,14 @@ Write-Host "Creating the new Azure Function application in the Kubernetes enviro
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
-az functionapp create --resource-group $Env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
+
+az functionapp create --resource-group $Env:resourceGroup `
+--name $functionAppName `
+--custom-location $customLocationId `
+--storage-account $storageAccountName `
+--functions-version 4 `
+--runtime dotnet `
+--runtime-version 6
 
 Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."

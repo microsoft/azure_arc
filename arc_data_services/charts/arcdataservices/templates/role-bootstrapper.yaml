@@ -1,3 +1,4 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.RuntimeServiceAccount) (not .Values.systemDefaultValues.runtimeServiceAccount) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -154,3 +155,4 @@ rules:
   verbs:
   - patch
   - update
+{{ end }}
