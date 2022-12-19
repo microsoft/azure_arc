@@ -648,7 +648,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 #### Azure Arc-enabled Kubernetes scenarios
 
-- [Bug fix: Azure Cluster API scenario for Azure Arc enabled Kubernetes script variables not matching #696](https://github.com/microsoft/azure_arc/issues/696)
+- [Bug fix: Azure Cluster API scenario for Azure Arc-enabled Kubernetes script variables not matching #696](https://github.com/microsoft/azure_arc/issues/696)
 
 #### Azure Arc-enabled data services scenarios
 
@@ -658,9 +658,9 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: failed to get file "infrastructure-components.yaml" #688](https://github.com/microsoft/azure_arc/issues/688)
 
-- [Bug fix: Azure Arc enabled data services for EKS: Failed to load state error #699](https://github.com/microsoft/azure_arc/issues/699)
+- [Bug fix: Azure Arc-enabled data services for EKS: Failed to load state error #699](https://github.com/microsoft/azure_arc/issues/699)
 
-- [Bug fix: Azure Arc enabled data services for EKS : logon script does not end #711](https://github.com/microsoft/azure_arc/issues/711)
+- [Bug fix: Azure Arc-enabled data services for EKS : logon script does not end #711](https://github.com/microsoft/azure_arc/issues/711)
 
 #### Azure Arc-enabled app service
 
