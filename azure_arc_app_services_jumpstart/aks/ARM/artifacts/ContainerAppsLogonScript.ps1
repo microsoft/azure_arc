@@ -82,10 +82,10 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $namespace; Start-Sleep -Seconds 5; Clear-Host }}
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying Azure App environment
-Write-Host "Deploying Application Platform extension"
+Write-Host "Deploying Application Platform extension. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 
 az k8s-extension create `
@@ -124,19 +124,38 @@ az connectedk8s enable-features --name $Env:connectedClusterName `
                                 --custom-locations-oid $Env:connectedClusterName `
                                 --features cluster-connect custom-locations
 
-$connectedClusterId = az connectedk8s show --name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
-$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace $namespace --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
+$connectedClusterId = $(az connectedk8s show `
+    --name $Env:clusterName `
+    --resource-group $Env:resourceGroup `
+    --query id `
+    --output tsv)
+
+$customLocationId = $(az customlocation create `
+    --name 'jumpstart-cl' `
+    --resource-group $Env:resourceGroup `
+    --namespace $namespace `
+    --host-resource-id $connectedClusterId `
+    --cluster-extension-ids $extensionId `
+    --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" `
+    --query id `
+    --output tsv)
 
 Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
-az containerapp connected-env create --resource-group $Env:resourceGroup --name $connectedEnvironmentName --custom-location $customLocationId
+az containerapp connected-env create `
+    --resource-group $Env:resourceGroup `
+    --name $connectedEnvironmentName `
+    --custom-location $customLocationId `
+    --location $Env:azureLocation
 
-Do {
-    Write-Host "Waiting for Connected Environment to become available."
-    Start-Sleep -Seconds 15
-    $appenv = $(if(kubectl get pods -n $namespace | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($appenv -eq "Nope")
+$containerAppEnvId = $(az containerapp connected-env show `
+    --name $connectedEnvironmentName `
+     --resource-group $Env:resourceGroup  `
+     --query id `
+     --output tsv)
+
+az resource wait --ids $containerAppEnvId --created
 
 Write-Host "`n"
 Write-Host "Creating the products api container app"
