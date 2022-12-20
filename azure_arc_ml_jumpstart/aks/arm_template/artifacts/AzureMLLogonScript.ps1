@@ -79,8 +79,8 @@ $url = "http://$pip" + ":4040"
 Start-Process microsoft-edge:"$url" -WindowStyle maximized
 ###################################################################################################################
 
-# Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Monitor pods across namespaces

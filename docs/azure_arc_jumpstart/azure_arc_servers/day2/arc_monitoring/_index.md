@@ -26,13 +26,13 @@ in this scenario, you will create the following Azure resources that support thi
 
 - Azure Policies to automate agents deployment:
 
-  - Configure Log Analytics extension on Azure Arc enabled Windows servers.
+  - Configure Log Analytics extension on Azure Arc-enabled Windows servers.
 
-  - Configure Log Analytics extension on Azure Arc enabled Linux servers.
+  - Configure Log Analytics extension on Azure Arc-enabled Linux servers.
 
-  - Configure Dependency agent on Azure Arc enabled Windows servers.
+  - Configure Dependency agent on Azure Arc-enabled Windows servers.
 
-  - Configure Dependency agent on Azure Arc enabled Linux server.
+  - Configure Dependency agent on Azure Arc-enabled Linux server.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
 

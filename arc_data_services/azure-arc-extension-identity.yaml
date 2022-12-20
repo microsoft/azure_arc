@@ -1,0 +1,34 @@
+# Replace these placeholders with the actual values before applying
+# - {{NAMESPACE}}: namespace for Azure Arc-enabled Data Services below
+# - {{INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{NAMESPACE}}:cr-extension-identity
+rules:
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureextensionidentities
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{NAMESPACE}}:crb-extension-identity
+  namespace: azure-arc
+subjects:
+- kind: ServiceAccount
+  name: {{INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{NAMESPACE}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{NAMESPACE}}:cr-extension-identity
