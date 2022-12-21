@@ -84,7 +84,7 @@ az connectedk8s connect --name $Env:connectedClusterName `
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
 
-# Deploying Azure App environment
+# Deploying Application Platform extension
 Write-Host "Deploying Application Platform extension. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 
@@ -170,7 +170,7 @@ az containerapp create `
     --dapr-app-port 80 `
     --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
-    --image 'arcjumpstart.azurecr.io/products:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b' `
+    --image $Env:productsImage `
     --ingress 'internal' `
     --target-port 80 `
     --transport 'http' `
@@ -198,7 +198,7 @@ az containerapp create `
     --dapr-app-port 80 `
     --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
-    --image 'arcjumpstart.azurecr.io/inventory:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b' `
+    --image $Env:inventoryImage `
     --ingress 'internal' `
     --target-port 80 `
     --transport 'http' `
@@ -225,7 +225,7 @@ az containerapp create `
     --dapr-app-port 80 `
     --dapr-app-protocol 'http' `
     --revisions-mode 'single' `
-    --image 'arcjumpstart.azurecr.io/store:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b' `
+    --image $Env:storeImage `
     --ingress 'external' `
     --target-port 80 `
     --transport 'http' `
