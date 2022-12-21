@@ -46,14 +46,6 @@ param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 @description('DNS Server configuration')
 param dnsServers array = []
 
-var updates = {
-  name: 'Updates(${workspaceName})'
-  galleryName: 'Updates'
-}
-var changeTracking = {
-  name: 'ChangeTracking(${workspaceName})'
-  galleryName: 'ChangeTracking'
-}
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
@@ -439,48 +431,6 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  location: location
-  name: updates.name
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: updates.name
-    publisher: 'Microsoft'
-    promotionCode: ''
-    product: 'OMSGallery/${updates.galleryName}'
-  }
-}
-
-resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  location: location
-  name: 'VMInsights(${split(workspace.id, '/')[8]})'
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: 'VMInsights(${split(workspace.id, '/')[8]})'
-    product: 'OMSGallery/VMInsights'
-    promotionCode: ''
-    publisher: 'Microsoft'
-  }
-}
-
-resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  name: changeTracking.name
-  location: location
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: changeTracking.name
-    promotionCode: ''
-    product: 'OMSGallery/${changeTracking.galleryName}'
-    publisher: 'Microsoft'
-  }
-}
-
 resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   name: security.name
   location: location
@@ -502,17 +452,6 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' 
     sku: {
       name: 'Basic'
     }
-  }
-  dependsOn: [
-    workspace
-  ]
-}
-
-resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2020-08-01' = {
-  parent: workspace
-  name: 'Automation'
-  properties: {
-    resourceId: automationAccount.id
   }
 }
 
