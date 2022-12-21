@@ -186,18 +186,21 @@
         },
         "productsImage": {
             "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/products:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Products API Image"
             }
         },
         "inventoryImage": {
             "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/inventory:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Inventory API Image"
             }
         },
         "storeImage": {
             "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/store:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Store API Image"
             }
