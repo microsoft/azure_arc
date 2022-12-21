@@ -312,13 +312,13 @@
                         "value": "[variables('bastionSubnetPrefix')]"
                     },
                     "productsImage": {
-                        "value": "[variables('productsImage')]"
+                        "value": "[parameters('productsImage')]"
                     },
                     "inventoryImage": {
-                        "value": "[variables('inventoryImage')]"
+                        "value": "[parameters('inventoryImage')]"
                     },
                     "storeImage": {
-                        "value": "[variables('storeImage')]"
+                        "value": "[parameters('storeImage')]"
                     }
                 }
             }
