@@ -82,7 +82,6 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying Application Platform extension
 Write-Host "Deploying Application Platform extension. Hold tight, this might take a few minutes..."
@@ -105,6 +104,9 @@ az k8s-extension create `
     --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
     --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
+
+# Get Application Platform extension Id
 $extensionId=$(az k8s-extension show `
     --cluster-type connectedClusters `
     --cluster-name $Env:connectedClusterName `
@@ -115,6 +117,7 @@ $extensionId=$(az k8s-extension show `
 
 az resource wait --ids $extensionId --custom "properties.installState!='Pending'"
 
+# Deploying Custom Location
 Write-Host "`n"
 Write-Host "Deploying Custom Location."
 Write-Host "`n"
@@ -140,6 +143,7 @@ $customLocationId = $(az customlocation create `
     --query id `
     --output tsv)
 
+# Deploying Connected Environment
 Write-Host "`n"
 Write-Host "Deploying Connected Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
@@ -157,6 +161,7 @@ $containerAppEnvId = $(az containerapp connected-env show `
 
 az resource wait --ids $containerAppEnvId --created
 
+# Deploying Products API Container App
 Write-Host "`n"
 Write-Host "Creating the products api container app"
 Write-Host "`n"
@@ -185,6 +190,7 @@ Do {
     $productsapi = $(if(kubectl get pods -n $namespace | Select-String "product" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($productsapi -eq "Nope")
 
+# Deploying Inventory API Container App
 Write-Host "`n"
 Write-Host "Creating the inventory api container app"
 Write-Host "`n"
@@ -212,6 +218,7 @@ Do {
     $inventoryapi = $(if(kubectl get pods -n $namespace | Select-String "inventory" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($inventoryapi -eq "Nope")
 
+# Deploying Store API Container App
 Write-Host "`n"
 Write-Host "Creating the store api container app"
 Write-Host "`n"
