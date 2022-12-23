@@ -70,7 +70,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
 - _Azure Arc-enabled servers_ - Shows metrics for CPU and memory usage on the Azure Arc-enabled servers. Use the parameters section to select the Azure Arc-enabled server as well as a time range to visualize the data.
 
-   ![Monitoring Azure Arc enabled Server Metrics](./monitoring_arc_servers.png)
+   ![Monitoring Azure Arc-enabled Server Metrics](./monitoring_arc_servers.png)
 
 - _Azure Arc-enabled Kubernetes_ - Shows information and metrics from ArcBox's Azure Arc-enabled Kubernetes clusters. Use the parameters section to filter data:
   - Time Range: provide a time range for the metrics and logs to be displayed.
@@ -87,19 +87,19 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
   - _Pod and Container restart trend graphs._
 
-     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_1.png)
+     ![Monitoring Azure Arc-enabled K8S Metrics](./monitoring_arc_kubernetes_1.png)
 
   - _Pod count and status chart._
 
-     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_2.png)
+     ![Monitoring Azure Arc-enabled K8S Metrics](./monitoring_arc_kubernetes_2.png)
 
   - _A list of the container status for pods._
 
-     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
+     ![Monitoring Azure Arc-enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
 
   - _The Kubernetes cluster's nodes CPU and memory working set percentage._
 
-     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
+     ![Monitoring Azure Arc-enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
 
 ### Security
 
@@ -155,7 +155,7 @@ Once configured, the report will provide an overview of the secure score, you ca
 
      ![Resources changed overtime selected resources](./security_changes_resource.png)
 
-This part of the workbook also includes a section dedicated to agent monitoring. For Microsoft Defender for Cloud to be able to monitor an Azure Arc enabled-servers certain configurations have to be in place and the workbook will help visualize machines that may not be properly reporting to the Log Analytics workspace.
+This part of the workbook also includes a section dedicated to agent monitoring. For Microsoft Defender for Cloud to be able to monitor an Azure Arc-enabled-servers certain configurations have to be in place and the workbook will help visualize machines that may not be properly reporting to the Log Analytics workspace.
 
 In the parameters section select the Log Analytics workspace used by ArcBox.
 
@@ -177,7 +177,7 @@ From within the Agent Monitoring section you will get several tabs:
 
    ![Machines not reporting](./agentmgmt_machinesnotreport.png)
 
-- _Security status_ - has a full report of Azure VMs and Azure Arc enabled-servers security configurations including its Log Analytics workspace and the agent status.
+- _Security status_ - has a full report of Azure VMs and Azure Arc-enabled-servers security configurations including its Log Analytics workspace and the agent status.
 
    ![Security Status](./agentmgmt_securitystatus.png)
 

@@ -249,9 +249,9 @@ In this scenario, the Azure Arc-enabled API Management cluster extension was dep
 
 - In order to view cluster extensions, click on the azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./19.png)
+  ![Azure Arc-enabled Kubernetes resource](./19.png)
 
-  ![Azure Arc enabled Kubernetes cluster extensions settings](./20.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./20.png)
 
 Deploying the API Management gateway extension to an Azure Arc-enabled Kubernetes cluster creates an Azure API Management self-hosted gateway. You can verify this from the portal by going to the Resource Group and selecting the API management service.
 
