@@ -1,0 +1,17 @@
+{{ if eq .Values.connectionMode "direct" }}
+
+{{ if .Values.Azure.proxySettings.isProxyEnabled }}
+{{ if .Values.Azure.proxySettings.proxyCert }}
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: proxy-cert
+type: Opaque
+data:
+  proxy-cert.crt: {{ .Values.Azure.proxySettings.proxyCert | b64enc }}
+{{ end }}
+{{ end }}
+
+{{ end }}

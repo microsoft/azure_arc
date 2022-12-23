@@ -1,0 +1,31 @@
+{% comment %}
+TODO: Before HAIKU add capability to merge two objects, we have to map each individual object in the top level of spec. 
+We are adding loginRef into Custom Resource Spec in order for k8 bridge to create the secret in the Kubernetes cluster. 
+What we want here is to merge k8sRaw.spec with loginRef together to become a larger spec.
+However, Liquid template does not support merging objects. In order for it to work, I have to list them one by one.
+{% endcomment%}
+
+{%- assign resource = content.properties -%}
+{%- assign loginPassword = resource.basicLoginInformation | KubernetesSecret: secretName:'login-secret' -%}
+{%- assign scheduling = resource.k8sRaw.spec.scheduling -%}
+{%- assign docker = resource.k8sRaw.spec.docker -%}
+{%- assign services = resource.k8sRaw.spec.services -%}
+{%- assign storage = resource.k8sRaw.spec.storage -%}
+{%- assign dev = resource.k8sRaw.spec.dev -%}
+
+{
+  "spec": {
+    {% if scheduling != nil %} "scheduling": {{ scheduling }}, {% endif %}
+    {% if docker != nil %} "docker": {{ docker }}, {% endif %}
+    {% if services != nil %} "services": {{ services }}, {% endif %}
+    {% if storage != nil %} "storage": {{ storage }}, {% endif %}
+    {% if dev != nil %} "dev": {{ dev }}, {% endif %}
+    "security": {
+      {% if resource.k8sRaw.spec.security.adminLoginSecret != nil %}
+        "adminLoginSecret": {{ resource.k8sRaw.spec.security.adminLoginSecret | json }}
+      {% elsif loginPassword != nil %}
+        "adminLoginSecret": {{ loginPassword.Name | json }}
+      {% endif %}
+    }
+  }
+}

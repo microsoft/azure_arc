@@ -16,9 +16,9 @@ $clusterName = 'Provide a name for your AKS cluster'
 $linuxNodeCount = 'Provide a number of Linux node VMs for your cluster'
 
 #Environment variables to onboard the cluster on Azure Arc 
-$resourceGroup = 'Provide a resource group to connect your Azure Arc enabled Kubernetes'
-$location = 'Provide an  Azure region to connect your Azure Arc enabled Kubernetes'
-$subscriptionId = 'Provide a subscription to connect your Azure Arc enabled Kubernetes'
+$resourceGroup = 'Provide a resource group to connect your Azure Arc-enabled Kubernetes'
+$location = 'Provide an  Azure region to connect your Azure Arc-enabled Kubernetes'
+$subscriptionId = 'Provide a subscription to connect your Azure Arc-enabled Kubernetes'
 $appId = 'Provide the appID of the service principal created'
 $password = 'Provide the password of the service principal created'
 $tenant = 'Provide your tenantID'
