@@ -1,4 +1,45 @@
+# ---------------------------- Direct <> Indirect ----------------------------
+#'connectionMode' is used to figure out when to apply 'direct' mode specific
+# resources by the entity applying the helm chart.
+# 
+# The 2 entities that will apply this helm chart are:
+#
+# 1. `arc-bootstrapper-job` - indirect -> projects/azure-cli-extension/.../dc/client.py -> bootstrap_create()
+# 2.   `extension-manager`  -  direct  ->    https://bit.ly/ArcExtensionOperator_helm   -> reconcileHelmRelease()
+#
+# By default, this starts with indirect, and at helm publish time for Connected
+# K8s in the build pipeline, this is changed to 'direct' inline.
+connectionMode: indirect
+# ----------------------------------------------------------------------------
+imageCredentials:
+  username: ""
+  password: ""
+  email: ""
+  registry: ""
+Azure:
+  Cluster:
+    ResourceId: ""
+    Region: ""
+    Distribution: ""
+    Infrastructure: ""
+  proxySettings:
+    isProxyEnabled: ""
+    httpProxy: ""
+    httpsProxy: ""
+    noProxy: ""
+    proxyCert: ""
+  Identity:
+    isEnabled: ""
+    Type: ""
+  Extension:
+    Name: ""
+    ResourceId: ""
+  LeastPrivilegeSettings:
+    InstallerServiceAccount: ""
+    RuntimeServiceAccount: ""
 systemDefaultValues:
-  image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.13.0_2022-11-08
+  image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.14.0_2022-12-13
   imagePullPolicy: Always
   imagePullSecret: arc-private-registry
+  installerServiceAccount: ""
+  runtimeServiceAccount: ""

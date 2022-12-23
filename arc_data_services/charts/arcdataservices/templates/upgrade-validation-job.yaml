@@ -28,4 +28,4 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.systemDefaultValues.imagePullSecret }}
       restartPolicy: Never
-      serviceAccountName: sa-arc-bootstrapper
+      serviceAccountName: {{ include "installerServiceAccount" . | default "sa-arc-bootstrapper" }}

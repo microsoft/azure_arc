@@ -1,3 +1,4 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.InstallerServiceAccount) (not .Values.systemDefaultValues.installerServiceAccount) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -30,3 +31,4 @@ rules:
   verbs:
   - patch
   - get
+{{ end }}

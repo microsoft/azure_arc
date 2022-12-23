@@ -1,0 +1,37 @@
+{%- assign activeDirectoryConnectorProperties = content.properties -%}
+
+{%- assign domainServiceAccount = activeDirectoryConnectorProperties.domainServiceAccountLoginInformation | KubernetesSecret: secretName:'domain-service-account-secret' -%}
+
+{%- assign activeDirectory = activeDirectoryConnectorProperties.spec.activeDirectory -%}
+{%- assign dns = activeDirectoryConnectorProperties.spec.dns -%}
+
+{
+  "spec": {
+    "activeDirectory": {
+      {% if activeDirectory.serviceAccountProvisioning != nil %} "serviceAccountProvisioning": {{ activeDirectory.serviceAccountProvisioning | json }}, {% endif %}
+      {% if activeDirectory.netbiosDomainName != nil %} "netbiosDomainName": {{ activeDirectory.netbiosDomainName | json }}, {% endif %}
+      {% if activeDirectory.ouDistinguishedName != nil %} "ouDistinguishedName": {{ activeDirectory.ouDistinguishedName | json }}, {% endif %}
+      {% if domainServiceAccount != nil %} "domainServiceAccountSecret": {{ domainServiceAccount.Name | json }}, {% endif %}
+      {% if activeDirectory.domainControllers != nil %}
+        "domainControllers": {
+          {% if activeDirectory.domainControllers.secondaryDomainControllers != nil %}
+            "secondaryDomainControllers": [
+            {% for domainController in activeDirectory.domainControllers.secondaryDomainControllers %}
+              {
+                "hostname": {{ domainController.hostname | json }}
+              }
+              {% if forloop.last != true %},{% endif %}
+            {% endfor %}],
+          {% endif %}
+          {% if activeDirectory.domainControllers.primaryDomainController != nil %}
+            "primaryDomainController": {
+              "hostname": {{ activeDirectory.domainControllers.primaryDomainController.hostname | json }}
+            }
+          {% endif %}
+        },
+      {% endif %}
+      {% if activeDirectory.realm != nil %} "realm": {{ activeDirectory.realm | json }} {% endif %}
+    },
+    "dns": {{ dns }}
+  }
+}
