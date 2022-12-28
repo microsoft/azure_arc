@@ -81,14 +81,6 @@
                 "description": "Tenant id of the service principal"
             }
         },
-        "azdataUsername": {
-            "type": "string",
-            "defaultValue": "arcdemo"
-        },
-        "azdataPassword": {
-            "type": "securestring",
-            "defaultValue": "ArcPassword123!!"
-        },
         "workspaceName": {
             "type": "string",
             "metadata": {
