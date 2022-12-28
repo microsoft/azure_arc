@@ -24,7 +24,7 @@ locals {
           name   = "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA"
           id     = "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0"
           params = { "logAnalyticsWorkspace": { "value": "${var.workspace_id}" }}
-          role   = "Log Analytics Contributor"
+          role   = [ "Log Analytics Contributor", "Azure Connected Machine Resource Administrator", "Monitoring Contributor" ]
           flavor = [ "Full", "ITPro" ]
       },
       {
@@ -69,6 +69,6 @@ PARAMETERS
 
 resource "azurerm_role_assignment" "policy_AMA_role_0" {
   scope                = data.azurerm_resource_group.rg.id
-  role_definition_name = local.policies[0].value.role[0]
-  principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0]["principal_id"]
+  role_definition_name = local.policies[0].role[0]
+  principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
 }
