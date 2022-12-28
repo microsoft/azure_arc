@@ -28,18 +28,18 @@ locals {
           flavor = [ "Full", "ITPro" ]
       },
       {
-          name   = "(ArcBox) Enable Azure Defender on Kubernetes clusters"
-          id     = "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c"
-          params = {}
-          role   = "Log Analytics Contributor"
-          flavor = [ "Full", "DevOps" ]
-      },
-      {
           name   = "(ArcBox) Tag resources"
           id     = "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26"
           params = { "tagName": { "value": "project" }, "tagValue": { "value": "jumpstart_arcbox" }}
           role   = "Tag Contributor"
           flavor = [ "Full", "DevOps", "ITPro" , "DataOps" ]
+      },
+      {
+          name   = "(ArcBox) Enable Azure Defender on Kubernetes clusters"
+          id     = "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c"
+          params = {}
+          role   = "Log Analytics Contributor"
+          flavor = [ "Full", "DevOps" ]
       }
   ]
 }
@@ -71,4 +71,28 @@ resource "azurerm_role_assignment" "policy_AMA_role_0" {
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[0].role[0]
   principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "policy_AMA_role_1" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = local.policies[0].role[1]
+  principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "policy_AMA_role_2" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = local.policies[0].role[2]
+  principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "policy_tagging_resources" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = local.policies[1].role
+  principal_id         = azurerm_resource_group_policy_assignment.policies[1].identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "policy_defender_kubernetes" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = local.policies[2].role
+  principal_id         = azurerm_resource_group_policy_assignment.policies[2].identity[0].principal_id
 }
