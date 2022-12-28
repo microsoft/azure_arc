@@ -21,30 +21,9 @@ variable "deployment_flavor" {
 locals {
   policies = [
       {
-          name   = "(ArcBox) Deploy Linux Log Analytics agents"
-          id     = "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf"
-          params = { "logAnalytics": { "value": "${var.workspace_id}" }}
-          role   = "Log Analytics Contributor"
-          flavor = [ "Full", "ITPro" ]
-      },
-      {
-          name   = "(ArcBox) Deploy Windows Log Analytics agents"
-          id     = "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203"
-          params = { "logAnalytics": { "value": "${var.workspace_id}" }}
-          role   = "Log Analytics Contributor"
-          flavor = [ "Full", "ITPro" ]
-      },
-      {
-          name   = "(ArcBox) Deploy Linux Dependency Agents"
-          id     = "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43"
-          params = {}
-          role   = "Log Analytics Contributor"
-          flavor = [ "Full", "ITPro" ]
-      },
-      {
-          name   = "(ArcBox) Deploy Windows Dependency Agents"
-          id     = "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4"
-          params = {}
+          name   = "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA"
+          id     = "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0"
+          params = { "logAnalyticsWorkspace": { "value": "${var.workspace_id}" }}
           role   = "Log Analytics Contributor"
           flavor = [ "Full", "ITPro" ]
       },
@@ -88,11 +67,8 @@ ${jsonencode(each.value.params)}
 PARAMETERS
 }
 
-resource "azurerm_role_assignment" "roles" {
-  for_each             = { for i, v in local.policies: i => v 
-                           if contains(v.flavor, var.deployment_flavor)
-                         }
+resource "azurerm_role_assignment" "policy_AMA_role_0" {
   scope                = data.azurerm_resource_group.rg.id
-  role_definition_name = each.value.role
-  principal_id         = azurerm_resource_group_policy_assignment.policies[index(local.policies, each.value)].identity[0]["principal_id"]
+  role_definition_name = local.policies[0].value.role[0]
+  principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0]["principal_id"]
 }
