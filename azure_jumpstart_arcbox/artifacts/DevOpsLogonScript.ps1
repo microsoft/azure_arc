@@ -207,7 +207,11 @@ Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath
 Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
 Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+az keyvault certificate import `
+    --vault-name $Env:keyVaultName `
+    --password "arcbox" `
+    --name $certname `
+    --file "$Env:TempDir\$certname.pfx"
 
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
 az k8s-extension create `
