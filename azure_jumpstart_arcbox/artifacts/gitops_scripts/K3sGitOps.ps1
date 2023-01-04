@@ -71,7 +71,7 @@ echo "Importing the TLS certificate to Key Vault"
 az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
  
 echo "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $Env:k3sArcClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $Env:k3sArcClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Create the Kubernetes secret with the service principal credentials
 kubectl create secret generic secrets-store-creds --namespace $k3sNamespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
