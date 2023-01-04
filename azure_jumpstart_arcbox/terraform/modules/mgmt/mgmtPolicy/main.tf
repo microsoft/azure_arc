@@ -68,30 +68,35 @@ PARAMETERS
 }
 
 resource "azurerm_role_assignment" "policy_AMA_role_0" {
+  count                = contains(local.policies[0].flavor, var.deployment_flavor) ? 1 : 0
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[0].role[0]
   principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "policy_AMA_role_1" {
+  count                = contains(local.policies[0].flavor, var.deployment_flavor) ? 1 : 0
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[0].role[1]
   principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "policy_AMA_role_2" {
+  count                = contains(local.policies[0].flavor, var.deployment_flavor) ? 1 : 0
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[0].role[2]
   principal_id         = azurerm_resource_group_policy_assignment.policies[0].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "policy_tagging_resources" {
+  count                = contains(local.policies[1].flavor, var.deployment_flavor) ? 1 : 0
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[1].role
   principal_id         = azurerm_resource_group_policy_assignment.policies[1].identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "policy_defender_kubernetes" {
+  count                = contains(local.policies[2].flavor, var.deployment_flavor) ? 1 : 0
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = local.policies[2].role
   principal_id         = azurerm_resource_group_policy_assignment.policies[2].identity[0].principal_id
