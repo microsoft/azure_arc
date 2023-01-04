@@ -16,7 +16,7 @@ $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\K3sGitOps.log
 
-# echo "Login to Az CLI using the service principal"
+Write-Host "Login to Az CLI using the service principal"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
@@ -32,7 +32,7 @@ kubectx arcbox-k3s
 #############################
 
 # Create GitOps config for NGINX Ingress Controller
-echo "Creating GitOps config for NGINX Ingress Controller"
+Write-Host "Creating GitOps config for NGINX Ingress Controller"
 az k8s-configuration flux create `
     --cluster-name $Env:k3sArcClusterName `
     --resource-group $Env:resourceGroup `
@@ -45,7 +45,7 @@ az k8s-configuration flux create `
     --kustomization name=nginx path=./nginx/release
 
 # Create GitOps config for Hello-Arc application
-echo "Creating GitOps config for Hello-Arc application"
+Write-Host "Creating GitOps config for Hello-Arc application"
 az k8s-configuration flux create `
     --cluster-name $Env:k3sArcClusterName `
     --resource-group $Env:resourceGroup `
@@ -67,11 +67,24 @@ $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
 Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
-echo "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+Write-Host "Importing the TLS certificate to Key Vault"
+az keyvault certificate import `
+  --vault-name $Env:keyVaultName `
+  --password "arcbox" `
+  --name $certname `
+  --file "$Env:TempDir\$certname.pfx"
  
-echo "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $Env:k3sArcClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+Write-Host "Installing Azure Key Vault Kubernetes extension instance"
+az k8s-extension create `
+  --name 'akvsecretsprovider' `
+  --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+  --version '1.3.0' `
+  --scope cluster `
+  --cluster-name $Env:k3sArcClusterName `
+  --resource-group $Env:resourceGroup `
+  --cluster-type connectedClusters `
+  --release-namespace kube-system `
+  --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Create the Kubernetes secret with the service principal credentials
 kubectl create secret generic secrets-store-creds --namespace $k3sNamespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
@@ -104,7 +117,7 @@ spec:
     tenantId: "$Env:spnTenantId"
 "@
 
-echo "Creating Secret Provider Class"
+Write-Host "Creating Secret Provider Class"
 $secretProvider | kubectl apply -n $k3sNamespace -f -
 
 # Create the pod with volume referencing the secrets-store.csi.k8s.io driver
@@ -135,7 +148,7 @@ spec:
           name: secrets-store-creds  
 "@
 
-echo "Deploying App referencing the secret"
+Write-Host "Deploying App referencing the secret"
 $appConsumer | kubectl apply -n $k3sNamespace -f -
 
 # Deploy an Ingress Resource referencing the Secret created by the CSI driver
@@ -164,7 +177,7 @@ spec:
               number: 8080
 "@
 
-echo "Deploying Ingress Resource"
+Write-Host "Deploying Ingress Resource"
 $ingressController | kubectl apply -n $k3sNamespace -f -
 
 $ip = kubectl get service/ingress-nginx-controller --namespace $ingressNamespace --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
