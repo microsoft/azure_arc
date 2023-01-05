@@ -20,6 +20,7 @@ weight: 5
 
 #### Azure Arc-enabled Kubernetes
 
+- [New scenario: Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster via service account token authentication](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/connected_cluster/)
 - [Enhancement: Bump CAPI, K3s, and kubeadm automation to support k8s 1.25 #1571](https://github.com/microsoft/azure_arc/issues/1571)
 
 #### Azure Arc-enabled data services
