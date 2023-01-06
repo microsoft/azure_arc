@@ -1,12 +1,12 @@
-$Env:ArcBoxDir = "C:\ArcBox"
-$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
-$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
-$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$agentScript = "$Env:ArcBoxDir\agentScript"
+$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
+$Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
+$Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
+$agentScript = "$Env:ArcJSDir\agentScript"
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log
+Start-Transcript -Path "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 
-$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
+$cliDir = New-Item -Path "$Env:ArcJSDir\.cli\" -Name ".servers" -ItemType Directory
 
 if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
@@ -30,7 +30,7 @@ az provider register --namespace Microsoft.OperationsManagement --wait
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
-Add-DhcpServerv4Scope -Name "ArcBox" `
+Add-DhcpServerv4Scope -Name "ArcJS" `
                       -StartRange 10.10.1.100 `
                       -EndRange 10.10.1.200 `
                       -SubnetMask 255.255.255.0 `
@@ -62,29 +62,31 @@ Write-Header "Enabling Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 Write-Header "Fetching Nested VMs"
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
-$sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
+$sourceFolder = "https://jumpstart.blob.core.windows.net/jumpstartvhds"
+$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 $Env:AZCOPY_BUFFER_GB=4
 
-# Other ArcBox flavors does not have an azcopy network throughput capping
+# Other ArcJS flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" --recursive=true --check-length=false --log-level=ERROR
+$JSWinSQLVHDFileName = "JS-Win-SQL-01.vhdx"
+azcopy cp "$sourceFolder/$JSWinSQLVHDFileName$sas" "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" --recursive=true --check-length=false --log-level=ERROR
 
 # Create the nested VMs
 Write-Header "Create Hyper-V VMs"
-New-VM -Name ArcBox-SQL -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName ArcBox-SQL -Count 2
+$JSWinSQLVMName = "JS-Win-SQL-01"
+New-VM -Name $JSWinSQLVMName -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" -Path $Env:ArcJSVMDir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName $JSWinSQLVMName -Count 2
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Header "Set VM Auto Start/Stop"
-Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name $JSWinSQLVMName -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
 Write-Header "Enabling Guest Integration Service"
 Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
 
 # Start all the VMs
 Write-Header "Starting VMs"
-Start-VM -Name ArcBox-SQL
+Start-VM -Name $JSWinSQLVMName
 
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
@@ -98,12 +100,12 @@ $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindows
 # Restarting Windows VM Network Adapters
 Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
 
-# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
+# Configure the Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
 Write-Header "Blocking IMDS"
-Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
+Write-Output "Configure the ArcJS VM to allow the nested VMs onboard as Azure Arc-enabled servers"
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
@@ -132,29 +134,27 @@ if(-not $hasPermission) {
 Write-Header "Copying Onboarding Scripts"
 
 # Copy installtion script to nested Windows VMs
-Write-Output "Transferring installation script to nested Windows VMs..."
-Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\ArcBox\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
-
-Write-Header "Onboarding Arc-enabled Servers"
+Write-Output "Transferring installation script to nested Windows VM..."
+Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$agentScript\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
-Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+Write-Output "Onboarding the nested Windows VM as Azure Arc-enabled servers"
 
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $winCreds
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $agentScript\installArcAgentSQL.ps1 } -Credential $winCreds
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-# Prepare ArcBox-SQL onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
+# Prepare JS-Win-SQL-01 onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
 if(-not $hasPermission) {
     Write-Header "Creating Arc-enabled SQL Shortcut"
 
     # Replace variables in Arc-enabled SQL onboarding scripts
-    $sqlServerName = "ArcBox-SQL"
+    $sqlServerName = $JSWinSQLVMName
 
-    (Get-Content -path "$Env:ArcBoxDir\installArcAgentSQLUser.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<location>',"$Env:azureLocation" | Set-Content -Path "$Env:ArcBoxDir\installArcAgentSQLUser.ps1"
-    (Get-Content -path "$Env:ArcBoxDir\ArcSQLManualOnboarding.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcBoxDir\ArcSQLManualOnboarding.ps1"
+    (Get-Content -path "$Env:ArcJSDir\installArcAgentSQLUser.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<location>',"$Env:azureLocation" | Set-Content -Path "$Env:ArcJSDir\installArcAgentSQLUser.ps1"
+    (Get-Content -path "$Env:ArcJSDir\ArcSQLManualOnboarding.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcJSDir\ArcSQLManualOnboarding.ps1"
 
     # Set Edge as the Default Browser
     & SetDefaultBrowser.exe HKLM "Microsoft Edge"
@@ -178,13 +178,13 @@ if(-not $hasPermission) {
     Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
     # Creating Arc-enabled SQL Server onboarding desktop shortcut
-    $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLManualOnboarding.ps1"
+    $sourceFileLocation = "${Env:ArcJSDir}\ArcSQLManualOnboarding.ps1"
     $shortcutLocation = "$Env:Public\Desktop\Onboard SQL Server.lnk"
     $wScriptShell = New-Object -ComObject WScript.Shell
     $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
     $shortcut.TargetPath = "powershell.exe"
     $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${Env:ArcBoxIconDir}\arcsql.ico, 0"
+    $shortcut.IconLocation="${Env:ArcJSIconDir}\arcsql.ico, 0"
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 }
@@ -200,11 +200,11 @@ az security workspace-setting create -n default --target-workspace "/subscriptio
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-Copy-VMFile ArcBox-SQL -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1 " -DestinationPath C:\ArcBox\testDefenderForSQL.ps1 -CreateFullPath -FileSource Host
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\testDefenderForSQL.ps1} -Credential $winCreds
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath "$agentScript\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $agentScript\testDefenderForSQL.ps1} -Credential $winCreds
 
 
-# Changing to Jumpstart ArcBox wallpaper
+# Changing to Jumpstart wallpaper
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
@@ -232,5 +232,5 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Start-Sleep -Seconds 5
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
+    7z a $Env:ArcJSLogsDir\LogsBundle-"$RandomString".zip $Env:ArcJSLogsDir\*.log
 }'
