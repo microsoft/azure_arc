@@ -109,7 +109,8 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
-        "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+        "bastionName": "JS-Bastion",
+        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
@@ -123,29 +124,8 @@
             "apiVersion": "2021-03-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
-            "condition": "[parameters('deployBastion')]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2021-03-01",
-            "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
-            "condition": "[not(parameters('deployBastion'))]",
             "dependsOn": [
-                "[variables('PublicIPNoBastion')]"
+                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -156,12 +136,12 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[variables('PublicIPNoBastion')]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ]
             }
-        },        
+        },
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2021-03-01",
@@ -250,5 +230,17 @@
                 }
             }
         }
-    ]
+    ],
+
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('windowsAdminUsername')]"
+        },
+        "publicIP": {
+            "condition": "[not(parameters('deployBastion'))]",
+            "type": "string",
+            "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
+        }
+    }
 }
