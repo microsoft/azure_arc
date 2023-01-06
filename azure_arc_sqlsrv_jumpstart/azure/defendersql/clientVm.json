@@ -123,8 +123,29 @@
             "apiVersion": "2021-03-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
+            "condition": "[parameters('deployBastion')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2021-03-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[parameters('location')]",
+            "condition": "[not(parameters('deployBastion'))]",
             "dependsOn": [
-                "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'), json(''))]"
+                "[variables('PublicIPNoBastion')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -135,12 +156,12 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[variables('PublicIPNoBastion')]"
                         }
                     }
                 ]
             }
-        },
+        },        
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2021-03-01",
