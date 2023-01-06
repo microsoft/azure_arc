@@ -27,6 +27,14 @@ az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 az provider register --namespace Microsoft.OperationsManagement --wait
 
+# Enable defender for cloud
+Write-Header "Enabling defender for cloud for SQL Server"
+az security pricing create -n SqlServerVirtualMachines --tier 'standard'
+
+# Set defender for cloud log analytics workspace
+Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
@@ -110,6 +118,8 @@ Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
 
+Write-Header "Verifying Azure AD service principal permissions"
+
 # Check if Service Principal has 'Microsoft.Authorization/roleAssignments/write' permissions to target Resource Group
 $requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
 
@@ -126,8 +136,10 @@ Write-Output "Replacing values within Azure Arc connected machine agent install 
 
 # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
 if(-not $hasPermission) {
+    Write-Header "Service principal do not have Azure RM permissions"
     (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 } else {
+    Write-Header "Service principal has required Azure RM permissions"
     (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$myResourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" -replace '\$logAnalyticsWorkspaceName',"'$Env:workspaceName'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 }
 
@@ -148,7 +160,7 @@ Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administra
 
 # Prepare JS-Win-SQL-01 onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
 if(-not $hasPermission) {
-    Write-Header "Creating Arc-enabled SQL Shortcut"
+    Write-Header "Current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc. Creating Arc-enabled SQL Shortcut"
 
     # Replace variables in Arc-enabled SQL onboarding scripts
     $sqlServerName = $JSWinSQLVMName
@@ -189,19 +201,10 @@ if(-not $hasPermission) {
     $shortcut.Save()
 }
 
-
-# Enable defender for cloud
-Write-Header "Enabling defender for cloud for SQL Server"
-az security pricing create -n SqlServerVirtualMachines --tier 'standard'
-
-# Set defender for cloud log analytics workspace
-Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
-
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
 Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath "$agentScript\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $agentScript\testDefenderForSQL.ps1} -Credential $winCreds
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File "$agentScript\testDefenderForSQL.ps1"} -Credential $winCreds
 
 
 # Changing to Jumpstart wallpaper
