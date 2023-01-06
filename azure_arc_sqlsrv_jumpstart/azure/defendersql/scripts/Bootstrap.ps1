@@ -97,8 +97,9 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcJSLogsDir\LogInstructions.txt
 
 Write-Host "Fetching Artifacts for Arc SQL Server"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile $Env:ArcJSDir\ArcServersLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcJSDir\agentScript\installArcAgentSQLSP.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile "$Env:ArcJSDir\ArcServersLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile "$Env:agentScript\installArcAgentSQLSP.ps1"
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgent.ps1") -OutFile "$Env:agentScript\installArcAgent.ps1"
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcJSIconDir\arcsql.ico
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcJSDir\testDefenderForSQL.ps1
 
