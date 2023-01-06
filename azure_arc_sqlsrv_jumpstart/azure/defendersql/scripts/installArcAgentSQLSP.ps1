@@ -4,9 +4,10 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 
-Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+Start-Transcript -Path "$Env:ArcJSLogsDir\installArcAgentSQL.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -15,8 +16,8 @@ $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
-$resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = "ArcBox-SQL"
+$resourceTags= @{"Project"="jumpstart_defender_sql_server"}
+$arcMachineName = $env:computername
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
