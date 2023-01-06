@@ -4,14 +4,15 @@
     [string]$sqlServerName = "<sqlServerName>"
 )
 
+$Env:ArcJSDir = "C:\ArcJumpStart"
+$scriptLocation = "$Env:ArcJSDir\agentScript"
+$logLocation = "$Env:ArcJSDir\Logs"
+
 $host.ui.RawUI.WindowTitle = “Onboarding...”
 
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
 $WarningPreference = 'SilentlyContinue'
-
-$logLocation = 'C:\ArcBox\Logs'
-$scriptLocation = 'C:\ArcBox'
 
 # Define function to display pop-up message boxes
 
@@ -44,7 +45,7 @@ Start-Transcript -Path "${logLocation}\ArcSQLServer.log"
 # Inform user of onboarding process and ask to proceed
 
 $startMsg = @"
-This script will onboard the VM 'ArcBox-SQL' as an Azure Arc-enabled SQL Server.
+This script will onboard the VM 'JS-Win-SQL-01' as an Azure Arc-enabled SQL Server.
 
 When you click 'OK', you will be redirected to the Micorsoft Device Authentication website. The code will be copied to the clipboard, so simply paste it in and complete the Microsoft authentication process.
 
