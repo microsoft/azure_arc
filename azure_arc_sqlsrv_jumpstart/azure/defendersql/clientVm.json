@@ -124,7 +124,7 @@
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+                "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
             ],
             "properties": {
                 "ipConfigurations": [
