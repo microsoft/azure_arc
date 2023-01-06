@@ -124,7 +124,7 @@
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+                "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'), json(''))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -135,7 +135,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json(''))]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ]
