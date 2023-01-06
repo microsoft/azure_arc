@@ -109,8 +109,7 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
-        "bastionName": "JS-Bastion",
-        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
+        "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
@@ -230,17 +229,5 @@
                 }
             }
         }
-    ],
-
-    "outputs": {
-        "adminUsername": {
-            "type": "string",
-            "value": "[parameters('windowsAdminUsername')]"
-        },
-        "publicIP": {
-            "condition": "[not(parameters('deployBastion'))]",
-            "type": "string",
-            "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
-        }
-    }
+    ]
 }
