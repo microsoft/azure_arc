@@ -147,12 +147,12 @@ Write-Header "Copying Onboarding Scripts"
 
 # Copy installtion script to nested Windows VMs
 Write-Output "Transferring installation script to nested Windows VM..."
-Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$agentScript\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
+$remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VM as Azure Arc-enabled servers"
-
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $agentScript\installArcAgentSQL.ps1 } -Credential $winCreds
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
@@ -203,8 +203,9 @@ if(-not $hasPermission) {
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath "$agentScript\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File "$agentScript\testDefenderForSQL.ps1"} -Credential $winCreds
+$remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
 
 # Changing to Jumpstart wallpaper
