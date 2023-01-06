@@ -30,27 +30,25 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
 
-# Creating ArcBox path
-Write-Output "Creating ArcBox path"
-$Env:ArcBoxDir = "C:\ArcBox"
-$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
-$Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
-$Env:ArcBoxGitOpsDir = "C:\ArcBox\GitOps"
-$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$Env:agentScript = "C:\ArcBox\agentScript"
+# Creating ArcJS path
+Write-Output "Creating ArcJS path"
+$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
+$Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
+$Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
+$Env:agentScript = "$Env:ArcJSDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
-New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
-New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
-New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
-New-Item -Path $Env:ArcBoxIconDir -ItemType directory -Force
+New-Item -Path $Env:ArcJSDir -ItemType directory -Force
+New-Item -Path $Env:ArcJSLogsDir -ItemType directory -Force
+New-Item -Path $Env:ArcJSVMDir -ItemType directory -Force
+New-Item -Path $Env:ArcJSIconDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
+Start-Transcript -Path "$Env:ArcJSLogsDir\Bootstrap.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -95,20 +93,20 @@ foreach ($app in $appsToInstall)
 Write-Header "Fetching GitHub Artifacts"
 
 Write-Host "Fetching Artifacts for All Flavors"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile $Env:ArcBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile $Env:ArcJSDir\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcJSLogsDir\LogInstructions.txt
 
 Write-Host "Fetching Artifacts for Arc SQL Server"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQLSP.ps1
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcBoxIconDir\arcsql.ico
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile $Env:ArcJSDir\ArcServersLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcJSDir\agentScript\installArcAgentSQLSP.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcJSIconDir\arcsql.ico
+Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcJSDir\testDefenderForSQL.ps1
 
 Write-Header "Configuring Logon Scripts"
 
 # Creating scheduled task for ArcServersLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcJSDir\ArcServersLogonScript.ps1
 Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
@@ -125,5 +123,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content $Env:ArcJSLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:ArcJSLogsDir\Bootstrap.log -Force

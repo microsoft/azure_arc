@@ -4,14 +4,14 @@
   "parameters": {
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "ArcBox-VNet",
+      "defaultValue": "JS-VNet",
       "metadata": {
         "description": "Name of the VNet"
       }
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "ArcBox-Subnet",
+      "defaultValue": "JS-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
@@ -45,7 +45,7 @@
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "ArcBox-NSG",
+      "defaultValue": "JS-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
@@ -64,13 +64,13 @@
       "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
-    "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
+    "automationAccountName": "[concat('JS-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
-    "bastionName": "ArcBox-Bastion",
+    "bastionName": "JS-Bastion",
     "bastionSubnetIpPrefix": "172.16.3.64/26",
     "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
     "subnetsWithBastion" : [
