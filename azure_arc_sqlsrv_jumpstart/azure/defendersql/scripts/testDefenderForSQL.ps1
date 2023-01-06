@@ -9,8 +9,13 @@ do
 Import-Module $moduleFile
 Get-Command -Module SqlAdvancedThreatProtectionShell
 
-#$encrypted = ConvertFrom-SecureString -SecureString $saPassword -AsPlainText -Force
-#$saPasswordEncrypted = ConvertTo-SecureString -String $encrypted
-#test-SqlAtpInjection -UserName sa -Password $saPasswordEncrypted
+$saPasswordEncrypted = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
+Test-SqlAtpInjection -UserName sa -Password $saPasswordEncrypted # High risk
+Start-Sleep(30) # Wait between tests
+
 # Run brute  force test to generate alerts
-Test-SqlAtpBruteForce
+Test-SqlAtpBruteForce # High risk
+Start-Sleep(30) # Wait between tests
+
+# Run shell obfuscation test
+Test-SqlATpShellObfuscation # Medium risk
