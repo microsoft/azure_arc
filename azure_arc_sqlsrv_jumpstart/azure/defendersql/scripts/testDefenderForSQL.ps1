@@ -18,4 +18,4 @@ Test-SqlAtpBruteForce # High risk
 Start-Sleep(30) # Wait between tests
 
 # Run shell obfuscation test
-Test-SqlATpShellObfuscation # Medium risk
+Test-SqlATpShellObfuscation -UserName sa -Password $saPasswordEncrypted # Medium risk
