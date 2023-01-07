@@ -79,6 +79,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
+      "dependsOn": ["mgmtArtifactsAndPolicyDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
