@@ -9,9 +9,7 @@ weight: 1
 
 The following Jumpstart scenario will walk you through on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server, setup Hyper-V to support nested virtualization, and create guest VM with SQL Server 2019 on Hyper-V to demonstrate Defender for Cloud for SQL servers on machines and generate alerts for SQL attacks.
 
-By the end of the guide, you will have an Azure VM **ArcBox-Client** installed with Windows Server 2019 with Hyper-V and nested Windows Server VM **ArcBox-SQL** pre-configured with SQL Server 2019, projected as an Azure Arc-enabled SQL Server, then enabled SQL assessment and Microsoft Defender for SQL servers on machines.
-
-As part of this scenario deployment Defender for SQL Servers on machine plan is enabled and Log Analytics workspace created in the scenario will be assigned as default workspace for Defender for Cloud.
+By the end of the guide, you will have an Azure VM **JS-Client** installed with Windows Server 2019 with Hyper-V and nested Windows Server VM **JS-Win-SQL-01** pre-configured with SQL Server 2019, projected as an Azure Arc-enabled SQL Server, then enabled SQL assessment and Microsoft Defender for SQL servers on machines.
 
 ## Prerequisites
 
@@ -83,7 +81,7 @@ The automation for this scenario includes different PowerShell scripts executed 
     1. Download and install pre-requisite utilities via [Chocolatey](https://chocolatey.org/).
     2. Download the [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1), [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1), and [*testDefenderForSQL.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/testDefenderForSQL.ps1) scripts.
 
-2. [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1) - Executed upon initial login to the **ArcBox-Client** Azure virtual machine. This script has the following functionalities:
+2. [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1) - Executed upon initial login to the **JS-Client** Azure virtual machine. This script has the following functionalities:
 
     1. Install Windows Hyper-V server and configure networking.
     2. Create a guest Windows Server VM with SQL Server pre-installed.
@@ -125,7 +123,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
     For example:
 
     ```shell
-    az group create --name Arc-SQL-Demo --location "East US" --tags "Project=jumpstart_azure_arc_sql_defender"
+    az group create --name Arc-SQL-Defender --location "East US" --tags "Project=jumpstart_azure_arc_sql_defender"
     ```
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/defendersql) and run the following command:
@@ -160,16 +158,16 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 ## Windows Login & Post Deployment
 
-There are two options available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
+There are two options available to connect to _JS-Client_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_defender/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_defender/#connect-using-just-in-time-access-jit).
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_defender/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _JS-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_defender/#connect-using-just-in-time-access-jit).
 - [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_defender/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 ### Connecting directly with RDP
 
 By design, port 3389 is not allowed to access from the public internet. You must create an NSG rule to allow inbound 3389.
 
-- Open the __ArcBox-NSG_ resource in Azure portal, go to Inbound security rules, and click "Add" to add your client IP to allow RDP access to the VM.
+- Open the __JS-NSG_ resource in Azure portal, go to Inbound security rules, and click "Add" to add your client IP to allow RDP access to the VM.
 
   ![Screenshot showing Arc-App-Client NSG with blocked RDP](./default-nsg-rules.png)
 
@@ -189,7 +187,7 @@ By design, port 3389 is not allowed to access from the public internet. You must
 
   ![Screenshot showing connecting to the VM using Bastion](./vm-bastion.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _JS-Client_ with Azure Bastion.**
 
 ### Connect using just-in-time access (JIT)
 
@@ -221,6 +219,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing Azure Arc-enabled SQL server](./post-deployment-portal-arcsql.png)
 
+  ![Screenshot showing Azure Arc-enabled SQL server threat simulation](./post-deploy-script-testsqlinjection.png)
+
 - Open Hyper-V to login to nested SQL server VM
 
   ![Screenshot showing Hyper-V with nested SQL Server VM](./hyperv-nested-vm.png)
@@ -235,7 +235,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ## Microsoft Defender for Cloud - SQL servers on machines
 
-This section guides you through different settings for enabling Microsoft Defender for Cloud - SQL servers on machines. Most of these settings are already enabled during the logon script execution when login to _ArcBox-Client_ Azure VM. Even though these are pre-configured there might be delays in showing them in the Azure portal.
+This section guides you through different settings for enabling Microsoft Defender for Cloud - SQL servers on machines. Most of these settings are already enabled during the logon script execution when login to _JS-Client_ Azure VM. Even though these are pre-configured there might be delays in showing them in the Azure portal.
 
 - Following are the settings of Microsoft Defender for Cloud - SQL servers on machines configured using automation scripts and can be reviewed in Azure portal.
 
@@ -247,15 +247,15 @@ This section guides you through different settings for enabling Microsoft Defend
 
   ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./arcsql-defender-status.png)
 
+- Following screen shows the SQL threat detected by Defender for Cloud.
+
+  ![Screenshot showing Defender for SQL security incidents and alerts](./defender-sql-security-incidents.png)
+
 - Following is the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers.
 
   ![Screenshot showing Defender for SQL test scripts](./defender-sql-testing-script.png)
 
-- Following screen shows the SQL threat detected by Defender for Cloud.
-
-  ![Screenshot showing Defender for SQL alerts](./brute-force-attack-detection.png)
-
-- Please note once in a while these test execution fails randomly. If you did do not find these alerts, login to nested SQL VM in Hyper-V and execute test script manually as show below.
+- Please note once in a while these test execution may fails randomly. If you don't find these alerts, login to nested SQL VM in Hyper-V and execute test script manually as show below.
 
   ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
 
