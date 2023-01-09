@@ -2,36 +2,33 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "spnClientId": {
-            "value": "0c7d9c54-0f48-4374-8d59-2bb7d59935ff"
+        "vmSize": {
+            "value": "<VM size>"
         },
-        "spnClientSecret": {
-            "value": "e8q5Fpn4s66fT9YQqrZ_.klC6ZgvXt9b5k"
+        "vmName": {
+            "value": "<VM Name>"
         },
-        "spnTenantId": {
-            "value": "47dc6937-8464-4e20-a29e-bdfbdbd086f6"
+        "adminUsername": {
+            "value": "<Windows VM admin username>"
         },
-        "windowsAdminUsername": {
-            "value": "arcdemo"
+        "adminPassword": {
+            "value": "<Windows VM admin password>"
         },
-        "windowsAdminPassword": {
-            "value": "ArcPassword123!!"
+        "servicePrincipalAppId": {
+            "value": "<Azure service principal name>"
+        },
+        "servicePrincipalSecret": {
+            "value": "<Azure service principal password>"
+        },
+        "servicePrincipalTenantId": {
+            "value": "<Azure tenant ID>"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "defendersqlla-0106"
+            "value": "<your unique Log Analytics workspace name>"
         },
         "deployBastion": {
-            "value": false
-        },
-        "githubUser": {
-            "value": "chintalavr"
-        },
-        "githubBranch": {
-            "value": "arcsqlserver-defender"
-        }
-		,
-        "githubAccount": {
-            "value": "chintalavr"
+            "value": "(true/false)"
         }
     }
 }
+  
