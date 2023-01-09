@@ -85,9 +85,9 @@ The automation for this scenario includes different PowerShell scripts executed 
 
     1. Install Windows Hyper-V server and configure networking.
     2. Create a guest Windows Server VM with SQL Server pre-installed.
-    3. Restore AdventureWorksLT2019 Database.
+    3. Restore _AdventureWorksLT2019_ Database.
     4. Execute the *ArcServersLogonScript.ps1* script.
-    5. Enable Defender for SQL Servers on Machine at subscription level and setup default Log Analytics workspace.
+    5. Enable Defender for SQL Servers on Machine at the subscription level and setup the default Log Analytics workspace.
     6. Execute the *testDefenderForSQL.ps1* script to simulate SQL attacks.
 
 3. [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1) - This is the main script and will be executed by the *ArcServersLogonScript.ps1* script at VM runtime. This script has the following functionalities:
