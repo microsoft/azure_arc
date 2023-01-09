@@ -93,7 +93,6 @@ foreach ($app in $appsToInstall)
 Write-Header "Fetching GitHub Artifacts"
 
 Write-Host "Fetching Artifacts for All Flavors"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile $Env:ArcJSDir\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcJSLogsDir\LogInstructions.txt
 
 Write-Host "Fetching Artifacts for Arc SQL Server"
