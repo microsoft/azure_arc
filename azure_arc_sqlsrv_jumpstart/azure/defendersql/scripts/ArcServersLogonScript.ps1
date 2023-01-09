@@ -3,6 +3,8 @@ $Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 $Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
 $Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
 $agentScript = "$Env:ArcJSDir\agentScript"
+$Env:ToolsDir = "C:\Tools"
+$Env:tempDir = "C:\Temp"
 
 Start-Transcript -Path "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 
@@ -208,21 +210,25 @@ Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
 
-# Changing to Jumpstart wallpaper
+# Changing to Client VM wallpaper
+$imgPath="$Env:TempDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
     
-    public class Wallpaper{ 
+     public class Wallpaper{ 
         [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
             SystemParametersInfo(20,0,thePath,3); 
-            }
-        }
-    } 
+         }
+    }
+ } 
 '@
+
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
