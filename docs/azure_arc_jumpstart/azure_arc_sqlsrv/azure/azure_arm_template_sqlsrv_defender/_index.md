@@ -227,7 +227,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing Azure nested SQL Server VM afeter login](./hyperv-nested-vm-sql-login.png)
 
-- Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed.
+- Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the _AdventureWorksLT2019_ sample database is deployed.
 
   ![Screenshot showing SQL Management Studio](./sqlserver-management-login.png)
 
