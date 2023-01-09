@@ -5,7 +5,7 @@ linkTitle: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers 
 weight: 1
 ---
 
-## Deploy an Azure Virtual Machine with Windows Server with Hyper-V to support nested virtualization
+## Integrate Microsoft Defender for SQL servers with Azure Arc-enabled SQL Server (on Windows) using Hyper-V nested virtualization and ARM templates
 
 The following Jumpstart scenario will walk you through on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server, setup Hyper-V to support nested virtualization, and create guest VM with SQL Server 2019 on Hyper-V to demonstrate Defender for Cloud for SQL servers on machines and generate alerts for SQL attacks.
 
