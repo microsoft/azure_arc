@@ -248,7 +248,7 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./arcsql-defender-status.png)
 
-- Following screen shows the SQL threat detected by Defender for Cloud.
+- The below screenshot shows the SQL threat detected by Defender for Cloud.
 
   ![Screenshot showing Defender for SQL security incidents and alerts](./defender-sql-security-incidents.png)
 
