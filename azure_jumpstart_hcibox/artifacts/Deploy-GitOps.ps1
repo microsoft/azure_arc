@@ -137,10 +137,22 @@ Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
 }
 
 Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+az keyvault certificate import `
+    --vault-name $keyVaultName `
+    --password "arcbox" `
+    --name $certname `
+    --file "$Env:TempDir\$certname.pfx"
 
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+az k8s-extension create --name 'akvsecretsprovider' `
+    --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+    --version '1.3.0' `
+    --scope cluster `
+    --cluster-name $clusterName `
+    --resource-group $Env:resourceGroup `
+    --cluster-type connectedClusters `
+    --release-namespace kube-system `
+    --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Replace Variable values
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/devops_ingress/hello-arc.yaml") -OutFile $Env:HCIBoxKVDir\hello-arc.yaml
