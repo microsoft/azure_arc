@@ -463,13 +463,6 @@ resource "azurerm_log_analytics_solution" "update_solution" {
   }
 }
 
-resource "azurerm_automation_account" "automation" {
-  name                = "ArcBox-Automation-${random_string.random.result}"
-  location            = data.azurerm_resource_group.rg.location == "eastus" ? "eastus2" : (data.azurerm_resource_group.rg.location == "eastus2" ? "eastus" : data.azurerm_resource_group.rg.location)
-  resource_group_name = data.azurerm_resource_group.rg.name
-  sku_name            = "Basic"
-}
-
 resource "azurerm_public_ip" "publicIpAddress" {
   count                   = var.deploy_bastion == true ? 1 : 0
   resource_group_name     = data.azurerm_resource_group.rg.name
