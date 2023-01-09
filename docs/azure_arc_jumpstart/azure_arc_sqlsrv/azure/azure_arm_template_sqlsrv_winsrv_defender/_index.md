@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
-linkTitle: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
+title: "SQL Server Hyper-V Virtual Machine (Windows)"
+linkTitle: "SQL Server Hyper-V Virtual Machine (Windows)"
 weight: 1
 ---
 
@@ -61,7 +61,6 @@ By the end of the guide, you will have an Azure VM **JS-Client** installed with 
     ```
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
-
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 - As part of the scenario deployment following resource providers are registered in your subscription to support Azure Arc-enabled SQL Server.
@@ -76,21 +75,21 @@ By the end of the guide, you will have an Azure VM **JS-Client** installed with 
 
 The automation for this scenario includes different PowerShell scripts executed in the following order:
 
-1. [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
+1. [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
 
     1. Download and install pre-requisite utilities via [Chocolatey](https://chocolatey.org/).
-    2. Download the [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1), [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1), and [*testDefenderForSQL.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/testDefenderForSQL.ps1) scripts.
+    2. Download the [_ArcServersLogonScript.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/ArcServersLogonScript.ps1), [_installArcAgentSQLSP.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/installArcAgentSQLSP.ps1), and [_testDefenderForSQL.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/testDefenderForSQL.ps1) scripts.
 
-2. [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1) - Executed upon initial login to the **JS-Client** Azure virtual machine. This script has the following functionalities:
+2. [_ArcServersLogonScript.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/ArcServersLogonScript.ps1) - Executed upon initial login to the **JS-Client** Azure virtual machine. This script has the following functionalities:
 
     1. Install Windows Hyper-V server and configure networking.
     2. Create a guest Windows Server VM with SQL Server pre-installed.
     3. Restore _AdventureWorksLT2019_ Database.
-    4. Execute the *ArcServersLogonScript.ps1* script.
+    4. Execute the _ArcServersLogonScript.ps1_ script.
     5. Enable Defender for SQL Servers on Machine at the subscription level and setup the default Log Analytics workspace.
-    6. Execute the *testDefenderForSQL.ps1* script to simulate SQL attacks.
+    6. Execute the _testDefenderForSQL.ps1_ script to simulate SQL attacks.
 
-3. [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1) - This is the main script and will be executed by the *ArcServersLogonScript.ps1* script at VM runtime. This script has the following functionalities:
+3. [_installArcAgentSQLSP.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/installArcAgentSQLSP.ps1) - This is the main script and will be executed by the _ArcServersLogonScript.ps1_ script at VM runtime. This script has the following functionalities:
 
     1. Project SQL Server as an Azure Arc-enabled SQL server resource
     2. Install the Log Analytics agent using an extension on the Azure Arc-enabled server
@@ -100,9 +99,9 @@ To get familiar with the automation and deployment flow read the following expla
 
 1. User edits the ARM template parameters file (1-time edit). These parameters values are used throughout the deployment.
 
-2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) PowerShell Script. The script will:
+2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/scripts/Bootstrap.ps1) PowerShell Script. The script will:
 
-    1. Download the *ArcServersLogonScript.ps1*,  *installArcAgentSQLSP*, and *testDefenderForSQL.ps1* PowerShell scripts
+    1. Download the _ArcServersLogonScript.ps1_, _installArcAgentSQLSP.ps1_, and _testDefenderForSQL.ps1_ PowerShell scripts
 
     2. Set local OS environment variables
 
@@ -112,7 +111,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 - Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
-- The deployment uses the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/azuredeploy.parameters.example.json).
+- The deployment uses the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/azuredeploy.parameters.example.json).
 
 - Create a Resource Group which will contain the target for the ARM Template deployment using the following command:
 
@@ -126,13 +125,13 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
     az group create --name Arc-SQL-Defender --location "East US" --tags "Project=jumpstart_azure_arc_sql_defender"
     ```
 
-- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/defendersql) and run the following command:
+- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template) and run the following command:
 
     ```shell
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
@@ -144,7 +143,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
     az deployment group create \
     --resource-group Arc-SQL-Defender \
     --name arcsqldefender \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/windows/defender_sql/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
@@ -225,7 +224,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing Hyper-V with nested SQL Server VM](./hyperv-nested-vm.png)
 
-  ![Screenshot showing Azure nested SQL Server VM afeter login](./hyperv-nested-vm-sql-login.png)
+  ![Screenshot showing Azure nested SQL Server VM after login](./hyperv-nested-vm-sql-login.png)
 
 - Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the _AdventureWorksLT2019_ sample database is deployed.
 
@@ -243,7 +242,7 @@ This section guides you through different settings for enabling Microsoft Defend
 
   ![Screenshot showing Microsoft Defender for Cloud SQL enabled](./defender-sql-plan.png)
 
-- The below screenshots show Arc-enabled SQL Server Defender for Cloud enablement and protection status. Defender for Cloud for SQL Server is enabled at the subscription level, but the protection status is still showing as not enabled. 
+- The below screenshots show Arc-enabled SQL Server Defender for Cloud enablement and protection status. Defender for Cloud for SQL Server is enabled at the subscription level, but the protection status is still showing as not enabled.
 Please note it may take some time to show this status in the Azure portal, but still able to detect SQL threats generated by the test scripts.
 
   ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./arcsql-defender-status.png)
