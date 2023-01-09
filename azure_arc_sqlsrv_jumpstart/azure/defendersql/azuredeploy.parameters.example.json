@@ -5,9 +5,6 @@
         "vmSize": {
             "value": "Standard_D8s_v3"
         },
-        "vmName": {
-            "value": "Arc-SQL-Defender"
-        },
         "adminUsername": {
             "value": "arcdemo"
         },

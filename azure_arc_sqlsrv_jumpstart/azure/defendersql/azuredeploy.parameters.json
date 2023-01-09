@@ -5,9 +5,6 @@
         "vmSize": {
             "value": "<VM size>"
         },
-        "vmName": {
-            "value": "<VM Name>"
-        },
         "adminUsername": {
             "value": "<Windows VM admin username>"
         },
