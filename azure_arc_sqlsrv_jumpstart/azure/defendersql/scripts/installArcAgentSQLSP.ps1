@@ -4,7 +4,7 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSDir = "C:\Jumpstart"
 $Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 
 Start-Transcript -Path "$Env:ArcJSLogsDir\installArcAgentSQL.log"
