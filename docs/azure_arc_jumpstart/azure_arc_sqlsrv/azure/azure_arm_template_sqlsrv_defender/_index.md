@@ -1,13 +1,13 @@
 ---
 type: docs
-title: "Azure Arc-enabled SQL server - Microsoft Defender for SQL servers on machines"
-linkTitle: "SQL servers on machines - Defender for Cloud"
+title: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
+linkTitle: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
 weight: 1
 ---
 
-## Deploy an Azure Virtual Machine with Windows Server with Hyper-V to support nested virtualization
+## Integrate Microsoft Defender for SQL servers with Azure Arc-enabled SQL Server (on Windows) using Hyper-V nested virtualization and ARM templates
 
-The following Jumpstart scenario will walk you through on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server, setup Hyper-V to support nested virtualization, and create guest VM with SQL Server 2019 on Hyper-V to demonstrate Defender for Cloud for SQL servers on machines and generate alerts for SQL attacks.
+The following Jumpstart scenario will walk you through how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server, setup Hyper-V to support nested virtualization, and create guest VM with SQL Server 2019 on Hyper-V to demonstrate Defender for Cloud for SQL servers on machines and generate alerts for SQL attacks.
 
 By the end of the guide, you will have an Azure VM **JS-Client** installed with Windows Server 2019 with Hyper-V and nested Windows Server VM **JS-Win-SQL-01** pre-configured with SQL Server 2019, projected as an Azure Arc-enabled SQL Server, then enabled SQL assessment and Microsoft Defender for SQL servers on machines.
 
@@ -66,17 +66,17 @@ By the end of the guide, you will have an Azure VM **JS-Client** installed with 
 
 - As part of the scenario deployment following resource providers are registered in your subscription to support Azure Arc-enabled SQL Server.
 
-  - Microsoft.AzureArcData
-  - Microsoft.HybridCompute
-  - Microsoft.OperationsManagement
-  - Microsoft.HybridConnectivity
-  - Microsoft.GuestConfiguration
+  - _Microsoft.AzureArcData_
+  - _Microsoft.HybridCompute_
+  - _Microsoft.OperationsManagement_
+  - _Microsoft.HybridConnectivity_
+  - _Microsoft.GuestConfiguration_
   
 ## Automation Flow
 
 The automation for this scenario includes different PowerShell scripts executed in the following order:
 
-1. [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
+1. [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
 
     1. Download and install pre-requisite utilities via [Chocolatey](https://chocolatey.org/).
     2. Download the [*ArcServersLogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/ArcServersLogonScript.ps1), [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1), and [*testDefenderForSQL.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/testDefenderForSQL.ps1) scripts.
@@ -85,15 +85,15 @@ The automation for this scenario includes different PowerShell scripts executed 
 
     1. Install Windows Hyper-V server and configure networking.
     2. Create a guest Windows Server VM with SQL Server pre-installed.
-    3. Restore AdventureWorksLT2019 Database.
+    3. Restore _AdventureWorksLT2019_ Database.
     4. Execute the *ArcServersLogonScript.ps1* script.
-    5. Enable Defender for SQL Servers on Machine at subscription level and setup default Log Analytics workspace.
+    5. Enable Defender for SQL Servers on Machine at the subscription level and setup the default Log Analytics workspace.
     6. Execute the *testDefenderForSQL.ps1* script to simulate SQL attacks.
 
 3. [*installArcAgentSQLSP.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/installArcAgentSQLSP.ps1) - This is the main script and will be executed by the *ArcServersLogonScript.ps1* script at VM runtime. This script has the following functionalities:
 
     1. Project SQL Server as an Azure Arc-enabled SQL server resource
-    2. Install Log Analytics agent using an extension on Azure Arc-enabled server
+    2. Install the Log Analytics agent using an extension on the Azure Arc-enabled server
     3. Create SQL Assessment and inject data to Azure Log Analytics workspace
 
 To get familiar with the automation and deployment flow read the following explanation.
@@ -102,7 +102,7 @@ To get familiar with the automation and deployment flow read the following expla
 
 2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) PowerShell Script. The script will:
 
-    1. Download the *ArcServersLogonScript.ps1*,  *installArcAgentSQLSP*, and  *testDefenderForSQL.ps1* PowerShell scripts
+    1. Download the *ArcServersLogonScript.ps1*,  *installArcAgentSQLSP*, and *testDefenderForSQL.ps1* PowerShell scripts
 
     2. Set local OS environment variables
 
@@ -243,7 +243,8 @@ This section guides you through different settings for enabling Microsoft Defend
 
   ![Screenshot showing Microsoft Defender for Cloud SQL enabled](./defender-sql-plan.png)
 
-- Following screen shows Arc-enabled SQL server Defender for Cloud enablement and protection status. Defender for Cloud for SQL Server is enabled at the subscription level, but protection status is still showing is not enabled. Please note it may take sometime to show this status in Azure portal, but still able to detect SQL threats generated by the test scripts.
+- The below screenshots show Arc-enabled SQL Server Defender for Cloud enablement and protection status. Defender for Cloud for SQL Server is enabled at the subscription level, but the protection status is still showing as not enabled. 
+Please note it may take some time to show this status in the Azure portal, but still able to detect SQL threats generated by the test scripts.
 
   ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./arcsql-defender-status.png)
 
