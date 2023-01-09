@@ -1,7 +1,7 @@
 ---
 type: docs
 title: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
-linkTitle: "SQL servers on machines - Defender for Cloud"
+linkTitle: "Azure Arc-enabled SQL Server and Microsoft Defender for SQL servers (Windows)"
 weight: 1
 ---
 
