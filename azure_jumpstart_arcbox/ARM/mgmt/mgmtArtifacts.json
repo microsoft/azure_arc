@@ -111,14 +111,12 @@
       "galleryName": "Security"
     },
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
-    "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "addressPrefix": "10.16.0.0/16",
     "subnetAddressPrefix": "10.16.1.0/24",
     "aksSubnetPrefix": "10.16.76.0/22",
     "dcSubnetPrefix": "10.16.2.0/24",
     "drAddressPrefix": "172.16.0.0/16",
     "drSubnetPrefix": "172.16.128.0/17",
-    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
@@ -532,17 +530,6 @@
       },
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2021-06-22",
-      "name": "[variables('automationAccountName')]",
-      "location": "[variables('automationAccountLocation')]",
-      "properties": {
-        "sku": {
-          "name": "Basic"
-        }
       }
     },
     {

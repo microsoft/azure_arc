@@ -51,14 +51,12 @@ var security = {
   galleryName: 'Security'
 }
 
-var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
 var subnetAddressPrefix = '10.16.1.0/24'
 var addressPrefix = '10.16.0.0/16'
 var aksSubnetPrefix = '10.16.76.0/22'
 var dcSubnetPrefix = '10.16.2.0/24'
 var drAddressPrefix = '172.16.0.0/16'
 var drSubnetPrefix = '172.16.128.0/17'
-var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'ArcBox-Bastion'
@@ -442,16 +440,6 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     promotionCode: ''
     product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
-  }
-}
-
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
-  name: automationAccountName
-  location: automationAccountLocation
-  properties: {
-    sku: {
-      name: 'Basic'
-    }
   }
 }
 
