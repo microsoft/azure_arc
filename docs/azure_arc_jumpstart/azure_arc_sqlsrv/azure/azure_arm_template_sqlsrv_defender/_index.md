@@ -252,7 +252,7 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Defender for SQL security incidents and alerts](./defender-sql-security-incidents.png)
 
-- Following is the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers.
+- The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers.
 
   ![Screenshot showing Defender for SQL test scripts](./defender-sql-testing-script.png)
 
