@@ -167,7 +167,7 @@ There are two options available to connect to _JS-Client_ VM, depending on the p
 
 By design, port 3389 is not allowed to access from the public internet. You must create an NSG rule to allow inbound 3389.
 
-- Open the __JS-NSG_ resource in Azure portal, go to Inbound security rules, and click "Add" to add your client IP to allow RDP access to the VM.
+- Open the _JS-NSG_ resource in the Azure portal, go to Inbound security rules, and click "Add" to add your client IP to allow RDP access to the VM.
 
   ![Screenshot showing Arc-App-Client NSG with blocked RDP](./default-nsg-rules.png)
 
