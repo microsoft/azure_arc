@@ -66,11 +66,11 @@ By the end of the guide, you will have an Azure VM **JS-Client** installed with 
 
 - As part of the scenario deployment following resource providers are registered in your subscription to support Azure Arc-enabled SQL Server.
 
-  - Microsoft.AzureArcData
-  - Microsoft.HybridCompute
-  - Microsoft.OperationsManagement
-  - Microsoft.HybridConnectivity
-  - Microsoft.GuestConfiguration
+  - _Microsoft.AzureArcData_
+  - _Microsoft.HybridCompute_
+  - _Microsoft.OperationsManagement_
+  - _Microsoft.HybridConnectivity_
+  - _Microsoft.GuestConfiguration_
   
 ## Automation Flow
 
