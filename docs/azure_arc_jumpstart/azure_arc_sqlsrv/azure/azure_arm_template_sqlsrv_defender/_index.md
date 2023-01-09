@@ -102,7 +102,7 @@ To get familiar with the automation and deployment flow read the following expla
 
 2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/defendersql/scripts/Bootstrap.ps1) PowerShell Script. The script will:
 
-    1. Download the *ArcServersLogonScript.ps1*,  *installArcAgentSQLSP*, and  *testDefenderForSQL.ps1* PowerShell scripts
+    1. Download the *ArcServersLogonScript.ps1*,  *installArcAgentSQLSP*, and *testDefenderForSQL.ps1* PowerShell scripts
 
     2. Set local OS environment variables
 
