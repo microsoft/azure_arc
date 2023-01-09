@@ -260,7 +260,7 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
 
-- Following is an email alert sent by Defender for Cloud when SQL threat is detected. By default this email is sent to the registered contact email at the subscription level.
+- The below screenshot shows an email alert sent by Defender for Cloud when a SQL threat is detected. By default, this email is sent to the registered contact email at the subscription level.
   ![Screenshot showing test script results](./brute-force-attack-alert.png)
 
 ## Cleanup
