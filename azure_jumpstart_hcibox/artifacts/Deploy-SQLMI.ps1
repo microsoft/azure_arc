@@ -127,6 +127,7 @@ foreach ($VM in $SDNConfig.HostList) {
 Write-Host "Deploying the Arc Data Controller"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     #$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Installing the Arc Data extension"
     Write-Host "`n"
     az k8s-extension create --name arc-data-services `
@@ -157,7 +158,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
-
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
     az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $using:rg --query id -o tsv
@@ -198,6 +199,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 # Preparing AD for SQL MI AD authenticaion
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Import-Module ActiveDirectory
     Import-Module DnsServer
     $sqlmiouName = "ArcSQLMI"
@@ -480,6 +482,7 @@ Write-Host "Generating endpoints file"
 write-host "`n"
 
 # Retrieving SQL MI connection endpoint
+Get-AksHciCredential -name $using:clusterName -Confirm:$false
 $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
 write-host "`n"
