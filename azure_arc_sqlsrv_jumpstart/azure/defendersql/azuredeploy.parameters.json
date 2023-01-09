@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "spnClientId": {
-            "value": "<your service principal client id>"
+            "value": "0c7d9c54-0f48-4374-8d59-2bb7d59935ff"
         },
         "spnClientSecret": {
-            "value": "<your service principal secret>"
+            "value": "e8q5Fpn4s66fT9YQqrZ_.klC6ZgvXt9b5k"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "47dc6937-8464-4e20-a29e-bdfbdbd086f6"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
@@ -18,16 +18,20 @@
             "value": "ArcPassword123!!"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "<your unique Log Analytics workspace name>"
+            "value": "defendersqlla-0106"
         },
         "deployBastion": {
             "value": false
         },
         "githubUser": {
-            "value": "microsoft"
+            "value": "chintalavr"
         },
         "githubBranch": {
-            "value": "main"
+            "value": "arcsqlserver-defender"
+        }
+		,
+        "githubAccount": {
+            "value": "chintalavr"
         }
     }
 }
