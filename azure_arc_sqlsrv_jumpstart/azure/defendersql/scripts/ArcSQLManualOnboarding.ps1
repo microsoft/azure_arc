@@ -4,7 +4,7 @@
     [string]$sqlServerName = "<sqlServerName>"
 )
 
-$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSDir = "C:\Jumpstart"
 $scriptLocation = "$Env:ArcJSDir\agentScript"
 $logLocation = "$Env:ArcJSDir\Logs"
 

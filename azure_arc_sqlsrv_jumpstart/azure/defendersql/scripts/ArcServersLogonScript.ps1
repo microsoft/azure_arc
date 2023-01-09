@@ -1,4 +1,4 @@
-$Env:ArcJSDir = "C:\ArcJumpStart"
+$Env:ArcJSDir = "C:\Jumpstart"
 $Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 $Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
 $Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
