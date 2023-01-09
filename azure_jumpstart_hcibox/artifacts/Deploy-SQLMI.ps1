@@ -141,6 +141,10 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Write-Host "`n"
 
+    kubectl get pods -n arc
+
+    Write-Host "`n"
+
     Do {
         Write-Host "Waiting for bootstrapper pod, hold tight..."
         Start-Sleep -Seconds 20
