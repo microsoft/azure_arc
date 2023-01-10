@@ -1,10 +1,10 @@
-# Azure Arc enabled data services - Sample yaml files
+# Azure Arc-enabled data services - Sample yaml files
 
-This folder contains deployment related scripts for Azure Arc enabled data services. These scripts can be applied using kubectl command-line tool. If you are performing any operations on the services using the [Azure Data CLI](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15) tool then ensure that you have the latest version always.
+This folder contains deployment related scripts for Azure Arc-enabled data services. These scripts can be applied using kubectl command-line tool. If you are performing any operations on the services using the [Azure Data CLI](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15) tool then ensure that you have the latest version always.
 
 ## Deployment yaml files for kube-native operations
 
-The following yaml files can be used to create Azure Arc enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
+The following yaml files can be used to create Azure Arc-enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
 
 1. [Create Deployer Service Account](../../arcdata-deployer.yaml)
 This yaml file creates a deployer service account in a specified namespace with proper RBAC. This service account will be used in the next step to run a "bootstrap" job. Replace the placeholder `{{NAMESPACE}}` in the file before applying.
@@ -64,6 +64,36 @@ On Linux, the following bash shell command can be used to decode a base64 encode
 echo -n <YourEncodedPasswordHere>|base64 -d
 ```
 
+## Azure Arc-enabled data services extension with least privileges in direct connectivity mode
+
+The following commands create the Azure Arc-enabled data services extension with least privileges in direct connectivity mode.
+
+```ps
+<# Inputs:
+  $ENV:EXTENSION_NAMESPACE: the namespace to install arcdataservices k8s extension into
+  $ENV:EXTENSION_NAME: the name of the arcdataservices k8s extension
+  $ENV:INSTALLER_SERVICE_ACCOUNT: the name of the installer service account
+  $ENV:RUNTIME_SERVICE_ACCOUNT: the name of the runtime service account
+  $ENV:CLUSTER_NAME: the name of the Arc Kuberenetes cluster
+  $ENV:RESOURCE_GROUP: the resource group of the Arc Kuberenetes cluster
+#>
+
+kubectl create namespace $ENV:EXTENSION_NAMESPACE
+
+kubectl -n $ENV:EXTENSION_NAMESPACE create serviceaccount $ENV:INSTALLER_SERVICE_ACCOUNT
+kubectl -n $ENV:EXTENSION_NAMESPACE create serviceaccount $ENV:RUNTIME_SERVICE_ACCOUNT
+
+# To configure RBAC permissions for the installer and runtime service accounts created above,
+# replace template placeholders {{NAMESPACE}}, {{INSTALLER_SERVICE_ACCOUNT}} and {{RUNTIME_SERVICE_ACCOUNT}} in the yaml files below with actual valus before applying
+kubectl apply --namespace $ENV:EXTENSION_NAMESPACE -f ../../arcdata-installer.yaml
+kubectl apply --namespace $ENV:EXTENSION_NAMESPACE -f ../../arcdata-runtime.yaml
+kubectl apply -f ../../azure-arc-extension-identity.yaml
+
+az k8s-extension create --cluster-name $ENV:CLUSTER_NAME --resource-group $ENV:RESOURCE_GROUP --name $ENV:EXTENSION_NAME --cluster-type connectedClusters --extension-type microsoft.arcdataservices --auto-upgrade false --scope cluster --release-namespace $ENV:EXTENSION_NAMESPACE --config service-account-extension-install="system:serviceaccount:arc:$ENV:INSTALLER_SERVICE_ACCOUNT" --config service-account-extension-runtime="system:serviceaccount:arc:$ENV:RUNTIME_SERVICE_ACCOUNT"
+```
+
+Similary, the RBAC permissions for the corresponding release must be applied before running `az k8s-extension update` to upgrade the Azure Arc-enabled data services extension to a specific release.
+
 ## [RBAC samples](./rbac)
 
-This folder contains yaml files that provide cluster roles and roles to configure Kubernetes RBAC for Azure Arc enabled data services.
+This folder contains yaml files that provide cluster roles and roles to configure Kubernetes RBAC for Azure Arc-enabled data services.

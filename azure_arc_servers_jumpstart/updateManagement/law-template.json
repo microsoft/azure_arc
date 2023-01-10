@@ -5,7 +5,7 @@
     "arcVmName": {
       "type": "string",
       "metadata": {
-        "description": "Azure Arc enabled server resource name"
+        "description": "Azure Arc-enabled server resource name"
       }
     },
     "workspaceName": {
@@ -48,7 +48,7 @@
     "arcVmResourceGroup": {
       "type": "string",
       "metadata": {
-        "description": "Specifies the resource group of your Azure Arc enabled server."
+        "description": "Specifies the resource group of your Azure Arc-enabled server."
       }
     },
     "automationAccountName": {
