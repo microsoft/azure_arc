@@ -1,0 +1,23 @@
+{{ if eq .Values.connectionMode "direct" }}
+
+{{ if .Values.Azure.proxySettings.isProxyEnabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: proxy-config
+type: Opaque
+data:
+{{ if .Values.Azure.proxySettings.httpProxy }}
+  ARC_HTTP_PROXY: {{ .Values.Azure.proxySettings.httpProxy | b64enc }}
+{{ end }}
+{{ if .Values.Azure.proxySettings.httpsProxy }}
+  ARC_HTTPS_PROXY: {{ .Values.Azure.proxySettings.httpsProxy | b64enc }}
+{{ end }}
+{{ if .Values.Azure.proxySettings.noProxy }}
+  ARC_NO_PROXY: {{ .Values.Azure.proxySettings.noProxy | b64enc }}
+{{ end }}
+{{ end }}
+
+{{ end }}

@@ -67,4 +67,20 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Set-ClusterQuorum -Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
 }
 
+# Install Az CLI and extensions on each node
+foreach ($VM in $SDNConfig.HostList) { 
+    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
+        # Install Chocolatey
+        Write-Verbose "Installing Chocolatey"
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        Start-Sleep -Seconds 10
+
+        Write-Verbose "Installing Az CLI"
+        $expression = "choco install azure-cli -y"
+        Invoke-Expression $expression
+
+        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
+        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+    }
+}
 Stop-Transcript

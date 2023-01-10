@@ -152,7 +152,7 @@ To disable SSH access to an Azure Arc-enabled server, run the below command.
   az rest --method delete --uri https://management.azure.com/subscriptions/<subscription>/resourceGroups/<resourcegroup>/providers/Microsoft.HybridCompute/machines/<arc enabled server name>/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2021-10-06-preview
   ```
 
-On the Azure Arc enabled-server's operating system, remove the configured port by running the below command on the server:
+On the Azure Arc-enabled-server's operating system, remove the configured port by running the below command on the server:
 
   ```shell
   azcmagent config set incomingconnections.ports ""

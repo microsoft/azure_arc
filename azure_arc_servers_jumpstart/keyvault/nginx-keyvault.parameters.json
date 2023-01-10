@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "value": "<name of your Azure Arc enabled server" // Arc VM name as it is registered in ARM
+            "value": "<name of your Azure Arc-enabled server" // Arc VM name as it is registered in ARM
         },
         "location": {
             "value": "<your region>" // Azure Region where the Arc VM is registered
