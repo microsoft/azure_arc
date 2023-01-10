@@ -105,6 +105,8 @@ az k8s-extension create `
     --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
     --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
+
 # Get Application Platform extension Id
 $extensionId=$(az k8s-extension show `
     --cluster-type connectedClusters `
@@ -264,6 +266,9 @@ namespace Win32{
 
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ContainerAppsLogonScript" -Confirm:$false
