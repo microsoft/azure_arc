@@ -61,7 +61,7 @@ function Install-PowershellModule() {
 
 # Confirm that Azure powershell module is installed, and install if not present
 #
-if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az -MinimumVersion 8.0.0 -ErrorAction SilentlyContinue)) {
     Install-PowershellModule
     if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
         Write-Warning -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
@@ -73,21 +73,20 @@ else
     Write-Verbose "Az already installed. Skipping installation."
 }
 
-
-if (-Not (Get-InstalledModule -Name Az.ConnectedMachine  -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az.ConnectedMachine -MinimumVersion 0.4.0 -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Az.connectedMachine module."
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Find-Module -Name Az.ConnectedMachine | Install-Module  -Force
+    Find-Module -Name Az.ConnectedMachine | Install-Module -Force
 }
 else
 {
     Write-Verbose "Az.ConnectedMachine already installed. Skipping installation."
 }
 
-if (-Not (Get-InstalledModule -Name Az.Resources  -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az.Resources -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Az.Resources module."
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    Find-Module -Name Az.Resources | Install-Module  -Force
+    Find-Module -Name Az.Resources | Install-Module -Force
 }
 else
 {
@@ -97,7 +96,7 @@ else
 # For manual Azure Arc registration, an access token prevents a duplicate Azure login
 # Getting an access token is only supported in Az.Accounts 2.2 or up
 #
-if (-Not (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2  -ErrorAction SilentlyContinue) -and -Not $unattended) {
+if (-Not (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2 -ErrorAction SilentlyContinue) -and -Not $unattended) {
     Write-Warning "For the best user experience, we recommend updating the Az.Accounts module. Please confirm installation."
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Install-Module -Name Az.Accounts -MinimumVersion 2.2 -Confirm -Force
@@ -200,9 +199,9 @@ if(!$currentRoleAssignment)
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
-$Settings = '{ "SqlManagement" : { "IsEnabled" : true }, "licenseType": "LicneseOnly"}'
+$settings = @{ SqlManagement = @{ IsEnabled = $true }, "licenseType": "LicneseOnly"}
 
-$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $Settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
+$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
 
 if($result.ProvisioningState -eq "Failed")
 {

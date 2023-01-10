@@ -18,7 +18,7 @@ Write-Host "`n"
 Write-Host "Configuring and deploying sample Logic App template Azure dependencies.`n"
 Write-Host "Updating connectors-parameters.json with appropriate values.`n"
 $connectorsParametersPath = "C:\Temp\ARM\connectors-parameters.json"
-$spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
+$spnObjectId = az ad sp show --id $env:spnClientID --query id -o tsv
 (Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
@@ -43,11 +43,11 @@ Do {
 Do {
     Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 15
-    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
+    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  6 Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($logProcessorStatus -eq "Nope")
 
 # Deploy Logic App code
-Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled Logic App.`n"
+Write-Host "Packaging sample Logic App code and deploying to Azure Arc-enabled Logic App.`n"
 7z a c:\Temp\logicAppCode.zip c:\Temp\logicAppCode\*
 az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 

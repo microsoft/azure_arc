@@ -188,25 +188,25 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-06-01",
+      "apiVersion": "2022-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
-      "location": "[parameters('location')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+      "apiVersion": "2022-05-01",
+      "condition": "[parameters('deployBastion')]",
+      "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
+      "name": "[concat(parameters('networkSecurityGroupName'),'/allow_SSH_22')]",
       "properties": {
-        "securityRules": [
-          {
-            "name": "SSH",
-            "properties": {
-              "priority": 1000,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),'*')]",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "22"
-            }
-          }
-        ]
+        "priority": 1001,
+        "protocol": "TCP",
+        "access": "Allow",
+        "direction": "Inbound",
+        "sourceAddressPrefix": "[variables('bastionSubnetIpPrefix')]",
+        "sourcePortRange": "*",
+        "destinationAddressPrefix": "*",
+        "destinationPortRange": "22"
       }
     },
     {

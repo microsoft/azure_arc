@@ -1,6 +1,3 @@
-@description('Your public IP address, used to RDP to the client VM')
-param myIpAddress string
-
 @description('The name of you Virtual Machine')
 param vmName string = 'ArcBox-K3s'
 
@@ -21,13 +18,11 @@ param ubuntuOSVersion string = '20_04-lts-gen2'
 param azureLocation string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D4s_v4'
+param vmSize string = 'Standard_B4ms'
 
 @description('Resource Id of the subnet in the virtual network')
-param subnetId string 
+param subnetId string
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-K3s-NSG'
 param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
@@ -51,11 +46,18 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool = false
+
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
+var PublicIPNoBastion = {
+  id: publicIpAddress.id
+}
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -67,119 +69,14 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
-  name: networkSecurityGroupName
-  location: azureLocation
-  properties: {
-    securityRules: [
-      {
-        name: 'allow_SSH'
-        properties: {
-          priority: 1001
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: myIpAddress
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '22'
-        }
-      }
-      {
-        name: 'allow_k8s_6443'
-        properties: {
-          priority: 1002
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '6443'
-        }
-      }
-      {
-        name: 'allow_k8s_80'
-        properties: {
-          priority: 1003
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '80'
-        }
-      }
-      {
-        name: 'allow_k8s_8080'
-        properties: {
-          priority: 1004
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '8080'
-        }
-      }
-      {
-        name: 'allow_k8s_443'
-        properties: {
-          priority: 1005
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '443'
-        }
-      }
-      {
-        name: 'allow_k8s_kubelet'
-        properties: {
-          priority: 1006
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '10250'
-        }
-      }
-      {
-        name: 'allow_traefik_lb_external'
-        properties: {
-          priority: 1007
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '32323'
+          publicIPAddress: deployBastion== false  ? PublicIPNoBastion : json('null')
         }
       }
     ]
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if(deployBastion == false){
   name: publicIpAddressName
   location: azureLocation
   properties: {
@@ -192,7 +89,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: azureLocation
   tags: resourceTags
@@ -241,7 +138,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   }
 }
 
-resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
   parent: vm
   name: 'installscript_k3s'
   location: azureLocation
@@ -252,7 +149,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${deployBastion}'
       fileUris: [
         '${templateBaseUrl}artifacts/installK3s.sh'
       ]

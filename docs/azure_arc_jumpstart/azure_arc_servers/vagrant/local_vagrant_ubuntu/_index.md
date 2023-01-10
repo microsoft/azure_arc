@@ -12,33 +12,33 @@ The following Jumpstart scenario will guide you on how to deploy a local **Ubunt
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+- Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
+- Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
 
-  * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
+  - Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
 
-    * If you are an OSX user, simply run ```brew cask install virtualbox```
-    * If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/virtualbox)
-    * If you are a Linux user, all package installation methods can be found [here](https://www.virtualbox.org/wiki/Linux_Downloads)
+    - If you are an OSX user, simply run ```brew cask install virtualbox```
+    - If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/virtualbox)
+    - If you are a Linux user, all package installation methods can be found [here](https://www.virtualbox.org/wiki/Linux_Downloads)
 
-  * Install [Vagrant](https://www.vagrantup.com/docs/installation/)
+  - Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
-    * If you are an OSX user, simply run ```brew cask install vagrant```
-    * If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/vagrant)
-    * If you are a Linux user, look [here](https://www.vagrantup.com/downloads.html)
+    - If you are an OSX user, simply run ```brew cask install vagrant```
+    - If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/vagrant)
+    - If you are a Linux user, look [here](https://www.vagrantup.com/downloads.html)
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To connect the Vagrant virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
@@ -71,14 +71,15 @@ The following Jumpstart scenario will guide you on how to deploy a local **Ubunt
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  * Microsoft.HybridCompute
-  * Microsoft.GuestConfiguration
+  - Microsoft.HybridCompute
+  - Microsoft.GuestConfiguration
 
       ```shell
       az provider register --namespace 'Microsoft.HybridCompute'
       az provider register --namespace 'Microsoft.GuestConfiguration'
+      az provider register --namespace 'Microsoft.HybridConnectivity'
       ```
 
       You can monitor the registration process with the following commands:
@@ -86,16 +87,17 @@ The following Jumpstart scenario will guide you on how to deploy a local **Ubunt
       ```shell
       az provider show --namespace 'Microsoft.HybridCompute'
       az provider show --namespace 'Microsoft.GuestConfiguration'
+      az provider show --namespace 'Microsoft.HybridConnectivity'
       ```
 
-* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure service principal you've just created.
+- The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure service principal you've just created.
 
-  * subscriptionId=Your Azure subscription ID
-  * appId=Your Azure service principal name
-  * password=Your Azure service principal password
-  * tenantId=Your Azure tenant ID
-  * resourceGroup=Azure resource group name
-  * location=Azure region
+  - subscriptionId=Your Azure subscription ID
+  - appId=Your Azure service principal name
+  - password=Your Azure service principal password
+  - tenantId=Your Azure tenant ID
+  - resourceGroup=Azure resource group name
+  - location=Azure region
 
 ## Deployment
 
@@ -132,11 +134,11 @@ In a case you want to demo/control the actual registration process, to the follo
 
     ![Screenshot of the az group create command](./07.png)
 
-* SSH the VM using the ```vagrant ssh``` command.
+- SSH the VM using the ```vagrant ssh``` command.
 
     ![Screenshot of of SSH to the Vagrant machine](./08.png)
 
-* Run the same *azcmagent connect* command you've just commented out using your environment variables.
+- Run the same *azcmagent connect* command you've just commented out using your environment variables.
 
     ![Screenshot of the azcmagent connect](./09.png)
 

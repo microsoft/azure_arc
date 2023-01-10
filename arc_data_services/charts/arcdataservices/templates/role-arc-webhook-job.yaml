@@ -1,0 +1,24 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.InstallerServiceAccount) (not .Values.systemDefaultValues.installerServiceAccount) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: role-arc-webhook-job
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resourceNames:
+  - arc-webhook-secret
+  resources:
+  - secrets
+  verbs:
+  - get
+{{ end }}

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arc-bootstrapper-upgrade-job
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      imagePullSecrets:
+      - name: your-private-registry
+      containers:
+      - name: bootstrapper
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.14.0_2022-12-13
+        imagePullPolicy: Always
+        command: ["/opt/bootstrapper/bin/bootstrapper"]
+        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.14.0_2022-12-13", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
+      restartPolicy: Never
+      serviceAccountName: sa-arcdata-deployer
+  ttlSecondsAfterFinished: 86400 #24 hours
+  backoffLimit: 0

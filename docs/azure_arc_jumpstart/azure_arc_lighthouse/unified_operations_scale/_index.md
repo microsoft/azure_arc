@@ -35,7 +35,7 @@ After you finish the onboarding process you will have a central management tenan
 
 Once you have centralized all operations in Azure using Lighthouse and Azure's Operations and Management tools, you can stretch these services to run across on-premises, other clouds, or the edge.
 
-With Azure Arc, your on-premises and other cloud deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters, or data services can be treated as first-class citizens of Azure.  As with any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign RBAC, and can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Azure Sentinel, or Azure Automation.
+With Azure Arc, your on-premises and other cloud deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters, or data services can be treated as first-class citizens of Azure.  As with any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign Role-based access control (RBAC), and can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Microsoft Sentinel, or Azure Automation.
 
 ![Azure Lighthouse and Azure Arc Diagram](./02.png)
 
@@ -67,7 +67,7 @@ For multitenant organizations, this service also supports Azure Lighthouse to al
 
 To explore this use case, use this Jumpstart scenario to work with tagged Azure Arc-enabled servers in your managed tenants:
 
-- [Apply inventory tagging to Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_tagging/)
+- [Azure Arc-enabled servers inventory management using Resource Graph Explorer](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_management/#apply-resource-tags-to-azure-arc-enabled-servers)
 
 ### Monitoring and Alerting
 
@@ -88,7 +88,7 @@ Use these Jumpstart scenarios to integrate Azure Monitor and Azure Arc in your m
 
 ### Hybrid Services Onboarding at Scale
 
-In the Contoso scenario, you will centrally manage at scale infrastructure and services that are distributed, for the operations you will usually use services such as Azure Monitoring, Azure Automation, Azure Security Center, or Azure Sentinel. To work with these services you will need to deploy an agent on your Arc-enabled resources and there are several ways you can do that:
+In the Contoso scenario, you will centrally manage at scale infrastructure and services that are distributed, for the operations you will usually use services such as Azure Monitoring, Azure Automation, Azure Security Center, or Microsoft Sentinel. To work with these services you will need to deploy an agent on your Arc-enabled resources and there are several ways you can do that:
 
 - Using a configuration management tool of your choice
 - Using Azure Policy and its remediation tasks

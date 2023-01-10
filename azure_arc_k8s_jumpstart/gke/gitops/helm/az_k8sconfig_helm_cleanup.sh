@@ -3,45 +3,44 @@
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export servicePrincipalAppId='<Your Azure service principal name>'
-export servicePrincipalSecret='<Your Azure service principal password>'
-export servicePrincipalTenantId='<Your Azure tenant ID>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
+export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
-export arcClusterName='<The name of Azure Arc enabled Kubernetes cluster>'
+export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-# Installing Azure CLI & Azure Arc extensions
-echo "Installing Azure CLI & Azure Arc Extensions"
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
-curl -sL https://packages.microsoft.com/keys/microsoft.asc |
-gpg --dearmor |
-sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
-AZ_REPO=$(lsb_release -cs)
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
-sudo tee /etc/apt/sources.list.d/azure-cli.list
-sudo apt-get update
-sudo apt-get install azure-cli
+# Installing Azure Arc k8s CLI extensions
+echo "Checking if you have up-to-date Az CLI 'k8s-configuration' extension..."
+az extension show --name "k8s-configuration" &> extension_output
+if cat extension_output | grep -q "not installed"; then
+az extension add --name "k8s-configuration"
+rm extension_output
+else
+az extension update --name "k8s-configuration"
+rm extension_output
+fi
+echo ""
 
-# Log in to Azure using service principal
+echo "Checking if you have up-to-date Az CLI 'k8s-extension' extension..."
+az extension show --name "k8s-extension" &> extension_output
+if cat extension_output | grep -q "not installed"; then
+az extension add --name "k8s-extension"
+rm extension_output
+else
+az extension update --name "k8s-extension"
+rm extension_output
+fi
+echo ""
+
+# Login to Azure using the service principal
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
+az login --service-principal --username $appId --password $password --tenant $tenantId
 
-# Deleting GitOps Configurations from Azure Arc Kubernetes cluster
-echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
-az k8s-configuration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
-az k8s-configuration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+# Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster
+echo "Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster"
+az k8s-configuration flux delete --name config-nginx --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
+az k8s-configuration flux delete --name config-helloarc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
 
-# Cleaning Kubernetes cluster
-echo "Cleaning Kubernetes cluster. You can safely ignore non-exist resources"
-kubectl delete ns prod
-kubectl delete ns cluster-mgmt
-
-kubectl delete clusterrole cluster-mgmt-helm-cluster-mgmt-helm-operator
-kubectl delete clusterrole hello-arc-helm-prod-helm-operator-crd
-kubectl delete clusterrole nginx-ingress
-
-kubectl delete clusterrolebinding cluster-mgmt-helm-cluster-mgmt-helm-operator
-kubectl delete clusterrolebinding hello-arc-helm-prod-helm-operator
-kubectl delete clusterrolebinding nginx-ingress
-
-kubectl delete secret sh.helm.release.v1.azure-arc.v1 -n default
+# Deleting GitOps Flux extension
+echo "Deleting GitOps Flux extension"
+az k8s-extension delete --name flux --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y

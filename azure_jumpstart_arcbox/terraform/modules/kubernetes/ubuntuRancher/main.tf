@@ -12,7 +12,7 @@ variable "vm_name" {
 variable "vm_size" {
   type        = string
   description = "The size of the capi virtual machine."
-  default     = "Standard_D4s_v4"
+  default     = "Standard_B4ms"
 }
 
 variable "os_sku" {
@@ -46,11 +46,6 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
-}
-
 variable "template_base_url" {
   type        = string
   description = "Base URL for the GitHub repo where the ArcBox artifacts are located."
@@ -81,47 +76,16 @@ variable "workspace_name" {
   description = "Log Analytics workspace name."
 }
 
+variable "deploy_bastion" {
+  type       = bool
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = false
+}
+
 locals {
     public_ip_name         = "${var.vm_name}-PIP"
-    nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
-    inbound_tcp_rules      = [
-        {
-            name                   = "allow_SSH"
-            source_address_prefix  = var.user_ip_address
-            destination_port_range = "22"
-        },
-        {
-            name                   = "allow_k8s_6443"
-            source_address_prefix  = "*"
-            destination_port_range = "6443"
-        },
-        {
-            name                   = "allow_k8s_80"
-            source_address_prefix  = "*"
-            destination_port_range = "80"
-        },
-        {
-            name                   = "allow_k8s_8080"
-            source_address_prefix  = "*"
-            destination_port_range = "8080"
-        },
-        {
-            name                   = "allow_k8s_443"
-            source_address_prefix  = "*"
-            destination_port_range = "443"
-        },
-        {
-            name                   = "allow_k8s_kubelet"
-            source_address_prefix  = "*"
-            destination_port_range = "10250"
-        },
-        {
-            name                   = "allow_traefik_lb_external"
-            source_address_prefix  = "*"
-            destination_port_range = "32323"
-        }
-    ]
+    bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
 
 data "azurerm_subscription" "primary" {
@@ -142,29 +106,8 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   allocation_method   = "Static"
+  count               = var.deploy_bastion == false ? 1: 0
 }
-
-resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-resource "azurerm_network_security_rule" "nsg_rules" {
-  for_each                    = { for i, v in local.inbound_tcp_rules: i => v }
-  name                        = each.value.name
-  priority                    = (index(local.inbound_tcp_rules, each.value) + 1001)
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = each.value.destination_port_range
-  source_address_prefix       = each.value.source_address_prefix
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
 resource "azurerm_network_interface" "nic" {
   name                = local.network_interface_name
   location            = data.azurerm_resource_group.rg.location
@@ -174,15 +117,9 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_virtual_machine" "client" {
   name                  = var.vm_name
   location              = data.azurerm_resource_group.rg.location
@@ -230,7 +167,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/installK3s.sh"
       ],
-      "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name}"
+      "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.deploy_bastion}"
     }
 PROTECTED_SETTINGS
 }

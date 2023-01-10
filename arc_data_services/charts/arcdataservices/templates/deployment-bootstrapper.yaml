@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bootstrapper
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: bootstrapper
+  namespace: {{ .Release.Namespace }}
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bootstrapper
+  template:
+    metadata:
+      annotations:
+        releaseRevision: {{ .Release.Revision | quote }}
+      labels:
+        app: bootstrapper
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        image: {{ .Values.systemDefaultValues.image }}
+        imagePullPolicy: {{ .Values.systemDefaultValues.imagePullPolicy }}
+        name: bootstrapper
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext:
+          runAsUser: 1000700001
+          runAsGroup: 1000700001
+      imagePullSecrets:
+      - name: {{ .Values.systemDefaultValues.imagePullSecret }}
+      securityContext:
+        fsGroup: 1000700001
+      serviceAccountName: {{ include "runtimeServiceAccount" . }}

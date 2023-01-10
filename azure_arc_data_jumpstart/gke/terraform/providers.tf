@@ -5,9 +5,9 @@
 terraform {
   required_version = "~> 1.0"
   required_providers {
-    google  = "~> 3.71.0"
-    local   = "~> 2.1"
-    azurerm = "~> 2.62.1"
+    google  = "~> 4.36.0"
+    local   = "~> 2.2.3"
+    azurerm = "~> 3.20.0"
   }
 }
 
@@ -23,5 +23,9 @@ provider "azurerm" {
   client_id       = var.SPN_CLIENT_ID
   client_secret   = var.SPN_CLIENT_SECRET
   tenant_id       = var.SPN_TENANT_ID
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }

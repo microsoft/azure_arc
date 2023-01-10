@@ -1,0 +1,328 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "windowsAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for Windows account"
+      }
+    },
+    "windowsAdminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+      }
+    },
+    "sshRSAPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "RSA public key used for securing SSH access to Azure resources"
+      }
+    },
+    "spnClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure service principal client id"
+      }
+    },
+    "spnClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Azure service principal client secret"
+      }
+    },
+    "spnTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD tenant id for your service principal"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "kubernetesVersion": {
+      "defaultValue": "1.23.8",
+      "type": "string",
+      "metadata": {
+        "description": "The version of Kubernetes"
+      }
+    },
+    "clusterName": {
+      "type": "string",
+      "defaultValue": "Arc-DataSvc-AKS",
+      "metadata": {
+        "description": "The name of the Kubernetes cluster resource"
+      }
+    },
+    "dnsPrefixPrimary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the primary cluster"
+      }
+    },
+    "dnsPrefixSecondary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the secondary cluster"
+      }
+    },
+    "deploySQLMI": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance deployment"
+      }
+    },
+    "SQLMIHA": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance high-availability deployment"
+      }
+    },
+    "githubAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "microsoft"
+    },
+    "githubBranch": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue" : false
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/DR/ARM/')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
+    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+    "primaryVnetName": "Arc-VNet-Primary",
+    "primaryAddressPrefix": "10.0.0.0/8",
+    "primarySubnetName": "Arc-Data-Primary",
+    "primarySubnetAddressPrefix": "10.240.0.0/16",
+    "secondaryVnetName" : "Arc-VNet-Secondary",
+    "secondaryAddressPrefix": "172.0.0.0/8",
+    "secondarySubnetName": "Arc-Data-Secondary",
+    "secondarySubnetAddressPrefix": "172.240.0.0/16",
+    "clientVnetName": "Arc-VNet-Client",
+    "clientSubnetName": "Arc-Data-Client",
+    "clientAddressPrefix" : "192.168.0.0/16",
+    "clientSubnetAddressPrefix": "192.168.10.0/24",
+    "bastionSubnetPrefix": "192.168.2.64/26",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('clientVnetName'), variables('bastionSubnetName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys a VNET and Subnet for Client VM",
+      "apiVersion": "2021-04-01",
+      "name": "VNETDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "primaryVnetName": {
+            "value": "[variables('primaryVnetName')]"
+          },
+          "primarySubnetName": {
+            "value": "[variables('primarySubnetName')]"
+          },
+          "primaryAddressPrefix": {
+            "value": "[variables('primaryAddressPrefix')]"
+          },
+          "primarySubnetAddressPrefix": {
+            "value": "[variables('primarySubnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "clientVnetName": {
+            "value": "[variables('clientVnetName')]"
+          },
+          "clientSubnetName": {
+            "value": "[variables('clientSubnetName')]"
+          },
+          "clientAddressPrefix": {
+            "value": "[variables('clientAddressPrefix')]"
+          },
+          "clientSubnetAddressPrefix": {
+            "value": "[variables('clientSubnetAddressPrefix')]"
+          },
+          "secondaryVnetName": {
+            "value": "[variables('secondaryVnetName')]"
+          },
+          "secondarySubnetName": {
+            "value": "[variables('secondarySubnetName')]"
+          },
+          "secondaryAddressPrefix": {
+            "value": "[variables('secondaryAddressPrefix')]"
+          },
+          "secondarySubnetAddressPrefix": {
+            "value": "[variables('secondarySubnetAddressPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys an AKS Cluster",
+      "apiVersion": "2021-04-01",
+      "name": "aksDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('aksTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "kubernetesVersion": {
+            "value": "[parameters('kubernetesVersion')]"
+          },
+          "dnsPrefixPrimary": {
+            "value": "[parameters('dnsPrefixPrimary')]"
+          },
+          "dnsPrefixSecondary": {
+            "value": "[parameters('dnsPrefixSecondary')]"
+          },
+          "primaryVnetName": {
+            "value": "[variables('primaryVnetName')]"
+          },
+          "secondaryVnetName": {
+            "value": "[variables('secondaryVnetName')]"
+          },
+          "primarySubnetName": {
+            "value": "[variables('primarySubnetName')]"
+          },
+           "secondarySubnetName": {
+            "value": "[variables('secondarySubnetName')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys the Client Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "clientVmDeployment",
+      "dependsOn": ["VNETDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clientVmTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
+          "clientVnetName": {
+            "value": "[variables('clientVnetName')]"
+          },
+          "clientSubnetName": {
+            "value": "[variables('clientSubnetName')]"
+          },
+          "deploySQLMI": {
+            "value": "[parameters('deploySQLMI')]"
+          },
+          "SQLMIHA": {
+            "value": "[parameters('SQLMIHA')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
+      "apiVersion": "2021-04-01",
+      "name": "logAnalyticsDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('logAnalyticsUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          }
+        }
+      }
+    }
+  ]
+}

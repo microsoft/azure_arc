@@ -14,38 +14,38 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+- Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* Install VMware PowerCLI
+- Install VMware PowerCLI
 
   > **NOTE: This guide was tested with the latest version of PowerCLI as of date (12.0.0) but earlier versions are expected to work as well**
 
-  * Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
-    * Windows PowerShell 5.1
-    * PowerShell 7
-    * Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
+  - Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
+    - Windows PowerShell 5.1
+    - PowerShell 7
+    - Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
 
     ```powershell
     Install-Module -Name VMware.PowerCLI
     ```
 
-* To be able to read the VM inventory from vCenter as well as invoke a script on the VM OS-level, the following permissions are needed:
+- To be able to read the VM inventory from vCenter as well as invoke a script on the VM OS-level, the following permissions are needed:
 
-  * [VirtualMachine.GuestOperations](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.security.doc/GUID-6A952214-0E5E-4CCF-9D2A-90948FF643EC.html) user account
+  - [VirtualMachine.GuestOperations](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.security.doc/GUID-6A952214-0E5E-4CCF-9D2A-90948FF643EC.html) user account
 
-  * VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
+  - VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
@@ -78,14 +78,16 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  * Microsoft.HybridCompute
-  * Microsoft.GuestConfiguration
+  - Microsoft.HybridCompute
+  - Microsoft.GuestConfiguration
+  - Microsoft.HybridConnectivity
 
       ```shell
       az provider register --namespace 'Microsoft.HybridCompute'
       az provider register --namespace 'Microsoft.GuestConfiguration'
+      az provider register --namespace 'Microsoft.HybridConnectivity'
       ```
 
       You can monitor the registration process with the following commands:
@@ -93,6 +95,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
       ```shell
       az provider show --namespace 'Microsoft.HybridCompute'
       az provider show --namespace 'Microsoft.GuestConfiguration'
+      az provider show --namespace 'Microsoft.HybridConnectivity'
       ```
 
 ## Automation Flow
@@ -119,13 +122,13 @@ To demonstrate the before & after for this scenario, the below screenshots shows
 
 Before running the PowerCLI script, you must set the [environment variables](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/vmware/scaled_deployment/powercli/windows/vars.ps1) which will be used by the *install_arc_agent.ps1* script. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials and data.
 
-* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command
+- Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command
 
-* Use the Azure service principal ID and password created in the prerequisites section
+- Use the Azure service principal ID and password created in the prerequisites section
 
 ![Export environment variables](./04.png)
 
-* From the [*azure_arc_servers_jumpstart\vmware\scaled_deploy\powercli\windows*](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/vmware/scaled_deployment/powercli/windows) folder, open PowerShell session as an Administrator and run the [*scale_deploy.ps1*](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/vmware/scaled_deployment/powercli/windows/scale_deploy.ps1) script.
+- From the [*azure_arc_servers_jumpstart\vmware\scaled_deploy\powercli\windows*](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/vmware/scaled_deployment/powercli/windows) folder, open PowerShell session as an Administrator and run the [*scale_deploy.ps1*](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/vmware/scaled_deployment/powercli/windows/scale_deploy.ps1) script.
 
     ![scale_deploy PowerShell script](./05.png)
 
@@ -133,7 +136,7 @@ Before running the PowerCLI script, you must set the [environment variables](htt
 
     ![scale_deploy PowerShell script](./07.png)
 
-* Upon completion, the VM will have the "Azure Arc Connected Machine Agent" installed as well as the Azure resource group populated with the new Azure Arc-enabled servers.
+- Upon completion, the VM will have the "Azure Arc Connected Machine Agent" installed as well as the Azure resource group populated with the new Azure Arc-enabled servers.
 
     ![Azure Arc Connected Machine Agent installed](./08.png)
 

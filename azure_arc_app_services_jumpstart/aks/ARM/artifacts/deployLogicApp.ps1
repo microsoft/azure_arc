@@ -18,7 +18,7 @@ Write-Host "`n"
 Write-Host "Configuring and deploying sample Logic App template Azure dependencies.`n"
 Write-Host "Updating connectors-parameters.json with appropriate values.`n"
 $connectorsParametersPath = "C:\Temp\ARM\connectors-parameters.json"
-$spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
+$spnObjectId = az ad sp show --id $env:spnClientID --query id -o tsv
 (Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
@@ -47,7 +47,7 @@ Do {
     } while ($logProcessorStatus -eq "Nope")
 
 # Deploy Logic App code
-Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled Logic App.`n"
+Write-Host "Packaging sample Logic App code and deploying to Azure Arc-enabled Logic App.`n"
 7z a c:\Temp\logicAppCode.zip c:\Temp\logicAppCode\*
 az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 

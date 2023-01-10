@@ -1,0 +1,743 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "type": "array",
+            "defaultValue": [
+                "alertDeploymentContainerCPU",
+                "alertDeploymentContainerWorkingSetMemory",
+                "alertDeploymentNodeCPU",
+                "alertDeploymentNodeDiskUsage",
+                "alertDeploymentNodeNotReady",
+                "alertDeploymentNodeWorkingSetMemory",
+                "alertDeploymentOOMKilledContainers",
+                "alertDeploymentPodsReady",
+                "alertDeploymentFailedPodCounts",
+                "alertDeploymentPersistentVolumeUsage",
+                "alertDeploymentRestartingContainerCount",
+                "alertDeploymentCompletedJobCount",
+                "alertDailyDataCapBreachedForWorkspace"
+            ],
+            "metadata": {
+                "description": "Name of the alert"
+            }
+        },
+        "alertDescription": {
+            "type": "array",
+            "defaultValue": [
+                "Average container CPU percent is greater than 95%",
+                "Average container working set memory percent is greater than 95%",
+                "Average node CPU percent is greater than 80%",
+                "Average node disk usage percent is greater than 80%",
+                "Number of nodes in not ready state are greater than 0",
+                "Average node working set memory is greater than 80%",
+                "Number of OOM killed containers are greater than 0",
+                "Average ready state pods are less than 80%",
+                "Number of Pods in Failed state are greater than 0",
+                "Average PV usage percent is greater than 95%",
+                "Number of restarting containers are greater than 0",
+                "Number of completed jobs (more than 6 hours ago) are greater than 0",
+                "This alert monitors daily data cap defined on a workspace and fires when the daily data cap is breached."
+            ],
+            "metadata": {
+                "description": "Description of alert"
+            }
+        },
+        "alertSeverity": {
+            "type": "int",
+            "defaultValue": 3,
+            "allowedValues": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "metadata": {
+                "description": "Severity of alert {0,1,2,3,4}"
+            }
+        },
+        "isEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether the alert is enabled"
+            }
+        },
+        "clusterResourceId": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "Full Resource ID of the kubernetes cluster emitting the metric that will be used for the comparison. For example /subscriptions/00000000-0000-0000-0000-0000-00000000/resourceGroups/ResourceGroupName/providers/Microsoft.ContainerService/managedClusters/cluster-xyz"
+            }
+        },
+        "operator": {
+            "type": "string",
+            "defaultValue": "GreaterThan",
+            "allowedValues": [
+                "Equals",
+                "NotEquals",
+                "GreaterThan",
+                "GreaterThanOrEqual",
+                "LessThan",
+                "LessThanOrEqual"
+            ],
+            "metadata": {
+                "description": "Operator comparing the current value with the threshold value."
+            }
+        },
+        "threshold": {
+            "type": "array",
+            "defaultValue": [
+                95,
+                95,
+                80,
+                80,
+                0,
+                80,
+                0,
+                80,
+                0,
+                95,
+                0,
+                0,
+                0
+            ],
+            "metadata": {
+                "description": "The threshold value at which the alert is activated."
+            }
+        },
+        "timeAggregation": {
+            "type": "string",
+            "defaultValue": "Average",
+            "allowedValues": [
+                "Average",
+                "Minimum",
+                "Maximum",
+                "Count"
+            ],
+            "metadata": {
+                "description": "How the data that is collected should be combined over time."
+            }
+        },
+        "windowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H",
+                "PT6H",
+                "PT12H",
+                "PT24H"
+            ],
+            "metadata": {
+                "description": "Period of time used to monitor alert activity based on the threshold. Must be between one minute and one day. ISO 8601 duration format."
+            }
+        },
+        "evaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H"
+            ],
+            "metadata": {
+                "description": "how often the metric alert is evaluated represented in ISO 8601 duration format"
+            }
+        },
+        "actionGroupId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The ID of the action group that is triggered when the alert is activated or deactivated"
+            }
+        },
+        "lawId": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The ID of the Log Analytics Workspace"
+            }
+        },
+        "azureLocation": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the Azure datacenter location"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('alertName')[0]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[0]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "cpuExceededPercentage",
+                            "metricNamespace": "Insights.Container/containers",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[0]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[1]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[1]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "memoryWorkingSetExceededPercentage",
+                            "metricNamespace": "Insights.Container/containers",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[1]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[2]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[2]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('clusterResourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "cpuUsagePercentage",
+                            "metricNamespace": "Insights.Container/nodes",
+                            "dimensions":[{
+                                "name": "host",
+                                "operator": "Include",
+                                "values": [
+                                    "*"
+                                ]
+                            }],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')[2]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[3]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[3]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('clusterResourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "DiskUsedPercentage",
+                            "metricNamespace": "Insights.Container/nodes",
+                            "dimensions":[{
+                                "name": "host",
+                                "operator": "Include",
+                                "values": [
+                                    "*"
+                                ]
+                            },
+                            {
+                                "name": "device",
+                                "operator": "Include",
+                                "values": [
+                                    "*"
+                                ]
+                            }],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')[3]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[4]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[4]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('clusterResourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "nodesCount",
+                            "metricNamespace": "Insights.Container/nodes",
+                            "dimensions":[{
+                                "name": "status",
+                                "operator": "Include",
+                                "values": [
+                                    "NotReady"
+                                ]
+                            }],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')[4]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[5]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[5]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('clusterResourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "memoryWorkingSetPercentage",
+                            "metricNamespace": "Insights.Container/nodes",
+                            "dimensions":[{
+                                "name": "host",
+                                "operator": "Include",
+                                "values": [
+                                    "*"
+                                ]
+                            }],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')[5]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[6]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[6]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "oomKilledContainerCount",
+                            "metricNamespace": "Insights.Container/pods",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[6]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[7]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[7]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "PodReadyPercentage",
+                            "metricNamespace": "Insights.Container/pods",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[7]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[8]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[8]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('clusterResourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "podCount",
+                            "metricNamespace": "Insights.Container/pods",
+                            "dimensions":[{
+                                "name": "phase",
+                                "operator": "Include",
+                                "values": [
+                                    "Failed"
+                                ]
+                            }],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')[8]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[9]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[9]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "pvUsageExceededPercentage",
+                            "metricNamespace": "Insights.Container/persistentvolumes",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetesNamespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "podName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[9]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[10]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[10]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "restartingContainerCount",
+                            "metricNamespace": "Insights.Container/pods",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[10]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[11]]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[11]]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": [
+                    "[parameters('clusterResourceId')]"
+                ],
+                "evaluationFrequency": "[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "1st criterion",
+                            "metricName": "completedJobsCount",
+                            "metricNamespace": "Insights.Container/pods",
+                            "dimensions": [
+                                {
+                                    "name": "kubernetes namespace",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "controllerName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "[parameters('operator')]",
+                            "threshold": "[parameters('threshold')[11]]",
+                            "timeAggregation": "[parameters('timeAggregation')]",
+                            "skipMetricValidation": true
+                        }
+                    ]
+                },
+                "actions": "[if(empty(parameters('actionGroupId')), json('null'), json(concat('[{\"actionGroupId\": \"',parameters('actionGroupId'),'\"}]')))]"
+            }
+        },
+        {
+            "name": "[parameters('alertName')[12]]",
+            "type": "microsoft.insights/scheduledqueryrules",
+            "location": "[parameters('azureLocation')]",
+            "apiVersion": "2018-04-16",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')[12]]",
+                "enabled": "[parameters('isEnabled')]",
+                "source": {
+                    "query": "_LogOperation | where Operation == \"Data collection Status\" | where Detail contains \"OverQuota\"",
+                    "authorizedResources": [],
+                    "dataSourceId": "[parameters('lawId')]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 5,
+                    "timeWindowInMinutes": 5
+                },
+                "action": {
+                    "severity": "[parameters('alertSeverity')]",
+                    "aznsAction": {
+                        "actionGroup": ["[parameters('actionGroupId')]"]
+                    },
+                    "throttlingInMin": 1440,
+                    "throttleConsecutiveWindowCount": 0,
+                    "trigger": {
+                        "thresholdOperator": "[parameters('operator')]",
+                        "threshold": "[parameters('threshold')[12]]"
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
+            }
+        }
+
+    ]
+}

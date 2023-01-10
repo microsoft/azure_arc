@@ -1,10 +1,25 @@
+locals {
+  template_base_url           = "https://raw.githubusercontent.com/${var.github_account}/azure_arc/${var.github_branch}/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform/"
+  vm_name                     = "${var.azure_vm_name}-${random_string.guid.result}"
+  virtual_network_name        = "${var.azure_vm_name}-VNET-${random_string.guid.result}"
+  public_ip_name              = "${var.azure_vm_name}-PIP-${random_string.guid.result}"
+  network_security_group_name = "${var.azure_vm_name}-NSG-${random_string.guid.result}"
+  network_interface_name      = "${var.azure_vm_name}-NIC-${random_string.guid.result}"
+  os_disk_name                = "${var.azure_vm_name}-OSDisk-${random_string.guid.result}"
+}
+
+resource "random_string" "guid" {
+  length  = 4
+  special = false
+}
+
 resource "azurerm_resource_group" "arck3sdemo" {
   name     = var.azure_resource_group
   location = var.location
 }
 
 resource "azurerm_virtual_network" "arck3sdemo" {
-  name                = "${var.azure_vnet}-VNET"
+  name                = local.virtual_network_name
   address_space       = ["${var.azure_vnet_address_space}"]
   location            = azurerm_resource_group.arck3sdemo.location
   resource_group_name = azurerm_resource_group.arck3sdemo.name
@@ -14,18 +29,26 @@ resource "azurerm_subnet" "arck3sdemo" {
   name                 = var.azure_vnet_subnet
   resource_group_name  = azurerm_resource_group.arck3sdemo.name
   virtual_network_name = azurerm_virtual_network.arck3sdemo.name
-  address_prefix       = var.azure_subnet_address_prefix
+  address_prefixes     = [var.azure_subnet_address_prefix]
+}
+
+resource "azurerm_subnet" "bastion" {
+  name                 = "AzureBastionSubnet"
+  resource_group_name  = azurerm_resource_group.arck3sdemo.name
+  virtual_network_name = azurerm_virtual_network.arck3sdemo.name
+  address_prefixes     = [var.bastion_subnet_prefix]
 }
 
 resource "azurerm_public_ip" "arck3sdemo" {
-  name                = "${var.azure_public_ip}-PIP"
+  count               = var.deploy_bastion == false ? 1 : 0
+  name                = local.public_ip_name
   location            = azurerm_resource_group.arck3sdemo.location
   resource_group_name = azurerm_resource_group.arck3sdemo.name
   allocation_method   = "Static"
 }
 
 resource "azurerm_network_security_group" "arck3sdemo" {
-  name                = "${var.azure_nsg}-NSG"
+  name                = local.network_security_group_name
   location            = azurerm_resource_group.arck3sdemo.location
   resource_group_name = azurerm_resource_group.arck3sdemo.name
 
@@ -38,92 +61,14 @@ resource "azurerm_network_security_group" "arck3sdemo" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "${var.my_ip_address}"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_k8s_6443"
-    description                = "Allow k8s ports access"
-    priority                   = 1002
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "6443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_k8s_80"
-    description                = "Allow k8s ports access"
-    priority                   = 1003
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_k8s_8080"
-    description                = "Allow k8s ports access"
-    priority                   = 1004
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "8080"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_k8s_443"
-    description                = "Allow k8s ports access"
-    priority                   = 1005
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_k8s_kubelet"
-    description                = "Allow k8s ports access"
-    priority                   = 1006
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "10250"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "allow_traefik_lb_external"
-    description                = "Allow Traefik LoadBalancer external port access"
-    priority                   = 1007
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "32323"
-    source_address_prefix      = "*"
+    source_address_prefix      = var.bastion_subnet_prefix
     destination_address_prefix = "*"
   }
 
 }
 
 resource "azurerm_network_interface" "arck3sdemo" {
-  name                = "${var.azure_vm_nic}-NIC"
+  name                = local.network_interface_name
   location            = azurerm_resource_group.arck3sdemo.location
   resource_group_name = azurerm_resource_group.arck3sdemo.name
 
@@ -131,34 +76,38 @@ resource "azurerm_network_interface" "arck3sdemo" {
     name                          = "private"
     subnet_id                     = azurerm_subnet.arck3sdemo.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.arck3sdemo.id
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.arck3sdemo[0].id : null
   }
 }
 
-resource "azurerm_network_interface_security_group_association" "main" {
-  network_interface_id      = azurerm_network_interface.arck3sdemo.id
+resource "azurerm_subnet_network_security_group_association" "main" {
+  subnet_id                 = azurerm_subnet.arck3sdemo.id
   network_security_group_id = azurerm_network_security_group.arck3sdemo.id
 }
 
 resource "azurerm_linux_virtual_machine" "arck3sdemo" {
-  name                            = var.azure_vm_name
+  name                            = local.vm_name
   resource_group_name             = azurerm_resource_group.arck3sdemo.name
   location                        = azurerm_resource_group.arck3sdemo.location
   size                            = var.azure_vm_size
   admin_username                  = var.admin_username
-  admin_password                  = var.admin_password
-  disable_password_authentication = false
+  disable_password_authentication = true
   network_interface_ids           = [azurerm_network_interface.arck3sdemo.id]
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = var.ssh_rsa_public_key
+  }
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = var.ubuntuOSVersion
     version   = "latest"
   }
 
   os_disk {
-    name                 = "${var.azure_vm_name}-OS-Disk"
+    name                 = local.os_disk_name
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
     disk_size_gb         = var.azure_vm_os_disk_size_gb
@@ -168,68 +117,33 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
     Project = "jumpstart_azure_arc_k8s"
   }
 
-  provisioner "file" {
-    source      = "scripts/install_k3s.sh"
-    destination = "/tmp/install_k3s.sh"
-
-    connection {
-      type     = "ssh"
-      host     = azurerm_public_ip.arck3sdemo.ip_address
-      user     = var.admin_username
-      password = var.admin_password
-      timeout  = "2m"
-    }
-  }
-
-  provisioner "file" {
-    source      = "scripts/vars.sh"
-    destination = "/tmp/vars.sh"
-
-    connection {
-      type     = "ssh"
-      host     = azurerm_public_ip.arck3sdemo.ip_address
-      user     = var.admin_username
-      password = var.admin_password
-      timeout  = "2m"
-    }
-  }
-
-  provisioner "file" {
-    source      = "deployment/hello-kubernetes.yaml"
-    destination = "hello-kubernetes.yaml"
-
-    connection {
-      type     = "ssh"
-      host     = azurerm_public_ip.arck3sdemo.ip_address
-      user     = var.admin_username
-      password = var.admin_password
-      timeout  = "2m"
-    }
-  }
-
-  provisioner "remote-exec" {
-
-    inline = [
-      "sudo chmod +x /tmp/install_k3s.sh",
-      "/tmp/install_k3s.sh",
-    ]
-
-    connection {
-      type     = "ssh"
-      host     = azurerm_public_ip.arck3sdemo.ip_address
-      user     = var.admin_username
-      password = var.admin_password
-      timeout  = "2m"
-    }
-  }
 }
 
-# Output VM Public IP
-data "azurerm_public_ip" "arck3sdemo" {
-  name                = azurerm_public_ip.arck3sdemo.name
-  resource_group_name = azurerm_linux_virtual_machine.arck3sdemo.resource_group_name
+resource "azurerm_virtual_machine_extension" "custom_script" {
+  name                       = var.azure_vm_name
+  virtual_machine_id         = azurerm_linux_virtual_machine.arck3sdemo.id
+  publisher                  = "Microsoft.Azure.Extensions"
+  type                       = "CustomScript"
+  type_handler_version       = "2.1"
+  auto_upgrade_minor_version = true
+  timeouts {
+    create = "60m"
+  }
+
+  protected_settings = <<PROTECTED_SETTINGS
+    {
+      "fileUris": [
+          "${local.template_base_url}scripts/installK3s.sh"
+      ],
+  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.client_id} ${var.client_secret} ${var.tenant_id} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url}"    }
+PROTECTED_SETTINGS
 }
 
-output "public_ip_address" {
-  value = data.azurerm_public_ip.arck3sdemo.ip_address
+# Output 
+output "admin_username" {
+  value = var.admin_username
+}
+
+output "ssh_command" {
+  value = var.deploy_bastion ? null : "ssh ${var.admin_username}@${azurerm_public_ip.arck3sdemo[0].ip_address}"
 }

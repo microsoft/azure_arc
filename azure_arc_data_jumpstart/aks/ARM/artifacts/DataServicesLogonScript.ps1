@@ -92,7 +92,8 @@ az connectedk8s connect --name $connectedClusterName `
                         --location $Env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data_services' `
                         --kube-config $Env:KUBECONFIG `
-                        --kube-context $Env:KUBECONTEXT
+                        --kube-context $Env:KUBECONTEXT `
+                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
 
@@ -181,9 +182,15 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # If flag set, deploy SQL MI
-if ( $Env:deploySQLMI -eq $true )
+if ( $Env:deploySQLMI -eq $true -and $Env:enableADAuth -eq $false)
 {
 & "$Env:TempDir\DeploySQLMI.ps1"
+}
+
+# if ADDS domainname is passed as parameter, deploy SQLMI with AD auth support
+if ($Env:deploySQLMI -eq $true -and $Env:enableADAuth -eq $true)
+{
+& "$Env:TempDir\DeploySQLMIADAuth.ps1"
 }
 
 # If flag set, deploy PostgreSQL

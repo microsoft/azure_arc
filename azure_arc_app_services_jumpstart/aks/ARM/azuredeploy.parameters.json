@@ -20,9 +20,6 @@
         "windowsAdminPassword": {
             "value": "ArcPassword123!!"
         },
-        "myIpAddress": {
-            "value": "<your local public IP address>"
-        },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
@@ -46,6 +43,6 @@
         },
         "bastionHostName": {
           "value": "Arc-App-Demo-Bastion"
-      }
+        }
     }
 }

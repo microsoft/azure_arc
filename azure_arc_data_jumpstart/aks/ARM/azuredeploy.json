@@ -16,12 +16,6 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
-    "myIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address"
-      }
-    },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
@@ -53,7 +47,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.23.3",
+      "defaultValue": "1.23.8",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes"
@@ -80,7 +74,14 @@
         "description": "SQL Managed Instance deployment"
       }
     },
-    "SQLMIHA": {
+    "enableADAuth": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Indicate whethe to support AD authentication in SQLMI"
+      }
+    },
+     "SQLMIHA": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
@@ -129,14 +130,18 @@
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'addsVm.json')]",
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
+    "akssubnetName": "AKS-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetPrefix": "172.16.2.64/26",
+    "addsPrivateIPAddress": "172.16.1.100",
     "bastionSubnetName": "AzureBastionSubnet",
-    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "addsDomainName": "jumpstart.local"
   },
   "resources": [
     {
@@ -171,9 +176,45 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Updates VNet DNS servers after ADDS VM is deployed",
+      "apiVersion": "2021-04-01",
+      "name": "updateVNetDNSServers",
+      "condition": "[parameters('enableADAuth')]",
+      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "dnsServers": {
+            "value": ["[variables('addsPrivateIPAddress')]", "168.63.129.16"]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
       "comments": "Deploys an AKS Cluster",
       "apiVersion": "2021-04-01",
       "name": "aksDeployment",
+      "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -195,6 +236,53 @@
           },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
+          },
+          "vnetSubnetID": {
+            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('aksSubnetName'))]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Active Directory Domain Services Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "addsVmDeployment",
+      "condition": "[parameters('enableADAuth')]",
+      "dependsOn": ["VNETDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('addsVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "addsDomainName": {
+            "value": "[variables('addsDomainName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addsPrivateIPAddress":{
+            "value": "[variables('addsPrivateIPAddress')]"
+          },
+          "templateBaseUrl":{
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion":{
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -204,7 +292,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["VNETDeployment"],
+      "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -227,9 +315,6 @@
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
           },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
-          },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
@@ -248,6 +333,10 @@
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
           },
+          "enableADAuth":
+          {
+            "value": "[parameters('enableADAuth')]"
+          },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
           },
@@ -265,6 +354,9 @@
           },
           "bastionSubnetRef": {
             "value": "[variables('bastionSubnetRef')]"
+          },
+          "addsDomainName": {
+            "value": "[variables('addsDomainName')]"
           }
         }
       }

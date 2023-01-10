@@ -1,0 +1,486 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "ProxyvmName": {
+        "type": "string",
+        "defaultValue": "Arc-Proxy-Server",
+        "metadata": {
+          "description": "The name of your Proxy server Virtual Machine."
+        }
+      },
+     "vmName": {
+      "type": "string",
+      "defaultValue": "Arc-Proxy-Client",
+      "metadata": {
+        "description": "The name of your Virtual Machine that will be Arc enabled."
+      }
+    },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_D4s_v3",
+        "metadata": {
+          "description": "The size of the VM"
+        }
+      },
+      "adminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "Username for the Virtual Machine."
+        }
+      },
+      "authenticationType": {
+        "type": "string",
+        "defaultValue": "password",
+        "allowedValues": [
+          "password"
+        ],
+        "metadata": {
+          "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+        }
+      },
+      "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+        }
+      },
+      "dnsLabelPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "proxydnsLabelPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure region location for all resources."
+        }
+      },
+      "deployBastion": {
+        "type": "bool",
+        "metadata": {
+          "description": "Choice to deploy Bastion to connect to the client VM"
+        }
+      },
+      "bastionHostName": {
+        "type": "string",
+        "defaultValue": "Arc-Win-Demo-Bastion",
+        "metadata": {
+          "description": "the Azure Bastion host name"
+        }
+      },
+      "virtualNetworkName": {
+        "type": "string",
+        "defaultValue": "Arc-Demo-Proxy-VNET",
+        "metadata": {
+          "description": "Name of the VNET"
+        }
+      },
+      "ProxysubnetName": {
+        "type": "string",
+        "defaultValue": "proxy-ubnet",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network for the proxy server"
+        }
+      },
+    "subnetName": {
+        "type": "string",
+        "defaultValue": "client-subnet",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network"
+        }
+      },
+      "proxyNSG": {
+        "type": "string",
+        "defaultValue": "Arc-Proxy-NSG",
+        "metadata": {
+          "description": "Name of the Network Security Group for the proxy subnet"
+        }
+      },
+      "vmNSG": {
+        "type": "string",
+        "defaultValue": "Arc-Client-NSG",
+        "metadata": {
+          "description": "Name of the Network Security Group for the Arc-enabled server subnet"
+        }
+      }
+    },
+    "variables": {
+      "proxypublicIpAddressName": "[concat(parameters('ProxyvmName'), '-PIP' )]",
+      "proxynetworkInterfaceName": "[concat(parameters('ProxyvmName'),'-NIC')]",
+      "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+      "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+      "proxysubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('ProxysubnetName'))]",
+      "bastionSubnetName": "AzureBastionSubnet",
+      "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+      "osDiskType": "Standard_LRS",
+      "subnetAddressPrefix": "10.1.0.0/24",
+      "proxysubnetAddressPrefix": "10.1.1.0/24",
+      "addressPrefix": "10.1.0.0/16",
+      "bastionName": "[concat(parameters('bastionHostName'))]",
+      "bastionSubnetIpPrefix": "10.1.2.64/26",
+      "PublicIPNoBastion": {
+        "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+      },
+     "proxyPublicIPNoBastion": {
+        "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('proxypublicIPAddressName'))]"
+      },
+      "linuxConfiguration": {
+        "disablePasswordAuthentication": true,
+        "ssh": {
+          "publicKeys": [
+            {
+              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+              "keyData": "[parameters('adminPassword')]"
+            }
+          ]
+        }
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2020-06-01",
+        "name": "[variables('networkInterfaceName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+          "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "subnet": {
+                  "id": "[variables('subnetRef')]"
+                },
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+              }
+            }
+          ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('vmNSG'))]"
+        }
+        }
+      },
+            {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2020-06-01",
+        "name": "[variables('proxynetworkInterfaceName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+          "[resourceId('Microsoft.Network/publicIpAddresses/', variables('proxypublicIpAddressName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "subnet": {
+                  "id": "[variables('proxysubnetRef')]"
+                },
+                "privateIPAllocationMethod": "Static",
+                "privateIPAddress": "10.1.1.10",
+                "publicIpAddress": "[if(not(parameters('deployBastion')),variables('proxyPublicIPNoBastion'),json('null'))]"
+              }
+            }
+          ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('proxyNSG'))]"
+        }
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('proxyNSG')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "SSH",
+              "properties": {
+                "priority": 1000,
+                "protocol": "TCP",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),'*')]",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "22"
+              }
+            },
+                        {
+              "name": "Proxy",
+              "properties": {
+                "priority": 1001,
+                "protocol": "TCP",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "*",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "3128"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('vmNSG')]",
+        "location": "[parameters('location')]",
+        "properties": {
+          "securityRules": [
+                     {
+                        "name": "SSH",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),'*')]",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('virtualNetworkName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('vmNSG'))]",
+          "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('proxyNSG'))]"
+        ],
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "[variables('addressPrefix')]"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "[parameters('ProxysubnetName')]",
+              "properties": {
+                "addressPrefix": "[variables('proxysubnetAddressPrefix')]",
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled",
+                "networkSecurityGroup": {
+                    "ID" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('proxyNSG'))]"
+                }
+              }
+            },
+            {
+              "name": "[parameters('subnetName')]",
+              "properties": {
+                "addressPrefix": "[variables('subnetAddressPrefix')]",
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled",
+                "networkSecurityGroup": {
+                "ID" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmNSG'))]"
+                }
+              }
+            },
+            {
+              "name": "AzureBastionSubnet",
+              "properties": {
+                "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/publicIpAddresses",
+        "apiVersion": "2020-06-01",
+        "name": "[variables('proxypublicIpAddressName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
+        },
+        "properties": {
+          "publicIpAllocationMethod": "Dynamic",
+          "publicIPAddressVersion": "IPv4",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('proxydnsLabelPrefix')]"
+          },
+          "idleTimeoutInMinutes": 4
+        }
+      },
+     {
+        "type": "Microsoft.Network/publicIpAddresses",
+        "apiVersion": "2020-06-01",
+        "name": "[variables('publicIpAddressName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
+        },
+        "properties": {
+          "publicIpAllocationMethod": "Dynamic",
+          "publicIPAddressVersion": "IPv4",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+          },
+          "idleTimeoutInMinutes": 4
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('ProxyvmName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkInterfaces/', variables('proxynetworkInterfaceName'))]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('vmSize')]"
+          },
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "fromImage",
+              "managedDisk": {
+                "storageAccountType": "[variables('osDiskType')]"
+              }
+            },
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "0001-com-ubuntu-server-focal",
+              "sku": "20_04-lts-gen2",
+              "version": "latest"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('proxynetworkInterfaceName'))]"
+              }
+            ]
+          },
+          "osProfile": {
+            "computerName": "[parameters('ProxyvmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[concat(parameters('ProxyvmName'),'/proxy')]",
+        "apiVersion": "2015-05-01-preview",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/', parameters('ProxyvmName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "2.1",
+          "autoUpgradeMinorVersion": true,
+          "protectedSettings": {
+            "fileUris": [
+              "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/proxy/artifacts/proxy_setup.sh"
+            ],
+            "commandToExecute": "./proxy_setup.sh"
+          }
+        }
+      },
+          {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('vmName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('osDiskType')]"
+            }
+          },
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "0001-com-ubuntu-server-focal",
+            "sku": "20_04-lts-gen2",
+            "version": "latest"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+        }
+      }
+    },
+      {
+        "type": "Microsoft.Network/bastionHosts",
+        "condition": "[parameters('deployBastion')]",
+        "name": "[variables('bastionName')]",
+        "location": "[parameters('location')]",
+        "apiVersion": "2020-11-01",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+          "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+  
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "IpConf",
+              "properties": {
+                "subnet": {
+                  "id": "[variables('bastionSubnetRef')]"
+                },
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+  "outputs":{
+          "ProxyPrivate": {
+            "type": "object",
+            "value": "[reference(concat('Microsoft.Network/networkInterfaces/', variables('proxynetworkInterfaceName')),'2020-06-01')]"
+        }
+}
+}
+  

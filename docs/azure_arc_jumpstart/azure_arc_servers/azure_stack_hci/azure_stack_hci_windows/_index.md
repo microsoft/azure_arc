@@ -12,17 +12,17 @@ The following Jumpstart scenario will guide you on how to use the provided Power
 
 This guide will **not** provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have it provisioned. If you don't have any Azure Stack HCI cluster created, please have a look at the following [Azure Stack HCI 20H2 Evaluation Guide](https://github.com/Azure/AzureStackHCI-EvalGuide).
 
-The commands below and the Powershell script described in this guide should be run on the **management computer**.
+The commands below and the Powershell script described in this scenario should be run on the **management computer**.
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+- Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```powershell
   Register-AzResourceProvider -ProviderNamespace Microsoft.HybridCompute
@@ -30,9 +30,12 @@ The commands below and the Powershell script described in this guide should be r
 
   Register-AzResourceProvider -ProviderNamespace Microsoft.GuestConfiguration
   Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState | Select-String  -Pattern "Microsoft.GuestConfiguration"
+
+  Register-AzResourceProvider -ProviderNamespace Microsoft.HybridConnectivity
+  Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState | Select-String  -Pattern "Microsoft.HybridConnectivity"
   ```
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account using PowerShell and run the below command.
 
@@ -66,11 +69,11 @@ The commands below and the Powershell script described in this guide should be r
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    Copy and save the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
+    Copy and save the Service Principal ApplicationId and Secret as you will need it for later in the automation.
 
     > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
-* Enable CredSSP in the Host Server
+- Enable CredSSP in the Host Server
 
     The PowerShell script leverages [CredSSP](https://docs.microsoft.com/windows/win32/secauthn/credential-security-support-provider) to delegate credentials from the management server to the target server for remote authentication. It's required to allow the host server to receive credentials from a remote computer.
 
@@ -95,13 +98,13 @@ For you to get familiar with the automation and deployment flow, below is an exp
 1. User is editing the PowerShell script environment variables (1-time edit). These variables values are being used throughout the deployment and Azure Arc onboarding.
 
 2. User is running the PowerShell script to deploy a basic Windows Server Virtual Machine on Azure Stack HCI and onboard onto Azure Arc. Runtime script will:
-    * Set local OS variables
-    * Download VHDX file with Windows Server 2019 Datacenter installed
-    * Enable CredSSP on the management VM, for allowing the credential delegation to the host server
-    * Create a new Virtual Machine based on the VHDX file
-    * Add Virtual Machine to Server Cluster (optional)
-    * Assign Static IP address to Virtual Machine (optional)
-    * Install Azure Arc agent and onboarding
+    - Set local OS variables
+    - Download VHDX file with Windows Server 2019 Datacenter installed
+    - Enable CredSSP on the management VM, for allowing the credential delegation to the host server
+    - Create a new Virtual Machine based on the VHDX file
+    - Add Virtual Machine to Server Cluster (optional)
+    - Assign Static IP address to Virtual Machine (optional)
+    - Install Azure Arc agent and onboarding
 
 ## Deployment
 
@@ -111,66 +114,66 @@ As mentioned, this deployment will leverage this [PowerShell script](https://git
 
 1. Environment variables for optional configurations
 
-    * **DHCPEnabled:** Select _$true_ if DHCP is enabled on your environment, or _$false_ if a static IP assignment is needed.
-        * If **DHCPEnabled** = _$false_, please provide the networking parameters described below to assign to the VM. If **DHCPEnabled** = _$true_, please attribute _$null_ to all the paramenters below:
-            * **IPAddress:**  Provide the static IP address to assign to the VM.
-            * **Prefix Lenght:** Provide the subnet length to assign to the VM.
-            * **DefaultGateway:** Provide the default gateway to assign to the VM.
-            * **DNSServer:** Provide the DNS Server to assign to the VM.
-    * **ServerClusterEnabled:** Select _$true_ if you have a server cluster created, _$false_ if not.
-        * If **ServerClusterEnabled** = _$true_, please provide the path to the cluster storage in the following format:
-            * **vmdir:** Disk Letter:\ClusterStorage
-        * If **ServerClusterEnabled** = _$false_, please provide the path to the folder where the VM will be created in the following format:
-            * **vmdir:** Disk Letter:\Folder
+    - **DHCPEnabled:** Select _$true_ if DHCP is enabled on your environment, or _$false_ if a static IP assignment is needed.
+        - If **DHCPEnabled** = _$false_, please provide the networking parameters described below to assign to the VM. If **DHCPEnabled** = _$true_, please attribute _$null_ to all the paramenters below:
+            - **IPAddress:**  Provide the static IP address to assign to the VM.
+            - **Prefix Lenght:** Provide the subnet length to assign to the VM.
+            - **DefaultGateway:** Provide the default gateway to assign to the VM.
+            - **DNSServer:** Provide the DNS Server to assign to the VM.
+    - **ServerClusterEnabled:** Select _$true_ if you have a server cluster created, _$false_ if not.
+        - If **ServerClusterEnabled** = _$true_, please provide the path to the cluster storage in the following format:
+            - **vmdir:** Disk Letter:\ClusterStorage
+        - If **ServerClusterEnabled** = _$false_, please provide the path to the folder where the VM will be created in the following format:
+            - **vmdir:** Disk Letter:\Folder
 
     ![Screenshot showing first set of variables in the PowerShell script](./03.png)
 
     As an example:
-    * **DHCPEnabled:** _$false_
-    * **IPAddress:** '192.168.0.11'
-    * **PrefixLenght:** '24'
-    * **DefaultGateway:** '192.168.0.1'
-    * **DNSServer:** '192.168.0.2'
-    * **ServerClusterEnabled:** _$true_
-    * **vmdir:** "C:\ClusterStorage\VMSTORAGE"
+    - **DHCPEnabled:** _$false_
+    - **IPAddress:** '192.168.0.11'
+    - **PrefixLenght:** '24'
+    - **DefaultGateway:** '192.168.0.1'
+    - **DNSServer:** '192.168.0.2'
+    - **ServerClusterEnabled:** _$true_
+    - **vmdir:** "C:\ClusterStorage\VMSTORAGE"
 
 2. Environment variables for the VM creation
 
-    * **NodeName:** Provide the name of the node where the VM will be created.
-    * **DomainName:** Provide the name of the domain where the node is added.
-    * **VMName:** Provide the name of the VM.
-    * **VSwitchCreation:** = Select _$true_ if an external VSwitch creation is needed, _$false_ if already created
-    * **VSwitchName:** Provide the name of the Virtual Switch.
+    - **NodeName:** Provide the name of the node where the VM will be created.
+    - **DomainName:** Provide the name of the domain where the node is added.
+    - **VMName:** Provide the name of the VM.
+    - **VSwitchCreation:** = Select _$true_ if an external VSwitch creation is needed, _$false_ if already created
+    - **VSwitchName:** Provide the name of the Virtual Switch.
 
     ![Screenshot showing second set of variables in the Powershell script](./04.png)
 
     As an example:
-    * **NodeName:** 'AZSHCINODE001'
-    * **DomainName:** 'azshci.local'
-    * **VMName:** 'ArcJS-VM1'
-    * **VSwitchCreation:** _$false_
-    * **VSwitchName:** 'Internet-vSwitch'
+    - **NodeName:** 'AZSHCINODE001'
+    - **DomainName:** 'azshci.local'
+    - **VMName:** 'ArcJS-VM1'
+    - **VSwitchCreation:** _$false_
+    - **VSwitchName:** 'Internet-vSwitch'
 
 3. Environment variables to onboard the VM to Azure Arc
 
-    * **subID:** Provide the subscriptionID
-    * **appID:** Provide the Service Principal ApplicationID
-    * **secret:** Provide the Service Principal Secret
-    * **tID:** Provide the tenantID
-    * **rgroup:** Provide the Resource Group Name
-    * **location:** Provide the Region
+    - **subID:** Provide the subscriptionID
+    - **appID:** Provide the Service Principal ApplicationID
+    - **secret:** Provide the Service Principal Secret
+    - **tID:** Provide the tenantID
+    - **rgroup:** Provide the Resource Group Name
+    - **location:** Provide the Region
 
     ![Screenshot showing third set of variables in the Powershell script](./05.png)
 
     As an example:
-    * **subID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
-    * **appID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
-    * **secret:** "XXXXXXXXXX"
-    * **tID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
-    * **rgroup:** "arc-vms-rg"
-    * **location:** "West Europe"
+    - **subID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+    - **appID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+    - **secret:** "XXXXXXXXXX"
+    - **tID:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+    - **rgroup:** "arc-vms-rg"
+    - **location:** "West Europe"
 
-* After editing the variables, to run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/azure_stack_hci/powershell) and run:
+- After editing the variables, to run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/azure_stack_hci/powershell) and run:
 
   ```powershell
   .\azstack_hci_vm_deploy.ps1
@@ -184,15 +187,15 @@ As mentioned, this deployment will leverage this [PowerShell script](https://git
 
     ![Screenshot showing the credentials prompt](./07.png)
 
-* Once the script run has finished, the output will look like the following:
+- Once the script run has finished, the output will look like the following:
 
     ![Screenshot showing the installation completed!](./08.png)
 
-* From the Windows Admin Center, you can see as well the VM created:
+- From the Windows Admin Center, you can see as well the VM created:
 
     ![Screenshot showing the VM in WAC!](./09.png)
 
-* The Windows Virtual Machine created in Azure Stack HCI will be projected as a new Azure Arc-enabled Server resource.
+- The Windows Virtual Machine created in Azure Stack HCI will be projected as a new Azure Arc-enabled Server resource.
 
     ![Screenshot showing Arc-enabled Server](./10.png)
 

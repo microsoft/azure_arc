@@ -20,9 +20,6 @@
     "windowsAdminPassword": {
       "value": "ArcPassword123!!"
     },
-    "myIpAddress": {
-      "value": "<your IP address>"
-    },
     "logAnalyticsWorkspaceName": {
       "value": "<your unique Log Analytics workspace name>"
     },
@@ -42,7 +39,10 @@
       "value": "(true/false)"
     },
     "dnsPrefix": {
-        "value": "<A DNS prefix for the Public IP>"
+        "value": "<Optional DNS prefix to use with hosted Kubernetes API server FQDN>"
+    },
+    "enableADAuth": {
+      "value": "(true/false)"
     }
   }
 }

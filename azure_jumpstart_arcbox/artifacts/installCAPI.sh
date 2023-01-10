@@ -8,9 +8,6 @@ sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/s
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
-# Creating login message of the day (motd)
-sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeCAPI.sh
-
 # Injecting environment variables from Azure deployment
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
@@ -23,6 +20,7 @@ echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >> vars.sh
+echo $flavor:${11} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -33,9 +31,13 @@ sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '10s/^/export capiArcDataClusterName=/' vars.sh
 sed -i '11s/^/export templateBaseUrl=/' vars.sh
+sed -i '12s/^/export flavor=/' vars.sh
 
 chmod +x vars.sh
 . ./vars.sh
+
+# Creating login message of the day (motd)
+sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeCAPI.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
@@ -55,6 +57,15 @@ export AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[
 az -v
 echo ""
 
+echo "Registering resource providers"
+
+sudo -u $adminUsername az provider register --namespace Microsoft.Kubernetes --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.KubernetesConfiguration --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.ExtendedLocation --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.AzureArcData --wait
+
+echo ""
+
 # Installing snap
 sudo apt install snapd
 
@@ -70,12 +81,14 @@ sudo snap install kubectl --classic
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.1.3" # Do not change!
+export CLUSTERCTL_VERSION="1.3.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.2.1" # Do not change!
+export CAPI_PROVIDER_VERSION="1.6.0" # Do not change!
+export KUBERNETES_VERSION="1.25.4" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.25.0" # Do not change!
+export K3S_VERSION="1.25.4+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.8" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="1"
+export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CLUSTER_NAME=$(echo "${capiArcDataClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
@@ -83,8 +96,12 @@ export AZURE_SUBSCRIPTION_ID=$subscriptionId
 export AZURE_TENANT_ID=$SPN_TENANT_ID
 export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v4"
-export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v4"
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_B4ms"
+if [ $flavor = "DevOps" ]; then
+  export AZURE_NODE_MACHINE_TYPE="Standard_B2ms"
+else
+  export AZURE_NODE_MACHINE_TYPE="Standard_B8ms"
+fi
 
 # Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
@@ -97,21 +114,21 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Installing Rancher K3s single node cluster using k3sup
+# Installing Rancher K3s cluster (single control plane)
 echo ""
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo k3sup install --local --context arcboxcapimgmt --k3s-extra-args '--no-deploy traefik'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
+sudo kubectl config rename-context default arcboxcapimgmt --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config-mgmt
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
-export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl config set-context arcboxcapimgmt
 
 # Installing clusterctl
@@ -138,7 +155,7 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -151,6 +168,7 @@ sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBa
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
 sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
+sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
@@ -206,7 +224,7 @@ sudo service sshd restart
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 echo ""
-sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
+sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
 # Renaming CAPI cluster context name 
 echo ""
@@ -215,17 +233,23 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox'
+sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox' --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
+
+# Enabling Microsoft Defender for Containers and Container Insights cluster extensions
+echo ""
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+echo ""
+sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Enabling Azure Policy for Kubernetes on the cluster
 echo ""
-sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights 
+sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+# Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
 echo ""
-sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-echo ""
-sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
+sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
+source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""

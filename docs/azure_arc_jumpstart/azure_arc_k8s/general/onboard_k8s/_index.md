@@ -16,7 +16,7 @@ The following Jumpstart scenario will guide you on how to connect an existing Ku
 
 * (Optional) To simplify work against multiple k8s contexts, consider using [kubectx](https://github.com/ahmetb/kubectx).
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -159,13 +159,13 @@ The following Jumpstart scenario will guide you on how to connect an existing Ku
   If using shell:
 
   ```shell
-  az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
+  az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   ```
 
   If using PowerShell:
 
   ```powershell
-  az connectedk8s connect --name $env:arcClusterName --resource-group $env:resourceGroup
+  az connectedk8s connect --name $env:arcClusterName --resource-group $env:resourceGroup --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   ```
 
 Upon completion, you will have your Kubernetes cluster, connected as a new Azure Arc-enabled Kubernetes resource inside your resource group.

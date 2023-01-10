@@ -1,0 +1,16 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.RuntimeServiceAccount) (not .Values.systemDefaultValues.runtimeServiceAccount) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: rb-bootstrapper
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: role-bootstrapper
+subjects:
+- kind: ServiceAccount
+  name: sa-arc-bootstrapper
+  namespace: {{ .Release.Namespace }}
+{{ end }}

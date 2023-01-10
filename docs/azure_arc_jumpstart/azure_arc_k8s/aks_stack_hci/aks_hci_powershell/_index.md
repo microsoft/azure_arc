@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to use the provided Power
 
 Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premises using hyperconverged infrastructure operating system that is delivered as an Azure service.  
 
-This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster. The commands described in this guide should be run on the management computer or in a host server in a cluster.
+This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster. The commands described in this scenario should be run on the management computer or in a host server in a cluster.
 
 ## Prerequisites
 
@@ -56,7 +56,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    Copy the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
+    Copy the Service Principal ApplicationId and Secret as you will need it for later in the automation.
 
     > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 

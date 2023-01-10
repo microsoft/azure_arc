@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to RDP to the client VM"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "ArcBox-CAPI-MGMT",
@@ -54,7 +48,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_D4s_v4",
+            "defaultValue": "Standard_B4ms",
             "metadata": {
                 "description": "The size of the VM"
             }
@@ -71,13 +65,6 @@
             "defaultValue": "ArcBox-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
-            }
-        },
-        "networkSecurityGroupName": {
-            "type": "string",
-            "defaultValue": "ArcBox-CAPI-MGMT-NSG",
-            "metadata": {
-                "description": "Name of the Network Security Group"
             }
         },
         "resourceTags": {
@@ -115,12 +102,31 @@
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
-        },        
+        },
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
                 "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template"
             }
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Azure Bastion"
+            },
+            "defaultValue": false
+        },
+        "flavor": {
+            "type": "string",
+            "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+            },
+            "allowedValues": [
+                "Full",
+                "ITPro",
+                "DevOps",
+                "DataOps"
+            ]
         }
     },
     "variables": {
@@ -128,16 +134,18 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2022-01-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -149,35 +157,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
-                        }
-                    }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-02-01",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1001,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ]
@@ -185,8 +165,9 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2022-01-01",
             "name": "[variables('publicIpAddressName')]",
+            "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
@@ -200,7 +181,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2022-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('azureLocation')]",
             "tags": "[parameters('resourceTags')]",
@@ -254,10 +235,10 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/installscript_CAPI')]",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2022-03-01",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
@@ -267,7 +248,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('capiArcDataClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('capiArcDataClusterName'), ' ', parameters('templateBaseUrl'), ' ', parameters('flavor'))]",
                     "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]" ]
                 }
             }

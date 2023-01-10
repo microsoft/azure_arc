@@ -1,0 +1,410 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+       "ProxyvmName": {
+        "type": "string",
+        "defaultValue": "Arc-Proxy-Server",
+        "metadata": {
+          "description": "The name of your Proxy server Virtual Machine."
+        }
+      },
+     "vmName": {
+      "type": "string",
+      "defaultValue": "Arc-Proxy-Client",
+      "metadata": {
+        "description": "The name of your Virtual Machine that will be Arc enabled."
+      }
+    },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_D4s_v3",
+        "metadata": {
+          "description": "The size of the VM"
+        }
+      },
+      "adminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "Username for the Virtual Machine."
+        }
+      },
+      "authenticationType": {
+        "type": "string",
+        "defaultValue": "password",
+        "allowedValues": [
+          "password"
+        ],
+        "metadata": {
+          "description": "Type of authentication to use on the Virtual Machine."
+        }
+      },
+      "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "SSH password for the Virtual Machine."
+        }
+      },
+      "dnsLabelPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "proxydnsLabelPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "ubuntuOSVersion": {
+        "type": "string",
+        "defaultValue": "20_04-lts-gen2",
+        "metadata": {
+          "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+        }
+      },
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure region location for all resources."
+        }
+      },
+      "deployBastion": {
+        "type": "bool",
+        "metadata": {
+          "description": "Choice to deploy Bastion to connect to the client VM"
+        }
+      },
+      "bastionHostName": {
+        "type": "string",
+        "defaultValue": "Arc-Win-Demo-Bastion",
+        "metadata": {
+          "description": "the Azure Bastion host name"
+        }
+      },
+      "virtualNetworkName": {
+        "type": "string",
+        "defaultValue": "Arc-Demo-Proxy-VNET",
+        "metadata": {
+          "description": "Name of the VNET"
+        }
+      },
+      "ProxysubnetName": {
+        "type": "string",
+        "defaultValue": "proxy-subnet",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network for the proxy server"
+        }
+      },
+    "subnetName": {
+        "type": "string",
+        "defaultValue": "client-subnet",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network"
+        }
+      },
+      "proxyNSG": {
+        "type": "string",
+        "defaultValue": "Arc-Proxy-NSG",
+        "metadata": {
+          "description": "Name of the Network Security Group for the proxy subnet"
+        }
+      },
+      "vmNSG": {
+        "type": "string",
+        "defaultValue": "Arc-Client-NSG",
+        "metadata": {
+          "description": "Name of the Network Security Group for the Arc-enabled server subnet"
+        }
+      },
+      "subscriptionID": {
+        "type": "string",
+        "metadata": {
+          "description": "Subscription ID"
+        }
+      },
+      "servicePrincipalClient": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure service principal name"
+        }
+      },
+      "servicePrincipalClientSecret": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure service principal password"
+        }
+      },
+      "resourceGroup": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure resource group where all resource to be deployed"
+        }
+      },
+      "tenantID": {
+        "type": "string",
+        "metadata": {
+          "description": "Azure tenant ID"
+        }
+      }
+    },
+    "variables": {
+      "bastionSubnetIpPrefix": "10.1.2.64/26"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "InfraDeployment",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/proxy/ARM/cloudDeploy.json"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "ProxyvmName": {
+                     "value": "[parameters('ProxyvmName')]"
+                  },
+                 "vmName": {
+                     "value": "[parameters('vmName')]"
+                  },
+                "vmSize": {
+                     "value": "[parameters('vmSize')]"
+                  },
+                 "adminUsername": {
+                     "value": "[parameters('adminUsername')]"
+                  },
+                 "authenticationType": {
+                     "value": "[parameters('authenticationType')]"
+                  },
+                 "adminPassword": {
+                     "value": "[parameters('adminPassword')]"
+                  },
+                 "dnsLabelPrefix": {
+                     "value": "[parameters('dnsLabelPrefix')]"
+                  },
+                 "proxydnsLabelPrefix": {
+                     "value": "[parameters('proxydnsLabelPrefix')]"
+                  },
+                 "ubuntuOSVersion": {
+                     "value": "[parameters('ubuntuOSVersion')]"
+                  },
+                 "location": {
+                     "value": "[parameters('location')]"
+                  },
+                 "deployBastion": {
+                     "value": "[parameters('deployBastion')]"
+                  },
+                "bastionHostName": {
+                     "value": "[parameters('bastionHostName')]"
+                  },
+                 "virtualNetworkName": {
+                     "value": "[parameters('virtualNetworkName')]"
+                  },
+                "ProxysubnetName": {
+                     "value": "[parameters('ProxysubnetName')]"
+                  },
+                "subnetName": {
+                     "value": "[parameters('subnetName')]"
+                  },
+                "proxyNSG": {
+                     "value": "[parameters('proxyNSG')]"
+                  },
+                "vmNSG": {
+                     "value": "[parameters('vmNSG')]"
+                  }
+                    
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "ConnectArc",
+            "dependsOn": [
+                "InfraDeployment"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "subscriptionID": {
+                        "value": "[parameters('subscriptionID')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                     "value": "[parameters('adminPassword')]"
+                    },
+                    "servicePrincipalClient": {
+                        "value": "[parameters('servicePrincipalClient')]"
+                    },
+                    "servicePrincipalClientSecret": {
+                        "value": "[parameters('servicePrincipalClientSecret')]"
+                    },
+                    "resourceGroup": {
+                        "value": "[parameters('resourceGroup')]"
+                    },
+                    "tenantID": {
+                        "value": "[parameters('tenantID')]"
+                    },
+                    "ProxyPrivateIP": {
+                        "value": "[reference('InfraDeployment').outputs.ProxyPrivate.value.ipConfigurations[0].properties.privateIPAddress]"
+                    },
+                    "vmNSG": {
+                        "value": "[parameters('vmNSG')]"
+                    },
+                    "deployBastion": {
+                        "value": "[parameters('deployBastion')]"
+                    },
+                    "bastionSubnetIpPrefix": {
+                        "value": "[variables('bastionSubnetIpPrefix')]"
+                    }
+                    },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "vmName": {
+                            "type": "string"
+                        },
+                        "location": {
+                            "type": "string"
+                        },                     
+                       "adminUsername": {
+                            "type": "string"
+                        },
+                       "adminPassword": {
+                        "type": "securestring"
+                       },
+                        "subscriptionID": {
+                            "type": "string"
+                        },
+                        "servicePrincipalClient": {
+                            "type": "string"
+                        },
+                        "servicePrincipalClientSecret": {
+                            "type": "string"
+                        },
+                        "resourceGroup": {
+                            "type": "string"
+                        },
+                        "tenantID": {
+                            "type": "string"
+                        },
+                        "ProxyPrivateIP": 
+                        {
+                            "type": "string"
+                        },
+                        "vmNSG": 
+                        {
+                            "type": "string"
+                        },
+                        "deployBastion": 
+                        {
+                            "type": "bool"
+                        },
+                        "bastionSubnetIpPrefix": 
+                        {
+                            "type": "string"
+                        }
+                    },
+                    "variables": {
+                         "extension_name": "[concat('Microsoft.Compute/virtualMachines/',parameters('vmName'), '/extensions/allowarcproxy')]"
+                    },
+                    "resources": [
+     {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'),'/allowarcproxy')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.1",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/proxy/artifacts/install_arc_agent_proxy.sh"
+          ],
+          "commandToExecute": "[concat('./install_arc_agent_proxy.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName'), ' ', parameters('ProxyPrivateIP'), ' ', parameters('adminPassword'))]"
+        }
+      }
+    },
+                {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('vmNSG')]",
+        "dependsOn": [
+          "[variables('extension_name')]"
+        ],
+        "location": "[parameters('location')]",
+        "properties": {
+          "securityRules": [
+                    {
+                        "name": "Internet",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Deny",
+                            "priority": 301,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                                    {
+                        "name": "SSH",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),parameters('bastionSubnetIpPrefix'),'*')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                        {
+                        "name": "Proxy",
+                        "properties": {
+                            "priority": 1001,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3128"
+              }
+            }
+          ]
+        }
+      }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

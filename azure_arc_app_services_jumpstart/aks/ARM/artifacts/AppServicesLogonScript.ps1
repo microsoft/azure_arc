@@ -9,7 +9,7 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 $Env:TempDir = "C:\Temp"
 $namespace="appservices"
 $extensionName = "arc-app-services"
-$extensionVersion = "0.12.2"
+$extensionVersion = "0.13.1"
 $apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -45,6 +45,7 @@ Write-Host "`n"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 Write-Host "`n"
+az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --name "appservice-kube" -y
@@ -82,7 +83,8 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --location $Env:azureLocation `
                         --tags "jumpstart_azure_arc_app_services" `
                         --kube-config $Env:KUBECONFIG `
-                        --kube-context $Env:KUBECONTEXT
+                        --kube-context $Env:KUBECONTEXT `
+                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}

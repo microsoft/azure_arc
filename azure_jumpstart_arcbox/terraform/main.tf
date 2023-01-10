@@ -62,9 +62,10 @@ variable "workspace_name" {
   default     = "ArcBox-Workspace"
 }
 
-variable "user_ip_address" {
+variable "github_username" {
   type        = string
-  description = "Users public IP address, used to RDP to the client VM."
+  description = "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
+  default     = "microsoft"
 }
 
 variable "github_repo" {
@@ -114,21 +115,42 @@ variable "client_admin_ssh" {
   sensitive   = true
 }
 
+variable "deploy_bastion" {
+  type        = bool
+  description = "Choice to deploy Azure Bastion"
+  default     = false
+}
+
+variable "addsDomainName" {
+  type        = string
+  description = "Active directory domain services domain name"
+  default     = "jumpstart.local"
+}
+
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'Developer'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'DevOps'."
   default     = "Full"
 
   validation {
-    condition     = contains(["Full", "ITPro", "Developer"], var.deployment_flavor)
-    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'Developer'."
+    condition     = contains(["Full", "ITPro", "DevOps", "DataOps"], var.deployment_flavor)
+    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
   }
 }
 ##############################################################################
 
 locals {
-  template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
+  template_base_url            = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
+  capi_arc_data_cluster_name   = "ArcBox-CAPI-Data"
+  k3s_arc_data_cluster_name    = var.rancher_vm_name
+  aks_arc_data_cluster_name    = "ArcBox-AKS-Data"
+  aks_dr_arc_data_cluster_name = "ArcBox-AKS-DR-Data"
+}
+
+resource "random_string" "guid" {
+  length  = 4
+  special = false
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -148,11 +170,13 @@ module "management_artifacts" {
   source = "./modules/mgmt/mgmtArtifacts"
 
   resource_group_name  = azurerm_resource_group.rg.name
+  spn_client_id        = var.spn_client_id
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
-
-  depends_on = [azurerm_resource_group.rg]
+  deploy_bastion       = var.deploy_bastion
+  deployment_flavor    = var.deployment_flavor
+  depends_on           = [azurerm_resource_group.rg]
 }
 
 module "management_policy" {
@@ -161,6 +185,7 @@ module "management_policy" {
   resource_group_name = azurerm_resource_group.rg.name
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
+  deployment_flavor   = var.deployment_flavor
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -168,62 +193,90 @@ module "management_policy" {
 module "client_vm" {
   source = "./modules/clientVm"
 
-  resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.client_vm_name
-  virtual_network_name = var.virtual_network_name
-  subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
-  template_base_url    = local.template_base_url
-  storage_account_name = module.management_storage.storage_account_name
-  workspace_name       = var.workspace_name
-  spn_client_id        = var.spn_client_id
-  spn_client_secret    = var.spn_client_secret
-  spn_tenant_id        = var.spn_tenant_id
-  deployment_flavor    = var.deployment_flavor
-  admin_username       = var.client_admin_username
-  admin_password       = var.client_admin_password
-  github_repo          = var.github_repo
-  github_branch        = var.github_branch
+  resource_group_name          = azurerm_resource_group.rg.name
+  vm_name                      = var.client_vm_name
+  virtual_network_name         = var.virtual_network_name
+  subnet_name                  = var.subnet_name
+  template_base_url            = local.template_base_url
+  storage_account_name         = module.management_storage.storage_account_name
+  workspace_name               = var.workspace_name
+  spn_client_id                = var.spn_client_id
+  spn_client_secret            = var.spn_client_secret
+  spn_tenant_id                = var.spn_tenant_id
+  deployment_flavor            = var.deployment_flavor
+  admin_username               = var.client_admin_username
+  admin_password               = var.client_admin_password
+  github_username              = var.github_username
+  github_repo                  = var.github_repo
+  github_branch                = var.github_branch
+  deploy_bastion               = var.deploy_bastion
+  capi_arc_data_cluster_name   = "${local.capi_arc_data_cluster_name}-${random_string.guid.result}"
+  k3s_arc_cluster_name         = "${local.k3s_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_arc_data_cluster_name    = "${local.aks_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_dr_arc_data_cluster_name = "${local.aks_dr_arc_data_cluster_name}-${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage,
+    random_string.guid,
+    module.adds_vm
+  ]
+}
+
+module "adds_vm" {
+  source                 = "./modules/mgmt/addsVM"
+  count                  = var.deployment_flavor == "DataOps" ? 1 : 0
+  resource_group_name    = azurerm_resource_group.rg.name
+  adds_Domain_Name       = var.addsDomainName
+  deploy_bastion         = var.deploy_bastion
+  windows_Admin_Username = var.client_admin_username
+  windows_Admin_password = var.client_admin_password
+  template_base_url      = local.template_base_url
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts,
+    module.management_storage
   ]
 }
 
 module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps", "DataOps"], var.deployment_flavor) ? 1 : 0
 
-  resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.capi_vm_name
-  virtual_network_name = var.virtual_network_name
-  subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
-  template_base_url    = local.template_base_url
-  storage_account_name = module.management_storage.storage_account_name
-  spn_client_id        = var.spn_client_id
-  spn_client_secret    = var.spn_client_secret
-  spn_tenant_id        = var.spn_tenant_id
-  admin_username       = var.client_admin_username
-  admin_ssh_key        = var.client_admin_ssh
-  workspace_name       = var.workspace_name
+  resource_group_name        = azurerm_resource_group.rg.name
+  vm_name                    = var.capi_vm_name
+  virtual_network_name       = var.virtual_network_name
+  subnet_name                = var.subnet_name
+  template_base_url          = local.template_base_url
+  storage_account_name       = module.management_storage.storage_account_name
+  spn_client_id              = var.spn_client_id
+  spn_client_secret          = var.spn_client_secret
+  spn_tenant_id              = var.spn_tenant_id
+  admin_username             = var.client_admin_username
+  admin_ssh_key              = var.client_admin_ssh
+  workspace_name             = var.workspace_name
+  deploy_bastion             = var.deploy_bastion
+  deployment_flavor          = var.deployment_flavor
+  capi_arc_data_cluster_name = "${local.capi_arc_data_cluster_name}-${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage,
+    random_string.guid,
+    module.adds_vm
   ]
 }
 
 module "rancher_vm" {
   source = "./modules/kubernetes/ubuntuRancher"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.rancher_vm_name
+  vm_name              = "${local.k3s_arc_data_cluster_name}-${random_string.guid.result}"
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
   template_base_url    = local.template_base_url
   storage_account_name = module.management_storage.storage_account_name
   spn_client_id        = var.spn_client_id
@@ -232,9 +285,36 @@ module "rancher_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage,
+    random_string.guid
   ]
+}
+
+module "aks_clusters" {
+  source = "./modules/kubernetes/aks"
+  count  = var.deployment_flavor == "DataOps" ? 1 : 0
+
+  resource_group_name = azurerm_resource_group.rg.name
+  spn_client_id       = var.spn_client_id
+  spn_client_secret   = var.spn_client_secret
+  spn_tenant_id       = var.spn_tenant_id
+  ssh_rsa_public_key  = var.client_admin_ssh
+  aks_cluster_name    = "${local.aks_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_dr_cluster_name = "${local.aks_dr_arc_data_cluster_name}-${random_string.guid.result}"
+
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts,
+    module.management_storage,
+    module.adds_vm
+  ]
+}
+
+output "clientVmLogonUserName" {
+  value = var.deployment_flavor == "DataOps" ? "${var.client_admin_username}@${var.addsDomainName}" : null
 }

@@ -36,18 +36,18 @@
     },
     "readableSecondaries": {
       "type": "String"
-    },    
+    },
     "vCoresRequest": {
       "type": "String"
     },
     "memoryRequest": {
-        "type": "String"
+      "type": "String"
     },
     "vCoresLimit": {
-        "type": "String"
+      "type": "String"
     },
     "memoryLimit": {
-        "type": "String"
+      "type": "String"
     },
     "dataStorageSize": {
       "type": "String",
@@ -84,6 +84,9 @@
     },
     "licenseType": {
       "type": "String"
+    },
+    "port": {
+      "type": "int"
     }
   },
   "variables": {},
@@ -115,27 +118,29 @@
             "dev": true,
             "services": {
               "primary": {
-                "type": "[parameters('serviceType')]"
+                "type": "[parameters('serviceType')]",
+                "port": "[parameters('port')]"
               },
               "readableSecondaries": {
-                "type": "[parameters('readableSecondaries')]"
+                "type": "[parameters('readableSecondaries')]",
+                "port": "[parameters('port')]"
               }
             },
             "replicas": "[parameters('replicas')]",
             "scheduling": {
               "default": {
-                  "resources": {
-                      "requests": {
-                          "cpu": "[parameters('vCoresRequest')]",
-                          "memory": "[parameters('memoryRequest')]"
-                      },
-                      "limits": {
-                          "cpu": "[parameters('vCoresLimit')]",
-                          "memory": "[parameters('memoryLimit')]"
-                      }
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('vCoresRequest')]",
+                    "memory": "[parameters('memoryRequest')]"
+                  },
+                  "limits": {
+                    "cpu": "[parameters('vCoresLimit')]",
+                    "memory": "[parameters('memoryLimit')]"
                   }
+                }
               }
-          },
+            },
             "storage": {
               "data": {
                 "volumes": [

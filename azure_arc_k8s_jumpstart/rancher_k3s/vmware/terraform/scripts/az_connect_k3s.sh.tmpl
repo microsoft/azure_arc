@@ -4,14 +4,14 @@ sudo apt-get update
 
 # Injecting environment variables
 source /tmp/vars.sh
-# publicIp=$(curl icanhazip.com)
 
-# Installing Rancer K3s single master cluster using k3sup
+# Installing Rancher K3s cluster (single control plane)
+echo ""
 sudo mkdir ~/.kube
-sudo curl -sLS https://get.k3sup.dev | sh
-sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arck3sdemo --local-path ~/.kube/config
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" INSTALL_K3S_VERSION=v$K3S_VERSION sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+sudo kubectl config rename-context default arck3sdemo --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 
 # Installing Helm 3
 sudo snap install helm --classic
@@ -33,4 +33,4 @@ sudo chmod -R 777 /home/$TF_VAR_admin_user/.azure/config
 sudo chmod -R 777 /home/$TF_VAR_admin_user/.azure
 
 sudo az login --service-principal --username $TF_VAR_client_id --password $TF_VAR_client_secret --tenant $TF_VAR_tenant_id
-sudo az connectedk8s connect --name $TF_VAR_arcClusterName --resource-group $TF_VAR_resourceGroup --location $TF_VAR_location --tags 'Project=jumpstart_azure_arc_k8s'
+sudo az connectedk8s connect --name $TF_VAR_arcClusterName --resource-group $TF_VAR_resourceGroup --location $TF_VAR_location --tags 'Project=jumpstart_azure_arc_k8s' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

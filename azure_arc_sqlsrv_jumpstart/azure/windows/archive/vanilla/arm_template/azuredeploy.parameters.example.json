@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmSize": {
+            "value": "Standard_D8s_v3"
+        },
+        "vmName": {
+            "value": "Arc-SQL-Demo"
+        },
+        "adminUsername": {
+            "value": "arcdemo"
+        },
+        "adminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "servicePrincipalAppId": {
+            "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+        },
+        "servicePrincipalSecret": {
+            "value": "33333333-XXXX-YTYT-9c21-7777777777"
+        },
+        "servicePrincipalTenantId": {
+            "value": "33333333-XXXX-41af-1111-7777777777"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "rg-la-arc"
+        },
+        "deployBastion": {
+            "value": false
+        }
+    }
+}

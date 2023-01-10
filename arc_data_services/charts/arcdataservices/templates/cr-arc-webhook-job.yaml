@@ -1,0 +1,34 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.InstallerServiceAccount) (not .Values.systemDefaultValues.installerServiceAccount) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: cr-arc-webhook-job
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resourceNames:
+  - arcdata.microsoft.com-webhook-{{ .Release.Namespace }}
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - get
+  - delete
+  - patch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  resourceNames:
+  - {{ .Release.Namespace }}
+  verbs:
+  - patch
+  - get
+{{ end }}

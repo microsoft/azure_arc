@@ -12,19 +12,19 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+- Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
@@ -57,9 +57,9 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for two providers for Azure Arc-enabled Kubernetes.
+- Enable subscription for two providers for Azure Arc-enabled Kubernetes.
   
-* [Enable subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- [Enable subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -75,60 +75,91 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
   az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
-## Deployment
-
-The deployment is using the template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include your IP address, the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
-
-* To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
+- [- [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client).
 
   ```shell
-  az group create --name <Name of the Azure resource group> --location <Azure Region>
-  az deployment group create \
-  --resource-group <Name of the Azure resource group> \
-  --name <The name of this deployment> \
-  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-  --parameters <The *azuredeploy.parameters.json* parameters file location>
+  ssh-keygen -t rsa -b 4096
   ```
 
-  For example:
+  To retrieve the SSH public key after it's been created, depending on your environment, use one of the below methods:
+  - In Linux, use the `cat ~/.ssh/id_rsa.pub` command.
+  - In Windows (CMD/PowerShell), use the SSH public key file that by default, is located in the _`C:\Users\WINUSER/.ssh/id_rsa.pub`_ folder.
+
+  SSH public key example output:
 
   ```shell
-  az group create --name Arc-K3s-Demo --location "East US"
-  az deployment group create \
-  --resource-group Arc-K3s-Demo \
-  --name arck3sdemo01 \
-  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-  --parameters azuredeploy.parameters.json
-  ```
+  ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
+  ```](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) (or use existing ssh key)
 
-  Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
+> **NOTE: Default file location for public key: Windows - (C:\Users\WINUSER/.ssh\id_rsa.pub), Linux - (~/.ssh/id_rsa.pub)**
 
-  ![Azure resource group](./01.png)
+## Deployment Options and Automation Flow
 
-## K3s External Access
+This Jumpstart scenario provides multiple paths for deploying and configuring resources. Deployment options include:
 
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes).
+- Azure portal
+- ARM template via Azure CLI
 
-* Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG).
+For you to get familiar with the automation and deployment flow, below is an explanation.
 
-  ![Azure Network Security Group (NSG) rule](./02.png)
+1. User provides the ARM template parameter values, either via the portal or editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-  ![hello-kubernetes.yaml file](./03.png)
+2. User deploys the ARM template that will initiate the deployment of the k3s cluster and that will be onboarded as an Azure Arc-enabled Kubernetes cluster.
 
-* To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created.
+3. User configures external access for the cluster.
 
-  ![kubectl apply -f hello-kubernetes.yaml command](./04.png)
+## Deployment Option 1: Azure portal
 
-  ![kubectl get pods command](./05.png)
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_k8s_jumpstart%2Francher_k3s%2Fazure%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-  ![kubectl get svc command](./06.png)
+  ![Screenshot showing Azure portal deployment](./01.png)
 
-* In your browser, enter the *cluster_public_ip:32323* which will bring up the *hello-world* application.
+  ![Screenshot showing Azure portal deployment completion](./02.png)
 
-  ![hello-kubernetes application in a web browser](./07.png)
+## Deployment Option 2: ARM template with Azure CLI
 
-## Delete the deployment
+The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include your public SSH key, the Ubuntu OS username as well as the appId, password and tenant generated from the service principal creation.  
+
+To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
+
+```shell
+az group create --name <Name of the Azure resource group> --location <Azure Region>
+az deployment group create \
+--resource-group <Name of the Azure resource group> \
+--name <The name of this deployment> \
+--template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+--parameters <The *azuredeploy.parameters.json* parameters file location>
+```
+
+For example:
+
+```shell
+az group create --name Arc-K3s-Demo --location "East US 2"
+az deployment group create \
+--resource-group Arc-K3s-Demo \
+--name arck3sdemo01 \
+--template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+--parameters azuredeploy.parameters.json
+```
+
+Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
+
+![Screenshot showing Azure resource group](./03.png)
+
+## Logging
+
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
+
+```shell
+cat /home/<USER>/jumpstart_logs/installK3s.log
+```
+
+![Screenshot showing the installK3s log file](./04.png)
+
+> **NOTE: For enhanced security posture, SSH (22) port are not open by default in this scenario. You will need to create a network security group (NSG) rule to allow network access to port 22, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
+
+## Cleanup
 
 To delete environment, simply just delete the Azure resource group.
 
-![Delete Azure resource group](./08.png)
+![Screenshot showing Delete Azure resource group](./05.png)

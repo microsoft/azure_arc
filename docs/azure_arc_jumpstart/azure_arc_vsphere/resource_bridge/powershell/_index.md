@@ -14,7 +14,6 @@ The following README will guide you on how to use the provided PowerShell script
 
 > **NOTE: Azure Arc-enabled VMware vSphere is currently in Preview and as a result, versions captured in the scenario's various screenshots are subject to change.**
 
-
 ## Prerequisites
 
 - Clone the Azure Arc Jumpstart repository
@@ -57,7 +56,7 @@ The following README will guide you on how to use the provided PowerShell script
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    Copy and save the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
+    Copy and save the Service Principal ApplicationId and Secret as you will need it for later in the automation.
 
     > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
@@ -82,12 +81,12 @@ The following README will guide you on how to use the provided PowerShell script
 - A vSphere datastore with a minimum of 100 GB of free disk space.
 
 - A vSphere account [assigned](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-18071E9A-EED1-4968-8D51-E0B4F526FDA3.html) with the following [permissions](https://docs.microsoft.com/azure/azure-arc/vmware-vsphere/quick-start-connect-vcenter-to-arc-using-script#vsphere-account):
-    - Read all inventory.
-    - Deploy and update VMs to all the resource pools (or clusters), networks, and VM templates that you want to use with Azure Arc.
+  - Read all inventory.
+  - Deploy and update VMs to all the resource pools (or clusters), networks, and VM templates that you want to use with Azure Arc.
 
-As mentioned, this guide starts at the point where you already have an up and running VMware vSphere environment managed by vCenter. The automation will be run from a PowerShell window on a computer (which can be your local computer) that has network connectivity to vCenter.
+As mentioned, this scenario starts at the point where you already have an up and running VMware vSphere environment managed by vCenter. The automation will be run from a PowerShell window on a computer (which can be your local computer) that has network connectivity to vCenter.
 
-    > **NOTE: the script will automatically uninstall any pre-existing Azure CLI versions in the workstation and will deploy the latest 64-bit version, as it is a requirement to deploy the Azure Arc resource bridge**
+  > **NOTE: the script will automatically uninstall any pre-existing Azure CLI versions in the workstation and will deploy the latest 64-bit version, as it is a requirement to deploy the Azure Arc resource bridge**
 
 ## Automation Flow
 
@@ -106,8 +105,8 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`subscriptionId`_ - your subscription ID
   - _`resourceGroupName`_ - the name of the Azure resource group you will create your resources in
   - _`applianceName`_ - a name for the Azure Arc resource bridge appliance
-  - _`customLocationName`_ - a name for the Azure Arc custom location
-  - _`vcenterName`_ - your vCenter name
+  - _`customLocationName`_ - the name of your Azure Arc custom location
+  - _`vcenterName`_ -  the name of your vCenter
   - _`vcenterFqdn`_ - your vCenter fully qualified name
   - _`vcenterUsername`_ - username to authenticate to vCenter
   - _`vcenterPassword`_ - password to authenticate to vCenter
@@ -126,7 +125,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`segment`_ - Name of the virtual network or segment to which the appliance VM must be connected
   - _`resourcePool`_ - the name of the vSphere resource pool to be used by the appliance
   - _`controlPlaneEndpoint`_ - IP address of the Kubernetes cluster control plane
-  - _`vSphereRP`_ - _ConnectedVMwarevSphere_ resource provider Id 
+  - _`vSphereRP`_ - _ConnectedVMwarevSphere_ resource provider Id
   
   ![Screenshot environment variables](./02.png)
 

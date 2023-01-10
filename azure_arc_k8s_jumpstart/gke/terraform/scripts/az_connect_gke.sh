@@ -1,10 +1,7 @@
 #!/bin/sh
 
-sudo apt-get update
-
 # <--- Change the following environment variables according to your Azure service principal name --->
 
-export subscriptionId='<Your Azure subscription ID>'
 export servicePrincipalAppId='<Your Azure service principal name>'
 export servicePrincipalSecret='<Your Azure service principal password>'
 export servicePrincipalTenantId='<Your Azure tenant ID>'
@@ -20,26 +17,45 @@ chmod 700 get_helm.sh
 
 # Installing Azure CLI & Azure Arc Extensions
 echo "Installing Azure CLI & Azure Arc Extensions"
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
-curl -sL https://packages.microsoft.com/keys/microsoft.asc |
-gpg --dearmor |
-sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
-AZ_REPO=$(lsb_release -cs)
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
-sudo tee /etc/apt/sources.list.d/azure-cli.list
-sudo apt-get update
-sudo apt-get install azure-cli
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-az extension remove --name connectedk8s
-az extension remove --name k8s-configuration
+echo "Clear cached Azure Arc Helm Charts"
 rm -rf ~/.azure/AzureArcCharts
-az extension add --name connectedk8s
-az extension add --name k8s-configuration
+
+# Installing Azure Arc k8s CLI extensions
+echo "Checking if you have up-to-date Az CLI 'connectedk8s' extension..."
+az extension show --name "connectedk8s" &> extension_output
+if cat extension_output | grep -q "not installed"; then
+az extension add --name "connectedk8s"
+rm extension_output
+else
+az extension update --name "connectedk8s"
+rm extension_output
+fi
+echo ""
+
+echo "Checking if you have up-to-date Az CLI 'k8s-configuration' extension..."
+az extension show --name "k8s-configuration" &> extension_output
+if cat extension_output | grep -q "not installed"; then
+az extension add --name "k8s-configuration"
+rm extension_output
+else
+az extension update --name "k8s-configuration"
+rm extension_output
+fi
+echo ""
 
 echo "Log in to Azure using service principal"
 az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
-az group create --location $location --name $resourceGroup --subscription $subscriptionId
+
+echo "Registering Azure Arc providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+
+az provider show -n Microsoft.Kubernetes -o table
+az provider show -n Microsoft.KubernetesConfiguration -o table
+az provider show -n Microsoft.ExtendedLocation -o table
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

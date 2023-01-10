@@ -7,7 +7,7 @@ weight: 1
 
 ## Azure Arc Jumpstart
 
-The Azure Arc Jumpstart project is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
+The Azure Arc Jumpstart is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
 
 The Jumpstart provides step-by-step guides for independent Azure Arc scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and a rich and comprehensive experience while getting started with the Azure Arc platform.
 
@@ -30,6 +30,14 @@ Have you ever wanted to have a complete Azure Arc environment with just one clic
 [ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc-enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
 <p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_arcbox/" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></a></p>
+
+## Jumpstart HCIBox
+
+Are you eager to try out Azure Stack HCI but you don't have access to physical hardware? If so then HCIBox is the tool for you.
+
+[HCIBox](https://azurearcjumpstart.io/azure_jumpstart_hcibox/) is a dedicated Azure Stack HCI sandbox environment, and like ArcBox you only need an Azure subscription to get started. With a one-click deployment, you get a full Azure Stack HCI lab packed with technology including Azure Arc integration, Azure Kubernetes Service, Windows Admin Center and much more. Check out HCIBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
+
+<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_hcibox/" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="250"></a></p> 
 
 ## Jumpstart YouTube Channel
 
