@@ -1,0 +1,16 @@
+{{ if eq .Values.connectionMode "direct" }}
+
+apiVersion: clusterconfig.azure.com/v1beta1
+kind: AzureExtensionIdentity
+metadata:
+  name: {{ .Release.Name }}
+  namespace: azure-arc
+spec:
+  serviceAccounts:
+    - name: sa-arc-controller
+      namespace: {{ .Release.Namespace }}
+    - name: sa-arc-bootstrapper
+      namespace: {{ .Release.Namespace }}
+  tokenNamespace: {{ .Release.Namespace }}
+
+{{ end }}

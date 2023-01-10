@@ -32,7 +32,7 @@
     natHostVMSwitchName                  = "InternalNAT"
     natConfigure                         = $true
     natSubnet                            = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
-    natDNS                               = "1.1.1.1"                              # DNS address for forwarding from Domain Controller. Using Cloudflare DNS.
+    natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # Global MTU
     SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. 

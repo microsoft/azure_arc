@@ -1,3 +1,4 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.RuntimeServiceAccount) (not .Values.systemDefaultValues.runtimeServiceAccount) }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -5,3 +6,4 @@ metadata:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: sa-arc-bootstrapper
   namespace: {{ .Release.Namespace }}
+{{ end }}

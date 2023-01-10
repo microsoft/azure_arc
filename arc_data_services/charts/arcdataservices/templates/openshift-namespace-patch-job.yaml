@@ -1,0 +1,33 @@
+{{ if eq .Values.connectionMode "direct" }}
+
+{{ if eq .Values.Azure.Cluster.Distribution "openshift" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  name: openshift-namespace-patch-job
+  namespace: azure-arc
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "100"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - command:
+        - /opt/deploy/openshift-patch-namespace.sh
+        - {{ .Release.Namespace }}
+        image: {{ .Values.systemDefaultValues.image }}
+        name: bootstrapper
+      imagePullSecrets:
+      - name: {{ .Values.systemDefaultValues.imagePullSecret }}
+      restartPolicy: Never
+      serviceAccountName: azure-arc-operatorsa
+  backoffLimit: 4
+{{ end }}
+
+{{ end }}
