@@ -71,8 +71,8 @@
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_sqlsrv_jumpstart/')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/windows/defender_sql/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/windows/defender_sql/mgmtArtifacts.json')]"
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/windows/defender_sql/arm_template/clientVm.json')]",
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'azure/windows/defender_sql/arm_template/mgmtArtifacts.json')]"
   },
   "resources": [
     {
