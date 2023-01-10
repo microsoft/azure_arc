@@ -53,7 +53,7 @@ Start-Transcript -Path "$Env:ArcJSLogsDir\Bootstrap.log"
 $ErrorActionPreference = 'SilentlyContinue'
 
 # Copy PowerShell Profile and Reload
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
 
 # Extending C:\ partition to the maximum size
@@ -93,14 +93,14 @@ foreach ($app in $appsToInstall)
 Write-Header "Fetching GitHub Artifacts"
 
 Write-Host "Fetching Artifacts for All Flavors"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/LogInstructions.txt") -OutFile $Env:ArcJSLogsDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/LogInstructions.txt") -OutFile $Env:ArcJSLogsDir\LogInstructions.txt
 
 Write-Host "Fetching Artifacts for Arc SQL Server"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/ArcServersLogonScript.ps1") -OutFile "$Env:ArcJSDir\ArcServersLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgentSQLSP.ps1") -OutFile "$Env:agentScript\installArcAgentSQLSP.ps1"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/installArcAgent.ps1") -OutFile "$Env:agentScript\installArcAgent.ps1"
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/icons/arcsql.ico") -OutFile $Env:ArcJSIconDir\arcsql.ico
-Invoke-WebRequest ($templateBaseUrl + "azure/defendersql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcJSDir\testDefenderForSQL.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/ArcServersLogonScript.ps1") -OutFile "$Env:ArcJSDir\ArcServersLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/installArcAgentSQLSP.ps1") -OutFile "$Env:agentScript\installArcAgentSQLSP.ps1"
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/installArcAgent.ps1") -OutFile "$Env:agentScript\installArcAgent.ps1"
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/icons/arcsql.ico") -OutFile $Env:ArcJSIconDir\arcsql.ico
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcJSDir\testDefenderForSQL.ps1
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Env:tempDir\wallpaper.png"
 
 Write-Header "Configuring Logon Scripts"
