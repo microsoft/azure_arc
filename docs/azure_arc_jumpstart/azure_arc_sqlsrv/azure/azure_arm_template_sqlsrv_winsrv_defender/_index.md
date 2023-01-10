@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "SQL Server Hyper-V Virtual Machine (Windows)"
-linkTitle: "SQL Server Hyper-V Virtual Machine (Windows)"
+title: "SQL Server Hyper-V Windows Virtual Machine"
+linkTitle: "SQL Server Hyper-V Windows Virtual Machine"
 weight: 1
 ---
 
