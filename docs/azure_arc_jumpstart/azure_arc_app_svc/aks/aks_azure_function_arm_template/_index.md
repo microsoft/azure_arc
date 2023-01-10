@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Function ARM Template"
 linkTitle: "Azure Function ARM Template"
-weight: 2
+weight: 3
 description: >
 ---
 
