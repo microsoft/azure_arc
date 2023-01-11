@@ -49,6 +49,7 @@ Write-Header "Install necessary AZ modules plus AksHCI module and initialize aks
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $ProgressPreference = "SilentlyContinue"
     Install-Module -Name AksHci -Force -AcceptLicense
     Import-Module Az.Accounts
