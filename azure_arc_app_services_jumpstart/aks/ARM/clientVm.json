@@ -203,7 +203,6 @@
             }
         },
         "kubectlVersion": {
-            "defaultValue": "1.24.9",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubectl"
