@@ -41,6 +41,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('productsImage', $productsImage,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('inventoryImage', $inventoryImage,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('storeImage', $storeImage,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('kubectlVersion', $kubectlVersion,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path
