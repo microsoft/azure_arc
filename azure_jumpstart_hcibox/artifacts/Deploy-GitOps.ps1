@@ -23,7 +23,14 @@ $certdns = "hcibox.devops.com"
 
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+if ($host.Name -match 'ISE') {throw "Running this script in PowerShell ISE is not supported"}
+
+try {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
+catch {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
@@ -130,10 +137,21 @@ Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
 }
 
 Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+az keyvault certificate import `
+    --vault-name $keyVaultName `
+    --password "arcbox" `
+    --name $certname `
+    --file "$Env:TempDir\$certname.pfx"
 
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+az k8s-extension create --name 'akvsecretsprovider' `
+    --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+    --scope cluster `
+    --cluster-name $clusterName `
+    --resource-group $Env:resourceGroup `
+    --cluster-type connectedClusters `
+    --release-namespace kube-system `
+    --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Replace Variable values
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/devops_ingress/hello-arc.yaml") -OutFile $Env:HCIBoxKVDir\hello-arc.yaml

@@ -1,0 +1,51 @@
+{% comment %}
+TODO: Before HAIKU add capability to merge two objects, we have to map each individual object in the top level of spec. 
+We are adding loginRef into Custom Resource Spec in order for k8 bridge to create the secret in the Kubernetes cluster. 
+What we want here is to merge k8sRaw.spec with loginRef together to become a larger spec.
+However, Liquid template does not support merging objects. In order for it to work, I have to list them one by one.
+{% endcomment%}
+
+{%- assign clusterResource = content.properties -%}
+{%- assign controllerLogin = clusterResource.basicLoginInformation | KubernetesSecret: secretName:'controller-login-secret',includeName:false -%}
+{%- assign uploadServicePrincipal = clusterResource.uploadServicePrincipal | KubernetesSecret: secretName:'upload-service-principal-secret',includeName:false -%}
+{%- assign logAnalyticsWorkspaceConfig = clusterResource.logAnalyticsWorkspaceConfig | KubernetesSecret: secretName:'log-workspace-secret',includeName:false -%}
+{%- assign credentials = clusterResource.k8sRaw.spec.credentials -%}
+{%- assign docker = clusterResource.k8sRaw.spec.docker -%}
+{%- assign security = clusterResource.k8sRaw.spec.security -%}
+{%- assign services = clusterResource.k8sRaw.spec.services -%}
+{%- assign storage = clusterResource.k8sRaw.spec.storage -%}
+{%- assign settings = clusterResource.k8sRaw.spec.settings -%}
+{%- assign resources = clusterResource.k8sRaw.spec.resources -%}
+{%- assign infrastructure = clusterResource.infrastructure -%}
+
+{% comment %}
+TODO: Properly mapping after API Version is bumped: https://msdata.visualstudio.com/Tina/_workitems/edit/1439642
+{% endcomment%}
+{%- assign metricsAdminLogin = clusterResource.basicLoginInformation | KubernetesSecret: secretName:'metricsui-admin-secret',includeName:false -%}
+{%- assign logsAdminLogin = clusterResource.basicLoginInformation | KubernetesSecret: secretName:'logsui-admin-secret',includeName:false -%}
+
+{
+  "spec": {
+    {% if uploadServicePrincipal != nil %} "uploadServicePrincipal": {{ uploadServicePrincipal }}, {% endif %}
+    {% if logAnalyticsWorkspaceConfig != nil %} "logAnalyticsWorkspaceConfig": {{ logAnalyticsWorkspaceConfig }}, {% endif %}
+    "credentials": {
+        {% if credentials.controllerAdmin != nil %} "controllerAdmin": {{ controllerLogin.Name | json }}, {% endif %}
+        {% if credentials.dockerRegistry != nil %} "dockerRegistry": {{ credentials.dockerRegistry | json }}, {% endif %}
+        {% if credentials.domainServiceAccount != nil %} "domainServiceAccount": {{ credentials.domainServiceAccount | json }}, {% endif %}
+        {% if credentials.serviceAccount != nil %} "serviceAccount": {{ credentials.serviceAccount | json }} {% endif %}
+    },
+    {% if docker != nil %} "docker": {{ docker }}, {% endif %}
+    {% if storage != nil %} "storage": {{ storage }}, {% endif %}
+    {% if security != nil %} "security": {{ security }}, {% endif %}
+    {% if services != nil %}
+      "services": [
+      {% for service in services %}
+        {{ service }}
+        {% if forloop.last != true %},{% endif %}
+      {% endfor %}],
+    {% endif %}
+    {% if settings != nil %} "settings": {{ settings }}, {% endif %}
+    {% if resources != nil %} "resources": {{ resources }}, {% endif %}
+    {% if infrastructure != nil %} "infrastructure": "{{ infrastructure }}", {% endif %}
+  }
+}

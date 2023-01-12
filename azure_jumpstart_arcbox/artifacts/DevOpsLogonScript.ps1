@@ -207,10 +207,22 @@ Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath
 Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
 Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+az keyvault certificate import `
+    --vault-name $Env:keyVaultName `
+    --password "arcbox" `
+    --name $certname `
+    --file "$Env:TempDir\$certname.pfx"
 
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+az k8s-extension create `
+    --name 'akvsecretsprovider' `
+    --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+    --scope cluster `
+    --cluster-name $Env:capiArcDataClusterName `
+    --resource-group $Env:resourceGroup `
+    --cluster-type connectedClusters `
+    --release-namespace kube-system `
+    --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Replace Variable values
 Get-ChildItem -Path $Env:ArcBoxKVDir |

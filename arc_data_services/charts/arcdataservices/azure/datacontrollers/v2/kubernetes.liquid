@@ -1,0 +1,21 @@
+{%- assign metadata = content.metadata -%}
+{%- assign spec = content.spec -%}
+{%- assign status = content.status -%}
+{%- assign uploadStatus = content.status.azure.uploadStatus | LogData -%}
+{%- assign infrastructure = spec.infrastructure | downcase -%}
+
+{
+  "properties": {
+    "k8sRaw": {
+      "metadata": {{ metadata }},
+      "spec": {{ spec }},
+      "status": {{ status }}
+    },
+    "infrastructure": "{{ infrastructure }}",
+    "basicLoginInformation": null,
+    "metricsDashboardCredential": null,
+    "logsDashboardCredential": null,
+    "logAnalyticsWorkspaceConfig": null,
+    "uploadServicePrincipal": null
+  }
+}

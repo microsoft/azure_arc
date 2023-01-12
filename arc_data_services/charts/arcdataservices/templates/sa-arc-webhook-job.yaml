@@ -1,3 +1,4 @@
+{{ if and (not .Values.Azure.LeastPrivilegeSettings.InstallerServiceAccount) (not .Values.systemDefaultValues.installerServiceAccount) }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -5,3 +6,4 @@ metadata:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   name: sa-arc-webhook-job
   namespace: {{ .Release.Namespace }}
+{{ end }}
