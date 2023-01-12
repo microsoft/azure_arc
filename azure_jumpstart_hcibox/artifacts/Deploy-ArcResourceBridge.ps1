@@ -13,11 +13,12 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+$csv_path = "C:\ClusterStorage\S2D_vDISK1"
 
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"
@@ -27,30 +28,35 @@ $adcred = New-Object -TypeName System.Management.Automation.PSCredential -Argume
 # Install AZ Resource Bridge and prerequisites
 Write-Host "Now Preparing to Install Azure Arc Resource Bridge"
 
-# Install Required Modules
-foreach ($VM in $SDNConfig.HostList) { 
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
-    }
-}
-$csv_path = "C:\ClusterStorage\S2D_vDISK1"
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
+if ($env:deployAKSHCI -eq $false) {
+    Write-Header "Install latest versions of Nuget and PowershellGet"
+    Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+        Enable-PSRemoting -Force
         Install-PackageProvider -Name NuGet -Force 
-        # Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Install-Module -Name PowershellGet -Force
     }
 }
+
+Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+    Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
+    Initialize-MocNode
+    Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+}
+
 foreach ($VM in $SDNConfig.HostList) {
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        $ErrorActionPreference = "SilentlyContinue"
+        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
+        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+        $ErrorActionPreference = "Continue"
+        $WarningPreference = "SilentlyContinue"
         az extension add --upgrade --name arcappliance
         az extension add --upgrade --name connectedk8s
         az extension add --upgrade --name k8s-configuration
         az extension add --upgrade --name k8s-extension
         az extension add --upgrade --name customlocation
         az extension add --upgrade --name azurestackhci
-        $ErrorActionPreference = "Continue"
+        $WarningPreference = "Continue"
     }
 }
 
@@ -66,12 +72,29 @@ $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $location = "eastus"
 $custom_location_name = "hcibox-rb-cl"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
+$cloudServiceIP = $SDNConfig.AKSCloudSvcidr.Substring(0, $SDNConfig.AKSCloudSvcidr.IndexOf('/'))
+
+if ($env:deployAKSHCI -eq "false") {
+    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+        $vnet = New-MocNetworkSetting -Name $using:SDNConfig.AKSvnetname -vswitchName $using:SDNConfig.AKSvSwitchName -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -vlanID $using:SDNConfig.AKSVlanID
+        Set-MocConfig -workingDir $using:csv_path\ResourceBridge -vnet $vnet -imageDir $using:csv_path\imageStore -skipHostLimitChecks -cloudConfigLocation $using:csv_path\cloudStore -catalog aks-hci-stable-catalogs-ext -ring stable -CloudServiceIP $using:cloudServiceIP -createAutoConfigContainers $false
+        Install-Moc
+    }
 }
-$ErrorActionPreference = "SilentlyContinue"
+
+if ($env:deployAKSHCI -eq "false") {
+    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+        New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
+    }
+} else {
+    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+        New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
+    }  
+}
+$ErrorActionPreference = "Continue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Deploying Arc Resource Bridge. This will take a while."
+    $WarningPreference = "SilentlyContinue"
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
     az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml
@@ -107,6 +130,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     az customlocation create --resource-group $using:rg --name $using:custom_location_name --cluster-extension-ids "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name/providers/Microsoft.KubernetesConfiguration/extensions/hci-vmoperator" --namespace hci-vmoperator --host-resource-id "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name" --location $using:location
     Write-Host "Custom location created."
+    $WarningPreference = "Continue"
 }
 $ErrorActionPreference = "Continue"
 
@@ -133,4 +157,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
 }
 $ErrorActionPreference = "Continue"
+
+# Set env variable deployResourceBridge to true (in case the script was run manually)
+[System.Environment]::SetEnvironmentVariable('deployResourceBridge', 'true',[System.EnvironmentVariableTarget]::Machine)
 Stop-Transcript

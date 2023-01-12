@@ -1,0 +1,46 @@
+{%- assign metadata = content.metadata -%}
+{%- assign spec = content.spec -%}
+{%- assign status = content.status -%}
+{%- assign tier = spec.tier -%}
+{%- assign tierLower = tier | downcase -%}
+{%- assign parentResource = spec.parentResource -%}
+
+{% if tierLower == "bc" %}
+  {%- assign tier = "BusinessCritical" -%}
+{% elsif tierLower == "businesscritical" %}
+  {%- assign tier = "BusinessCritical" -%}
+{% elsif tierLower == "gp" %}
+  {%- assign tier = "GeneralPurpose" -%}
+{% elsif tierLower == "generalpurpose" %}
+  {%- assign tier = "GeneralPurpose" -%}
+{% endif %}
+
+{%- assign licenseType = spec.licenseType -%}
+{%- assign licenseTypeLower = licenseType | downcase -%}
+
+{% if licenseTypeLower == "licenseincluded" %}
+  {%- assign licenseType = "LicenseIncluded" -%}
+{% elsif licenseTypeLower == "baseprice" %}
+  {%- assign licenseType = "BasePrice" -%}
+{% endif %}
+
+{%- assign skuName = "vCore" -%}
+
+{
+  "sku" : {
+    "name": "{{ skuName }}",
+    "tier": "{{ tier }}"
+  },
+  "properties": {
+    "k8sRaw": {
+      "metadata": {{ metadata }},
+    {% if status != nil %}
+      "status": {{ status }},
+    {% endif %}
+      "spec": {{ spec }}
+    },
+    "basicLoginInformation": null,
+    "licenseType": "{{ licenseType }}",
+    {% if parentResource != nil %} "dataControllerId": {{ parentResource | KubernetesReference | json }}, {% endif %}
+  }
+}

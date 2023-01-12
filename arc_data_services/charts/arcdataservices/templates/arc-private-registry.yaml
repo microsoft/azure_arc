@@ -1,0 +1,19 @@
+{{- define "imagePullSecret" }}
+{{- with .Values.imageCredentials }}
+{{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
+{{- end }}
+{{- end }}
+
+{{ if eq .Values.connectionMode "direct" }}
+
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: {{ .Values.systemDefaultValues.imagePullSecret }}
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+
+{{ end }}

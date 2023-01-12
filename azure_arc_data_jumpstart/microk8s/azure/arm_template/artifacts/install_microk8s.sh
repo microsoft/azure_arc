@@ -44,7 +44,7 @@ echo "Installing snap and Microk8s..."
 echo "###########################################################################"
 
 # Set Microk8s deployment environment variables
-export MICROK8S_VERSION="1.2.4" # Do not change!
+export MICROK8S_VERSION="1.25" # Do not change!
 
 # Sync packages
 sudo apt-get update
