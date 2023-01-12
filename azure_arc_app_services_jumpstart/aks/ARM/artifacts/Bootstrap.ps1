@@ -18,8 +18,7 @@ param (
     [string]$templateBaseUrl,
     [string]$productsImage,
     [string]$inventoryImage,
-    [string]$storeImage,
-    [string]$kubectlVersion
+    [string]$storeImage
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -41,7 +40,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('productsImage', $productsImage,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('inventoryImage', $inventoryImage,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('storeImage', $storeImage,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('kubectlVersion', $kubectlVersion,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path
@@ -93,6 +91,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") 
 workflow ClientTools_01
         {
             $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $kubectlVersion = '1.24.9'
             #Run commands in parallel.
             Parallel 
                 {
@@ -117,8 +116,8 @@ workflow ClientTools_01
                             foreach ($app in $appsToInstall)
                             {
                                 if ($app -eq "kubernetes-cli"){
-                                    Write-Host "Installing $app $kubectlVersion"
-                                    & choco install $app --version 1.24.9 /y -Force| Write-Output
+                                    Write-Host "Installing $app"
+                                    & choco install $app --version $kubectlVersion /y -Force| Write-Output
                                 } else {
                                     Write-Host "Installing $app"
                                     & choco install $app /y -Force| Write-Output
