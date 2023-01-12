@@ -201,6 +201,13 @@
             "metadata": {
                 "description": "Store API Image"
             }
+        },
+        "kubectlVersion": {
+            "defaultValue": "1.24.9",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubectl"
+            }
         }
     },
     "variables": {
@@ -349,7 +356,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployContainerApps ', parameters('deployContainerApps'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'),  ' -connectedClusterName ', parameters('connectedClusterName'), ' -adminEmail ', parameters('adminEmail'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -productsImage ', parameters('productsImage'), ' -inventoryImage ', parameters('inventoryImage'), ' -storeImage ', parameters('storeImage'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployContainerApps ', parameters('deployContainerApps'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'),  ' -connectedClusterName ', parameters('connectedClusterName'), ' -adminEmail ', parameters('adminEmail'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -productsImage ', parameters('productsImage'), ' -inventoryImage ', parameters('inventoryImage'), ' -storeImage ', parameters('storeImage'), ' -kubectlVersion ', parameters('kubectlVersion'))]"
                 }
             }
         },
