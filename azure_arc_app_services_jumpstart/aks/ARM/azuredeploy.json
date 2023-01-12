@@ -53,6 +53,13 @@
                 "description": "The version of Kubernetes"
             }
         },
+        "kubectlVersion": {
+            "defaultValue": "1.24.9",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubectl"
+            }
+        },
         "clusterName": {
             "type": "string",
             "defaultValue": "Arc-AppSvc-AKS",
@@ -113,7 +120,7 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "microsoft"
+            "defaultValue": "zaidmohd"
         },
         "githubBranch": {
             "type": "string",
@@ -319,6 +326,9 @@
                     },
                     "storeImage": {
                         "value": "[parameters('storeImage')]"
+                    },
+                    "kubectlVersion": {
+                        "value": "[parameters('kubectlVersion')]"
                     }
                 }
             }
