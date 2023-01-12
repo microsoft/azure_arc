@@ -11,6 +11,7 @@ $Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
+
 $WarningPreference = "SilentlyContinue"
 
 Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-SQLMI.log
@@ -142,10 +143,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Write-Host "`n"
 
-    kubectl get pods -n arc
-
-    Write-Host "`n"
-
     Do {
         Write-Host "Waiting for bootstrapper pod, hold tight..."
         Start-Sleep -Seconds 20
@@ -198,7 +195,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 
 # Preparing AD for SQL MI AD authenticaion
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
-Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Import-Module ActiveDirectory
     Import-Module DnsServer
