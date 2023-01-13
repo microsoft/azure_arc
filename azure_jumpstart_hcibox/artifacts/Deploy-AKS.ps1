@@ -55,6 +55,8 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Import-Module Az.Resources
     Import-Module AzureAD
     Import-Module AksHci
+    Import-Module ActiveDirectory
+    Import-Module DnsServer
     Initialize-AksHciNode
     $ProgressPreference = "Continue"
 }
