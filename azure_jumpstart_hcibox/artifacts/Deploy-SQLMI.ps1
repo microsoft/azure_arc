@@ -128,7 +128,7 @@ foreach ($VM in $SDNConfig.HostList) {
 
 
 # View data services deployment progress
-Start-Process -PassThru PowerShell { for (0 -lt 1) { Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host} } }
+#Start-Process -PassThru PowerShell { for (0 -lt 1) { Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host} } }
 
 # Deploying the Arc Data Controller
 Write-Host "Deploying the Arc Data Controller"
@@ -206,8 +206,6 @@ Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
-    Import-Module ActiveDirectory
-    Import-Module DnsServer
     $sqlmiouName = "ArcSQLMI"
     $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
     $sqlmi_port = 11433
