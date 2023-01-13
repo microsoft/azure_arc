@@ -1,10 +1,10 @@
-# Azure Arc-enabled data services - Sample yaml files
+# Azure Arc enabled data services - Sample yaml files
 
-This folder contains deployment related scripts for Azure Arc-enabled data services. These scripts can be applied using kubectl command-line tool. If you are performing any operations on the services using the [Azure Data CLI](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15) tool then ensure that you have the latest version always.
+This folder contains deployment related scripts for Azure Arc enabled data services. These scripts can be applied using kubectl command-line tool. If you are performing any operations on the services using the [Azure Data CLI](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15) tool then ensure that you have the latest version always.
 
 ## Deployment yaml files for kube-native operations
 
-The following yaml files can be used to create Azure Arc-enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
+The following yaml files can be used to create Azure Arc enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
 
 1. [Create Deployer Service Account](../../arcdata-deployer.yaml)
 This yaml file creates a deployer service account in a specified namespace with proper RBAC. This service account will be used in the next step to run a "bootstrap" job. Replace the placeholder `{{NAMESPACE}}` in the file before applying.
@@ -96,4 +96,4 @@ Similary, the RBAC permissions for the corresponding release must be applied bef
 
 ## [RBAC samples](./rbac)
 
-This folder contains yaml files that provide cluster roles and roles to configure Kubernetes RBAC for Azure Arc-enabled data services.
+This folder contains yaml files that provide cluster roles and roles to configure Kubernetes RBAC for Azure Arc enabled data services.
