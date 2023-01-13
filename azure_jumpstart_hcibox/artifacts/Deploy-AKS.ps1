@@ -55,8 +55,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Import-Module Az.Resources
     Import-Module AzureAD
     Import-Module AksHci
-    Import-Module ActiveDirectory
-    Import-Module DnsServer
+    Install-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
     Initialize-AksHciNode
     $ProgressPreference = "Continue"
 }
