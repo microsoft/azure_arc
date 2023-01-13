@@ -117,7 +117,7 @@ workflow ClientTools_01
                             {
                                 if ($app -eq "kubernetes-cli"){
                                     Write-Host "Installing $app"
-                                    & choco install $app --version $kubectlVersion /y -Force| Write-Output
+                                    & choco install $app --version $using:kubectlVersion /y -Force| Write-Output
                                 } else {
                                     Write-Host "Installing $app"
                                     & choco install $app /y -Force| Write-Output
