@@ -205,6 +205,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
+    Import-Module ActiveDirectory
+    Import-Module DnsServer
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $sqlmiouName = "ArcSQLMI"
     $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
