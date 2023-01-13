@@ -27,7 +27,7 @@ spec:
       jsonPath: ".metadata.creationTimestamp"
   - name: v1beta2
     served: true
-    storage: true
+    storage: false
     schema:
       openAPIV3Schema:
         type: object
@@ -41,6 +41,15 @@ spec:
     - name: Age
       type: date
       jsonPath: ".metadata.creationTimestamp"
+  - name: v1beta3
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
   conversion:
     strategy: None
   names:
