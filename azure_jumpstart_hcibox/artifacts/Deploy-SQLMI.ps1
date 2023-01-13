@@ -55,19 +55,6 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Import-Module AksHci
     Initialize-AksHciNode
 }
-# Initializing variables
-$subId = $env:subscriptionId
-$rg = $env:resourceGroup
-$spnClientId = $env:spnClientId
-$spnSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
-$adminUsername = $env:adminUsername
-$adminPassword = $env:adminPassword
-$workspaceName = $env:workspaceName
-$customLocationObjectId = $env:customLocationObjectId
-$dataController = "arcbox-dc"
-$sqlMI = "jumpstart-sql"
-$customLocation = "jumpstart-cl"
 
 # Downloading artifacts for Azure Arc Data services
 Write-Header "Downloading artifacts for Azure Arc Data services"
@@ -97,6 +84,21 @@ for ($i = 0; $i -lt $prefixLen; $i++) {
 $clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
 [System.Environment]::SetEnvironmentVariable('AKS-DataSvcs-ClusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
 
+# Initializing variables
+$subId = $env:subscriptionId
+$rg = $env:resourceGroup
+$spnClientId = $env:spnClientId
+$spnSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$adminUsername = $env:adminUsername
+$adminPassword = $env:adminPassword
+$workspaceName = $env:workspaceName
+$customLocationObjectId = $env:customLocationObjectId
+$dataController = "arcbox-dc-$namingPrefix"
+$sqlMI = "jumpstart-sql"
+$customLocation = "jumpstart-cl-$namingPrefix"
+
+
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
@@ -124,9 +126,14 @@ foreach ($VM in $SDNConfig.HostList) {
     }
 }
 
+
+# View data services deployment progress
+Start-Process -PassThru PowerShell { for (0 -lt 1) { Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host} } }
+
 # Deploying the Arc Data Controller
 Write-Host "Deploying the Arc Data Controller"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    $WarningPreference = "SilentlyContinue"
     #$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Installing the Arc Data extension"
@@ -155,6 +162,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
+    $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
     az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations
@@ -196,6 +204,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 # Preparing AD for SQL MI AD authenticaion
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Import-Module ActiveDirectory
     Import-Module DnsServer
