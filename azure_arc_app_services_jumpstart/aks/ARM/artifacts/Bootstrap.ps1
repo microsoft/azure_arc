@@ -91,6 +91,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") 
 workflow ClientTools_01
         {
             $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $kubectlVersion = '1.24.9'
             #Run commands in parallel.
             Parallel 
                 {
@@ -114,8 +115,13 @@ workflow ClientTools_01
                         
                             foreach ($app in $appsToInstall)
                             {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
+                                if ($app -eq "kubernetes-cli"){
+                                    Write-Host "Installing $app"
+                                    & choco install $app --version $using:kubectlVersion /y -Force| Write-Output
+                                } else {
+                                    Write-Host "Installing $app"
+                                    & choco install $app /y -Force| Write-Output
+                                }
                             }
                         }
                     }
