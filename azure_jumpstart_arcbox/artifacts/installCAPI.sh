@@ -81,9 +81,9 @@ sudo snap install kubectl --classic
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.3.1" # Do not change!
+export CLUSTERCTL_VERSION="1.3.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.6.1" # Do not change!
+export CAPI_PROVIDER_VERSION="1.7.0" # Do not change!
 export KUBERNETES_VERSION="1.25.5" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.26.0" # Do not change!
 export K3S_VERSION="1.25.5+k3s1" # Do not change!
