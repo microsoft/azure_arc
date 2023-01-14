@@ -14,7 +14,7 @@ By the end of this scenario, you will have an AKS cluster deployed with the Azur
 
 > **NOTE: Currently, Azure Azure Container Apps is in preview.**
 
-The following Jumpstart scenario will guide you on how to run cloud-native application on [Azure Container Apps](https://azure.microsoft.com/en-us/products/container-apps/). The Azure Container Apps service enables you to run microservices and containerized applications on a serverless platform. Individual container apps are deployed to a single Container Apps environment, which acts as a secure boundary around groups of container apps.
+The following Jumpstart scenario will guide you on how to run cloud-native application on [Azure Container Apps](https://azure.microsoft.com/products/container-apps/). The Azure Container Apps service enables you to run microservices and containerized applications on a serverless platform. Individual container apps are deployed to a single Container Apps environment, which acts as a secure boundary around groups of container apps.
 
 In this scenario, you will deploy a [Container Apps environment](https://learn.microsoft.com/en-us/azure/container-apps/environment) and a 3-node container app running in Azure.
 
