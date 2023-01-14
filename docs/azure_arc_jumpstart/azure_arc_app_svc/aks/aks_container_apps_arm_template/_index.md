@@ -147,7 +147,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: The deployment time for this scenario can take ~10-20min**
 
-    > **NOTE: Since Azure Container App on Azure Arc-enabled Kubernetes is [currently in preview](https://learn.microsoft.com/en-us/azure/container-apps/azure-arc-overview#public-preview-limitations), deployment regions availability is limited to East US, East Asia and West Europe.**
+    > **NOTE: Since Azure Container App on Azure Arc-enabled Kubernetes is [currently in preview](https://learn.microsoft.com/azure/container-apps/azure-arc-overview#public-preview-limitations), deployment regions availability is limited to East US, East Asia and West Europe.**
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
