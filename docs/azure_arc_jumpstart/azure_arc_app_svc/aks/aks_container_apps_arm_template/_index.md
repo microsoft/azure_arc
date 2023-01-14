@@ -18,9 +18,9 @@ The following Jumpstart scenario will guide you on how to run cloud-native appli
 
 In this scenario, you will deploy a [Container Apps environment](https://learn.microsoft.com/en-us/azure/container-apps/environment) and a 3-node container app running in Azure.
 
-- Store - The store app is the store's frontend app, running a Blazor Server project that reaches out to the backend APIs.
-- Products API - This API is a Swagger UI-enabled API that hands back product names and IDs to callers.
-- Inventory API - A simple API that provides a random number for a given product ID string. The values of each string/integer pair are stored in memory cache so they are consistent between API calls.
+- Store - The store app is the store's frontend app, running a [Blazor Server project](https://learn.microsoft.com/dotnet/architecture/blazor-for-web-forms-developers/introduction) that reaches out to the backend APIs.
+- Products API - This API is a [Swagger UI-enabled API](https://swagger.io/tools/swagger-ui/) that hands back product names and IDs to callers.
+- Inventory API - A simple API that provides a random number for a given product ID string. The values of each string/integer pair are stored in a memory cache so they are consistent between API calls.
 
 ## Prerequisites
 
