@@ -461,12 +461,12 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$using:adminUsername in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
-        Write-Host "`n"
-        Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-        kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
-        Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-        kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminPassword -P "$using:adminPassword" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
-        Write-Host "Restoring AdventureWorks database completed."
+    Write-Host "`n"
+    Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+    kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+    Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+    kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminPassword -P "$using:adminPassword" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+    Write-Host "Restoring AdventureWorks database completed."
 }
 
 # Install Azure Data Studio
@@ -492,50 +492,50 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $Shortcut.Save()
 
     Write-Host "Generating endpoints file"
-write-host "`n"
+    Write-host "`n"
 
-# Retrieving SQL MI connection endpoint
-Get-AksHciCredential -name $using:clusterName -Confirm:$false
-$sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
-$sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
-write-host "`n"
+    # Retrieving SQL MI connection endpoint
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
+    $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+    $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
+    Write-host "`n"
 
-# Get public ip of the SQLMI endpoint
-$sqlmiIpaddress = kubectl get svc -n arc "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+    # Get public ip of the SQLMI endpoint
+    $sqlmiIpaddress = kubectl get svc -n arc "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 
-# Get public ip of the secondary SQLMI endpoint
-$sqlmiSecondaryIpaddress = kubectl get svc -n arc "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
+    # Get public ip of the secondary SQLMI endpoint
+    $sqlmiSecondaryIpaddress = kubectl get svc -n arc "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
 
-# Write endpoint information in the file
+    # Write endpoint information in the file
 
-$SQLInstanceName = $sqlInstance.context.toupper()
+    $SQLInstanceName = $sqlInstance.context.toupper()
 
-Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 5
 
-Add-Content $Endpoints "======================================================================"
-Add-Content $Endpoints ""
-Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
-$sqlmiEndPoint | Add-Content $Endpoints
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
+    $sqlmiEndPoint | Add-Content $Endpoints
 
-Add-Content $Endpoints ""
-Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
-$sqlmiSecondaryEndPoint | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
+    $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
-Add-Content $Endpoints ""
-Add-Content $Endpoints "SQL Managed Instance SQL login username:"
-$using:adminUsername | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "SQL Managed Instance SQL login username:"
+    $using:adminUsername | Add-Content $Endpoints
 
-Add-Content $Endpoints ""
-Add-Content $Endpoints "SQL Managed Instance SQL login password:"
-$using:adminPassword | Add-Content $Endpoints
-Add-Content $Endpoints ""
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "SQL Managed Instance SQL login password:"
+    $using:adminPassword | Add-Content $Endpoints
+    Add-Content $Endpoints ""
 
-Add-Content $Endpoints "======================================================================"
-Add-Content $Endpoints ""
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
 
-Copy-Item "c:\VHD\$filename.txt" -Destination "\\admincenter\c$\users\$using:adminUsername\desktop\endpoints.txt" -Force
+    Copy-Item "c:\VHD\$filename.txt" -Destination "\\admincenter\c$\users\$using:adminUsername\desktop\endpoints.txt" -Force
 
 }
 
