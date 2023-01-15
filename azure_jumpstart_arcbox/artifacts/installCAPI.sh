@@ -74,10 +74,6 @@ sudo snap install docker
 sudo groupadd docker
 sudo usermod -aG docker $adminUsername
 
-# Installing kubectl
-# sudo snap install kubectl --classic
-sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
-
 # Installing kustomize
 sudo snap install kustomize
 
@@ -115,6 +111,10 @@ export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d 
 export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Installing kubectl
+# sudo snap install kubectl --classic
+sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
 
 # Installing Rancher K3s cluster (single control plane)
 echo ""
