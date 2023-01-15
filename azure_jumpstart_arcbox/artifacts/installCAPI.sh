@@ -75,12 +75,14 @@ sudo groupadd docker
 sudo usermod -aG docker $adminUsername
 
 # Installing kubectl
-sudo snap install kubectl --classic
+# sudo snap install kubectl --classic
+sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
 
 # Installing kustomize
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
+export KUBECTL_VERSION="1.24/stable" # Do not change!
 export CLUSTERCTL_VERSION="1.3.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.7.0" # Do not change!
