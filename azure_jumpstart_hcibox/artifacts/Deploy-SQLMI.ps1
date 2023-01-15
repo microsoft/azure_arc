@@ -97,7 +97,8 @@ $customLocationObjectId = $env:customLocationObjectId
 $dataController = "arcbox-dc-$namingPrefix"
 $sqlMI = "jumpstart-sql"
 $customLocation = "jumpstart-cl-$namingPrefix"
-
+$domainName = "jumpstart"
+$defaultDomainPartition = "DC=$domainName,DC=local"
 
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
@@ -126,15 +127,10 @@ foreach ($VM in $SDNConfig.HostList) {
     }
 }
 
-
-# View data services deployment progress
-#Start-Process -PassThru PowerShell { for (0 -lt 1) { Invoke-Command -VMName $using:SDNConfig.HostList[0] -Credential $using:adcred -ScriptBlock {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host} } }
-
 # Deploying the Arc Data Controller
 Write-Host "Deploying the Arc Data Controller"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
-    #$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Installing the Arc Data extension"
     Write-Host "`n"
@@ -152,6 +148,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Do {
         Write-Host "Waiting for bootstrapper pod, hold tight..."
+        Write-Host "`n"
+        kubectl get pods -n arc
+        Write-Host "`n"
         Start-Sleep -Seconds 20
         $podStatus = $(if (kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($podStatus -eq "Nope")
@@ -161,7 +160,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
-Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
@@ -194,6 +193,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 
     Do {
         Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+        Write-Host "`n"
+        kubectl get pods -n arc
+        Write-Host "`n"
         Start-Sleep -Seconds 45
         $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
@@ -205,13 +207,13 @@ Invoke-Command -VMName $SDNConfig.HostList[0]  -Credential $adcred -ScriptBlock 
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
-    Import-Module ActiveDirectory
-    Import-Module DnsServer
+    Add-WindowsFeature -Name "RSAT-AD-PowerShell" –IncludeAllSubFeature
+    Add-WindowsFeature -Name "RSAT-DNS-Server" –IncludeAllSubFeature
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
+    $dcInfo = Get-ADDomainController -discover -domain $using:domainName
     $sqlmiouName = "ArcSQLMI"
-    $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
+    $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $using:defaultDomainPartition
     $sqlmi_port = 11433
-    $dcInfo = Get-ADDomainController
     $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
     $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
 
@@ -261,12 +263,12 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         }
         else {
             Write-Host "Organization Unit $sqlmiouName does not exist. Creating new OU."
-            New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+            New-ADOrganizationalUnit -Name $sqlmiouName -Path $using:defaultDomainPartition -ProtectedFromAccidentalDeletion $False
         }
     }
     catch {
         Write-Host "Organization Unit $sqlmiOu does not exist. Creating new OU."
-        New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+        New-ADOrganizationalUnit -Name $sqlmiouName -Path $using:defaultDomainPartition -ProtectedFromAccidentalDeletion $False
     }
 
     # Deploying Active Directory connector and Azure Arc SQL MI
@@ -363,6 +365,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "`n"
     Do {
         Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
+        Write-Host "`n"
+        kubectl get pods -n arc
+        Write-Host "`n"
         Start-Sleep -Seconds 30
         $adcStatus = $(if (kubectl get adc adarc -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($adcStatus -eq "Nope")
@@ -438,6 +443,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Do {
         Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Write-Host "`n"
+        kubectl get pods -n arc
+        Write-Host "`n"
         Start-Sleep -Seconds 45
         $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
@@ -482,9 +490,8 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
     $Shortcut.TargetPath = $TargetFile
     $Shortcut.Save()
-}
 
-Write-Host "Generating endpoints file"
+    Write-Host "Generating endpoints file"
 write-host "`n"
 
 # Retrieving SQL MI connection endpoint
@@ -527,6 +534,10 @@ Add-Content $Endpoints ""
 
 Add-Content $Endpoints "======================================================================"
 Add-Content $Endpoints ""
+
+Copy-Item "c:\VHD\$filename.txt" -Destination "\\admincenter\c$\users\$using:adminUsername\desktop\endpoints.txt" -Force
+
+}
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)
