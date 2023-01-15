@@ -160,7 +160,7 @@ $containerAppEnvId = $(az containerapp connected-env show `
      --query id `
      --output tsv)
 
-az resource wait --ids $containerAppEnvId --created
+az resource wait --ids $containerAppEnvId --custom "properties.installState!='Pending'"
 
 # Deploying Products API Container App
 Write-Host "`n"
