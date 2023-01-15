@@ -8,19 +8,19 @@ description: >
 
 ## Deploy Azure Container Apps on AKS using an ARM Template
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/azure-arc-overview) deployed on Azure Arc-enabled [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/azure-arc-overview) deployed on Azure Arc-enabled [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this scenario, you will have an AKS cluster deployed with the Azure Container Apps connected environment, a sample Web Application and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Container Apps.
+By the end of this scenario, you will have an Azure Kubernetes Service (AKS) cluster deployed with the Azure Container Apps connected environment, a sample Web Application and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Container Apps.
 
 > **NOTE: Currently, Azure Azure Container Apps is in preview.**
 
-The following Jumpstart scenario will guide you on how to run cloud-native application on [Azure Container Apps](https://azure.microsoft.com/en-us/products/container-apps/). The Azure Container Apps service enables you to run microservices and containerized applications on a serverless platform. Individual container apps are deployed to a single Container Apps environment, which acts as a secure boundary around groups of container apps.
+The following Jumpstart scenario will guide you on how to run cloud-native application on [Azure Container Apps](https://azure.microsoft.com/products/container-apps/). The Azure Container Apps service enables you to run microservices and containerized applications on a serverless platform. Individual container apps are deployed to a single Container Apps environment, which acts as a secure boundary around groups of container apps.
 
 In this scenario, you will deploy a [Container Apps environment](https://learn.microsoft.com/en-us/azure/container-apps/environment) and a 3-node container app running in Azure. The app leverages [Dapr](https://learn.microsoft.com/azure/container-apps/dapr-overview?tabs=bicep1%2Cyaml) to simplify service to service invocation.
 
-- Store - The store app is the store's frontend app, running a Blazor Server project that reaches out to the backend APIs.
-- Products API - This API is a Swagger UI-enabled API that hands back product names and IDs to callers.
-- Inventory API - A simple API that provides a random number for a given product ID string. The values of each string/integer pair are stored in memory cache so they are consistent between API calls.
+- Store - The store app is the store's frontend app, running a [Blazor Server project](https://learn.microsoft.com/dotnet/architecture/blazor-for-web-forms-developers/introduction) that reaches out to the backend APIs.
+- Products API - This API is a [Swagger UI-enabled API](https://swagger.io/tools/swagger-ui/) that hands back product names and IDs to callers.
+- Inventory API - A simple API that provides a random number for a given product ID string. The values of each string/integer pair are stored in a memory cache so they are consistent between API calls.
 
 ## Prerequisites
 
@@ -147,7 +147,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: The deployment time for this scenario can take ~10-20min**
 
-    > **NOTE: Since Azure Container App on Azure Arc-enabled Kubernetes is [currently in preview](https://learn.microsoft.com/en-us/azure/container-apps/azure-arc-overview#public-preview-limitations), deployment regions availability is limited to East US, East Asia and West Europe.**
+    > **NOTE: Since Azure Container App on Azure Arc-enabled Kubernetes is [currently in preview](https://learn.microsoft.com/azure/container-apps/azure-arc-overview#public-preview-limitations), deployment regions availability is limited to East US, East Asia and West Europe.**
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
@@ -232,7 +232,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   - **Custom location** - Provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
-  - **Container Apps Connected Environment**- Container Apps connected environment enables configuration common across apps but not related to cluster operations. Conceptually, it's deployed into the custom location resource, and app developers create apps into this environment.
+  - **Container Apps Connected Environment**- Container Apps connected environment enables common configuration across apps but is not related to cluster operations. Conceptually, it's deployed into the Custom location resource, and app developers create apps in this environment.
 
   - **Container App** - Azure Container Apps manages the details of Kubernetes and container orchestration for you. Containers in Azure Container Apps can use any runtime, programming language, or development stack of your choice.
   
