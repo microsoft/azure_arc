@@ -81,19 +81,17 @@ sudo snap install docker
 sudo groupadd docker
 sudo usermod -aG docker $adminUsername
 
-# Installing kubectl
-sudo snap install kubectl --classic
-
 # Installing kustomize
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.3.0" # Do not change!
+export KUBECTL_VERSION="1.24/stable" # Do not change!
+export CLUSTERCTL_VERSION="1.3.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.6.0" # Do not change!
-export KUBERNETES_VERSION="1.25.4" # Do not change!
-export AZURE_DISK_CSI_DRIVER_VERSION="1.25.0" # Do not change!
-export K3S_VERSION="1.25.4+k3s1" # Do not change!
+export CAPI_PROVIDER_VERSION="1.7.0" # Do not change!
+export KUBERNETES_VERSION="1.25.5" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.26.0" # Do not change!
+export K3S_VERSION="1.25.5+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -116,6 +114,9 @@ export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d 
 export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Installing kubectl
+sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
 
 # Installing Rancher K3s cluster (single control plane)
 echo ""

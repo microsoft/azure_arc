@@ -113,7 +113,6 @@ export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
 # Installing kubectl
-# sudo snap install kubectl --classic
 sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
 
 # Installing Rancher K3s cluster (single control plane)
