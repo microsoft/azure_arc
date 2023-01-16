@@ -61,7 +61,6 @@ echo "Create Azure Key Vault Kubernetes extension instance"
 az k8s-extension create \
   --name $k8sExtensionName \
   --extension-type Microsoft.AzureKeyVaultSecretsProvider \
-  --version '1.3.0' \
   --cluster-name $arcClusterName \
   --resource-group $resourceGroup \
   --cluster-type connectedClusters \
