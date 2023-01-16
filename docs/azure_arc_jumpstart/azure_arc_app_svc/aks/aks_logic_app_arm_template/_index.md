@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Logic App ARM Template"
 linkTitle: "Azure Logic App ARM Template"
-weight: 3
+weight: 4
 description: >
 ---
 
