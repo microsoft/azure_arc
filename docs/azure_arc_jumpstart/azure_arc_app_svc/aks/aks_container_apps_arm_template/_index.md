@@ -121,7 +121,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   - _`bastionHostName`_ - Azure Bastion host name.
 
-- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_app_services_jumpstart/aks/arm_template) and run the below command:
+- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_app_services_jumpstart/aks/ARM) and run the below command:
 
     ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region>
@@ -228,7 +228,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - Since this scenario is deploying both the Azure Container Apps, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
-  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled Kubernetes are used to deploy the Azure Containers Apps[cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled Kubernetes are used to deploy the Azure Containers Apps [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
   - **Custom location** - Provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
