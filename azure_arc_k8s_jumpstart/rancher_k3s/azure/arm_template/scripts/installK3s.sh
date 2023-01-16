@@ -28,7 +28,7 @@ sed -i '8s/^/export templateBaseUrl=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-export K3S_VERSION="1.25.4+k3s1"
+export K3S_VERSION="1.25.5+k3s1" # Do not change!
 
 # Creating login message of the day (motd)
 sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}scripts/welcomeK3s.sh
