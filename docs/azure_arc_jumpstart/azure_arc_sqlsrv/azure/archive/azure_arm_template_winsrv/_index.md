@@ -1,11 +1,11 @@
----
+<!-- ---
 type: docs
-title: "SQL Server Virtual Machine"
-linkTitle: "SQL Server Virtual Machine"
+title: "SQL Server on Windows Server Virtual Machine"
+linkTitle: "SQL Server on Windows Server Virtual Machine"
 weight: 1
----
+--- -->
 
-## Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform
+## Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using ARM Template
 
 The following Jumpstart scenario will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server and Microsoft SQL Server 2019 (Developer edition) and connect it as an Azure Arc-enabled SQL server resource.
 
@@ -67,10 +67,9 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
     ```
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
-
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-- Enable subscription for the *Microsoft.AzureArcData* and *Microsoft.HybridCompute* resource providers for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- Enable subscription for the _Microsoft.AzureArcData_ and _Microsoft.HybridCompute_ resource providers for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -90,19 +89,19 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
 The automation for this scenario includes 3 PowerShell scripts executed in the following order:
 
-1. [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
+1. [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/Bootstrap.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has the following functionalities:
 
     1. Download and install pre-requisite utilities via [Chocolatey](https://chocolatey.org/).
-    2. Download the [*LogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/LogonScript.ps1) and [*installArcAgentSQL.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/installArcAgentSQL.ps1) scripts.  
+    2. Download the [_LogonScript.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/LogonScript.ps1) and [_installArcAgentSQL.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/installArcAgentSQL.ps1) scripts.  
 
-2. [*LogonScript.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/LogonScript.ps1) - Executed upon initial login to the SQL virtual machine. This script has the following functionalities:
+2. [_LogonScript.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/LogonScript.ps1) - Executed upon initial login to the SQL virtual machine. This script has the following functionalities:
 
     1. Install and configure SQL Server on the VM
     2. Restore AdventureWorksLT2019 Database
     3. Allow Azure VM to be onboarded to Azure Arc
-    4. Execute the *installArcAgentSQL* script
+    4. Execute the _installArcAgentSQL_ script
 
-3. [*installArcAgentSQL.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/installArcAgentSQL.ps1) - This is the main script and will be executed by the *LogonScript* script at VM runtime. This script has the following functionalities:
+3. [_installArcAgentSQL.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/installArcAgentSQL.ps1) - This is the main script and will be executed by the _LogonScript_ script at VM runtime. This script has the following functionalities:
 
     1. Project SQL Server as an Azure Arc-enabled SQL server resource
     2. Install Log Analytics agent using an extension on Azure Arc-enabled server
@@ -112,9 +111,9 @@ To get familiar with the automation and deployment flow read the following expla
 
 1. User edits the ARM template parameters file (1-time edit). These parameters values are used throughout the deployment.
 
-2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [*Bootstrap.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Bootstrap.ps1) PowerShell Script. The script will:
+2. The ARM template includes an Azure VM Custom Script Extension which will deploy the [_Bootstrap.ps1_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/scripts/Bootstrap.ps1) PowerShell Script. The script will:
 
-    1. Download the *LogonScript.ps1* and *installArcAgentSQL* PowerShell scripts
+    1. Download the _LogonScript.ps1_ and _installArcAgentSQL_ PowerShell scripts
 
     2. Set local OS environment variables
 
@@ -124,7 +123,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 - Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
-- The deployment uses the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.parameters.example.json).
+- The deployment uses the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/azuredeploy.parameters.example.json).
 
 - Create a Resource Group which will contain the target for the ARM Template deployment using the following command:
 
@@ -138,14 +137,14 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
     az group create --name Arc-SQL-Demo --location "East US" --tags "Project=jumpstart_azure_arc_sql"
     ```
 
-- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/arm_template) and run the following command:
+- To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template) and run the following command:
 
     ```shell
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.json \
-    --parameters <The *azuredeploy.parameters.json* parameters file location>
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/azuredeploy.json \
+    --parameters <The _azuredeploy.parameters.json_ parameters file location>
     ```
 
     > **NOTE: Make sure that you are using the same Azure resource group name as the one you created in the previous step.**
@@ -156,7 +155,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
     az deployment group create \
     --resource-group Arc-SQL-Demo \
     --name arcsqlsrvdemo \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/windows/vanilla/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
@@ -227,7 +226,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
     ![Screenshot showing Azure Arc-enabled SQL resources](./post_deployment_portal_arc_sql.png)
 
-- Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed.
+- Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the _AdventureWorksLT2019_ sample database is deployed.
 
     ![Screenshot showing SQL Management Studio](./sql_server_management_login.png)
 
@@ -239,7 +238,7 @@ Now that you have both the server and SQL projected as Azure Arc resources the l
 
 - On the SQL Azure Arc resource click on "Environment Health", then click "Download configuration script".
 
-    Since the *installArcAgentSQL* run in the deployment step took care of deploying and installing the required binaries you can safely ignore and delete the downloaded *AddSqlAssessment.ps1* file.
+    Since the _installArcAgentSQL_ run in the deployment step took care of deploying and installing the required binaries you can safely ignore and delete the downloaded _AddSqlAssessment.ps1_ file.
 
     Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 

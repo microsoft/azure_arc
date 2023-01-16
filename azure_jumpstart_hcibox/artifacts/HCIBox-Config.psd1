@@ -12,7 +12,7 @@
     azsHCIVHDXPath                       = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
     
     # SDN Lab Admin Password
-    SDNAdminPassword                     = "%staging-password%"                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
+    SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
 
     # VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
