@@ -1,0 +1,412 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "JS-VNet",
+      "metadata": {
+        "description": "Name of the VNet"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "JS-Subnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network"
+      }
+    },
+    "workspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure Region to deploy the Log Analytics Workspace"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "pergb2018",
+      "metadata": {
+        "description": "SKU, leave default pergb2018"
+      }
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Azure Bastion"
+      },
+      "defaultValue": false
+    },
+    "networkSecurityGroupName": {
+      "type": "string",
+      "defaultValue": "JS-NSG",
+      "metadata": {
+        "description": "Name of the Network Security Group"
+      }
+    }
+  },
+  "variables": {
+    "Updates": {
+      "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
+      "galleryName": "Updates"
+    },
+    "ChangeTracking": {
+      "name": "[format('ChangeTracking({0})', parameters('workspaceName'))]",
+      "galleryName": "ChangeTracking"
+    },
+    "Security": {
+      "name": "[format('Security({0})', parameters('workspaceName'))]",
+      "galleryName": "Security"
+    },
+    "automationAccountName": "[concat('JS-Automation-', uniquestring(resourceGroup().id))]",
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "addressPrefix": "172.16.0.0/16",
+    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "bastionName": "JS-Bastion",
+    "bastionSubnetIpPrefix": "172.16.3.64/26",
+    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
+    "subnetsWithBastion" : [
+      {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+              "networkSecurityGroup" : {
+                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
+            }
+          }
+    ],
+    "subnetsWithoutBastion" : [
+      {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
+            }
+          }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-02-01",
+      "name": "[parameters('networkSecurityGroupName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allow_RDP_3389",
+            "properties": {
+              "priority": 1001,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "[if(parameters('deployBastion'), variables('bastionSubnetIpPrefix'), variables('addressPrefix'))]",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          },
+          {
+            "name": "bastion_allow_https_inbound",
+            "properties": {
+              "priority": 1010,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_gateway_manager_inbound",
+            "properties": {
+              "priority": 1011,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "GatewayManager",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_load_balancer_inbound",
+            "properties": {
+              "priority": 1012,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_host_comms",
+            "properties": {
+              "priority": 1013,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRanges": [
+                "8080",
+                "5701"
+              ]
+            }
+          },
+          {
+            "name": "bastion_allow_ssh_rdp_outbound",
+            "properties": {
+              "priority": 1014,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRanges": [ "22", "3389" ]
+            }
+          },
+          {
+            "name": "bastion_allow_azure_cloud_outbound",
+            "properties": {
+              "priority": 1015,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "AzureCloud",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_bastion_comms",
+            "properties": {
+              "priority": 1016,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRanges": [ "8080", "5701" ]
+            }
+          },
+          {
+            "name": "bastion_allow_get_session_info",
+            "properties": {
+              "priority": 1017,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "Internet",
+              "destinationPortRanges": [ "80", "443" ]
+            }
+          }          
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2021-12-01-preview",
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('sku')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('location')]",
+      "name": "[variables('Updates').name]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
+      "properties": {
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      },
+      "plan": {
+        "name": "[variables('Updates').name]",
+        "publisher": "Microsoft",
+        "promotionCode": "",
+        "product": "[concat('OMSGallery/', variables('Updates').galleryName)]"
+      }
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
+      "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+      "properties": {
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      },
+      "plan": {
+        "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+        "product": "[concat('OMSGallery/', 'VMInsights')]",
+        "promotionCode": "",
+        "publisher": "Microsoft"
+      }
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "apiVersion": "2015-11-01-preview",
+      "name": "[variables('ChangeTracking').name]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      ],
+      "plan": {
+        "name": "[variables('ChangeTracking').name]",
+        "promotionCode": "",
+        "product": "[format('OMSGallery/{0}', variables('ChangeTracking').galleryName)]",
+        "publisher": "Microsoft"
+      },
+      "properties": {
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.OperationsManagement/solutions",
+      "apiVersion": "2015-11-01-preview",
+      "name": "[variables('Security').name]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      ],
+      "plan": {
+        "name": "[variables('Security').name]",
+        "promotionCode": "",
+        "product": "[format('OMSGallery/{0}', variables('Security').galleryName)]",
+        "publisher": "Microsoft"
+      },
+      "properties": {
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2021-06-22",
+      "name": "[variables('automationAccountName')]",
+      "location": "[variables('automationAccountLocation')]",
+      "dependsOn": [
+        "[parameters('workspaceName')]"
+      ],
+      "properties": {
+        "sku": {
+          "name": "Basic"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
+      "apiVersion": "2020-08-01",
+      "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[parameters('workspaceName')]",
+        "[variables('automationAccountName')]"
+      ],
+      "properties": {
+        "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2021-05-01",
+      "name": "[variables('bastionPublicIpAddressName')]",
+      "condition": "[parameters('deployBastion')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "idleTimeoutInMinutes": 4
+      },
+      "sku": {
+        "name": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[parameters('deployBastion')]",
+      "name": "[variables('bastionName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2021-05-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionPublicIpAddressName'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
