@@ -146,7 +146,6 @@ az keyvault certificate import `
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
 az k8s-extension create --name 'akvsecretsprovider' `
     --extension-type Microsoft.AzureKeyVaultSecretsProvider `
-    --version '1.3.0' `
     --scope cluster `
     --cluster-name $clusterName `
     --resource-group $Env:resourceGroup `
