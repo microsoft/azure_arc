@@ -33,7 +33,7 @@ param deployResourceBridge bool = true
 param deploySQLMI bool = true
 
 @description('Public DNS to use for the domain')
-param natDNS string = '8.8.8.8'
+param natDNS string = '1.1.1.1'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
