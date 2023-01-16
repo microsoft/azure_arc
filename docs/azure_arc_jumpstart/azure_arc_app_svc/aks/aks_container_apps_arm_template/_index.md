@@ -246,7 +246,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing the web application open in a web browser](./23.png)
 
-- Optionally, you can review the Dapr configuration for the Container apps by navigating to the Dapr setting.
+- Optionally, you can review the [Dapr](https://learn.microsoft.com/azure/container-apps/dapr-overview?tabs=bicep1%2Cyaml) configuration for the Container apps by navigating to the Dapr setting.
 
   ![Screenshot showing Store Container App Dapr](./24.png)
 
