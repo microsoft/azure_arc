@@ -119,7 +119,7 @@ Start-Sleep -Seconds 20
 az customlocation create --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
 
 # Deploying Azure Arc Data Controller
-Write-Host "Deploying Azure Arc Data Controller"
+Write-Header "Deploying Azure Arc Data Controller"
 
 $customLocationId = $(az customlocation show --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 
