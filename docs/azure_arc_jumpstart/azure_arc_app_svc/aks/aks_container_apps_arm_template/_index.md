@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to deploy a "Ready to Go"
 
 By the end of this scenario, you will have an Azure Kubernetes Service (AKS) cluster deployed with the Azure Container Apps connected environment, a sample Web Application and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Container Apps.
 
-> **NOTE: Currently, Azure Azure Container Apps is in preview.**
+> **NOTE: Currently, Azure Arc-enabled Container Apps is in preview.**
 
 The following Jumpstart scenario will guide you on how to run cloud-native application on [Azure Container Apps](https://azure.microsoft.com/products/container-apps/). The Azure Container Apps service enables you to run microservices and containerized applications on a serverless platform. Individual container apps are deployed to a single Container Apps environment, which acts as a secure boundary around groups of container apps.
 
