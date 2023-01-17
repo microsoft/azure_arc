@@ -1,5 +1,5 @@
 #
-# This file contains sample RoleBindings for Azure Arc-enabled data services that uses Roles.
+# This file contains sample RoleBindings for Azure Arc enabled data services that uses Roles.
 #
 # This rolebinding grants permission to the user based on the azure-arc-data:reader role
 apiVersion: rbac.authorization.k8s.io/v1

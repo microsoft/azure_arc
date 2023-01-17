@@ -1,12 +1,11 @@
-# This file needs to match the CRD defined in the postgres plug-in in the controller.
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: postgresqls.arcdata.microsoft.com
+  annotations:
+    helm.sh/resource-policy: keep
   labels:
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-  annotations:
-    helm.sh/resource-policy: "keep"
 spec:
   group: arcdata.microsoft.com
   versions:
@@ -20,18 +19,12 @@ spec:
     subresources:
       status: {}
     additionalPrinterColumns:
-    - name: State
+    - jsonPath: .status.state
+      name: Status
       type: string
-      jsonPath: ".status.state"
-    - name: Ready-Pods
-      type: string
-      jsonPath: ".status.readyPods"
-    - name: Primary-Endpoint
-      type: string
-      jsonPath: ".status.primaryEndpoint"
-    - name: Age
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
       type: date
-      jsonPath: ".metadata.creationTimestamp"
   - name: v1beta2
     served: true
     storage: false
@@ -42,45 +35,497 @@ spec:
     subresources:
       status: {}
     additionalPrinterColumns:
-    - name: State
+    - jsonPath: .status.state
+      name: Status
       type: string
-      jsonPath: ".status.state"
-    - name: Ready-Pods
-      type: string
-      jsonPath: ".status.readyPods"
-    - name: Primary-Endpoint
-      type: string
-      jsonPath: ".status.primaryEndpoint"
-    - name: Age
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
       type: date
-      jsonPath: ".metadata.creationTimestamp"
   - name: v1beta3
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              services:
+                type: object
+                properties:
+                  primary:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      port:
+                        type: integer
+                      dnsName:
+                        type: string
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+              security:
+                type: object
+                properties:
+                  adminLoginSecret:
+                    type: string
+              scheduling:
+                type: object
+                properties:
+                  default:
+                    type: object
+                    properties:
+                      resources:
+                        type: object
+                        properties:
+                          limits:
+                            type: object
+                            additionalProperties:
+                              type: string
+                          requests:
+                            type: object
+                            additionalProperties:
+                              type: string
+              storage:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  logs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  backups:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+              dev:
+                type: boolean
+              update:
+                type: object
+                properties:
+                  desiredVersion:
+                    type: string
+              parentResource:
+                type: object
+                properties:
+                  apiGroup:
+                    type: string
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+          status:
+            type: object
+            properties:
+              primaryEndpoint:
+                type: string
+              logSearchDashboard:
+                type: string
+              metricsDashboard:
+                type: string
+              readyPods:
+                type: string
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+          apiVersion:
+            type: string
+          kind:
+            type: string
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+  - name: v1beta4
     served: true
     storage: true
     schema:
       openAPIV3Schema:
         type: object
-        x-kubernetes-preserve-unknown-fields: true
+        properties:
+          spec:
+            type: object
+            properties:
+              services:
+                type: object
+                properties:
+                  primary:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      port:
+                        type: integer
+                      dnsName:
+                        type: string
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+              security:
+                type: object
+                properties:
+                  adminLoginSecret:
+                    type: string
+                  serviceCertificateSecret:
+                    type: string
+              scheduling:
+                type: object
+                properties:
+                  default:
+                    type: object
+                    properties:
+                      resources:
+                        type: object
+                        properties:
+                          limits:
+                            type: object
+                            additionalProperties:
+                              type: string
+                          requests:
+                            type: object
+                            additionalProperties:
+                              type: string
+              storage:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  logs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  backups:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+              config:
+                type: object
+                properties:
+                  recoverySettings:
+                    type: object
+                    properties:
+                      sourceName:
+                        description: The name of the Postgres instance to restore
+                          from.
+                        type: string
+                      recoveryTargetTime:
+                        description: The timestamp to which the postgres recovery
+                          will proceed.
+                        type: string
+                        format: date-time
+                    required:
+                    - recoveryTargetTime
+                required:
+                - recoverySettings
+              dev:
+                type: boolean
+              settings:
+                description: Configure postgres.conf.
+                x-kubernetes-preserve-unknown-fields: true
+              update:
+                type: object
+                properties:
+                  desiredVersion:
+                    type: string
+              parentResource:
+                type: object
+                properties:
+                  apiGroup:
+                    type: string
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+          status:
+            type: object
+            properties:
+              primaryEndpoint:
+                type: string
+              logSearchDashboard:
+                type: string
+              metricsDashboard:
+                type: string
+              readyPods:
+                type: string
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+          apiVersion:
+            type: string
+          kind:
+            type: string
     subresources:
       status: {}
     additionalPrinterColumns:
-    - name: State
+    - name: Status
       type: string
-      jsonPath: ".status.state"
+      jsonPath: .status.state
     - name: Ready-Pods
       type: string
-      jsonPath: ".status.readyPods"
+      jsonPath: .status.readyPods
     - name: Primary-Endpoint
       type: string
-      jsonPath: ".status.primaryEndpoint"
+      jsonPath: .status.primaryEndpoint
+    - name: Running-Version
+      type: string
+      jsonPath: .status.runningVersion
     - name: Age
       type: date
-      jsonPath: ".metadata.creationTimestamp"
-  conversion:
-    strategy: None
+      jsonPath: .metadata.creationTimestamp
   names:
     kind: PostgreSql
     plural: postgresqls
     shortNames:
     - postgres
+    - pgsql
   scope: Namespaced
