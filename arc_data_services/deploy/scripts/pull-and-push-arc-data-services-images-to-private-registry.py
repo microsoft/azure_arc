@@ -2,9 +2,9 @@
 
 # requires installation of Docker: https://docs.docker.com/install/
 
-from subprocess import check_output, CalledProcessError, STDOUT, Popen, PIPE
-import os
 import getpass
+import os
+from subprocess import PIPE, STDOUT, CalledProcessError, Popen, check_output
 
 
 def execute_cmd(cmd):
@@ -54,9 +54,9 @@ else:
 if os.getenv("SOURCE_DOCKER_TAG") is None:
     SOURCE_DOCKER_TAG = (
         input(
-            "Provide container image tag for the images at the source - press ENTER for using 'v1.14.0_2022-12-13': "
+            "Provide container image tag for the images at the source - press ENTER for using 'v1.15.0_2023-01-10': "
         )
-        or "v1.14.0_2022-12-13"
+        or "v1.15.0_2023-01-10"
     )
 else:
     SOURCE_DOCKER_TAG = os.environ["SOURCE_DOCKER_TAG"]
