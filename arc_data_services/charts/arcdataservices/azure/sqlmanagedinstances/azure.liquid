@@ -18,6 +18,8 @@ However, Liquid template does not support merging objects. In order for it to wo
 {%- assign readableSecondaries = resource.k8sRaw.spec.readableSecondaries -%}
 {%- assign syncSecondaryToCommit = resource.k8sRaw.spec.syncSecondaryToCommit -%}
 {%- assign replicas = resource.k8sRaw.spec.replicas -%}
+{%- assign orchestratorReplicas = resource.k8sRaw.spec.orchestratorReplicas -%}
+{%- assign monitoringProfile = resource.k8sRaw.spec.monitoringProfile -%}
 
 {%- assign preferredPrimaryReplicaSpec = resource.k8sRaw.spec.preferredPrimaryReplicaSpec -%}
 {%- assign backup = resource.k8sRaw.spec.backup -%}
@@ -59,6 +61,8 @@ However, Liquid template does not support merging objects. In order for it to wo
     {% if readableSecondaries != nil %} "readableSecondaries": {{ readableSecondaries }}, {% endif %}
     {% if syncSecondaryToCommit != nil %} "syncSecondaryToCommit": {{ syncSecondaryToCommit }}, {% endif %}
     {% if replicas != nil %} "replicas": {{ replicas }}, {% endif %}
+    {% if orchestratorReplicas != nil %} "orchestratorReplicas": {{ orchestratorReplicas }}, {% endif %}
+    {% if monitoringProfile != nil %} "monitoringProfile": {{ monitoringProfile }}, {% endif %}
     {% if sku != nil and sku.tier != nil %} "tier": "{{ sku.tier }}", {% endif %}
     {% if update != nil %} "update": {{ update }}, {% endif %}
     {% if preferredPrimaryReplicaSpec != nil %} "preferredPrimaryReplicaSpec": {{ preferredPrimaryReplicaSpec }}, {% endif %}
