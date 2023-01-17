@@ -198,7 +198,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         Write-Host "`n"
         kubectl get pods -n arc
         Write-Host "`n"
-        Start-Sleep -Seconds 45
+        Start-Sleep -Seconds 65
         $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc data controller is ready!"
@@ -448,7 +448,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         Write-Host "`n"
         kubectl get pods -n arc
         Write-Host "`n"
-        Start-Sleep -Seconds 45
+        Start-Sleep -Seconds 65
         $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc SQL Managed Instance is ready!"
