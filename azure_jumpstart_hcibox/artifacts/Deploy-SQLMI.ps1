@@ -64,6 +64,7 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.json") -OutFile
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.parameters.json") -OutFile $Env:HCIBoxKVDir\adConnector.parameters.json
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.json") -OutFile $Env:HCIBoxKVDir\sqlmiAD.json
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.parameters.json") -OutFile $Env:HCIBoxKVDir\sqlmiAD.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:HCIBoxKVDir\settingsTemplate.json
 Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable") -OutFile $Env:HCIBoxKVDir\azuredatastudio.zip
 
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
@@ -72,6 +73,7 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\adConnector.jso
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
 
 # Generate unique name for workload cluster
@@ -473,6 +475,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 # Install Azure Data Studio
 Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+
     Write-Host "Installing Azure Data Studio"
     Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
     Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
@@ -493,10 +496,17 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $Shortcut.TargetPath = $TargetFile
     $Shortcut.Save()
 
+    
+}
+
+Write-Header "Configure ADS"
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Generating endpoints file"
     Write-host "`n"
 
     # Retrieving SQL MI connection endpoint
+    $sqlMIName = $using:sqlMI
+    $dcInfo = Get-ADDomainController -discover -domain $using:domainName
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
     $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
@@ -512,17 +522,17 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 
     # Write endpoint information in the file
 
-    $SQLInstanceName = $sqlInstance.context.toupper()
-
     Start-Sleep -Seconds 5
+    $filename = "SQLMIEndpoints.txt"
+    $Endpoints = "c:\vhd\$filename.txt"
 
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
     $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
@@ -539,7 +549,37 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 
     Copy-Item "c:\VHD\$filename.txt" -Destination "\\admincenter\c$\users\$using:adminUsername\desktop\endpoints.txt" -Force
 
+    write-host "Configuring ADS"
+
+    $settingsTemplate = "c:\VHD\settingsTemplate.json"
+    $ADSConnections = @"
+{
+ "options": {
+      "connectionName": "SQLMI",
+      "server": "$sqlmiEndPoint",
+      "database": "",
+      "authenticationType": "Integrated",
+      "applicationName": "azdata",
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "databaseDisplayName": ""
+    },
+    "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+    "providerName": "MSSQL",
+    "savePassword": true,
+    "id": "ac333479-a04b-436b-88ab-3b314a201295"
 }
+"@
+
+$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+$settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $ADSConnections
+ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplate
+
+New-Item -Path "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path $settingsTemplate -Destination "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+
+}
+
+
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)
