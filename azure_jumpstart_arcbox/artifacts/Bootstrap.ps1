@@ -73,15 +73,15 @@ param (
 # Creating ArcBox path
 Write-Output "Creating ArcBox path"
 $Env:ArcBoxDir = "C:\ArcBox"
-$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
-$Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
-$Env:ArcBoxGitOpsDir = "C:\ArcBox\GitOps"
-$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$Env:agentScript = "C:\ArcBox\agentScript"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
+$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$Env:ArcBoxKVDir = "$Env:ArcBoxDir\KeyVault"
+$Env:ArcBoxGitOpsDir = "$Env:ArcBoxDir\GitOps"
+$Env:ArcBoxIconDir = "$Env:ArcBoxDir\Icons"
+$Env:agentScript = "$Env:ArcBoxDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
-$Env:ArcBoxDataOpsDir = "C:\ArcBox\DataOps"
+$Env:ArcBoxDataOpsDir = "$Env:ArcBoxDir\DataOps"
 
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
@@ -183,6 +183,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arcsql.ico") -OutFile $Env:ArcBoxIconDir\arcsql.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1   
 }
 
 # DevOps
@@ -221,7 +222,8 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsAppScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsAppScript.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsAppDRScript.ps1") -OutFile $Env:ArcBoxDataOpsDir\DataOpsAppDRScript.ps1
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsTestAppScript.ps1") -OutFile $Env:ArcBoxDataOpsDir\DataOpsTestAppScript.ps1   
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsTestAppScript.ps1") -OutFile $Env:ArcBoxDataOpsDir\DataOpsTestAppScript.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1   
 }
 
 # Full
