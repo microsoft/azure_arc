@@ -209,8 +209,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 Write-Header "Preparing Active directory for SQL MI AD authenticaion"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
-    Add-WindowsFeature -Name "RSAT-AD-PowerShell" –IncludeAllSubFeature
-    Add-WindowsFeature -Name "RSAT-DNS-Server" –IncludeAllSubFeature
+    Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
+    Add-WindowsFeature -Name "RSAT-DNS-Server" -IncludeAllSubFeature
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $dcInfo = Get-ADDomainController -discover -domain $using:domainName
     $sqlmiouName = "ArcSQLMI"
