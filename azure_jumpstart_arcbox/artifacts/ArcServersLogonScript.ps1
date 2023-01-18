@@ -218,7 +218,7 @@ else {
     Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
 
     $Ubuntu02vmName = "ArcBox-Ubuntu-02"
-    New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${$Ubuntu02vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
     Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
 
