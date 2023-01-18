@@ -64,7 +64,7 @@ if ($Env:flavor -eq 'DataOps') {
 
     # Create the nested SQL VM
     Write-Host "Create Hyper-V VMs"
-    New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${SQLvmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${SQLvmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $SQLvmName -Count 2
 
     # We always want the VMs to start with the host and shut down cleanly with the host
@@ -201,24 +201,24 @@ else {
     # Create the nested VMs
     Write-Header "Create Hyper-V VMs"
     $Win2k19vmName = "ArcBox-Win2K19"
-    New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${Win2k19vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${Win2k19vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $Win2k19vmName -Count 2
 
     $Win2k22vmName = "ArcBox-Win2K22"
-    New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${Win2k22vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${Win2k22vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $Win2k22vmName -Count 2
 
     $SQLvmName = "ArcBox-SQL"
-    New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${SQLvmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${SQLvmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $SQLvmName -Count 2
 
     $Ubuntu01vmName = "ArcBox-Ubuntu-01"
-    New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${Ubuntu01vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${Ubuntu01vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
     Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
 
     $Ubuntu02vmName = "ArcBox-Ubuntu-02"
-    New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\${$Ubuntu02vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${$Ubuntu02vmName}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
     Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
 
