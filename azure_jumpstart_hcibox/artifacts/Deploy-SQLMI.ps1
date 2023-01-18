@@ -123,9 +123,9 @@ foreach ($VM in $SDNConfig.HostList) {
         [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin", [System.EnvironmentVariableTarget]::Machine)
         $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
         $ErrorActionPreference = "Continue"
-        az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+        az config set extension.use_dynamic_install=yes_without_prompt
         az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
-        az extension add --name arcdata --system --only-show-errors
+        az extension add --name arcdata --system
     }
 }
 
@@ -146,7 +146,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         --scope cluster `
         --release-namespace arc `
         --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper `
-        --only-show-errors
+        
 
     Write-Host "`n"
 
@@ -168,10 +168,10 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
-    az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations --only-show-errors
+    az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations 
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $using:rg --query id -o tsv
     Start-Sleep -Seconds 20
-    az customlocation create --name $using:customLocation --resource-group $using:rg --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
+    az customlocation create --name $using:customLocation --resource-group $using:rg --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId 
 
     $customLocationId = $(az customlocation show --name $using:customLocation --resource-group $using:rg --query id -o tsv)
 
