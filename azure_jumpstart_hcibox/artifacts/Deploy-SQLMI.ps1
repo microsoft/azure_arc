@@ -570,16 +570,37 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 }
 "@
 
-$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
-$settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $ADSConnections
-ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplate
+    $settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+    $settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $ADSConnections
+    ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplate
 
-New-Item -Path "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path $settingsTemplate -Destination "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    New-Item -Path "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+    Copy-Item -Path $settingsTemplate -Destination "\\admincenter\c$\users\$using:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 }
 
+Write-Header "Configure Grafana and Kibana shortcuts"
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
+    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $GrafanaURL = "https://" + $GrafanaURL + ":3000"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut("c:\VHD\Grafana.url")
+    $Favorite.TargetPath = $GrafanaURL;
+    $Favorite.Save()
 
+    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $KibanaURL = "https://" + $KibanaURL + ":5601"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut("c:\VHD\Desktop\Kibana.url")
+    $Favorite.TargetPath = $KibanaURL;
+    $Favorite.Save()
+
+    Copy-Item -Path "c:\VHD\Grafana.url" -Destination "\\admincenter\c$\users\$using:adminUsername\Desktop\Grafana.url"
+    Copy-Item -Path "c:\VHD\Kibana.url" -Destination "\\admincenter\c$\users\$using:adminUsername\Desktop\Kibana.url"
+
+}
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)
