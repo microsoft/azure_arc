@@ -179,7 +179,7 @@ else {
     $Env:AZCOPY_BUFFER_GB = 4
     if ($Env:flavor -eq "Full") {
         # The "Full" ArcBox flavor has an azcopy network throughput capping
-        Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."  
+        Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
         azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
     }
     else {
@@ -274,7 +274,7 @@ else {
     Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
     (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
     (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
-    
+
     # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
     if (-not $hasPermission) {
     (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
@@ -285,13 +285,13 @@ else {
 
     Write-Header "Copying Onboarding Scripts"
 
-    # Copy installtion script to nested Windows VMs
+    # Copy installation script to nested Windows VMs
     Write-Output "Transferring installation script to nested Windows VMs..."
     Copy-VMFile "ArcBox-Win2K19" -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
     Copy-VMFile "ArcBox-Win2K22" -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
     Copy-VMFile "ArcBox-SQL" -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\ArcBox\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
 
-    # Copy installtion script to nested Linux VMs
+    # Copy installation script to nested Linux VMs
     Write-Output "Transferring installation script to nested Linux VMs..."
     Set-SCPItem -ComputerName $Ubuntu01VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
     Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
@@ -314,6 +314,22 @@ else {
     $ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
     $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
     $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+
+    # Install SSH on the nested Windows VMs
+    Write-Output "Installing SSH on the nested Windows VMs"
+
+    Invoke-Command -VMName "ArcBox-SQL","ArcBox-Win2K19","ArcBox-Win2K22" -ScriptBlock {
+
+        # Install OpenSSH Server
+        Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+        Start-Service sshd
+        Set-Service -Name sshd -StartupType 'Automatic'
+        New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+
+        # Allow SSH via Azure Arc agent
+        azcmagent config set incomingconnections.ports 22
+
+    } -Credential $winCreds -AsJob
 
     # Creating Hyper-V Manager desktop shortcut
     Write-Header "Creating Hyper-V Shortcut"
@@ -363,19 +379,19 @@ else {
     }
 
     # Changing to Jumpstart ArcBox wallpaper
-    $code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+    $code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+    public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+            public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
             }
         }
-    } 
+    }
 '@
 
     $DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
@@ -383,7 +399,7 @@ namespace Win32{
     if (-not $DataServicesLogonScript) {
         Write-Header "Changing Wallpaper"
         $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-        Add-Type $code 
+        Add-Type $code
         [Win32.Wallpaper]::SetWallpaper($imgPath)
     }
 
@@ -393,7 +409,7 @@ namespace Win32{
 
     # Executing the deployment logs bundle PowerShell script in a new window
     Write-Header "Uploading Log Bundle"
-    Invoke-Expression 'cmd /c start Powershell -Command { 
+    Invoke-Expression 'cmd /c start Powershell -Command {
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
