@@ -47,7 +47,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.23.8",
+            "defaultValue": "1.24.6",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes"
@@ -65,6 +65,13 @@
             "defaultValue": "arcappsvc",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+            }
+        },
+        "deployContainerApps": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Container Apps deployment"
             }
         },
         "deployAppService": {
@@ -128,7 +135,29 @@
             "metadata": {
                 "description": "the Azure Bastion host name"
             }
+        },
+        "productsImage": {
+            "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/products:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
+            "metadata": {
+                "description": "Products API Image"
+            }
+        },
+        "inventoryImage": {
+            "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/inventory:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
+            "metadata": {
+                "description": "Inventory API Image"
+            }
+        },
+        "storeImage": {
+            "type": "string",
+            "defaultValue": "arcjumpstart.azurecr.io/store:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
+            "metadata": {
+                "description": "Store API Image"
+            }
         }
+
     },
     "variables": {
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_app_services_jumpstart/aks/ARM/')]",
@@ -249,6 +278,9 @@
                     "subnetName": {
                         "value": "[variables('subnetName')]"
                     },
+                    "deployContainerApps": {
+                        "value": "[parameters('deployContainerApps')]"
+                    },
                     "deployAppService": {
                         "value": "[parameters('deployAppService')]"
                     },
@@ -278,6 +310,15 @@
                     },
                     "bastionSubnetPrefix": {
                         "value": "[variables('bastionSubnetPrefix')]"
+                    },
+                    "productsImage": {
+                        "value": "[parameters('productsImage')]"
+                    },
+                    "inventoryImage": {
+                        "value": "[parameters('inventoryImage')]"
+                    },
+                    "storeImage": {
+                        "value": "[parameters('storeImage')]"
                     }
                 }
             }
