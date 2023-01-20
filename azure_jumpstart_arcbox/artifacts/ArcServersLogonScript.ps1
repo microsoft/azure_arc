@@ -331,6 +331,17 @@ else {
 
     } -Credential $winCreds -AsJob
 
+    # Enable Remote Desktop on the nested Windows VMs
+    Write-Output "Enabling Remote Desktop on the nested Windows VMs"
+
+    Invoke-Command -VMName "ArcBox-SQL","ArcBox-Win2K19","ArcBox-Win2K22" -ScriptBlock {
+
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
+
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    } -Credential $winCreds -AsJob
+
     # Creating Hyper-V Manager desktop shortcut
     Write-Header "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
