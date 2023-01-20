@@ -64,7 +64,7 @@
       "metadata": {
         "description": "Target GitHub account"
       },
-      "defaultValue": "microsoft"
+      "defaultValue": "zaidmohd"
     },
     "githubBranch": {
       "type": "string",
