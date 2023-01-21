@@ -46,27 +46,17 @@ param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 @description('DNS Server configuration')
 param dnsServers array = []
 
-var updates = {
-  name: 'Updates(${workspaceName})'
-  galleryName: 'Updates'
-}
-var changeTracking = {
-  name: 'ChangeTracking(${workspaceName})'
-  galleryName: 'ChangeTracking'
-}
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
 }
 
-var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
 var subnetAddressPrefix = '10.16.1.0/24'
 var addressPrefix = '10.16.0.0/16'
 var aksSubnetPrefix = '10.16.76.0/22'
 var dcSubnetPrefix = '10.16.2.0/24'
 var drAddressPrefix = '172.16.0.0/16'
 var drSubnetPrefix = '172.16.128.0/17'
-var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'ArcBox-Bastion'
@@ -439,48 +429,6 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  location: location
-  name: updates.name
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: updates.name
-    publisher: 'Microsoft'
-    promotionCode: ''
-    product: 'OMSGallery/${updates.galleryName}'
-  }
-}
-
-resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  location: location
-  name: 'VMInsights(${split(workspace.id, '/')[8]})'
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: 'VMInsights(${split(workspace.id, '/')[8]})'
-    product: 'OMSGallery/VMInsights'
-    promotionCode: ''
-    publisher: 'Microsoft'
-  }
-}
-
-resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  name: changeTracking.name
-  location: location
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: changeTracking.name
-    promotionCode: ''
-    product: 'OMSGallery/${changeTracking.galleryName}'
-    publisher: 'Microsoft'
-  }
-}
-
 resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   name: security.name
   location: location
@@ -492,27 +440,6 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     promotionCode: ''
     product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
-  }
-}
-
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
-  name: automationAccountName
-  location: automationAccountLocation
-  properties: {
-    sku: {
-      name: 'Basic'
-    }
-  }
-  dependsOn: [
-    workspace
-  ]
-}
-
-resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2020-08-01' = {
-  parent: workspace
-  name: 'Automation'
-  properties: {
-    resourceId: automationAccount.id
   }
 }
 

@@ -136,13 +136,13 @@ From within the Agent Monitoring section you will get several tabs:
 
 - _Overview_ - with three visualizations:
 
-  - _Log Analytics Agent installation status_ shows the Log Analytics Agent installation status as reported by Microsoft Defender for Cloud.
+  - _Azure Monitor Agent installation status_ shows the Azure Monitor Agent installation status as reported by Microsoft Defender for Cloud.
 
-     ![Log Analytics Agent installation status](./agentmgmt_overviewstatus.png)
+     ![Azure Monitor Agent installation status](./agentmgmt_overviewstatus.png)
 
-  - _Log Analytics Agent reporting status_ shows the current Log Analytics Agent reporting status of the Azure Arc-enabled servers. Machines that are sending current heartbeat information within the last 15 minutes are considered as currently reporting.
+  - _Azure Monitor Agent reporting status_ shows the current Azure Monitor Agent reporting status of the Azure Arc-enabled servers. Machines that are sending current heartbeat information within the last 15 minutes are considered as currently reporting.
 
-     ![Log Analytics Agent reporting status](./agentmgmt_overviewsreport.png)
+     ![Azure Monitor Agent reporting status](./agentmgmt_overviewsreport.png)
 
   - _Azure Defender coverage_ shows the status of Azure Defender for Servers across all servers that are protected by Microsoft Defender for Cloud.
 
@@ -155,105 +155,3 @@ From within the Agent Monitoring section you will get several tabs:
 - _Security status_ - has a full report of Azure VMs and Azure Arc-enabled-servers security configurations including its Log Analytics workspace and the agent status.
 
    ![Security Status](./agentmgmt_securitystatus.png)
-
-### Change Tracking
-
-Change Tracking in Azure Automation keeps track of the changes in virtual machines hosted in Azure, on-premises, and other cloud environments to help you pinpoint operational and environmental issues with software managed by the Distribution Package Manager.
-
-In Jumpstart ArcBox for IT Pros all of the Azure Arc-enabled servers are onboarded onto Change Tracking and Inventory. The "Change Tracking" tab of the Jumpstart Workbook shows insights from Azure Automation. To use this report you need to provide ArcBox's subscription and Log Analytics workspace in the parameters section along with a time range.
-
-   ![Change Tracking Parameters](./changetracking_parameters.png)
-
-The tab has two different sections:
-
-- _Software Inventory_ - This section provides a distinct count of publishers and applications for the servers selected. You can filter data by computer, publisher, or application.
-
-   ![Change Tracking Software Inventory](./changetracking_software.png)
-
-- _Windows Services_ - This section shows a table of Windows services with their state, account, and path.
-
-   ![Change Tracking Windows Services](./changetracking_services.png)
-
-### Update Management
-
-Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc-enabled servers.
-
-The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In ArcBox for IT Pros, all of the Azure Arc-enabled servers are onboarded onto Update Management with the "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation.
-
-To use this report you need to provide ArcBox's subscription, resource group, and Log Analytics workspace in the parameters section along with a time range.
-
-   ![Update Management parameters](./update_parameters.png)
-
-The tab has two different sections, one for Windows and one for Linux machines:
-
-- _Windows VM Updates_ - This section provides several reports:
-
-  - _Types of Windows Updates_ - This donut chart shows the number of Windows Updates grouped by type.
-
-   ![Update Windows Updates](./update_windows.png)
-
-  - _Top Windows VMs with Updates_ - Shows the top Windows machines with updates available and the number of updates per machine.
-
-   ![ Update Windows Top](./update_windows_top.png)
-
-  - _Update Summary_ - Shows a table with the updates available for each of the Windows machines and its severity. By selecting one of the names of the resources, you will get additional information on the available updates.
-
-   ![ Update Windows Summary](./update_windows_summary.png)
-
-- _Linux VM Updates_ - This section provides several reports:
-
-   > **Note: Please note there are no updates available for the Azure Arc-enabled servers in Arcbox for IT Pros in this instance.**
-
-  - _Types of Linux Updates_ - This donut chart shows the number of Windows Updates grouped by type.
-
-   ![Update Linux Updates](./update_linux.png)
-
-  - _Top Linux VMs with Updates_ - Shows the top Linux machines with updates available and the number of updates per machine.
-
-   ![ Update Linux Top](./update_linux_top.png)
-
-  - _Update Summary_ - Shows a table with the updates available for each of the Linux machines and its severity. By selecting one of the names of the resources, you will get additional information on the available updates.
-
-   ![ Update Linux Summary](./update_linux_summary.png)
-
-### SQL Healthcheck
-
-The Azure Monitor SQL Health Check solution assesses the risk and health of your Windows-based SQL Server instance that is connected to Azure Arc. The solution provides a prioritized list of recommendations specific to your deployed server infrastructure. Each recommendation provides guidance based on best practices and how to implement the suggested changes.
-
-ArcBox for IT Pros has one Windows VM running SQL Server that is onboarded as Azure Arc-enabled SQL server (as well as an Azure Arc-enabled server) where the SQL Assessment has been run. To use the "SQL Healthcheck" tab of the ArcBox for ITPros workbook you need to provide ArcBox's subscription, resource group, and Log Analytics workspace as parameters.
-
-   ![SQL Healthcheck parameters](./sql_healthcheck_parameters.png)
-
-The report will display the results of the assessment in four sections:
-
-- _Security and compliance_ - This section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the security and compliance recommendations.
-
-   ![SQL Healthcheck security and compliance status](./sql_healthcheck_security_status.png)
-
-   ![SQL Healthcheck security and compliance priority](./sql_healthcheck_security_priority.png)
-
-   ![SQL Healthcheck security and compliance status recommendations](./sql_healthcheck_security_recommendations.png)
-
-- _High availability and business continuity_ - This section has three different reports for all high availability and business continuity recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the high availability and business continuity recommendations.
-
-   ![SQL Healthcheck HA status](./sql_healthcheck_ha_status.png)
-
-   ![SQL Healthcheck HA priority](./sql_healthcheck_ha_priority.png)
-
-   ![SQL Healthcheck HA status recommendations](./sql_healthcheck_ha_recommendations.png)
-
-- _Performance and scalability_ - This section has three different reports for all performance and scalability recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the performance and scalability recommendations.
-
-   ![SQL Healthcheck performance status](./sql_healthcheck_performance_status.png)
-
-   ![SQL Healthcheck performance priority](./sql_healthcheck_performance_priority.png)
-
-   ![SQL Healthcheck performance status recommendations](./sql_healthcheck_performance_recommendations.png)
-
-- _Upgrade, migration, and deployment_ - This section has three different reports for all upgrade, migration, and deployment recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the upgrade, migration, and deployment recommendations.
-
-   ![SQL Healthcheck upgrade status](./sql_healthcheck_upgrade_status.png)
-
-   ![SQL Healthcheck upgrade priority](./sql_healthcheck_upgrade_priority.png)
-
-   ![SQL Healthcheck upgrade recommendations](./sql_healthcheck_upgrade_recommendations.png)
