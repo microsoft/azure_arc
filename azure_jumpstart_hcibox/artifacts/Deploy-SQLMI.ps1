@@ -105,7 +105,7 @@ $defaultDomainPartition = "DC=$domainName,DC=local"
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-AksHciCluster -name $using:clusterName -nodePoolName sqlminodepool -nodecount 3 -osType linux -nodeVmSize Standard_D4s_v3
+    New-AksHciCluster -name $using:clusterName -nodePoolName sqlminodepool -nodecount 3 -osType linux -nodeVmSize Standard_D8s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
@@ -197,10 +197,11 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Do {
         Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+        Start-Sleep -Seconds 55
         Write-Host "`n"
         kubectl get pods -n arc
         Write-Host "`n"
-        Start-Sleep -Seconds 65
+        Start-Sleep -Seconds 10
         $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc data controller is ready!"
