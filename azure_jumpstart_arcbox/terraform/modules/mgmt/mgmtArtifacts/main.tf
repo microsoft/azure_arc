@@ -82,18 +82,6 @@ locals {
 
   solutions = [
     {
-      name   = "Updates"
-      flavor = ["Full", "ITPro"]
-    },
-    {
-      name   = "VMInsights"
-      flavor = ["Full", "ITPro"]
-    },
-    {
-      name   = "ChangeTracking"
-      flavor = ["Full", "ITPro"]
-    },
-    {
       name   = "Security"
       flavor = ["Full", "ITPro", "DevOps", "DataOps"]
     }
@@ -473,19 +461,6 @@ resource "azurerm_log_analytics_solution" "update_solution" {
     publisher = "Microsoft"
     product   = "OMSGallery/${each.value.name}"
   }
-}
-
-resource "azurerm_automation_account" "automation" {
-  name                = "ArcBox-Automation-${random_string.random.result}"
-  location            = data.azurerm_resource_group.rg.location == "eastus" ? "eastus2" : (data.azurerm_resource_group.rg.location == "eastus2" ? "eastus" : data.azurerm_resource_group.rg.location)
-  resource_group_name = data.azurerm_resource_group.rg.name
-  sku_name            = "Basic"
-}
-
-resource "azurerm_log_analytics_linked_service" "linked_service" {
-  resource_group_name = data.azurerm_resource_group.rg.name
-  workspace_id        = azurerm_log_analytics_workspace.workspace.id
-  read_access_id      = azurerm_automation_account.automation.id
 }
 
 resource "azurerm_public_ip" "publicIpAddress" {
