@@ -8,12 +8,12 @@ while ($attempts -le 3)
     $attempts = $attempts + 1
     if ($true -eq [System.IO.File]::Exists($moduleFile))
     {
-        Write-Error "Foud module file $moduleFile installed."
+        Write-Information "Found module file $moduleFile installed."
         break
     }
     else 
     {
-        Write-Information "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
+        Write-Error "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
         Start-Sleep(20) # Wait for agent to isntall all modules
     }
 }
