@@ -285,8 +285,8 @@ weight: 5
 
 #### Azure Arc-enabled Kubernetes
 
-- [New scenario: Integrate Azure Monitor Container Insights and recommended alerts with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/container_insights/)
-- [New scenario: Integrate Azure Policy with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/azure_policy/)
+- [New scenario: Integrate Azure Monitor Container Insights and recommended alerts with an Azure Arc-enabled Kubernetes cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/container_insights/)
+- [New scenario: Integrate Azure Policy with an Azure Arc-enabled Kubernetes cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/azure_policy/)
 - [Updated scenario: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_basic/)
 - [Updated scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/)
 - [Updated scenario: Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
