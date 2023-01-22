@@ -109,7 +109,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: deploySQLMI == true ? 'Standard_E48s_v4' : 'Standard_D48s_v5'
+      vmSize: deploySQLMI == true ? 'Standard_E48s_v5' : 'Standard_D48s_v5'
     }
     storageProfile: {
       osDisk: {
