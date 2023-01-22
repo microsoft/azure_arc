@@ -486,6 +486,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   $localUser = "arcdemo"
 
   az ssh arc --resource-group $rgName --name $serverName --local-user $localUser --rdp
+  ```
 
   ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
 
