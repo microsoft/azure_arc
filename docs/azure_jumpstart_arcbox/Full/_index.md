@@ -444,44 +444,46 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
 
-- Use Azure CLI to [connect to Azure Arc-enabled servers using SSH](https://learn.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli)
+- Alternately, you can use Azure CLI to [connect to Azure Arc-enabled servers using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli).
 
-  ```shell
+  - Windows (PowerShell)
+
+    ```powershell
+    az login
+
+    $rgName = "arcbox-rg"
+    $serverName = "ArcBox-Win2K22"
+    $localUser = "arcdemo"
+
+    az ssh arc --resource-group $rgName --name $serverName --local-user $localUser
+    ```
+
+  - Linux (shell)
+
+    ```shell
+    az login
+
+    export rgName="arcbox-rg"
+    export serverName="ArcBox-Win2K22"
+    export localUser="arcdemo"
+
+    az ssh arc --resource-group $rgName --name $serverName --local-user $localUser
+    ```
+
+    ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_01.png)
+
+    ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_02.png)
+
+- Following to the previous method, you can also use Azure CLI to connect to Azure Arc-enabled servers (Windows) using Remote Desktop tunnelled via SSH.
+
+  ```powershell
   az login
-
-  # Windows
 
   $rgName = "arcbox-rg"
   $serverName = "ArcBox-Win2K22"
+  $localUser = "arcdemo"
 
-  az ssh arc --resource-group $rgName --name $serverName --local-user administrator
-
-  # Linux
-
-  $rgName = "arcbox-rg"
-  $serverName = "ArcBox-Ubuntu-01"
-
-  az ssh arc --resource-group $rgName --name $serverName --local-user arcdemo
-
-  ```
-- **Password: ArcDemo123!!**
-
-  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_01.png)
-
-  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_02.png)
-
-- Use Azure CLI to connect to Azure Arc-enabled servers using Remote Desktop tunnelled via SSH
-
-  ```shell
-  az login
-
-  $rgName = "arcbox-rg"
-  $serverName = "ArcBox-Win2K22"
-
-  az ssh arc --resource-group $rgName --name $serverName --local-user administrator --rdp
-
-  ```
-- **Password: ArcDemo123!!**
+  az ssh arc --resource-group $rgName --name $serverName --local-user $localUser --rdp
 
   ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
 
