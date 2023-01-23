@@ -54,7 +54,7 @@
     MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
     # Cluster S2D Storage Disk Size (per disk)
-    S2D_Disk_Size                        = 200GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
+    S2D_Disk_Size                        = 150GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
 
     # SDN Host IPs
     AzSMGMTIP                            = "192.168.1.11/24"
