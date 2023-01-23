@@ -126,8 +126,7 @@ foreach ($VM in $SDNConfig.HostList) {
 }
 
 # Deploying the Arc Data Controller
-Write-Host "Deploying the Arc Data Controller"
-Write-Host "`n"
+Write-Header "Deploying the Arc Data extension"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
@@ -163,10 +162,12 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 }
 
 # Configuring Azure Arc Custom Location on the cluster
-Write-Header "Configuring Azure Arc Custom Location"
+Write-Header "Configuring the Azure Arc Data Controller and Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
+    Write-Host "Creating the Azure Arc Custom Location"
+    Write-Host "`n"
     $connectedClusterId = az connectedk8s show --name $using:clusterName --resource-group $using:rg --query id -o tsv
     az connectedk8s enable-features -n $using:clusterName -g $using:rg --custom-locations-oid $using:customLocationObjectId --features cluster-connect custom-locations --only-show-errors
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $using:clusterName --resource-group $using:rg --query id -o tsv
@@ -178,6 +179,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $workspaceId = $(az resource show --resource-group $using:rg --name $using:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $using:rg --workspace-name $using:workspaceName --query primarySharedKey -o tsv)
 
+    Write-Host "Deploy the Azure Arc Data Controller"
+    Write-Host "`n"
     $dataControllerParams = "C:\VHD\dataController.parameters.json"
 
     (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $using:dataController | Set-Content -Path $dataControllerParams
@@ -209,7 +212,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 }
 
 # Preparing AD for SQL MI AD authenticaion
-Write-Header "Preparing Active directory for SQL MI AD authenticaion"
+Write-Header "Deploying the Azure Arc-enabled SQL Managed Instance"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
