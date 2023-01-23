@@ -84,7 +84,7 @@ for ($i = 0; $i -lt $prefixLen; $i++) {
     $namingPrefix += [char]$rand.Next(97, 122)
 }
 $clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
-[System.Environment]::SetEnvironmentVariable('AKS-DataSvcs-ClusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKS-sqlmi-ClusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
 
 # Initializing variables
 $subId = $env:subscriptionId
@@ -200,7 +200,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     Do {
         Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
-        Start-Sleep -Seconds 55
+        Start-Sleep -Seconds 50
         Write-Host "`n"
         kubectl get pods -n arc
         Write-Host "`n"
@@ -369,14 +369,15 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
         (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
 
-    az deployment group create --resource-group $using:rg --name $sqlmiName --template-file "C:\VHD\adConnector.json" --parameters "C:\VHD\adConnector.parameters.json"
+    az deployment group create --resource-group $using:rg --name "AD-Connector" --template-file "C:\VHD\adConnector.json" --parameters "C:\VHD\adConnector.parameters.json"
     Write-Host "`n"
     Do {
         Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
         Write-Host "`n"
+        Start-Sleep -Seconds 15
         kubectl get pods -n arc
+        Start-Sleep -Seconds 5
         Write-Host "`n"
-        Start-Sleep -Seconds 30
         $adcStatus = $(if (kubectl get adc adarc -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($adcStatus -eq "Nope")
 
@@ -405,17 +406,14 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     # Storage
     $StorageClassName = "default"
-    $dataStorageSize = "10Gi"
-    $logsStorageSize = "10Gi"
-    $dataLogsStorageSize = "10Gi"
+    $dataStorageSize = "5Gi"
+    $logsStorageSize = "5Gi"
+    $dataLogsStorageSize = "5Gi"
 
     # High Availability
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
-
-
-    Copy-Item "C:\VHD\sqlmiAD.parameters.json" -Destination "C:\VHD\sqlmiAD.parameters.json"
     $SQLParams = "C:\VHD\sqlmiAD.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $using:rg | Set-Content -Path $SQLParams
@@ -452,9 +450,10 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Do {
         Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Write-Host "`n"
+        Start-Sleep -Seconds 50
         kubectl get pods -n arc
         Write-Host "`n"
-        Start-Sleep -Seconds 65
+        Start-Sleep -Seconds 10
         $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc SQL Managed Instance is ready!"
