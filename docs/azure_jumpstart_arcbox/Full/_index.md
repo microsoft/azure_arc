@@ -460,16 +460,15 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
     ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_02.png)
 
-- Following to the previous method, you can also use Azure CLI to connect to Azure Arc-enabled servers (Windows) using Remote Desktop tunnelled via SSH.
+- Following the previous method, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines using Remote Desktop tunneled via SSH.
 
   ```powershell
-  az login
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
 
-  $rgName = "arcbox-rg"
   $serverName = "ArcBox-Win2K22"
-  $localUser = "arcdemo"
+  $localUser = "Administrator"
 
-  az ssh arc --resource-group $rgName --name $serverName --local-user $localUser --rdp
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
   ```
 
   ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
