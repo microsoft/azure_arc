@@ -324,27 +324,17 @@ else {
 
     Invoke-Command -VMName "ArcBox-SQL","ArcBox-Win2K19","ArcBox-Win2K22" -ScriptBlock {
 
-        # Install OpenSSH Server
+        <# Install OpenSSH Server
         Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
         Start-Service sshd
         Set-Service -Name sshd -StartupType 'Automatic'
         New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
-
+        #>
+        
         # Allow SSH via Azure Arc agent
         azcmagent config set incomingconnections.ports 22
 
-    } -Credential $winCreds -AsJob
-
-    # Enable Remote Desktop on the nested Windows VMs
-    Write-Output "Enabling Remote Desktop on the nested Windows VMs"
-
-    Invoke-Command -VMName "ArcBox-SQL","ArcBox-Win2K19","ArcBox-Win2K22" -ScriptBlock {
-
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
-
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-
-    } -Credential $winCreds -AsJob
+    } -Credential $winCreds
 
     # Creating Hyper-V Manager desktop shortcut
     Write-Header "Creating Hyper-V Shortcut"
