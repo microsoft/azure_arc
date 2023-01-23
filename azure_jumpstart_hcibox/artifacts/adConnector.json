@@ -23,7 +23,7 @@
     },
     "nameserverIPAddresses": {
       "type": "array",
-      "defaultValue": [ "10.16.2.100" ]
+      "defaultValue": [ "192.168.1.254" ]
     },
     "replicas": {
       "type": "int",
