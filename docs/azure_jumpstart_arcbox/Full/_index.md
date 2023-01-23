@@ -444,30 +444,16 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
 
-- Alternately, you can use Azure CLI to [connect to Azure Arc-enabled servers using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli).
+- Alternately, you can use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Ubuntu virtual machines [using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli). Open a PowerShell session and use the below commands.
 
   - Windows (PowerShell)
 
     ```powershell
-    az login
+    az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
 
-    $rgName = "arcbox-rg"
-    $serverName = "ArcBox-Win2K22"
+    $serverName = "ArcBox-Ubuntu-01"
     $localUser = "arcdemo"
-
-    az ssh arc --resource-group $rgName --name $serverName --local-user $localUser
-    ```
-
-  - Linux (shell)
-
-    ```shell
-    az login
-
-    export rgName="arcbox-rg"
-    export serverName="ArcBox-Win2K22"
-    export localUser="arcdemo"
-
-    az ssh arc --resource-group $rgName --name $serverName --local-user $localUser
+    az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
     ```
 
     ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_01.png)
