@@ -162,7 +162,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 }
 
 # Configuring Azure Arc Custom Location on the cluster
-Write-Header "Deploying the Azure Arc Data Controller"
+Write-Header "Deploying the Azure Arc Data Controller and Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
@@ -179,7 +179,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $workspaceId = $(az resource show --resource-group $using:rg --name $using:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $using:rg --workspace-name $using:workspaceName --query primarySharedKey -o tsv)
 
-    Write-Host "Deploy the Azure Arc Data Controller"
+    Write-Host "Deploying the Azure Arc Data Controller"
     Write-Host "`n"
     $dataControllerParams = "C:\VHD\dataController.parameters.json"
 
