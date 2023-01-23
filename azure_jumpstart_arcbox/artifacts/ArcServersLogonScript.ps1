@@ -126,14 +126,15 @@ else {
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
 
+    # Install Azure CLI extensions
+    Write-Header "Az CLI extensions"
+    az extension add --yes --name ssh
+
     $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
     az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-    # Install Azure CLI extensions
-    az extension add --yes --name ssh
 
     # Register Azure providers
     Write-Header "Registering Providers"
