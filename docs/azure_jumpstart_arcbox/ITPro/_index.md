@@ -456,7 +456,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
     ```
 
-    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the deployment scripts is finished until the *az ssh* commands will run successfully.**.
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the *az ssh* commands will run successfully.**.
 
     ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
