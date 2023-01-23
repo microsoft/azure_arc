@@ -132,6 +132,9 @@ else {
     Write-Header "Az CLI Login"
     az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
+    # Install Azure CLI extensions
+    az extension add --yes --name ssh
+
     # Register Azure providers
     Write-Header "Registering Providers"
     az provider register --namespace Microsoft.HybridCompute --wait
