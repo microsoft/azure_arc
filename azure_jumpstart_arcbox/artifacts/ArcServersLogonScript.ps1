@@ -319,18 +319,11 @@ else {
     $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
     $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-    # Install SSH on the nested Windows VMs
-    Write-Output "Installing SSH on the nested Windows VMs"
+    # Configure SSH on the nested Windows VMs
+    Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
 
     Invoke-Command -VMName "ArcBox-SQL","ArcBox-Win2K19","ArcBox-Win2K22" -ScriptBlock {
 
-        <# Install OpenSSH Server
-        Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
-        Start-Service sshd
-        Set-Service -Name sshd -StartupType 'Automatic'
-        New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
-        #>
-        
         # Allow SSH via Azure Arc agent
         azcmagent config set incomingconnections.ports 22
 
