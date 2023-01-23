@@ -448,8 +448,6 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 - Alternately, you can use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Ubuntu virtual machines [using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli). Open a PowerShell session and use the below commands.
 
-  - Windows (PowerShell)
-
     ```powershell
     az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
 
@@ -458,11 +456,28 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
     ```
 
-    ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_01.png)
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the deployment scripts is finished until the *az ssh* commands will run successfully.**.
 
-    ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./ssh_via_az_cli_02.png)
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
-- Following the previous method, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines using Remote Desktop tunneled via SSH.
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+
+- Following the previous method, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines via SSH.
+
+  ```powershell
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+  ```
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+
+- In addition to SSH, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines using Remote Desktop tunneled via SSH.
 
   ```powershell
   az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
