@@ -841,8 +841,8 @@ In the case of a failed deployment, pointing to a failure in the _ubuntuCAPIDepl
 
     > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps/#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
 
-- As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
-  - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
+- As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the _jumpstart_logs_ folder. This installation logs can help determine the root cause for the failed deployment.
+  - _ArcBox-CAPI-MGMT_ log path: _jumpstart_logs/installCAPI.log_
 
       ![Screenshot showing login and the message of the day](./login_motd.png)
 

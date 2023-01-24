@@ -136,7 +136,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-  
+
   - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install Azure PowerShell modules.
 
     ```PowerShell
@@ -233,7 +233,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az deployment group create \
   --resource-group <Name of the Azure resource group> \
   --template-file azuredeploy.json \
-  --parameters azuredeploy.parameters.json 
+  --parameters azuredeploy.parameters.json
   ```
 
   ![Screenshot showing az group create](./azgroupcreate.png)
@@ -324,7 +324,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   terraform plan -out=infra.out
   terraform apply "infra.out"
   ```
-  
+
 - Example output from `terraform init`:
 
   ![terraform init](./terraform_init.png)
@@ -440,11 +440,68 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
-- Open Hyper-V and access the Azure Arc-enabled servers
-  - **Username: arcdemo**
-  - **Password: ArcDemo123!!**
+- Open the Hyper-V Manager to access the ArcBox nested virtual machines, that are onboarded as Azure Arc-enabled servers.
+&nbsp;
+
+  Windows virtual machine credentials:
+
+  ```text
+  Username: Administrator
+  Password: ArcDemo123!!
+  ```
+
+  Ubuntu virtual machine credentials:
+  
+  ```text
+  Username: arcdemo
+  Password: ArcDemo123!!
+  ```
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
+
+- Alternately, you can use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Ubuntu virtual machines [using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli). Open a PowerShell session and use the below commands.
+
+    ```powershell
+    az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+    $serverName = "ArcBox-Ubuntu-01"
+    $localUser = "arcdemo"
+    az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+    ```
+
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the _az ssh_ commands will run successfully.**.
+
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
+
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+
+- Following the previous method, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines via SSH.
+
+  ```powershell
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+  ```
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+
+- In addition to SSH, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines using Remote Desktop tunneled via SSH.
+
+  ```powershell
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
+  ```
+
+  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
 
 ### ArcBox Azure Monitor workbook
 
@@ -464,7 +521,7 @@ The following tools are including on the _ArcBox-Client_ VM.
 - Git
 
 ### Next steps
-  
+
 ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or a kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
 - Build policy initiatives that apply to your Azure Arc-enabled resources
