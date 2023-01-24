@@ -9,12 +9,16 @@ param (
     [string]$workspaceName,
     [string]$clusterName,
     [string]$connectedClusterName,
+    [string]$deployContainerApps,
     [string]$deployAppService,
     [string]$deployFunction,
     [string]$deployApiMgmt,
     [string]$deployLogicApp,
     [string]$adminEmail,
-    [string]$templateBaseUrl
+    [string]$templateBaseUrl,
+    [string]$productsImage,
+    [string]$inventoryImage,
+    [string]$storeImage
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -33,6 +37,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('productsImage', $productsImage,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('inventoryImage', $inventoryImage,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('storeImage', $storeImage,[System.EnvironmentVariableTarget]::Machine)
+
 
 # Create path
 Write-Output "Create deployment path"
@@ -66,16 +74,24 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1
+if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"  
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1" 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1" 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1" 
+}
+
+# Downloading GitHub artifacts for ContainerAppsLogonScript.ps1
+if ($deployContainerApps -eq $true) {
+Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") -OutFile "C:\Temp\ContainerAppsLogonScript.ps1"
+}
 
 # Installing tools
 workflow ClientTools_01
         {
             $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $kubectlVersion = '1.24.9'
             #Run commands in parallel.
             Parallel 
                 {
@@ -99,8 +115,13 @@ workflow ClientTools_01
                         
                             foreach ($app in $appsToInstall)
                             {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
+                                if ($app -eq "kubernetes-cli"){
+                                    Write-Host "Installing $app"
+                                    & choco install $app --version $using:kubectlVersion /y -Force| Write-Output
+                                } else {
+                                    Write-Host "Installing $app"
+                                    & choco install $app /y -Force| Write-Output
+                                }
                             }
                         }
                     }
@@ -115,10 +136,19 @@ Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2135274" -OutFile "C:
 Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\FuncCLI.msi /quiet'
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
+if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
 # Creating scheduled task for AppServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AppServicesLogonScript.ps1'
 Register-ScheduledTask -TaskName "AppServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
+
+if ($deployContainerApps -eq $true) {
+# Creating scheduled task for ContainerAppsLogonScript.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\ContainerAppsLogonScript.ps1'
+Register-ScheduledTask -TaskName "ContainerAppsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

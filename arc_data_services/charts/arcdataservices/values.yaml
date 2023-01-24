@@ -38,7 +38,7 @@ Azure:
     InstallerServiceAccount: ""
     RuntimeServiceAccount: ""
 systemDefaultValues:
-  image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.14.0_2022-12-13
+  image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.15.0_2023-01-10
   imagePullPolicy: Always
   imagePullSecret: arc-private-registry
   installerServiceAccount: ""

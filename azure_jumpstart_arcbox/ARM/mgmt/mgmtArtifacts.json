@@ -106,27 +106,17 @@
     }
   },
   "variables": {
-    "Updates": {
-      "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
-      "galleryName": "Updates"
-    },
-    "ChangeTracking": {
-      "name": "[format('ChangeTracking({0})', parameters('workspaceName'))]",
-      "galleryName": "ChangeTracking"
-    },
     "Security": {
       "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
-    "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "addressPrefix": "10.16.0.0/16",
     "subnetAddressPrefix": "10.16.1.0/24",
     "aksSubnetPrefix": "10.16.76.0/22",
     "dcSubnetPrefix": "10.16.2.0/24",
     "drAddressPrefix": "172.16.0.0/16",
     "drSubnetPrefix": "172.16.128.0/17",
-    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
@@ -391,7 +381,7 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "5022 "
             }
-          },
+          }
         ]
       }
     },
@@ -527,63 +517,6 @@
     {
       "type": "Microsoft.OperationsManagement/solutions",
       "apiVersion": "2015-11-01-preview",
-      "location": "[parameters('location')]",
-      "name": "[variables('Updates').name]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      ],
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      },
-      "plan": {
-        "name": "[variables('Updates').name]",
-        "publisher": "Microsoft",
-        "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('Updates').galleryName)]"
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      },
-      "plan": {
-        "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
-        "product": "[concat('OMSGallery/', 'VMInsights')]",
-        "promotionCode": "",
-        "publisher": "Microsoft"
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
-      "name": "[variables('ChangeTracking').name]",
-      "location": "[parameters('location')]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      ],
-      "plan": {
-        "name": "[variables('ChangeTracking').name]",
-        "promotionCode": "",
-        "product": "[format('OMSGallery/{0}', variables('ChangeTracking').galleryName)]",
-        "publisher": "Microsoft"
-      },
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
       "name": "[variables('Security').name]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -597,34 +530,6 @@
       },
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2021-06-22",
-      "name": "[variables('automationAccountName')]",
-      "location": "[variables('automationAccountLocation')]",
-      "dependsOn": [
-        "[parameters('workspaceName')]"
-      ],
-      "properties": {
-        "sku": {
-          "name": "Basic"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
-      "apiVersion": "2020-08-01",
-      "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[parameters('workspaceName')]",
-        "[variables('automationAccountName')]"
-      ],
-      "properties": {
-        "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
       }
     },
     {
