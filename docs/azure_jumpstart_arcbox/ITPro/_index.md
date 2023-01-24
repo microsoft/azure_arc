@@ -440,9 +440,16 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
-- Open Hyper-V and access the Azure Arc-enabled servers
-  - **Username: arcdemo**
-  - **Password: ArcDemo123!!**
+- Open the Hyper-V Manager to access the ArcBox nested virtual machines, that are onboarded as Azure Arc-enabled servers.
+&nbsp;
+
+  - Windows virtual machine credentials
+    - **Username: Administrator**
+    - **Password: ArcDemo123!!**
+
+  - Ubuntu virtual machine credentials
+    - **Username: arcdemo**
+    - **Password: ArcDemo123!!**
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
 
@@ -456,7 +463,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
     ```
 
-    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the *az ssh* commands will run successfully.**.
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the _az ssh_ commands will run successfully.**.
 
     ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
