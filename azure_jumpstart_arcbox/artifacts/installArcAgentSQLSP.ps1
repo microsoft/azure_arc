@@ -352,7 +352,7 @@ Write-Host "SQL Server - Azure Arc resources should show up in resource group in
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
 Write-Host "Enabling Log Analytics Solutions"
-$solutions = "Security", "Updates", "SQLAssessment", "SQLAdvancedThreatProtection"
+$solutions = "Security", "Updates", "SQLAssessment"
 foreach ($solution in $solutions) {
     Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $resourceGroup -WorkspaceName $workspaceName -IntelligencePackName $solution -Enabled $true -Verbose
 }
