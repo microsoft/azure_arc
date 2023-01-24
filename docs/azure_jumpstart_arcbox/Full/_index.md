@@ -441,13 +441,19 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 - Open the Hyper-V Manager to access the ArcBox nested virtual machines, that are onboarded as Azure Arc-enabled servers.
 &nbsp;
 
-  - Windows virtual machine credentials
-    - **Username: Administrator**
-    - **Password: ArcDemo123!!**
+  Windows virtual machine credentials:
 
-  - Ubuntu virtual machine credentials
-    - **Username: arcdemo**
-    - **Password: ArcDemo123!!**
+  ```text
+  Username: Administrator
+  Password: ArcDemo123!!
+  ```
+
+  Ubuntu virtual machine credentials:
+  
+  ```text
+  Username: arcdemo
+  Password: ArcDemo123!!
+  ```
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
 
