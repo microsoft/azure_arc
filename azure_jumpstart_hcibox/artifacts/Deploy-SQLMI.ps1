@@ -279,10 +279,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         New-ADOrganizationalUnit -Name $sqlmiouName -Path $using:defaultDomainPartition -ProtectedFromAccidentalDeletion $False
     }
 
-    # Deploying Active Directory connector and Azure Arc SQL MI
-    Write-Host "Deploying Active Directory connector"
-    Write-Host "`n"
-
     # Creating endpoints file
     Write-Host "Creating endpoints file"
     Write-Host "`n"
