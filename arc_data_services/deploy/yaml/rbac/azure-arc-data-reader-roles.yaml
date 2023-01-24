@@ -1,4 +1,4 @@
-# This role provides read access to Azure Arc-enabled data services resources
+# This role provides read access to Azure Arc enabled data services resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
