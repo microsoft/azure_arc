@@ -32,7 +32,7 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '10s/^/export deployBastion=/' vars.sh
 sed -i '11s/^/export templateBaseUrl=/' vars.sh
 
-export K3S_VERSION="1.25.4+k3s1"
+export K3S_VERSION="1.25.5+k3s1"
 
 chmod +x vars.sh
 . ./vars.sh
@@ -49,7 +49,7 @@ echo ""
 publicIp=$(hostname -i)
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp} --bind-address ${publicIp}" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
