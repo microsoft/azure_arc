@@ -141,9 +141,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 $ErrorActionPreference = "SilentlyContinue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $vnetName="sdnSwitch"
+    $vnetName="vlan200"
     New-MocGroup -name "Default_Group" -location "MocLocation"
-    New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -vlanID $vlanID
+    New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -tags @{'VSwitch-Name' = "sdnSwitch"} -vlanID $using:SDNConfig.AKSVlanID
     az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName --vlan $using:SDNConfig.AKSVlanID
     
     $galleryImageName = "ubuntu20"
