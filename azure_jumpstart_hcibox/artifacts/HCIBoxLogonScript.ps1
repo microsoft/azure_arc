@@ -68,7 +68,7 @@ if ($env:registerCluster -eq $true) {
 }
 
 # deploy AKS
-if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true)) {
+if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true) -and ($env:deploySQLMI -eq $false)) {
     Write-Header "Deploying AKS"
     & "$Env:HCIBoxDir\Deploy-AKS.ps1"
 }
