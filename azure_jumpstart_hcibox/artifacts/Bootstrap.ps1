@@ -123,6 +123,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/GetServiceAccountBearerToken.ps
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $Env:HCIBoxDir\jumpstart-user-secret.yaml
 
 # Replace password and DNS placeholder
+$adminPassword = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($adminPassword))
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-natDNS%',$natDNS | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 
@@ -180,5 +181,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log"
 Stop-Transcript
-#$logSuppress = Get-Content $Env:HCIBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-#$logSuppress | Set-Content $Env:HCIBoxLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content $Env:HCIBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:HCIBoxLogsDir\Bootstrap.log -Force
