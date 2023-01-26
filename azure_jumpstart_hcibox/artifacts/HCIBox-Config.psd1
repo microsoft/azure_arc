@@ -141,5 +141,6 @@
     rbLocation                           = "eastus"
     rbCustomLocationName                 = "hcibox-rb-cl"
     rbIp                                 = "192.168.200.201"
+    rbIp2                                = "192.168.200.203"
     rbCpip                               = "192.168.200.202"
 }
