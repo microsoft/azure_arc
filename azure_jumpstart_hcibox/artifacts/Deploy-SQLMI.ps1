@@ -1,7 +1,7 @@
-# Set paths
 $WarningPreference = "SilentlyContinue"
 $ProgressPreference = 'SilentlyContinue'
 
+# Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
 $Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
 $Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
