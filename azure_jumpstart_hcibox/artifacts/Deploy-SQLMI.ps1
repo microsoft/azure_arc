@@ -106,7 +106,7 @@ $domainName = "jumpstart"
 $defaultDomainPartition = "DC=$domainName,DC=local"
 
 # Install AksHci - only need to perform the following on one of the nodes
-if($env:deployAKSHCI -eq $false){
+if($env:deploySQLMI -eq $true){
     Write-Header "Prepping AKS Install"
     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
         $vnet = New-AksHciNetworkSetting -name $using:SDNConfig.AKSvnetname -vSwitchName $using:SDNConfig.AKSvSwitchName -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -ipAddressPrefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsServers $using:SDNConfig.AKSDNSIP -vlanID $using:SDNConfig.AKSVlanID        
