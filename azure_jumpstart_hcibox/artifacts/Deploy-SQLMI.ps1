@@ -1,6 +1,5 @@
 # Set paths
 $WarningPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 $Env:HCIBoxDir = "C:\HCIBox"
@@ -15,8 +14,6 @@ $Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
-
-$WarningPreference = "SilentlyContinue"
 
 Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-SQLMI.log
 
@@ -148,7 +145,6 @@ foreach ($VM in $SDNConfig.HostList) {
 # Deploying the Arc Data Controller
 Write-Header "Deploying the Arc Data extension"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $WarningPreference = "SilentlyContinue"
     az config set extension.use_dynamic_install=yes_without_prompt 
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az extension add --name arcdata --system 
@@ -184,7 +180,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Deploying the Azure Arc Data Controller and Custom Location"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $WarningPreference = "SilentlyContinue"
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Creating the Azure Arc Custom Location"
     Write-Host "`n"
@@ -234,7 +229,6 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 # Preparing AD for SQL MI AD authenticaion
 Write-Header "Deploying the Azure Arc-enabled SQL Managed Instance"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $WarningPreference = "SilentlyContinue"
     Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
     Add-WindowsFeature -Name "RSAT-DNS-Server" -IncludeAllSubFeature
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
