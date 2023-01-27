@@ -346,5 +346,6 @@ if($result.ProvisioningState -eq "Failed")
 }
 
 Write-Host "SQL Server - Azure Arc resources should show up in resource group in less than 1 minute."
+Write-Host "Arc-enabled SQL server deployment complete."
 
 Stop-Transcript
