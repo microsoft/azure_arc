@@ -30,7 +30,8 @@
         "dataCollectionRuleName": "[concat('sqlbpa-', parameters('vmName'), '-', variables('randomText'), '-dcr')]",
         "workspaceResourceId": "[concat('/subscriptions/', parameters('arcSubscriptionId'), '/resourcegroups/', variables('arcResourceGroup'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
         "dataCollectionRuleId": "[concat('/subscriptions/', parameters('arcSubscriptionId'), '/resourceGroups/', variables('arcResourceGroup'), '/providers/Microsoft.Insights/dataCollectionRules/', variables('dataCollectionRuleName'))]",
-        "associationName": "[concat('sqlbpa-', parameters('vmName'), variables('randomText'), '-linkage')]"
+        "associationName": "[concat('sqlbpa-', parameters('vmName'), variables('randomText'), '-linkage')]",
+        "sqlAssessmentCL": "[concat('Custom-SqlAssessment_CL_', variables('randomText'))]"
     },
     "resources": [
         {
@@ -72,7 +73,7 @@
                     "logFiles": [
                         {
                             "streams": [
-                                "Custom-SqlAssessment_CL"
+                                "[variables('sqlAssessmentCL')]"
                             ],
                             "filePatterns": [
                                 "C:\\Windows\\System32\\config\\systemprofile\\AppData\\Local\\Microsoft SQL Server Extension Agent\\Assessment\\*.csv"
@@ -98,13 +99,13 @@
                 "dataFlows": [
                     {
                         "streams": [
-                            "Custom-SqlAssessment_CL"
+                            "[variables('sqlAssessmentCL')]"
                         ],
                         "destinations": [
                             "[parameters('workspaceName')]"
                         ],
                         "transformKql": "source",
-                        "outputStream": "Custom-SqlAssessment_CL"
+                        "outputStream": "[variables('sqlAssessmentCL')]"
                     }
                 ]
             }
