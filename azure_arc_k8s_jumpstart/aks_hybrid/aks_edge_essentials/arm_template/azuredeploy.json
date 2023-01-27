@@ -91,6 +91,20 @@
                 "description": "Azure subscription ID"
             }
         },
+        "githubAccount": {
+            "type": "string",
+            "metadata": {
+                "description": "Target GitHub account"
+            },
+            "defaultValue": "microsoft"
+        },
+        "githubBranch": {
+            "type": "string",
+            "metadata": {
+                "description": "Target GitHub branch"
+            },
+            "defaultValue": "main"
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "AKS-EE-Demo-VNET",
@@ -120,7 +134,7 @@
         }
     },
     "variables": {
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/",
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/')]",
         "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
