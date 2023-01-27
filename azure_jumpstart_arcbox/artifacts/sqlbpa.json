@@ -73,7 +73,7 @@
                     "logFiles": [
                         {
                             "streams": [
-                                "[variables('sqlAssessmentCL')]"
+                                "Custom-SqlAssessment_CL"
                             ],
                             "filePatterns": [
                                 "C:\\Windows\\System32\\config\\systemprofile\\AppData\\Local\\Microsoft SQL Server Extension Agent\\Assessment\\*.csv"
@@ -99,13 +99,13 @@
                 "dataFlows": [
                     {
                         "streams": [
-                            "[variables('sqlAssessmentCL')]"
+                            "Custom-SqlAssessment_CL"
                         ],
                         "destinations": [
                             "[parameters('workspaceName')]"
                         ],
                         "transformKql": "source",
-                        "outputStream": "[variables('sqlAssessmentCL')]"
+                        "outputStream": "Custom-SqlAssessment_CL]"
                     }
                 ]
             }
