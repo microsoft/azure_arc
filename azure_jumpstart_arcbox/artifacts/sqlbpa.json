@@ -30,7 +30,7 @@
         "dataCollectionRuleName": "[concat('sqlbpa-', parameters('vmName'), '-', variables('randomText'), '-dcr')]",
         "workspaceResourceId": "[concat('/subscriptions/', parameters('arcSubscriptionId'), '/resourcegroups/', variables('arcResourceGroup'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]",
         "dataCollectionRuleId": "[concat('/subscriptions/', parameters('arcSubscriptionId'), '/resourceGroups/', variables('arcResourceGroup'), '/providers/Microsoft.Insights/dataCollectionRules/', variables('dataCollectionRuleName'))]",
-        "associationName": "[concat('sqlbpa-', parameters('vmName'), variables('randomText'), '-linkage')]",
+        "associationName": "[concat('sqlbpa-', parameters('vmName'), variables('randomText'), '-linkage')]"
     },
     "resources": [
         {
