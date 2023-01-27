@@ -140,12 +140,6 @@ if ($Env:flavor -eq 'DataOps') {
     $nestedVMArcBoxDir = $Env:ArcBoxDir
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 } -Credential $winCreds
 
-    # Test Defender for SQL
-    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-    $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
-
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
@@ -357,12 +351,6 @@ else {
     Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 } -Credential $winCreds
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 } -Credential $winCreds
 
-    # Test Defender for SQL
-    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-    $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
-
     Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 
     $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
@@ -480,7 +468,12 @@ if ($Env:flavor -ne "DevOps")
     # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
     Write-Host "Deploying SQLAdvancedThreatProtection and SQLVulnerabilityAssessment solutions to support Defender for SQL server."
     az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName
-    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName
+
+    # Test Defender for SQL
+    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+    $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
+    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
     # Enable Best practices assessment
     Write-Host "Enabling SQL server best practices assessment"
