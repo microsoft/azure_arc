@@ -119,6 +119,12 @@ if ($Env:flavor -eq 'DataOps') {
     Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
     az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
 
+    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
+    Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
+    # Install log-analytics-solution cli extension
+    az extension add --name log-analytics-solution
+    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
+
     # Copying the Azure Arc Connected Agent to nested VMs
     Write-Header "Customize Onboarding Scripts"
     Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
@@ -178,6 +184,12 @@ else {
     # Set defender for cloud log analytics workspace
     Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
     az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+
+    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
+    Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
+    # Install log-analytics-solution cli extension
+    az extension add --name log-analytics-solution
+    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
 
     # Install and configure DHCP service (used by Hyper-V nested VMs)
     Write-Header "Configuring DHCP Service"
@@ -463,21 +475,12 @@ namespace Win32{
 
 if ($Env:flavor -ne "DevOps")
 {
-    Start-Transcript -Path $Env:ArcBoxLogsDir\NestedSqlLogonScript.log
-    
-    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
-    Write-Host "Deploying SQLAdvancedThreatProtection and SQLVulnerabilityAssessment solutions to support Defender for SQL server."
-    # Install log-analytics-solution cli extension
-    az extension add --name log-analytics-solution
-    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
-
-    # Test Defender for SQL
-    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-    $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
+    Start-Transcript -Path $Env:ArcBoxLogsDir\SQLAssessment-Defender.log
 
     # Enable Best practices assessment
+    # Create custom log analytics table for SQL assessment
+    az monitor log-analytics workspace table create --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime
+
     Write-Host "Enabling SQL server best practices assessment"
     $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
     az deployment group create --resource-group $Env:resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$Env:subscriptionId
@@ -485,10 +488,12 @@ if ($Env:flavor -ne "DevOps")
     # Run Best practices assessment
     Write-Host "Execute SQL server best practices assessment"
 
+    # Wait for a minute to finish everyting and run assessment
+    Start-Sleep(60)
+
     # Get access token to make ARM REST API call for SQL server BPA
     $armRestApiEndpoint = "https://management.azure.com/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
     $token=(az account get-access-token --subscription $Env:subscriptionId --query accessToken --output tsv)
-    #$secureToken = ConvertTo-SecureString $token -AsPlainText -Force
 
     # Build API request payload
     $worspaceResourceId = "/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
@@ -500,5 +505,12 @@ if ($Env:flavor -ne "DevOps")
     $headers = @{"Authorization"="Bearer $token"; "Content-Type"="application/json"}
     Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
     Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for assessment to complete to view results."
+
+    # Test Defender for SQL
+    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+    $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
+    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
+
     Stop-Transcript
 }
