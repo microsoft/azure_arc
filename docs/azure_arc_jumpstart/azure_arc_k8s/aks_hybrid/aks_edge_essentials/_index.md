@@ -197,7 +197,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ![Screenshot Azure Arc-enabled server on resource group](./21.png)
 
-- You can also run _kubectl get nodes -o wide_ to check the cluster node status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extensions](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) ([Azure Policy](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes), [Defender for Containers](https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction) and [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview))) are in running state.
+- You can also run _kubectl get nodes -o wide_ to check the cluster node status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extensions](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) ([Azure Policy](https://learn.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes), [Defender for Containers](https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction) and [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview))) are in running state.
 
 ![Screenshot kubectl get nodes -o wide](./22.png)
 
