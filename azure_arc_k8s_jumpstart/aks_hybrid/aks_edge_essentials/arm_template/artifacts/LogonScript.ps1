@@ -156,7 +156,7 @@ Write-Host "`n"
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
-$Env:arcClusterName = "aks-ee-demo-$suffix"
+$Env:arcClusterName = "AKS-EE-Demo-$suffix"
 az connectedk8s connect --name $Env:arcClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $env:location `
