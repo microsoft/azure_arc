@@ -197,9 +197,11 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ![Screenshot Azure Arc-enabled server on resource group](./21.png)
 
-- You can also run a _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extensions](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) ([Azure Policy](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes), [Defender for Containers](https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction) and [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview))) are in running state.
+- You can also run _kubectl get nodes -o wide_ to check the cluster node status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extensions](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) ([Azure Policy](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes), [Defender for Containers](https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction) and [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview))) are in running state.
 
-![Screenshot Azure Arc-enabled server on resource group](./22.png)
+![Screenshot kubectl get nodes -o wide](./22.png)
+
+![Screenshot kubectl get pod -A](./23.png)
 
 ## Cluster extensions
 
@@ -213,7 +215,7 @@ In this scenario, four Azure Arc-enabled Kubernetes cluster extensions were inst
 
 - In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./23.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./24.png)
 
 ### Exploring logs from the Client VM
 
@@ -225,10 +227,10 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS Edge Essentials cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
 |
 
-![Screenshot showing the Temp folder with deployment logs](./24.png)
+![Screenshot showing the Temp folder with deployment logs](./25.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./25.png)
+    ![Screenshot showing Azure resource group deletion](./26.png)
