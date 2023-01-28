@@ -464,10 +464,12 @@ namespace Win32{
 if ($Env:flavor -ne "DevOps")
 {
     Start-Transcript -Path $Env:ArcBoxLogsDir\NestedSqlLogonScript.log
-    $arcMachineName = "ArcBox-SQL"
+    
     # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
     Write-Host "Deploying SQLAdvancedThreatProtection and SQLVulnerabilityAssessment solutions to support Defender for SQL server."
-    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName
+    # Install log-analytics-solution cli extension
+    az extension add --name log-analytics-solution
+    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
 
     # Test Defender for SQL
     Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
@@ -478,19 +480,19 @@ if ($Env:flavor -ne "DevOps")
     # Enable Best practices assessment
     Write-Host "Enabling SQL server best practices assessment"
     $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
-    az deployment group create --resource-group $Env:resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$arcMachineName arcSubscriptionId=$Env:subscriptionId
+    az deployment group create --resource-group $Env:resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$Env:subscriptionId
 
     # Run Best practices assessment
     Write-Host "Execute SQL server best practices assessment"
 
     # Get access token to make ARM REST API call for SQL server BPA
-    $armRestApiEndpoint = "https://management.azure.com/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$arcMachineName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
+    $armRestApiEndpoint = "https://management.azure.com/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
     $token=(az account get-access-token --subscription $Env:subscriptionId --query accessToken --output tsv)
     #$secureToken = ConvertTo-SecureString $token -AsPlainText -Force
 
     # Build API request payload
     $worspaceResourceId = "/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
-    $sqlExtensionId = "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$arcMachineName/extensions/WindowsAgent.SqlServer".ToLower()
+    $sqlExtensionId = "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer".ToLower()
     $sqlbpaPayloadTemplate = "$Env:templateBaseUrl/artifacts/sqlbpa.payload.json"
     $apiPayload = (Invoke-WebRequest -Uri $sqlbpaPayloadTemplate).Content -replace '{{RESOURCEID}}', $sqlExtensionId -replace '{{LOCATION}}', $Env:azureLocation -replace '{{WORKSPACEID}}', $worspaceResourceId
 
