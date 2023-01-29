@@ -1,6 +1,5 @@
 $WarningPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
-$ErrorActionPreference = 'SilentlyContinue'
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
@@ -527,6 +526,7 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 Write-Header "Configure ADS"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
+    $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $using:adcred
     Write-Host "Generating endpoints file"
     Write-host "`n"
 
@@ -573,7 +573,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 
-    Copy-Item "c:\VHD\$filename.txt" -Destination "C:\users\$adminUsername\desktop\endpoints.txt" -ToSession $adminCenterSession -Force
+    Copy-Item "c:\VHD\$filename.txt" -Destination "C:\users\$adminUsername\desktop\SQLMI endpoints.txt" -ToSession $adminCenterSession -Force
 
     write-host "Configuring ADS"
 
@@ -608,6 +608,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 Write-Header "Configure Grafana shortcut"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
+    $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $using:adcred
     # Creating desktop url shortcuts for built-in Grafana and Kibana services
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
