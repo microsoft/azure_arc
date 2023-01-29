@@ -85,6 +85,8 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[1] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
+$adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adcred
+Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
@@ -500,7 +502,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
     Write-Host "Installing Azure Data Studio"
-    Expand-Archive "C:\VHD\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
+    Expand-Archive "C:\VHDs\azuredatastudio.zip" -DestinationPath 'C:\Program Files\Azure Data Studio'
     Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
     Write-Host "Installing Azure Data Studio extensions"
     $Env:argument1 = "--install-extension"
@@ -571,7 +573,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 
-    Copy-Item "c:\VHD\$filename.txt" -Destination "\\admincenter\c$\users\$adminUsername\desktop\endpoints.txt" -Force
+    Copy-Item "c:\VHD\$filename.txt" -Destination "C:\users\$adminUsername\desktop\endpoints.txt" -ToSession $adminCenterSession -Force
 
     write-host "Configuring ADS"
 
@@ -603,7 +605,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 }
 
-Write-Header "Configure Grafana and Kibana shortcuts"
+Write-Header "Configure Grafana shortcut"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
     # Creating desktop url shortcuts for built-in Grafana and Kibana services
@@ -615,15 +617,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $Favorite.TargetPath = $GrafanaURL;
     $Favorite.Save()
 
-    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    $KibanaURL = "https://" + $KibanaURL + ":5601"
-    $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut("c:\VHD\Desktop\Kibana.url")
-    $Favorite.TargetPath = $KibanaURL;
-    $Favorite.Save()
+    Copy-Item "c:\VHD\Grafana.url" -Destination "C:\users\$adminUsername\desktop\Grafana.url" -ToSession $adminCenterSession -Force
 
-    Copy-Item -Path "c:\VHD\Grafana.url" -Destination "\\admincenter\c$\users\$adminUsername\Desktop\Grafana.url"
-    Copy-Item -Path "c:\VHD\Kibana.url" -Destination "\\admincenter\c$\users\$adminUsername\Desktop\Kibana.url"
 
 }
 
