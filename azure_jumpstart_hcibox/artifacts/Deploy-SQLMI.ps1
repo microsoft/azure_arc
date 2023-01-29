@@ -85,7 +85,6 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\settingsTemplat
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[1] -SourcePath "$Env:HCIBoxKVDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
-Copy-VMFile -ComputerName admincenter -SourcePath "$Env:HCIBoxKVDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
