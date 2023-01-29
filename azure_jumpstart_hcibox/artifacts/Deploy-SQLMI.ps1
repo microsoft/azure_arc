@@ -65,26 +65,26 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 
 # Downloading artifacts for Azure Arc Data services
 Write-Header "Downloading artifacts for Azure Arc Data services"
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxKVDir\dataController.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxKVDir\dataController.parameters.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.json") -OutFile $Env:HCIBoxKVDir\adConnector.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.parameters.json") -OutFile $Env:HCIBoxKVDir\adConnector.parameters.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.json") -OutFile $Env:HCIBoxKVDir\sqlmiAD.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.parameters.json") -OutFile $Env:HCIBoxKVDir\sqlmiAD.parameters.json
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:HCIBoxKVDir\settingsTemplate.json
-Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable") -OutFile $Env:HCIBoxKVDir\azuredatastudio.zip
-Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:HCIBoxKVDir\AZDataCLI.msi
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:HCIBoxDir\dataController.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxDir\dataController.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.json") -OutFile $Env:HCIBoxDir\adConnector.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/adConnector.parameters.json") -OutFile $Env:HCIBoxDir\adConnector.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.json") -OutFile $Env:HCIBoxDir\sqlmiAD.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.parameters.json") -OutFile $Env:HCIBoxDir\sqlmiAD.parameters.json
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:HCIBoxDir\settingsTemplate.json
+Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable") -OutFile $Env:HCIBoxDir\azuredatastudio.zip
+Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:HCIBoxDir\AZDataCLI.msi
 
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[1] -SourcePath "$Env:HCIBoxKVDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[1] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
