@@ -122,8 +122,8 @@ if ($Env:flavor -eq 'DataOps') {
     # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
     Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
     # Install log-analytics-solution cli extension
-    az extension add --name log-analytics-solution
-    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
+    az extension add --name log-analytics-solution --yes
+    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName
 
     # Copying the Azure Arc Connected Agent to nested VMs
     Write-Header "Customize Onboarding Scripts"
@@ -188,8 +188,8 @@ else {
     # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
     Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
     # Install log-analytics-solution cli extension
-    az extension add --name log-analytics-solution
-    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --yes
+    az extension add --name log-analytics-solution --yes
+    az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName
 
     # Install and configure DHCP service (used by Hyper-V nested VMs)
     Write-Header "Configuring DHCP Service"
