@@ -532,7 +532,7 @@ Open the [data services operations page](https://azurearcjumpstart.io/azure_jump
 
 ### Arc-enabled SQL Server - Best practices assessment
 
-As part of the ArcBox Full flavor deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open ArcBox-SQL Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
+As part of the ArcBox deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open ArcBox-SQL Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
 
 - Following screenshot shows the SQL Server best practices assessment page and the scheduled and previously ran assessments. If this page do not show assessment results click on Refresh button show assessments. Once displayed the assessments and results click on _View assessment_ results to see results.
 
