@@ -68,7 +68,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-- Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/aksee/azure/ARM/azuredeploy.json) will initiate the deployment of the following resources:
+- Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.json) will initiate the deployment of the following resources:
 
   - _Virtual Network_ - Virtual Network for Azure Windows Server VM.
   - _Network Interface_ - Network Interface for Azure Windows Server VM.
@@ -112,7 +112,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create \
     --resource-group AKS-EE-Demo \
     --name akseedemo \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
