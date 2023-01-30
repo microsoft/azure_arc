@@ -2,7 +2,7 @@
 Write-Information "Executing Defender for SQL threat simulation script."
 $attempts = 0
 
-while ($attempts -le 3)
+while ($attempts -le 5)
 {
     $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse).FullName
     $attempts = $attempts + 1
@@ -14,7 +14,7 @@ while ($attempts -le 3)
     else 
     {
         Write-Error "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
-        Start-Sleep(20) # Wait for agent to isntall all modules
+        Start-Sleep(60) # Wait for agent to isntall all modules
     }
 }
 
