@@ -4,13 +4,7 @@ $attempts = 0
 
 while ($attempts -le 5)
 {
-    try {
-        $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse).FullName
-    }
-    catch {
-        <#Do this if a terminating exception happens#>
-    }
-
+    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse -ErrorAction SilentlyContinue).FullName
     $attempts = $attempts + 1
     if ($true -eq [System.IO.File]::Exists($moduleFile))
     {
