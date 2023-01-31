@@ -790,7 +790,7 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Defender for SQL security incidents and alerts](./sql-defender-incidents.png)
 
-   > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, login to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute test script manually as shown below.**
+   > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, log in to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute the test script manually as shown below.**
 
 - The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers. This script is copied on the nested ArcBox-SQL Hyper-V virtual machine and can be used to run additional tests to generate security incidents and alerts.
 
