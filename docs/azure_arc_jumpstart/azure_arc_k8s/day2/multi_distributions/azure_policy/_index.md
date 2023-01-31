@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Integrate Azure Policy with an Azure Arc-enabled K8s cluster using extensions
+## Integrate Azure Policy with an Azure Arc-enabled Kubernetes cluster using extensions
 
 The following Jumpstart scenario will guide you on how to enable [Azure Policy](https://docs.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes?toc=%2Fazure%2Fazure-arc%2Fkubernetes%2Ftoc.json) for an Azure Arc-enabled Kubernetes cluster.
 
@@ -88,7 +88,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User edits the environment variables on the Shell script file (1-time edit) which then will be used throughout the extension deployment.
 
-- User runs the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Policy extension on the Azure Arc-enabled Kubernetes cluster and assign an Azure Policy to your Azure Arc-enabled K8s cluster's resource group.
+- User runs the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Policy extension on the Azure Arc-enabled Kubernetes cluster and assign an Azure Policy to your Azure Arc-enabled Kubernetes cluster's resource group.
 
 - User verifies that the Azure Policy extension is deployed as well as the Azure Policy assignment was created.
 

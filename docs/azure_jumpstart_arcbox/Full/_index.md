@@ -41,7 +41,7 @@ ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which i
 
 ### Hybrid Unified Operations
 
-ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. These resources include an an Azure Automation account, an Azure Log Analytics workspace with the Update Management solution, an Azure Monitor workbook, Azure Policy assignments for deploying Log Analytics agents on Windows and Linux Azure Arc-enabled servers, Azure Policy assignment for adding tags to resources, and a storage account used for staging resources needed for the deployment automation.
+ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. These resources include an Azure Log Analytics workspace, an Azure Monitor workbook, Azure Policy assignments for deploying Azure Monitor agents on Windows and Linux Azure Arc-enabled servers, Azure Policy assignment for adding tags to resources, and a storage account used for staging resources needed for the deployment automation.
 
 ![ArcBox unified operations diagram](./unifiedops.png)
 
@@ -151,7 +151,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-  
+
   - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install Azure PowerShell modules.
 
     ```PowerShell
@@ -174,7 +174,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
-    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**.
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
@@ -233,7 +233,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az deployment group create \
   --resource-group <Name of the Azure resource group> \
   --template-file azuredeploy.json \
-  --parameters azuredeploy.parameters.json 
+  --parameters azuredeploy.parameters.json
   ```
 
   ![Screenshot showing az group create](./azgroupcreate.png)
@@ -322,7 +322,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   terraform plan -out=infra.out
   terraform apply "infra.out"
   ```
-  
+
 - Example output from `terraform init`:
 
   ![terraform init](./terraform_init.png)
@@ -438,11 +438,68 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
-- Open Hyper-V and access the Azure Arc-enabled servers
-  - **Username: arcdemo**
-  - **Password: ArcDemo123!!**
+- Open the Hyper-V Manager to access the ArcBox nested virtual machines, that are onboarded as Azure Arc-enabled servers.
+&nbsp;
+
+  Windows virtual machine credentials:
+
+  ```text
+  Username: Administrator
+  Password: ArcDemo123!!
+  ```
+
+  Ubuntu virtual machine credentials:
+  
+  ```text
+  Username: arcdemo
+  Password: ArcDemo123!!
+  ```
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
+
+- Alternately, you can use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Ubuntu virtual machines [using SSH](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-cli). Open a PowerShell session and use the below commands.
+
+    ```powershell
+    az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+    $serverName = "ArcBox-Ubuntu-01"
+    $localUser = "arcdemo"
+    az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+    ```
+
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the _az ssh_ commands will run successfully.**.
+
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
+
+    ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+
+- Following the previous method, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines via SSH.
+
+  ```powershell
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+  ```
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+
+  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+
+- In addition to SSH, you can also use Azure CLI to connect to one of the Azure Arc-enabled servers, Hyper-V Windows Server virtual machines using Remote Desktop tunneled via SSH.
+
+  ```powershell
+  az login -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET -t $env:SPN_TENANT_ID --service-principal
+
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
+  ```
+
+  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
 
 - Use the included [kubectx](https://github.com/ahmetb/kubectx) tool to switch Kubernetes contexts between the Rancher K3s and AKS clusters.
 
@@ -473,6 +530,51 @@ Open the [data services operations page](https://azurearcjumpstart.io/azure_jump
 
   ![Screenshot showing Grafana dashboard](./activity1.png)
 
+### Arc-enabled SQL Server - Best practices assessment
+
+As part of the ArcBox deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open _ArcBox-SQL_ Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
+
+- The following screenshot shows the SQL Server best practices assessment page and the scheduled and previously ran assessments. If this page does not show assessment results click on the Refresh button to show assessments. Once displayed the assessments and results click on _View assessment_ results to see results.
+
+  ![Screenshot showing SQL Server best practices assessment configuration](./sql-pba-view-results.png)
+
+  ![Screenshot showing SQL Server best practices assessment results part 1](./sql-bpa-results-1.png)
+
+  ![Screenshot showing SQL Server best practices assessment results part 2](./sql-bpa-results-2.png)
+
+### Microsoft Defender for Cloud - SQL servers on machines
+
+This section guides you through different settings for enabling Microsoft Defender for Cloud - SQL servers on machines. Most of these settings are already enabled during the logon script execution after logging in to _ArcBox-Client_ Azure VM. Even though these are pre-configured there might be delays in showing them in the Azure portal.
+
+- Following are the settings of Microsoft Defender for Cloud - SQL servers on machines configured using automation scripts and can be reviewed in Azure portal.
+
+  ![Screenshot showing Microsoft Defender for Cloud plans](./microsoft-defender-plans.png)
+
+  ![Screenshot showing Microsoft Defender for Cloud SQL enabled](./defender-sql-plan.png)
+
+- The below screenshots show Arc-enabled SQL Server Defender for Cloud enablement and protection status. Defender for Cloud for SQL Server is enabled at the subscription level, but the protection status is still showing as not enabled.
+
+Please note it may take some time to show this status in the Azure portal, but still able to detect SQL threats generated by the test scripts.
+
+  ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./sql-defender-status.png)
+
+- The below screenshot shows the SQL threats detected by Microsoft Defender for Cloud.
+
+  ![Screenshot showing Defender for SQL security incidents and alerts](./sql-defender-incidents.png)
+
+  > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, log in to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute the test script manually as shown below.**
+
+- The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers. This script is copied on the nested _ArcBox-SQL_ Hyper-V virtual machine and can be used to run additional tests to generate security incidents and alerts.
+
+  ![Screenshot showing Defender for SQL test scripts](./sql-defender-testing-script.png)
+
+- Open PowerShell window and change directory to _C:\ArcBox\agentScript_ folder and run _testDefenderForSQL.ps1_ PowerShell script to generate Defender for SQL incidents and alerts.
+
+  ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
+
+- The below screenshot shows an email alert sent by Defender for Cloud when a SQL threat is detected. By default, this email is sent to the registered contact email at the subscription level.
+  ![Screenshot showing test script results](./brute-force-attack-alert.png)
+
 ### Included tools
 
 The following tools are including on the _ArcBox-Client_ VM.
@@ -488,7 +590,7 @@ The following tools are including on the _ArcBox-Client_ VM.
 - SqlQueryStress
 
 ### Next steps
-  
+
 ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or a kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
 - Deploy sample databases to the PostgreSQL instance or to the SQL Managed Instance
@@ -565,9 +667,9 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
       ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
 
-- As described in the message of the day (motd), depends on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
-  - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
-  - _ArcBox-K3s_ log path: *jumpstart_logs/installK3s.log*
+- As described in the message of the day (motd), depends on which virtual machine you logged into, the installation log can be found in the _jumpstart_logs_ folder. This installation logs can help determine the root cause for the failed deployment.
+  - _ArcBox-CAPI-MGMT_ log path: _jumpstart_logs/installCAPI.log_
+  - _ArcBox-K3s_ log path: _jumpstart_logs/installK3s.log_
 
       ![Screenshot showing login and the message of the day](./login_motd.png)
 
