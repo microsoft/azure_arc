@@ -785,15 +785,17 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Microsoft Defender for Cloud - Arc-enabled SQL server status](./sql-defender-status.png)
 
-- The below screenshot shows the SQL threat detected by Defender for Cloud.
+- The below screenshot shows the SQL threats detected by Microsoft Defender for Cloud.
 
   ![Screenshot showing Defender for SQL security incidents and alerts](./sql-defender-incidents.png)
+
+   > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, login to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute test script manually as shown below.**
 
 - The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers. This script is copied on the nested ArcBox-SQL Hyper-V virtual machine and can be used to run additional tests to generate security incidents and alerts.
 
   ![Screenshot showing Defender for SQL test scripts](./sql-defender-testing-script.png)
 
-- Please note once in a while these test execution may fails randomly. If you don't find these alerts, login to nested SQL VM in Hyper-V and execute test script manually as show below.
+- Open PowerShell window and change directory to _C:\ArcBox\agentScript_ folder and run _testDefenderForSQL.ps1_ PowerShell script to generate Defender for SQL incidents and alerts.
 
   ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
 
