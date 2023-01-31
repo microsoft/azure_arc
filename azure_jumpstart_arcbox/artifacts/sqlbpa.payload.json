@@ -1,0 +1,34 @@
+{
+    "id": "{{RESOURCEID}}",
+    "name": "WindowsAgent.SqlServer",
+    "type": "Microsoft.HybridCompute/machines/extensions",
+    "location": "{{LOCATION}}",
+    "properties": {
+        "publisher": "Microsoft.AzureData",
+        "type": "WindowsAgent.SqlServer",
+        "autoUpgradeMinorVersion": false,
+        "enableAutomaticUpgrade": true,
+        "settings": {
+            "SqlManagement": {
+                "IsEnabled": true
+            },
+            "ExcludedSqlInstances": [
+                ""
+            ],
+            "AssessmentSettings": {
+                "Enable": true,
+                "RunImmediately": true,
+                "schedule": {
+                    "Enable": true,
+                    "WeeklyInterval": 1,
+                    "monthlyOccurrence": null,
+                    "dayOfWeek": "Monday",
+                    "StartDate": null,
+                    "startTime": "09:00"
+                },
+                "WorkspaceResourceId": "{{WORKSPACEID}}",
+                "WorkspaceLocation": "{{LOCATION}}"
+            }
+        }
+    }
+}
