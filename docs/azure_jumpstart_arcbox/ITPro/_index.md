@@ -511,9 +511,9 @@ Open the [ArcBox Azure Monitor workbook documentation](https://azurearcjumpstart
 
 ### Arc-enabled SQL Server - Best practices assessment
 
-As part of the ArcBox deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open ArcBox-SQL Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
+As part of the ArcBox deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open _ArcBox-SQL_ Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
 
-- Following screenshot shows the SQL Server best practices assessment page and the scheduled and previously ran assessments. If this page do not show assessment results click on Refresh button show assessments. Once displayed the assessments and results click on _View assessment_ results to see results.
+- The following screenshot shows the SQL Server best practices assessment page and the scheduled and previously ran assessments. If this page does not show assessment results click on the Refresh button to show assessments. Once displayed the assessments and results click on _View assessment_ results to see results.
 
   ![Screenshot showing SQL Server best practices assessment configuration](./sql-pba-view-results.png)
 
@@ -525,7 +525,7 @@ As part of the ArcBox deployment SQL Server best practices assessment is configu
 
 This section guides you through different settings for enabling Microsoft Defender for Cloud - SQL servers on machines. Most of these settings are already enabled during the logon script execution when login to _ArcBox-Client_ Azure VM. Even though these are pre-configured there might be delays in showing them in the Azure portal.
 
-- Following are the settings of Microsoft Defender for Cloud - SQL servers on machines configured using automation scripts and can be reviewed in Azure portal.
+- Following are the settings of Microsoft Defender for Cloud - SQL servers on machines configured using automation scripts and can be reviewed in the Azure portal.
 
   ![Screenshot showing Microsoft Defender for Cloud plans](./microsoft-defender-plans.png)
 
@@ -540,13 +540,13 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Defender for SQL security incidents and alerts](./sql-defender-incidents.png)
 
-  > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, login to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute test script manually as shown below.**
+  > **NOTE: Once in a while executing Defender for SQL test script (_testDefenderForSQL.ps1_) may fail due to delays in deploying SQLAdvancedThreatProtection Log Analytics solution and may not generate security incidents and alerts. If you do not find these security incidents and alerts, log in to nested SQL server VM _ArcBox-SQL_ in Hyper-V and execute the test script manually as shown below.**
 
-- The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers. This script is copied on the nested ArcBox-SQL Hyper-V virtual machine and can be used to run additional tests to generate security incidents and alerts.
+- The below screenshot shows the test script used to generate SQL threats, detect, and alert using Defender for Cloud for SQL servers. This script is copied on the nested _ArcBox-SQL_ Hyper-V virtual machine and can be used to run additional tests to generate security incidents and alerts.
 
   ![Screenshot showing Defender for SQL test scripts](./sql-defender-testing-script.png)
 
-- Open PowerShell window and change directory to _C:\ArcBox\agentScript_ folder and run _testDefenderForSQL.ps1_ PowerShell script to generate Defender for SQL incidents and alerts.
+- Open PowerShell window and change the directory to _C:\ArcBox\agentScript_ folder and run _testDefenderForSQL.ps1_ PowerShell script to generate Defender for SQL incidents and alerts.
 
   ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
 
