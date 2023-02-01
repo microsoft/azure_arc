@@ -1,4 +1,4 @@
-# This role provides writer access to Azure Arc-enabled data services resources
+# This role provides writer access to Azure Arc enabled data services resources
 # Write access implies create, edit & delete of the resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
