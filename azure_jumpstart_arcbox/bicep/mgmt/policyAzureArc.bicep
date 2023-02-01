@@ -9,52 +9,25 @@ param flavor string
 
 var policies = [
   {
-    name: '(ArcBox) Deploy Linux Log Analytics agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf'
+    name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
+    definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0'
     flavors: [
       'Full'
       'ITPro'
     ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+    roleDefinition:  [
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa'
+    ]
     parameters: {
-      logAnalytics: {
+      logAnalyticsWorkspace: {
         value: logAnalyticsWorkspaceId
       }
-    }
-  }
-  {
-    name: '(ArcBox) Deploy Windows Log Analytics agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {
-      logAnalytics: {
-        value: logAnalyticsWorkspaceId
+      enableProcessesAndDependencies: {
+        value: true
       }
     }
-  }
-  {
-    name: '(ArcBox) Deploy Linux Dependency Agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {}
-  }
-  {
-    name: '(ArcBox) Deploy Windows Dependency Agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {}
   }
   {
     name: '(ArcBox) Tag resources'
@@ -99,11 +72,48 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = 
   }
 }]
 
-resource policies_name_id 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' =  [for (item,i) in policies: if (contains(item.flavors, flavor)) {
-  name: guid( item.name, resourceGroup().id)
+resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[0].flavors, flavor)) {
+  name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
-    roleDefinitionId: item.roleDefinition
-    principalId: contains(item.flavors, flavor)?policies_name[i].identity.principalId:guid('policies_name_id${i}')
+    roleDefinitionId: policies[0].roleDefinition[0]
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
-}]
+}
+
+resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[0].flavors, flavor)) {
+  name: guid( policies[0].name, policies[0].roleDefinition[1],resourceGroup().id)
+  properties: {
+    roleDefinitionId: policies[0].roleDefinition[1]
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[0].flavors, flavor)) {
+  name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
+  properties: {
+    roleDefinitionId: policies[0].roleDefinition[2]
+    principalId: contains(policies[0].flavors, flavor)?policies_name[0].identity.principalId:guid('policies_name_id${0}')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
+  name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
+  properties: {
+    roleDefinitionId: policies[1].roleDefinition
+    principalId: contains(policies[1].flavors, flavor)?policies_name[1].identity.principalId:guid('policies_name_id${0}')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[2].flavors, flavor)) {
+  name: guid( policies[2].name, policies[2].roleDefinition,resourceGroup().id)
+  properties: {
+    roleDefinitionId: policies[2].roleDefinition
+    principalId: contains(policies[2].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
+    principalType: 'ServicePrincipal'
+  }
+}
+

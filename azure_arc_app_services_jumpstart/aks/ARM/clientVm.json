@@ -104,6 +104,13 @@
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },
+        "deployContainerApps": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Container Apps deployment."
+            }
+        },
         "deployAppService": {
             "type": "bool",
             "defaultValue": false,
@@ -175,6 +182,24 @@
             "type": "string",
             "metadata": {
                 "description": "Azure Bastion subnet IP prefix"
+            }
+        },
+        "productsImage": {
+            "type": "string",
+            "metadata": {
+                "description": "Products API Image"
+            }
+        },
+        "inventoryImage": {
+            "type": "string",
+            "metadata": {
+                "description": "Inventory API Image"
+            }
+        },
+        "storeImage": {
+            "type": "string",
+            "metadata": {
+                "description": "Store API Image"
             }
         }
     },
@@ -324,7 +349,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'),  ' -connectedClusterName ', parameters('connectedClusterName'), ' -adminEmail ', parameters('adminEmail'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployContainerApps ', parameters('deployContainerApps'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'),  ' -connectedClusterName ', parameters('connectedClusterName'), ' -adminEmail ', parameters('adminEmail'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -productsImage ', parameters('productsImage'), ' -inventoryImage ', parameters('inventoryImage'), ' -storeImage ', parameters('storeImage'))]"
                 }
             }
         },
