@@ -627,7 +627,7 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 
   ![Screenshot showing Bookstore repo Traffic split 01](./capi_osm05.png)
 
-- Wait for the changes to propagate and observe the counters increment for bookstore and bookstore-v2 as well. 
+- Wait for the changes to propagate and observe the counters increment for bookstore and bookstore-v2 as well.
 
   We have updated the Service Mesh Interface (SMI) Traffic Split policy to direct 75 percent of the traffic sent to the root bookstore service and 25 percent to the bookstore-v2 service by modifying the weight fields for the bookstore-v2 backend. Also, observe the changes on the bookbuyer pod logs in the PowerShell window.
 
@@ -914,9 +914,9 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
     > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
 
-- As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
-  - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
-  - _ArcBox-K3s_ log path: *jumpstart_logs/installK3s.log*
+- As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the _jumpstart_logs_ folder. This installation logs can help determine the root cause for the failed deployment.
+  - _ArcBox-CAPI-MGMT_ log path: _jumpstart_logs/installCAPI.log_
+  - _ArcBox-K3s_ log path: _jumpstart_logs/installK3s.log_
 
       ![Screenshot showing login and the message of the day](./login_motd.png)
 

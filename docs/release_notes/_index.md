@@ -9,6 +9,59 @@ weight: 5
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
+## 2023
+
+### January 2023
+
+#### Release highlights
+
+- New and updated Jumpstart scenarios:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled Kubernetes (first one for AKS hybrid)
+  - Azure Arc-enabled app services (first one for Container Apps)
+- Multiple ArcBox enhancements and bug fixes
+- Multiple HCIBox bug fixes
+- [Updated community decks](https://github.com/microsoft/azure_arc/tree/main/docs/ppt)
+  - Azure Arc Overview slide library deck v1.8
+  - Azure Arc Jumpstart overview deck v1.3
+
+#### Azure Arc-enabled SQL Server
+
+- [Updated scenario: Integrate Microsoft Defender for SQL servers with Azure Arc-enabled SQL Server (on Windows) using Hyper-V nested virtualization and ARM templates](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_sqlsrv_winsrv_defender/)
+
+#### Azure Arc-enabled Kubernetes
+
+- [New scenario: Deploy an AKS Edge Essentials in Azure Windows Server VM, and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/)
+- [Enhancement: January Kubernetes-related version bump #1611](https://github.com/microsoft/azure_arc/issues/1611)
+- [Bug fix: Getting error while installing Azure Key Vault Secrets Provider extension on HCI Arc enabled Cluster #1587](https://github.com/microsoft/azure_arc/issues/1587)
+
+#### Azure Arc-enabled data services
+
+- [Enhancement: Azure Arc-enabled data services - January release #1585](https://github.com/microsoft/azure_arc/issues/1585)
+- [Enhancement: January Kubernetes-related version bump #1611](https://github.com/microsoft/azure_arc/issues/1611)
+
+#### Azure Arc-enabled app services
+
+- [New scenario: Deploy Azure Container Apps on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_container_apps_arm_template/)
+- [Enhancement: January Kubernetes-related version bump #1611](https://github.com/microsoft/azure_arc/issues/1611)
+
+#### Jumpstart ArcBox
+
+- [Enhancement: Migrate from MMA to AMA #1569](https://github.com/microsoft/azure_arc/issues/1569)
+- [Enhancement: January Kubernetes-related version bump #1611](https://github.com/microsoft/azure_arc/issues/1611)
+- [Enhancement: Install SSH server on the nested Windows VMs #1618](https://github.com/microsoft/azure_arc/issues/1618)
+- [Enhancement: ArcBox - Microsoft Defender for SQL server #1617](https://github.com/microsoft/azure_arc/issues/1617)
+- [Bug fix: Ubuntu VMs offline due to full disks #1601](https://github.com/microsoft/azure_arc/issues/1601)
+- [Bug fix: DevOps Scenario K3sGitOps.ps1 script references the CAPI cluster not the K3s cluster #1607](https://github.com/microsoft/azure_arc/issues/1607)
+- [Bug fix: ArcBox Full - update API call to get SQLMI primary endpoint #1609](https://github.com/microsoft/azure_arc/issues/1609)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: HCIBox deployment fails if passwords contain dollar signs #1590](https://github.com/microsoft/azure_arc/issues/1590)
+- [Bug fix: HCIBox - HCIBoxLogonScript - NuGet/PS Timeout Errors on Deploy-AKS.ps1 #1591](https://github.com/microsoft/azure_arc/issues/1591)
+- [Bug fix: HCIBox - HCIBoxLogonScript - NuGet/PS Timeout Errors on Deploy-AKS.ps1 #1591](https://github.com/microsoft/azure_arc/issues/1591)
+- [Bug fix: HCIBox - Deployment Error- Choco Install Fails - Register-AzSHCI.ps1 #1597](https://github.com/microsoft/azure_arc/issues/1597)
+
 ## 2022
 
 ### December 2022
@@ -285,8 +338,8 @@ weight: 5
 
 #### Azure Arc-enabled Kubernetes
 
-- [New scenario: Integrate Azure Monitor Container Insights and recommended alerts with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/container_insights/)
-- [New scenario: Integrate Azure Policy with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/azure_policy/)
+- [New scenario: Integrate Azure Monitor Container Insights and recommended alerts with an Azure Arc-enabled Kubernetes cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/container_insights/)
+- [New scenario: Integrate Azure Policy with an Azure Arc-enabled Kubernetes cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/azure_policy/)
 - [Updated scenario: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_basic/)
 - [Updated scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/)
 - [Updated scenario: Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
