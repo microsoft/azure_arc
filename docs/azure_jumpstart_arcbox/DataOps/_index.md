@@ -760,7 +760,7 @@ Open the [ArcBox Azure Monitor workbook documentation](https://azurearcjumpstart
 
 ### Arc-enabled SQL Server - Best practices assessment
 
-As part of the ArcBox deployment SQL Server best practices assessment is configured and ran SQL assessment to show assessment results. Open _ArcBox-SQL_ Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Serve best practice assessment results.
+As part of the ArcBox deployment, SQL Server best practices assessment is configured and run. Open _ArcBox-SQL_ Arc-enabled SQL Server resource from the resource group deployed or Azure Arc service blade to view SQL Server best practice assessment results.
 
 - The following screenshot shows the SQL Server best practices assessment page and the scheduled and previously ran assessments. If this page does not show assessment results click on the Refresh button to show assessments. Once displayed the assessments and results click on _View assessment_ results to see results.
 
