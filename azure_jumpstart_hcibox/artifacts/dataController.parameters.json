@@ -56,10 +56,10 @@
         "value": "Always"
       },
       "dockerImageTag": {
-        "value": "v1.16.0_2023-02-14"
+        "value": "v1.15.0_2023-01-10"
       },
       "dockerRegistry": {
-        "value": "mcr.microsoft.com/test"
+        "value": "mcr.microsoft.com"
       },
       "dockerRepository": {
         "value": "arcdata"
