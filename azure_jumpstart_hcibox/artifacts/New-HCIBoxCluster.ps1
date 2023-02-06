@@ -1383,9 +1383,9 @@ function New-DCVM {
             #Set-DhcpServerDnsCredential -Credential $Credential -ComputerName "jumpstartdc.jumpstart.local"
 
             # Add DHCP scope for Resource bridge VMs
-            Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+            $scope = Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
             #Add-DhcpServerv4ExclusionRange -ScopeID 10.0.1.0 -StartRange 10.0.1.1 -EndRange 10.0.1.15
-            #Set-DhcpServerv4OptionValue -OptionID 3 -Value 10.0.1.1 -ScopeID 10.0.1.0 -ComputerName DHCP1.corp.contoso.com
+            Set-DhcpServerv4OptionValue -OptionID 3 -Value $SDNConfig.BGPRouterIP_VLAN200.Trim("/24") -ScopeID $scope.ScopeID -ComputerName $dnsName
         }
     }
     $ErrorActionPreference = "Stop"
