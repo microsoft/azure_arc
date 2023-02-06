@@ -2,7 +2,7 @@
 type: docs
 title: "Key Vault Integration"
 linkTitle: "Key Vault Integration"
-weight: 6
+weight: 5
 description: >
 ---
 

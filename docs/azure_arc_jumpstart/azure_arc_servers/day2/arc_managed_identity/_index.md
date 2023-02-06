@@ -2,7 +2,7 @@
 type: docs
 title: "Managed Identity"
 linkTitle: "Managed Identity"
-weight: 13
+weight: 12
 description: >-
 ---
 

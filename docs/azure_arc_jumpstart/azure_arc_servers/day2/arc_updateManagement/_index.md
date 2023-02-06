@@ -2,7 +2,7 @@
 type: docs
 title: "Update Management"
 linkTitle: "Update Management"
-weight: 9
+weight: 8
 description: >
 ---
 
