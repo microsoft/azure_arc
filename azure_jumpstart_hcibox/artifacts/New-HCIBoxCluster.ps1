@@ -1361,7 +1361,32 @@ function New-DCVM {
 
             CMD.exe /c "certutil -SetCATemplates +WebServer"
  
-        }   
+        }
+
+        # Set up DHCP scope for Arc resource bridge
+        Invoke-Command -VMName $SDNConfig.DCName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
+            $SDNConfig = $args[0]
+
+            # Install DHCP feature
+            Install-WindowsFeature DHCP -IncludeManagementTools
+            CMD.exe /c "netsh dhcp add securitygroups"
+            Restart-Service dhcpserver
+
+            # Allow DHCP in domain
+            $dnsName = $SDNConfig.DCName + "." + $SDNConfig.SDNDomainFQDN
+            Add-DhcpServerInDC -DnsName $dnsName -IPAddress 192.168.1.254
+            Get-DHCPServerInDC
+
+            # Configure dynamic DNS updates for DHCP records
+            #Set-DhcpServerv4DnsSetting -ComputerName "jumpstartdc.jumpstart.local" -DynamicUpdates "Always" -DeleteDnsRRonLeaseExpiry $True
+            #$Credential = Get-Credential
+            #Set-DhcpServerDnsCredential -Credential $Credential -ComputerName "jumpstartdc.jumpstart.local"
+
+            # Add DHCP scope for Resource bridge VMs
+            Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+            #Add-DhcpServerv4ExclusionRange -ScopeID 10.0.1.0 -StartRange 10.0.1.1 -EndRange 10.0.1.15
+            #Set-DhcpServerv4OptionValue -OptionID 3 -Value 10.0.1.1 -ScopeID 10.0.1.0 -ComputerName DHCP1.corp.contoso.com
+        }
     }
     $ErrorActionPreference = "Stop"
 }
@@ -1662,7 +1687,29 @@ function New-RouterVM {
 
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-    
+            
+            # Enable DHCP Relay
+            $routerNetAdapterName = "VLAN200"
+            $netshDhcpRelay=@"
+pushd routing ip relay
+install
+set global loglevel=ERROR
+add dhcpserver $($SDNConfig.DCIP)
+add interface name="$routerNetAdapterName"
+set interface name="$routerNetAdapterName" relaymode=enable maxhop=6 minsecs=6
+popd
+"@
+
+            $netshDhcpRelayPath="$ENV:TEMP\netshDhcpRelay"
+
+            # Create netsh script file
+            New-Item -Path $netshDhcpRelayPath -Type File -ErrorAction SilentlyContinue | Out-Null
+
+            # Populate contents of the script 
+            Set-Content -Path $netshDhcpRelayPath -Value $netshDhcpRelay.Split("`r`n") -Encoding ASCII
+
+            # run it
+            CMD.exe /c "netsh -f $netshDhcpRelayPath"
         }     
     
         $ErrorActionPreference = "Continue"
