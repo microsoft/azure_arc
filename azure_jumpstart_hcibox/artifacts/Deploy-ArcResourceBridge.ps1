@@ -83,7 +83,7 @@ if ($env:deployAKSHCI -eq "false") {
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     #New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
-    New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -vipPoolStart $using:SDNConfig.rbCpip -vipPoolEnd $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp2 -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix -vswitchName $using:SDNConfig.AKSvSwitchName -vLanID $using:SDNConfig.AKSVlanID
+    New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -vipPoolStart $using:SDNConfig.rbVipStart -vipPoolEnd $using:SDNConfig.rbVipEnd -vswitchName $using:SDNConfig.AKSvSwitchName -vLanID $using:SDNConfig.AKSVlanID
 } 
 
 # if ($env:deployAKSHCI -eq "false") {
