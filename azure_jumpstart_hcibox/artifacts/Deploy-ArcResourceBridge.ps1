@@ -72,7 +72,7 @@ $location = "eastus"
 $custom_location_name = "hcibox-rb-cl"
 $cloudServiceIP = $SDNConfig.AKSCloudSvcidr.Substring(0, $SDNConfig.AKSCloudSvcidr.IndexOf('/'))
 
-if ($env:deployAKSHCI -eq "false") {
+if ($env:deployAKSHCI -eq $false) {
     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         #$vnet = New-MocNetworkSetting -Name $using:SDNConfig.AKSvnetname -vswitchName $using:SDNConfig.AKSvSwitchName -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -vlanID $using:SDNConfig.AKSVlanID
         #Set-MocConfig -workingDir $using:csv_path\ResourceBridge -vnet $vnet -imageDir $using:csv_path\imageStore -skipHostLimitChecks -cloudConfigLocation $using:csv_path\cloudStore -catalog aks-hci-stable-catalogs-ext -ring stable -CloudServiceIP $using:cloudServiceIP -createAutoConfigContainers $false
