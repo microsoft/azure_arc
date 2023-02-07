@@ -147,4 +147,5 @@
     rbVipEnd                             = "192.168.200.249"
     rbDHCPExclusionStart                 = "192.168.200.200"
     rbDHCPExclusionEnd                   = "192.168.200.209"
+    dcVLAN200IP                          = "192.168.200.205"
 }

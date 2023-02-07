@@ -1095,6 +1095,10 @@ function New-DCVM {
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
 
+        # Add NIC for VLAN200 for DHCP server
+        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName "vSwitch-Fabric" -DeviceNaming "On"
+        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $SDNConfig.AKSVlanID
+
         # Inject Answer File
         Write-Verbose "Mounting and injecting answer file into the $VMName VM."        
         $VerbosePreference = "SilentlyContinue"
@@ -1196,6 +1200,13 @@ function New-DCVM {
             New-NetIPAddress -InterfaceAlias $DCName –IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
             Install-WindowsFeature -name AD-Domain-Services –IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
+
+            Write-Verbose "Configuring NIC settings for DC VLAN200"
+            $VerbosePreference = "SilentlyContinue"
+            $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
+            Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
+            New-NetIPAddress -InterfaceAlias VLAN200 –IPAddress $SDNConfig.dcVLAN200IP -PrefixLength ($SDNConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $SDNConfig.AKSGWIP | Out-Null
             $VerbosePreference = "Continue"
 
             Write-Verbose "Configuring Trusted Hosts"
@@ -1381,6 +1392,10 @@ function New-DCVM {
             #Set-DhcpServerv4DnsSetting -ComputerName "jumpstartdc.jumpstart.local" -DynamicUpdates "Always" -DeleteDnsRRonLeaseExpiry $True
             #$Credential = Get-Credential
             #Set-DhcpServerDnsCredential -Credential $Credential -ComputerName "jumpstartdc.jumpstart.local"
+            
+            # Bind DHCP only to VLAN200 NIC
+            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
+            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
 
             # Add DHCP scope for Resource bridge VMs
             $scope = Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
@@ -1689,28 +1704,28 @@ function New-RouterVM {
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
             
-            # Enable DHCP Relay
-            $routerNetAdapterName = "VLAN200"
-            $netshDhcpRelay=@"
-pushd routing ip relay
-install
-set global loglevel=ERROR
-add dhcpserver $($SDNConfig.DCIP)
-add interface name="$routerNetAdapterName"
-set interface name="$routerNetAdapterName" relaymode=enable maxhop=6 minsecs=6
-popd
-"@
+#             # Enable DHCP Relay
+#             $routerNetAdapterName = "VLAN200"
+#             $netshDhcpRelay=@"
+# pushd routing ip relay
+# install
+# set global loglevel=ERROR
+# add dhcpserver $($SDNConfig.DCIP)
+# add interface name="$routerNetAdapterName"
+# set interface name="$routerNetAdapterName" relaymode=enable maxhop=6 minsecs=6
+# popd
+# "@
 
-            $netshDhcpRelayPath="$ENV:TEMP\netshDhcpRelay"
+#             $netshDhcpRelayPath="$ENV:TEMP\netshDhcpRelay"
 
-            # Create netsh script file
-            New-Item -Path $netshDhcpRelayPath -Type File -ErrorAction SilentlyContinue | Out-Null
+            # # Create netsh script file
+            # New-Item -Path $netshDhcpRelayPath -Type File -ErrorAction SilentlyContinue | Out-Null
 
-            # Populate contents of the script 
-            Set-Content -Path $netshDhcpRelayPath -Value $netshDhcpRelay.Split("`r`n") -Encoding ASCII
+            # # Populate contents of the script 
+            # Set-Content -Path $netshDhcpRelayPath -Value $netshDhcpRelay.Split("`r`n") -Encoding ASCII
 
-            # run it
-            CMD.exe /c "netsh -f $netshDhcpRelayPath"
+            # # run it
+            # CMD.exe /c "netsh -f $netshDhcpRelayPath"
         }     
     
         $ErrorActionPreference = "Continue"
