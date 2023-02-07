@@ -143,6 +143,8 @@
     rbIp                                 = "192.168.200.201"
     rbIp2                                = "192.168.200.203"
     rbCpip                               = "192.168.200.202"
-    rbVipStart                           = "192.168.200.210"
+    rbVipStart                           = "192.168.200.200"
     rbVipEnd                             = "192.168.200.249"
+    rbDHCPExclusionStart                 = "192.168.200.200"
+    rbDHCPExclusionEnd                   = "192.168.200.209"
 }
