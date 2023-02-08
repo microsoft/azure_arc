@@ -151,6 +151,7 @@ rules:
   - update
 - apiGroups:
   - sql.arcdata.microsoft.com
+  - tasks.postgresql.arcdata.microsoft.com
   - tasks.sql.arcdata.microsoft.com
   - tasks.arcdata.microsoft.com
   - arcdata.microsoft.com
