@@ -1384,8 +1384,8 @@ function New-DCVM {
             Restart-Service dhcpserver
 
             # Allow DHCP in domain
-            $dnsName = $SDNConfig.DCName + "." + $SDNConfig.SDNDomainFQDN
-            Add-DhcpServerInDC -DnsName $dnsName -IPAddress 192.168.1.254
+            $fqdnsName = $SDNConfig.DCName + "." + $SDNConfig.SDNDomainFQDN
+            Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $SDNConfig.dcVLAN200IP
             Get-DHCPServerInDC
 
             # Configure dynamic DNS updates for DHCP records
