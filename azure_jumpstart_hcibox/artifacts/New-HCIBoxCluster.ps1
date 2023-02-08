@@ -1399,7 +1399,8 @@ function New-DCVM {
             Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
 
             # Add DHCP scope for Resource bridge VMs
-            $scope = Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+            Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+            $scope = Get-DhcpServerv4Scope
             Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $SDNConfig.rbDHCPExclusionStart -EndRange $SDNConfig.rbDHCPExclusionEnd
             #Set-DhcpServerv4OptionValue -OptionID 3 -Value $SDNConfig.BGPRouterIP_VLAN200.Trim("/24") -ScopeID $scope.ScopeID.IPAddressToString -ComputerName $dnsName
             Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $SDNConfig.SDNLABDNS -Router $SDNConfig.BGPRouterIP_VLAN200.Trim("/24")
