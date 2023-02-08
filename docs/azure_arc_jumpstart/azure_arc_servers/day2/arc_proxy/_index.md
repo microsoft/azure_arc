@@ -2,7 +2,7 @@
 type: docs
 title: "Connectivity behind a proxy server"
 linkTitle: "Connectivity behind a proxy server"
-weight: 11
+weight: 10
 description: >
 ---
 
