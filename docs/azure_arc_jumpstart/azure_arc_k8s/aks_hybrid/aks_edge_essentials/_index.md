@@ -8,13 +8,15 @@ description: >
 
 ## Deploy an AKS Edge Essentials in Azure Windows Server VM, and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using an ARM Template
 
-The following Jumpstart scenario will guide you on how to automatically create an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentiales cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentiales cluster)) on the Azure VM.
+The following Jumpstart scenario will guide you on how to automatically create an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster)) on the Azure VM.
 
 > **NOTE: Currently, AKS Edge Essentials is in [public preview](https://learn.microsoft.com/azure/aks/hybrid/aks-edge-overview)**.
 
-Azure VMs leverage the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
+Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
 
-However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e. "on-premises" or in other cloud platforms).
+![Screenshot ARM template output](./01.png)
+
+However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc, and by doing so, you will be able to simulate a server that is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 > **NOTE: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
@@ -28,9 +30,9 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 - In case you don't already have one, you can [Create a free Azure account](https://azure.microsoft.com/free/).
 
-- Create Azure service principal (SP).
+- Create Azure service principal (SP)
 
-    To be complete the scenario and its related automation, an Azure service principal assigned the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account and run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
@@ -59,14 +61,14 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
 
-    > **NOTE: The Jumpstart scenarios are designed with ease of use in-mind and adhere to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering use of a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 
 ## Automation Flow
 
-These steps will help you to get familiar with the automation and deployment flow.
+For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User is edits the ARM template parameters file (1-time edit). These parameters values are used throughout the deployment.
+- User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.json) will initiate the deployment of the following resources:
 
@@ -91,6 +93,20 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 - Before deploying the ARM template, login to Azure using Azure CLI with the ```az login``` command.
 
 - The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/azuredeploy.parameters.example.json).
+
+  - _`vmSize`_ - Client Windows VM size.
+  - _`vmName`_ - Client Windows VM name.
+  - _`kubernetesDistribution`_ - Choice (k8s | k3s) kubernetes distribution.
+  <!-- - _`windowsNode`_ - Choice (true | false) to deploy AKS Windows Node. -->
+  - _`adminUsername`_ - Client Windows VM Administrator name.
+  - _`adminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`appId`_ - Your Azure service principal id.
+  - _`password`_ - Your Azure service principal secret.
+  - _`tenantId`_ - Your Azure tenant id.
+  - _`subscriptionId`_ - Your Subscription ID.
+  - _`location`_ - Azure location.
+  - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _`bastionHostName`_ - Azure Bastion name.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials/arm_template/) and run the below command:
 
@@ -118,9 +134,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![Screenshot ARM template output](./01.png)
+    ![Screenshot ARM template output](./02.png)
 
-    ![Screenshot resources in resource group](./02.png)
+    ![Screenshot resources in resource group](./03.png)
 
 ## Windows Login & Post Deployment
 
@@ -135,23 +151,23 @@ By design, port 3389 is not allowed on the network security group. Therefore, yo
 
 - Open the _AKS-EE-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing AKS-EE-Demo-NSG NSG with blocked RDP](./03.png)
+  ![Screenshot showing AKS-EE-Demo-NSG NSG with blocked RDP](./04.png)
 
-  ![Screenshot showing adding a new inbound security rule](./04.png)
+  ![Screenshot showing adding a new inbound security rule](./05.png)
 
 - Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
 
-  ![Screenshot showing all inbound security rule](./05.png)
+  ![Screenshot showing all inbound security rule](./06.png)
 
-  ![Screenshot showing all NSG rules after opening RDP](./06.png)
+  ![Screenshot showing all NSG rules after opening RDP](./07.png)
 
-  ![Screenshot showing connecting to the VM using RDP](./07.png)
+  ![Screenshot showing connecting to the VM using RDP](./08.png)
 
 ### Connect using Azure Bastion
 
 - If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the Azure VM.
 
-  ![Screenshot showing connecting to the VM using Bastion](./08.png)
+  ![Screenshot showing connecting to the VM using Bastion](./09.png)
 
   > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
 
@@ -161,9 +177,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./09.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./10.png)
 
-  ![Screenshot showing connecting to the VM using JIT](./10.png)
+  ![Screenshot showing connecting to the VM using JIT](./11.png)
 
 ### Post Deployment
 
@@ -172,8 +188,6 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 - Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
 
     > **NOTE: The script run time is ~25min long.**
-
-    ![Screenshot script output](./11.png)
 
     ![Screenshot script output](./12.png)
 
@@ -193,29 +207,27 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
     ![Screenshot script output](./20.png)
 
+    ![Screenshot script output](./21.png)
+
 - Upon successful run, a new Azure Arc-enabled server and Azure Arc-enabled Kubernetes cluster will be added to the resource group.
 
-![Screenshot Azure Arc-enabled server on resource group](./21.png)
+![Screenshot Azure Arc-enabled server on resource group](./22.png)
 
 - You can also run _kubectl get nodes -o wide_ to check the cluster node status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extensions](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) ([Azure Policy](https://learn.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes), [Defender for Containers](https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction) and [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview))) are in running state.
 
-![Screenshot kubectl get nodes -o wide](./22.png)
+![Screenshot kubectl get nodes -o wide](./23.png)
 
-![Screenshot kubectl get pod -A](./23.png)
+![Screenshot kubectl get pod -A](./24.png)
 
 ## Cluster extensions
 
-In this scenario, four Azure Arc-enabled Kubernetes cluster extensions were installed:
-
-- _microsoft.policyinsights_ - The Azure Policy cluster extension. To learn more about it, read the ["Understand Azure Policy for Kubernetes clusters"](https://docs.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes) Azure doc.
-
-- _microsoft.azuredefender.kubernetes_ - The Microsoft Defender for Cloud cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Defender with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_defender_extension/#create-azure-defender-extensions-instance) scenario.
+In this scenario, Azure Arc-enabled Kubernetes cluster Azure Monitor extension was installed:
 
 - _azuremonitor-containers_ - The Azure Monitor Container Insights cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
 
 - In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./24.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./25.png)
 
 ### Exploring logs from the Client VM
 
@@ -227,10 +239,10 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS Edge Essentials cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
 |
 
-![Screenshot showing the Temp folder with deployment logs](./25.png)
+![Screenshot showing the Temp folder with deployment logs](./26.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./26.png)
+    ![Screenshot showing Azure resource group deletion](./27.png)
