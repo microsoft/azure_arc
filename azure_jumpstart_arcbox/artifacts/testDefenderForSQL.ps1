@@ -4,7 +4,7 @@ $attempts = 0
 
 while ($attempts -le 5)
 {
-    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse).FullName
+    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse -ErrorAction SilentlyContinue).FullName
     $attempts = $attempts + 1
     if ($true -eq [System.IO.File]::Exists($moduleFile))
     {
@@ -13,14 +13,14 @@ while ($attempts -le 5)
     }
     else 
     {
-        Write-Error "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
+        Write-Information "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
         Start-Sleep(60) # Wait for agent to isntall all modules
     }
 }
 
 if ($true -ne [System.IO.File]::Exists($moduleFile))
 {
-    Write-Error "Module file $moduleFile not installed. Try running script mannually later."
+    Write-Information "Module file $moduleFile not installed. Try running script mannually later. Search for PowerShell module file 'SqlAdvancedThreatProtectionShell.psm1' in one of the '$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\' sub folders to re-run this test script."
     Exit
 }
 
