@@ -11,9 +11,6 @@
     "kubernetesDistribution": {
       "value": "k8s"
     },
-    "windowsNode": {
-      "value": false
-    },
     "adminUsername": {
       "value": "arcdemo"
     },
