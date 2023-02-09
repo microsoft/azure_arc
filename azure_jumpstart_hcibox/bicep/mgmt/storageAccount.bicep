@@ -19,7 +19,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
     name: storageAccountType
   }
   kind: 'StorageV2'
-  properties: {}
+  properties: {
+    supportsHttpsTrafficOnly: true
+  }
 }
 
 output storageAccountName string = storageAccountName

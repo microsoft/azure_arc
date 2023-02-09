@@ -8,7 +8,7 @@ toc_hide: true
 
 Azure Stack HCI supports [VM provisioning the Azure portal](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines). HCIBox is pre-configured with [Arc resource bridge](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines#what-is-azure-arc-resource-bridge) to support this capability.
 
-  > **NOTE: Deploying a guest VM using the included Windows Server 2022 image will result in a deployment failure if the "Enable guest management" box is checked. To explore self-service VM creation, it is recommended at this time to use the included Linux image.**
+  > **NOTE: Resource bridge only supports deploying a guest VM with DHCP IP assignment. HCIBox runs a simple DHCP server that provides IP addresses to VMs created with resource bridge. The DHCP range is 192.168.200.210 - 192.168.200.249. Static assignment of IP from the Azure portal is not supported at this time.**
 
 ## Deploy a new Linux virtual machine
 
