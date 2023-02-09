@@ -16,34 +16,6 @@
         "description": "Name of the subnet in the virtual network"
       }
     },
-    "aksSubnetName": {
-      "type": "string",
-      "defaultValue": "ArcBox-AKS-Subnet",
-      "metadata": {
-        "description": "Name of the subnet in the virtual network"
-      }
-    },
-    "dcSubnetName": {
-      "type": "string",
-      "defaultValue": "ArcBox-DC-Subnet",
-      "metadata": {
-        "description": "Name of the Domain Controller subnet in the virtual network"
-      }
-    },
-    "drVirtualNetworkName": {
-      "type": "string",
-      "defaultValue": "ArcBox-DR-VNet",
-      "metadata": {
-        "description": "Name of the DR VNet"
-      }
-    },
-    "drSubnetName": {
-      "type": "string",
-      "defaultValue": "ArcBox-DR-Subnet",
-      "metadata": {
-        "description": "Name of the DR subnet in the DR virtual network"
-      }
-    },
     "workspaceName": {
       "type": "string",
       "metadata": {
@@ -70,12 +42,6 @@
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
     },
-    "flavor": {
-      "type": "string",
-      "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
-      }
-    },
     "deployBastion": {
       "type": "bool",
       "metadata": {
@@ -96,13 +62,6 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
-    },
-    "dnsServers": {
-      "type": "array",
-      "defaultValue": [],
-      "metadata": {
-        "description": "DNS Server configuration"
-      }
     }
   },
   "variables": {
@@ -113,10 +72,6 @@
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "addressPrefix": "10.16.0.0/16",
     "subnetAddressPrefix": "10.16.1.0/24",
-    "aksSubnetPrefix": "10.16.76.0/22",
-    "dcSubnetPrefix": "10.16.2.0/24",
-    "drAddressPrefix": "172.16.0.0/16",
-    "drSubnetPrefix": "172.16.128.0/17",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
@@ -145,30 +100,6 @@
           }
         }
       }
-    ],
-    "dataOpsSubnets": [
-      {
-        "name": "[parameters('aksSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('aksSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "[parameters('dcSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('dcSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      }
     ]
   },
   "resources": [
@@ -187,88 +118,9 @@
             "[variables('addressPrefix')]"
           ]
         },
-        "dhcpOptions": {
-          "dnsServers": "[parameters('dnsServers')]"
-        },
         "subnets": "[
-          if(
-            and(not(parameters('deployBastion')),not(equals(parameters('flavor'),'DataOps'))),variables('primarySubnet'),
-            if(
-              and(not(parameters('deployBastion')),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('dataOpsSubnets')),
-              if(
-                and(parameters('deployBastion'),not(equals(parameters('flavor'),'DataOps'))),union(variables('primarySubnet'),variables('bastionSubnet')),
-                if(
-                  and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),variables('primarySubnet')))))
+          union(variables('primarySubnet'), variables('bastionSubnet'))
         ]"
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2022-01-01",
-      "name": "[parameters('drVirtualNetworkName')]",
-      "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
-      ],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('drAddressPrefix')]"
-          ]
-        },
-        "dhcpOptions": {
-          "dnsServers": "[parameters('dnsServers')]"
-        },
-        "subnets": [
-          {
-            "name": "[parameters('drSubnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('drSubnetPrefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "apiVersion": "2022-01-01",
-      "name": "[format('{0}/peering-to-DR-vnet', parameters('virtualNetworkName'))]",
-      "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('drVirtualNetworkName'))]"
-      ],
-      "properties": {
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": false,
-        "useRemoteGateways": false,
-        "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "apiVersion": "2022-01-01",
-      "name": "[format('{0}/peering-to-primary-vnet', parameters('drVirtualNetworkName'))]",
-      "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('drVirtualNetworkName'))]"
-      ],
-      "properties": {
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": false,
-        "useRemoteGateways": false,
-        "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
-        }
       }
     },
     {
@@ -551,9 +403,6 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('workspaceName')]"
-          },
-          "flavor": {
-            "value": "[parameters('flavor')]"
           }
         }
       }
