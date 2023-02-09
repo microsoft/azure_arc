@@ -2,7 +2,7 @@
 type: docs
 title: "Custom Script Extension"
 linkTitle: "Custom Script Extension"
-weight: 4
+weight: 3
 description: >
 ---
 

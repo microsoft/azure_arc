@@ -63,9 +63,9 @@ Jumpstart Lightning is the show where you get a chance to share with our team an
 
 What are you waiting for?! [Fill the submission form](https://forms.office.com/r/cyg2DduG1W) and if it’s snazzy enough, you will be hearing from us soon.
 
-## Diagrams
+## Community decks
 
-Architecture diagrams and visualization are important so we wanted you to have our [validated Azure Hybrid diagrams](https://github.com/microsoft/azure_arc/blob/main/docs/ppt/diagrams.pptx) we use, you know, because we care!
+Architecture diagrams and visualization are important so we wanted you to have our [official Azure Arc overview library and the Azure Arc Jumpstart overview PowerPoint decks](https://github.com/microsoft/azure_arc/tree/main/docs/ppt) we use, just because you know, we care!
 
 ![diagrams](/img/diagrams.png)
 
