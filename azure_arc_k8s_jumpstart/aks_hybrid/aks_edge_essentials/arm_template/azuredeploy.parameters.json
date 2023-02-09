@@ -11,9 +11,6 @@
     "kubernetesDistribution": {
       "value": "k8s"
     },
-    "windowsNode": {
-      "value": false
-    },
     "adminUsername": {
       "value": "arcdemo"
     },
@@ -21,16 +18,16 @@
       "value": "ArcPassword123!!"
     },
     "appId": {
-      "value": "774f4609-b87e-4074-9630-41e427587697"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "password": {
-      "value": "WTE8Q~AJiwR6~x7kg2fN3EyMRfk_DQ-tiZBIwdk_"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "tenantId": {
-      "value": "992574ac-b653-4e8b-b422-f383337f11c1"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "subscriptionId": {
-      "value": "7f1393bb-9f7e-4298-98b5-6d2a055e7786"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "location": {
       "value": "eastus"

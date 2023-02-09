@@ -8,7 +8,7 @@ description: >
 
 ## Deploy an AKS Edge Essentials in Azure Windows Server VM, and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using an ARM Template
 
-The following Jumpstart scenario will guide you on how to automatically create an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the LogonScript (AKS Edge Essentiales cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentiales cluster)) on the Azure VM.
+The following Jumpstart scenario will guide you on how to automatically create an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster)) on the Azure VM.
 
 > **NOTE: Currently, AKS Edge Essentials is in [public preview](https://learn.microsoft.com/azure/aks/hybrid/aks-edge-overview)**.
 
@@ -16,7 +16,7 @@ Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://do
 
 ![Screenshot ARM template output](./01.png)
 
-However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
+However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc, and by doing so, you will be able to simulate a server that is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 > **NOTE: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
@@ -32,7 +32,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 - Create Azure service principal (SP)
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account and run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
@@ -61,7 +61,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
 
-    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 
 ## Automation Flow
@@ -97,7 +97,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`vmSize`_ - Client Windows VM size.
   - _`vmName`_ - Client Windows VM name.
   - _`kubernetesDistribution`_ - Choice (k8s | k3s) kubernetes distribution.
-  - _`windowsNode`_ - Choice (true | false) to deploy AKS Windows Node.
+  <!-- - _`windowsNode`_ - Choice (true | false) to deploy AKS Windows Node. -->
   - _`adminUsername`_ - Client Windows VM Administrator name.
   - _`adminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`appId`_ - Your Azure service principal id.
