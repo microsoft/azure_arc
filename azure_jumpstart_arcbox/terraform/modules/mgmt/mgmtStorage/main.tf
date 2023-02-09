@@ -35,6 +35,7 @@ resource "azurerm_storage_account" "storage" {
   location                 = data.azurerm_resource_group.rg.location
   account_tier             = var.storage_account_type
   account_replication_type = "LRS"
+  enable_https_traffic_only = true
 }
 
 output "storage_account_name" {
