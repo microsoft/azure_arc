@@ -11,6 +11,9 @@
     "kubernetesDistribution": {
       "value": "k8s"
     },
+    "windowsNode": {
+      "value": false
+    },
     "adminUsername": {
       "value": "arcdemo"
     },
@@ -33,7 +36,7 @@
       "value": "eastus"
     },
     "deployBastion": {
-        "value": false
+      "value": false
     },
     "bastionHostName": {
       "value": "Arc-Win-Demo-Bastion"
