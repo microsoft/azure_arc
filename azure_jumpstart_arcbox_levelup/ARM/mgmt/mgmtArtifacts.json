@@ -36,12 +36,6 @@
         "description": "SKU, leave default pergb2018"
       }
     },
-    "templateBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
-      }
-    },
     "deployBastion": {
       "type": "bool",
       "metadata": {
@@ -240,7 +234,6 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2022-01-01",
       "name": "[parameters('bastionNetworkSecurityGroupName')]",
-      "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
