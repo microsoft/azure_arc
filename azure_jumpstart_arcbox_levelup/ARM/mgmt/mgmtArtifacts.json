@@ -69,7 +69,6 @@
       "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "addressPrefix": "10.16.0.0/16",
     "subnetAddressPrefix": "10.16.1.0/24",
     "bastionSubnetName": "AzureBastionSubnet",
