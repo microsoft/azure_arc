@@ -13,12 +13,6 @@
             "metadata": {
                 "description": "Name of your log analytics workspace"
             }
-        },
-        "flavor": {
-            "type": "string",
-            "metadata": {
-                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
-            }
         }
     },
     "variables": {
@@ -59,7 +53,7 @@
                         "value": "Project"
                     },
                     "tagValue": {
-                        "value": "jumpstart_arcbox"
+                        "value": "jumpstart_arcbox_levelup"
                     }
                 }
             },

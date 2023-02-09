@@ -385,29 +385,6 @@
       }
     },
     {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "name": "policyDeployment",
-      "dependsOn": [
-        "[parameters('workspaceName')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('policyTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "azureLocation": {
-            "value": "[parameters('location')]"
-          },
-          "logAnalyticsWorkspace": {
-            "value": "[parameters('workspaceName')]"
-          }
-        }
-      }
-    },
-    {
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2022-01-01",
       "name": "[variables('bastionPublicIpAddressName')]",
