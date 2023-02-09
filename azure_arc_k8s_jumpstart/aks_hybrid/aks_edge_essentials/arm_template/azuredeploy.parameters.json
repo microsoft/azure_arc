@@ -11,6 +11,9 @@
     "kubernetesDistribution": {
       "value": "k8s"
     },
+    "windowsNode": {
+      "value": false
+    },
     "adminUsername": {
       "value": "arcdemo"
     },
@@ -18,22 +21,22 @@
       "value": "ArcPassword123!!"
     },
     "appId": {
-      "value": "XXXXX-XXXXX-XXXXX"
+      "value": "774f4609-b87e-4074-9630-41e427587697"
     },
     "password": {
-      "value": "XXXXX-XXXXX-XXXXX"
+      "value": "WTE8Q~AJiwR6~x7kg2fN3EyMRfk_DQ-tiZBIwdk_"
     },
     "tenantId": {
-      "value": "XXXXX-XXXXX-XXXXX"
+      "value": "992574ac-b653-4e8b-b422-f383337f11c1"
     },
     "subscriptionId": {
-      "value": "XXXXX-XXXXX-XXXXX"
+      "value": "7f1393bb-9f7e-4298-98b5-6d2a055e7786"
     },
     "location": {
       "value": "eastus"
     },
     "deployBastion": {
-        "value": false
+      "value": false
     },
     "bastionHostName": {
       "value": "Arc-Win-Demo-Bastion"
