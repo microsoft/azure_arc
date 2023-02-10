@@ -65,7 +65,7 @@ What are you waiting for?! [Fill the submission form](https://forms.office.com/r
 
 ## Community decks
 
-Architecture diagrams and visualization are important so we wanted you to have our [official Azure Arc overview library and the Azure Arc Jumpstart overview PowerPoint decks](https://github.com/microsoft/azure_arc/tree/main/docs/ppt) we use, just because you know, we care!
+Architecture diagrams and visualization are important so we wanted you to have our [official Azure Arc overview library, the Azure Kubernetes Service (AKS) hybrid deployment options library deck, and the Azure Arc Jumpstart overview PowerPoint decks](https://github.com/microsoft/azure_arc/tree/main/docs/ppt) we use, just because you know, we care!
 
 ![diagrams](/img/diagrams.png)
 
