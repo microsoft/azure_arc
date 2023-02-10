@@ -9,7 +9,10 @@
       "value": "AKS-EE-Win-Demo"
     },
     "kubernetesDistribution": {
-      "value": "k8s"
+      "value": "k3s"
+    },
+    "windowsNode": {
+      "value": false
     },
     "adminUsername": {
       "value": "arcdemo"
