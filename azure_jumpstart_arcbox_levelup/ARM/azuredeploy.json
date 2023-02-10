@@ -109,6 +109,9 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
+          },
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
           }
         }
       }

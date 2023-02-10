@@ -99,6 +99,12 @@
             "metadata": {
                 "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
             }
+        },
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the environment Azure Log Analytics workspace"
+            }
         }
     },
     "variables": {
@@ -220,7 +226,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -githubUser ', parameters('githubUser'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -githubUser ', parameters('githubUser'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
                 }
             }
         }

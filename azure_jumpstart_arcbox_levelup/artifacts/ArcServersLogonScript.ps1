@@ -236,7 +236,6 @@ Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for 
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
 $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
 Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
 Stop-Transcript
 
