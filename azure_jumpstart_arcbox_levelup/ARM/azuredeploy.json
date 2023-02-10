@@ -72,17 +72,13 @@
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_jumpstart_arcbox_levelup/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]"
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": [
-        "stagingStorageAccountDeployment"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
