@@ -1,0 +1,163 @@
+{
+    "crds": {
+        "DataController": {
+            "currentVersion": "v5",
+            "versions": [
+                "v1beta1",
+                "v1",
+                "v2",
+                "v3",
+                "v4",
+                "v5"
+            ],
+            "metadata.name": "datacontrollers.arcdata.microsoft.com",
+            "changed": false
+        },
+        "ActiveDirectoryConnector": {
+            "currentVersion": "v1",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1"
+            ],
+            "metadata.name": "activedirectoryconnectors.arcdata.microsoft.com",
+            "changed": false
+        },
+        "ExportTask": {
+            "currentVersion": "v2",
+            "versions": [
+                "v1beta1",
+                "v1",
+                "v2"
+            ],
+            "metadata.name": "exporttasks.tasks.arcdata.microsoft.com",
+            "changed": false
+        },
+        "Kafka": {
+            "currentVersion": "v1beta3",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1beta3"
+            ],
+            "metadata.name": "kafkas.arcdata.microsoft.com",
+            "changed": false
+        },
+        "Monitor": {
+            "currentVersion": "v2",
+            "versions": [
+                "v1beta1",
+                "v1",
+                "v2"
+            ],
+            "metadata.name": "monitors.arcdata.microsoft.com",
+            "changed": false
+        },
+        "PostgreSql": {
+            "currentVersion": "v1beta5",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1beta3",
+                "v1beta4",
+                "v1beta5"
+            ],
+            "metadata.name": "postgresqls.arcdata.microsoft.com",
+            "changed": true
+        },
+        "PostgreSqlRestoreTask": {
+            "currentVersion": "v1beta1",
+            "versions": [
+                "v1beta1"
+            ],
+            "metadata.name": "postgresqlrestoretasks.tasks.postgresql.arcdata.microsoft.com",
+            "changed": true
+        },
+        "Redis": {
+            "currentVersion": "v1beta1",
+            "versions": [
+                "v1beta1"
+            ],
+            "metadata.name": "redis.arcdata.microsoft.com",
+            "changed": false
+        },
+        "FailoverGroup": {
+            "currentVersion": "v2",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1",
+                "v2"
+            ],
+            "metadata.name": "failovergroups.sql.arcdata.microsoft.com",
+            "changed": false
+        },
+        "SqlManagedInstanceMonitoringProfile": {
+            "currentVersion": "v1beta2",
+            "versions": [
+                "v1beta1",
+                "v1beta2"
+            ],
+            "metadata.name": "sqlmanagedinstancemonitoringprofiles.arcdata.microsoft.com",
+            "changed": false
+        },
+        "SqlManagedInstanceReprovisionReplicaTask": {
+            "currentVersion": "v1beta1",
+            "versions": [
+                "v1beta1"
+            ],
+            "metadata.name": "sqlmanagedinstancereprovisionreplicatasks.tasks.sql.arcdata.microsoft.com",
+            "changed": false
+        },
+        "SqlManagedInstanceRestoreTask": {
+            "currentVersion": "v1",
+            "versions": [
+                "v1beta1",
+                "v1"
+            ],
+            "metadata.name": "sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com",
+            "changed": false
+        },
+        "SqlManagedInstance": {
+            "currentVersion": "v10",
+            "versions": [
+                "v1beta1",
+                "v1",
+                "v2",
+                "v3",
+                "v4",
+                "v5",
+                "v6",
+                "v7",
+                "v8",
+                "v9",
+                "v10"
+            ],
+            "metadata.name": "sqlmanagedinstances.sql.arcdata.microsoft.com",
+            "changed": true
+        },
+        "TelemetryCollector": {
+            "currentVersion": "v1beta4",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1beta3",
+                "v1beta4"
+            ],
+            "metadata.name": "telemetrycollectors.arcdata.microsoft.com",
+            "changed": true
+        },
+        "TelemetryRouter": {
+            "currentVersion": "v1beta5",
+            "versions": [
+                "v1beta1",
+                "v1beta2",
+                "v1beta3",
+                "v1beta4",
+                "v1beta5"
+            ],
+            "metadata.name": "telemetryrouters.arcdata.microsoft.com",
+            "changed": true
+        }
+    }
+}
