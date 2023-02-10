@@ -97,7 +97,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`vmSize`_ - Client Windows VM size.
   - _`vmName`_ - Client Windows VM name.
   - _`kubernetesDistribution`_ - Choice (k8s | k3s) kubernetes distribution.
-  <!-- - _`windowsNode`_ - Choice (true | false) to deploy AKS Windows Node. -->
+  - _`windowsNode`_ - Choice (true | false) to deploy AKS Windows Node.
   - _`adminUsername`_ - Client Windows VM Administrator name.
   - _`adminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`appId`_ - Your Azure service principal id.
