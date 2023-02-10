@@ -64,10 +64,10 @@ Write-Header "Enabling Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 Write-Header "Fetching Nested VMs"
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
-$sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
+$sourceFolder = 'https://jumpstartlevelup.blob.core.windows.net/luarcsqlsrv'
+$sas = "?sp=rl&st=2023-02-10T00:00:00Z&se=2024-02-10T08:00:00Z&spr=https&sv=2021-06-08&sr=c&sig=MOG4q%2BzXkiPAFZguYxyLgQxKmSu2W3AZFZKbWwBJBfg%3D"
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --include-pattern 'JSLU-*' --check-length=false --log-level=ERROR
 
 # Create the nested VMs
 Write-Header "Create Hyper-V VMs"
@@ -75,7 +75,7 @@ $JSLUWinSQL01 = "JSLU-Win-SQL-01"
 New-VM -Name $JSLUWinSQL01 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${JSLUWinSQL01}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName $JSLUWinSQL01 -Count 2
 
-$JSLUWinSQL02 = "AJSLU-Win-SQL-02"
+$JSLUWinSQL02 = "JSLU-Win-SQL-02"
 New-VM -Name $JSLUWinSQL02 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${JSLUWinSQL02}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName $JSLUWinSQL02 -Count 2
 
@@ -163,9 +163,9 @@ Write-Header "Copying Onboarding Scripts"
 
 # Copy installation script to nested Windows VMs
 Write-Output "Transferring installation script to nested Windows VMs..."
-Copy-VMFile $JSLUWinSQL01 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
-Copy-VMFile $JSLUWinSQL02 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
-Copy-VMFile $JSLUWinSQL03 -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
+Copy-VMFile $JSLUWinSQL01 -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL02 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL03 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
 Write-Header "Onboarding Arc-enabled Servers"
 
@@ -177,18 +177,11 @@ Invoke-Command -VMName $JSLUWinSQL01 -ScriptBlock { powershell -File $Using:nest
 Invoke-Command -VMName $JSLUWinSQL02 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 } -Credential $winCreds
 Invoke-Command -VMName $JSLUWinSQL03 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 } -Credential $winCreds
 
-# Configure SSH on the nested Windows VMs
-Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-Invoke-Command -VMName $JSLUWinSQL01, $JSLUWinSQL02, $JSLUWinSQL03, $JSLUWinSQL04, $JSLUWinSQL05 -ScriptBlock {
-    # Allow SSH via Azure Arc agent
-    azcmagent config set incomingconnections.ports 22
-} -Credential $winCreds
-
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-# Prepare ArcBox-SQL onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
+# Prepare Arc-enabled SQL server onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
 # Changing to Jumpstart ArcBox wallpaper
 $code = @'
 using System.Runtime.InteropServices;

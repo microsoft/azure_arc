@@ -4,7 +4,7 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$ArcBoxLogsDir = "C:\ArcBoxLevelup\Logs"
 
 Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
 
@@ -15,8 +15,8 @@ $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
-$resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = "ArcBox-SQL"
+$resourceTags= @{"Project"="jumpstart_arcbox_levelup"}
+$arcMachineName = $Env:ComputerName
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely

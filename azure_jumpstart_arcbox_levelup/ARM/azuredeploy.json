@@ -105,12 +105,6 @@
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
           },
-          "workspaceName": {
-            "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },
-          "stagingStorageAccountName": {
-            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
-          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           },
