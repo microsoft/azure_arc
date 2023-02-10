@@ -127,7 +127,7 @@
             "name": "internet_deny_inbound",
             "properties": {
               "priority": 4000,
-              "protocol": "Any",
+              "protocol": "*",
               "access": "Deny",
               "direction": "Inbound",
               "sourceAddressPrefix": "Internet",
