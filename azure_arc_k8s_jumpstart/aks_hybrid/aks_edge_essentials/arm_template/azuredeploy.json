@@ -11,6 +11,7 @@
         },
         "kubernetesDistribution": {
             "type": "string",
+            "defaultValue": "k3s",
             "allowedValues": [
                 "k8s",
                 "k3s"
