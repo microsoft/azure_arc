@@ -1,7 +1,3 @@
-@description('RSA public key used for securing SSH access to ArcBox resources')
-@secure()
-param sshRSAPublicKey string
-
 @description('Azure service principal client id')
 param spnClientId string
 
