@@ -69,12 +69,6 @@
     "logsStorageSize": {
       "type": "String"
     },
-    "backupStorageClass": {
-      "type": "String"
-    },
-    "backupStorageSize": {
-      "type": "String"
-    },
     "serviceType": {
       "type": "String"
     },
@@ -174,11 +168,6 @@
                 "accessMode": "ReadWriteOnce",
                 "className": "[parameters('logsStorageClass')]",
                 "size": "[parameters('logsStorageSize')]"
-              },
-              "backup": {
-                "accessMode": "ReadWriteMany",
-                "className": "[parameters('backupStorageClass)]",
-                "size": "[parameters('backupStorageSize)]"
               }
             }
           },
