@@ -159,6 +159,7 @@
               "backups": {
                 "volumes": [
                   {
+                    "accessMode": "ReadWriteMany",
                     "className": "[parameters('backupsStorageClassName')]",
                     "size": "[parameters('backupsStorageSize')]"
                   }
