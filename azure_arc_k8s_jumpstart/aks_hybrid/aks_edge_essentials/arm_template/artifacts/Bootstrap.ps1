@@ -7,7 +7,7 @@ param (
     [string]$location,
     [string]$templateBaseUrl,
     [string]$resourceGroup,
-    # [string]$windowsNode,
+    [string]$windowsNode,
     [string]$kubernetesDistribution
 )
 
@@ -20,7 +20,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution,[System.EnvironmentVariableTarget]::Machine)
-# [System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
@@ -38,7 +38,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli'
             #Run commands in parallel.
             Parallel 
                 {
