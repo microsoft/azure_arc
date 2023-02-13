@@ -26,13 +26,17 @@ $unattended = $spnClientId -And $spnTenantId -And $spnClientSecret
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 try {
+    Write-Host "Downloading AzureExtensionForSQLServer.msi"
 	Invoke-WebRequest -Uri https://aka.ms/AzureExtensionForSQLServer -OutFile AzureExtensionForSQLServer.msi
+    Write-Host "Download complete"
 }
 catch {
+    Write-Host "Downloading AzureExtensionForSQLServer.msi failed."
     throw "Invoke-WebRequest failed: $_"
 }
 
 try {
+    Write-Host "Installing AzureExtensionForSQLServer.msi"
 	$exitcode = (Start-Process -FilePath msiexec.exe -ArgumentList @("/i", "AzureExtensionForSQLServer.msi","/l*v", "installationlog.txt", "/qn") -Wait -Passthru).ExitCode
 
 	if ($exitcode -ne 0) {
@@ -41,9 +45,13 @@ try {
 		return
 	}
 
+    Write-Host "Installing AzureExtensionForSQLServer.msi successful."
+
 	if ($unattended) {
+        Write-Host "Registering Arc-enabled SQL server using unattended method with AzureExtensionForSQLServer.exe."
 		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --service-principal-app-id $spnClientId --service-principal-secret $spnClientSecret --licenseType $licenseType --tags $resourceTags 
 	} else {
+        Write-Host "Registering Arc-enabled SQL server using interactive login with AzureExtensionForSQLServer.exe"
 		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --licenseType $licenseType  --tags $resourceTags
 	}
 
@@ -64,5 +72,3 @@ Write-Host "SQL Server - Azure Arc resources should show up in resource group in
 Write-Host "Arc-enabled SQL server deployment complete."
 
 Stop-Transcript
-
-#$settings = '{\"SqlManagement\": {\"IsEnabled\": true}, \"LiceseType\":\"PAYG\"}'
