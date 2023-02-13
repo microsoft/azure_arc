@@ -151,6 +151,7 @@ Write-Output "Transferring installation script to nested Windows VMs..."
 Copy-VMFile $JSLUWinSQL01 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSLUWinSQL02 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSLUWinSQL04 -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL04 -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
 
 Write-Header "Onboarding Arc-enabled Servers"
 
@@ -166,8 +167,8 @@ $resourceGroup = $env:resourceGroup
 $azureLocation = $Env:azureLocation
 
 Invoke-Command -VMName $JSLUWinSQL01 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
-#Invoke-Command -VMName $JSLUWinSQL02 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
-Invoke-Command -VMName $JSLUWinSQL04 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds 
+Invoke-Command -VMName $JSLUWinSQL02 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+#Invoke-Command -VMName $JSLUWinSQL04 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds 
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
@@ -194,46 +195,11 @@ public class Wallpaper{
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
-# Enable Best practices assessment
-# Create custom log analytics table for SQL assessment
-$SQLvmName = $JSLUWinSQL01
-az monitor log-analytics workspace table create --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime
-
-Write-Host "Enabling SQL server best practices assessment"
-$bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
-az deployment group create --resource-group $Env:resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$Env:subscriptionId
-
-# Run Best practices assessment
-Write-Host "Execute SQL server best practices assessment"
-
-# Wait for a minute to finish everyting and run assessment
-Start-Sleep(60)
-
-# Get access token to make ARM REST API call for SQL server BPA
-$armRestApiEndpoint = "https://management.azure.com/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
-$token=(az account get-access-token --subscription $Env:subscriptionId --query accessToken --output tsv)
-
-# Build API request payload
-$worspaceResourceId = "/subscriptions/$Env:subscriptionId/resourcegroups/$Env:resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
-$sqlExtensionId = "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer".ToLower()
-$sqlbpaPayloadTemplate = "$Env:templateBaseUrl/artifacts/sqlbpa.payload.json"
-$apiPayload = (Invoke-WebRequest -Uri $sqlbpaPayloadTemplate).Content -replace '{{RESOURCEID}}', $sqlExtensionId -replace '{{LOCATION}}', $Env:azureLocation -replace '{{WORKSPACEID}}', $worspaceResourceId
-
-# Call REST API to run best practices assessment
-$headers = @{"Authorization"="Bearer $token"; "Content-Type"="application/json"}
-Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
-Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for assessment to complete to view results."
-
-# Test Defender for SQL
-Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-$remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-
 # Creating SQL Server Management Studio desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQL Server Management Studio Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\Ssms.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
 
 # Verify if shortcut already exists
