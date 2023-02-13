@@ -155,15 +155,6 @@
                     "size": "[parameters('logsStorageSize')]"
                   }
                 ]
-              },
-              "backups": {
-                "volumes": [
-                  {
-                    "accessMode": "ReadWriteMany",
-                    "className": "[parameters('backupsStorageClassName')]",
-                    "size": "[parameters('backupsStorageSize')]"
-                  }
-                ]
               }
             },
             "settings": {
