@@ -64,12 +64,6 @@
       "logsStorageSize": {
         "value": "10Gi"
       },
-      "backupStorageClass": {
-        "value": "managed-premium"
-      },
-      "backupStorageSize": {
-        "value": "10Gi"
-      },
       "serviceType": {
         "value": "LoadBalancer"
       },
