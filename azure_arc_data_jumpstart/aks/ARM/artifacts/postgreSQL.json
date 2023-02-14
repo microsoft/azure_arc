@@ -60,12 +60,6 @@
     "logStorageClassName": {
       "type": "String"
     },
-    "backupsStorageSize": {
-      "type": "String"
-    },
-    "backupsStorageClassName": {
-      "type": "String"
-    },
     "resourceTags": {
       "type": "Object"
     },
@@ -153,14 +147,6 @@
                   {
                     "className": "[parameters('logStorageClassName')]",
                     "size": "[parameters('logsStorageSize')]"
-                  }
-                ]
-              },
-              "backups": {
-                "volumes": [
-                  {
-                    "className": "[parameters('backupsStorageClassName')]",
-                    "size": "[parameters('backupsStorageSize')]"
                   }
                 ]
               }
