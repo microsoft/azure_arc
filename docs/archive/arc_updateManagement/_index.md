@@ -1,12 +1,12 @@
----
+<!-- ---
 type: docs
 title: "Update Management"
 linkTitle: "Update Management"
-weight: 9
+weight: 8
 description: >
----
+--- -->
 
-## Enable Update Management on Azure Arc-enabled servers
+<!-- ## Enable Update Management on Azure Arc-enabled servers
 
 The scenario will show you how to onboard Azure Arc-enabled servers to [Update Management](https://docs.microsoft.com/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc-enabled servers running Windows or Linux.
 
@@ -31,8 +31,8 @@ in this scenario, you will create and configure an Azure Automation account and 
 
 ## Prerequisites
 
-- Clone the Azure Arc Jumpstart repository
-
+- Clone the Azure Arc Jumpstart repository -->
+<!-- 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
@@ -153,4 +153,4 @@ Complete the following steps to clean up your environment.
     az group delete --name <Name of your resource group>
     ```
 
-    ![Screenshot showing az group delete being run](./26.png)
+    ![Screenshot showing az group delete being run](./26.png) -->

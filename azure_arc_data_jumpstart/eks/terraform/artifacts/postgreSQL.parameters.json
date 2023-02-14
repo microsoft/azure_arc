@@ -53,12 +53,6 @@
         "logStorageClassName": {
             "value": "logsStorageClassName-stage"
         },
-        "backupsStorageSize": {
-            "value": "backupsSize-stage"
-        },
-        "backupsStorageClassName": {
-            "value": "backupStorageClassName-stage"
-        },
         "resourceTags": {
             "value": {
                 "Project": "jumpstart_azure_arc_data_services"

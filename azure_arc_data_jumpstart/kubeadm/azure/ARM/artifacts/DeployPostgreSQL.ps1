@@ -28,7 +28,6 @@ $coordinatorMemoryLimit = "8Gi"
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
-$backupsStorageSize = "5Gi"
 
 # Citus Scale out
 $numWorkers = 1
@@ -48,10 +47,8 @@ $PSQLParams = "$Env:TempDir\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryLimit-stage',$coordinatorMemoryLimit | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'backupStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataSize-stage',$dataStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
 az deployment group create --resource-group $env:resourceGroup `
@@ -77,11 +74,11 @@ Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
 Write-Host "`n"
-Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
+Write-Host "Downloading AdventureWorks.sql template for PostgreSQL (1/3)"
 kubectl exec $pgWorkerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null
-Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
+Write-Host "Creating AdventureWorks database on PostgreSQL (2/3)"
 kubectl exec $pgWorkerPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
-Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
+Write-Host "Restoring AdventureWorks database on PostgreSQL (3/3)"
 kubectl exec $pgWorkerPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
