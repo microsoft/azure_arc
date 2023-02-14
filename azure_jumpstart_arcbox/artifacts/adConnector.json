@@ -34,7 +34,7 @@
       "defaultValue": false
     },
     "apiVersion": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {},
