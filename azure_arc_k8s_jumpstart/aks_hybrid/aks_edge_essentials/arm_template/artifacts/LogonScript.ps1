@@ -2,9 +2,17 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 
 ## Deploy AKS EE
 
+# Parameters
+$gAksEdgeRemoteDeployVersion = "1.0.221212.1200"
+$schemaVersion = "1.1"
+$version = "1.0"
+$schemaVersionAksEdgeConfig = "1.5"
+$versionAksEdgeConfig = "1.0"
+$aksEdgeDeployModules = "main"
+
 # Requires -RunAsAdministrator
 
-New-Variable -Name gAksEdgeRemoteDeployVersion -Value "1.0.221212.1200" -Option Constant -ErrorAction SilentlyContinue
+New-Variable -Name gAksEdgeRemoteDeployVersion -Value $gAksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
 if (! [Environment]::Is64BitProcess) {
     Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
@@ -21,43 +29,91 @@ if ($env:kubernetesDistribution -eq "k8s") {
 
 # Here string for the json content
 
+if ($env:windowsNode -eq $true) {
 $jsonContent = @"
 {
-    "SchemaVersion": "1.1",
-    "Version": "1.0",
+    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
+    "Version": "$schemaVersion",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
     "Azure": {
-        "SubscriptionName": "External-subscription-pabloam",
         "SubscriptionId": "$env:subscriptionId",
         "TenantId": "$env:tenantId",
         "ResourceGroupName": "$env:resourceGroup",
-        "ServicePrincipalName": "AKSHybridSP",
-        "Location": "$env:location",
-        "Auth":{
-            "ServicePrincipalId":"$env:appId",
-            "Password":"$env:password"
-        }
+        "Location": "$env:location"
     },
-    "AksEdgeConfig": {
-        "DeployOptions": {
-            "SingleMachineCluster": true,
-            "NodeType": "Linux",
-            "NetworkPlugin": "$networkplugin",
-            "Headless": true
+    "AksEdgeConfig":{
+        "SchemaVersion": "$schemaVersionAksEdgeConfig",
+        "Version": "$versionAksEdgeConfig",
+        "DeploymentType": "SingleMachineCluster",
+        "Init": {
+            "ServiceIPRangeSize": 0
         },
-        "EndUser": {
+        "Network": {
+            "NetworkPlugin": "$networkplugin",
+            "InternetDisabled": false
+        },
+        "User": {
             "AcceptEula": true,
             "AcceptOptionalTelemetry": true
         },
-        "LinuxVm": {
-            "CpuCount": 4,
-            "MemoryInMB": 4096,
-            "DataSizeinGB": 20
-        }
+        "Machines": [
+            {
+                "LinuxNode": {
+                    "CpuCount": 4,
+                    "MemoryInMB": 4096,
+                    "DataSizeInGB": 20
+                },
+                "WindowsNode": {
+                    "CpuCount": 2,
+                    "MemoryInMB": 4096
+                }
+            }
+        ]
     }
 }
 "@
+} else {
+$jsonContent = @"
+{
+    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
+    "Version": "$schemaVersion",
+    "AksEdgeProduct": "$productName",
+    "AksEdgeProductUrl": "",
+    "Azure": {
+        "SubscriptionId": "$env:subscriptionId",
+        "TenantId": "$env:tenantId",
+        "ResourceGroupName": "$env:resourceGroup",
+        "Location": "$env:location"
+    },
+    "AksEdgeConfig":{
+        "SchemaVersion": "$schemaVersionAksEdgeConfig",
+        "Version": "$versionAksEdgeConfig",
+        "DeploymentType": "SingleMachineCluster",
+        "Init": {
+            "ServiceIPRangeSize": 0
+        },
+        "Network": {
+            "NetworkPlugin": "$networkplugin",
+            "InternetDisabled": false
+        },
+        "User": {
+            "AcceptEula": true,
+            "AcceptOptionalTelemetry": true
+        },
+        "Machines": [
+            {
+                "LinuxNode": {
+                    "CpuCount": 4,
+                    "MemoryInMB": 4096,
+                    "DataSizeInGB": 20
+                }
+            }
+        ]
+    }
+}
+"@
+}
 
 ###
 # Main
@@ -65,8 +121,8 @@ $jsonContent = @"
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "https://github.com/Azure/AKS-Edge/archive/refs/tags/0.7.22335.1024.zip"
-$zipFile = "0.7.22335.1024.zip"
+$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
+$zipFile = "$aksEdgeDeployModules.zip"
 
 $installDir = "C:\AksEdgeScript"
 
@@ -106,6 +162,12 @@ if ($retval) {
     Pop-Location
     exit -1
 }
+
+Write-Host "`n"
+Write-Host "Checking kubernetes nodes"
+Write-Host "`n"
+kubectl get nodes -o wide
+Write-Host "`n"
 
 # az version
 az -v
@@ -152,6 +214,8 @@ Write-Host "`n"
 Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
 Write-Host "`n"
 
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host }}
+
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
@@ -181,25 +245,25 @@ az k8s-extension create --name "azuremonitor-containers" `
                         --extension-type Microsoft.AzureMonitor.Containers `
                         --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Creating Azure Defender Kubernetes extension..."
-Write-Host "`n"
-az k8s-extension create --name "azure-defender" `
-                        --cluster-name $Env:arcClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --cluster-type connectedClusters `
-                        --extension-type Microsoft.AzureDefender.Kubernetes
+# # Deploying Azure Defender Kubernetes extension instance
+# Write-Host "`n"
+# Write-Host "Creating Azure Defender Kubernetes extension..."
+# Write-Host "`n"
+# az k8s-extension create --name "azure-defender" `
+#                         --cluster-name $Env:arcClusterName `
+#                         --resource-group $Env:resourceGroup `
+#                         --cluster-type connectedClusters `
+#                         --extension-type Microsoft.AzureDefender.Kubernetes
 
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Create Azure Policy extension..."
-Write-Host "`n"
-az k8s-extension create --cluster-type connectedClusters `
-                        --cluster-name $Env:arcClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --extension-type Microsoft.PolicyInsights `
-                        --name azurepolicy
+# # Deploying Azure Policy Kubernetes extension instance
+# Write-Host "`n"
+# Write-Host "Create Azure Policy extension..."
+# Write-Host "`n"
+# az k8s-extension create --cluster-type connectedClusters `
+#                         --cluster-name $Env:arcClusterName `
+#                         --resource-group $Env:resourceGroup `
+#                         --extension-type Microsoft.PolicyInsights `
+#                         --name azurepolicy
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
@@ -253,6 +317,9 @@ namespace Win32{
 
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
