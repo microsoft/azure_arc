@@ -82,7 +82,7 @@ variable "os_type" {
 variable "Kubernetes_version" {
   type        = string
   description = "The version of Kubernetes"
-  default     = "1.24.6"
+  default     = "1.24.9"
 }
 
 locals {

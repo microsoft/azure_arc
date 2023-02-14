@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "windowsAdminUsername": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Username for Windows account"
       }
     },
     "windowsAdminPassword": {
-      "type": "securestring",
+      "type": "SecureString",
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
@@ -17,31 +17,31 @@
       }
     },
     "sshRSAPublicKey": {
-      "type": "securestring",
+      "type": "SecureString",
       "metadata": {
         "description": "RSA public key used for securing SSH access to Azure resources."
       }
     },
     "spnClientId": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Azure service principal client id"
       }
     },
     "spnClientSecret": {
-      "type": "securestring",
+      "type": "SecureString",
       "metadata": {
         "description": "Azure service principal client secret"
       }
     },
     "spnTenantId": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Azure AD tenant id for your service principal"
       }
     },
     "logAnalyticsWorkspaceName": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Name for your Azure Log Analytics workspace"
       }
@@ -75,20 +75,20 @@
       }
     },
     "adminEmail": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
     },
     "githubAccount": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Target GitHub account"
       },
       "defaultValue": "microsoft"
     },
     "githubBranch": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Target GitHub branch"
       },
@@ -102,14 +102,14 @@
       "defaultValue": false
     },
     "bastionHostName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "Arc-AppSvc-Demo-Bastion",
       "metadata": {
         "description": "the Azure Bastion host name"
       }
     },
     "guid":{
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Random GUID for cluster names"
       },
