@@ -52,18 +52,6 @@
       "dockerRegistryCredential": {
         "value": "arc-private-registry"
       },
-      "dockerImagePullPolicy": {
-        "value": "Always"
-      },
-      "dockerImageTag": {
-        "value": "v1.16.0_2023-02-14"
-      },
-      "dockerRegistry": {
-        "value": "mcr.microsoft.com"
-      },
-      "dockerRepository": {
-        "value": "arcdata/preview"
-      },
       "dataStorageClass": {
         "value": "default"
       },
