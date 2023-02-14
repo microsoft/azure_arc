@@ -3,37 +3,37 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "type": "securestring",
+      "type": "SecureString",
       "metadata": {
         "description": "RSA public key used for securing SSH access to ArcBox resources"
       }
     },
     "spnClientId": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Azure service principal client id"
       }
     },
     "spnClientSecret": {
-      "type": "securestring",
+      "type": "SecureString",
       "metadata": {
         "description": "Azure service principal client secret"
       }
     },
     "spnTenantId": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Azure AD tenant id for your service principal"
       }
     },
     "windowsAdminUsername": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Username for Windows account"
       }
     },
     "windowsAdminPassword": {
-      "type": "securestring",
+      "type": "SecureString",
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
@@ -41,13 +41,13 @@
       }
     },
     "logAnalyticsWorkspaceName": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
     },
     "flavor": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       },
@@ -59,14 +59,14 @@
       "defaultValue": "Full"
     },
     "githubAccount": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Target GitHub account"
       },
       "defaultValue": "microsoft"
     },
     "githubBranch": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Target GitHub branch"
       },
@@ -80,40 +80,40 @@
       "defaultValue": true
     },
     "githubUser": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "microsoft"
     },
     "principalId": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "The principal to assign the role to"
       }
     },
     "securityAdminRoleGuid": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[newGuid()]"
     },
     "contributorRoleGuid": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[newGuid()]"
     },
     "securityReaderRoleGuid": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[newGuid()]"
     },
     "monitoringMetricsRoleGuid": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[newGuid()]"
     },
     "userAccessAdministratorRoleGuid": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[newGuid()]"
     },
     "epochTime": {
-      "type": "int",
+      "type": "Int",
       "defaultValue": "[dateTimeToEpoch(dateTimeAdd(utcNow(), 'P0Y'))]"
     }
   },

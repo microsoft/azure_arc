@@ -3,90 +3,90 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "resourceGroup": {
-      "type": "string"
+      "type": "String"
     },
     "dataControllerId": {
-      "type": "string"
+      "type": "String"
     },
     "customLocation": {
-      "type": "string"
+      "type": "String"
     },
     "subscriptionId": {
-      "type": "string"
+      "type": "String"
     },
     "admin": {
-      "type": "string"
+      "type": "String"
     },
     "password": {
-      "type": "securestring"
+      "type": "SecureString"
     },
     "namespace": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "arc"
     },
     "serviceType": {
-      "type": "string"
+      "type": "String"
     },
     "readableSecondaries": {
-      "type": "string"
+      "type": "String"
     },
     "vCoresRequest": {
-      "type": "string"
+      "type": "String"
     },
     "memoryRequest": {
-      "type": "string"
+      "type": "String"
     },
     "vCoresLimit": {
-      "type": "string"
+      "type": "String"
     },
     "memoryLimit": {
-      "type": "string"
+      "type": "String"
     },
     "dataStorageSize": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "5"
     },
     "dataStorageClassName": {
-      "type": "string"
+      "type": "String"
     },
     "logsStorageSize": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "5"
     },
     "logsStorageClassName": {
-      "type": "string"
+      "type": "String"
     },
     "dataLogsStorageSize": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "5"
     },
     "dataLogsStorageClassName": {
-      "type": "string"
+      "type": "String"
     },
     "replicas": {
-      "type": "int"
+      "type": "Int"
     },
     "resourceTags": {
-      "type": "object"
+      "type": "Object"
     },
     "apiVersion": {
-      "type": "string"
+      "type": "String"
     },
     "pricingTier": {
-      "type": "string"
+      "type": "String"
     },
     "licenseType": {
-      "type": "string"
+      "type": "String"
     },
     "port": {
-      "type": "int"
+      "type": "Int"
     }
   },
   "variables": {},
