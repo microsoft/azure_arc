@@ -11,6 +11,7 @@
         },
         "kubernetesDistribution": {
             "type": "string",
+            "defaultValue": "k3s",
             "allowedValues": [
                 "k8s",
                 "k3s"
@@ -130,6 +131,13 @@
             "type": "object",
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_servers"
+            }
+        },
+        "windowsNode": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Deploy Windows Node for AKS Edge Essentials"
             }
         }
     },
@@ -314,7 +322,7 @@
                     "fileUris": [
                         "[uri(variables('templateBaseUrl'), concat('artifacts/Bootstrap.ps1'))]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -templateBaseUrl ', variables('templateBaseUrl'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -windowsNode ', parameters('windowsNode'), ' -templateBaseUrl ', variables('templateBaseUrl'))]"
                 }
             }
         },
