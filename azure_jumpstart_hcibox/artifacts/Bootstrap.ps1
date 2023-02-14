@@ -124,9 +124,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpress.ps1") -OutFile $
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressModule.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressUI.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HCIBoxSDNDir\Single-NC.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxSDNDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "artifacts/GetServiceAccountBearerToken.ps1") -OutFile $Env:HCIBoxDir\GetServiceAccountBearerToken.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $Env:HCIBoxDir\jumpstart-user-secret.yaml
 
 # Replace password and DNS placeholder
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 (Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-natDNS%',$natDNS | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 
