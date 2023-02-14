@@ -1,11 +1,11 @@
----
+<!-- ---
 type: docs
 title: "Monitoring Agent Extension"
 linkTitle: "Monitoring Agent Extension"
 weight: 3
 description: >
----
-
+--- -->
+<!-- 
 ## Deploy Monitoring Agent Extension on Azure Arc Linux and Windows servers using Extension Management
 
 The following Jumpstart scenario will guide you on how to manage extensions on Azure Arc-enabled servers. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
@@ -182,4 +182,4 @@ Remove the virtual machines from each environment by following the teardown inst
 
     ```shell
     az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics Workspace Name> --yes
-    ```
+    ``` -->
