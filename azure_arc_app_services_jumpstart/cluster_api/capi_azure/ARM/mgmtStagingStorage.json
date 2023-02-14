@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "storageAccountType": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Standard_LRS",
             "allowedValues": [
                 "Standard_LRS",
@@ -16,7 +16,7 @@
             }
         },
         "location": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
@@ -41,7 +41,7 @@
     ],
     "outputs": {
         "storageAccountName": {
-            "type": "string",
+            "type": "String",
             "value": "[variables('storageAccountName')]"
         }
     }
