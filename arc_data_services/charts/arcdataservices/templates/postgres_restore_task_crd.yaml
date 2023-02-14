@@ -1,0 +1,209 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: postgresqlrestoretasks.tasks.postgresql.arcdata.microsoft.com
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  group: tasks.postgresql.arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              sourceName:
+                description: The name of the PostgreSql resource to restore from.
+                type: string
+              destinationName:
+                description: The name of the PostgreSql resource to restore to.
+                type: string
+              destinationStorage:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  logs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  backups:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+              restorePoint:
+                description: Restore point in time.
+                type: string
+                format: date-time
+              dryRun:
+                description: If true, the restore operation will be validated but
+                  not executed.
+                type: boolean
+                default: false
+            required:
+            - sourceName
+            - destinationName
+            - restorePoint
+          status:
+            type: object
+            properties:
+              earliestRestoreTime:
+                description: The earliest time that the instance can be restored to.
+                type: string
+                format: date-time
+              latestRestoreTime:
+                description: The latest time that the instance can be restored to.
+                type: string
+                format: date-time
+              percentComplete:
+                type: integer
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+          apiVersion:
+            type: string
+          kind:
+            type: string
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: .status.state
+    - name: Replicas
+      type: string
+      jsonPath: .status.readyReplicas
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: .status.primaryEndpoint
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  names:
+    kind: PostgreSqlRestoreTask
+    singular: postgresqlrestoretask
+    plural: postgresqlrestoretasks
+    shortNames:
+    - arcpsrt
+  scope: Namespaced

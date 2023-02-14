@@ -1,10 +1,28 @@
-# Replace these placeholder:
-# - {{RUNTIME_SERVICE_ACCOUNT}}: runtime service account for Azure Arc-enabled Data Services
+# ==========================================================================
+# ARCDATA-RUNTIME
+# --------------------------------------------------------------------------
+# Service account used by Runtime Operator Pods for maintaining lifecycle of
+# Arc-enabled Data services.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# - {{ARCDATA_RUNTIME_SERVICE_ACCOUNT}}: name of the runtime service account
+# ==========================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ARCDATA_RUNTIME_SERVICE_ACCOUNT}}
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
+
+---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: arcdata-runtime-role
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 rules:
 - apiGroups:
   - ""
@@ -69,6 +87,7 @@ rules:
 - apiGroups:
   - sql.arcdata.microsoft.com
   - tasks.sql.arcdata.microsoft.com
+  - tasks.postgresql.arcdata.microsoft.com
   - tasks.arcdata.microsoft.com
   - arcdata.microsoft.com
   resources:
@@ -102,9 +121,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: arcdata-runtime-role-binding
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 subjects:
 - kind: ServiceAccount
-  name: {{RUNTIME_SERVICE_ACCOUNT}}
+  name: {{ARCDATA_RUNTIME_SERVICE_ACCOUNT}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
