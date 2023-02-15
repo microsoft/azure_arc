@@ -3,28 +3,28 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "addsDomainName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "jumpstart.local",
       "metadata": {
         "description": "The FQDN of the domain"
       }
     },
     "vmName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "ArcBox-ADDS",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
     },
     "windowsAdminUsername": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "arcdemo",
       "metadata": {
         "description": "Username for the Virtual Machine"
       }
     },
     "windowsAdminPassword": {
-      "type": "securestring",
+      "type": "SecureString",
       "minLength": 12,
       "maxLength": 123,
       "defaultValue": "ArcPassword123!!",
@@ -33,21 +33,21 @@
       }
     },
     "windowsOSVersion": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "2022-datacenter-g2",
       "metadata": {
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
       }
     },
     "azureLocation": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "vmSize": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "Standard_B2ms",
       "metadata": {
         "description": "The size of the VM"
@@ -61,7 +61,7 @@
       "defaultValue": false
     },
     "templateBaseUrl": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "",
       "metadata": {
         "description": "Base URL for ARM template"
@@ -196,7 +196,7 @@
   ],
   "outputs": {
     "scriptfile": {
-      "type": "string",
+      "type": "String",
       "value": "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
     }
   }

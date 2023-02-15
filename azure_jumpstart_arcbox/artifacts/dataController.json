@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
@@ -55,18 +55,6 @@
       "type": "Object"
     },
     "dockerRegistryCredential": {
-      "type": "String"
-    },
-    "dockerImagePullPolicy": {
-      "type": "String"
-    },
-    "dockerImageTag": {
-      "type": "String"
-    },
-    "dockerRegistry": {
-      "type": "String"
-    },
-    "dockerRepository": {
       "type": "String"
     },
     "dataStorageClass": {
@@ -138,12 +126,6 @@
               "serviceAccount": "sa-arc-controller"
             },
             "infrastructure": "[parameters('infrastructure')]",
-            "docker": {
-              "imagePullPolicy": "[parameters('dockerImagePullPolicy')]",
-              "imageTag": "[parameters('dockerImageTag')]",
-              "registry": "[parameters('dockerRegistry')]",
-              "repository": "[parameters('dockerRepository')]"
-            },
             "security": {
               "allowDumps": true,
               "allowNodeMetricsCollection": true,
