@@ -330,6 +330,31 @@ else {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
 
+    # Configuring the local SQL VM
+    Write-Host "Setting local SQL authentication and adding a SQL login"
+    $localSQLUser = $Env:AZDATA_USERNAME
+    $localSQLPassword = $Env:AZDATA_PASSWORD
+    Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
+        Install-Module -Name SqlServer -AllowClobber -Force
+        $server = "localhost"
+        $user = $Using:localSQLUser
+        $LoginType = "SqlLogin"
+        $pass = ConvertTo-SecureString -String $Using:localSQLPassword -AsPlainText -Force
+        $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pass
+        Add-SqlLogin -ServerInstance $Server -LoginName $User -LoginType $LoginType -DefaultDatabase AdventureWorksLT2019 -Enable -GrantConnectSql -LoginPSCredential $Credential
+        $svr = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $server
+        $svr.Settings.LoginMode = [Microsoft.SqlServer.Management.SMO.ServerLoginMode]::Mixed
+        $svr.Alter()
+        Restart-Service -Force MSSQLSERVER
+        $svrole = $svr.Roles | where { $_.Name -eq 'sysadmin' }
+        $svrole.AddMember($user)
+    }
+
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "Creating Hyper-V Shortcut"
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+
     # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
     Write-Header "Blocking IMDS"
     Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
