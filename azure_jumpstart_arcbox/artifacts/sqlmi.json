@@ -3,14 +3,14 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "resourceGroup": {
-      "type": "string"
+      "type": "String"
     },
     "dataControllerId": {
       "type": "String"
@@ -86,7 +86,7 @@
       "type": "String"
     },
     "port": {
-      "type": "int"
+      "type": "Int"
     }
   },
   "variables": {},
