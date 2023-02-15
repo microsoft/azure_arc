@@ -139,6 +139,12 @@ if ($Env:flavor -eq 'DataOps') {
     Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
 
     $nestedVMArcBoxDir = $Env:ArcBoxDir
+    $spnClientId = $env:spnClientId
+    $spnClientSecret = $env:spnClientSecret
+    $spnTenantId = $env:spnTenantId
+    $subscriptionId = $env:subscriptionId
+    $azureLocation = $env:azureLocation
+    $resourceGroup = $env:resourceGroup
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
     # Creating Hyper-V Manager desktop shortcut
@@ -347,6 +353,12 @@ else {
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 
     $nestedVMArcBoxDir = $Env:ArcBoxDir
+    $spnClientId = $env:spnClientId
+    $spnClientSecret = $env:spnClientSecret
+    $spnTenantId = $env:spnTenantId
+    $subscriptionId = $env:subscriptionId
+    $azureLocation = $env:azureLocation
+    $resourceGroup = $env:resourceGroup
     Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
     Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
