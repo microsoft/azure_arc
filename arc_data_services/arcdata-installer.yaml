@@ -1,11 +1,29 @@
-# Replace these placeholders with the actual values before applying
-# - {{NAMESPACE}}: namespace for Azure Arc-enabled Data Services below
-# - {{INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+# ==========================================================================
+# ARCDATA-INSTALLER
+# --------------------------------------------------------------------------
+# Service account used by Bootstrapper Helm Chart for installation of Arc-
+# enabled Data services.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{AZURE_ARC_NAMESPACE}}: namespace for ConnectedK8s operators
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# - {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+# ==========================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
+
+---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: arcdata-installer-role
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 rules:
 - apiGroups:
   - ""
@@ -13,16 +31,32 @@ rules:
   - pods/log
   verbs:
   - get
+  # --------------------------------------------------------------------------
+  # Extension installer service account manages the helm release secret
+  # (sh.helm.release.v1.extension-name.v1) on the Data Services Namespace
+  # --------------------------------------------------------------------------
 - apiGroups:
   - ""
   resources:
   - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - ""
+  # --------------------------------------------------------------------------
+  resources:
   - configmaps
   verbs:
   - create
   - get
   - delete
   - list
+  - update
 - apiGroups:
   - apps
   resources:
@@ -64,7 +98,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{NAMESPACE}}:cr-arcdata-installer
+  name: {{DATA_CONTROLLER_NAMESPACE}}:cr-arcdata-installer
 rules:
 - apiGroups:
   - apiextensions.k8s.io
@@ -87,6 +121,7 @@ rules:
   - monitors.arcdata.microsoft.com
   - telemetrycollectors.arcdata.microsoft.com
   - postgresqls.arcdata.microsoft.com
+  - postgresqlrestoretasks.tasks.postgresql.arcdata.microsoft.com
   - sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
   - sqlmanagedinstances.sql.arcdata.microsoft.com
   - telemetryrouters.arcdata.microsoft.com
@@ -142,14 +177,8 @@ rules:
   resources:
   - namespaces
   verbs:
-  - create
-  - list
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
   - get
+  - list
   - patch
 - apiGroups:
   - ""
@@ -166,14 +195,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{NAMESPACE}}:crb-arcdata-installer
+  name: {{DATA_CONTROLLER_NAMESPACE}}:crb-arcdata-installer
 subjects:
 - kind: ServiceAccount
-  name: {{INSTALLER_SERVICE_ACCOUNT}}
-  namespace: {{NAMESPACE}}
+  name: {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 roleRef:
   kind: ClusterRole
-  name: {{NAMESPACE}}:cr-arcdata-installer
+  name: {{DATA_CONTROLLER_NAMESPACE}}:cr-arcdata-installer
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -182,9 +211,49 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: arcdata-installer-role-binding
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 subjects:
 - kind: ServiceAccount
-  name: {{INSTALLER_SERVICE_ACCOUNT}}
+  name: {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: arcdata-installer-role
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: arcdata-installer-role
+  namespace: {{AZURE_ARC_NAMESPACE}}
+rules:
+  # --------------------------------------------------------------------------
+  # During Helm install, Openshift namespace patcher requires ability to spin up
+  # Jobs in azure-arc namespace
+  # --------------------------------------------------------------------------
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - list
+  - delete
+  # --------------------------------------------------------------------------
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: arcdata-installer-role-binding
+  namespace: {{AZURE_ARC_NAMESPACE}}
+subjects:
+- kind: ServiceAccount
+  name: {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
