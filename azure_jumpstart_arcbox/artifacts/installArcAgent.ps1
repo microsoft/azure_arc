@@ -1,4 +1,13 @@
  # Download the package
+ param (
+    [string]$spnClientId,
+    [string]$spnClientSecret,        
+    [string]$spnTenantId,
+    [string]$subscriptionId,
+    [string]$resourceGroup,
+    [string]$Azurelocation
+)
+
  function download() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi}
  download
  
