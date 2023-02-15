@@ -1,0 +1,47 @@
+# ==========================================================================
+# >>>>>>>>>>> ⚠️ TEMPORARY WORKAROUND FOR CUSTOM LOCATION RP ⚠️ <<<<<<<<<<<
+# ==========================================================================
+# AZURE-ARC-CUSTOM-LOCATION-WORKAROUND
+# --------------------------------------------------------------------------
+# Basically, a massive hack because Custom Locations RP still asks for "*".
+# Remove once the RP is deployed to request least priveleges.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# - {{CUSTOM_LOCATION_OID}}: Tenant specific GUID of CL RP's identity
+# ==========================================================================
+
+  # --------------------------------------------------------------------------
+  # Once Custom Locations team stops asking for "*", "*", "*", remove this and
+  # test for functionality regression.
+  # --------------------------------------------------------------------------
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: custom-locations-arc-data-namespace-admin-workaround-role
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: custom-locations-arc-data-namespace-admin-workaround-rolebinding
+  namespace:  {{DATA_CONTROLLER_NAMESPACE}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: custom-locations-arc-data-namespace-admin-workaround-role
+subjects:
+- kind: User
+  name: {{CUSTOM_LOCATION_OID}}
+  apiGroup: rbac.authorization.k8s.io
+  # --------------------------------------------------------------------------
+# ==========================================================================
+# >>>>>>>>>>> ⚠️ TEMPORARY WORKAROUND FOR CUSTOM LOCATION RP ⚠️ <<<<<<<<<<<
+# ==========================================================================
