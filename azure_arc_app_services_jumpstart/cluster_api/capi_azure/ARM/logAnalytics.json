@@ -3,27 +3,27 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workspaceName": {
-      "type": "string",
+      "type": "String",
       "metadata": {
         "description": "Name for your Azure Log Analytics workspace"
       }
     },
     "location": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Azure Region to deploy the Log Analytics Workspace"
       }
     },
     "sku": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "pergb2018",
       "metadata": {
         "description": "SKU, leave default pergb2018"
       }
     },
     "tags": {
-      "type": "object",
+      "type": "Object",
       "defaultValue": {
         "Project": "jumpstart_azure_arc_app_services"
       }

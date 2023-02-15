@@ -57,18 +57,6 @@
       "dockerRegistryCredential": {
         "type": "String"
       },
-      "dockerImagePullPolicy": {
-        "type": "String"
-      },
-      "dockerImageTag": {
-        "type": "String"
-      },
-      "dockerRegistry": {
-        "type": "String"
-      },
-      "dockerRepository": {
-        "type": "String"
-      },
       "dataStorageClass": {
         "type": "String"
       },
@@ -138,12 +126,6 @@
                 "serviceAccount": "sa-arc-controller"
               },
               "infrastructure": "[parameters('infrastructure')]",
-              "docker": {
-                "imagePullPolicy": "[parameters('dockerImagePullPolicy')]",
-                "imageTag": "[parameters('dockerImageTag')]",
-                "registry": "[parameters('dockerRegistry')]",
-                "repository": "[parameters('dockerRepository')]"
-              },
               "security": {
                 "allowDumps": true,
                 "allowNodeMetricsCollection": true,
