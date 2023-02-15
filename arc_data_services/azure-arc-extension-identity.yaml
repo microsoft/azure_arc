@@ -1,11 +1,19 @@
-# Replace these placeholders with the actual values before applying
-# - {{NAMESPACE}}: namespace for Azure Arc-enabled Data Services below
-# - {{INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+# ==========================================================================
+# AZURE-ARC-EXTENSION-IDENTITY
+# --------------------------------------------------------------------------
+# Custom Resource Definition used to give our extension an identity in Azure
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{AZURE_ARC_NAMESPACE}}: namespace for ConnectedK8s operators
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# - {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+# ==========================================================================
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{NAMESPACE}}:cr-extension-identity
+  name: {{DATA_CONTROLLER_NAMESPACE}}:cr-extension-identity
 rules:
 - apiGroups:
   - clusterconfig.azure.com
@@ -22,13 +30,13 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{NAMESPACE}}:crb-extension-identity
-  namespace: azure-arc
+  name: {{DATA_CONTROLLER_NAMESPACE}}:crb-extension-identity
+  namespace: {{AZURE_ARC_NAMESPACE}}
 subjects:
 - kind: ServiceAccount
-  name: {{INSTALLER_SERVICE_ACCOUNT}}
-  namespace: {{NAMESPACE}}
+  name: {{ARCDATA_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{NAMESPACE}}:cr-extension-identity
+  name: {{DATA_CONTROLLER_NAMESPACE}}:cr-extension-identity

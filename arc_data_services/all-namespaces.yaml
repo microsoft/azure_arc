@@ -1,0 +1,40 @@
+# ==========================================================================
+# ALL-NAMESPACES
+# --------------------------------------------------------------------------
+# All namespaces that must be pre-created for Least Priveleges Deployment.
+# Label 'azure-arc' is used to track all namespaces created by CI pipelines,
+# this is not required for manual deployments.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{AZURE_ARC_NAMESPACE}}: namespace for ConnectedK8s operators
+# - {{AZURE_ARC_RELEASE_NAMESPACE}}: namespace for ConnectedK8s release
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# ==========================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    admission.policy.azure.com/ignore: 'true'
+    azure-arc: 'true'
+    control-plane: 'true'
+  name: {{AZURE_ARC_NAMESPACE}}
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    azure-arc: 'true'
+  name: {{AZURE_ARC_RELEASE_NAMESPACE}}
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    azure-arc: 'true'
+  name: {{DATA_CONTROLLER_NAMESPACE}}
