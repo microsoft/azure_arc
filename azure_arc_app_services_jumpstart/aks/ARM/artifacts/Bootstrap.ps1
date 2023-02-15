@@ -130,8 +130,6 @@ workflow ClientTools_01
 
 ClientTools_01 | Format-Table
 
-# Invoke-WebRequest -Uri https://azurecliprod.blob.core.windows.net/msi/azure-cli-2.40.0.msi -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
-
 Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2135274" -OutFile "C:\Temp\FuncCLI.msi"
 Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\FuncCLI.msi /quiet'
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
