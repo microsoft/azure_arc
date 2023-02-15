@@ -3,28 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-App-Client",
             "metadata": {
                 "description": "The name of your Virtual Machine"
             }
         },
         "connectedClusterName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-AppSvc-AKS",
             "metadata": {
                 "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
             }
         },
         "windowsAdminUsername": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine"
             }
         },
         "windowsAdminPassword": {
-            "type": "securestring",
+            "type": "SecureString",
             "minLength": 12,
             "maxLength": 123,
             "defaultValue": "ArcPassword123!!",
@@ -33,73 +33,73 @@
             }
         },
         "windowsOSVersion": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "2022-datacenter-g2",
             "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
             }
         },
         "azureLocation": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources"
             }
         },
         "vmSize": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Standard_D8s_v4",
             "metadata": {
                 "description": "The size of the VM"
             }
         },
         "virtualNetworkName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-Data-VNet",
             "metadata": {
                 "description": "Name of the VNET"
             }
         },
         "subnetName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-Data-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "networkSecurityGroupName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-App-Client-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
         },
         "resourceTags": {
-            "type": "object",
+            "type": "Object",
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_app_services"
             }
         },
         "spnClientId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Client id of the service principal"
             }
         },
         "spnClientSecret": {
-            "type": "securestring",
+            "type": "SecureString",
             "metadata": {
                 "description": "Client secret of the service principal"
             }
         },
         "spnTenantId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Tenant id of the service principal"
             }
         },
         "workspaceName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
@@ -140,26 +140,26 @@
             }
         },
         "adminEmail": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Email address to which all notifications from the deployment will be sent"
             }
         },
         "clusterName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-AppSvc-AKS",
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource"
             }
         },
         "templateBaseUrl": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Base URL for ARM template"
             }
         },
         "bastionSubnetRef": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Azure Bastion subnet reference"
             }
@@ -172,32 +172,32 @@
             "defaultValue": false
         },
         "bastionHostName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Arc-App-Demo-Bastion",
             "metadata": {
                 "description": "Azure Bastion host name"
             }
         },
         "bastionSubnetPrefix": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Azure Bastion subnet IP prefix"
             }
         },
         "productsImage": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Products API Image"
             }
         },
         "inventoryImage": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Inventory API Image"
             }
         },
         "storeImage": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Store API Image"
             }
@@ -382,11 +382,11 @@
 
     "outputs": {
         "adminUsername": {
-            "type": "string",
+            "type": "String",
             "value": "[parameters('windowsAdminUsername')]"
         },
         "publicIP": {
-            "type": "string",
+            "type": "String",
             "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
         }
     }
