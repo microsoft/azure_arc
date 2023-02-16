@@ -17,9 +17,17 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
     name: skuName
     capacity: capacity
   }
+  properties: {
+    eventHubEndpoints: {
+      events: {
+        retentionTimeInDays: 1
+        partitionCount: 4
+      }
+    }
+  }
 }
 
-resource iotHubEventHub 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
+resource iotHubConsumerGroup 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
   name: '${iotHubName}/events/AgoraConsumerGroup'
   properties: {
     name: 'AgoraConsumerGroup'
@@ -28,5 +36,5 @@ resource iotHubEventHub 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGro
 
 output iotHubHostName string = iotHub.properties.hostName
 output iotHubId string = iotHub.id
-output iotHubConsumerGroup string = iotHubEventHub.name
+output iotHubConsumerGroup string = iotHubConsumerGroup.name
 output iotHubSharedAccessPolicyName string = iotHub.properties.eventHubEndpoints.events.endpoint
