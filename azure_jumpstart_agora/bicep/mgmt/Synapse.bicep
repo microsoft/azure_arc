@@ -126,9 +126,8 @@ resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-0
 }
 
 resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases/dataConnections@2021-06-01-preview' = {
-  name: dxDatabaseName
+  name: '${synapse.name}/${synapsedx}/${dxdatabase}'
   kind: 'IotHub'
-  parent: dxdatabase
   location: location
   properties: {
     consumerGroup: iotHubConsumerGroup
