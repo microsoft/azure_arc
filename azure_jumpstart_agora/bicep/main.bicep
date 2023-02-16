@@ -65,7 +65,7 @@ param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
 @description('The name of the IotHub')
 param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_agora/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
