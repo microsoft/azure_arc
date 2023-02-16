@@ -56,8 +56,11 @@ param aksProdClusterName string = 'Agora-AKS-Prod'
 @description('The name of the Dev Kubernetes cluster resource')
 param aksDevClusterName string = 'Agora-AKS-Dev'
 
-@description('Name for your synapse workspace')
-param synapseWorkspaceName string = 'synapse${uniqueString(resourceGroup().id)}'
+@description('The name of the synapse workspace')
+param synapseWorkspaceName string = 'Agora-synapse-${uniqueString(resourceGroup().id)}'
+
+@description('The name of the IotHub')
+param iotHubName string = 'Agora-IotHub-${uniqueString(resourceGroup().id)}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -118,6 +121,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
+    aksProdClusterName : aksProdClusterName
+    aksDevClusterName : aksDevClusterName
   }
 }
 
@@ -128,5 +133,13 @@ module synapseDeployment 'mgmt/synapse.bicep' = {
     location: location
     synapseAdminUserName : windowsAdminUsername
     synapseAdminPassword : windowsAdminPassword
+  }
+}
+
+module iotHubDeployment 'mgmt/iotHub.bicep' = {
+  name: 'iotHubDeployment'
+  params: {
+    location: location
+    iotHubName: iotHubName
   }
 }
