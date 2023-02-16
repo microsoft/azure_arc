@@ -37,9 +37,6 @@ param iotHubId string
 @description('The name of the IoT Hub consumer group')
 param iotHubConsumerGroup string
 
-@description('The name of the IoT Hub shared access policy')
-param iotHubSharedAccessPolicyName string
-
 @description('The name of the Synapse Data Explorer database')
 param dxDatabaseName string = 'agoradxdb'
 
@@ -136,7 +133,7 @@ resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases
   properties: {
     consumerGroup: iotHubConsumerGroup
     iotHubResourceId: iotHubId
-    sharedAccessPolicyName: iotHubSharedAccessPolicyName
+    sharedAccessPolicyName: 'iothubowner'
   }
 }
 
