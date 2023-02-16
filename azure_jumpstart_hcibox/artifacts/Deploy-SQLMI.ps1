@@ -248,7 +248,9 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $using:defaultDomainPartition
     $sqlmi_port = 31433
     $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
+    $dcIpv4Secondary = ($using:SDNConfig.dcVLAN200IP).GetAddressBytes()
     $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
+    $reverseLookupSecondaryCidr = [System.String]::Concat($dcIpv4Secondary[0], '.', $dcIpv4Secondary[1], '.', $dcIpv4Secondary[2], '.0/24')
 
     Write-Host "Reverse lookup zone CIDR $reverseLookupCidr"
     # Setup reverse lookup zone
@@ -257,6 +259,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     if ($null -eq $ReverseDnsZone) {
         try {
             Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope Domain -ComputerName $dcInfo.HostName
+            Add-DnsServerPrimaryZone -NetworkId $reverseLookupSecondaryCidr -ReplicationScope Domain -ComputerName $dcInfo.HostName
             Write-Host "Successfully created reverse DNS Zone."
 
             $ReverseDnsZone = Get-DnsServerZone -ComputerName $dcInfo.HostName | Where-Object { $_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true }
@@ -275,6 +278,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     if ($null -ne $ReverseDnsZone) {
         try {
             Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
+            Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIpv4Secondary[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
             Write-Host "Created PTR record for domain controller."
         }
         catch {
