@@ -19,4 +19,14 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
   }
 }
 
+resource iotHubEventHub 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
+  name: '${iotHubName}/events/AgoraConsumerGroup'
+  properties: {
+    name: 'AgoraConsumerGroup'
+  }
+}
+
 output iotHubHostName string = iotHub.properties.hostName
+output iotHubId string = iotHub.id
+output iotHubConsumerGroup string = iotHubEventHub.name
+output iotHubSharedAccessPolicyName string = iotHub.properties.eventHubEndpoints.events.endpoint

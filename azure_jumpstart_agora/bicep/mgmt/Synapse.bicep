@@ -31,6 +31,15 @@ param dataExplorerSkuCapacity int = 2
 @description('The user name of the Synapse admin')
 param synapseAdminUserName string
 
+@description('The ID of the IoT Hub')
+param iotHubId string
+
+@description('The name of the IoT Hub consumer group')
+param iotHubConsumerGroup string
+
+@description('The name of the IoT Hub shared access policy')
+param iotHubSharedAccessPolicyName string
+
 
 @description('The password of the Synapse admin')
 @minLength(12)
@@ -118,6 +127,17 @@ resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-0
   kind: 'ReadWrite'
 }
 
+resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases/dataConnections@2021-06-01-preview' = {
+  name: iotHubId
+  kind: 'IotHub'
+  parent: dxdatabase
+  location: location
+  properties: {
+    consumerGroup: iotHubConsumerGroup
+    iotHubResourceId: iotHubId
+    sharedAccessPolicyName: iotHubSharedAccessPolicyName
+  }
+}
 
 resource roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(synapse.id, storageBlobDataContributorRoleID)
