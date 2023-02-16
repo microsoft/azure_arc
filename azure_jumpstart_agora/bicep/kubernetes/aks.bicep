@@ -58,6 +58,7 @@ param aksSubnetNameDev string
   'Linux'
 ])
 param osType string = 'Linux'
+var tier  = 'free'
 
 @description('The version of Kubernetes')
 param kubernetesVersion string = '1.24.6'
@@ -75,6 +76,10 @@ resource aksProd 'Microsoft.ContainerService/managedClusters@2022-07-02-preview'
   name: aksProdClusterName
   identity: {
     type: 'SystemAssigned'
+  }
+  sku: {
+    name: 'Basic'
+    tier: 'Free'
   }
   properties: {
     kubernetesVersion: kubernetesVersion
@@ -128,6 +133,10 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
   name: aksDevClusterName
   identity: {
     type: 'SystemAssigned'
+  }
+  sku: {
+    name: 'Basic'
+    tier: 'Free'
   }
   properties: {
     kubernetesVersion: kubernetesVersion
