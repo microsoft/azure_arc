@@ -1,5 +1,5 @@
 @description('The name of the storage account used by the Synapse workspace.')
-param SynapseStorageAccountName string = 'agorastorage${uniqueString(resourceGroup().id)}'
+param SynapseStorageAccountName string = 'agstorage${uniqueString(resourceGroup().id)}'
 
 @description('The name of the container used by the Synapse workspace.')
 param containerName string = 'agorafs'
