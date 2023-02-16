@@ -81,7 +81,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 # Installing DHCP service
-Write-Output "Installing DHCP service"
-Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
+#Write-Output "Installing DHCP service"
+#Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 Stop-Transcript
