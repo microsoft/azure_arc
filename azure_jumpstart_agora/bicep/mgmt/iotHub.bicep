@@ -24,7 +24,7 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
     eventHubEndpoints: {
       events: {
         retentionTimeInDays: 1
-        partitionCount: 4
+        partitionCount: 2
       }
     }
   }
