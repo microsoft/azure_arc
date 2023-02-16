@@ -67,6 +67,9 @@ param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var iotHubHostName = iotHubDeployment.outputs.iotHubHostName
+var iotHubId = iotHubDeployment.outputs.iotHubId
+var iotHubConsumerGroup = iotHubDeployment.outputs.iotHubConsumerGroup
+var iotHubSharedAccessPolicyName = iotHubDeployment.outputs.iotHubSharedAccessPolicyName
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -139,6 +142,9 @@ module synapseDeployment 'mgmt/synapse.bicep' = {
     synapseAdminUserName : windowsAdminUsername
     synapseAdminPassword : windowsAdminPassword
     namingGuid : namingGuid
+    iotHubId : iotHubId
+    iotHubConsumerGroup: iotHubConsumerGroup
+    iotHubSharedAccessPolicyName: iotHubSharedAccessPolicyName
   }
 }
 
