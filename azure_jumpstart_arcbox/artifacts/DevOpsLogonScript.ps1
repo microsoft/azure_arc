@@ -109,7 +109,7 @@ az -v
 
 # "Create OSM Kubernetes extension instance"
 Write-Header "Creating OSM K8s Extension Instance"
-az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name $osmMeshName
+az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name $osmMeshName auto-upgrade-minor-version false
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
