@@ -56,6 +56,9 @@ param aksProdClusterName string = 'Agora-AKS-Prod'
 @description('The name of the Dev Kubernetes cluster resource')
 param aksDevClusterName string = 'Agora-AKS-Dev'
 
+@description('Name for your synapse workspace')
+param synapseWorkspaceName string = 'synapse${uniqueString(resourceGroup().id)}'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -115,5 +118,15 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
+  }
+}
+
+module synapseDeployment 'synapse/synapse.bicep' = {
+  name: 'synapseDeployment'
+  params: {
+    synapseWorkspaceName: synapseWorkspaceName
+    location: location
+    synapseAdminUserName : windowsAdminUsername
+    synapseAdminPassword : windowsAdminPassword
   }
 }
