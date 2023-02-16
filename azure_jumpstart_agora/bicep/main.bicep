@@ -66,6 +66,7 @@ param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
 param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
+var iotHubHostName = iotHubDeployment.outputs.iotHubHostName
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -126,6 +127,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksProdClusterName : aksProdClusterName
     aksDevClusterName : aksDevClusterName
+    iotHubHostName : iotHubHostName
   }
 }
 
