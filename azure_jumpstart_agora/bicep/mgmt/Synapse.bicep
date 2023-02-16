@@ -16,6 +16,9 @@ param location string
 @description('The name of the Synapse Data Explorer cluster.')
 param dataExplorerClusterName string = 'agoradxcluster'
 
+@description('The name of the Synapse Data Explorer database')
+param dataExplorerDatabaseName string = 'agoradxdb'
+
 @description('The Sku of the data explorer cluster')
 param dataExplorerSkuName string = 'Compute Optimized'
 
@@ -103,6 +106,12 @@ resource synapse 'Microsoft.Synapse/workspaces@2021-06-01' = {
     }
     properties: {
       workspaceUID: synapse.properties.workspaceUID
+    }
+
+    resource dxdatabase 'databases@2021-06-01-preview' = {
+      name: dataExplorerDatabaseName
+      location: location
+      kind: 'ReadWrite'
     }
   }
 }
