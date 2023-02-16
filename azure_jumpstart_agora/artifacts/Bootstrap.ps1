@@ -80,6 +80,12 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
+
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgoraDir\AgoraLogonScript.ps1
+Register-ScheduledTask -TaskName "AgoraLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+
 # Installing DHCP service
 #Write-Output "Installing DHCP service"
 #Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
