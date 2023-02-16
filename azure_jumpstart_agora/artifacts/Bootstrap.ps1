@@ -80,6 +80,9 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
+# All Industries
+Write-Host "Fetching Artifacts for All Industries"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgoraLogonScript.ps1") -OutFile $Env:AgoreDir\AgoraLogonScript.ps1
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgoraDir\AgoraLogonScript.ps1
@@ -91,3 +94,9 @@ Register-ScheduledTask -TaskName "AgoraLogonScript" -Trigger $Trigger -User $adm
 #Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 Stop-Transcript
+
+# Clean up Bootstrap.log
+Write-Host "Clean up Bootstrap.log"
+Stop-Transcript
+$logSuppress = Get-Content $Env:AgoraLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:AgoraLogsDir\Bootstrap.log -Force
