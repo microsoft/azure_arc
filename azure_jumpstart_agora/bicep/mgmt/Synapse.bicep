@@ -126,7 +126,7 @@ resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-0
 }
 
 resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases/dataConnections@2021-06-01-preview' = {
-  name: '${synapse.name}/${synapsedx.name}/${dxdatabase.name}'
+  name: '${synapse.name}/${synapsedx.name}/${dxdatabase.name}/dbConnection'
   kind: 'IotHub'
   location: location
   properties: {
