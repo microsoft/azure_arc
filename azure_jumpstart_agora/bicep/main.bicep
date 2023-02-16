@@ -66,10 +66,6 @@ param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
 param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
-var iotHubHostName = iotHubDeployment.outputs.iotHubHostName
-var iotHubId = iotHubDeployment.outputs.iotHubId
-var iotHubConsumerGroup = iotHubDeployment.outputs.iotHubConsumerGroup
-var iotHubSharedAccessPolicyName = iotHubDeployment.outputs.iotHubSharedAccessPolicyName
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -130,7 +126,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksProdClusterName : aksProdClusterName
     aksDevClusterName : aksDevClusterName
-    iotHubHostName : iotHubHostName
+    iotHubHostName : iotHubDeployment.outputs.iotHubHostName
   }
 }
 
@@ -142,9 +138,9 @@ module synapseDeployment 'mgmt/synapse.bicep' = {
     synapseAdminUserName : windowsAdminUsername
     synapseAdminPassword : windowsAdminPassword
     namingGuid : namingGuid
-    iotHubId : iotHubId
-    iotHubConsumerGroup: iotHubConsumerGroup
-    iotHubSharedAccessPolicyName: iotHubSharedAccessPolicyName
+    iotHubId : iotHubDeployment.outputs.iotHubId
+    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
+    iotHubSharedAccessPolicyName: iotHubDeployment.outputs.iotHubSharedAccessPolicyName
   }
 }
 
