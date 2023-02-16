@@ -11,6 +11,9 @@ param spnTenantId string
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Random GUID')
+param namingGuid string = toLower(substring(newGuid(),0,5))
+
 @description('Username for Windows account')
 param windowsAdminUsername string
 
@@ -57,10 +60,10 @@ param aksProdClusterName string = 'Agora-AKS-Prod'
 param aksDevClusterName string = 'Agora-AKS-Dev'
 
 @description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'Agora-synapse-${uniqueString(resourceGroup().id)}'
+param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
 
 @description('The name of the IotHub')
-param iotHubName string = 'Agora-IotHub-${uniqueString(resourceGroup().id)}'
+param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -133,6 +136,7 @@ module synapseDeployment 'mgmt/synapse.bicep' = {
     location: location
     synapseAdminUserName : windowsAdminUsername
     synapseAdminPassword : windowsAdminPassword
+    namingGuid : namingGuid
   }
 }
 
