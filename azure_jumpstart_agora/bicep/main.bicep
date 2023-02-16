@@ -121,7 +121,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }
 
-module synapseDeployment 'synapse/synapse.bicep' = {
+module synapseDeployment 'mgmt/synapse.bicep' = {
   name: 'synapseDeployment'
   params: {
     synapseWorkspaceName: synapseWorkspaceName
