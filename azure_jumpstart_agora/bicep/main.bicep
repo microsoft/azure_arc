@@ -140,7 +140,6 @@ module synapseDeployment 'mgmt/synapse.bicep' = {
     namingGuid : namingGuid
     iotHubId : iotHubDeployment.outputs.iotHubId
     iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-    iotHubSharedAccessPolicyName: iotHubDeployment.outputs.iotHubSharedAccessPolicyName
   }
 }
 
