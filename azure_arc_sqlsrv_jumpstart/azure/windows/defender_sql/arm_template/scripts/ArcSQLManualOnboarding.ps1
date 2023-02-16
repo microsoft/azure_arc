@@ -76,7 +76,7 @@ Invoke-Command -Session $Server01 -ScriptBlock {Install-Module -Name Az -AllowCl
 
 Write-Host "Copying Azure Arc-enabled SQL onboarding script to ${sqlServerName}.."
 
-Copy-Item –Path $scriptLocation\installArcAgentSQLUser.ps1 –Destination $scriptLocation –ToSession $Server01 -Force
+Copy-Item -Path $scriptLocation\installArcAgentSQLUser.ps1 -Destination $scriptLocation -ToSession $Server01 -Force
 
 # Authenticate to Azure PowerShell SDK
 
@@ -178,6 +178,6 @@ Write-Host "SQL Server Onboarded!"
 Show-Message 'Azure Arc-enabled SQL Server' $onboardSuccessMsg 'None' 'Ok'
 
 $shortcutLink = "$Env:Public\Desktop\Onboard SQL Server.lnk"
-Remove-Item $shortcutLink –Force
+Remove-Item $shortcutLink -Force
 
 Stop-Transcript
