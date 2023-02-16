@@ -1,5 +1,8 @@
+@description('The GUID used for naming')
+param namingGuid string
+
 @description('The name of the storage account used by the Synapse workspace.')
-param SynapseStorageAccountName string = 'agstorage${uniqueString(resourceGroup().id)}'
+param SynapseStorageAccountName string = 'agorastorage${namingGuid}'
 
 @description('The name of the container used by the Synapse workspace.')
 param containerName string = 'agorafs'
@@ -24,6 +27,7 @@ param dataExplorerSkuCapacity int = 2
 
 @description('The user name of the Synapse admin')
 param synapseAdminUserName string
+
 
 @description('The password of the Synapse admin')
 @minLength(12)
