@@ -12,6 +12,7 @@ param (
     [string]$workspaceName,
     [string]$aksProdClusterName,
     [string]$aksDevClusterName,
+    [string]$iotHubHostName,
     [string]$githubUser,
     [string]$templateBaseUrl
 )
@@ -33,6 +34,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksProdClusterName', $aksProdClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksDevClusterName', $aksDevClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgoraDir', "C:\Agora", [System.EnvironmentVariableTarget]::Machine)
@@ -81,6 +83,31 @@ Install-Module -Name Posh-SSH -Force
 # Installing DHCP service
 Write-Output "Installing DHCP service"
 Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
+
+# Install Windows Terminal
+Write-Header "Installing Windows Terminal"
+If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+
+# Define environment variables
+$downloadDir = "C:\WinTerminal"
+$gitRepo = "microsoft/terminal"
+$filenamePattern = "*.msixbundle"
+$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+
+# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
+Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
+
+# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+Add-AppxPackage -Path $framworkPkgPath
+Add-AppxPackage -Path $msiPath
+
+# Cleanup
+Remove-Item $downloadDir -Recurse -Force
 
 # Install Winget
 Write-Header "Installing Winget"
