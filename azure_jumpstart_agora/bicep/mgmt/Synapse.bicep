@@ -38,7 +38,7 @@ param iotHubId string
 param iotHubConsumerGroup string
 
 @description('The name of the Synapse Data Explorer database')
-param dxDatabaseName string = 'agoradxdb'
+param dxDatabaseConnection string = 'agoradxdb'
 
 
 @description('The password of the Synapse admin')
@@ -126,7 +126,7 @@ resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-0
 }
 
 resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases/dataConnections@2021-06-01-preview' = {
-  name: '${synapse.name}/${synapsedx.name}/${dxdatabase.name}/dbConnection'
+  name: '${synapse.name}/${synapsedx.name}/${dxdatabase.name}/${dxDatabaseConnection}'
   kind: 'IotHub'
   location: location
   properties: {
