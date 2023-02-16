@@ -40,4 +40,3 @@ resource iotHubConsumerGroup 'Microsoft.Devices/IotHubs/eventHubEndpoints/Consum
 output iotHubHostName string = iotHub.properties.hostName
 output iotHubId string = iotHub.id
 output iotHubConsumerGroup string = iotHubConsumerGroup.name
-output iotHubSharedAccessPolicyName string = iotHub.properties.eventHubEndpoints.events.endpoint
