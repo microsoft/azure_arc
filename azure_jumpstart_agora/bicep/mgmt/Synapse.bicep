@@ -2,7 +2,7 @@
 param namingGuid string
 
 @description('The name of the storage account used by the Synapse workspace.')
-param SynapseStorageAccountName string = 'agorastorage${namingGuid}'
+param SynapseStorageAccountName string = 'agorasynapsestg${namingGuid}'
 
 @description('The name of the container used by the Synapse workspace.')
 param containerName string = 'agorafs'
