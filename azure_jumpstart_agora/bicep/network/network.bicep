@@ -1,8 +1,14 @@
-@description('Name of the VNet')
-param virtualNetworkName string = 'Agora-VNet'
+@description('Name of the Cloud VNet')
+param virtualNetworkNameCloud string
 
-@description('Name of the subnet in the virtual network')
-param subnetName string = 'Agora-Subnet'
+@description('Name of the prod AKS subnet in the cloud virtual network')
+param subnetNameCloudAksProd string
+
+@description('Name of the dev AKS subnet in the cloud virtual network')
+param subnetNameCloudAksDev string
+
+@description('Name of the inner-loop AKS subnet in the cloud virtual network')
+param subnetNameCloudAksInnerLoop string
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -10,77 +16,152 @@ param location string = resourceGroup().location
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'Agora-NSG'
+@description('Name of the prod Network Security Group')
+param networkSecurityGroupNameCloud string = 'Agora-Cloud-NSG'
 
 @description('Name of the Bastion Network Security Group')
 param bastionNetworkSecurityGroupName string = 'Agora-Bastion-NSG'
 
-var addressPrefix = '172.16.0.0/16'
-var subnetAddressPrefix = '172.16.1.0/24'
+var addressPrefixCloud = '10.16.0.0/16'
+var subnetAddressPrefixAksProd = '10.16.72.0/21'
+var subnetAddressPrefixAksDev = '10.16.80.0/21'
+var subnetAddressPrefixInnerLoop = '10.16.64.0/21'
+var bastionSubnetIpPrefix = '10.16.3.64/26'
+
 var bastionSubnetName = 'AzureBastionSubnet'
-var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
+var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Agora-Bastion'
-var bastionSubnetIpPrefix = '172.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
-resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
-  name: virtualNetworkName
+var cloudAKSProdSubnet = [
+  {
+    name: subnetNameCloudAksProd
+    properties: {
+      addressPrefix: subnetAddressPrefixAksProd
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.id
+      }
+    }
+  }
+]
+var bastionSubnet = [
+  {
+    name: 'AzureBastionSubnet'
+    properties: {
+      addressPrefix: bastionSubnetIpPrefix
+      networkSecurityGroup: {
+        id: bastionNetworkSecurityGroup.id
+      }
+    }
+  }
+]
+var cloudAKSDevSubnet = [
+  {
+    name: subnetNameCloudAksDev
+    properties: {
+      addressPrefix: subnetAddressPrefixAksDev
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.id
+      }
+    }
+  }
+]
+
+var cloudAKSInnerLoopSubnet = [
+  {
+    name: subnetNameCloudAksInnerLoop
+    properties: {
+      addressPrefix: subnetAddressPrefixInnerLoop
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.id
+      }
+    }
+  }
+]
+
+resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+  name: virtualNetworkNameCloud
   location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
-        addressPrefix
+        addressPrefixCloud
       ]
     }
-    subnets: deployBastion == true ? [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-          networkSecurityGroup: {
-            id: networkSecurityGroup.id
-          }
-        }
-      }
-      {
-        name: 'AzureBastionSubnet'
-        properties: {
-          addressPrefix: bastionSubnetIpPrefix
-          networkSecurityGroup: {
-            id: bastionNetworkSecurityGroup.id
-          }
-        }
-      }
-    ] : [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-          networkSecurityGroup: {
-            id: networkSecurityGroup.id
-          }
-        }
-      }
-    ]
+    subnets: (deployBastion == false) ? union (cloudAKSProdSubnet,cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSProdSubnet,cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
-  name: networkSecurityGroupName
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (deployBastion == true) {
+  name: bastionPublicIpAddressName
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+
+
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
+  name: networkSecurityGroupNameCloud
   location: location
   properties: {
     securityRules: [
-      
+      {
+        name: 'allow_k8s_80'
+        properties: {
+          priority: 1003
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '80'
+        }
+      }
+      {
+        name: 'allow_k8s_8080'
+        properties: {
+          priority: 1004
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '8080'
+        }
+      }
+      {
+        name: 'allow_k8s_443'
+        properties: {
+          priority: 1005
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
     ]
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true) {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
   properties: {
@@ -205,20 +286,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (deployBastion == true) {
-  name: bastionPublicIpAddressName
-  location: location
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    publicIPAddressVersion: 'IPv4'
-    idleTimeoutInMinutes: 4
-  }
-  sku: {
-    name: 'Standard'
-  }
-}
-
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBastion == true) {
   name: bastionName
   location: location
   properties: {
@@ -238,5 +306,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBas
   }
 }
 
-output vnetId string = arcVirtualNetwork.id
-output subnetId string = arcVirtualNetwork.properties.subnets[0].id
+output vnetId string = cloudVirtualNetwork.id
+output CloudSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output virtualNetworkNameCloud string = cloudVirtualNetwork.name
+output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
