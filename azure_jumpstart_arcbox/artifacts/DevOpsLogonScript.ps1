@@ -5,7 +5,7 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$osmRelease = "v1.1.1"
+$osmRelease = "1.1.1"
 $osmMeshName = "osm"
 $ingressNamespace = "ingress-nginx"
 
@@ -79,8 +79,8 @@ kubectx
 
 # "Download OSM binaries"
 Write-Header "Downloading OSM Binaries"
-Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmRelease/osm-$osmRelease-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmRelease-windows-amd64.zip"
-Expand-Archive "$Env:TempDir\osm-$osmRelease-windows-amd64.zip" -DestinationPath $Env:TempDir
+Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/v$osmRelease/osm-v$osmRelease-windows-amd64.zip" -Outfile "$Env:TempDir\osm-v$osmRelease-windows-amd64.zip"
+Expand-Archive "$Env:TempDir\osm-v$osmRelease-windows-amd64.zip" -DestinationPath $Env:TempDir
 Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 
 Write-Header "Adding Tools Folder to PATH"
