@@ -40,6 +40,9 @@ param iotHubConsumerGroup string
 @description('The name of the IoT Hub shared access policy')
 param iotHubSharedAccessPolicyName string
 
+@description('The name of the Synapse Data Explorer database')
+param dxDatabaseName string = 'agoradxdb'
+
 
 @description('The password of the Synapse admin')
 @minLength(12)
@@ -51,8 +54,6 @@ param synapseAdminPassword string
 @description('The role ID of Storage Blob Data Contributor.')
 var storageBlobDataContributorRoleID = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 
-
-// Synapse storage account
 resource synapseStg 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: SynapseStorageAccountName
   location: location
@@ -128,7 +129,7 @@ resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-0
 }
 
 resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases/dataConnections@2021-06-01-preview' = {
-  name: iotHubId
+  name: dxDatabaseName
   kind: 'IotHub'
   parent: dxdatabase
   location: location
