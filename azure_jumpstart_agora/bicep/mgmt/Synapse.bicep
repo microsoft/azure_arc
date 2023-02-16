@@ -95,25 +95,27 @@ resource synapse 'Microsoft.Synapse/workspaces@2021-06-01' = {
       filesystem: 'synapse'
     }
   }
+}
 
-  resource synapsedx 'kustoPools@2021-06-01-preview' = {
-    name: dataExplorerClusterName
-    location: location
-    sku: {
-      name: dataExplorerSkuName
-      capacity: dataExplorerSkuCapacity
-      size: dataExplorerSkuSize
-    }
-    properties: {
-      workspaceUID: synapse.properties.workspaceUID
-    }
-
-    resource dxdatabase 'databases@2021-06-01-preview' = {
-      name: dataExplorerDatabaseName
-      location: location
-      kind: 'ReadWrite'
-    }
+resource synapsedx 'Microsoft.Synapse/workspaces/kustoPools@2021-06-01-preview' = {
+  name: dataExplorerClusterName
+  parent: synapse
+  location: location
+  sku: {
+    name: dataExplorerSkuName
+    capacity: dataExplorerSkuCapacity
+    size: dataExplorerSkuSize
   }
+  properties: {
+    workspaceUID: synapse.properties.workspaceUID
+  }
+}
+
+resource dxdatabase 'Microsoft.Synapse/workspaces/kustoPools/databases@2021-06-01-preview' = {
+  name: dataExplorerDatabaseName
+  parent: synapsedx
+  location: location
+  kind: 'ReadWrite'
 }
 
 
