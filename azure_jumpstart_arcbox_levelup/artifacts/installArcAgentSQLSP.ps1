@@ -8,6 +8,10 @@ param (
 )
 
 $ArcBoxLogsDir = "C:\ArcBoxLevelup\Logs"
+
+# Change working directory 
+Set-Location -Path $ArcBoxLogsDir
+
 Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -27,7 +31,7 @@ $unattended = $spnClientId -And $spnTenantId -And $spnClientSecret
 
 try {
     Write-Host "Downloading AzureExtensionForSQLServer.msi"
-	Invoke-WebRequest -Uri https://aka.ms/AzureExtensionForSQLServer -OutFile AzureExtensionForSQLServer.msi
+	Invoke-WebRequest -Uri https://aka.ms/AzureExtensionForSQLServer/test -OutFile AzureExtensionForSQLServer.msi
     Write-Host "Download complete"
 }
 catch {
