@@ -233,7 +233,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -githubUser ', parameters('githubUser'), ' -templateBaseUrl ', parameters('templateBaseUrl'), '-rdpPort', parameters('rdpPort'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -githubUser ', parameters('githubUser'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -rdpPort ', parameters('rdpPort'))]"
                 }
             }
         }
