@@ -260,8 +260,8 @@ If (-NOT (Test-Path $RegistryPath)) {
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Disable Microsoft Edge first-run Welcome screen
-$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftEdge\Main'
-$Name         = 'PreventFirstRunPage'
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+$Name         = 'HideFirstRunExperience'
 $Value        = '00000001'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
