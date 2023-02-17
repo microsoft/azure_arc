@@ -107,12 +107,12 @@
             }
         },
         "rdpPort": {
-        "type": "string",
-        "metadata": {
-            "description": "Override default RDP 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
-        },
-        "defaultValue": ""
-    }
+            "type": "string",
+            "metadata": {
+                "description": "Override default RDP 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+            },
+            "defaultValue": ""
+        }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
