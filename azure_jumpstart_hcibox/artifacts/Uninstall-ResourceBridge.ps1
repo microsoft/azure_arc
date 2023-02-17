@@ -29,9 +29,7 @@ $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
-$location = "eastus"
 $custom_location_name = "hcibox-rb-cl"
-$cloudServiceIP = $SDNConfig.AKSCloudSvcidr.Substring(0, $SDNConfig.AKSCloudSvcidr.IndexOf('/'))
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Removing Arc Resource Bridge."
