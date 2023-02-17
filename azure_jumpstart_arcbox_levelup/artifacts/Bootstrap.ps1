@@ -11,7 +11,7 @@ param (
     [string]$workspaceName,
     [string]$githubUser,
     [string]$templateBaseUrl,
-    [string]$automationTriggerAtLogon
+    [string]$rdpPort
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -30,8 +30,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon, [System.EnvironmentVariableTarget]::Machine)
-
 [System.Environment]::SetEnvironmentVariable('ArcBoxDir', "C:\ArcBoxLevelup", [System.EnvironmentVariableTarget]::Machine)
 
 # Creating ArcBox path
