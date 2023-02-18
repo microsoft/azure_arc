@@ -108,7 +108,6 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo-VNET",
             "metadata": {
                 "description": "Name of the VNET"
             }
@@ -122,7 +121,6 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
