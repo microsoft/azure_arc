@@ -191,13 +191,13 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2022-07-01",
+            "apiVersion": "2019-02-01",
             "name": "[variables('networkSecurityGroupName')]",
             "location": "[parameters('location')]"
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2022-07-01",
+            "apiVersion": "2022-05-01",
             "condition": "[parameters('deployBastion')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
