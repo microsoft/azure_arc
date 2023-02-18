@@ -192,7 +192,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
-            "name": "[variables('networkSecurityGroupName')]",
+            "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('location')]"
         },
         {
