@@ -124,7 +124,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 # Change RDP Port
-if ($rdpPort -ne $null -and $rdpPort -ne "")
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 {
     $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
     $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
