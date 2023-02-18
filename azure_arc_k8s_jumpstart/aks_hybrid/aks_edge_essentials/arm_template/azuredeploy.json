@@ -108,6 +108,7 @@
         },
         "virtualNetworkName": {
             "type": "string",
+            "defaultValue": "AKS-EE-Demo-VNET",
             "metadata": {
                 "description": "Name of the VNET"
             }
@@ -121,6 +122,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
+            "defaultValue": "AKS-EE-Demo-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -161,7 +163,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2022-07-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -189,13 +191,13 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-02-01",
-            "name": "[parameters('networkSecurityGroupName')]",
+            "apiVersion": "2022-07-01",
+            "name": "[variables('networkSecurityGroupName')]",
             "location": "[parameters('location')]"
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2022-05-01",
+            "apiVersion": "2022-07-01",
             "condition": "[parameters('deployBastion')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
@@ -214,8 +216,8 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
-            "name": "[parameters('virtualNetworkName')]",
+            "apiVersion": "2022-07-01",
+            "name": "[variables('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
@@ -243,7 +245,7 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2022-07-01",
             "name": "[variables('publicIpAddressName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -257,7 +259,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2022-11-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
@@ -305,7 +307,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/Bootstrap')]",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2022-11-01",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
@@ -328,7 +330,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2022-11-01",
             "name": "[concat(variables('vmName'),'/InstallWindowsFeatures')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -354,7 +356,7 @@
             "condition": "[parameters('deployBastion')]",
             "name": "[variables('bastionName')]",
             "location": "[parameters('location')]",
-            "apiVersion": "2020-11-01",
+            "apiVersion": "2022-07-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
