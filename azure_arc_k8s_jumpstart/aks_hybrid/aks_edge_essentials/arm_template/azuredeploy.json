@@ -146,6 +146,8 @@
         "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+        "networkSecurityGroupName": "[concat(parameters('vmName'),'-NSG')]",
+        "virtualNetworkName": "[concat(parameters('vmName'),'-VNET')]",
         "bastionSubnetName": "AzureBastionSubnet",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",

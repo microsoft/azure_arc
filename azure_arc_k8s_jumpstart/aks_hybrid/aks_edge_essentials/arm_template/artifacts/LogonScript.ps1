@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$gAksEdgeRemoteDeployVersion = "1.0.221212.1200"
+$AksEdgeRemoteDeployVersion = "1.0.221212.1200"
 $schemaVersion = "1.1"
 $version = "1.0"
 $schemaVersionAksEdgeConfig = "1.5"
@@ -12,7 +12,7 @@ $aksEdgeDeployModules = "main"
 
 # Requires -RunAsAdministrator
 
-New-Variable -Name gAksEdgeRemoteDeployVersion -Value $gAksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
+New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
 if (! [Environment]::Is64BitProcess) {
     Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
@@ -32,7 +32,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 if ($env:windowsNode -eq $true) {
 $jsonContent = @"
 {
-    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
+    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
     "Version": "$schemaVersion",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
@@ -76,7 +76,7 @@ $jsonContent = @"
 } else {
 $jsonContent = @"
 {
-    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
+    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
     "Version": "$schemaVersion",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
@@ -115,10 +115,6 @@ $jsonContent = @"
 "@
 }
 
-###
-# Main
-###
-
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
 $url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
@@ -132,6 +128,10 @@ if (-not (Test-Path -Path $installDir)) {
 }
 
 Push-Location $installDir
+
+Write-Host "`n"
+Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
+Write-Host "`n"
 
 try {
     function download2() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile}
@@ -220,11 +220,11 @@ $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl ge
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
-$Env:arcClusterName = "AKS-EE-Demo-$suffix"
+$Env:arcClusterName = "$Env:ComputerName-$suffix"
 az connectedk8s connect --name $Env:arcClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $env:location `
-                        --tags "Project=jumpstart_azure_arc_data_services" "ClusterId=$clusterId" `
+                        --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
                         --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Write-Host "`n"
