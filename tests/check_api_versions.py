@@ -3,7 +3,7 @@ import re
 import requests
 
 # Define the regex pattern for matching Azure API versions
-api_version_pattern = re.compile(r"(?<=apiVersion\": \")[\d-\.]+(?=\")")
+api_version_pattern = re.compile(r"(?<=apiVersion\": \")[\d.-]+(?=\")")
 
 # Define the directory to start scanning from (root of repository)
 start_dir = os.getcwd()
