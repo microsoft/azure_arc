@@ -292,6 +292,12 @@
           },
           "aksdrArcClusterName": {
             "value": "[variables('aksDrArcDataClusterName')]"
+          },
+          "rdpPort":{
+            "value": "[parameters('rdpPort')]"
+          },
+          "sshPort":{
+            "value": "[parameters('sshPort')]"
           }
         }
       }
