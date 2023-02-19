@@ -12,7 +12,7 @@ api_version_pattern = re.compile(r"apiVersion\s*=\s*['\"](.*?)['\"]", re.IGNOREC
 api_endpoint = "https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/management"
 
 # Define the output file name for the API report
-report_file = "api_report.txt"
+report_file = "tests/api_report.txt"
 
 # Get the latest API versions from the Azure API endpoint
 api_endpoint_url = f"{api_endpoint}/readme.md"
