@@ -13,6 +13,7 @@ param (
     [string]$aksProdClusterName,
     [string]$aksDevClusterName,
     [string]$iotHubHostName,
+    [string]$acrDevLoginServer,
     [string]$githubUser,
     [string]$templateBaseUrl
 )
@@ -35,6 +36,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('aksProdClusterName', $aksProdClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksDevClusterName', $aksDevClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrDevLoginServer', $acrDevLoginServer, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgoraDir', "C:\Agora", [System.EnvironmentVariableTarget]::Machine)
