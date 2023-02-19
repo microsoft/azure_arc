@@ -7,8 +7,6 @@ Start-Transcript -Path $Env:AgoraLogsDir\AgoraLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
-<#
-
 # Install Windows Terminal
 Write-Header "Installing Windows Terminal"
 If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
@@ -33,6 +31,8 @@ Add-AppxPackage -Path $msiPath
 
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
+
+<#
 
 # Install Winget
 Write-Header "Installing Winget"
@@ -152,6 +152,10 @@ foreach ($app in $appsToInstall) {
     & winget install $app --force --silent --accept-source-agreements --accept-package-agreements | Write-Output
 
 }
+
+# Cleanup
+Push-Location $HOME
+Remove-Item $downloadDir -Recurse -Force
 #>
 
 $cliDir = New-Item -Path "$Env:AgoraDir\.cli\" -Name ".agora" -ItemType Directory
@@ -190,15 +194,12 @@ az -v
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
 
-#kubectx aks="$Env:aksArcClusterName-admin"
-#kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-
+kubectx aksProd = "$Env:aksProdClusterName-admin"
+kubectx aksDev = "$Env:aksDevClusterName-admin"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "AgoraLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-# Cleanup
-Push-Location $HOME
-Remove-Item $downloadDir -Recurse -Force
+
