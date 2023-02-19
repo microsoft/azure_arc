@@ -50,8 +50,6 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Agora-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
-var networkPeeringCloudToStores = 'networkPeeringCloudToStores'
-var networkPeeringStoresToCloud = 'networkPeeringStoresToCloud'
 
 var cloudAKSProdSubnet = [
   {
