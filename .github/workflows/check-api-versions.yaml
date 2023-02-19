@@ -34,14 +34,3 @@ jobs:
       with:
         name: api_report
         path: tests/api_report.txt
-
-    - name: Display report as comment
-      if: always()
-      uses: pullreminders/comment-on-pr@v1
-      with:
-        message: |
-          API Version Report:
-          
-          ```
-          ${{ steps.check-versions.outputs.report }}
-          ```
