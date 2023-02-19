@@ -267,7 +267,7 @@ resource pushRoleassignmentDev 'Microsoft.Authorization/roleAssignments@2022-04-
 }
 
 @description('Output the login server property for Dev ACR')
-output acrDevLoginServer string = acrResourceDev.properties.loginServer
+output acrDevName string = acrResourceDev.name
 
 @description('Output the login server property for Prod ACR')
-output acrProdLoginServer string = acrResourceProd.properties.loginServer
+output acrProdName string = acrResourceProd.name

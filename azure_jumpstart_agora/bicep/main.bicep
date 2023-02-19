@@ -155,8 +155,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksProdClusterName : aksProdClusterName
     aksDevClusterName : aksDevClusterName
     iotHubHostName : iotHubDeployment.outputs.iotHubHostName
-    acrDevLoginServer : kubernestesDeployment.outputs.acrDevLoginServer
-    acrProdLoginServer : kubernestesDeployment.outputs.acrProdLoginServer
+    acrDevName : kubernestesDeployment.outputs.acrDevName
+    acrProdName : kubernestesDeployment.outputs.acrProdName
   }
 }
 
