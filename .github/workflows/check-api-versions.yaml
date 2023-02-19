@@ -39,4 +39,9 @@ jobs:
       if: always()
       uses: unsplash/comment-on-pr@v1.5.2
       with:
-        message: "API Version Report:\n\n\`\`\`\n${{ steps.check-versions.outputs.report }}\n\`\`\`"
+        message: |
+          API Version Report:
+          
+          ```
+          ${{ steps.check-versions.outputs.report }}
+          ```
