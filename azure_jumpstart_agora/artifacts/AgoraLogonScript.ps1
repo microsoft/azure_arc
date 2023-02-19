@@ -139,7 +139,7 @@ if ($result -and (Test-Path -Path "$env:LOCALAPPDATA\Microsoft\WindowsApps\winge
 
 # Installing tools
 Write-Header "Installing WinGet Apps"
-$winGetAppList = 'azure-cli,kubectl,Microsoft.VCRedist.2015+.x64,Microsoft.Edge,Microsoft.Azure.AZCopy.10,Microsoft.VisualStudioCode,Git.Git,7zip,kubectx,Hashicorp.Terraform,PuTTY.PuTTY,Helm.Helm,Microsoft.DotNet.AspNetCore.3_1,ShiningLight.OpenSSL.Light,thomasnordquist.MQTT-Explorer'
+$winGetAppList = 'azure-cli,kubectl,Microsoft.VCRedist.2015+.x64,Microsoft.Azure.AZCopy.10,Microsoft.VisualStudioCode,Git.Git,7zip,kubectx,Hashicorp.Terraform,PuTTY.PuTTY,Helm.Helm,Microsoft.DotNet.AspNetCore.3_1,ShiningLight.OpenSSL.Light,thomasnordquist.MQTT-Explorer'
 
 Write-Host "Winget Apps Specified"
 
