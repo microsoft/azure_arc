@@ -83,7 +83,6 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameter
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[1] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adcred
 Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession
 
@@ -248,7 +247,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $using:defaultDomainPartition
     $sqlmi_port = 31433
     $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
-    $dcIpv4Secondary = ($using:SDNConfig.dcVLAN200IP).GetAddressBytes()
+    $dcIpv4Secondary = ([System.Net.IPAddress]$using:SDNConfig.dcVLAN200IP).GetAddressBytes()
     $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
     $reverseLookupSecondaryCidr = [System.String]::Concat($dcIpv4Secondary[0], '.', $dcIpv4Secondary[1], '.', $dcIpv4Secondary[2], '.0/24')
 
@@ -277,8 +276,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     # Create reverse DNS for domain controller
     if ($null -ne $ReverseDnsZone) {
         try {
-            Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
-            Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIpv4Secondary[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
+            Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone[0].ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
+            Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone[1].ZoneName -Name $dcIpv4Secondary[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
             Write-Host "Created PTR record for domain controller."
         }
         catch {
