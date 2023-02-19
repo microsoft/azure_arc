@@ -1,0 +1,21 @@
+name: Latest Release Checker
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Run script
+      run: python check_releases.py
+      env:
+        USERNAME: likamrat
