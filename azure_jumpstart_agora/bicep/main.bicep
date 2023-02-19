@@ -44,6 +44,9 @@ param githubUser string = 'microsoft'
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Agora-Cloud-VNet'
 
+@description('Name of the Cloud VNet')
+param virtualNetworkNameStores string = 'Agora-Stores-VNet'
+
 @description('Name of the prod AKS subnet in the cloud virtual network')
 param subnetNameCloudAksProd string = 'Agora-Cloud-Prod-Subnet'
 
@@ -52,6 +55,15 @@ param subnetNameCloudAksDev string = 'Agora-Cloud-Dev-Subnet'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloudAksInnerLoop string = 'Agora-Cloud-inner-loop-Subnet'
+
+@description('Name of the New York subnet subnet in the stores virtual network')
+param subnetNameStoresNewYork string = 'Agora-Store-NewYork-Subnet'
+
+@description('Name of the Chicago subnet subnet in the stores virtual network')
+param subnetNameStoresChicago string = 'Agora-Store-Chicago-Subnet'
+
+@description('Name of the Boston subnet subnet in the stores virtual network')
+param subnetNameStoresBoston string = 'Agora-Store-Boston-Subnet'
 
 @description('The name of the Prod Kubernetes cluster resource')
 param aksProdClusterName string = 'Agora-AKS-Prod'
@@ -82,6 +94,10 @@ module networkDeployment 'network/network.bicep' = {
     subnetNameCloudAksProd : subnetNameCloudAksProd
     subnetNameCloudAksDev: subnetNameCloudAksDev
     subnetNameCloudAksInnerLoop : subnetNameCloudAksInnerLoop
+    subnetNameStoresNewYork: subnetNameStoresNewYork
+    subnetNameStoresChicago: subnetNameStoresChicago
+    subnetNameStoresBoston: subnetNameStoresBoston
+    virtualNetworkNameStores: virtualNetworkNameStores
     deployBastion: deployBastion
     location: location
   }
