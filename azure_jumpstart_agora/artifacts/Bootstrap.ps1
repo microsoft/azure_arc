@@ -76,6 +76,30 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Installing tools
+Write-Header "Installing Chocolatey Apps"
+$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light,mqtt-explorer,choco install microsoft-windows-terminal'
+
+try {
+    choco config get cacheLocation
+}
+catch {
+    Write-Output "Chocolatey not detected, trying to install now"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
+Write-Host "Chocolatey Apps Specified"
+
+$appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall) {
+    Write-Host "Installing $app"
+    & choco install $app /y -Force | Write-Output
+    
+}
+
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
+
 # Disable Microsoft Edge sidebar
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
 $Name         = 'HubsSidebarEnabled'
@@ -113,9 +137,10 @@ Register-ScheduledTask -TaskName "AgoraLogonScript" -Trigger $Trigger -User $adm
 #Write-Output "Installing DHCP service"
 #Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
-Write-Header "Install Az Powershell module"
+<#Write-Header "Install Az Powershell module"
 Install-Module -Name PowerShellGet -Force
 Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force
+#>
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
