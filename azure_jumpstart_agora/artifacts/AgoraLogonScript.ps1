@@ -190,6 +190,12 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClu
 #kubectx aks="$Env:aksArcClusterName-admin"
 #kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 
+
+# Removing the LogonScript Scheduled Task so it won't run on next reboot
+Write-Header "Removing Logon Task"
+Unregister-ScheduledTask -TaskName "AgoraLogonScript" -Confirm:$false
+Start-Sleep -Seconds 5
+
 # Cleanup
 Push-Location $HOME
 Remove-Item $downloadDir -Recurse -Force
