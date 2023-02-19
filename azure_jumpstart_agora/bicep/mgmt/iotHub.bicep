@@ -31,7 +31,7 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
 }
 
 resource iotHubConsumerGroup 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
-  name: '${iotHub.name}/events/AgoraConsumerGroup'
+  name: '${iotHub.name}/events/agconsumergroup'
   properties: {
     name: consumerGroupName
   }
