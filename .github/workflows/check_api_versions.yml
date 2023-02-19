@@ -1,0 +1,28 @@
+name: Azure API Version Checker
+
+on:
+  push:
+    branches:
+      - release_checker
+
+jobs:
+  check-api-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Check API versions
+        run: |
+          python ./check_api_versions.py
+
+      - name: Display report
+        run: cat report.txt
