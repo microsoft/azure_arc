@@ -252,7 +252,7 @@ Write-Host "`n"
 $workspaceName = ($Env:arcClusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
     --resource-group $Env:resourceGroup `
-    --workspace-name "$workspaceName-$suffix" `
+    --workspace-name "$workspaceName-law" `
     --query id -o tsv
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
