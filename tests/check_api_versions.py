@@ -2,58 +2,64 @@ import os
 import re
 import requests
 
-# Define the excluded folders
-excluded_folders = [".github", "docs", "img", "social", "tests"]
+# Define the regex pattern for matching Azure API versions
+api_version_pattern = re.compile(r"(?<=apiVersion\": \")[\d.-]+(?=\")")
 
-# Define the regular expression pattern to match Azure API versions
-api_version_pattern = re.compile(r"apiVersion\s*=\s*['\"](.*?)['\"]", re.IGNORECASE)
+# Define the directory to start scanning from (root of repository)
+start_dir = os.getcwd()
 
-# Define the Azure API endpoint to get the latest API versions
-api_endpoint = "https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/management"
+# Define the directories to exclude
+exclude_dirs = [".github", "docs", "img", "social", "tests"]
 
-# Define the output file name for the API report
-report_file = "tests/api_report.txt"
+# Define the output file and location
+output_file = os.path.join(start_dir, 'tests', 'api_report.txt')
 
-# Get the latest API versions from the Azure API endpoint
-api_endpoint_url = f"{api_endpoint}/readme.md"
-api_readme = requests.get(api_endpoint_url).text
-latest_api_versions = api_version_pattern.findall(api_readme)
+# Define the Azure API version endpoint URL
+api_endpoint = 'https://management.azure.com/providers/Microsoft.ApiManagement/apiVersionSet?api-version=2020-06-01-preview'
 
-def find_files(root_dir):
-    file_list = []
-    for root, dirs, files in os.walk(root_dir):
+# Send a request to the API endpoint to get the latest published API versions
+response = requests.get(api_endpoint)
+if response.status_code == 200:
+    latest_api_versions = set(response.json().get('value')[0].get('versionSet').get('versions'))
+else:
+    print(f'Error getting latest API versions: {response.status_code}')
+    latest_api_versions = set()
+
+# Recursively search through all directories, skipping any excluded directories
+with open(output_file, 'w') as f:
+    for root, dirs, files in os.walk(start_dir):
+        # Skip any excluded directories
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
-            if file.endswith((".json", ".bicep", ".tf", ".hcl")) and not any(excluded_folder in root for excluded_folder in excluded_folders):
-                file_list.append(os.path.join(root, file))
-    return file_list
+            # Check if the file is an ARM, Bicep, or Terraform template
+            if file.endswith('.json') or file.endswith('.bicep') or file.endswith('.tf'):
+                # Read the file contents and look for the API version
+                with open(os.path.join(root, file), 'r') as file_contents:
+                    contents = file_contents.read()
+                    api_versions = api_version_pattern.findall(contents)
+                    for api_version in api_versions:
+                        # Get the Azure resource type from the file extension
+                        if file.endswith('.json'):
+                            resource_type = 'ARM Template'
+                        elif file.endswith('.bicep'):
+                            resource_type = 'Bicep Template'
+                        else:
+                            resource_type = 'Terraform Template'
+                        # Write the API version, Azure resource type, and file location to the report file
+                        f.write(f'{api_version},{resource_type},{os.path.relpath(root, start=start_dir)}/{file}\n')
 
-def get_file_api_versions(file_path):
-    with open(file_path, "r") as f:
-        file_contents = f.read()
-        api_versions = api_version_pattern.findall(file_contents)
-    return api_versions
+# Read the API versions and file locations from the report file and compare to the latest published API versions
+with open(output_file, 'r') as f:
+    repo_api_versions = set(f.read().splitlines())
 
-def write_api_report(api_report):
-    with open(report_file, "w") as f:
-        f.write(api_report)
+# Create a report of the API versions and the latest published API versions
+report = []
+for api_info in repo_api_versions:
+    api_version, resource_type, file_path = api_info.split(',')
+    if api_version not in latest_api_versions:
+        report.append(f'In {resource_type} at {file_path}, API version {api_version} is not the latest published version')
 
-def generate_api_report():
-    repo_files = find_files(".")
-    repo_api_versions = set()
-    api_report = "Azure API Report\n\n"
-    api_report += f"Latest API versions: {latest_api_versions}\n\n"
-    api_report += f"{'-'*100}\n"
-    api_report += f"| {'API Version':20} | {'Azure Resource Type':35} | {'File Name':45} |\n"
-    api_report += f"{'-'*100}\n"
-    for file_path in repo_files:
-        file_api_versions = get_file_api_versions(file_path)
-        if file_api_versions:
-            for version in file_api_versions:
-                resource_type = os.path.splitext(os.path.basename(file_path))[0]
-                repo_api_versions.add(version)
-                api_report += f"| {version:20} | {resource_type:35} | {file_path:45} |\n"
-    api_report += f"{'-'*100}\n"
-    api_report += f"\nRepo API versions: {sorted(repo_api_versions)}\n"
-    write_api_report(api_report)
-
-generate_api_report()
+if report:
+    print('\n'.join(report))
+else:
+    print('All API versions in the repo are the latest published versions')
