@@ -247,10 +247,12 @@ az connectedk8s connect --name $Env:arcClusterName `
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
+
 # Deploying Azure log-analytics workspace
+$workspaceName = ($Env:arcClusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
     --resource-group $Env:resourceGroup `
-    --workspace-name "law-aks-ee-demo-$suffix" `
+    --workspace-name "$workspaceName-$suffix" `
     --query id -o tsv
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
