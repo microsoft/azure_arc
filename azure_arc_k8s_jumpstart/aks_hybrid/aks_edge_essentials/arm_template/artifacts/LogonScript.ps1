@@ -237,7 +237,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
-$suffix = -join ((97..122) | Get-Random -Count 4 | % { [char]$_ })
+$suffix = -join ((97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
 $Env:arcClusterName = "$Env:ComputerName-$suffix"
 az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
