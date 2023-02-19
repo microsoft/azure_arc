@@ -82,7 +82,7 @@ Install-Module -Name Posh-SSH -Force
 
 # All Industries
 Write-Host "Fetching Artifacts for All Industries"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgoraLogonScript.ps1") -OutFile $Env:AgoreDir\AgoraLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgoraLogonScript.ps1") -OutFile $Env:AgoraDir\AgoraLogonScript.ps1
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgoraDir\AgoraLogonScript.ps1
