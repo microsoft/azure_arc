@@ -28,7 +28,6 @@ if ($Env:flavor -eq 'DataOps') {
         -Router 10.10.1.1 `
         -Force
 
-
     Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
     Restart-Service dhcpserver
 
@@ -92,6 +91,30 @@ if ($Env:flavor -eq 'DataOps') {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
 
+    # Configuring the local SQL VM
+    Write-Host "Setting local SQL authentication and adding a SQL login"
+    $localSQLUser = $Env:AZDATA_USERNAME
+    $localSQLPassword = $Env:AZDATA_PASSWORD
+    Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
+        Install-Module -Name SqlServer -AllowClobber -Force
+        $server = "localhost"
+        $user = $Using:localSQLUser
+        $LoginType = "SqlLogin"
+        $pass = ConvertTo-SecureString -String $Using:localSQLPassword -AsPlainText -Force
+        $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pass
+        Add-SqlLogin -ServerInstance $Server -LoginName $User -LoginType $LoginType -DefaultDatabase AdventureWorksLT2019 -Enable -GrantConnectSql -LoginPSCredential $Credential
+        $svr = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $server
+        $svr.Settings.LoginMode = [Microsoft.SqlServer.Management.SMO.ServerLoginMode]::Mixed
+        $svr.Alter()
+        Restart-Service -Force MSSQLSERVER
+        $svrole = $svr.Roles | where { $_.Name -eq 'sysadmin' }
+        $svrole.AddMember($user)
+    }
+
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "Creating Hyper-V Shortcut"
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
     # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
     Write-Header "Blocking IMDS"
     Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
@@ -126,25 +149,27 @@ if ($Env:flavor -eq 'DataOps') {
     az monitor log-analytics solution create --resource-group $Env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName
 
     # Copying the Azure Arc Connected Agent to nested VMs
-    Write-Header "Customize Onboarding Scripts"
-    Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
-    
     # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
     if (-not $hasPermission) {
-    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
     }
     else {
-    (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$myResourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
     }
-
-    Write-Header "Copying Onboarding Scripts"
+    (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
     # Copy installtion script to nested Windows VMs
     Write-Output "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
 
     $nestedVMArcBoxDir = $Env:ArcBoxDir
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 } -Credential $winCreds
+    $spnClientId = $env:spnClientId
+    $spnClientSecret = $env:spnClientSecret
+    $spnTenantId = $env:spnTenantId
+    $subscriptionId = $env:subscriptionId
+    $azureLocation = $env:azureLocation
+    $resourceGroup = $env:resourceGroup
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "Creating Hyper-V Shortcut"
@@ -306,6 +331,31 @@ else {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
 
+    # Configuring the local SQL VM
+    Write-Host "Setting local SQL authentication and adding a SQL login"
+    $localSQLUser = $Env:AZDATA_USERNAME
+    $localSQLPassword = $Env:AZDATA_PASSWORD
+    Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
+        Install-Module -Name SqlServer -AllowClobber -Force
+        $server = "localhost"
+        $user = $Using:localSQLUser
+        $LoginType = "SqlLogin"
+        $pass = ConvertTo-SecureString -String $Using:localSQLPassword -AsPlainText -Force
+        $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pass
+        Add-SqlLogin -ServerInstance $Server -LoginName $User -LoginType $LoginType -DefaultDatabase AdventureWorksLT2019 -Enable -GrantConnectSql -LoginPSCredential $Credential
+        $svr = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $server
+        $svr.Settings.LoginMode = [Microsoft.SqlServer.Management.SMO.ServerLoginMode]::Mixed
+        $svr.Alter()
+        Restart-Service -Force MSSQLSERVER
+        $svrole = $svr.Roles | where { $_.Name -eq 'sysadmin' }
+        $svrole.AddMember($user)
+    }
+
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "Creating Hyper-V Shortcut"
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+
     # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
     Write-Header "Blocking IMDS"
     Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
@@ -326,26 +376,19 @@ else {
     $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.actions | Select-Object) -ExcludeDifferent -IncludeEqual) -and -not (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.notactions | Select-Object) -ExcludeDifferent -IncludeEqual) } } | Select-Object -ExpandProperty roleName
     $hasPermission = $rolePermissions | Where-Object { ($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles) }
 
-    # Copying the Azure Arc Connected Agent to nested VMs
-    Write-Header "Customize Onboarding Scripts"
-    Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
-    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
-    (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
-
     # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
     if (-not $hasPermission) {
-    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
     }
     else {
-    (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$myResourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
     }
-
-    Write-Header "Copying Onboarding Scripts"
+    (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
     # Copy installation script to nested Windows VMs
     Write-Output "Transferring installation script to nested Windows VMs..."
-    Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
-    Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
+    Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
+    Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
     Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
 
     # Copy installation script to nested Linux VMs
@@ -359,9 +402,15 @@ else {
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 
     $nestedVMArcBoxDir = $Env:ArcBoxDir
-    Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 } -Credential $winCreds
-    Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 } -Credential $winCreds
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 } -Credential $winCreds
+    $spnClientId = $env:spnClientId
+    $spnClientSecret = $env:spnClientSecret
+    $spnTenantId = $env:spnTenantId
+    $subscriptionId = $env:subscriptionId
+    $azureLocation = $env:azureLocation
+    $resourceGroup = $env:resourceGroup
+    Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+    Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
     Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 
