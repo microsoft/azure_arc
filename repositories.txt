@@ -1,3 +1,1 @@
-openai/gpt-3
-tensorflow/tensorflow
-pytorch/pytorch
+kubernetes-sigs/cluster-api-provider-azure
