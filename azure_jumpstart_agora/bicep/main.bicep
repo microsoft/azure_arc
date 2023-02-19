@@ -30,10 +30,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Agora-Workspace'
 
 @description('Target GitHub account')
-param githubAccount string = 'sebassem'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'agora_cloud_infra'
+param githubBranch string = 'jumpstart_ag'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -155,8 +155,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksProdClusterName : aksProdClusterName
     aksDevClusterName : aksDevClusterName
     iotHubHostName : iotHubDeployment.outputs.iotHubHostName
-    acrDevName : kubernestesDeployment.outputs.acrDevName
-    acrProdName : kubernestesDeployment.outputs.acrProdName
+    acrNameDev : kubernestesDeployment.outputs.acrDevName
+    acrNameProd : kubernestesDeployment.outputs.acrProdName
   }
 }
 
