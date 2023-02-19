@@ -79,7 +79,7 @@ resource aksProd 'Microsoft.ContainerService/managedClusters@2022-07-02-preview'
   }
   sku: {
     name: 'Basic'
-    tier: 'Free'
+    tier: tier
   }
   properties: {
     kubernetesVersion: kubernetesVersion
@@ -136,7 +136,7 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
   }
   sku: {
     name: 'Basic'
-    tier: 'Free'
+    tier: tier
   }
   properties: {
     kubernetesVersion: kubernetesVersion
