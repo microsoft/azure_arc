@@ -23,6 +23,7 @@ if response.status_code == 200:
     latest_api_versions = set(response.json().get('value')[0].get('versionSet').get('versions'))
 else:
     print(f'Error getting latest API versions: {response.status_code}')
+    latest_api_versions = set()
 
 # Recursively search through all directories, skipping any excluded directories
 with open(output_file, 'w') as f:
