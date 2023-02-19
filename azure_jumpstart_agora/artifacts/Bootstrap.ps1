@@ -117,6 +117,9 @@ Write-Header "Install Az Powershell module"
 Install-Module -Name PowerShellGet -Force
 Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force
 
+# Disabling Windows Server Manager Scheduled Task
+Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
 Stop-Transcript
 
 # Clean up Bootstrap.log
