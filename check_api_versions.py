@@ -9,33 +9,35 @@ def get_latest_api_version(resource_type):
     response_json = json.loads(response.content)
     return response_json["resourceTypes"][0]["apiVersions"][0]
 
-# Define the directory to scan
-dir_path = "/path/to/your/directory"
+# Define the directory to start scanning
+repo_path = "/github/workspace"
 
-# List all the files in the directory
-files = os.listdir(dir_path)
+# Define the directories to exclude
+excluded_dirs = [".github", "docs", "img", "social", "tests"]
 
 # Initialize a dictionary to store the API versions
 api_versions = {}
 
-# Loop through each file and extract the API version
-for file in files:
-    if file.endswith((".json", ".bicep", ".tf")):
-        with open(os.path.join(dir_path, file), "r") as f:
-            template = json.load(f)
-            if "apiVersion" in template:
-                api_version = template["apiVersion"]
-                if api_version not in api_versions:
-                    api_versions[api_version] = []
-                api_versions[api_version].append(file.split("/")[-1])
-            elif "azurerm" in template:
-                modules = template["azurerm"]["modules"]
-                for module in modules:
-                    if "version" in module:
-                        api_version = module["version"]
-                        if api_version not in api_versions:
-                            api_versions[api_version] = []
-                        api_versions[api_version].append(file.split("/")[-1])
+# Loop through each file and directory in the repository, excluding the excluded directories
+for root, dirs, files in os.walk(repo_path, topdown=True):
+    dirs[:] = [d for d in dirs if d not in excluded_dirs]
+    for file in files:
+        if file.endswith((".json", ".bicep", ".tf")):
+            with open(os.path.join(root, file), "r") as f:
+                template = json.load(f)
+                if "apiVersion" in template:
+                    api_version = template["apiVersion"]
+                    if api_version not in api_versions:
+                        api_versions[api_version] = []
+                    api_versions[api_version].append(os.path.join(root, file))
+                elif "azurerm" in template:
+                    modules = template["azurerm"]["modules"]
+                    for module in modules:
+                        if "version" in module:
+                            api_version = module["version"]
+                            if api_version not in api_versions:
+                                api_versions[api_version] = []
+                            api_versions[api_version].append(os.path.join(root, file))
 
 # Get the latest published API versions for each resource type
 latest_api_versions = {}
@@ -47,4 +49,7 @@ report = ""
 for api_version, files in api_versions.items():
     if api_version not in latest_api_versions.values():
         report += f"\nAPI version {api_version} is out of date for the following files: {', '.join(files)}"
-print(report)
+
+# Write the report to a file
+with open(os.path.join(repo_path, "report.txt"), "w") as f:
+    f.write(report)
