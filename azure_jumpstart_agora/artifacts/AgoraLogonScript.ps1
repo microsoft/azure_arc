@@ -68,8 +68,13 @@ az -v
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
 
-kubectx aksProd = "$Env:aksProdClusterName-admin"
-kubectx aksDev = "$Env:aksDevClusterName-admin"
+kubectx aksProd="$Env:aksProdClusterName-admin"
+kubectx aksDev="$Env:aksDevClusterName-admin"
+
+# Attach ACRs to AKS clusters
+Write-Header "Attaching ACRs to AKS clusters"
+az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
+az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"

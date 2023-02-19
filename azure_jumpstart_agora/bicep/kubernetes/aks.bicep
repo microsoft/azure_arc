@@ -84,12 +84,6 @@ var serviceCidr_dev = '10.21.64.0/19'
 var dnsServiceIP_dev = '10.21.64.10'
 var dockerBridgeCidr_dev = '172.18.0.1/16'
 
-@description('The role Id of ACR pull role')
-var acrPullRoleID = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-
-@description('The role Id of ACR push role')
-var acrPushRoleID = '8311e382-0749-4cb8-b61a-304f252e45ec'
-
 resource aksProd 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
   location: location
   name: aksProdClusterName
@@ -223,46 +217,6 @@ resource acrResourceDev 'Microsoft.ContainerRegistry/registries@2023-01-01-previ
   }
   properties: {
     adminUserEnabled: true
-  }
-}
-
-resource pullRoleassignmentProd 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: acrResourceProd
-  name: guid(aksProd.id, acrPullRoleID)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleID)
-    principalId: aksProd.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource pullRoleassignmentDev 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: acrResourceDev
-  name: guid(aksDev.id, acrPullRoleID)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleID)
-    principalId: aksDev.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource pushRoleassignmentProd 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: acrResourceProd
-  name: guid(aksProd.id, acrPushRoleID)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPushRoleID)
-    principalId: aksProd.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource pushRoleassignmentDev 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: acrResourceDev
-  name: guid(aksDev.id, acrPushRoleID)
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPushRoleID)
-    principalId: aksDev.identity.principalId
-    principalType: 'ServicePrincipal'
   }
 }
 
