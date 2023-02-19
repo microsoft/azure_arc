@@ -168,7 +168,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -358,7 +358,7 @@
             "location": "[parameters('location')]",
             "apiVersion": "2022-07-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
             ],
             "properties": {
