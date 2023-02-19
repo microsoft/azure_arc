@@ -19,4 +19,4 @@ jobs:
         pip install requests
 
     - name: Run script
-      run: python check_releases.py >> releases.txt
+      run: python check_releases.py
