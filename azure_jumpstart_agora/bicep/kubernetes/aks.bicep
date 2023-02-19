@@ -53,9 +53,6 @@ param aksSubnetNameProd string
 param aksSubnetNameDev string
 //param aksSubnetNameInnerLoop string = 'Agora-Cloud-Inner-Loop-Subnet'
 
-@description('The GUID used for naming')
-param namingGuid string
-
 @minLength(5)
 @maxLength(50)
 @description('Name of the production Azure Container Registry')
