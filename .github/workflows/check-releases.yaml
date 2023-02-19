@@ -3,6 +3,9 @@ name: Latest Release Checker
 on:
   schedule:
     - cron: '0 0 * * *'
+  push:
+    branches:
+      - release_checker
 
 jobs:
   check-releases:
