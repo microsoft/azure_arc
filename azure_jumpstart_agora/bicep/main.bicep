@@ -132,7 +132,6 @@ module kubernestesDeployment 'kubernetes/aks.bicep' = {
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    namingGuid: namingGuid
     acrNameDev: acrNameDev
     acrNameProd: acrNameProd
   }
@@ -156,6 +155,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksProdClusterName : aksProdClusterName
     aksDevClusterName : aksDevClusterName
     iotHubHostName : iotHubDeployment.outputs.iotHubHostName
+    acrDevLoginServer : kubernestesDeployment.outputs.acrDevLoginServer
   }
 }
 
