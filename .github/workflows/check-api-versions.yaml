@@ -37,7 +37,7 @@ jobs:
 
     - name: Display report as comment
       if: always()
-      uses: unsplash/comment-on-pr@v1.5.2
+      uses: pullreminders/comment-on-pr@v1
       with:
         message: |
           API Version Report:
