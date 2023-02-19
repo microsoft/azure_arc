@@ -159,7 +159,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }
 
-/*module synapseDeployment 'mgmt/synapse.bicep' = {
+module synapseDeployment 'mgmt/synapse.bicep' = {
   name: 'synapseDeployment'
   params: {
     synapseWorkspaceName: synapseWorkspaceName
@@ -170,7 +170,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     iotHubId : iotHubDeployment.outputs.iotHubId
     iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
   }
-}*/
+}
 
 module iotHubDeployment 'mgmt/iotHub.bicep' = {
   name: 'iotHubDeployment'
