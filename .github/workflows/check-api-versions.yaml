@@ -21,7 +21,7 @@ jobs:
         run: pip install requests
 
       - name: Check API versions
-        run: python tests/check_releases.py
+        run: python tests/check_api_versions.py
 
       - name: Display report
-        run: cat api_report.txt
+        run: cat tests/api_report.txt
