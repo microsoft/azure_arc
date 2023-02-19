@@ -277,6 +277,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "DataOps") {
 }
 
 # Change RDP Port
+Write-Host "RDP port number from configuration is $rdpPort"
 if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 {
     Write-Host "Configuring RDP port number to $rdpPort"
@@ -286,7 +287,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     
     # RDP port
     $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
-    Write-Host Get RDP PortNumber: $portNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
     if (!($portNumber -eq $rdpPort))
     {
       Write-Host Setting RDP PortNumber to $rdpPort
