@@ -46,11 +46,12 @@ var subnetAddressPrefixNewYork = '10.18.72.0/21'
 var subnetAddressPrefixChicago = '10.18.80.0/21'
 var subnetAddressPrefixBoston = '10.18.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
-
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Agora-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
+var networkPeeringCloudToStores = 'networkPeeringCloudToStores'
+var networkPeeringStoresToCloud = 'networkPeeringStoresToCloud'
 
 var cloudAKSProdSubnet = [
   {
@@ -411,6 +412,32 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBas
         }
       }
     ]
+  }
+}
+
+resource peeringCloudToStores 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-07-01' = {
+  name: '${cloudVirtualNetwork}/peering-to-stores-vnet'
+  properties: {
+    remoteVirtualNetwork:{
+      id: storesVirtualNetwork.id
+    }
+    allowVirtualNetworkAccess: true
+    allowForwardedTraffic: false
+    allowGatewayTransit: false
+    useRemoteGateways: false
+  }
+}
+
+resource peeringStoresToCloud 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-07-01' = {
+  name: '${storesVirtualNetwork}/peering-to-cloud-vnet'
+  properties: {
+    remoteVirtualNetwork:{
+      id: cloudVirtualNetwork.id
+    }
+    allowVirtualNetworkAccess: true
+    allowForwardedTraffic: false
+    allowGatewayTransit: false
+    useRemoteGateways: false
   }
 }
 
