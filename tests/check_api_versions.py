@@ -51,5 +51,5 @@ for api_version, files in api_versions.items():
         report += f"\nAPI version {api_version} is out of date for the following files: {', '.join(files)}"
 
 # Write the report to a file
-with open(os.path.join(repo_path, "report.txt"), "w") as f:
+with open(os.path.join(repo_path, "api_report.txt"), "w") as f:
     f.write(report)
