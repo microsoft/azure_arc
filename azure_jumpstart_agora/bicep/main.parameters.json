@@ -19,6 +19,15 @@
     },
     "sshRSAPublicKey": {
       "value": ""
+    },
+    "deployBastion": {
+      "value": false
+    },
+    "githubAccount": {
+      "value": "microsoft"
+    },
+    "githubBranch": {
+      "value": "jumpstart_ag"
     }
   }
 }
