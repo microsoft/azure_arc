@@ -1,27 +1,42 @@
-name: Azure API Version Checker
+name: Check API Versions
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
-    branches:
+    branches: 
       - release_checker
 
 jobs:
   check-api-versions:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
 
-      - name: Install dependencies
-        run: pip install requests
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
 
-      - name: Check API versions
-        run: python tests/check_api_versions.py
+    - name: Run script to check API versions
+      id: check-versions
+      run: |
+        python tests/check_api_versions.py --exclude-folders=".github,tests"
+        echo "::set-output name=report::$(cat tests/api_report.txt)"
 
-      - name: Display report
-        run: cat tests/api_report.txt
+    - name: Save report as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: api_report
+        path: tests/api_report.txt
+
+    - name: Display report as comment
+      if: always()
+      uses: unsplash/comment-on-pr@v1.5.2
+      with:
+        message: "API Version Report:\n\n\`\`\`\n${{ steps.check-versions.outputs.report }}\n\`\`\`"
