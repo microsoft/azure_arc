@@ -416,7 +416,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBas
 }
 
 resource peeringCloudToStores 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-07-01' = {
-  name: '${cloudVirtualNetwork}/peering-to-stores-vnet'
+  name: '${cloudVirtualNetwork}-peering-to-stores-vnet'
   properties: {
     remoteVirtualNetwork:{
       id: storesVirtualNetwork.id
@@ -429,7 +429,7 @@ resource peeringCloudToStores 'Microsoft.Network/virtualNetworks/virtualNetworkP
 }
 
 resource peeringStoresToCloud 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-07-01' = {
-  name: '${storesVirtualNetwork}/peering-to-cloud-vnet'
+  name: '${storesVirtualNetwork}-peering-to-cloud-vnet'
   properties: {
     remoteVirtualNetwork:{
       id: cloudVirtualNetwork.id
