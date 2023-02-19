@@ -100,6 +100,20 @@
         "description": "Random GUID for cluster names"
       },
       "defaultValue": "[substring(newGuid(),0,4)]"
+    },
+    "rdpPort": {
+      "type": "string",
+      "metadata": {
+        "description": "Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+      },
+      "defaultValue": "3389"
+    },
+    "sshPort": {
+      "type": "string",
+      "metadata": {
+        "description": "Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM."
+      },
+      "defaultValue": "22"
     }
   },
   "variables": {
@@ -163,6 +177,12 @@
           },
           "capiArcDataClusterName" : {
             "value": "[variables('capiArcDataClusterName')]"
+          },
+          "rdpPort":{
+            "value": "[parameters('rdpPort')]"
+          },
+          "sshPort":{
+            "value": "[parameters('sshPort')]"
           }
         }
       }
