@@ -5,39 +5,7 @@ $Env:AgoraIconDir = "C:\Agora\Icons"
 
 Start-Transcript -Path $Env:AgoraLogsDir\AgoraLogonScript.log
 
-$cliDir = New-Item -Path "$Env:AgoraDir\.cli\" -Name ".agora" -ItemType Directory
-
-if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
-    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
-    $folder.Attributes += [System.IO.FileAttributes]::Hidden
-}
-
-$Env:AZURE_CONFIG_DIR = $cliDir.FullName
-
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
-
-# Required for azcopy
-Write-Header "Az PowerShell Login"
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
-
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-
-# Making extension install dynamic
-Write-Header "Installing Azure CLI extensions"
-az config set extension.use_dynamic_install=yes_without_prompt
-# Installing Azure CLI extensions
-az extension add --name arcdata --system
-az -v
 
 # Install Windows Terminal
 Write-Header "Installing Windows Terminal"
@@ -168,6 +136,59 @@ if ($result -and (Test-Path -Path "$env:LOCALAPPDATA\Microsoft\WindowsApps\winge
 } else {
     Write-Host "Oops... Failed to install Windows Package Manager (winget)" -ForegroundColor "Red"
 }
+
+# Installing tools
+Write-Header "Installing WinGet Apps"
+$winGetAppList = 'azure-cli,kubectl,Microsoft.VCRedist.2015+.x64,Microsoft.Edge,Microsoft.Azure.AZCopy.10,Microsoft.VisualStudioCode,Git.Git,7zip,kubectx,Hashicorp.Terraform,PuTTY.PuTTY,Helm.Helm,Microsoft.DotNet.AspNetCore.3_1,ShiningLight.OpenSSL.Light,thomasnordquist.MQTT-Explorer'
+
+Write-Host "Winget Apps Specified"
+
+$appsToInstall = $winGetAppList -split "," | foreach { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall) {
+    Write-Host "Installing $app"
+    & winget install $app --force --silent --accept-source-agreements --accept-package-agreements | Write-Output
+
+}
+
+$cliDir = New-Item -Path "$Env:AgoraDir\.cli\" -Name ".agora" -ItemType Directory
+
+if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
+    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
+    $folder.Attributes += [System.IO.FileAttributes]::Hidden
+}
+
+$Env:AZURE_CONFIG_DIR = $cliDir.FullName
+
+# Required for azcopy
+Write-Header "Az PowerShell Login"
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+
+# Required for CLI commands
+Write-Header "Az CLI Login"
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+# Register Azure providers
+Write-Header "Registering Providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+
+# Making extension install dynamic
+Write-Header "Installing Azure CLI extensions"
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+az extension add --name arcdata --system
+az -v
+
+# Getting AKS clusters' credentials
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+
+#kubectx aks="$Env:aksArcClusterName-admin"
+#kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 
 # Cleanup
 Push-Location $HOME
