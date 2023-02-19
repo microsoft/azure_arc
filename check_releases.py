@@ -11,6 +11,8 @@ for repo in repositories:
     if response.status_code == 200:
         data = response.json()
         latest_release = data["name"]
-        print(f"Latest release for {repo}: {latest_release}")
+        # extract version number
+        version_number = latest_release.lstrip('v')
+        print(f"Latest release for {repo}: v{version_number}")
     else:
         print(f"Error retrieving latest release for {repo}")
