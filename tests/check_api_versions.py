@@ -10,17 +10,17 @@ def get_latest_api_version(resource_type):
     return response_json["resourceTypes"][0]["apiVersions"][0]
 
 # Define the directory to start scanning
-repo_path = "azure_arc"
+repo_path = "/github/workspace"
 
-# Define the directories to exclude
+# Define the directory to exclude
 excluded_dirs = [".github", "docs", "img", "social", "tests"]
 
 # Initialize a dictionary to store the API versions
 api_versions = {}
 
-# Loop through each file and directory in the repository, excluding the excluded directories
+# Loop through each file and directory in the repository, excluding the excluded directory
 for root, dirs, files in os.walk(repo_path, topdown=True):
-    dirs[:] = [d for d in dirs if d not in excluded_dirs]
+    dirs[:] = [d for d in dirs if d != excluded_dir]
     for file in files:
         if file.endswith((".json", ".bicep", ".tf")):
             with open(os.path.join(root, file), "r") as f:
@@ -51,5 +51,8 @@ for api_version, files in api_versions.items():
         report += f"\nAPI version {api_version} is out of date for the following files: {', '.join(files)}"
 
 # Write the report to a file
-with open(os.path.join(repo_path, "tests/api_report.txt"), "w") as f:
+report_file_path = os.path.join(repo_path, "api_report.txt")
+with open(report_file_path, "w") as f:
     f.write(report)
+
+print(f"Report saved to {report_file_path}")
