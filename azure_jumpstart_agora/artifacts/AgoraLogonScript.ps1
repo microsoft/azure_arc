@@ -7,6 +7,8 @@ Start-Transcript -Path $Env:AgoraLogsDir\AgoraLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
+<#
+
 # Install Windows Terminal
 Write-Header "Installing Windows Terminal"
 If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
@@ -150,6 +152,7 @@ foreach ($app in $appsToInstall) {
     & winget install $app --force --silent --accept-source-agreements --accept-package-agreements | Write-Output
 
 }
+#>
 
 $cliDir = New-Item -Path "$Env:AgoraDir\.cli\" -Name ".agora" -ItemType Directory
 
