@@ -2,64 +2,83 @@ import os
 import re
 import requests
 
-# Define the regex pattern for matching Azure API versions
-api_version_pattern = re.compile(r"(?<=apiVersion\": \")[\d.-]+(?=\")")
+# Get latest Azure API versions for all resource types
+def get_latest_azure_api_versions():
+    # Retrieve list of Azure resource types
+    url = "https://management.azure.com/subscriptions/{subscription_id}/providers?api-version=2020-01-01"
+    headers = {"Authorization": "Bearer " + os.environ["GITHUB_TOKEN"]}
+    response = requests.get(url.format(subscription_id=os.environ["AZURE_SUBSCRIPTION_ID"]), headers=headers)
+    if not response.ok:
+        raise Exception(f"Failed to retrieve Azure resource types: {response.status_code} {response.reason}")
+    resource_types = [r["resourceType"] for r in response.json()["value"]]
 
-# Define the directory to start scanning from (root of repository)
-start_dir = os.getcwd()
+    # Retrieve latest API versions for each resource type
+    latest_api_versions = {}
+    for resource_type in resource_types:
+        url = f"https://management.azure.com/providers/{resource_type}?api-version=2020-01-01"
+        response = requests.get(url, headers=headers)
+        if response.ok:
+            latest_api_versions[resource_type] = response.json()["resourceTypes"][0]["apiVersions"][0]
 
-# Define the directories to exclude
-exclude_dirs = [".github", "docs", "img", "social", "tests"]
+    return latest_api_versions
 
-# Define the output file and location
-output_file = os.path.join(start_dir, 'tests', 'api_report.txt')
+# Get Azure API versions used in templates
+def get_template_api_versions(template_file):
+    with open(template_file, "r") as f:
+        content = f.read()
 
-# Define the Azure API version endpoint URL
-api_endpoint = 'https://management.azure.com/providers/Microsoft.ApiManagement/apiVersionSet?api-version=2020-06-01-preview'
+    api_versions = set(re.findall(r"apiVersion:\s*(\d{4}-\d{2}-\d{2})", content))
 
-# Send a request to the API endpoint to get the latest published API versions
-response = requests.get(api_endpoint)
-if response.status_code == 200:
-    latest_api_versions = set(response.json().get('value')[0].get('versionSet').get('versions'))
+    return api_versions
+
+def scan_templates(root_dir):
+    # Get latest Azure API versions for all resource types
+    latest_api_versions = get_latest_azure_api_versions()
+
+    # Scan all template files in directory
+    results = {}
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        # Ignore directories specified in excludes
+        for exclude in excludes:
+            if exclude in dirnames:
+                dirnames.remove(exclude)
+
+        for filename in filenames:
+            if filename.endswith(".json") or filename.endswith(".bicep"):
+                template_file = os.path.join(dirpath, filename)
+
+                # Get Azure API versions used in template
+                template_api_versions = get_template_api_versions(template_file)
+
+                # Compare with latest Azure API versions
+                for api_version in template_api_versions:
+                    resource_type = template_file.split(os.sep)[-2]
+                    if resource_type in latest_api_versions and api_version != latest_api_versions[resource_type]:
+                        if api_version not in results:
+                            results[api_version] = []
+                        results[api_version].append((resource_type, template_file))
+
+    return results
+
+# Scan templates in directory
+root_dir = "."
+excludes = [".github", "docs", "img", "social", "tests"]
+results = scan_templates(root_dir)
+
+# Generate report
+report = "Azure API versions in use:\n\n"
+if results:
+    report += "{:<20} {:<40} {}\n".format("API Version", "Azure Resource Type", "File")
+    report += "-" * 70 + "\n"
+    for api_version, resources in sorted(results.items()):
+        for resource_type, template_file in resources:
+            report += "{:<20} {:<40} {}\n".format(api_version, resource_type, template_file)
 else:
-    print(f'Error getting latest API versions: {response.status_code}')
-    latest_api_versions = set()
+    report += "No Azure API versions found in templates."
 
-# Recursively search through all directories, skipping any excluded directories
-with open(output_file, 'w') as f:
-    for root, dirs, files in os.walk(start_dir):
-        # Skip any excluded directories
-        dirs[:] = [d for d in dirs if d not in exclude_dirs]
-        for file in files:
-            # Check if the file is an ARM, Bicep, or Terraform template
-            if file.endswith('.json') or file.endswith('.bicep') or file.endswith('.tf'):
-                # Read the file contents and look for the API version
-                with open(os.path.join(root, file), 'r') as file_contents:
-                    contents = file_contents.read()
-                    api_versions = api_version_pattern.findall(contents)
-                    for api_version in api_versions:
-                        # Get the Azure resource type from the file extension
-                        if file.endswith('.json'):
-                            resource_type = 'ARM Template'
-                        elif file.endswith('.bicep'):
-                            resource_type = 'Bicep Template'
-                        else:
-                            resource_type = 'Terraform Template'
-                        # Write the API version, Azure resource type, and file location to the report file
-                        f.write(f'{api_version},{resource_type},{os.path.relpath(root, start=start_dir)}/{file}\n')
+# Save report to file
+report_file = os.path.join(root_dir, "tests", "api_report.txt")
+with open(report_file, "w") as f:
+    f.write(report)
 
-# Read the API versions and file locations from the report file and compare to the latest published API versions
-with open(output_file, 'r') as f:
-    repo_api_versions = set(f.read().splitlines())
-
-# Create a report of the API versions and the latest published API versions
-report = []
-for api_info in repo_api_versions:
-    api_version, resource_type, file_path = api_info.split(',')
-    if api_version not in latest_api_versions:
-        report.append(f'In {resource_type} at {file_path}, API version {api_version} is not the latest published version')
-
-if report:
-    print('\n'.join(report))
-else:
-    print('All API versions in the repo are the latest published versions')
+print(f"Report saved to {report_file}")
