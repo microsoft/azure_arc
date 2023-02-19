@@ -279,6 +279,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "DataOps") {
 # Change RDP Port
 if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 {
+    Write-Host "Configuring RDP port number to $rdpPort"
     $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
     $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
     Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
@@ -303,6 +304,8 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
       $systemroot = get-content env:systemroot
       netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
     }
+
+    Write-Host "RDP port configuration complete."
 }
 
 Write-Header "Configuring Logon Scripts"
