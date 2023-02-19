@@ -22,7 +22,7 @@ jobs:
 
       - name: Check API versions
         run: |
-          python ./check_api_versions.py
+          python check_api_versions.py
 
       - name: Display report
         run: cat report.txt
