@@ -77,6 +77,16 @@ param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
 @description('The name of the IotHub')
 param iotHubName string = 'Agora-IotHub-${namingGuid}'
 
+@minLength(5)
+@maxLength(50)
+@description('Name of the production Azure Container Registry')
+param acrNameProd string = 'agoraacrprod${namingGuid}'
+
+@minLength(5)
+@maxLength(50)
+@description('Name of the dev Azure Container Registry')
+param acrNameDev string = 'agoraacrdev${namingGuid}'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_agora/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -122,6 +132,9 @@ module kubernestesDeployment 'kubernetes/aks.bicep' = {
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
+    namingGuid: namingGuid
+    acrNameDev: acrNameDev
+    acrNameProd: acrNameProd
   }
 }
 

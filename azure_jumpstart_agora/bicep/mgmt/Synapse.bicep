@@ -137,6 +137,7 @@ resource dxdatabaseConnection 'Microsoft.Synapse/workspaces/kustoPools/databases
 }
 
 resource roleassignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: synapseStg
   name: guid(synapse.id, storageBlobDataContributorRoleID)
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataContributorRoleID)
