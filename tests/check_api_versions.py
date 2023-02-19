@@ -38,8 +38,15 @@ with open(output_file, 'w') as f:
                     contents = file_contents.read()
                     api_versions = api_version_pattern.findall(contents)
                     for api_version in api_versions:
+                        # Get the Azure resource type from the file extension
+                        if file.endswith('.json'):
+                            resource_type = 'ARM Template'
+                        elif file.endswith('.bicep'):
+                            resource_type = 'Bicep Template'
+                        else:
+                            resource_type = 'Terraform Template'
                         # Write the API version, Azure resource type, and file location to the report file
-                        f.write(f'{api_version},{os.path.splitext(file)[0]},{root}\n')
+                        f.write(f'{api_version},{resource_type},{os.path.relpath(root, start=start_dir)}/{file}\n')
 
 # Read the API versions and file locations from the report file and compare to the latest published API versions
 with open(output_file, 'r') as f:
@@ -48,9 +55,9 @@ with open(output_file, 'r') as f:
 # Create a report of the API versions and the latest published API versions
 report = []
 for api_info in repo_api_versions:
-    api_version, file_name, file_path = api_info.split(',')
+    api_version, resource_type, file_path = api_info.split(',')
     if api_version not in latest_api_versions:
-        report.append(f'API version {api_version} in {file_name} at {file_path} is not the latest published version')
+        report.append(f'In {resource_type} at {file_path}, API version {api_version} is not the latest published version')
 
 if report:
     print('\n'.join(report))
