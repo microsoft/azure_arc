@@ -1,84 +1,59 @@
 import os
-import re
+import json
+from tabulate import tabulate
+
 import requests
 
-# Get latest Azure API versions for all resource types
-def get_latest_azure_api_versions():
-    # Retrieve list of Azure resource types
-    url = "https://management.azure.com/subscriptions/{subscription_id}/providers?api-version=2020-01-01"
-    headers = {"Authorization": "Bearer " + os.environ["GITHUB_TOKEN"]}
-    response = requests.get(url.format(subscription_id=os.environ["AZURE_SUBSCRIPTION_ID"]), headers=headers)
-    if not response.ok:
-        raise Exception(f"Failed to retrieve Azure resource types: {response.status_code} {response.reason}")
-    resource_types = [r["resourceType"] for r in response.json()["value"]]
+azure_providers_url = "https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/providers/2019-05-10/swagger.json"
 
-    # Retrieve latest API versions for each resource type
-    latest_api_versions = {}
-    for resource_type in resource_types:
-        url = f"https://management.azure.com/providers/{resource_type}?api-version=2020-01-01"
-        response = requests.get(url, headers=headers)
-        if response.ok:
-            latest_api_versions[resource_type] = response.json()["resourceTypes"][0]["apiVersions"][0]
+api_versions = {}
 
-    return latest_api_versions
 
-# Get Azure API versions used in templates
-def get_template_api_versions(template_file):
-    with open(template_file, "r") as f:
-        content = f.read()
+def get_api_versions(swagger_url):
+    response = requests.get(swagger_url)
+    data = response.json()
+    resources = data["paths"]
+    for resource in resources:
+        for operation in resources[resource]:
+            if "parameters" in resources[resource][operation]:
+                for parameter in resources[resource][operation]["parameters"]:
+                    if "$ref" in parameter:
+                        ref = parameter["$ref"]
+                        if "#/parameters/api-version" in ref:
+                            provider_name = resource.split("/")[1]
+                            api_version = ref.split("/")[-1]
+                            api_versions[provider_name] = api_version
 
-    api_versions = set(re.findall(r"apiVersion:\s*(\d{4}-\d{2}-\d{2})", content))
 
-    return api_versions
+scan_directory = "."
 
-def scan_templates(root_dir):
-    # Get latest Azure API versions for all resource types
-    latest_api_versions = get_latest_azure_api_versions()
+for root, dirs, files in os.walk(scan_directory):
+    dirs[:] = [d for d in dirs if d not in [".github", "docs", "img", "social", "tests"]]
+    for file in files:
+        if file.endswith(".json") or file.endswith(".template") or file.endswith(".bicep"):
+            file_path = os.path.join(root, file)
+            with open(file_path, "r") as f:
+                data = f.read()
+                resources = json.loads(data)
+                for resource in resources["resources"]:
+                    resource_type = resource["type"]
+                    if "providers" in resource_type:
+                        provider_parts = resource_type.split("/")
+                        provider_name = provider_parts[2]
+                        if provider_name in api_versions:
+                            current_api_version = resource.get("apiVersion")
+                            latest_api_version = api_versions[provider_name]
+                            if current_api_version != latest_api_version:
+                                print(f"Resource: {resource_type} in {file_path} has an outdated API version. Current version is {current_api_version}. Latest version is {latest_api_version}.")
+                                api_versions[provider_name] = latest_api_version
 
-    # Scan all template files in directory
-    results = {}
-    for dirpath, dirnames, filenames in os.walk(root_dir):
-        # Ignore directories specified in excludes
-        for exclude in excludes:
-            if exclude in dirnames:
-                dirnames.remove(exclude)
+table = []
+for provider_name, latest_api_version in api_versions.items():
+    table.append([provider_name, latest_api_version])
 
-        for filename in filenames:
-            if filename.endswith(".json") or filename.endswith(".bicep"):
-                template_file = os.path.join(dirpath, filename)
+headers = ["Provider Name", "Latest API Version"]
 
-                # Get Azure API versions used in template
-                template_api_versions = get_template_api_versions(template_file)
-
-                # Compare with latest Azure API versions
-                for api_version in template_api_versions:
-                    resource_type = template_file.split(os.sep)[-2]
-                    if resource_type in latest_api_versions and api_version != latest_api_versions[resource_type]:
-                        if api_version not in results:
-                            results[api_version] = []
-                        results[api_version].append((resource_type, template_file))
-
-    return results
-
-# Scan templates in directory
-root_dir = "."
-excludes = [".github", "docs", "img", "social", "tests"]
-results = scan_templates(root_dir)
-
-# Generate report
-report = "Azure API versions in use:\n\n"
-if results:
-    report += "{:<20} {:<40} {}\n".format("API Version", "Azure Resource Type", "File")
-    report += "-" * 70 + "\n"
-    for api_version, resources in sorted(results.items()):
-        for resource_type, template_file in resources:
-            report += "{:<20} {:<40} {}\n".format(api_version, resource_type, template_file)
-else:
-    report += "No Azure API versions found in templates."
-
-# Save report to file
-report_file = os.path.join(root_dir, "tests", "api_report.txt")
-with open(report_file, "w") as f:
-    f.write(report)
-
-print(f"Report saved to {report_file}")
+with open("tests/api_report.json", "w") as f:
+    f.write(json.dumps(table, indent=4))
+    
+print(tabulate(table, headers=headers))
