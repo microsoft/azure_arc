@@ -47,6 +47,14 @@ jobs:
           echo "No outdated API versions found." > report.json
         fi
         
+    - name: Display report
+      run: |
+        if [ -f "report.json" ]; then
+          cat report.json
+        else
+          echo "No report found."
+        fi
+      
     - name: Upload report
       uses: actions/upload-artifact@v2
       with:
