@@ -18,27 +18,25 @@ jobs:
       
     - name: Find JSON, Terraform, and Bicep files
       run: |
-        find likamrat/azure_arc -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
+        find . -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
         -not -path "./tests/*" \
         -not -path "./docs/*" \
         -print > file_list.txt
-      
+
     - name: Check API versions
       run: |
-        touch output.txt
-        while read filename; do
-          # Extract resource types and API versions
-          # Check if API version is outdated
-          # Generate report
-          # Append report to output file
-          if [[ "$resourceType" != "" && "$apiVersion" != "" ]]; then
-            latestApiVersion=$(az provider show --namespace $namespace --query "resourceTypes[?name=='$resourceType'].apiVersions | [0][-1]" -o tsv)
-            if [[ "$apiVersion" != "$latestApiVersion" ]]; then
-              echo "{\"Filename\":\"$filename\",\"ResourceType\":\"$resourceType\",\"APIVersion\":\"$apiVersion\",\"LatestAPIVersion\":\"$latestApiVersion\"}" >> output.txt
-            fi
+        for filename in $(find . -type f -name "*.json" ! -path "./exclude/*" ! -path "./output.txt" ! -name "parameters.json" ! -name "parameters.prod.json"); do
+          resourceType=$(jq -r '.type' "$filename" | cut -d'/' -f2)
+          apiVersion=$(az provider show -n Microsoft.${resourceType} --query "resourceTypes[?resourceType=='${resourceType}'].apiVersions[0]" -o tsv)
+          latestVersion=$(az provider show -n Microsoft.${resourceType} --query "resourceTypes[?resourceType=='${resourceType}'].apiVersions[-1]" -o tsv)
+          echo "Checking $filename: ResourceType=$resourceType, APIVersion=$apiVersion"
+          if [ "$apiVersion" != "$latestVersion" ]; then
+            echo "$filename is using outdated API version $apiVersion (latest is $latestVersion)"
+            echo "{\"filename\": \"$filename\", \"resourceType\": \"$resourceType\", \"currentVersion\": \"$apiVersion\", \"latestVersion\": \"$latestVersion\"}" >> output.txt
           fi
         done < file_list.txt
-      
+      shell: bash
+
     - name: Generate report
       run: |
         if [ -f "output.txt" ]; then
