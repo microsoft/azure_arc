@@ -12,14 +12,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Install PowerShell
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y powershell
+    - name: Setup PowerShell
+      uses: microsoft/setup-powershell@v1
       
     - name: Run script
-      run: |
-        pwsh -File tests/check-api-versions.ps1
+      run: pwsh -File tests/check-api-versions.ps1
         
     - name: Upload report
       uses: actions/upload-artifact@v2
@@ -31,6 +28,12 @@ jobs:
       uses: actions/http-client@v1
       with:
         url: ${{ steps.upload_report.outputs.artifacts.report }} # Download the report from the artifact
+        method: GET # Use the GET method to download the report
+        headers: | # Set the headers for the request
+          Accept: application/json
+      id: show_report # Assign an ID to the step
+      
+    - name: Display report
       run: |
         Write-Host "Report:"
-        Write-Host ${{ toJson(fromJson(steps.show_report.outputs.result).data) }} # Convert the JSON to a PowerShell object and display it in the console
+        Write-Host ${{ steps.show_report.outputs.body }} # Display the response body in the console
