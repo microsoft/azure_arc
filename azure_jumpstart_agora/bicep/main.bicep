@@ -27,7 +27,7 @@ param windowsAdminPassword string
 param sshRSAPublicKey string
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'Agora-Workspace'
+param logAnalyticsWorkspaceName string = 'Ag-Workspace'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -42,52 +42,52 @@ param deployBastion bool = false
 param githubUser string = 'microsoft'
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Agora-Cloud-VNet'
+param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameStores string = 'Agora-Stores-VNet'
+param virtualNetworkNameStores string = 'Ag-Stores-VNet'
 
 @description('Name of the prod AKS subnet in the cloud virtual network')
-param subnetNameCloudAksProd string = 'Agora-Cloud-Prod-Subnet'
+param subnetNameCloudAksProd string = 'Ag-Cloud-Prod-Subnet'
 
 @description('Name of the dev AKS subnet in the cloud virtual network')
-param subnetNameCloudAksDev string = 'Agora-Cloud-Dev-Subnet'
+param subnetNameCloudAksDev string = 'Ag-Cloud-Dev-Subnet'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Agora-Cloud-inner-loop-Subnet'
+param subnetNameCloudAksInnerLoop string = 'Ag-Cloud-inner-loop-Subnet'
 
 @description('Name of the New York subnet subnet in the stores virtual network')
-param subnetNameStoresNewYork string = 'Agora-Store-NewYork-Subnet'
+param subnetNameStoresNewYork string = 'Ag-Store-NewYork-Subnet'
 
 @description('Name of the Chicago subnet subnet in the stores virtual network')
-param subnetNameStoresChicago string = 'Agora-Store-Chicago-Subnet'
+param subnetNameStoresChicago string = 'Ag-Store-Chicago-Subnet'
 
 @description('Name of the Boston subnet subnet in the stores virtual network')
-param subnetNameStoresBoston string = 'Agora-Store-Boston-Subnet'
+param subnetNameStoresBoston string = 'Ag-Store-Boston-Subnet'
 
 @description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string = 'Agora-AKS-Prod'
+param aksProdClusterName string = 'Ag-AKS-Prod'
 
 @description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string = 'Agora-AKS-Dev'
+param aksDevClusterName string = 'Ag-AKS-Dev'
 
 @description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'agorasynapse-${namingGuid}'
+param synapseWorkspaceName string = 'agsynapse-${namingGuid}'
 
 @description('The name of the IotHub')
-param iotHubName string = 'Agora-IotHub-${namingGuid}'
+param iotHubName string = 'Ag-IotHub-${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
 @description('Name of the production Azure Container Registry')
-param acrNameProd string = 'agoraacrprod${namingGuid}'
+param acrNameProd string = 'Agacrprod${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
 @description('Name of the dev Azure Container Registry')
-param acrNameDev string = 'agoraacrdev${namingGuid}'
+param acrNameDev string = 'Agacrdev${namingGuid}'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_agora/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_Ag/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'

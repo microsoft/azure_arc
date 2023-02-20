@@ -29,13 +29,13 @@ param location string = resourceGroup().location
 param deployBastion bool = false
 
 @description('Name of the prod Network Security Group')
-param networkSecurityGroupNameCloud string = 'Agora-Cloud-NSG'
+param networkSecurityGroupNameCloud string = 'Ag-Cloud-NSG'
 
 @description('Name of the stores Network Security Group')
-param networkSecurityGroupNameStores string = 'Agora-Stores-NSG'
+param networkSecurityGroupNameStores string = 'Ag-Stores-NSG'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'Agora-Bastion-NSG'
+param bastionNetworkSecurityGroupName string = 'Ag-Bastion-NSG'
 
 var addressPrefixCloud = '10.16.0.0/16'
 var subnetAddressPrefixAksProd = '10.16.72.0/21'
@@ -48,7 +48,7 @@ var subnetAddressPrefixBoston = '10.18.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
-var bastionName = 'Agora-Bastion'
+var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
 var cloudAKSProdSubnet = [

@@ -8,10 +8,10 @@ param aksDevClusterName string
 param location string = resourceGroup().location
 
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN prod')
-param dnsPrefixProd string = 'agora-prod'
+param dnsPrefixProd string = 'Ag-prod'
 
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN dev')
-param dnsPrefixDev string = 'agora-dev'
+param dnsPrefixDev string = 'Ag-dev'
 
 @description('Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize')
 @minValue(0)
@@ -51,7 +51,7 @@ param aksSubnetNameProd string
 
 @description('The name of the dev aks subnet')
 param aksSubnetNameDev string
-//param aksSubnetNameInnerLoop string = 'Agora-Cloud-Inner-Loop-Subnet'
+//param aksSubnetNameInnerLoop string = 'Ag-Cloud-Inner-Loop-Subnet'
 
 @minLength(5)
 @maxLength(50)
