@@ -20,6 +20,11 @@ jobs:
     - name: Install required modules
       run: pwsh -Command "Install-Module -Name Az -Force -AllowClobber"
     - name: Run script
+      id: check-api-versions
       run: |
-        $results = tests\check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
-        $results.Table
+        $output = tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
+        if ($output.Table) {
+          echo $output.Table
+        }
+      shell: pwsh
+
