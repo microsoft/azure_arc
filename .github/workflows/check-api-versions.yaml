@@ -18,7 +18,7 @@ jobs:
       
     - name: Find JSON, Terraform, and Bicep files
       run: |
-        find . -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
+        find likamrat/azure_arc -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
         -not -path "./tests/*" \
         -not -path "./docs/*" \
         -print > file_list.txt
