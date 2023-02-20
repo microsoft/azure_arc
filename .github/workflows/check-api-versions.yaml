@@ -30,11 +30,17 @@ jobs:
           # Check if API version is outdated
           # Generate report
           # Append report to output file
+          if [[ "$resourceType" != "" && "$apiVersion" != "" ]]; then
+            latestApiVersion=$(az provider show --namespace $namespace --query "resourceTypes[?name=='$resourceType'].apiVersions | [0][-1]" -o tsv)
+            if [[ "$apiVersion" != "$latestApiVersion" ]]; then
+              echo "{\"Filename\":\"$filename\",\"ResourceType\":\"$resourceType\",\"APIVersion\":\"$apiVersion\",\"LatestAPIVersion\":\"$latestApiVersion\"}" >> output.txt
+            fi
+          fi
         done < file_list.txt
       
     - name: Generate report
       run: |
-        cat output.txt | jq -s 'group_by(.ResourceType) | map({"ResourceType": .[0].ResourceType, "Count": length, "Files": [.[] | {"File": .Filename, "APIVersion": .APIVersion}]})' > report.json
+        cat output.txt | jq -s 'group_by(.ResourceType) | map({"ResourceType": .[0].ResourceType, "Count": length, "Files": [.[] | {"File": .Filename, "APIVersion": .APIVersion, "LatestAPIVersion": .LatestAPIVersion}]})' > report.json
         
     - name: Upload report
       uses: actions/upload-artifact@v2
