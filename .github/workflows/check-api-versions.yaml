@@ -18,7 +18,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y powershell
     - name: Install required modules
-      run: Install-Module -Name Az -Force -AllowClobber
+      run: pwsh -Command "Install-Module -Name Az -Force -AllowClobber"
     - name: Run script
       run: |
         $results = tests\check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
