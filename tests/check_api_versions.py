@@ -1,6 +1,6 @@
 import os
 import json
-from tabulate import tabulate
+from prettytable import PrettyTable
 
 import requests
 
@@ -28,9 +28,9 @@ def get_api_versions(swagger_url):
 scan_directory = "."
 
 for root, dirs, files in os.walk(scan_directory):
-    dirs[:] = [d for d in dirs if d not in [".github", "docs", "img", "social", "tests"]]
+    dirs[:] = [d for d in dirs if d not in ["tests", "venv", ".git"]]
     for file in files:
-        if file.endswith(".json") or file.endswith(".template") or file.endswith(".bicep"):
+        if file.endswith(".json") or file.endswith(".template") or file.endswith(".bicep") or file.endswith(".tf"):
             file_path = os.path.join(root, file)
             with open(file_path, "r") as f:
                 data = f.read()
@@ -47,13 +47,10 @@ for root, dirs, files in os.walk(scan_directory):
                                 print(f"Resource: {resource_type} in {file_path} has an outdated API version. Current version is {current_api_version}. Latest version is {latest_api_version}.")
                                 api_versions[provider_name] = latest_api_version
 
-table = []
-for provider_name, latest_api_version in api_versions.items():
-    table.append([provider_name, latest_api_version])
-
-headers = ["Provider Name", "Latest API Version"]
-
 with open("tests/api_report.json", "w") as f:
-    f.write(json.dumps(table, indent=4))
-    
-print(tabulate(table, headers=headers))
+    table = PrettyTable()
+    table.field_names = ["Provider", "Current API Version", "Latest API Version"]
+    for provider, latest_version in api_versions.items():
+        table.add_row([provider, "", latest_version])
+    f.write(table.get_json_string(indent=4))
+https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/resources/resource-manager/Microsoft.Resources/preview/2022-02-01/swagger/Microsoft.Resources.json
