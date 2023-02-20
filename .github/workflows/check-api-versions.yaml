@@ -1,4 +1,4 @@
-name: Azure API Version Checker
+name: Scan Azure resource API versions
 
 on:
   push:
@@ -6,22 +6,21 @@ on:
       - release_checker
 
 jobs:
-  check-api-versions:
+  scan-resources:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
       - name: Install dependencies
-        run: pip install requests
+        run: npm install
 
-      - name: Check API versions
-        run: python3 tests/check_api_versions.py
+      - name: Scan resources
+        run: node tests/scan-resources.js ./ docs,tests > report.json
 
-      - name: Display report
-        run: cat tests/api_report.json
+      - name: Upload report
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: report.json
