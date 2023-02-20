@@ -1,56 +1,85 @@
-import os
-import json
-from prettytable import PrettyTable
-
+from github import Github
 import requests
+import json
+from tabulate import tabulate
 
-azure_providers_url = "https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/providers/2019-05-10/swagger.json"
+# Access the public repository using an unauthenticated client
+g = Github()
 
-api_versions = {}
+# Get the repository object
+repo = g.get_repo("microsoft/azure_arc")
 
+# Define the file extensions to be searched
+file_extensions = [".json", ".yml", ".yaml", ".bicep", ".tf", ".hcl"]
 
-def get_api_versions(swagger_url):
-    response = requests.get(swagger_url)
-    data = response.json()
-    resources = data["paths"]
-    for resource in resources:
-        for operation in resources[resource]:
-            if "parameters" in resources[resource][operation]:
-                for parameter in resources[resource][operation]["parameters"]:
-                    if "$ref" in parameter:
-                        ref = parameter["$ref"]
-                        if "#/parameters/api-version" in ref:
-                            provider_name = resource.split("/")[1]
-                            api_version = ref.split("/")[-1]
-                            api_versions[provider_name] = api_version
+# Define the resource type patterns
+resource_type_patterns = ["Microsoft.", "azure"]
 
+# Define the exclude folders
+exclude_folders = [".github", "docs", "img", "social", "tests"]
 
-scan_directory = "."
+# Define the Azure API versions endpoint
+azure_api_versions_url = "https://management.azure.com/providers?api-version=2021-04-01"
 
-for root, dirs, files in os.walk(scan_directory):
-    dirs[:] = [d for d in dirs if d not in ["tests", "venv", ".git"]]
-    for file in files:
-        if file.endswith(".json") or file.endswith(".template") or file.endswith(".bicep") or file.endswith(".tf"):
-            file_path = os.path.join(root, file)
-            with open(file_path, "r") as f:
-                data = f.read()
-                resources = json.loads(data)
-                for resource in resources["resources"]:
-                    resource_type = resource["type"]
-                    if "providers" in resource_type:
-                        provider_parts = resource_type.split("/")
-                        provider_name = provider_parts[2]
-                        if provider_name in api_versions:
-                            current_api_version = resource.get("apiVersion")
-                            latest_api_version = api_versions[provider_name]
-                            if current_api_version != latest_api_version:
-                                print(f"Resource: {resource_type} in {file_path} has an outdated API version. Current version is {current_api_version}. Latest version is {latest_api_version}.")
-                                api_versions[provider_name] = latest_api_version
+# Get the latest Azure API versions
+latest_api_versions = {}
+response = requests.get(azure_api_versions_url)
+if response.status_code == 200:
+    response_json = response.json()
+    for provider in response_json["value"]:
+        for resource_type in provider["resourceTypes"]:
+            latest_api_versions[resource_type["resourceType"]] = resource_type["apiVersions"][-1]
 
-with open("tests/api_report.json", "w") as f:
-    table = PrettyTable()
-    table.field_names = ["Provider", "Current API Version", "Latest API Version"]
-    for provider, latest_version in api_versions.items():
-        table.add_row([provider, "", latest_version])
-    f.write(table.get_json_string(indent=4))
-https://raw.githubusercontent.com/Azure/azure-rest-api-specs/main/specification/resources/resource-manager/Microsoft.Resources/preview/2022-02-01/swagger/Microsoft.Resources.json
+# Initialize the report
+report = {
+    "repository": repo.full_name,
+    "outdated_api_versions": [],
+    "resource_types_not_found": []
+}
+
+# Iterate through the files in the repository
+for content in repo.get_contents(""):
+    if content.type == "dir" and content.name not in exclude_folders:
+        for inner_content in repo.get_contents(content.path):
+            if inner_content.type == "dir" and inner_content.name not in exclude_folders:
+                for file in repo.get_contents(inner_content.path):
+                    if file.path.endswith(tuple(file_extensions)):
+                        # Read the file content
+                        file_content = file.decoded_content.decode("utf-8")
+                        # Find the resource type and API version
+                        for pattern in resource_type_patterns:
+                            if pattern in file_content:
+                                resource_type = file_content[file_content.index(pattern):].split(".")[0]
+                                api_version = file_content[file_content.index("apiVersion")+12:].split("\n")[0].strip().replace("'", "").replace('"', '')
+                                if resource_type in latest_api_versions and api_version != latest_api_versions[resource_type]:
+                                    report["outdated_api_versions"].append({
+                                        "path": file.path,
+                                        "resource_type": resource_type,
+                                        "outdated_api_version": api_version,
+                                        "latest_api_version": latest_api_versions[resource_type]
+                                    })
+                                elif resource_type not in latest_api_versions:
+                                    report["resource_types_not_found"].append(resource_type)
+
+# Generate the report table
+outdated_api_versions_table = []
+for outdated_api_version in report["outdated_api_versions"]:
+    outdated_api_versions_table.append([
+        outdated_api_version["path"],
+        outdated_api_version["resource_type"],
+        outdated_api_version["outdated_api_version"],
+        outdated_api_version["latest_api_version"]
+    ])
+resource_types_not_found_table = []
+for resource_type_not_found in report["resource_types_not_found"]:
+    resource_types_not_found_table.append([
+        resource_type_not_found
+    ])
+headers = ["File Path", "Resource Type", "Outdated API Version", "Latest API Version"]
+outdated_api_versions_table_str = tabulate(outdated_api_versions_table, headers=headers, tablefmt="grid")
+headers = ["Resource Type"]
+resource_types_not_found_table_str = tabulate(resource_types_not_found_table, headers=headers, tablefmt="grid")
+
+# Write the report to a file
+with open("report.json", "w") as f:
+    f.write("Repository: {}\n\n".format(report["repository"]))
