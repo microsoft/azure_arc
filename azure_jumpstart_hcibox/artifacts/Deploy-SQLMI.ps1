@@ -246,6 +246,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $sqlmiouName = "ArcSQLMI"
     $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $using:defaultDomainPartition
     $sqlmi_port = 31433
+    $adminUsername = $using:adminUsername
+    $adminPassword = $using:adminPassword
     $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
     $dcIpv4Secondary = ([System.Net.IPAddress]$using:SDNConfig.dcVLAN200IP).GetAddressBytes()
     $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
@@ -485,18 +487,18 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
-    kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminUsername -P "$using:adminPassword" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
-    Write-Host "Created Windows user account ${domain_netbios_name}\$using:adminUsername in SQLMI instance."
+    kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $adminUsername -P "$adminPassword" -Q "CREATE LOGIN [${domain_netbios_name}\$adminUsername] FROM WINDOWS"
+    Write-Host "Created Windows user account ${domain_netbios_name}\$adminUsername in SQLMI instance."
 
-    kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminUsername -P "$using:adminPassword" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
-    Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$using:adminUsername in SQLMI instance."
+    kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $adminUsername -P "$adminPassword" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$adminUsername', @rolename = N'sysadmin'"
+    Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$adminUsername in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
     Write-Host "`n"
     Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
     kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
     Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-    kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $using:adminPassword -P "$using:adminPassword" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+    kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $adminUsername -P "$adminPassword" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
     Write-Host "Restoring AdventureWorks database completed."
 }
 
