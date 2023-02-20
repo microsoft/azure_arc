@@ -12,8 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Setup PowerShell
-      uses: microsoft/setup-powershell@v1
+    - name: Install http-client action
+      run: |
+        npm install @actions/http-client@1.0.0
+
+    - name: Install PowerShell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y powershell
       
     - name: Run script
       run: pwsh -File tests/check-api-versions.ps1
