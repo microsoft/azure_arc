@@ -1,4 +1,4 @@
-name: Azure API version check
+name: Check Azure API Versions
 
 on:
   push:
@@ -6,55 +6,29 @@ on:
       - release_checker
 
 jobs:
-  check-api-versions:
+  check-azure-api-versions:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
-      
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      
-    - name: Find JSON, Terraform, and Bicep files
-      run: |
-        find . -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
-        -not -path "./tests/*" \
-        -not -path "./docs/*" \
-        -print > file_list.txt
 
-    - name: Check API versions
-      run: |
-        for filename in $(find . -type f -name "*.json" ! -path "./exclude/*" ! -path "./output.txt" ! -name "parameters.json" ! -name "parameters.prod.json"); do
-          resourceType=$(jq -r '.type' "$filename" | cut -d'/' -f2)
-          apiVersion=$(az provider show -n Microsoft.${resourceType} --query "resourceTypes[?resourceType=='${resourceType}'].apiVersions[0]" -o tsv)
-          latestVersion=$(az provider show -n Microsoft.${resourceType} --query "resourceTypes[?resourceType=='${resourceType}'].apiVersions[-1]" -o tsv)
-          echo "Checking $filename: ResourceType=$resourceType, APIVersion=$apiVersion"
-          if [ "$apiVersion" != "$latestVersion" ]; then
-            echo "$filename is using outdated API version $apiVersion (latest is $latestVersion)"
-            echo "{\"filename\": \"$filename\", \"resourceType\": \"$resourceType\", \"currentVersion\": \"$apiVersion\", \"latestVersion\": \"$latestVersion\"}" >> output.txt
-          fi
-        done < file_list.txt
-      shell: bash
-
-    - name: Generate report
-      run: |
-        if [ -f "output.txt" ]; then
-          cat output.txt | jq -s 'group_by(.ResourceType) | map({"ResourceType": .[0].ResourceType, "Count": length, "Files": [.[] | {"File": .Filename, "APIVersion": .APIVersion, "LatestAPIVersion": .LatestAPIVersion}]})' > report.json
-        else
-          echo "No outdated API versions found." > report.json
-        fi
-        
-    - name: Display report
-      run: |
-        if [ -f "report.json" ]; then
-          cat report.json
-        else
-          echo "No report found."
-        fi
-      
-    - name: Upload report
-      uses: actions/upload-artifact@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        name: API report
-        path: report.json
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install PyGithub requests tabulate
+
+    - name: Run script and generate report
+      run: |
+        python script.py
+        cat report.json
+
+    - name: Display report
+      uses: 8398a7/action-show-report@v1
+      with:
+        title: "Check Azure API Versions Report"
+        file-path: "report.json"
