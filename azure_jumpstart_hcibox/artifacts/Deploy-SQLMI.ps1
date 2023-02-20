@@ -128,7 +128,7 @@ if ($env:deploySQLMI -eq $true) {
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-AksHciCluster -name $using:clusterName -nodePoolName sqlmipool -nodecount 4 -osType linux -nodeVmSize Standard_D4s_v3
+    New-AksHciCluster -name $using:clusterName -nodePoolName sqlmipool -nodecount 2 -osType linux -nodeVmSize Standard_D8s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
@@ -435,7 +435,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $dataLogsStorageSize = "5Gi"
 
     # High Availability
-    $replicas = 3 # Deploy SQL MI "Business Critical" tier
+    $replicas = 2 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
     $SQLParams = "C:\VHD\sqlmiAD.parameters.json"
