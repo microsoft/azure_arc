@@ -1,26 +1,29 @@
-name: Scan Azure resource API versions
+name: Scan templates
 
 on:
   push:
-    branches:
-      - release_checker
+    branches: [ release_checker ]
+  pull_request:
+    branches: [ release_checker ]
 
 jobs:
-  scan-resources:
+  scan-templates:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Scan resources
-        run: node tests/scan-resources.js ./ docs,tests > report.json
-
+      - name: Scan templates
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm install
+      - run: npm start ${{ github.workspace }}
+        env:
+          EXCLUDED_FOLDERS: 'docs,tests'
+      - name: Save report
+        run: echo ${{ steps.scan-templates.outputs.report }} > scan-report.json
       - name: Upload report
         uses: actions/upload-artifact@v2
         with:
-          name: report
-          path: report.json
+          name: scan-report
+          path: scan-report.json
