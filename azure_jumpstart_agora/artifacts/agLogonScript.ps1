@@ -1,9 +1,9 @@
-$Env:AgoraDir = "C:\Agora"
-$Env:AgoraLogsDir = "C:\Agora\Logs"
-$Env:AgoraVMDir = "$Env:AgoraDir\Virtual Machines"
-$Env:AgoraIconDir = "C:\Agora\Icons"
+$Env:AgDir = "C:\Ag"
+$Env:AgLogsDir = "C:\Ag\Logs"
+$Env:AgVMDir = "$Env:AgDir\Virtual Machines"
+$Env:AgIconDir = "C:\Ag\Icons"
 
-Start-Transcript -Path $Env:AgoraLogsDir\AgoraLogonScript.log
+Start-Transcript -Path $Env:AgLogsDir\AgLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
@@ -32,7 +32,7 @@ Add-AppxPackage -Path $msiPath
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 
-$cliDir = New-Item -Path "$Env:AgoraDir\.cli\" -Name ".agora" -ItemType Directory
+$cliDir = New-Item -Path "$Env:AgDir\.cli\" -Name ".Ag" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
@@ -78,7 +78,7 @@ az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "AgoraLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 

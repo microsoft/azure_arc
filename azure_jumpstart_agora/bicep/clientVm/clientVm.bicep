@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'Agora-Client'
+param vmName string = 'Ag-Client'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -20,7 +20,7 @@ param location string = resourceGroup().location
 param subnetId string
 
 param resourceTags object = {
-  Project: 'jumpstart_agora'
+  Project: 'jumpstart_Ag'
 }
 
 @description('Client id of the service principal')
