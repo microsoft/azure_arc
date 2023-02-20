@@ -114,7 +114,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
+    $subscriptionId=$(az account show --query id --output tsv)
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
@@ -122,7 +122,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
+    $subscriptionId=$(az account show --query id --output tsv)
     az ad sp create-for-rbac -n "JumpstartArcBoxSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
