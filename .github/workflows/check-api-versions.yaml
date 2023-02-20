@@ -3,7 +3,7 @@ name: Azure API Version Checker
 on:
   push:
     branches:
-      - main
+      - release_checker
 
 jobs:
   check-templates:
