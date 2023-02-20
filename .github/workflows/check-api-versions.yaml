@@ -6,33 +6,31 @@ on:
       - release_checker
 
 jobs:
-  check-api-versions:
+  check-azure-apis:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref }}
+      
     - name: Install PowerShell
       run: |
         sudo apt-get update
         sudo apt-get install -y powershell
-    - name: Install required modules
-      run: pwsh -Command "Install-Module -Name Az -Force -AllowClobber"
-    # - name: Run script
-    #   id: check-api-versions
-    #   run: |
-    #     $output = tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
-    #     if ($output.Table) {
-    #       echo $output.Table
-    #     }
-    #   shell: pwsh
-
+      
     - name: Run script
       run: |
-        tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
-        $results = Get-Content report-with-table.json -Raw | ConvertFrom-Json
-        Write-Host $results.Table
+        pwsh -File tests/check-api-versions.ps1
+        
+    - name: Upload report
+      uses: actions/upload-artifact@v2
+      with:
+        name: report
+        path: report.json
 
-    - name: Display results
-      run: echo "$results" >> $GITHUB_ENV
+    - name: Show report
+      uses: actions/http-client@v1
+      with:
+        url: ${{ steps.upload_report.outputs.artifacts.report }} # Download the report from the artifact
+      run: |
+        Write-Host "Report:"
+        Write-Host ${{ toJson(fromJson(steps.show_report.outputs.result).data) }} # Convert the JSON to a PowerShell object and display it in the console

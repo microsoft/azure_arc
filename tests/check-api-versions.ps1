@@ -1,5 +1,5 @@
 # Define the GitHub repository and branch
-$repository = "azure/azure_arc"
+$repository = "microsoft/azure_arc"
 $branch = "main"
 
 # Define the Azure API endpoint
