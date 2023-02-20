@@ -12,10 +12,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Install http-client action
-      run: |
-        npm install @actions/http-client@1.0.0
-
     - name: Install PowerShell
       run: |
         sudo apt-get update
@@ -31,15 +27,6 @@ jobs:
         path: report.json
 
     - name: Show report
-      uses: actions/http-client@v1
-      with:
-        url: ${{ steps.upload_report.outputs.artifacts.report }} # Download the report from the artifact
-        method: GET # Use the GET method to download the report
-        headers: | # Set the headers for the request
-          Accept: application/json
-      id: show_report # Assign an ID to the step
-      
-    - name: Display report
       run: |
-        Write-Host "Report:"
-        Write-Host ${{ steps.show_report.outputs.body }} # Display the response body in the console
+        echo "Report:"
+        curl -sL "$(jq -r '.reportUrl' report.json)" | jq # Download and pretty-print the report
