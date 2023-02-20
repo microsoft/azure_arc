@@ -73,6 +73,7 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmiAD.parameters.json") -
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:HCIBoxDir\settingsTemplate.json
 Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable") -OutFile $Env:HCIBoxDir\azuredatastudio.zip
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:HCIBoxDir\AZDataCLI.msi
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile $Env:HCIBoxDir\SqlQueryStress.zip
 
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
@@ -85,6 +86,8 @@ Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.z
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
 $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adcred
 Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession
+Copy-Item $Env:HCIBoxDir\SqlQueryStress.zip -Destination "C:\VHDs\SqlQueryStress.zip" -ToSession $adminCenterSession
+
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
@@ -610,7 +613,26 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 }
 
-Write-Header "Configure Grafana shortcut"
+Write-Header "Configure SQL Query Stress"
+# Unzip SqlQueryStress
+Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
+Expand-Archive -Path C:\VHDs\SqlQueryStress.zip -DestinationPath C:\VHDs\SqlQueryStress
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "Installing dotnetcore sdk"
+choco install dotnetcore-3.1-sdk -y -r --no-progress
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\VHDs\SqlQueryStress\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$using:adminUsername\Desktop\SqlQueryStress.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+}
+
+<#Write-Header "Configure Grafana shortcut"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
     $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $using:adcred
@@ -624,9 +646,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $Favorite.Save()
 
     Copy-Item "c:\VHD\Grafana.url" -Destination "C:\users\$adminUsername\desktop\Grafana.url" -ToSession $adminCenterSession -Force
-
-
 }
+#>
 
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)

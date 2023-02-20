@@ -49,12 +49,12 @@ foreach ($VM in $SDNConfig.HostList) {
         [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
         $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
         $ErrorActionPreference = "Continue"
-        az extension add --upgrade --name arcappliance
-        az extension add --upgrade --name connectedk8s
-        az extension add --upgrade --name k8s-configuration
-        az extension add --upgrade --name k8s-extension
-        az extension add --upgrade --name customlocation
-        az extension add --upgrade --name azurestackhci
+        az extension add --upgrade --name arcappliance --only-show-errors
+        az extension add --upgrade --name connectedk8s --only-show-errors
+        az extension add --upgrade --name k8s-configuration --only-show-errors
+        az extension add --upgrade --name k8s-extension --only-show-errors
+        az extension add --upgrade --name customlocation --only-show-errors
+        az extension add --upgrade --name azurestackhci --only-show-errors
     }
 }
 
