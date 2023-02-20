@@ -22,7 +22,7 @@ jobs:
     # - name: Run script
     #   id: check-api-versions
     #   run: |
-    #     $output = tests\check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
+    #     $output = tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
     #     if ($output.Table) {
     #       echo $output.Table
     #     }
@@ -30,7 +30,7 @@ jobs:
 
     - name: Run script
       run: |
-        tests/check-api-versions.ps1
+        tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
         $results = Get-Content report-with-table.json -Raw | ConvertFrom-Json
         Write-Host $results.Table
 
