@@ -41,34 +41,34 @@ param (
 [System.Environment]::SetEnvironmentVariable('acrNameDev', $acrNameDev, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AgoraDir', "C:\Agora", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 
 
-# Creating Agora path
-Write-Output "Creating Agora path"
-$Env:AgoraDir = "C:\Agora"
-$Env:AgoraLogsDir = "$Env:AgoraDir\Logs"
-$Env:AgoraVMDir = "$Env:AgoraDir\Virtual Machines"
-$Env:AgoraKVDir = "$Env:AgoraDir\KeyVault"
-$Env:AgoraGitOpsDir = "$Env:AgoraDir\GitOps"
-$Env:AgoraIconDir = "$Env:AgoraDir\Icons"
-$Env:agentScript = "$Env:AgoraDir\agentScript"
+# Creating Ag path
+Write-Output "Creating Ag path"
+$Env:AgDir = "C:\Ag"
+$Env:AgLogsDir = "$Env:AgDir\Logs"
+$Env:AgVMDir = "$Env:AgDir\Virtual Machines"
+$Env:AgKVDir = "$Env:AgDir\KeyVault"
+$Env:AgGitOpsDir = "$Env:AgDir\GitOps"
+$Env:AgIconDir = "$Env:AgDir\Icons"
+$Env:agentScript = "$Env:AgDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
-$Env:AgoraRetailDir = "$Env:AgoraDir\Retail"
+$Env:AgRetailDir = "$Env:AgDir\Retail"
 
-New-Item -Path $Env:AgoraDir -ItemType directory -Force
-New-Item -Path $Env:AgoraLogsDir -ItemType directory -Force
-New-Item -Path $Env:AgoraVMDir -ItemType directory -Force
-New-Item -Path $Env:AgoraKVDir -ItemType directory -Force
-New-Item -Path $Env:AgoraGitOpsDir -ItemType directory -Force
-New-Item -Path $Env:AgoraIconDir -ItemType directory -Force
+New-Item -Path $Env:AgDir -ItemType directory -Force
+New-Item -Path $Env:AgLogsDir -ItemType directory -Force
+New-Item -Path $Env:AgVMDir -ItemType directory -Force
+New-Item -Path $Env:AgKVDir -ItemType directory -Force
+New-Item -Path $Env:AgGitOpsDir -ItemType directory -Force
+New-Item -Path $Env:AgIconDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
-New-Item -Path $Env:AgoraRetailDir -ItemType directory -Force
+New-Item -Path $Env:AgRetailDir -ItemType directory -Force
 
-Start-Transcript -Path $Env:AgoraLogsDir\Bootstrap.log
+Start-Transcript -Path $Env:AgLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -130,11 +130,11 @@ Install-Module -Name Posh-SSH -Force
 
 # All Industries
 Write-Host "Fetching Artifacts for All Industries"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgoraLogonScript.ps1") -OutFile $Env:AgoraDir\AgoraLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile $Env:AgDir\AgLogonScript.ps1
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgoraDir\AgoraLogonScript.ps1
-Register-ScheduledTask -TaskName "AgoraLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgDir\AgLogonScript.ps1
+Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 
 # Installing DHCP service
@@ -154,5 +154,5 @@ Stop-Transcript
 # Clean up Bootstrap.log
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:AgoraLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $Env:AgoraLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content $Env:AgLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:AgLogsDir\Bootstrap.log -Force
