@@ -27,7 +27,7 @@
     },
     "replicas": {
       "type": "int",
-      "defaultValue": 2
+      "defaultValue": 1
     },
     "preferK8sDnsForPtrLookups": {
       "type": "bool",
