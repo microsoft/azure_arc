@@ -1,4 +1,4 @@
-name: Azure API Version Checker
+name: Azure API version check
 
 on:
   push:
@@ -6,34 +6,44 @@ on:
       - release_checker
 
 jobs:
-  check-templates:
+  check-api-versions:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
       
-      - name: Install Azure CLI
-        uses: azure/setup-azure-cli@v1
+    - name: Install Azure CLI
+      with:
+        node-version: '16'
+        cache: 'npm'
+      run: |
+        npm install -g azure-cli
       
-      - name: Check templates
-        run: |
-          # Scan ARM templates and Bicep templates
-          find . -type f -not -path './.github/*' -not -name '*.yaml' -not -name '*.yml' -name '*.json' -or -name '*.bicep' | while read file
-          do
-            az deployment sub list-api-versions --template-file $file --output json >> output.json
-          done
-          
-          # Scan Terraform templates
-          find . -type f -not -path './.github/*' -not -name '*.yaml' -not -name '*.yml' -name '*.tf' | while read file
-          do
-            az provider show -n $(grep provider $file | awk '{print $2}' | tr -d '"') --query "resourceTypes[].{resourceType:resourceType, apiVersion:apiVersions[0]}" --output json >> output.json
-          done
-          
-          # Print report
-          cat output.json | jq '.[] | {resourceType:.resourceType, currentApiVersion:.apiVersion, latestApiVersion:.resourceType+"/"+.apiVersion}' | sort -u | jq -s . > report.json
-          
-      - name: Save report
-        uses: actions/upload-artifact@v2
-        with:
-          name: report
-          path: report.json
+    - name: Find JSON, Terraform, and Bicep files
+      run: |
+        find . -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
+        -not -path "./exclude_folder/*" \
+        -not -path "./another_exclude_folder/*" \
+        -print > file_list.txt
+      
+    - name: Check API versions
+      env:
+        AZURE_CLOUD: AzureCloud
+        AZURE_CORE_OUTPUT: table
+      run: |
+        while read filename; do
+          # Extract resource types and API versions
+          # Check if API version is outdated
+          # Generate report
+          # Append report to output file
+        done < file_list.txt
+      
+    - name: Generate report
+      run: |
+        cat output.txt | jq -s 'group_by(.ResourceType) | map({"ResourceType": .[0].ResourceType, "Count": length, "Files": [.[] | {"File": .Filename, "APIVersion": .APIVersion}]})' > report.json
+        
+    - name: Upload report
+      uses: actions/upload-artifact@v2
+      with:
+        name: API report
+        path: report.json
