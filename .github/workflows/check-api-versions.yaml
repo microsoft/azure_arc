@@ -19,6 +19,10 @@ jobs:
         sudo apt-get install -y powershell
     - name: Install required modules
       run: pwsh -Command "Install-Module -Name Az -Force -AllowClobber"
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.4      
     - name: Run script
       id: check-api-versions
       run: |
