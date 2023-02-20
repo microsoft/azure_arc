@@ -23,7 +23,7 @@ function Test-OutdatedApiVersion($current_api_version, $latest_api_version) {
 }
 
 # Find all the ARM templates, bicep templates, and Terraform templates in the repository
-$templates = (Invoke-RestMethod "https://api.github.com/repos/$repository/contents" -QueryParams @{ref=$branch}).where{ $_.type -eq "file" -and $_.name -match $template_regex }
+$templates = (Invoke-RestMethod "https://api.github.com/repos/$repository/contents?ref=$branch").where{ $_.type -eq "file" -and $_.name -match $template_regex }
 
 # Loop through each template and find the resource types and API versions
 $results = foreach ($template in $templates) {
@@ -33,7 +33,7 @@ $results = foreach ($template in $templates) {
     foreach ($match in $matches) {
         $resource_type = $match.matches.groups[1].value
         $api_version = $match.matches.groups[2].value
-        $latest_api_version = (Invoke-RestMethod $latest_api_url | Where-Object { $_.namespace -eq $resource_type }).apiVersions | Select-Object -Last 1
+        $latest_api_version = (Invoke-RestMethod "$latest_api_url&\$filter=namespace eq '$resource_type'" | select -Expand apiVersions | select -Last 1).name
         if ($latest_api_version -and (Test-OutdatedApiVersion $api_version $latest_api_version)) {
             [pscustomobject]@{
                 ResourceType = $resource_type
