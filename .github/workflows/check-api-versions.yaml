@@ -13,23 +13,17 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Install Azure CLI
-      with:
-        node-version: '16'
-        cache: 'npm'
       run: |
-        npm install -g azure-cli
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
       
     - name: Find JSON, Terraform, and Bicep files
       run: |
         find . -type f \( -name "*.json" -o -name "*.tf" -o -name "*.bicep" \) \
-        -not -path "./exclude_folder/*" \
-        -not -path "./another_exclude_folder/*" \
+        -not -path "./tests/*" \
+        -not -path "./docs/*" \
         -print > file_list.txt
       
     - name: Check API versions
-      env:
-        AZURE_CLOUD: AzureCloud
-        AZURE_CORE_OUTPUT: table
       run: |
         while read filename; do
           # Extract resource types and API versions
