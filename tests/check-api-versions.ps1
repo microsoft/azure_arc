@@ -27,7 +27,7 @@ $files = Invoke-RestMethod "https://api.github.com/repos/$Repository/contents?re
 }
 
 $outdatedResources = foreach ($file in $files) {
-    if ($file.Name -match "\.(json|bicep|tf)$") {
+    if ($file.Name -match "\.(json|bicep)$") {
         $content = Invoke-RestMethod $file.Download_Url -Headers @{
             "Accept" = "application/vnd.github.v3.raw"
             "User-Agent" = "GitHub Actions"
@@ -38,9 +38,6 @@ $outdatedResources = foreach ($file in $files) {
         }
         elseif ($file.Name -like "*.bicep") {
             $template = Invoke-Expression $content
-        }
-        elseif ($file.Name -like "*.tf") {
-            $template = ConvertFrom-Json (ConvertTo-Json ((terraform show -json <<< $content) | ConvertFrom-Json))
         }
 
         foreach ($resource in $template.resources) {
