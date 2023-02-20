@@ -19,14 +19,20 @@ jobs:
         sudo apt-get install -y powershell
     - name: Install required modules
       run: pwsh -Command "Install-Module -Name Az -Force -AllowClobber"
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2   
     - name: Run script
       id: check-api-versions
       run: |
-        $output = tests/check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
+        $output = tests\check-api-versions.ps1 -Repository ${{ github.repository }} -Branch ${{ github.ref }}
         if ($output.Table) {
           echo $output.Table
         }
       shell: pwsh
 
+    - name: Run script
+      run: |
+        tests\check-api-versions.ps1
+        $results = Get-Content report-with-table.json -Raw | ConvertFrom-Json
+        Write-Host $results.Table
+
+    - name: Display results
+      run: echo "$results" >> $GITHUB_ENV
