@@ -440,7 +440,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $dataLogsStorageSize = "5Gi"
 
     # High Availability
-    $replicas = 2 # Deploy SQL MI "Business Critical" tier
+    $replicas = 3 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
     $SQLParams = "C:\VHD\sqlmiAD.parameters.json"
