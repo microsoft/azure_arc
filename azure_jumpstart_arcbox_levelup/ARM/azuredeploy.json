@@ -67,6 +67,13 @@
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "microsoft"
+    },
+    "rdpPort": {
+      "type": "string",
+      "metadata": {
+        "description": "Override default RDP 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+      },
+      "defaultValue": "3389"
     }
   },
   "variables": {
@@ -79,6 +86,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
+      "dependsOn": ["mgmtArtifactsAndPolicyDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -112,6 +120,9 @@
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "rdpPort": {
+            "value": "[parameters('rdpPort')]"
           }
         }
       }
