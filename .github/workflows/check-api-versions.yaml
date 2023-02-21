@@ -1,4 +1,4 @@
-name: Check API versions
+name: Check Azure API versions
 
 on:
   push:
