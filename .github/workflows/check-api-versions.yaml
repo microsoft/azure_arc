@@ -1,32 +1,26 @@
-name: Check API versions in Azure templates
+name: Check API versions
 
 on:
   push:
     branches:
-      - release_checker
+      - main
 
 jobs:
-  check-azure-apis:
+  check-api-versions:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Install PowerShell
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y powershell
-      
-    - name: Run script
-      run: pwsh -File tests/check-api-versions.ps1
-        
-    - name: Upload report
-      uses: actions/upload-artifact@v2
-      with:
-        name: report
-        path: report.json
-
-    - name: Show report
-      run: |
-        echo "Report:"
-        curl -sL "$(jq -r '.reportUrl' report.json)" | jq # Download and pretty-print the report
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Azure CLI
+        uses: azure/setup-azure-cli@v1
+        with:
+          install-cli: true
+      - name: Run script
+        run: |
+          chmod +x tests/GetAzAPI.sh
+          ./tests/GetAzAPI.sh
+      - name: Upload report
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: report.json
