@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'Agora-Client'
+param vmName string = 'Ag-Client'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -20,7 +20,7 @@ param location string = resourceGroup().location
 param subnetId string
 
 param resourceTags object = {
-  Project: 'jumpstart_agora'
+  Project: 'jumpstart_Ag'
 }
 
 @description('Client id of the service principal')
@@ -48,6 +48,21 @@ param githubUser string
 
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
+
+@description('The name of the Prod Kubernetes cluster resource')
+param aksProdClusterName string
+
+@description('The name of the Dev Kubernetes cluster resource')
+param aksDevClusterName string
+
+@description('The name of the IoT Hub')
+param iotHubHostName string
+
+@description('The login server name of the Azure Container Registry for dev')
+param acrNameDev string
+
+@description('The login server name of the Azure Container Registry for Prod')
+param acrNameProd string
 
 var bastionName = 'ArcBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -149,7 +164,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksProdClusterName ${aksProdClusterName} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd}'
     }
   }
 }
