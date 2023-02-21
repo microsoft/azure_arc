@@ -12,9 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Install Azure CLI
-        uses: azure/setup-azure-cli@v1
-        with:
-          install-cli: true
+        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
       - name: Run script
         run: |
           chmod +x tests/GetAzAPI.sh
