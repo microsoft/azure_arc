@@ -3,7 +3,7 @@ name: Check Azure API versions
 on:
   push:
     branches:
-      - main
+      - release_checker
 
 jobs:
   check-api-versions:
