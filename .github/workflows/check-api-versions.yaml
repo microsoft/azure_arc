@@ -24,3 +24,5 @@ jobs:
         with:
           name: report
           path: report.json
+      - name: Display report
+        run: cat report.json
