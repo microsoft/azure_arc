@@ -67,7 +67,7 @@ Write-Header "Fetching Nested VMs"
 $sourceFolder = 'https://jumpstartlevelup.blob.core.windows.net/luarcsqlsrv'
 $sas = "?sp=rl&st=2023-02-10T00:00:00Z&se=2024-02-10T08:00:00Z&spr=https&sv=2021-06-08&sr=c&sig=MOG4q%2BzXkiPAFZguYxyLgQxKmSu2W3AZFZKbWwBJBfg%3D"
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --include-pattern 'JSLU-Win-SQL-01.vhdx;JSLU-Win-SQL-02.vhdx;JSLU-Win-SQL-04.vhdx' --check-length=false --log-level=ERROR
+azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --include-pattern 'JSLU-Win-SQL-01.vhdx;JSLU-Win-SQL-02.vhdx;JSLU-Win-SQL-03.vhdx' --check-length=false --log-level=ERROR
 
 # Create the nested VMs
 Write-Header "Create Hyper-V VMs"
@@ -79,15 +79,15 @@ $JSLUWinSQL02 = "JSLU-Win-SQL-02"
 New-VM -Name $JSLUWinSQL02 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${JSLUWinSQL02}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName $JSLUWinSQL02 -Count 2
 
-$JSLUWinSQL04 = "JSLU-Win-SQL-04"
-New-VM -Name $JSLUWinSQL04 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${JSLUWinSQL04}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName $JSLUWinSQL04 -Count 2
+$JSLUWinSQL03 = "JSLU-Win-SQL-03"
+New-VM -Name $JSLUWinSQL03 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "${Env:ArcBoxVMDir}\${JSLUWinSQL03}.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName $JSLUWinSQL03 -Count 2
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Header "Set VM Auto Start/Stop"
 Set-VM -Name $JSLUWinSQL01 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name $JSLUWinSQL02 -AutomaticStartAction Start -AutomaticStopAction ShutDown
-Set-VM -Name $JSLUWinSQL04 -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name $JSLUWinSQL03 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
 Write-Header "Enabling Guest Integration Service"
 Get-VM | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-VMIntegrationService -Verbose
@@ -96,7 +96,7 @@ Get-VM | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-V
 Write-Header "Starting VMs"
 Start-VM -Name $JSLUWinSQL01
 Start-VM -Name $JSLUWinSQL02
-Start-VM -Name $JSLUWinSQL04
+Start-VM -Name $JSLUWinSQL03
 
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
@@ -112,7 +112,7 @@ Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $JSLUWinSQL01 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Invoke-Command -VMName $JSLUWinSQL02 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
-Invoke-Command -VMName $JSLUWinSQL04 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -VMName $JSLUWinSQL03 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
 
 # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
@@ -132,16 +132,11 @@ $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Comp
 $hasPermission = $rolePermissions | Where-Object { ($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles) }
 
 # Copying the Azure Arc Connected Agent to nested VMs
-Write-Header "Customize Onboarding Scripts"
-Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
-(Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
-
-# Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
 if (-not $hasPermission) {
-(Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    Write-Output "Service principal doesn't have necessary permissions to onboard Arc-enabled SQL server. Please grant required permissions to service principal."
 }
 else {
-(Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$myResourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+    Write-Output "Service Principal has necessary permissions to onboard Arc-enabled SQL server."
 }
 
 Write-Header "Copying Onboarding Scripts"
@@ -150,13 +145,15 @@ Write-Header "Copying Onboarding Scripts"
 Write-Output "Transferring installation script to nested Windows VMs..."
 Copy-VMFile $JSLUWinSQL01 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSLUWinSQL01 -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL01 -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
 
 Copy-VMFile $JSLUWinSQL02 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSLUWinSQL02 -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL02 -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
 
-Copy-VMFile $JSLUWinSQL04 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
-Copy-VMFile $JSLUWinSQL04 -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
-Copy-VMFile $JSLUWinSQL04 -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
+Copy-VMFile $JSLUWinSQL03 -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL03 -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSLUWinSQL03 -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -CreateFullPath -FileSource Host
 
 Write-Header "Onboarding Arc-enabled Servers"
 
@@ -171,9 +168,9 @@ $subscriptionId = $env:subscriptionId
 $resourceGroup = $env:resourceGroup
 $azureLocation = $Env:azureLocation
 
-Invoke-Command -VMName $JSLUWinSQL01 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+#Invoke-Command -VMName $JSLUWinSQL01 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 Invoke-Command -VMName $JSLUWinSQL02 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
-#Invoke-Command -VMName $JSLUWinSQL04 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds 
+Invoke-Command -VMName $JSLUWinSQL03 -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds 
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
