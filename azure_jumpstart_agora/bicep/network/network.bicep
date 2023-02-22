@@ -442,6 +442,7 @@ resource peeringStoresToCloud 'Microsoft.Network/virtualNetworks/virtualNetworkP
 }
 
 output vnetId string = cloudVirtualNetwork.id
-output CloudSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output prodSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output devSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
+output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[2].id
 output virtualNetworkNameCloud string = cloudVirtualNetwork.name
-output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
