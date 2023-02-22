@@ -6,7 +6,7 @@ with open("tests/repositories.txt") as f:
     repositories = [line.strip() for line in f]
 
 # create and open the output file for writing
-with open("tests/releases_report.txt", "w") as f:
+with open("tests/QueryReleases.txt", "w") as f:
     for repo in repositories:
         url = f"https://api.github.com/repos/{repo}/releases/latest"
         response = requests.get(url)
