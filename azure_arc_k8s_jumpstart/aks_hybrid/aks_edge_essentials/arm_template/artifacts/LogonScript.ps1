@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$AksEdgeRemoteDeployVersion = "1.0.221212.1200"
+$AksEdgeRemoteDeployVersion = "1.0.230221.1000"
 $schemaVersion = "1.1"
 $schemaVersionAksEdgeConfig = "1.5"
 $versionAksEdgeConfig = "1.0"
@@ -19,18 +19,15 @@ if (! [Environment]::Is64BitProcess) {
 }
 
 if ($env:kubernetesDistribution -eq "k8s") {
-    $productName = "AKS Edge Essentials - K8s (Public Preview)"
+    $productName = "AKS Edge Essentials - K8s"
     $networkplugin = "calico"
-}
-else {
-    $productName = "AKS Edge Essentials - K3s (Public Preview)"
+} else {
+    $productName = "AKS Edge Essentials - K3s"
     $networkplugin = "flannel"
 }
 
 # Here string for the json content
-
-if ($env:windowsNode -eq $true) {
-    $jsonContent = @"
+$aideuserConfig = @"
 {
     "SchemaVersion": "$AksEdgeRemoteDeployVersion",
     "Version": "$schemaVersion",
@@ -42,76 +39,68 @@ if ($env:windowsNode -eq $true) {
         "ResourceGroupName": "$env:resourceGroup",
         "Location": "$env:location"
     },
-    "AksEdgeConfig":{
-        "SchemaVersion": "$schemaVersionAksEdgeConfig",
-        "Version": "$versionAksEdgeConfig",
-        "DeploymentType": "SingleMachineCluster",
-        "Init": {
-            "ServiceIPRangeSize": 0
-        },
-        "Network": {
-            "NetworkPlugin": "$networkplugin",
-            "InternetDisabled": false
-        },
-        "User": {
-            "AcceptEula": true,
-            "AcceptOptionalTelemetry": true
-        },
-        "Machines": [
-            {
-                "LinuxNode": {
-                    "CpuCount": 4,
-                    "MemoryInMB": 4096,
-                    "DataSizeInGB": 20
-                },
-                "WindowsNode": {
-                    "CpuCount": 2,
-                    "MemoryInMB": 4096
-                }
-            }
-        ]
-    }
+    "AksEdgeConfigFile": "aksedge-config.json"
 }
 "@
-}
-else {
-    $jsonContent = @"
+
+if ($env:windowsNode -eq $true) {
+    $aksedgeConfig = @"
 {
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$env:subscriptionId",
-        "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$env:resourceGroup",
-        "Location": "$env:location"
+    "SchemaVersion": "$schemaVersionAksEdgeConfig",
+    "Version": "$versionAksEdgeConfig",
+    "DeploymentType": "SingleMachineCluster",
+    "Init": {
+        "ServiceIPRangeSize": 0
     },
-    "AksEdgeConfig":{
-        "SchemaVersion": "$schemaVersionAksEdgeConfig",
-        "Version": "$versionAksEdgeConfig",
-        "DeploymentType": "SingleMachineCluster",
-        "Init": {
-            "ServiceIPRangeSize": 0
-        },
-        "Network": {
-            "NetworkPlugin": "$networkplugin",
-            "InternetDisabled": false
-        },
-        "User": {
-            "AcceptEula": true,
-            "AcceptOptionalTelemetry": true
-        },
-        "Machines": [
-            {
-                "LinuxNode": {
-                    "CpuCount": 4,
-                    "MemoryInMB": 4096,
-                    "DataSizeInGB": 20
-                }
+    "Network": {
+        "NetworkPlugin": "$networkplugin",
+        "InternetDisabled": false
+    },
+    "User": {
+        "AcceptEula": true,
+        "AcceptOptionalTelemetry": true
+    },
+    "Machines": [
+        {
+            "LinuxNode": {
+                "CpuCount": 4,
+                "MemoryInMB": 4096,
+                "DataSizeInGB": 20
+            },
+            "WindowsNode": {
+                "CpuCount": 2,
+                "MemoryInMB": 4096
             }
-        ]
-    }
+        }
+    ]
+}
+"@
+} else {
+    $aksedgeConfig = @"
+{
+    "SchemaVersion": "$schemaVersionAksEdgeConfig",
+    "Version": "$versionAksEdgeConfig",
+    "DeploymentType": "SingleMachineCluster",
+    "Init": {
+        "ServiceIPRangeSize": 0
+    },
+    "Network": {
+        "NetworkPlugin": "$networkplugin",
+        "InternetDisabled": false
+    },
+    "User": {
+        "AcceptEula": true,
+        "AcceptOptionalTelemetry": true
+    },
+    "Machines": [
+        {
+            "LinuxNode": {
+                "CpuCount": 4,
+                "MemoryInMB": 4096,
+                "DataSizeInGB": 20
+            }
+        }
+    ]
 }
 "@
 }
@@ -120,8 +109,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
 $url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
-
 $installDir = "C:\AksEdgeScript"
+$workDir = "$installDir\AKS-Edge-main"
 
 if (-not (Test-Path -Path $installDir)) {
     Write-Host "Creating $installDir..."
@@ -145,21 +134,26 @@ catch {
     exit -1
 }
 
-Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
-$aidejson = (Get-ChildItem -Path "$installDir" -Filter aide-userconfig.json -Recurse).FullName
-Set-Content -Path $aidejson -Value $jsonContent -Force
+if (!(Test-Path -Path "$workDir")) {
+    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
+}
 
-$aksedgeShell = (Get-ChildItem -Path "$installDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
+$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
+Set-Content -Path $aidejson -Value $aideuserConfig -Force
+$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
+Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
+
+$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
 . $aksedgeShell
 
+# Download, install and deploy AKS EE 
+Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
 # invoke the workflow, the json file already stored above.
-$retval = Start-AideWorkflow
-
+$retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
     Write-Host "Deployment Successful. "
-}
-else {
+} else {
     Write-Error -Message "Deployment failed" -Category OperationStopped
     Stop-Transcript | Out-Null
     Pop-Location
