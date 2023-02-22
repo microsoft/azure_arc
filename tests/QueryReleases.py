@@ -2,7 +2,7 @@ import requests
 import re
 
 # read list of repositories from config file
-with open("repositories.txt") as f:
+with open("tests/repositories.txt") as f:
     repositories = [line.strip() for line in f]
 
 # create and open the output file for writing
