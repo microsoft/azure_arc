@@ -41,6 +41,12 @@ HCIBox includes [Azure Kubernetes Services on Azure Stack HCI (AKS-HCI)](https:/
 
 <img src="./aks_hci.png" width="250" alt="AKS-HCI diagram">
 
+### Azure Arc-enabled SQL Managed Instance on Azure Stack HCI
+
+HCIBox includes [Azure Arc-enabled SQL Managed Instance on Azure Stack HCI](https://learn.microsoft.com/azure/azure-arc/data/managed-instance-overview). As part of the deployment automation, HCIBox configures AKS-HCI infrastructure including a management cluster. It then creates a [target](https://learn.microsoft.com/azure-stack/aks-hci/kubernetes-concepts), or "workload", cluster (_HCIBox-AKS-$randomguid_) and deploys an Azure Arc-enabled SQL Managed Instance.
+
+<img src="./aks_sqlmi.png" width="250" alt="AKS-HCI diagram">
+
 ### Hybrid unified operations
 
 HCIBox includes capabilities to support managing, monitoring and governing the cluster. The deployment automation configures [Azure Stack HCI Insights](https://learn.microsoft.com/azure-stack/hci/manage/monitor-hci-multi) along with [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/overview) and a [Log Analytics workspace](https://learn.microsoft.com/azure/azure-monitor/logs/log-query-overview). Additionally, [Azure Policy](https://learn.microsoft.com/azure/governance/policy/overview) can be configured to support automation configuration and remediation of resources.
@@ -73,6 +79,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - Registers the HCI Cluster with Azure
   - Deploys AKS-HCI and a target AKS cluster
   - Deploys Arc Resource Bridge and gallery VM images
+  - Deploys an Azure Arc-enabled SQL Managed Instance on top of an AKS cluster
 
 ## Prerequisites
 
