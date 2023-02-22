@@ -1,11 +1,11 @@
-name: Latest Release Checker
+name: Query latest release
 
 on:
   schedule:
     - cron: '0 0 * * *'
   push:
     branches:
-      - release_checker
+      - main
 
 jobs:
   check-releases:
@@ -19,7 +19,7 @@ jobs:
         pip install requests
 
     - name: Run script
-      run: python tests/check_releases.py
+      run: python tests/QueryReleases.py
 
     - name: Display report
-      run: cat tests/releases_report.txt
+      run: cat tests/QueryReleases.txt
