@@ -417,6 +417,7 @@ Occasionally, you may need to review log output from scripts that run on the _HC
 | _C:\HCIBox\Logs\Register-AzSHCI.log_          | Output of _Register-AzSHCI.ps1_ which registers the cluster with Azure.                                                                   |
 | _C:\HCIBox\Logs\Deploy-AKS.log_               | Output of _Deploy-AKS.ps1_ which deploys and configures AKS on HCI.                                                                       |
 | _C:\HCIBox\Logs\Deploy-ArcResourceBridge.log_ | Output of _Deploy-ArcResourceBridge.ps1_ which deploys and configures Arc resource bridge and builds gallery images.                      |
+| _C:\HCIBox\Logs\Deploy-SQLMI.log_ | Output of _Deploy-SQLMI.ps1_ which deploys and configures Arc-enabled SQL Managed Instance.                      |
 
   ![Screenshot showing HCIBox logs folder on HCIBox-Client](./troubleshoot_logs.png)
 
