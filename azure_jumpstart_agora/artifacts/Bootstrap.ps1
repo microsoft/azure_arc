@@ -130,10 +130,10 @@ Install-Module -Name Posh-SSH -Force
 
 # All Industries
 Write-Host "Fetching Artifacts for All Industries"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile $Env:AgDir\AgLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $Env:AgDir\agLogonScript.ps1
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgDir\AgLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgDir\agLogonScript.ps1
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 
