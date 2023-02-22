@@ -127,13 +127,14 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
 - You will also need to get the Azure Custom Location Resource Provider (RP) Object ID (OID) and export it as an environment variable. This is required to enable [Custom Location](https://learn.microsoft.com/azure/azure-arc/platform/conceptual-custom-locations) on your cluster.
 
   > **NOTE: You need permissions to list all the service principals.**
-  #### Option 1: Bash
+
+#### Option 1: Bash
 
   ```bash
   customLocationObjectId=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
   ```
 
-  #### Option 2: PowerShell
+#### Option 2: PowerShell
 
   ```powershell
   $customLocationObjectId=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
