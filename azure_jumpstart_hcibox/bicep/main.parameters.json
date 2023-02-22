@@ -33,10 +33,7 @@
             "value": true
         },
         "deploySQLMI": {
-            "value": "false"
-        },
-        "customLocationObjectId":{
-            "value": ""
+            "value": false
         }
     }
 }
