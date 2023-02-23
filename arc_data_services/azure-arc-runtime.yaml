@@ -1,0 +1,183 @@
+# ==========================================================================
+# AZURE-ARC-RUNTIME
+# --------------------------------------------------------------------------
+# Service account used by ConnectedK8s Runtime Operator Pods for maintaining
+# lifecycle of the Arc-enabled Cluster.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{AZURE_ARC_NAMESPACE}}: namespace for ConnectedK8s operators
+# - {{DATA_CONTROLLER_NAMESPACE}}: namespace for Azure Arc-enabled Data Services
+# - {{AZURE_ARC_RUNTIME_SERVICE_ACCOUNT}}: name of the runtime service account
+# ==========================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{AZURE_ARC_RUNTIME_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_NAMESPACE}}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: onboarding-role-for-agents
+rules:
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: 
+    - customresourcedefinitions
+    verbs: 
+    - create
+    - get
+    - list
+    - patch
+    - update
+    - delete
+    - watch
+  # --------------------------------------------------------------------------
+  # Cluster-wide watcher started by Resource Sync Operator to sync Arc-enabled
+  # Data Services Custom Resources to Azure
+  # --------------------------------------------------------------------------
+  - apiGroups: ["arcdata.microsoft.com"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["tasks.arcdata.microsoft.com"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["sql.arcdata.microsoft.com"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["tasks.sql.arcdata.microsoft.com"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  # --------------------------------------------------------------------------
+  - apiGroups: [""]
+    resources: 
+    - services
+    verbs: 
+    - list
+    - get
+    - watch
+  - apiGroups: [""]
+    resources: 
+    - nodes
+    verbs: 
+    - list
+    - get
+  - apiGroups: [""]
+    resources:
+    - namespaces
+    verbs:
+    - get
+    - list
+    - watch
+    - patch
+  - apiGroups: ["clusterconfig.azure.com"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: 
+    - configmaps
+    verbs:
+    - get
+    - patch
+    - create
+    - update
+    - list
+    - watch
+  - apiGroups: [""]
+    resources: 
+    - secrets
+    verbs:
+    - get
+    - create
+    - update
+    - watch
+    - list
+  - apiGroups: ["arc.azure.com"]
+    resources:
+    - connectedclusters
+    - connectedclusters/status
+    verbs:
+    - list
+    - create
+    - get
+    - update
+  - apiGroups: [""]
+    resources: 
+    - pods 
+    verbs:
+    - create
+    - update
+    - get
+    - list
+    - watch
+  # --------------------------------------------------------------------------
+  # KAP uses impersonate for Cluster Connect and Custom Location calls
+  # --------------------------------------------------------------------------
+  - apiGroups: [""]
+    resources:
+    - users
+    - groups
+    - serviceaccounts
+    verbs:
+    - impersonate
+  - apiGroups: ["authentication.k8s.io"]
+    resources:
+    - userextras/oid
+    - userextras/obo
+    verbs:
+    - impersonate
+  # --------------------------------------------------------------------------
+  - apiGroups: [""]
+    resources:
+    - events
+    verbs: ["create", "get", "list", "watch", "patch", "update"] 
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: onboarding-rolebinding-agents
+subjects:
+  - kind: ServiceAccount
+    name: {{AZURE_ARC_RUNTIME_SERVICE_ACCOUNT}}
+    namespace: {{AZURE_ARC_NAMESPACE}}
+roleRef:
+  kind: ClusterRole
+  name: onboarding-role-for-agents
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: arc-data-services-direct-operations-role
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
+rules:
+  # --------------------------------------------------------------------------
+  # Required to enable CRUD operations on Arc-enabled Data Services namespace
+  # --------------------------------------------------------------------------
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # --------------------------------------------------------------------------
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: arc-data-services-direct-operations-rolebinding
+  namespace: {{DATA_CONTROLLER_NAMESPACE}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: arc-data-services-direct-operations-role
+subjects:
+- kind: ServiceAccount
+  name: {{AZURE_ARC_RUNTIME_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_NAMESPACE}}
