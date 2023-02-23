@@ -1,0 +1,13 @@
+{%- assign failoverGroupProperties = content.properties.spec -%}
+
+{
+  "spec": {
+    {% if failoverGroupProperties.sharedName != nil %} "sharedName": {{ failoverGroupProperties.sharedName | json }}, {% endif %}
+    {% if failoverGroupProperties.sourceMI != nil %} "sourceMI": {{ failoverGroupProperties.sourceMI | json }}, {% endif %}
+    {% if failoverGroupProperties.partnerMI != nil %} "partnerMI": {{ failoverGroupProperties.partnerMI | json }}, {% endif %}
+    {% if failoverGroupProperties.partnerMirroringURL != nil %} "partnerMirroringURL": {{ failoverGroupProperties.partnerMirroringURL | json }}, {% endif %}
+    {% if failoverGroupProperties.partnerMirroringCert != nil %} "partnerMirroringCert": {{ failoverGroupProperties.partnerMirroringCert | json }}, {% endif %}
+    {% if failoverGroupProperties.partnerSyncMode != nil %} "partnerSyncMode": {{ failoverGroupProperties.partnerSyncMode | json }}, {% endif %}
+    {% if failoverGroupProperties.role != nil %} "role": {{ failoverGroupProperties.role | json }}, {% endif %}
+  }
+}

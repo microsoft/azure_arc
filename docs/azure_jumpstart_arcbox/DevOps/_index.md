@@ -221,7 +221,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**
-
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 - [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
@@ -466,47 +465,49 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
 - Configure Azure Key Vault to allow your access to certificates.
 
-  - Navigate to the deployed Key Vault in the Azure portal and open the "Access Policies" blade
+  - Navigate to the deployed Key Vault in the Azure portal, open the "Access Policies" blade, and click on Create.
 
     ![Screenshot showing Azure Arc extensions ](./capi_keyvault01.png)
 
-  - Click "Add access policy" and in the dropdown for "Certificate Permissions" check Get and List.
+  - Under "Certificate Permissions" check the "Get" and "List" permissions. Click Next.
 
     ![Screenshot showing Azure Arc extensions ](./capi_keyvault02.png)
 
-  - Next to "Select principal" Click "None selected" and search for your user name and select it. Click "Add".
+  - Search for your user name and select it. Click Next.
 
     ![Screenshot showing Azure Arc extensions ](./capi_keyvault03.png)
 
-  - Click "Save" to commit the changes.
+  - You can skip adding the Application. Click Next.
 
     ![Screenshot showing Azure Arc extensions ](./capi_keyvault04.png)
 
+  - Review the configuration and click Create.
+
+    ![Screenshot showing Azure Arc extensions ](./capi_keyvault05.png)
+
+    ![Screenshot showing Azure Arc extensions ](./capi_keyvault06.png)
+
 - Open the extension tab section of the _ArcBox-CAPI-Data_ cluster resource in the Azure portal. You can now see that Azure Key Vault Secrets Provider, Flux (GitOps), and Open Service Mesh extensions are installed.
 
-  ![Screenshot showing Azure Arc extensions ](./capi_keyvault05.png)
+  ![Screenshot showing Azure Arc extensions ](./capi_keyvault07.png)
 
 - Click on the _CAPI Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.devops.com_ used from the Key Vault.
 
-  ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault06.png)
+  ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault08.png)
 
-  ![Screenshot showing Hello-Arc App](./capi_keyvault07.png)
+  ![Screenshot showing Hello-Arc App](./capi_keyvault09.png)
 
 - Validate that Key Vault certificate is being used by comparing the certificate thumbprint reported in the browser with your certificate thumbprint in Key Vault. Click on the lock icon and then select "Connection is secure".
 
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault08.png)
-
-- Click on the certificate icon.
-
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault09.png)
-
-- Open the "Details" tab to view the thumprint of the certificate.
-
   ![Screenshot showing Hello-Arc certificate](./capi_keyvault10.png)
+
+- Click on the certificate icon to view the thumbprint of the certificate.
+
+  ![Screenshot showing Hello-Arc certificate](./capi_keyvault11.png)
 
 - Browse to the certificate "ingress-cert" in Key Vault to view and compare the thumbprint.
 
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault11.png)
+  ![Screenshot showing Hello-Arc certificate](./capi_keyvault12.png)
 
 ### GitOps configurations
 
