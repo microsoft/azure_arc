@@ -30,7 +30,6 @@ $coordinatorMemoryLimit = "8Gi"
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
-$backupsStorageSize = "5Gi"
 
 # Citus Scale out
 $numWorkers = 1
@@ -50,10 +49,8 @@ $PSQLParams = "$Env:ArcBoxDir\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryLimit-stage',$coordinatorMemoryLimit | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'backupStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataSize-stage',$dataStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\postgreSQL.json" --parameters "$Env:ArcBoxDir\postgreSQL.parameters.json"
