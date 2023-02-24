@@ -43,21 +43,10 @@ Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Bla
 $armtoken = Get-AzAccessToken
 $clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
-Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $SDNConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
+Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $SDNConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup
 Move-Item -Path RegisterHCI_* -Destination $Env:HCIBoxLogsDir\RegisterHCI_PS_Output.log
 
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
-
-# Register MMA extension on nodes
-# Write-Host "Deploying monitoring agent on HCI host nodes"
-# $workspace = Get-AzOperationalInsightsWorkspace -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
-# $key = Get-AzOperationalInsightsWorkspaceSharedKey -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
-# $Setting = @{ "workspaceId" = $workspace.CustomerId }
-# $protectedSetting = @{ "workspaceKey" = $key.PrimarySharedKey }
-# foreach ($VM in $SDNConfig.HostList) {
-#     New-AzConnectedMachineExtension -Name MicrosoftMonitoringAgent -ResourceGroupName $env:resourceGroup-ArcServers -MachineName $VM -Location $env:azureLocation -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-# }
-# New-AzStackHciExtension -ArcSettingName "default" -ClusterName $clustername -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -ExtensionParameterType "MicrosoftMonitoringAgent" -ExtensionParameterSetting $Setting -ExtensionParameterProtectedSetting $protectedSetting
 
 # Set up cluster cloud witness
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
