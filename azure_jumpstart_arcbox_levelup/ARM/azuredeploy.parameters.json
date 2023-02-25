@@ -22,12 +22,6 @@
         },
         "deployBastion": {
             "value": false
-        },
-        "githubUser": {
-            "value": "microsoft"
-        },
-        "githubBranch": {
-            "value": "lu_arc_sql"
         }
     }
 }
