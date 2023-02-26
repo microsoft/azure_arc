@@ -79,7 +79,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - Registers the HCI Cluster with Azure
   - Deploys AKS-HCI and a target AKS cluster
   - Deploys Arc Resource Bridge and gallery VM images
-  - Deploys an Azure Arc-enabled SQL Managed Instance on top of an AKS cluster
+  - Deploys an Azure Arc-enabled SQL Managed Instance on top of the AKS cluster
 
 ## Prerequisites
 
@@ -372,7 +372,7 @@ HCIBox comes pre-configured with [Azure Kubernetes Service on Azure Stack HCI](h
 
 HCIBox supports deploying [Azure Arc-enabled SQL Managed Instance](https://learn.microsoft.com/azure/azure-arc/data/managed-instance-overview) on an AKS HCI cluster. Open the [HCIBox SQLMI documentation](https://azurearcjumpstart.io/azure_jumpstart_hcibox/SQLMI/) to get started with Azure Arc-enabled SQL Managed Instance in HCIBox.
 
-![Screenshot showing SQLMI on Azure Stack HCI](./.png)
+![Screenshot showing SQLMI on Azure Stack HCI](./sqlmi_portal.png)
 
 ### Advanced Configurations
 
