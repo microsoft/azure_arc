@@ -52,7 +52,7 @@
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "main"
+      "defaultValue": "lu_arc_sql"
     },
     "deployBastion": {
       "type": "bool",

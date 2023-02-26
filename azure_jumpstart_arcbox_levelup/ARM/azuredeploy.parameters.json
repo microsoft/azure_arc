@@ -22,9 +22,6 @@
         },
         "deployBastion": {
             "value": false
-        },
-        "githubUser": {
-            "value": "microsoft"
         }
     }
 }
