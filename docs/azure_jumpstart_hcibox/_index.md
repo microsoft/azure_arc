@@ -124,22 +124,6 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.ResourceConnector --wait
   ```
 
-- You will also need to get the Azure Custom Location Resource Provider (RP) Object ID (OID) and export it as an environment variable. This is required to enable [Custom Location](https://learn.microsoft.com/azure/azure-arc/platform/conceptual-custom-locations) on your cluster.
-
-  > **NOTE: You need permissions to list all the service principals.**
-
-#### Option 1: Bash
-
-  ```bash
-  customLocationObjectId=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
-  ```
-
-#### Option 2: PowerShell
-
-  ```powershell
-  $customLocationObjectId=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
-  ```
-
 - Create Azure service principal (SP). To deploy HCIBox, an Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
   - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
@@ -223,6 +207,22 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - _`deployResourceBridge`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
+
+- You will also need to get the Azure Custom Location Resource Provider (RP) Object ID (OID) and export it as an environment variable. This is required to enable [Custom Location](https://learn.microsoft.com/azure/azure-arc/platform/conceptual-custom-locations) on your cluster.
+
+  > **NOTE: You need permissions to list all the service principals.**
+
+  - **Option 1: Bash**
+
+  ```bash
+  customLocationObjectId=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
+
+  - **Option 2: PowerShell**
+
+  ```powershell
+  $customLocationObjectId=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
+  ```
 
 - Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_hcibox/bicep) and run the below command:
 
