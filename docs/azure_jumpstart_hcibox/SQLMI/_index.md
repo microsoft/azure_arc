@@ -12,7 +12,7 @@ Azure Stack HCI can provide host infrastructure for [Azure Kubernetes Service cl
 
 - Open the resource group and group by type to see the Azure Arc-enabled SQL Managed Instance deployed with HCIBox.
 
-  ![Screenshot showing clusters in resource group](./rg_aks.png)
+  ![Screenshot showing clusters in resource group](./rg_sqlmi.png)
 
 ## Connect to the Azure Arc-enabled SQL Managed Instance using Azure Data Studio
 
