@@ -278,8 +278,6 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   > **NOTE: The _Register-AzStackHCI_ PowerShell command registers the cluster to the East US region. This region is hardcoded into the script. If you have regional limitations in your Azure subscription that prevent resource creation in East US the registration will fail.**
 
-  > **NOTE: The _Register-AzStackHCI_ PowerShell command currently does not support registering the Azure Arc-enabled server resources for each cluster node to the same resource group as the registered cluster itself. For this reason, HCIBox will create a new resource group for the HCI nodes' Arc-enabled server resources. This resource group will be named by appending "-ArcServers" to the end of the resource group used in the initial deployment.**
-  
   ![Screenshot showing HCIBox resources in Azure portal](./rg_arc_servers.png)
 
 ## Using HCIBox
