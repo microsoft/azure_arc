@@ -7,7 +7,12 @@ param (
     [string]$Azurelocation
 )
 
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$ArcBoxDir = "C:\ArcBox"
+$ArcBoxLogsDir = "$ArcBoxDir\Logs"
+
+# Change working directory 
+Set-Location -Path $ArcBoxDir
+
 Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
 $ErrorActionPreference = 'SilentlyContinue'
 

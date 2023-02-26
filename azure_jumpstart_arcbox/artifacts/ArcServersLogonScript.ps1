@@ -135,8 +135,17 @@ if ($Env:flavor -eq 'DataOps') {
     $hasPermission = $rolePermissions | Where-Object { ($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles) }
 
     # Enable defender for cloud for SQL Server
-    Write-Header "Enabling defender for cloud for SQL Server"
-    az security pricing create -n SqlServerVirtualMachines --tier 'standard'
+    # Verify existing plan and update accordingly
+    $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $env:subscriptionId | ConvertFrom-Json)
+    if ($currentsqlplan.pricingTier -eq "Free")
+    {
+        # Update to standard plan
+        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier). Updating to standard plan."
+        az security pricing create -n SqlServerVirtualMachines --tier 'standard' --subscription $env:subscriptionId
+    }
+    else {
+        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+    }
 
     # Set defender for cloud log analytics workspace
     Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"

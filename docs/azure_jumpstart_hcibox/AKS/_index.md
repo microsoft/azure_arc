@@ -18,6 +18,20 @@ Azure Stack HCI can provide host infrastructure for [Azure Kubernetes Service cl
 
   ![Screenshot showing clusters in resource group](./aks_cluster_detail.png)
 
+- We can also view Kubernetes resources on the cluster from Azure portal. To do this you will need a service account bearer token. You can create one by opening the C:\HCIBox folder and running the GetServiceAccountBearerToken.ps1 script by right clicking on it and selecting "Run with PowerShell".
+
+  ![Screenshot showing how to run the service account bearer token generating script](./run_token_script.png)
+
+- After the script completes it will pause to allow you to copy the token. Highlight the token and right click to copy it.
+
+  ![Screenshot showing the script running](./run_token_script_result.png)
+
+- Navigate to the workload cluster in Azure portal and select Namespaces under Kubernetes resources (preview). After signing in with the token your Kubernetes resources will be available to view from Azure portal.
+
+  ![Screenshot showing Kubernetes token page in Azure portal](./enter_token_portal.png)
+
+  ![Screenshot showing Kubernetes resources in Azure portal](./k8s_resources_portal.png)
+
 - We can deploy configurations for this workload cluster automatically from source using [GitOps](https://learn.microsoft.com/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster). HCIBox includes a script that will automatically configure a simple "Hello Arc" application and ingress controller on the AKS cluster.
 
 - Open up Windows Explorer on the _HCIBox-Client_ and navigate to the _C:\HCIBox_ folder. From here, right click on the "_Deploy-GitOps.ps1_" file and run with PowerShell.
