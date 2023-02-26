@@ -46,7 +46,7 @@
       },
       "resourceTags": {
         "value": {
-          "Project": "jumpstart_hcibox"
+          "Project": "jumpstart_HCIBox"
         }
       },
       "dockerRegistryCredential": {
