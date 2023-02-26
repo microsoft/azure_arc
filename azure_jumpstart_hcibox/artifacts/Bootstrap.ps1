@@ -15,7 +15,8 @@ param (
     [string]$deploySQLMI,
     [string]$deployResourceBridge,
     [string]$natDNS,
-    [string]$customLocationObjectId
+    [string]$customLocationObjectId,
+    [string]$rdpPort
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -178,6 +179,39 @@ if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
 Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
+
+# Change RDP Port
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
+{
+    Write-Host "Configuring RDP port number to $rdpPort"
+    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+    # RDP port
+    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
+    if (!($portNumber -eq $rdpPort))
+    {
+      Write-Host Setting RDP PortNumber to $rdpPort
+      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+      Restart-Service TermService -force
+    }
+
+    #Setup firewall rules
+    if ($rdpPort -eq 3389)
+    {
+      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    } 
+    else
+    {
+      $systemroot = get-content env:systemroot
+      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    }
+
+    Write-Host "RDP port configuration complete."
+}
 
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
