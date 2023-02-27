@@ -18,7 +18,11 @@ $Env:VMPath = "C:\VMs"
 Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-SQLMI.log
 
 # Capture Custom Location ObjectID
-$customLocationObjectId=Read-Host -Prompt "Custom Location Object Id"
+do {
+    $customLocationObjectId = Read-Host -Prompt "Custom Location Object Id"
+    if ($customLocationObjectId -eq "") { write-host "Please enter the Custom Location Object Id to proceed!" }
+}
+until ($customLocationObjectId -ne "")
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
@@ -581,20 +585,20 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 Write-Header "Configure SQL Query Stress"
 # Unzip SqlQueryStress
 Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
-Expand-Archive -Path C:\VHDs\SqlQueryStress.zip -DestinationPath C:\VHDs\SqlQueryStress
+    Expand-Archive -Path C:\VHDs\SqlQueryStress.zip -DestinationPath C:\VHDs\SqlQueryStress
 
-# Create SQLQueryStress desktop shortcut
-Write-Host "Installing dotnetcore sdk"
-choco install dotnetcore-3.1-sdk -y -r --no-progress
-Write-Host "`n"
-Write-Host "Creating SQLQueryStress Desktop shortcut"
-Write-Host "`n"
-$TargetFile = "C:\VHDs\SqlQueryStress\SqlQueryStress.exe"
-$ShortcutFile = "C:\Users\$using:adminUsername\Desktop\SqlQueryStress.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
+    # Create SQLQueryStress desktop shortcut
+    Write-Host "Installing dotnetcore sdk"
+    choco install dotnetcore-3.1-sdk -y -r --no-progress
+    Write-Host "`n"
+    Write-Host "Creating SQLQueryStress Desktop shortcut"
+    Write-Host "`n"
+    $TargetFile = "C:\VHDs\SqlQueryStress\SqlQueryStress.exe"
+    $ShortcutFile = "C:\Users\$using:adminUsername\Desktop\SqlQueryStress.lnk"
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
 }
 
 <#Write-Header "Configure Grafana shortcut"
