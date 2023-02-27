@@ -203,32 +203,15 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - _`deployBastion`_ - Option to deploy Azure Bastion which used to connect to the _HCIBox-Client_ VM instead of normal RDP.
   - _`registerCluster`_ - Option to automatically register the cluster; set to true by default
   - _`deployAKSHCI`_ - Option to automatically deploy and configure AKS on HCI; set to true by default
-  - _`deploySQLMI`_ - Option to automatically deploy and configure Arc-enabled SQL Managed Instance on HCI; set to false by default
   - _`deployResourceBridge`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
-
-- You will also need to get the Azure Custom Location Resource Provider (RP) Object ID (OID) and export it as an environment variable. This is required to enable [Custom Location](https://learn.microsoft.com/azure/azure-arc/platform/conceptual-custom-locations) on your cluster.
-
-  > **NOTE: You need permissions to list all the service principals.**
-
-  - **Option 1: Bash**
-
-  ```bash
-  customLocationObjectId=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
-  ```
-
-  - **Option 2: PowerShell**
-
-  ```powershell
-  $customLocationObjectId=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
-  ```
 
 - Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_hcibox/bicep) and run the below command:
 
   ```shell
   az group create --name "<resource-group-name>"  --location "<preferred-location>"
-  az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json" -p customLocationObjectId="$customLocationObjectId"
+  az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
   ![Screenshot showing bicep deploying](./bicep_deploying.png)
