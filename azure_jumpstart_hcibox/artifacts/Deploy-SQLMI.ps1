@@ -17,6 +17,9 @@ $Env:VMPath = "C:\VMs"
 
 Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-SQLMI.log
 
+# Capture Custom Location ObjectID
+$customLocationObjectId=Read-Host -Prompt "Custom Location Object Id"
+
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
 $ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
@@ -108,7 +111,6 @@ $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
 $adminPassword = $SDNConfig.SDNAdminPassword
 $workspaceName = $env:workspaceName
-$customLocationObjectId = $env:customLocationObjectId
 $dataController = "jumpstart-dc-$namingPrefix"
 $sqlMI = "jumpstart-sql"
 $customLocation = "jumpstart-cl-$namingPrefix"
