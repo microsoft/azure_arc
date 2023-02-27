@@ -31,9 +31,6 @@
         },
         "deployAKSHCI": {
             "value": true
-        },
-        "deploySQLMI": {
-            "value": false
         }
     }
 }

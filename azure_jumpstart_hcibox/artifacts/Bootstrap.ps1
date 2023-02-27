@@ -12,10 +12,8 @@ param (
     [string]$templateBaseUrl,
     [string]$registerCluster,
     [string]$deployAKSHCI,
-    [string]$deploySQLMI,
     [string]$deployResourceBridge,
     [string]$natDNS,
-    [string]$customLocationObjectId,
     [string]$rdpPort
 )
 
@@ -34,11 +32,9 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('customLocationObjectId', $customLocationObjectId,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating HCIBox path
 Write-Output "Creating HCIBox paths"
