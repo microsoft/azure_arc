@@ -20,9 +20,9 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-SQLMI.log
 # Capture Custom Location ObjectID
 do {
     $customLocationObjectId = Read-Host -Prompt "Custom Location Object Id"
-    if ($customLocationObjectId -eq "") { write-host "Please enter the Custom Location Object Id to proceed!" }
+    if ($customLocationObjectId -eq "" -or $customLocationObjectId.Length -ne 36) { write-host "Please enter a valid Custom Location Object Id to proceed!" }
 }
-until ($customLocationObjectId -ne "")
+until ($customLocationObjectId -ne "" -and $customLocationObjectId.Length -eq 36)
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
