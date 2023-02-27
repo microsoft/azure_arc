@@ -29,9 +29,6 @@ param deployAKSHCI bool = true
 @description('Option to deploy Resource Bridge with HCIBox')
 param deployResourceBridge bool = true
 
-@description('Option to deploy SQL MI with HCIBox')
-param deploySQLMI bool = true
-
 @description('Public DNS to use for the domain')
 param natDNS string = '8.8.8.8'
 
@@ -46,9 +43,6 @@ param deployBastion bool = false
 
 @description('Location to deploy resources')
 param location string = resourceGroup().location
-
-@description('Custom Location object Id')
-param customLocationObjectId string = ''
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -93,11 +87,9 @@ module hostDeployment 'host/host.bicep' = {
     deployBastion: deployBastion
     registerCluster: registerCluster
     deployAKSHCI: deployAKSHCI
-    deploySQLMI: deploySQLMI
     deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
-    customLocationObjectId: customLocationObjectId
     rdpPort: rdpPort
   }
 }

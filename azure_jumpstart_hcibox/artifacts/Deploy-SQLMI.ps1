@@ -88,7 +88,6 @@ $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adc
 Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession
 Copy-Item $Env:HCIBoxDir\SqlQueryStress.zip -Destination "C:\VHDs\SqlQueryStress.zip" -ToSession $adminCenterSession
 
-
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
 $prefixLen = 5
@@ -96,7 +95,8 @@ $prefixLen = 5
 for ($i = 0; $i -lt $prefixLen; $i++) {
     $namingPrefix += [char]$rand.Next(97, 122)
 }
-$clusterName = $SDNConfig.AKSDataSvcsworkloadClusterName + "-" + $namingPrefix
+# Get cluster name
+$clusterName = $env:AKSClusterName
 [System.Environment]::SetEnvironmentVariable('AKS-sqlmi-ClusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
 
 # Initializing variables
@@ -109,48 +109,11 @@ $adminUsername = $env:adminUsername
 $adminPassword = $SDNConfig.SDNAdminPassword
 $workspaceName = $env:workspaceName
 $customLocationObjectId = $env:customLocationObjectId
-$dataController = "hcibox-dc-$namingPrefix"
+$dataController = "jumpstart-dc-$namingPrefix"
 $sqlMI = "jumpstart-sql"
 $customLocation = "jumpstart-cl-$namingPrefix"
 $domainName = "jumpstart"
 $defaultDomainPartition = "DC=$domainName,DC=local"
-
-# Install AksHci - only need to perform the following on one of the nodes
-if ($env:deploySQLMI -eq $true) {
-    Write-Header "Prepping AKS Install"
-    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-        $vnet = New-AksHciNetworkSetting -name $using:SDNConfig.AKSvnetname -vSwitchName $using:SDNConfig.AKSvSwitchName -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -ipAddressPrefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsServers $using:SDNConfig.AKSDNSIP -vlanID $using:SDNConfig.AKSVlanID        
-        Set-AksHciConfig -imageDir $using:SDNConfig.AKSImagedir -workingDir $using:SDNConfig.AKSWorkingdir -cloudConfigLocation $using:SDNConfig.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:SDNConfig.AKSCloudSvcidr -controlPlaneVmSize Standard_D4s_v3
-        $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
-        Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred -Region "eastus"
-        Write-Host "Ready to Install AKS on HCI Cluster"
-        Install-AksHci
-    }
-}
-
-# Create new AKS target cluster and connect it to Azure
-Write-Header "Creating AKS target cluster"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-AksHciCluster -name $using:clusterName -nodePoolName sqlmipool -nodecount 2 -osType linux -nodeVmSize Standard_D8s_v3
-    Enable-AksHciArcConnection -name $using:clusterName
-}
-
-Write-Header "Checking AKS-HCI nodes and running pods"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    Get-AksHciCredential -name $using:clusterName -Confirm:$false
-    kubectl get nodes
-    kubectl get pods -A
-}
-
-# Setting up azure cli
-Write-Host "Setting up azure cli"
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin", [System.EnvironmentVariableTarget]::Machine)
-        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
-    }
-    Start-Process msiexec.exe -Wait -ArgumentList "/I C:\VHD\AZDataCLI.msi /quiet"
-}
 
 # Deploying the Arc Data Controller
 Write-Header "Deploying the Arc Data extension"

@@ -86,7 +86,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 2 -osType linux -nodeVmSize Standard_A4_v2
+    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 2 -osType linux -nodeVmSize Standard_D8s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
