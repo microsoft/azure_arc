@@ -601,23 +601,6 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     $Shortcut.Save()
 }
 
-<#Write-Header "Configure Grafana shortcut"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $adminUsername = $using:adminUsername
-    $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $using:adcred
-    # Creating desktop url shortcuts for built-in Grafana and Kibana services
-    Get-AksHciCredential -name $using:clusterName -Confirm:$false
-    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    $GrafanaURL = "https://" + $GrafanaURL + ":3000"
-    $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut("c:\VHD\Grafana.url")
-    $Favorite.TargetPath = $GrafanaURL;
-    $Favorite.Save()
-
-    Copy-Item "c:\VHD\Grafana.url" -Destination "C:\users\$adminUsername\desktop\Grafana.url" -ToSession $adminCenterSession -Force
-}
-#>
-
 # Set env variable deployAKSHCI to true (in case the script was run manually)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', 'true', [System.EnvironmentVariableTarget]::Machine)
 
