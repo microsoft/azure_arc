@@ -488,21 +488,27 @@ else {
         $shortcut.Save()
     }
 
+    # Prepare Arc-enabled SQL server onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
     # Changing to Jumpstart ArcBox wallpaper
-    $code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
-
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-
-            public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
+    # Changing to Client VM wallpaper
+    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    $code = @' 
+    using System.Runtime.InteropServices; 
+    namespace Win32{ 
+        
+        public class Wallpaper{ 
+            [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+            
+            public static void SetWallpaper(string thePath){ 
+                SystemParametersInfo(20,0,thePath,3); 
             }
         }
-    }
+    } 
 '@
+
+    add-type $code 
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
 
     $DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
 
