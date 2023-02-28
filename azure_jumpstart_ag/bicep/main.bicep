@@ -87,7 +87,7 @@ param acrNameProd string = 'Agacrprod${namingGuid}'
 @description('Name of the dev Azure Container Registry')
 param acrNameDev string = 'Agacrdev${namingGuid}'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_agora/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
