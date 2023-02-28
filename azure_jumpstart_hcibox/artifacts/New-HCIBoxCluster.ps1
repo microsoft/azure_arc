@@ -224,7 +224,7 @@ function New-NestedVM {
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -VMName $AzSHOST | Out-Null
         }
     
-        Set-VM -Name $AzSHOST -ProcessorCount 20 -AutomaticStartAction Start
+        Set-VM -Name $AzSHOST -ProcessorCount 24 -AutomaticStartAction Start
         Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
         Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
         Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
