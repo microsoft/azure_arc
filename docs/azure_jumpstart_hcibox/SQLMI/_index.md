@@ -26,7 +26,7 @@ Azure Stack HCI can provide host infrastructure for [Azure Kubernetes Service cl
   az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv
   ```
 
-  ![Screenshot showing running a cli command to get custom location objectId](./objectid_Script.png)
+  ![Screenshot showing running a cli command to get custom location objectId](./objectid_script.png)
 
 - Open up Windows Explorer on the HCIBox-Client and navigate to the C:\HCIBox folder. From here, right click on the "Deploy-SQLMI.ps1" file and run with PowerShell.
 
