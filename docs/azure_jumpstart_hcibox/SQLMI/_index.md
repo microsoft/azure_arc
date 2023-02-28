@@ -46,7 +46,7 @@ Azure Stack HCI can provide host infrastructure for [Azure Kubernetes Service cl
 
 ## Connect to the Azure Arc-enabled SQL Managed Instance using Azure Data Studio
 
-Included in HCIBox, Azure Data Studio is installed and pre-configured on the AdminCenter computer to allow you to connect and manage your Arc-enabled SQL Managed Instance.
+Azure Data Studio is installed and pre-configured on the AdminCenter computer to allow you to connect and manage your Arc-enabled SQL Managed Instance.
 
 - To start, click on the Azure Data Studio shortcut on the desktop of the AdminCenter computer.
 
