@@ -56,15 +56,15 @@ Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
 # Install necessary AZ modules and initialize akshci on each node
 Write-Header "Install necessary AZ modules, AZ CLI extensions, plus AksHCI module and initialize akshci on each node"
 
-Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $ProgressPreference = "SilentlyContinue"
     Install-Module -Name AksHci -Force -AcceptLicense
-    Import-Module Az.Accounts
-    Import-Module Az.Resources
-    Import-Module AzureAD
-    Import-Module AksHci
+    Import-Module Az.Accounts -DisableNameChecking
+    Import-Module Az.Resources -DisableNameChecking
+    Import-Module AzureAD -DisableNameChecking
+    Import-Module AksHci -DisableNameChecking
     Initialize-AksHciNode
     $ProgressPreference = "Continue"
 }
@@ -82,18 +82,18 @@ Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win3
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:HCIBoxDir\AZDataCLI.msi
 Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile $Env:HCIBoxDir\SqlQueryStress.zip
 
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host -Force
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host -Force
 $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adcred
-Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession
-Copy-Item $Env:HCIBoxDir\SqlQueryStress.zip -Destination "C:\VHDs\SqlQueryStress.zip" -ToSession $adminCenterSession
+Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession -Force
+Copy-Item $Env:HCIBoxDir\SqlQueryStress.zip -Destination "C:\VHDs\SqlQueryStress.zip" -ToSession $adminCenterSession -Force
 
 # Generate unique name for workload cluster
 $rand = New-Object System.Random
@@ -124,6 +124,8 @@ $defaultDomainPartition = "DC=$domainName,DC=local"
 # Deploying the Arc Data Controller
 Write-Header "Deploying the Arc Data extension"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin", [System.EnvironmentVariableTarget]::Machine)
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az extension add --name arcdata --system --only-show-errors
