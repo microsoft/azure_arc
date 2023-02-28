@@ -504,6 +504,8 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 
 Write-Header "Configure ADS"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    $WarningPreference = 'SilentlyContinue'
+    $ErrorActionPreference = 'silentlycontinue'
     $adminUsername = $using:adminUsername
     $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $using:adcred
     Write-Host "Generating endpoints file"
