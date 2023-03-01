@@ -277,14 +277,14 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![ArcBox client desktop](arcbox-client-desktop.png)
 
-6. Once the logon script execution is complete, click on **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
+6. Once the logon script execution is complete, click on the **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
 
   ![ArcBox client logon script complete](arcbox-client-logn-script-complete.png)
 
 
 ### (Option 2) Using Azure Bastion
 
-1. In Azure portal, go to ArcSql-Levelup resource group and open ArcBox-Client VM.
+1. In the Azure portal, go to _ArcSql-Levelup_ resource group and open _ArcBox-Client_ VM.
 
   ![ArcBox client VM from bastion deployment](arcbox-client-bastion-vm-resource.png)
 
@@ -292,11 +292,11 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![ArcBox client VM connect using bastion](arcbox-client-select-bastion.png)
 
-3. Enter Username and Password and click on Connect.
+3. Enter the Username and Password and click on Connect.
 
   ![ArcBox client VM connect using bastion](arcbox-client-bastion-connect.png)
 
-4. This will open new tab, please make sure to accept pop up window warning to successfully log into the VM.
+4. This will open a new tab, make sure to accept the pop-up window warning to successfully log into the VM.
 
   ![ArcBox client VM bastion allow popup](arcbox-client-bastion-connect-allow-popup.png)
 
@@ -308,7 +308,7 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-desktop.png)
 
-6. Once the logon script execution is complete, click on **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
+6. Once the logon script execution is complete, click on the **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
 
   ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-logon-script-complete.png)
 
