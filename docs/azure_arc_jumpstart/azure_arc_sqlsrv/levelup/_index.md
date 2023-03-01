@@ -267,7 +267,7 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![Accept access warning](arcbox-client-connect-rdp-accept-warning.png)
 
-5. During the first time logon to _ArcBox-Client_  VM, lab environment setup script will be executed to setup nested Hyper-V server, guest VMs with different SQL server editions, and onboard 2 of the SQL Server guest VMs.
+5. During the first time logon to the _ArcBox-Client_ VM, the lab environment setup script will be executed to set up nested Hyper-V server, guest VMs with different SQL server editions, and onboard 2 of the SQL Server guest VMs.
 
   ![ArcBox client logon script launch](arcbox-client-logn-script-launch.png)
 
