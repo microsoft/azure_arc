@@ -6,13 +6,42 @@ The following README will guide you on how to automatically deploy an ArcBox for
 
 ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc enabled SQL servers’ capabilities in a sandbox environment. Screenshot below shows layout of the lab environment.
 
-> **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
+Following guest VMs will be deployed in this lab environment to use in different modules.
+
+|VM Name |Windows version|SQL Server version|Purpose|Initial State|
+|-------|-------|-------|-------|-------|
+|JSLU-Win-SQL-01|Windows 2016| SQL Server 2016 |Used in lab module 1|Not on-boarded to Azure Arc|
+|JSLU-Win-SQL-02|Windows 2019| SQL Server 2019 |Used in lab module 3|On-boarded to Azure Arc as connected machine|
+|JSLU-Win-SQL-03|Windows 2022| SQL Server 2022 |Used in lab module 3|On-boarded to Azure Arc as connected machine|
+
+> **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. Instead Hyper-V server on Azure VM is deployed and setup SQL Server guest VMs on Hyper-V for these labs. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
 ## Task 1: Setup prerequisites
 
 Please also refer to the prerequisites section of the Azure Arc Jumpstart scenario upon which this LevelUp session is based here.
 
-1. vCPU Cores: ArcBox requires 16 DSv5-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the Azure CLI command below to check your vCPU utilization.
+1. **Supported Regions:** Arc-enabled SQL Server is supported in the following Azure regions. Deploy this lab environment only in one of these supported regions.
+
+    - East US
+    - East US 2
+    - West US
+    - West US 2
+    - West US 3
+    - Central US
+    - North Central US
+    - South Central US
+    - Canada Central
+    - UK South
+    - France Central
+    - West Europe
+    - North Europe
+    - Japan East
+    - Korea Central
+    - East Asia
+    - Southeast Asia
+    - Australia East
+
+2. **vCPU Cores:** ArcBox requires 16 DSv5-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the Azure CLI command below to check your vCPU utilization.
 
   ```shell
   az vm list-usage –location <Your preferred Azure region>
@@ -23,7 +52,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![Azure VM Usage](list-azure-usage.png)
 
-2. AZ CLI Version: Install or update Azure CLI to version 2.42.0 and above. Verify with `az --version`
+2. **AZ CLI Version:** Install or update Azure CLI to version 2.42.0 and above. Verify with `az --version`
 
   ```shell
   az --version
@@ -31,9 +60,15 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![AZ CLI Version](az-cli-version-check.png)
 
-3. Azure Arc Git Repository or Azure Portal: Clone the repository using `git clone https://github.com/microsoft/azure_arc.git`. Alternatively, you can deploy using Azure Portal using the deployment URL in the instructions in this module.
+4. **Azure Arc Git Repository (Optional):** You can deploy LevelUp this lab environment through Azure Portal using the the instructions in this module. Alternatively you can clone the Azure Arc Git repository using `git clone https://github.com/microsoft/azure_arc.git`. For CLI deployment follow instructions in deployment Option 2 under Task 2 in this lab guide.
 
-4. Azure AD Service Principal and Secret: A service principal with owner role on your subscription, which can be created with:
+  ```shell
+  git clone -b lu_arc_sql https://github.com/microsoft/azure_arc.git
+  ```
+
+  ![Git clone Azure Arc repository](git-clone-lu-arc-sql.png)
+
+5. **Azure AD Service Principal and Secret:** A service principal with **Owner** role on your subscription, which can be created using commands below using PowerShell or CloudShell:
 
   ```shell
   $subscriptionId = "<Your subscription id>"
@@ -44,18 +79,18 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
   az ad sp create-for-rbac -n $servicePrincipalName --role "Owner" --scopes /subscriptions/$subscriptionId
   ```
 
-  > **Note**: If you can’t use Owner role please make sure to assign Contributor and User Access Administrator roles to the service principal using below commands.
+  > **Note**: If you can’t use Owner role please make sure to assign **Contributor** and User **Access Administrator** roles to the service principal using below commands.
 
   ```shell
   az ad sp create-for-rbac -n $servicePrincipalName --role "Contributor" --scopes /subscriptions/$subscriptionId
   az ad sp create-for-rbac -n $servicePrincipalName --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
   ```
 
-5. Once you run above commands output should look like below.
+  Once you run above commands output should look like below.
 
   ![Create SPN with RBAC](create-spn-with-rbac.png)
 
-6. From the output of the last command, make note of the *appId, password, and tenant* values as shown in the screenshot to use in the LevelUp deployment.
+7. **Client ID and Secret:** From the output of the last command, make note of the **appId, password, and tenant** values as shown in the screenshot to use in the LevelUp deployment.
 
 ## Task 2: Deploy LevelUp lab environment
 
@@ -149,7 +184,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![Deploy ARM template](azure-arm-group-deploy.png)
 
-6. Monitor deployment progress and to go Task 3 once deployment is complete. This deployment takes around 15 minutes to complete.
+7. Monitor deployment progress and to go Task 3 once deployment is complete. This deployment takes around 15 minutes to complete.
 
   ![Monitor ARM deployment progress](azure-arm-group-deployment-complete.png)
 
@@ -238,6 +273,8 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![ArcBox client logon script Arc server onboarding](arcbox-client-logn-script-progress-arc-server.png)
 
+  ![ArcBox client desktop](arcbox-client-desktop.png)
+
 6. Once the logon script execution is complete, click on **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
 
   ![ArcBox client logon script complete](arcbox-client-logn-script-complete.png)
@@ -265,9 +302,9 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-logon-script-launch.png)
 
-  ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-logon-script-progress.png)
-
   ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-logon-script-progress-arc-servers.png)
+
+  ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-desktop.png)
 
 6. Once the logon script execution is complete, click on **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
 
