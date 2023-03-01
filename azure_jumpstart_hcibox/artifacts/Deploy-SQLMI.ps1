@@ -103,7 +103,7 @@ for ($i = 0; $i -lt $prefixLen; $i++) {
     $namingPrefix += [char]$rand.Next(97, 122)
 }
 # Get cluster name
-$clusterName = $env:AKSClusterName
+$clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
 [System.Environment]::SetEnvironmentVariable('AKS-sqlmi-ClusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
 
 # Initializing variables
