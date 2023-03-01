@@ -2,7 +2,7 @@
 
 ![LevelUp Deployment Diagram](levelup-diagram.png)
 
-The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled SQL Servers LevelUp training.
+The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled SQL Servers LevelUp training. This lab environment setup will take around 35 minutes to complete.
 
 ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc-enabled SQL servers’ capabilities in a sandbox environment. The screenshot below shows the layout of the lab environment.
 
@@ -267,7 +267,7 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![Accept access warning](arcbox-client-connect-rdp-accept-warning.png)
 
-5. During the first time logon lab environment setup script will be executed to setup nested Hyper-V guest VMs with different SQL server editions. This process will take around 20 minutes to complete.
+5. During the first time logon to _ArcBox-Client_  VM, lab environment setup script will be executed to setup nested Hyper-V server, guest VMs with different SQL server editions, and onboard 2 of the SQL Server guest VMs.
 
   ![ArcBox client logon script launch](arcbox-client-logn-script-launch.png)
 
