@@ -116,7 +116,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![Deployment complete](azure-portal-deployment-complete.png)
 
-6. This deployment contains 9 resources including ArcBox-Client VM that will be used as part of the lab modules.
+6. This deployment contains 9 resources including _ArcBox-Client_ VM that will be used as part of the lab modules.
 
   ![Deployed resources](azure-portal-deployment-resources.png)
 
