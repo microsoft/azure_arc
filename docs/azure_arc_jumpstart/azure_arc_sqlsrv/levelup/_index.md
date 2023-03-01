@@ -124,7 +124,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
 1. Open PowerShell window and change directory to **C:\\** and create **ArcSqlLevelup** sub folder and change directory to **C:\ArcSqlLevelup** folder.
 
-2. Clone the Azure Arc Jumpstart repository using command below using PowerShell window on your computer or Azure Cloud Shell.
+2. Clone the Azure Arc Jumpstart repository using the command below using either local PowerShell or Azure Cloud Shell.
 
   ```shell
   git clone -b lu_arc_sql https://github.com/microsoft/azure_arc.git
@@ -168,7 +168,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
   }
   ```
 
-5. Create resource group using command below.
+5. Create a resource group using the command below.
 
   ```shell
   az group create -n ArcSql-Levelup -l eastus
@@ -176,7 +176,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![Create resource group](azure-arm-group-create.png)
 
-6. Deploy ARM template using command below. Please make sure you change the file path in case if you chose different folder for git clone.
+6. Deploy the ARM template using the command below. Please make sure you change the file path in case you chose a different folder when cloning the repository.
 
   ```shell
   az deployment group create --resource-group ArcSql-Levelup --template-file "C:\ArcSqlLevelup\azure_arc\azure_jumpstart_arcbox_levelup\ARM\azuredeploy.json" --parameters "C:\ArcSqlLevelup\azure_arc\azure_jumpstart_arcbox_levelup\ARM\azuredeploy.parameters.json"
@@ -184,7 +184,9 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![Deploy ARM template](azure-arm-group-deploy.png)
 
-7. Monitor deployment progress and to go Task 3 once deployment is complete. This deployment takes around 15 minutes to complete.
+7. Monitor deployment progress. Once the deployment is complete continue to Task #3.
+
+> **Note**: The deployment takes around 15 minutes to complete.
 
   ![Monitor ARM deployment progress](azure-arm-group-deployment-complete.png)
 
@@ -192,17 +194,17 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
 ## Task 3: Setup RDP Access
 
-> **Note**: Following steps are not required when using Azure Bastion. Go to Task 4, to continue with the lab instructions.
+> **Note**: Following steps are not required when using Azure Bastion. Advanced to Task 4, to continue with the lab instructions.
 
 ## (Option 1) Allow access to Client VM using your own IP address
 
 Use the following steps if you are not using Just-in-time access. Skip to section “Allow access to Client VM using Just-in-time access:”
 
-1. Click on **ArcBox-Client** VM and select **Networking** to add NSG rule to allow RDP access to ArcBox-Client VM.
+1. Click on **ArcBox-Client** VM and select **Networking** to add the NSG rule to allow RDP access to the _ArcBox-Client_ VM.
 
   ![Client VM Networking](arcbox-client-networking.png)
 
-2. By default, access to this VM from the Internet is denied to secure access. Click on Add inbound port rule to allow access from your public IP address.
+2. By default, accessing this VM from the Internet is denied to secure access. Click on "Add inbound port rule" fora allowing access from your public IP address.
 
   ![Client VM Networking default NSG rules](arcbox-client-networking-nsg-rules.png)
 
@@ -210,13 +212,13 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![Client VM Networking add NSG rule](arcbox-client-networking-add-nsg-rule.png)
 
-4. Please make sure this rule is added and looks as shown in screenshot below to avoid any connectivity issues. 
+4. Please make sure this rule is added and looks as shown in the screenshot below to avoid any connectivity issues. 
 
   ![Client VM Networking](arcbox-client-networking-nsg-rdp-rule.png)
 
 ## (Option 2) Allow access to Client VM using Just-in-time access
 
-1. From the ArcBox-Client VM Overview tab, expand connect and click on RDP.
+1. From the +ArcBox-Client_ VM Overview tab, expand connect and click on RDP.
 
   ![Client VM Connectivity using JIT](arcbox-client-connect-rdp.png)
 
@@ -228,31 +230,31 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![Client VM Connectivity enable JIT](arcbox-client-connect-rdp-enable-jit.png)
 
-4. Once JIT is enabled, go back to the Client VM Overview page, click on RDP under connect to request RDP access. 
+4. Once JIT is enabled, go back to the Client VM Overview page, and click on RDP under connect to request RDP access. 
 
 5. Select My IP and click Request access as shown in the screenshot below.
 
   ![Client VM Connectivity request access](arcbox-client-connect-rdp-request-access.png)
 
-6. Once access request to approved and completed, click on Download RDP File to connect to the ArcBox-Client VM using RDP.
+6. Once the access request is approved and completed, click on Download RDP File to connect to the _ArcBox-Client_ VM using RDP.
 
   ![Client VM Connectivity download RDP file](arcbox-client-connect-download-rdp-file.png)
 
-7. Now, go to Task 4 to login to Client VM to complete the logon script setup remaining lab setup.
+7. Now, go to Task 4 to log in to Client VM to complete the logon script and the remaining lab setup.
 
 ## Task 4: Login to ArcBox-Client
 
 ### (Option 1) Using Remote Desktop Client
 
-1. Double click on the download ArcBox-Client.rdp file in your download folder
+1. Double-click on the download _ArcBox-Client.rdp_ file in your download folder
 
   ![Open RDP file](rdp-file.png)
 
-2. Access warning and click on Connect.
+2. Access the warning and click on Connect.
 
   ![Accept access warning](arcbox-client-rdp-file-connect.png)
 
-3. Enter username and password specified in your template parameter or use following default credentials filled in by the template.
+3. Enter the username and password specified in your template parameter or use the following default credentials filled in by the template.
 
   ```shell
   Username: arcdemo
