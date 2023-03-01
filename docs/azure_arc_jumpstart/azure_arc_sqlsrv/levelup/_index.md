@@ -96,7 +96,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
 ### (Option 1): Deploy using Azure Portal
 
-1. Click on the link below to login to Azure portal and launch ARM template to deploy level up lab environment.
+1. Click on the link below to log in to the Azure portal and launch the ARM template to deploy the Level-Up lab environment.
 
   [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Flu_arc_sql%2Fazure_jumpstart_arcbox_levelup%2FARM%2Fazuredeploy.json)
 
