@@ -4,7 +4,7 @@
 
 The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled SQL Servers LevelUp training.
 
-ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc enabled SQL servers’ capabilities in a sandbox environment. Screenshot below shows layout of the lab environment.
+ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc-enabled SQL servers’ capabilities in a sandbox environment. The screenshot below shows the layout of the lab environment.
 
 Following guest VMs will be deployed in this lab environment to use in different modules.
 
