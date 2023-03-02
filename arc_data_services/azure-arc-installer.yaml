@@ -1,0 +1,260 @@
+# ==========================================================================
+# AZURE-ARC-INSTALLER
+# --------------------------------------------------------------------------
+# Permissions required by the end-user onboarding ConnectedK8s and Arc-enabled
+# Data services. Note, this file was originally constructed by the ConnectedK8s
+# team - we maintain this fork going forward for our CI, and for updates release
+# to release in our own source control.
+# --------------------------------------------------------------------------
+# VAR SUBSTITUTIONS
+# --------------------------------------------------------------------------
+# - {{AZURE_ARC_NAMESPACE}}: namespace for ConnectedK8s operators
+# - {{AZURE_ARC_RELEASE_NAMESPACE}}: namespace for ConnectedK8s release
+# - {{AZURE_ARC_INSTALLER_SERVICE_ACCOUNT}}: name of the installer service account
+# ==========================================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{AZURE_ARC_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: onboarding-cluster-role
+rules:
+- apiGroups: [""]
+  resources:
+  # --------------------------------------------------------------------------
+  # CLI onboarding command validates the pre-req - checks if any nodes with OS
+  # 'linux' and architecture 'amd64' are present for scheduling the Arc-Agents
+  # onto and connecting to Azure: https://aka.ms/ArcK8sSupportedOSArchitecture
+  # --------------------------------------------------------------------------
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+  # --------------------------------------------------------------------------
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs:
+  - create
+  - patch
+  - get
+  - list
+  - update
+  - watch
+- apiGroups: [""]
+  # --------------------------------------------------------------------------
+  # KAP runs as a service
+  # --------------------------------------------------------------------------
+  resources:
+  - services
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - delete
+  # --------------------------------------------------------------------------
+- apiGroups: ["authorization.k8s.io"]
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - get
+  - create
+- apiGroups: ["rbac.authorization.k8s.io"]
+  # --------------------------------------------------------------------------
+  # CLI checks the ability to create clusterrolebindings.
+  # --------------------------------------------------------------------------
+  resources: 
+  - clusterrolebindings
+  - clusterroles
+  verbs: 
+  - create
+  - update
+  - get
+  - list
+  - delete
+  # --------------------------------------------------------------------------
+  # Used by Custom Location
+  # --------------------------------------------------------------------------
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings", "roles"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # --------------------------------------------------------------------------
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: 
+  - customresourcedefinitions
+  verbs: 
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+  - delete
+  # --------------------------------------------------------------------------
+  # KAP uses impersonate for Cluster Connect and Custom Location calls
+  # --------------------------------------------------------------------------
+- apiGroups: [""]
+  resources:
+  - users
+  - groups
+  - serviceaccounts
+  verbs:
+  - "impersonate"
+- apiGroups: ["authentication.k8s.io"]
+  resources:
+  - userextras/oid
+  - userextras/obo
+  verbs:
+  - "impersonate"
+  # --------------------------------------------------------------------------
+- apiGroups: [""]
+  resources: 
+  - configmaps
+  verbs: 
+  - create
+  - update
+  - get
+  - list
+  - watch
+  - patch
+- apiGroups: [""]
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+- apiGroups: ["clusterconfig.azure.com"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["arc.azure.com"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["create", "get", "list", "watch", "update"] 
+- apiGroups: [""]
+  resources:
+  - namespaces
+  verbs: ["create", "get", "list", "watch", "update"]
+- apiGroups: [""]
+  resources:
+  - role
+  - rolebinding
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: onboarding-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{AZURE_ARC_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+roleRef:
+  kind: ClusterRole
+  name: onboarding-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: onboarding-azure-arc-ns-role
+  namespace: {{AZURE_ARC_NAMESPACE}}
+rules:
+- apiGroups: ["apps"]
+  resources:
+  - replicasets
+  - deployments
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - create
+  - delete
+- apiGroups: [""]
+  resources:
+  - configmaps
+  - secrets
+  verbs:
+  - delete
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - watch
+  - list
+  - update
+  - delete
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: onboarding-binding-ns-azure-arc
+  namespace: {{AZURE_ARC_NAMESPACE}}
+subjects:
+- kind: ServiceAccount
+  name: {{AZURE_ARC_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+roleRef:
+  kind: Role
+  name: onboarding-azure-arc-ns-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: onboarding-ns-{{AZURE_ARC_RELEASE_NAMESPACE}}-role
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+rules:
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs:
+  - update
+  - delete
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: onboarding-binding-ns-{{AZURE_ARC_RELEASE_NAMESPACE}}
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+subjects:
+- kind: ServiceAccount
+  name: {{AZURE_ARC_INSTALLER_SERVICE_ACCOUNT}}
+  namespace: {{AZURE_ARC_RELEASE_NAMESPACE}}
+roleRef:
+  kind: Role
+  name: onboarding-ns-{{AZURE_ARC_RELEASE_NAMESPACE}}-role
+  apiGroup: rbac.authorization.k8s.io

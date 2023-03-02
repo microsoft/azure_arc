@@ -166,6 +166,25 @@
             }
         },
         {
+            "ApiVersion": "2023-01-15-preview",
+            "ResourceType": "sqlManagedInstances/FailoverGroups",
+            "ProviderName": "Microsoft.AzureArcData",
+            "ResourceMapping":
+            {
+                "Version": "v2",
+                "Group": "sql.arcdata.microsoft.com",
+                "Kind": "FailoverGroup",
+                "Name": "failovergroups",
+                "IsAsync": false,
+                "NamingStrategy": "UniqueUUID",
+                "AutomaticDelete": true,
+                "Liquid": {
+                  "AzureToKubernetes": "failovergroups/v2/azure.liquid",
+                  "KubernetesToAzure": "failovergroups/v2/kubernetes.liquid"
+                }
+            }
+        },
+        {
             "ApiVersion": "2022-03-01-preview",
             "ResourceType": "postgresInstances",
             "ProviderName": "Microsoft.AzureArcData",

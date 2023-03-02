@@ -5,7 +5,8 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$osmRelease = "v1.1.1"
+$osmReleaseVersion = "1.1.1-1"
+$osmCLIReleaseVersion = "v1.2.3"
 $osmMeshName = "osm"
 $ingressNamespace = "ingress-nginx"
 
@@ -77,10 +78,10 @@ Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 kubectx
 
-# "Download OSM binaries"
+# Download OSM binaries
 Write-Header "Downloading OSM Binaries"
-Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmRelease/osm-$osmRelease-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmRelease-windows-amd64.zip"
-Expand-Archive "$Env:TempDir\osm-$osmRelease-windows-amd64.zip" -DestinationPath $Env:TempDir
+Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmCLIReleaseVersion/osm-$osmCLIReleaseVersion-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmCLIReleaseVersion-windows-amd64.zip"
+Expand-Archive "$Env:TempDir\osm-$osmCLIReleaseVersion-windows-amd64.zip" -DestinationPath $Env:TempDir
 Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 
 Write-Header "Adding Tools Folder to PATH"
@@ -109,7 +110,16 @@ az -v
 
 # "Create OSM Kubernetes extension instance"
 Write-Header "Creating OSM K8s Extension Instance"
-az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name $osmMeshName
+az k8s-extension create `
+    --name $osmMeshName `
+    --extension-type Microsoft.openservicemesh `
+    --scope cluster `
+    --cluster-name $Env:capiArcDataClusterName `
+    --resource-group $Env:resourceGroup `
+    --cluster-type connectedClusters `
+    --version $osmReleaseVersion `
+    --auto-upgrade-minor-version 'false'
+
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
