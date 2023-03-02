@@ -180,117 +180,162 @@ spec:
     storage: true
     schema:
       openAPIV3Schema:
+        description: A Sql Managed Instance Monitoring Profile is a resource that
+          specifies what monitoring data to collect for a SQL Managed Instances. The
+          data specified in this profile will be collected and sent to the Telemetry
+          Router on the SQL instances that reference this profile.
         type: object
         properties:
           spec:
+            description: Specification of the desired monitoring data to be collected
+              for any SQL instance that references this profile.
             type: object
             properties:
               datasets:
+                description: List of datasets available for collection.
                 type: object
                 properties:
                   activeSessions:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   cpuUtilization:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   databaseProperties:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   databaseReplicas:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   databaseStorageUtilization:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   healthDiagnostics:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   memoryUtilization:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   performanceCounters:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   serverProperties:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   queryRuntimeStats:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   queryWaitStats:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   sqlAgentJobHistory:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   sqlAgentJobState:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   storageIo:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   volumeStorageUtilization:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
                   waitStats:
+                    description: Configuration for the datasets.
                     type: object
                     properties:
                       frequency:
+                        description: Frequency desc.
                         type: string
               xevents:
                 description: List of Extended Events sessions to collect.
                 type: array
                 items:
+                  description: Represents and extended event session and target.
                   type: object
                   properties:
                     name:
                       description: The name of the Extended Events session.
                       type: string
                     target:
+                      description: The extended event session target to collect events
+                        from.
                       type: object
                       properties:
                         type:
-                          description: The target type.
+                          description: The target type. Currently only EventFile is
+                            supported.
                           type: string
                           enum:
                           - None
                           - EventFile
                         filename:
                           description: 'For EventFile targets, this is the filename
-                            without a path (e.g: "MySessionFile.xel").'
+                            without a path specified when the target was created (e.g:
+                            "MySessionFile.xel").'
                           type: string
           status:
+            description: Most recently observed status of the monitoring profile.
             type: object
             properties:
               observedGeneration:

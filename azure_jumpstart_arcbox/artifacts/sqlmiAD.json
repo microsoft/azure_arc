@@ -3,14 +3,14 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "resourceGroup": {
-      "type": "string"
+      "type": "String"
     },
     "dataControllerId": {
       "type": "String"
@@ -91,27 +91,27 @@
       "defaultValue": ""
     },
     "sqlInstanceName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": "jumpstart-sql"
     },
     "adAccountName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": ""
     },
     "adConnectorName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": ""
     },
     "dnsName": {
-      "type": "string",
+      "type": "String",
       "defaultValue": ""
     },
     "dnsNameSecondary": {
-      "type": "string",
+      "type": "String",
       "defaultValue": ""
     },
     "port": {
-      "type": "int"
+      "type": "Int"
     }
   },
   "variables": {},

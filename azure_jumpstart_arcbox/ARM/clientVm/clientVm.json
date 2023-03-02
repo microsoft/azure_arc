@@ -3,28 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-Client",
             "metadata": {
                 "description": "The name of your Virtual Machine"
             }
         },
         "capiArcDataClusterName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-CAPI-Data",
             "metadata": {
                 "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
             }
         },
         "windowsAdminUsername": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine"
             }
         },
         "windowsAdminPassword": {
-            "type": "securestring",
+            "type": "SecureString",
             "minLength": 12,
             "maxLength": 123,
             "defaultValue": "ArcPassword123!!",
@@ -33,137 +33,137 @@
             }
         },
         "windowsOSVersion": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "2022-datacenter-g2",
             "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
             }
         },
         "location": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources"
             }
         },
         "virtualNetworkName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-Vnet",
             "metadata": {
                 "description": "Name of the VNET"
             }
         },
         "subnetName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "resourceTags": {
-            "type": "object",
+            "type": "Object",
             "defaultValue": {
                 "Project": "jumpstart_arcbox"
             }
         },
         "spnClientId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Client id of the service principal"
             }
         },
         "spnClientSecret": {
-            "type": "securestring",
+            "type": "SecureString",
             "metadata": {
                 "description": "Client secret of the service principal"
             }
         },
         "spnAuthority": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "https://login.microsoftonline.com"
         },
         "spnTenantId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Tenant id of the service principal"
             }
         },
         "azdataUsername": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcdemo"
         },
         "azdataPassword": {
-            "type": "securestring",
+            "type": "SecureString",
             "defaultValue": "ArcPassword123!!"
         },
         "acceptEula": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "yes"
         },
         "registryUsername": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "registryUser"
         },
         "registryPassword": {
-            "type": "securestring",
+            "type": "SecureString",
             "defaultValue": "registrySecret"
         },
         "arcDcName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcdatactrl"
         },
         "mssqlmiName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcsqlmidemo"
         },
         "postgresName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcpg",
             "metadata": {
                 "description": "Name of PostgreSQL server group"
             }
         },
         "postgresWorkerNodeCount": {
-            "type": "int",
+            "type": "Int",
             "defaultValue": 3,
             "metadata": {
                 "description": "Number of PostgreSQL worker nodes"
             }
         },
         "postgresDatasize": {
-            "type": "int",
+            "type": "Int",
             "defaultValue": 1024,
             "metadata": {
                 "description": "Size of data volumes in MB"
             }
         },
         "postgresServiceType": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "LoadBalancer",
             "metadata": {
                 "description": "Choose how PostgreSQL service is accessed through Kubernetes networking interface"
             }
         },
         "stagingStorageAccountName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
         "workspaceName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Name for the environment Azure Log Analytics workspace"
             }
         },
         "templateBaseUrl": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
             }
         },
         "flavor": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             },
@@ -178,31 +178,45 @@
             "defaultValue": false
         },
         "githubUser": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
             }
         },
         "k3sArcClusterName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The name of the K3s cluster"
             },
             "defaultValue": "ArcBox-K3s"
         },
         "aksArcClusterName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The name of the AKS cluster"
             },
             "defaultValue": "ArcBox-AKS-Data"
         },
         "aksdrArcClusterName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The name of the AKS DR cluster"
             },
             "defaultValue": "ArcBox-AKS-DR-Data"
+        },
+        "rdpPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+            },
+            "defaultValue": "3389"
+        },
+        "sshPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM."
+            },
+            "defaultValue": "22"
         }
     },
     "variables": {
@@ -324,7 +338,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -registryUsername ', parameters('registryUsername'), ' -registryPassword ', parameters('registryPassword'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -mssqlmiName ', parameters('mssqlmiName'), ' -POSTGRES_NAME ', parameters('postgresName'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('postgresWorkerNodeCount'), ' -POSTGRES_DATASIZE ', parameters('postgresDatasize'), ' -POSTGRES_SERVICE_TYPE ', parameters('postgresServiceType'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -capiArcDataClusterName ', parameters('capiArcDataClusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -flavor ', parameters('flavor'), ' -k3sArcClusterName ', parameters('k3sArcClusterName'), ' -aksArcClusterName ', parameters('aksArcClusterName') , ' -aksdrArcClusterName ', parameters('aksdrArcClusterName') , ' -githubUser ', parameters('githubUser'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -registryUsername ', parameters('registryUsername'), ' -registryPassword ', parameters('registryPassword'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -mssqlmiName ', parameters('mssqlmiName'), ' -POSTGRES_NAME ', parameters('postgresName'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('postgresWorkerNodeCount'), ' -POSTGRES_DATASIZE ', parameters('postgresDatasize'), ' -POSTGRES_SERVICE_TYPE ', parameters('postgresServiceType'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -capiArcDataClusterName ', parameters('capiArcDataClusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -flavor ', parameters('flavor'), ' -k3sArcClusterName ', parameters('k3sArcClusterName'), ' -aksArcClusterName ', parameters('aksArcClusterName') , ' -aksdrArcClusterName ', parameters('aksdrArcClusterName') , ' -githubUser ', parameters('githubUser'), ' -rdpPort ', parameters('rdpPort'), ' -sshPort ', parameters('sshPort'))]"
                 }
             }
         }
@@ -332,12 +346,12 @@
 
     "outputs": {
         "adminUsername": {
-            "type": "string",
+            "type": "String",
             "value": "[parameters('windowsAdminUsername')]"
         },
         "publicIP": {
             "condition": "[not(parameters('deployBastion'))]",
-            "type": "string",
+            "type": "String",
             "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
         }
     }

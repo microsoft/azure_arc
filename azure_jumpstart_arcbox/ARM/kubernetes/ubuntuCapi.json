@@ -3,34 +3,34 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-CAPI-MGMT",
             "metadata": {
                 "description": "The name of you Virtual Machine"
             }
         },
         "capiArcDataClusterName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-CAPI-Data",
             "metadata": {
                 "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster"
             }
         },
         "adminUsername": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine"
             }
         },
         "sshRSAPublicKey": {
-            "type": "securestring",
+            "type": "SecureString",
             "metadata": {
                 "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
             }
         },
         "ubuntuOSVersion": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "20_04-lts-gen2",
             "allowedValues": [
                 "20_04-lts-gen2"
@@ -40,71 +40,71 @@
             }
         },
         "azureLocation": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
             }
         },
         "vmSize": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "Standard_B4ms",
             "metadata": {
                 "description": "The size of the VM"
             }
         },
         "virtualNetworkName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-VNet",
             "metadata": {
                 "description": "Name of the VNet"
             }
         },
         "subnetName": {
-            "type": "string",
+            "type": "String",
             "defaultValue": "ArcBox-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "resourceTags": {
-            "type": "object",
+            "type": "Object",
             "defaultValue": {
                 "Project": "jumpstart_arcbox"
             }
         },
         "spnClientId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Azure service principal client id"
             }
         },
         "spnClientSecret": {
-            "type": "securestring",
+            "type": "SecureString",
             "metadata": {
                 "description": "Azure service principal client secret"
             }
         },
         "spnTenantId": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Azure AD tenant id for your service principal"
             }
         },
         "stagingStorageAccountName": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
         "logAnalyticsWorkspace": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },
         "templateBaseUrl": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template"
             }
@@ -117,7 +117,7 @@
             "defaultValue": false
         },
         "flavor": {
-            "type": "string",
+            "type": "String",
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
             },
@@ -127,6 +127,20 @@
                 "DevOps",
                 "DataOps"
             ]
+        },
+        "rdpPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM."
+            },
+            "defaultValue": "3389"
+        },
+        "sshPort": {
+            "type": "string",
+            "metadata": {
+                "description": "Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM."
+            },
+            "defaultValue": "22"
         }
     },
     "variables": {
