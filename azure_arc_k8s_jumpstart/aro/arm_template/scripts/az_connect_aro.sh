@@ -81,5 +81,5 @@ user="kube:admin"
 context="default/$clusterName$user"
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s' --kube-context $context --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --distribution openshift --infrastructure azure --tags 'Project=jumpstart_azure_arc_k8s' --kube-context $context --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 echo ""

@@ -3,16 +3,15 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$gAksEdgeRemoteDeployVersion = "1.0.221212.1200"
+$AksEdgeRemoteDeployVersion = "1.0.230221.1000"
 $schemaVersion = "1.1"
-$version = "1.0"
 $schemaVersionAksEdgeConfig = "1.5"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 
 # Requires -RunAsAdministrator
 
-New-Variable -Name gAksEdgeRemoteDeployVersion -Value $gAksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
+New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
 if (! [Environment]::Is64BitProcess) {
     Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
@@ -20,19 +19,17 @@ if (! [Environment]::Is64BitProcess) {
 }
 
 if ($env:kubernetesDistribution -eq "k8s") {
-    $productName ="AKS Edge Essentials - K8s (Public Preview)"
+    $productName = "AKS Edge Essentials - K8s"
     $networkplugin = "calico"
 } else {
-    $productName = "AKS Edge Essentials - K3s (Public Preview)"
+    $productName = "AKS Edge Essentials - K3s"
     $networkplugin = "flannel"
 }
 
 # Here string for the json content
-
-if ($env:windowsNode -eq $true) {
-$jsonContent = @"
+$aideuserConfig = @"
 {
-    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
+    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
     "Version": "$schemaVersion",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
@@ -42,89 +39,78 @@ $jsonContent = @"
         "ResourceGroupName": "$env:resourceGroup",
         "Location": "$env:location"
     },
-    "AksEdgeConfig":{
-        "SchemaVersion": "$schemaVersionAksEdgeConfig",
-        "Version": "$versionAksEdgeConfig",
-        "DeploymentType": "SingleMachineCluster",
-        "Init": {
-            "ServiceIPRangeSize": 0
-        },
-        "Network": {
-            "NetworkPlugin": "$networkplugin",
-            "InternetDisabled": false
-        },
-        "User": {
-            "AcceptEula": true,
-            "AcceptOptionalTelemetry": true
-        },
-        "Machines": [
-            {
-                "LinuxNode": {
-                    "CpuCount": 4,
-                    "MemoryInMB": 4096,
-                    "DataSizeInGB": 20
-                },
-                "WindowsNode": {
-                    "CpuCount": 2,
-                    "MemoryInMB": 4096
-                }
+    "AksEdgeConfigFile": "aksedge-config.json"
+}
+"@
+
+if ($env:windowsNode -eq $true) {
+    $aksedgeConfig = @"
+{
+    "SchemaVersion": "$schemaVersionAksEdgeConfig",
+    "Version": "$versionAksEdgeConfig",
+    "DeploymentType": "SingleMachineCluster",
+    "Init": {
+        "ServiceIPRangeSize": 0
+    },
+    "Network": {
+        "NetworkPlugin": "$networkplugin",
+        "InternetDisabled": false
+    },
+    "User": {
+        "AcceptEula": true,
+        "AcceptOptionalTelemetry": true
+    },
+    "Machines": [
+        {
+            "LinuxNode": {
+                "CpuCount": 4,
+                "MemoryInMB": 4096,
+                "DataSizeInGB": 20
+            },
+            "WindowsNode": {
+                "CpuCount": 2,
+                "MemoryInMB": 4096
             }
-        ]
-    }
+        }
+    ]
 }
 "@
 } else {
-$jsonContent = @"
+    $aksedgeConfig = @"
 {
-    "SchemaVersion": "$gAksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$env:subscriptionId",
-        "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$env:resourceGroup",
-        "Location": "$env:location"
+    "SchemaVersion": "$schemaVersionAksEdgeConfig",
+    "Version": "$versionAksEdgeConfig",
+    "DeploymentType": "SingleMachineCluster",
+    "Init": {
+        "ServiceIPRangeSize": 0
     },
-    "AksEdgeConfig":{
-        "SchemaVersion": "$schemaVersionAksEdgeConfig",
-        "Version": "$versionAksEdgeConfig",
-        "DeploymentType": "SingleMachineCluster",
-        "Init": {
-            "ServiceIPRangeSize": 0
-        },
-        "Network": {
-            "NetworkPlugin": "$networkplugin",
-            "InternetDisabled": false
-        },
-        "User": {
-            "AcceptEula": true,
-            "AcceptOptionalTelemetry": true
-        },
-        "Machines": [
-            {
-                "LinuxNode": {
-                    "CpuCount": 4,
-                    "MemoryInMB": 4096,
-                    "DataSizeInGB": 20
-                }
+    "Network": {
+        "NetworkPlugin": "$networkplugin",
+        "InternetDisabled": false
+    },
+    "User": {
+        "AcceptEula": true,
+        "AcceptOptionalTelemetry": true
+    },
+    "Machines": [
+        {
+            "LinuxNode": {
+                "CpuCount": 4,
+                "MemoryInMB": 4096,
+                "DataSizeInGB": 20
             }
-        ]
-    }
+        }
+    ]
 }
 "@
 }
-
-###
-# Main
-###
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
 $url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
-
 $installDir = "C:\AksEdgeScript"
+$workDir = "$installDir\AKS-Edge-main"
 
 if (-not (Test-Path -Path $installDir)) {
     Write-Host "Creating $installDir..."
@@ -133,26 +119,37 @@ if (-not (Test-Path -Path $installDir)) {
 
 Push-Location $installDir
 
+Write-Host "`n"
+Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
+Write-Host "`n"
+
 try {
-    function download2() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile}
+    function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
     download2
-} catch {
+}
+catch {
     Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
     Stop-Transcript | Out-Null
     Pop-Location
     exit -1
 }
 
-Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
-$aidejson = (Get-ChildItem -Path "$installDir" -Filter aide-userconfig.json -Recurse).FullName
-Set-Content -Path $aidejson -Value $jsonContent -Force
+if (!(Test-Path -Path "$workDir")) {
+    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
+}
 
-$aksedgeShell = (Get-ChildItem -Path "$installDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
+$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
+Set-Content -Path $aidejson -Value $aideuserConfig -Force
+$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
+Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
+
+$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
 . $aksedgeShell
 
+# Download, install and deploy AKS EE 
+Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
 # invoke the workflow, the json file already stored above.
-$retval = Start-AideWorkflow
-
+$retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
     Write-Host "Deployment Successful. "
@@ -161,6 +158,20 @@ if ($retval) {
     Stop-Transcript | Out-Null
     Pop-Location
     exit -1
+}
+
+if ($env:windowsNode -eq $true) {
+    # Get a list of all nodes in the cluster
+    $nodes = kubectl get nodes -o json | ConvertFrom-Json
+
+    # Loop through each node and check the OSImage field
+    foreach ($node in $nodes.items) {
+        $os = $node.status.nodeInfo.osImage
+        if ($os -like '*windows*') {
+            # If the OSImage field contains "windows", assign the "worker" role
+            kubectl label nodes $node.metadata.name node-role.kubernetes.io/worker=worker
+        }
+    }
 }
 
 Write-Host "`n"
@@ -214,36 +225,38 @@ Write-Host "`n"
 Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host }}
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
-$suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
-$Env:arcClusterName = "AKS-EE-Demo-$suffix"
+$suffix = -join ((97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
+$Env:arcClusterName = "$Env:ComputerName-$suffix"
 az connectedk8s connect --name $Env:arcClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --location $env:location `
-                        --tags "Project=jumpstart_azure_arc_data_services" "ClusterId=$clusterId" `
-                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+    --resource-group $Env:resourceGroup `
+    --location $env:location `
+    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
+
 # Deploying Azure log-analytics workspace
+$workspaceName = ($Env:arcClusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
-                        --resource-group $Env:resourceGroup `
-                        --workspace-name "law-aks-ee-demo-$suffix" `
-                        --query id -o tsv
+    --resource-group $Env:resourceGroup `
+    --workspace-name "$workspaceName-law" `
+    --query id -o tsv
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" `
-                        --cluster-name $Env:arcClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --cluster-type connectedClusters `
-                        --extension-type Microsoft.AzureMonitor.Containers `
-                        --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+    --cluster-name $Env:arcClusterName `
+    --resource-group $Env:resourceGroup `
+    --cluster-type connectedClusters `
+    --extension-type Microsoft.AzureMonitor.Containers `
+    --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # # Deploying Azure Defender Kubernetes extension instance
 # Write-Host "`n"
@@ -278,7 +291,7 @@ Write-Host "`n"
 Write-Host "Onboarding the Azure VM to Azure Arc..."
 
 # Download the package
-function download1() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi}
+function download1() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi }
 download1
 
 # Install the package
@@ -288,18 +301,18 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
 $clusterName = "$env:computername-$env:kubernetesDistribution"
 
 # Run connect command
- & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
- --service-principal-id $env:appId `
- --service-principal-secret $env:password `
- --resource-group $env:resourceGroup `
- --tenant-id $env:tenantId `
- --location $env:location `
- --subscription-id $env:subscriptionId `
- --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
- --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+& "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
+    --service-principal-id $env:appId `
+    --service-principal-secret $env:password `
+    --resource-group $env:resourceGroup `
+    --tenant-id $env:tenantId `
+    --location $env:location `
+    --subscription-id $env:subscriptionId `
+    --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
+    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Changing to Client VM wallpaper
-$imgPath="C:\Temp\wallpaper.png"
+$imgPath = "C:\Temp\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
