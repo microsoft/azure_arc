@@ -1,10 +1,11 @@
 # Azure Arc-enabled SQL Servers LevelUp Training
 
-![LevelUp Deployment Diagram](levelup-diagram.png)
 
 The following README will guide you on how to automatically deploy an ArcBox for use with the Azure Arc-enabled SQL Servers LevelUp training. This lab environment setup will take around 35 minutes to complete.
 
 ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc-enabled SQL servers’ capabilities in a sandbox environment. The screenshot below shows the layout of the lab environment.
+
+![LevelUp Deployment Diagram](levelup-diagram.png)
 
 Following guest VMs will be deployed in this lab environment to use in different modules.
 
@@ -60,7 +61,7 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
   ![AZ CLI Version](az-cli-version-check.png)
 
-4. **Azure Arc Git Repository (Optional):** You can deploy LevelUp this lab environment through Azure Portal using the the instructions in this module. Alternatively you can clone the Azure Arc Git repository using `git clone https://github.com/microsoft/azure_arc.git`. For CLI deployment follow instructions in deployment Option 2 under Task 2 in this lab guide.
+4. **Azure Arc Git Repository (Optional):** You can deploy this LevelUp lab environment through Azure Portal using the the instructions in this module. Alternatively, you can clone the Azure Arc Git repository using `git clone https://github.com/microsoft/azure_arc.git`. For CLI deployment follow instructions in deployment Option 2 under Task 2 in this lab guide.
 
   ```shell
   git clone -b lu_arc_sql https://github.com/microsoft/azure_arc.git
@@ -194,17 +195,17 @@ Please also refer to the prerequisites section of the Azure Arc Jumpstart scenar
 
 ## Task 3: Setup RDP Access
 
-> **Note**: Following steps are not required when using Azure Bastion. Advanced to Task 4, to continue with the lab instructions.
+> **Note**: Following steps are not required when using Azure Bastion. Advance to Task 4, to continue with the lab instructions.
 
 ## (Option 1) Allow access to Client VM using your own IP address
 
-Use the following steps if you are not using Just-in-time access. Skip to section “Allow access to Client VM using Just-in-time access:”
+Use the following steps if you are not using Just-in-time access. Otherwise skip to section “Allow access to Client VM using Just-in-time access:”
 
 1. Click on **ArcBox-Client** VM and select **Networking** to add the NSG rule to allow RDP access to the _ArcBox-Client_ VM.
 
   ![Client VM Networking](arcbox-client-networking.png)
 
-2. By default, accessing this VM from the Internet is denied to secure access. Click on "Add inbound port rule" fora allowing access from your public IP address.
+2. By default, accessing this VM from the Internet is denied to secure access. Click on "Add inbound port rule" for allowing access from your public IP address.
 
   ![Client VM Networking default NSG rules](arcbox-client-networking-nsg-rules.png)
 
@@ -212,25 +213,25 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
   ![Client VM Networking add NSG rule](arcbox-client-networking-add-nsg-rule.png)
 
-4. Please make sure this rule is added and looks as shown in the screenshot below to avoid any connectivity issues. 
+4. Please make sure this rule is added and looks as shown in the screenshot below to avoid any connectivity issues.
 
   ![Client VM Networking](arcbox-client-networking-nsg-rdp-rule.png)
 
 ## (Option 2) Allow access to Client VM using Just-in-time access
 
-1. From the +ArcBox-Client_ VM Overview tab, expand connect and click on RDP.
+1. From the _ArcBox-Client_ VM Overview tab, expand connect and click on RDP.
 
   ![Client VM Connectivity using JIT](arcbox-client-connect-rdp.png)
 
-2. Click on "To improve security, enabled just-in-time access to this VM" as shown in the screenshot below.
+2. Click on "To improve security, enable just-in-time access to this VM" as shown in the screenshot below.
 
   ![Client VM Connectivity enable JIT](arcbox-client-connect-rdp-jit.png)
 
-3. Click on Enabled just-in-time as shown in the screenshot below.
+3. Click on "Enable just-in-time" as shown in the screenshot below.
 
   ![Client VM Connectivity enable JIT](arcbox-client-connect-rdp-enable-jit.png)
 
-4. Once JIT is enabled, go back to the Client VM Overview page, and click on RDP under connect to request RDP access. 
+4. Once JIT is enabled, go back to the Client VM Overview page, and click on RDP under connect to request RDP access.
 
 5. Select My IP and click Request access as shown in the screenshot below.
 
@@ -246,15 +247,15 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 
 ### (Option 1) Using Remote Desktop Client
 
-1. Double-click on the download _ArcBox-Client.rdp_ file in your download folder
+1. Double-click on the downloaded _ArcBox-Client.rdp_ file in your download folder
 
   ![Open RDP file](rdp-file.png)
 
-2. Access the warning and click on Connect.
+2. Accept the warning and click on Connect.
 
   ![Accept access warning](arcbox-client-rdp-file-connect.png)
 
-3. Enter the username and password specified in your template parameter or use the following default credentials filled in by the template.
+3. Enter the username and password specified in your template parameters or use the following default credentials filled in by the template.
 
   ```shell
   Username: arcdemo
@@ -311,6 +312,10 @@ Use the following steps if you are not using Just-in-time access. Skip to sectio
 6. Once the logon script execution is complete, click on the **Hyper-V Manager** icon on the desktop to see nested SQL Server VMs setup for the labs.
 
   ![ArcBox client VM bastion launch logon script](arcbox-client-bastion-logon-script-complete.png)
+
+7. Screenshot below shows all the resources created in the resource group once the deployment is completed.
+
+  ![ArcBox client VM bastion launch logon script](azure-bastion-deployment-resources.png)
 
 ## Required Credentials
 
