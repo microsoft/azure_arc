@@ -46,9 +46,9 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 
 foreach ($VM in $SDNConfig.HostList) {
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
-        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-        $ErrorActionPreference = "Continue"
+        # [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
+        # $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+        # $ErrorActionPreference = "Continue"
         az extension add --upgrade --name arcappliance --only-show-errors
         az extension add --upgrade --name connectedk8s --only-show-errors
         az extension add --upgrade --name k8s-configuration --only-show-errors
@@ -110,7 +110,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Do {
         Write-Host "Waiting on Arc Resource Bridge deployment to complete..."
         Start-Sleep 60
-        $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name | ConvertFrom-Json
+        $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name --only-show-errors | ConvertFrom-Json
         if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Running")) {
             $rbReady = $true
         }
@@ -126,7 +126,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Do {
         Write-Host "Waiting for custom location to provision..."
         Start-Sleep 10
-        $readiness = az k8s-extension show --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator | ConvertFrom-Json
+        $readiness = az k8s-extension show --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator --only-show-errors | ConvertFrom-Json
         if ($readiness.provisioningState -eq "Succeeded") {
             $clReady = $true
         }
