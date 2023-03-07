@@ -65,8 +65,8 @@ foreach ($VM in $SDNConfig.HostList) {
         Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet';
         Start-Sleep -Seconds 30
         $ProgressPreference = "Continue"
-        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
-        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+        # [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
+        # $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     }
 }
 Stop-Transcript
