@@ -53,6 +53,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -118,6 +120,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -183,6 +187,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
