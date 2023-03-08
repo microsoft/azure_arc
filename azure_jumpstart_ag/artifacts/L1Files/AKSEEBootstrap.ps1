@@ -56,6 +56,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+    Install-AksEdgeHostFeatures -Force
 
     $content = Get-Content $AKSEEConfigFilePath
 
@@ -118,6 +119,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+    Install-AksEdgeHostFeatures -Force
 
     $content = Get-Content $AKSEEConfigFilePath
 
@@ -180,6 +182,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+    Install-AksEdgeHostFeatures -Force
 
     $content = Get-Content $AKSEEConfigFilePath
 
