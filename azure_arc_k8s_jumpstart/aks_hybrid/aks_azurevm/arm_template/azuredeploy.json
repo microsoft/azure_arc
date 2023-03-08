@@ -363,7 +363,7 @@
         }
     },
     "variables": {
-        "templateBaseUrl": "https://raw.githubusercontent.com/lanicolas/aks-on-ws/main/",
+        "templateBaseUrl": "https://raw.githubusercontent.com/lanicolas/azure_arc/aks-on-ws/azure_arc_k8s_jumpstart/aks_hybrid/aks_azurevm/arm_template",
         "dataDisksCount": 8,
         "dscUri": "https://github.com/Azure/aks-hci/raw/main/eval/dsc/akshcihost.zip",
         "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/main/eval/",
@@ -669,7 +669,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(variables('templateBaseUrl'), concat('json/updatevnet.json'))]",
+                    "uri": "[uri(variables('templateBaseUrl'), concat('artifacts/updatevnet.json'))]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
