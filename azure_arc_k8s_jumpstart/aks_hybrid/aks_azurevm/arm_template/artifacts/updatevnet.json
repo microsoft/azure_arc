@@ -62,9 +62,9 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters'subnetName')]",
+                        "name": "[parameters('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[parameters'subnetPrefix')]",
+                            "addressPrefix": "[parameters('subnetPrefix')]",
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
@@ -72,7 +72,7 @@
                     {
                         "name" : "AzureBastionSubnet",
                         "properties": {
-                            "addressPrefix": "[parameters'bastionSubnetIpPrefix')]"
+                            "addressPrefix": "[parameters('bastionSubnetIpPrefix')]"
                         }
                      }
                 ]
@@ -80,4 +80,3 @@
         }
     ]
 }
-
