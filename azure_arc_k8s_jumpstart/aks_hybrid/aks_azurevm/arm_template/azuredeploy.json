@@ -669,7 +669,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(variables('templateBaseUrl'), concat('/updatevnet.json'))]",
+                    "uri": "[uri(variables('templateBaseUrl'),concat('artifacts/json/updatevnet.json'))]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
