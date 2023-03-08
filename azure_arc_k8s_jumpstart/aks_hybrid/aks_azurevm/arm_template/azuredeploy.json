@@ -694,7 +694,7 @@
                         "value": "[resourceGroup().location]"
                     },
                     "bastionSubnetIpPrefix": {
-                        "value": "[variables('bastionSubnetIpPrefix]"
+                        "value": "[variables('bastionSubnetIpPrefix')]"
                     }
                 }
             }
