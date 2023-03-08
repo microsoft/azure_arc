@@ -1,338 +1,138 @@
 Start-Transcript -Path C:\Temp\LogonScript.log
 
-## Deploy AKS EE
-
-# Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1000"
-$schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.5"
-$versionAksEdgeConfig = "1.0"
-$aksEdgeDeployModules = "main"
-
-# Requires -RunAsAdministrator
-
-New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
-
-if (! [Environment]::Is64BitProcess) {
-    Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
-    exit -1
-}
-
-if ($env:kubernetesDistribution -eq "k8s") {
-    $productName = "AKS Edge Essentials - K8s"
-    $networkplugin = "calico"
-} else {
-    $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "flannel"
-}
-
-# Here string for the json content
-$aideuserConfig = @"
-{
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$env:subscriptionId",
-        "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$env:resourceGroup",
-        "Location": "$env:location"
-    },
-    "AksEdgeConfigFile": "aksedge-config.json"
-}
-"@
-
-if ($env:windowsNode -eq $true) {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            },
-            "WindowsNode": {
-                "CpuCount": 2,
-                "MemoryInMB": 4096
-            }
-        }
-    ]
-}
-"@
-} else {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            }
-        }
-    ]
-}
-"@
-}
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
-# Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
-$zipFile = "$aksEdgeDeployModules.zip"
-$installDir = "C:\AksEdgeScript"
-$workDir = "$installDir\AKS-Edge-main"
-
-if (-not (Test-Path -Path $installDir)) {
-    Write-Host "Creating $installDir..."
-    New-Item -Path "$installDir" -ItemType Directory | Out-Null
-}
-
-Push-Location $installDir
-
-Write-Host "`n"
-Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
-Write-Host "`n"
-
-try {
-    function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
-    download2
-}
-catch {
-    Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if (!(Test-Path -Path "$workDir")) {
-    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
-}
-
-$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
-Set-Content -Path $aidejson -Value $aideuserConfig -Force
-$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
-Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
-
-$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
-. $aksedgeShell
-
-# Download, install and deploy AKS EE 
-Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
-# invoke the workflow, the json file already stored above.
-$retval = Start-AideWorkflow -jsonFile $aidejson
-# report error via Write-Error for Intune to show proper status
-if ($retval) {
-    Write-Host "Deployment Successful. "
-} else {
-    Write-Error -Message "Deployment failed" -Category OperationStopped
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if ($env:windowsNode -eq $true) {
-    # Get a list of all nodes in the cluster
-    $nodes = kubectl get nodes -o json | ConvertFrom-Json
-
-    # Loop through each node and check the OSImage field
-    foreach ($node in $nodes.items) {
-        $os = $node.status.nodeInfo.osImage
-        if ($os -like '*windows*') {
-            # If the OSImage field contains "windows", assign the "worker" role
-            kubectl label nodes $node.metadata.name node-role.kubernetes.io/worker=worker
-        }
-    }
-}
-
-Write-Host "`n"
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes -o wide
-Write-Host "`n"
-
-# az version
-az -v
+# Powershell-Cmdlet -Confirm:$false
 
 # Login as service principal
-az login --service-principal --username $Env:appId --password $Env:password --tenant $Env:tenantId
+az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
-# Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $Env:subscriptionId
+# Register your Azure subscription for features and providers
+az provider register --namespace Microsoft.Kubernetes --wait 
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.ResourceConnector --wait
+az provider register --namespace Microsoft.HybridContainerService --wait
+az feature register --namespace Microsoft.HybridConnectivity --name hiddenPreviewAccess
 
-# Installing Azure CLI extensions
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-Write-Host "Installing Azure CLI extensions"
-az extension add --name connectedk8s
-az extension add --name k8s-extension
-Write-Host "`n"
+Do {
+    Write-Host "Waiting for hiddenPreviewAccess feature registration, hold tight...(30s sleeping loop)"
+    Start-Sleep -Seconds 30
+    $state = az feature show --namespace Microsoft.HybridConnectivity --name hiddenPreviewAccess --query "properties.state" -o tsv
+    $state = $(if($state = "Registered"){"Ready!"}Else{"Nope"})
+} while ($state -eq "Nope")
 
-# Registering Azure Arc providers
-Write-Host "Registering Azure Arc providers, hold tight..."
-Write-Host "`n"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.HybridConnectivity --wait
 
-az provider show --namespace Microsoft.Kubernetes -o table
+# Installing Azure CLI extensions
 Write-Host "`n"
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
+Write-Host "Installing Azure CLI extensions"
+az extension add -n k8s-extension --upgrade
+az extension add -n customlocation --upgrade
+az extension add -n arcappliance --upgrade --version 0.2.27
+az extension add -n hybridaks --upgrade
 Write-Host "`n"
-az provider show --namespace Microsoft.HybridCompute -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.GuestConfiguration -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.HybridConnectivity -o table
-Write-Host "`n"
+az -v
 
-# Onboarding the cluster to Azure Arc
-Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
-Write-Host "`n"
+# Set default subscription to run commands against
+az account set --subscription $Env:subscriptionId
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+# Parameters
+$aksHciConfigVersion = "1.0.13.10907"
+$workingDir = "V:\AKS-HCI\WorkDir"
+$arcAppName = "arc-resource-bridge"
+$configFilePath = $workingDir + "\hci-appliance.yaml"
+$arcExtnName = "aks-hybrid-ext"
+$customLocationName = "azurevm-customlocation"
+$kubernetesVersion = "1.21.9"
 
-#Tag
-$clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
+# Install pre-requisite PowerShell repositories
 
-$suffix = -join ((97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
-$Env:arcClusterName = "$Env:ComputerName-$suffix"
-az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+$nid = (Start-Process -PassThru PowerShell {for (0 -lt 1) {Install-PackageProvider -Name NuGet -Force; Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted; Install-Module -Name PowershellGet -Force; Exit}}).id
+Wait-Process -Id $nid
+$nid = (Start-Process -PassThru PowerShell {for (0 -lt 1) {Install-Module -Name AksHci -Repository PSGallery -AcceptLicense -Force; Exit}}).id
+Wait-Process -Id $nid
+$nid = (Start-Process -PassThru PowerShell {for (0 -lt 1) {Install-Module -Name ArcHci -Repository PSGallery -AcceptLicense -Force; Exit}}).id
+Wait-Process -Id $nid
 
-Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
 
-# Deploying Azure log-analytics workspace
-$workspaceName = ($Env:arcClusterName).ToLower()
-$workspaceResourceId = az monitor log-analytics workspace create `
-    --resource-group $Env:resourceGroup `
-    --workspace-name "$workspaceName-law" `
-    --query id -o tsv
+Initialize-AksHciNode
 
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" `
-    --cluster-name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --cluster-type connectedClusters `
-    --extension-type Microsoft.AzureMonitor.Containers `
-    --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+New-Item -Path "V:\" -Name "AKS-HCI" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "Images" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "WorkingDir" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
 
-# # Deploying Azure Defender Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Creating Azure Defender Kubernetes extension..."
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" `
-#                         --cluster-name $Env:arcClusterName `
-#                         --resource-group $Env:resourceGroup `
-#                         --cluster-type connectedClusters `
-#                         --extension-type Microsoft.AzureDefender.Kubernetes
+# Install the AKS on Windows Server management cluster
+$vnet=New-AksHciNetworkSetting -Name "mgmt-vnet" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.4" -k8snodeippoolend "192.168.0.10" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.160"
+Set-AksHciConfig -vnet $vnet -imageDir "V:\AKS-HCI\Images" -workingDir "V:\AKS-HCI\WorkingDir" -cloudConfigLocation "V:\AKS-HCI\Config" -version $aksHciConfigVersion -cloudServiceIP "192.168.0.4"
 
-# # Deploying Azure Policy Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Policy extension..."
-# Write-Host "`n"
-# az k8s-extension create --cluster-type connectedClusters `
-#                         --cluster-name $Env:arcClusterName `
-#                         --resource-group $Env:resourceGroup `
-#                         --extension-type Microsoft.PolicyInsights `
-#                         --name azurepolicy
+$SecuredPassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Env:spnClientId, $SecuredPassword
+# Connect-AzAccount -ServicePrincipal -TenantId $Env:spnTenantId -Credential $Credential
+Set-AksHciRegistration -TenantId $Env:spnTenantId -SubscriptionId $Env:subscriptionId -ResourceGroupName $Env:resourceGroup -Credential $Credential
 
-## Arc - enabled Server
-## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
-Write-Host "`n"
-Write-Host "Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM"
-Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-Stop-Service WindowsAzureGuestAgent -Force -Verbose
-New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
+Install-AksHci
 
-## Azure Arc agent Installation
-Write-Host "`n"
-Write-Host "Onboarding the Azure VM to Azure Arc..."
+# Generate pre-requisite YAML files needed to deploy Azure Arc Resource Bridge
+New-ArcHciAksConfigFiles -subscriptionID $Env:subscriptionId -location $Env:location -resourceGroup $Env:resourceGroup -resourceName $arcAppName -workDirectory $workingDir -vnetName "appliance-vnet" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.11" -k8snodeippoolend "192.168.0.11" -controlPlaneIP "192.168.0.161"
 
-# Download the package
-function download1() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi }
-download1
+# Deploy Azure Arc Resource Bridge
+az arcappliance validate hci --config-file $configFilePath
+az arcappliance prepare hci --config-file $configFilePath
+az arcappliance deploy hci --config-file $configFilePath --outfile $workingDir\config
+az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDir\config
 
-# Install the package
-msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-String
+# The Arc Resource Bridge must be in Running status
+Do {
+    Write-Host "Waiting for Arc Resource Bridge (Connecting Arc Resource Bridge to Azure may take up to 10 minutes to finish), hold tight..."
+    Start-Sleep -Seconds 660 # Error!!! it retrieves status Running but it is Connected, so it will fail in next steps, so sleep 11min
+    $status = az arcappliance show --resource-group $Env:resourceGroup --name $arcAppName --query "status" -o tsv
+    $status = $(if($status = "Running"){"Ready!"}Else{"Nope"})
+} while ($status -eq "Nope")
 
-#Tag
-$clusterName = "$env:computername-$env:kubernetesDistribution"
 
-# Run connect command
-& "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-    --service-principal-id $env:appId `
-    --service-principal-secret $env:password `
-    --resource-group $env:resourceGroup `
-    --tenant-id $env:tenantId `
-    --location $env:location `
-    --subscription-id $env:subscriptionId `
-    --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+# Install the AKS hybrid extension on the Arc Resource Bridge
+az k8s-extension create -g $Env:resourceGroup -c $arcAppName --cluster-type appliances --name $arcExtnName  --extension-type Microsoft.HybridAKSOperator --config Microsoft.CustomLocation.ServiceAccount="default" --no-wait
 
-# Changing to Client VM wallpaper
-$imgPath = "C:\Temp\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-         }
-    }
- } 
-'@
+# AKS hybrid extension installation on the Arc Resource Bridge must be in Succeeded state
+Do {
+    Write-Host "Waiting for the AKS hybrid extension installation on the Arc Resource Bridge (May take up to 10 minutes to install), hold tight...(60s sleeping loop)"
+    Start-Sleep -Seconds 900 # Error!!! it retrieves state Succeeded, but InstallState of Cluster Extension is Unknown, so it will fail in next steps, so sleep 11min
+    $state = az k8s-extension show --resource-group $Env:resourceGroup --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName --query "provisioningState" -o tsv
+    $state = $(if($state = "Succeeded"){"Ready!"}Else{"Nope"})
+} while ($state -eq "Nope")
 
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+# Create a Custom Location on top of the Azure Arc Resource Bridge
+$ArcApplianceResourceId=az arcappliance show --resource-group $Env:resourceGroup --name $arcAppName --query id -o tsv
+$ClusterExtensionResourceId=az k8s-extension show --resource-group $Env:resourceGroup --cluster-name $arcAppName --cluster-type appliances --name $arcExtnName --query id -o tsv
+az customlocation create --name $customLocationName --namespace "default" --host-resource-id $ArcApplianceResourceId --cluster-extension-ids $ClusterExtensionResourceId --resource-group $Env:resourceGroup
 
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
+# Custom Location on top of the Azure Arc Resource Bridge must be in Succeeded state
+Do {
+    Write-Host "Custom Location on top of the Azure Arc Resource Bridge must be in Succeeded state (May take up to 10 minutes), hold tight...(60s sleeping loop)"
+    Start-Sleep -Seconds 60
+    $state = az customlocation show --name $customLocationName --resource-group $Env:resourceGroup --query "provisioningState" -o tsv
+    $state = $(if($state = "Succeeded"){"Ready!"}Else{"Nope"})
+} while ($state -eq "Nope")
+
+# Create a local network for AKS hybrid clusters and connect it to Azure
+New-KvaVirtualNetwork -name hybridaks-vnet -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.15" -k8snodeippoolend "192.168.0.25" -vipPoolStart "192.168.0.162" -vipPoolEnd "192.168.0.170" -kubeconfig $workingDir\config
+$clid = az customlocation show --name $customLocationName --resource-group $Env:resourceGroup --query "id" -o tsv
+az hybridaks vnet create -n "azvnet" -g $Env:resourceGroup --custom-location $clId --moc-vnet-name "hybridaks-vnet"
+$vnetId = az hybridaks vnet show -n "azvnet" -g $Env:resourceGroup --query id -o tsv
+
+# Download the Kubernetes VHD image to your Azure VM
+Add-KvaGalleryImage -kubernetesVersion $kubernetesVersion
+
+# Create an Azure AD group and add Azure AD members (AKS admins) to it
+$suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
+$groupId = az ad group create --display-name "adminGroupAksHybrid-$suffix" --mail-nickname "adminGroupAksHybrid-$suffix" --query id -o tsv
+$spnObjectId = az ad sp show --id $Env:spnClientId --query id -o tsv
+az ad group member add --group $groupId --member-id $spnObjectId
+
+# Create an AKS hybrid cluster using Azure CLI
+az hybridaks create --name akshybridcluster --resource-group $Env:resourceGroup --custom-location $clid --vnet-ids $vnetId --kubernetes-version "v$kubernetesVersion" --aad-admin-group-object-ids $groupId --generate-ssh-keys
+
+# Add a Linux nodepool to the AKS hybrid cluster
+az hybridaks nodepool add -n linuxNodepool --resource-group $Env:resourceGroup --cluster-name akshybridcluster
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false

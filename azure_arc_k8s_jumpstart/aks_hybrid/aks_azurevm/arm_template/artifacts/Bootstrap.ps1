@@ -1,26 +1,48 @@
 param (
-    [string]$adminUsername,
-    [string]$appId,
-    [string]$password,
-    [string]$tenantId,
+    [string]$userName,
+    [string]$spnClientId,
+    [string]$spnClientSecret,
+    [string]$spnTenantId,
     [string]$subscriptionId,
     [string]$location,
     [string]$templateBaseUrl,
-    [string]$resourceGroup,
-    [string]$windowsNode,
-    [string]$kubernetesDistribution
+    [string]$resourceGroup
 )
 
-[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('userName', $userName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode,[System.EnvironmentVariableTarget]::Machine)
+
+$ProgressPreference = "SilentlyContinue"
+
+mkdir -Path "C:\WAC"
+
+## Download the MSI file
+Invoke-WebRequest -UseBasicParsing -Uri 'https://aka.ms/WACDownload' -OutFile "C:\WAC\WindowsAdminCenter.msi"
+#Invoke-WebRequest -UseBasicParsing -Uri 'https://download.microsoft.com/download/1/0/5/1059800B-F375-451C-B37E-758FFC7C8C8B/WindowsAdminCenter2103.2.msi' -OutFile "C:\WAC\WindowsAdminCenter.msi"
+#Invoke-WebRequest -UseBasicParsing -Uri 'https://download.microsoft.com/download/1/0/5/1059800B-F375-451C-B37E-758FFC7C8C8B/WindowsAdminCenter2009.msi' -OutFile "C:\WAC\WindowsAdminCenter.msi"
+
+## install Windows Admin Center
+$msiArgs = @("/i", "C:\WAC\WindowsAdminCenter.msi", "/qn", "/L*v", "log.txt", "SME_PORT=443", "SSL_CERTIFICATE_OPTION=generate")
+Start-Process msiexec.exe -Wait -ArgumentList $msiArgs
+
+<# Update WAC Extensions
+Import-Module "$env:ProgramFiles\windows admin center\PowerShell\Modules\ExtensionTools" -Verbose
+
+# Specify the WAC gateway
+$WAC = "https://$env:COMPUTERNAME"
+
+# List the WAC extensions
+$extensions = Get-Extension $WAC | Where-Object { $_.isLatestVersion -like 'False' }
+
+ForEach ($extension in $extensions) {    
+    Update-Extension $WAC -ExtensionId $extension.Id -Verbose | out-file -append C:\Users\Public\WACUpdateLog$(get-date -f MM-dd-yyyy_HH_mm).txt
+} #>
 
 # Create path
 Write-Output "Create deployment path"
@@ -29,16 +51,15 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 
-$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = 'SilentlyContinue'
 
-# Downloading GitHub artifacts
+# Downloading GitHub artifacts for DataServicesLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
-# Installing tools
+Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli'
+            $chocolateyAppList = 'azure-cli,kubernetes-cli,kubernetes-helm'
             #Run commands in parallel.
             Parallel 
                 {
@@ -70,35 +91,15 @@ workflow ClientTools_01
                 }
         }
 
-ClientTools_01 | Format-Table
+ClientTools_01 | Format-Table 
 
-# Enable VirtualMachinePlatform feature, the vm reboot will be done in DSC extension
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 
-# Disable Microsoft Edge sidebar
-$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HubsSidebarEnabled'
-$Value        = '00000000'
-# Create the key if it does not exist
-If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
-}
-New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
-
-# Disable Microsoft Edge first-run Welcome screen
-$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HideFirstRunExperience'
-$Value        = '00000001'
-# Create the key if it does not exist
-If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
-}
-New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 # Creating scheduled task for LogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\LogonScript.ps1'
-Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $userName -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
