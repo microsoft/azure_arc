@@ -51,6 +51,12 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
+    $msiFilePath = Join-Path $deploymentFolder $msiFileName
+    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
+    $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
+    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -107,6 +113,12 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
+    $msiFilePath = Join-Path $deploymentFolder $msiFileName
+    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
+    $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
+    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -162,6 +174,12 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
         "Ethernet-Null"               = $AdapterName
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
+
+    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
+    $msiFilePath = Join-Path $deploymentFolder $msiFileName
+    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
+    $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
+    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
 
     $content = Get-Content $AKSEEConfigFilePath
 
