@@ -669,7 +669,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(variables('templateBaseUrl'), concat('artifacts/updatevnet.json'))]",
+                    "uri": "[uri(variables('templateBaseUrl'), concat('/updatevnet.json'))]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -704,14 +704,6 @@
         "adminUsername": {
             "type": "string",
             "value": "[parameters('adminUsername')]"
-        },
-        "rdpPort": {
-            "type": "string",
-            "value": "[parameters('customRdpPort')]"
-        },
-        "fqdn": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).dnsSettings.fqdn]",
-            "type": "string"
         }
     }
 }
