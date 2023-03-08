@@ -40,6 +40,9 @@ if ($env:deployAKSHCI -eq $false) {
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
+    Initialize-MocNode
+    Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
 }
 
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
