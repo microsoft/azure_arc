@@ -39,23 +39,17 @@ if ($env:deployAKSHCI -eq $false) {
 }
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
-    Install-Module -Name Moc -Repository PSGallery -AcceptLicense -Force
-    Initialize-MocNode
-    Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
 }
 
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        # [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
-        # $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-        # $ErrorActionPreference = "Continue"
-        az extension add --upgrade --name arcappliance --only-show-errors
-        az extension add --upgrade --name connectedk8s --only-show-errors
-        az extension add --upgrade --name k8s-configuration --only-show-errors
-        az extension add --upgrade --name k8s-extension --only-show-errors
-        az extension add --upgrade --name customlocation --only-show-errors
-        az extension add --upgrade --name azurestackhci --only-show-errors
-    }
+Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+    az extension add --upgrade --name arcappliance --only-show-errors
+    az extension add --upgrade --name connectedk8s --only-show-errors
+    az extension add --upgrade --name k8s-configuration --only-show-errors
+    az extension add --upgrade --name k8s-extension --only-show-errors
+    az extension add --upgrade --name customlocation --only-show-errors
+    az extension add --upgrade --name azurestackhci --only-show-errors
 }
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
@@ -82,19 +76,9 @@ if ($env:deployAKSHCI -eq $false) {
 }
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    #New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
     New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -vnetName $using:SDNConfig.AKSvSwitchName -vswitchName $using:SDNConfig.AKSvSwitchName -ipaddressprefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -vlanID $using:SDNConfig.AKSVlanID
 }
-# if ($env:deployAKSHCI -eq "false") {
-#     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-#         New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
-#     }
-# } else {
-#     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-#         #New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
-#         New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -vipPoolStart $using:SDNConfig.rbCpip -vipPoolEnd $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp2 -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix -vswitchName $using:SDNConfig.AKSvSwitchName -vLanID $using:SDNConfig.AKSVlanID
-#     }  
-# }
+
 $ErrorActionPreference = "Continue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Deploying Arc Resource Bridge. This will take a while."
