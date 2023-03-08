@@ -86,6 +86,7 @@ $ErrorActionPreference = "Continue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Deploying Arc Resource Bridge. This will take a while."
     $WarningPreference = "SilentlyContinue"
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
     az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --only-show-errors
@@ -136,6 +137,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $vnetName="vlan200"
     New-MocGroup -name "Default_Group" -location "MocLocation"
     New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -tags @{'VSwitch-Name' = "sdnSwitch"} -vlanID $using:SDNConfig.AKSVlanID
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName --vlan $using:SDNConfig.AKSVlanID --only-show-errors
     
     $galleryImageName = "ubuntu20"
