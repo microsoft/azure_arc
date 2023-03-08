@@ -40,18 +40,6 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $ControlPlaneEndpointIp = "172.20.1.21"
     $LinuxNodeIp4Address = "172.20.1.11"
 
-    $AdapterName = (Get-NetAdapter).Name
-    $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-    New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-    Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
-
-    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
-    $msiFilePath = Join-Path $deploymentFolder $msiFileName
-    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
-    $msiInstallLog = "$logsFolder\$fileNameWithoutExt.log"
-    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-    Install-AksEdgeHostFeatures -Force
-
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
         "1000"                        = $ServiceIPRangeSize
@@ -107,18 +95,6 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     $ServiceIPRangeSize = "10"
     $ControlPlaneEndpointIp = "172.20.1.61"
     $LinuxNodeIp4Address = "172.20.1.51"
-
-    $AdapterName = (Get-NetAdapter).Name
-    $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-    New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-    Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
-
-    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
-    $msiFilePath = Join-Path $deploymentFolder $msiFileName
-    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
-    $msiInstallLog = "$logsFolder\$fileNameWithoutExt.log"
-    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-    Install-AksEdgeHostFeatures -Force
 
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
@@ -176,18 +152,6 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
     $ControlPlaneEndpointIp = "172.20.1.91"
     $LinuxNodeIp4Address = "172.20.1.81"
 
-    $AdapterName = (Get-NetAdapter).Name
-    $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-    New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-    Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
-
-    $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
-    $msiFilePath = Join-Path $deploymentFolder $msiFileName
-    $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
-    $msiInstallLog = "$logsFolder\$fileNameWithoutExt.log"
-    Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-    Install-AksEdgeHostFeatures -Force
-
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
         "1000"                        = $ServiceIPRangeSize
@@ -232,5 +196,5 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 else {
-    Write-Error "Something is wrong, check AKSEEBootstrap log file located in $logPath"
+    Write-Error "Something is wrong, check AKSEEBootstrap log file located in $logsFolder"
 }
