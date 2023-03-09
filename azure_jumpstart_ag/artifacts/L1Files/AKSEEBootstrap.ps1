@@ -58,8 +58,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         Start-Sleep -Seconds 5
     }
 
-    Write-Host "Fetching latest AKS Edge Essentials MSI"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -130,8 +130,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         Start-Sleep -Seconds 5
     }
 
-    Write-Host "Fetching latest AKS Edge Essentials MSI"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -202,8 +202,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
         Start-Sleep -Seconds 5
     }
 
-    Write-Host "Fetching latest AKS Edge Essentials MSI"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
