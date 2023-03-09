@@ -54,10 +54,10 @@ try {
 
 	if ($unattended) {
         Write-Host "Registering Arc-enabled SQL server using unattended method with AzureExtensionForSQLServer.exe."
-		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --service-principal-app-id $spnClientId --service-principal-secret $spnClientSecret --licenseType $licenseType --tags $resourceTags 
+		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --service-principal-app-id $spnClientId --service-principal-secret $spnClientSecret --licenseType $licenseType --tags $resourceTags --waitTime 5
 	} else {
         Write-Host "Registering Arc-enabled SQL server using interactive login with AzureExtensionForSQLServer.exe"
-		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --licenseType $licenseType  --tags $resourceTags
+		& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId --resourceGroup $resourceGroup --location $Azurelocation --tenantid $spnTenantId --licenseType $licenseType  --tags $resourceTags  --waitTime 5
 	}
 
 	if($LASTEXITCODE -eq 0){
