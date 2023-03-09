@@ -53,6 +53,11 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    while (-not (Test-Connection -ComputerName google.com -Quiet)) {
+        Write-Host "Waiting for internet connectivity..."
+        Start-Sleep -Seconds 5
+    }
+
     Write-Host "Fetching latest AKS Edge Essentials MSI"
     Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
@@ -120,6 +125,11 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    while (-not (Test-Connection -ComputerName google.com -Quiet)) {
+        Write-Host "Waiting for internet connectivity..."
+        Start-Sleep -Seconds 5
+    }
+
     Write-Host "Fetching latest AKS Edge Essentials MSI"
     Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
@@ -185,6 +195,11 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
         "DnsServer-null"              = $DNSClientServerAddress
         "Ethernet-Null"               = $AdapterName
         "Ip4Address-null"             = $LinuxNodeIp4Address
+    }
+
+    while (-not (Test-Connection -ComputerName google.com -Quiet)) {
+        Write-Host "Waiting for internet connectivity..."
+        Start-Sleep -Seconds 5
     }
 
     Write-Host "Fetching latest AKS Edge Essentials MSI"
