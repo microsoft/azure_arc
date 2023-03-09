@@ -35,13 +35,13 @@ az -v
 az account set --subscription $Env:subscriptionId
 
 # Parameters
-$aksHciConfigVersion = "1.0.13.10907"
+$aksHciConfigVersion = "0.1.16.10119"
 $workingDir = "V:\AKS-HCI\WorkDir"
 $arcAppName = "arc-resource-bridge"
 $configFilePath = $workingDir + "\hci-appliance.yaml"
 $arcExtnName = "aks-hybrid-ext"
 $customLocationName = "azurevm-customlocation"
-$kubernetesVersion = "1.21.9"
+$kubernetesVersion = "1.22.11"
 
 # Install pre-requisite PowerShell repositories
 
