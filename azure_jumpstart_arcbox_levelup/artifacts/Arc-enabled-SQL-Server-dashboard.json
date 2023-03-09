@@ -1,0 +1,675 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<h1>SQL Version and Compatibility</h1>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "1": {
+            "position": {
+              "x": 0,
+              "y": 1,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceName = name, Version = tostring(properties.version)\r\n| summarize Instances = count() by Version\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Instances by Version",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "2": {
+            "position": {
+              "x": 7,
+              "y": 1,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceId = id, InstanceName = name, Version = tostring(properties.version)\r\n| join kind = inner (\r\n    resources\r\n    | where type == \"microsoft.azurearcdata/sqlserverinstances/databases\"\r\n    | where name !in (\"master\", \"model\", \"msdb\", \"tempdb\")\r\n    | project InstanceId = substring(id, 0, indexof(id, \"Databases\", 0) - 1), DatabaseName = name, CompatibilityLevel = tostring(properties.compatibilityLevel)\r\n) on InstanceId\r\n| project InstanceName, DatabaseName, CompatibilityLevel = strcat(Version, \" - Level \", CompatibilityLevel)\r\n| summarize Databases = count() by CompatibilityLevel \r\n| order by CompatibilityLevel asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Databases by Version and Compatibility",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "3": {
+            "position": {
+              "x": 0,
+              "y": 6,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<h1>SQL Server Collation</h1>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "4": {
+            "position": {
+              "x": 0,
+              "y": 7,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceName = name, Collation = tostring(properties.collation)\r\n| summarize Instances = count() by Collation",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Instances by Collation",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "5": {
+            "position": {
+              "x": 7,
+              "y": 7,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceId = id, InstanceName = name, Collation = tostring(properties.collation)\r\n| join kind = inner (\r\n    resources\r\n    | where type == \"microsoft.azurearcdata/sqlserverinstances/databases\"\r\n    | where name !in (\"master\", \"model\", \"msdb\", \"tempdb\")\r\n    | project InstanceId = substring(id, 0, indexof(id, \"Databases\", 0) - 1), DatabaseName = name, Collation = tostring(properties.collationName)\r\n) on InstanceId\r\n|project InstanceName, InstanceCollation = Collation, DatabaseName, DatabaseCollation = Collation1\r\n| where InstanceCollation != DatabaseCollation\r\n| summarize Databases = count() by InstanceName\r\n| order by InstanceName asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Databases not on Instance Collation",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "6": {
+            "position": {
+              "x": 0,
+              "y": 12,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<h1>Edition and License Type</h1>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "7": {
+            "position": {
+              "x": 0,
+              "y": 13,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceName = name, Edition = tostring(properties.edition)\r\n| summarize Instances = count() by Edition",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Edition",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "8": {
+            "position": {
+              "x": 7,
+              "y": 13,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceName = name, LicenseType = tostring(properties.licenseType)\r\n| summarize Instances = count() by LicenseType",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "License Type",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "9": {
+            "position": {
+              "x": 0,
+              "y": 18,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<h1>TDE and Backups</h1>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "10": {
+            "position": {
+              "x": 0,
+              "y": 19,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceId = id, InstanceName = name\r\n| join kind = inner (\r\n    resources\r\n    | where type == \"microsoft.azurearcdata/sqlserverinstances/databases\"\r\n    | where name !in (\"master\", \"model\", \"msdb\", \"tempdb\")\r\n    | project InstanceId = substring(id, 0, indexof(id, \"Databases\", 0) - 1), DatabaseName = name, IsEncrypted = properties.databaseOptions.isEncrypted\r\n) on InstanceId\r\n| where IsEncrypted == \"false\"\r\n| project InstanceName, DatabaseName, IsEncrypted\r\n| summarize Databases = count() by InstanceName\r\n| order by InstanceName asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Databases not encrypted",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "11": {
+            "position": {
+              "x": 7,
+              "y": 19,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceId = id, InstanceName = name\r\n| join kind = inner (\r\n    resources\r\n    | where type == \"microsoft.azurearcdata/sqlserverinstances/databases\"\r\n    | where name !in (\"master\", \"model\", \"msdb\", \"tempdb\")\r\n    | project InstanceId = substring(id, 0, indexof(id, \"Databases\", 0) - 1), DatabaseName = name, LastFullBackup = todatetime(properties.backupInformation.lastFullBackup)\r\n) on InstanceId\r\n| where LastFullBackup < ago(7d) or isnull(LastFullBackup)\r\n| project InstanceName, DatabaseName, LastFullBackup\r\n| summarize Databases = count() by InstanceName\r\n| order by InstanceName asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Databases not backed up in last 7 days",
+                "subtitle": "KQL"
+              }
+            }
+          },
+          "12": {
+            "position": {
+              "x": 0,
+              "y": 24,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<h1>CPU Cores and Metrics</h1>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "13": {
+            "position": {
+              "x": 0,
+              "y": 25,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\r\n| project InstanceId = id, InstanceName = name, vCores = toint(properties.vCore)\r\n| summarize vCores = sum(vCores) by InstanceName",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "CPUs by Instance",
+                "subtitle": "KQL"
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_Subscription": {
+              "model": {
+                "operator": "equals",
+                "selectAllState": "all"
+              },
+              "displayCache": {
+                "name": "Subscription",
+                "value": "all"
+              },
+              "filteredPartIds": [
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029c4",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029c6",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029ca",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029cc",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d0",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d2",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d6",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d8",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029dc"
+              ]
+            },
+            "MsPortalFx_Location": {
+              "model": {
+                "operator": "equals",
+                "values": [
+                  {
+                    "name": "eastus"
+                  }
+                ]
+              },
+              "displayCache": {
+                "name": "Location",
+                "value": "East US"
+              },
+              "filteredPartIds": [
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029c4",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029c6",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029ca",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029cc",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d0",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d2",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d6",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029d8",
+                "StartboardPart-ArgQueryChartTile-f2e93e78-e393-47c1-9e96-7639bdd029dc"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Arc-Enabled SQL Servers",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Arc-Enabled SQL Servers"
+  },
+  "apiVersion": "2015-08-01-preview"
+}
