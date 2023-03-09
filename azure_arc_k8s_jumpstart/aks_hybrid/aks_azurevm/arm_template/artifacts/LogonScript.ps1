@@ -26,7 +26,7 @@ Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
 az extension add -n k8s-extension --upgrade
 az extension add -n customlocation --upgrade
-az extension add -n arcappliance --upgrade --version 0.2.27
+az extension add -n arcappliance --upgrade --version 0.2.29
 az extension add -n hybridaks --upgrade
 Write-Host "`n"
 az -v
@@ -35,7 +35,7 @@ az -v
 az account set --subscription $Env:subscriptionId
 
 # Parameters
-$aksHciConfigVersion = "0.1.16.10119"
+$aksHciConfigVersion = "1.0.16.10113"
 $workingDir = "V:\AKS-HCI\WorkDir"
 $arcAppName = "arc-resource-bridge"
 $configFilePath = $workingDir + "\hci-appliance.yaml"
