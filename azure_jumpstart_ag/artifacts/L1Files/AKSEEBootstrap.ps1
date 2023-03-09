@@ -24,8 +24,8 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 #########################################
 
 # Parameterizing the host, L0 username and password Required for the shared drive functionality (New-PSDrive)
-$HVHostUsername = "arcdemo"
-$HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
+# $HVHostUsername = "arcdemo"
+# $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
 if ($env:COMPUTERNAME -eq "Seattle") {
 
@@ -91,11 +91,11 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     kubectl get nodes -o wide
     Write-Host
 
-    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $destinationPath = "\\$DefaultGateway\kube"
-    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    Copy-Item -Path $sourcePath -Destination $destinationPath
+    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # $destinationPath = "\\$DefaultGateway\kube"
+    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    # Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
@@ -163,11 +163,11 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     kubectl get nodes -o wide
     Write-Host
 
-    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $destinationPath = "\\$DefaultGateway\kube"
-    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    Copy-Item -Path $sourcePath -Destination $destinationPath
+    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # $destinationPath = "\\$DefaultGateway\kube"
+    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    # Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
@@ -235,11 +235,11 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
     kubectl get nodes -o wide
     Write-Host
 
-    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $destinationPath = "\\$DefaultGateway\kube"
-    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    Copy-Item -Path $sourcePath -Destination $destinationPath
+    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # $destinationPath = "\\$DefaultGateway\kube"
+    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    # Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
