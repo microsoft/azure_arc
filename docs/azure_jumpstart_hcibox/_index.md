@@ -326,6 +326,7 @@ Azure Stack HCI integrates with [Azure Monitor](https://learn.microsoft.com/azur
   ![Screenshot showing capabilities tab](./enable_monitoring_2.png)
 
 - On the "Capabilities" tab, click on "Not configured" on the "Insights" box.
+
 - On the dialog box, click "Turn on". After a few seconds, the Insights box should show as "Configured" on the Capabilities tab.
 
   ![Screenshot showing logs configured](./enable_monitoring_3.png)
