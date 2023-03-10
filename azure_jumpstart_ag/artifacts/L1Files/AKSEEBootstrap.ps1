@@ -173,7 +173,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
-elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
+elseif ($env:COMPUTERNAME -eq "AKSEEDev-Local") {
 
     $NetIPAddress = "172.20.1.4"
     $DefaultGateway = "172.20.1.1"
