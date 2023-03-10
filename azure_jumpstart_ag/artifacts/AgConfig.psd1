@@ -8,12 +8,11 @@
     StoreLocations                       = "Chicago", "New Orleans", "Seattle"                # The location names for the stores
 
     # VHDX Paths 
-    L0VHDPath                          = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
-    L1VHDPath                       = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
+    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
+    L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
     
-    # SDN Lab Admin Password
-    SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
-
+    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
+    
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
     L1VMMemoryInGB                       = 16GB                                  # This value controls the amount of RAM for each AKS EE host VM
