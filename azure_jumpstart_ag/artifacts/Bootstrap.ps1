@@ -102,6 +102,12 @@ foreach ($app in $appsToInstall) {
     
 }
 
+# Download artifacts
+Write-Header "Downloading Azure Stack HCI configuration scripts"
+#Invoke-WebRequest "https://raw.githubusercontent.com/main/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $Env:AgDir\agLogonScript.ps1
+
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 # Disable Microsoft Edge sidebar
@@ -127,10 +133,6 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 # Installing Posh-SSH PowerShell Module
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
-
-# All Industries
-Write-Host "Fetching Artifacts for All Industries"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $Env:AgDir\agLogonScript.ps1
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgDir\agLogonScript.ps1
