@@ -43,6 +43,12 @@ $arcExtnName = "aks-hybrid-ext"
 $customLocationName = "azurevm-customlocation"
 $kubernetesVersion = "1.22.11"
 
+New-Item -Path "V:\" -Name "AKS-HCI" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "Images" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "WorkingDir" -ItemType "directory" -Force
+New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
+
+
 # Install pre-requisite PowerShell repositories
 
 $nid = (Start-Process -PassThru PowerShell {for (0 -lt 1) {Install-PackageProvider -Name NuGet -Force; Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted; Install-Module -Name PowershellGet -Force; Exit}}).id
@@ -55,10 +61,7 @@ Wait-Process -Id $nid
 
 Initialize-AksHciNode
 
-New-Item -Path "V:\" -Name "AKS-HCI" -ItemType "directory" -Force
-New-Item -Path "V:\AKS-HCI\" -Name "Images" -ItemType "directory" -Force
-New-Item -Path "V:\AKS-HCI\" -Name "WorkingDir" -ItemType "directory" -Force
-New-Item -Path "V:\AKS-HCI\" -Name "Config" -ItemType "directory" -Force
+
 
 # Install the AKS on Windows Server management cluster
 $vnet=New-AksHciNetworkSetting -Name "mgmt-vnet" -vSwitchName "InternalNAT" -gateway "192.168.0.1" -dnsservers "192.168.0.1" -ipaddressprefix "192.168.0.0/16" -k8snodeippoolstart "192.168.0.4" -k8snodeippoolend "192.168.0.10" -vipPoolStart "192.168.0.150" -vipPoolEnd "192.168.0.160"
