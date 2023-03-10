@@ -4,6 +4,8 @@ $Env:AgVMDir = "$Env:AgDir\Virtual Machines"
 $Env:AgIconDir = "C:\Ag\Icons"
 
 Start-Transcript -Path $Env:AgLogsDir\AgLogonScript.log
+$ConfigurationDataFile = "$Env:AgDir\HCIBox-Config.psd1"
+$AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
@@ -47,15 +49,15 @@ $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
+# Register Azure providers
+Write-Header "Registering Providers"
+foreach ($provider in $AgConfig.AzureProviders) {
+    Register-AzResourceProvider -ProviderNamespace $provider
+}
+
 # Required for CLI commands
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"
@@ -81,4 +83,20 @@ Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
+# Executing the deployment logs bundle PowerShell script in a new window
+Write-Header "Uploading Log Bundle"
+Invoke-Expression 'cmd /c start Powershell -Command { 
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
+    Start-Sleep -Seconds 5
+    Write-Host "`n"
+    Write-Host "Creating deployment logs bundle"
+    7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
+}'
 
+Write-Header "Changing Wallpaper"
+$imgPath="$Env:AgDir\wallpaper.png"
+Add-Type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
+
+Stop-Transcript
