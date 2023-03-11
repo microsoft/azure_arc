@@ -6,7 +6,7 @@
 
 net start w32time
 w32tm /resync
-Start-Sleep -Seconds 120
+Start-Sleep -Seconds 300
 
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
