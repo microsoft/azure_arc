@@ -4,8 +4,8 @@
 # Preparing environment folders structure #
 ###########################################
 
-net start w32time
-w32tm /resync
+# net start w32time
+# w32tm /resync
 Start-Sleep -Seconds 300
 
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
