@@ -6,7 +6,7 @@
 
 # net start w32time
 # w32tm /resync
-Start-Sleep -Seconds 60
+# Start-Sleep -Seconds 60
 
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
@@ -72,7 +72,9 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+
     Start-Sleep -Seconds 5
+    Set-Service -Name "WSSD Agent Service (wssdagent)" -StartupType Automatic
     Start-Service -Name "WSSD Agent Service (wssdagent)"
     Start-Sleep -Seconds 10
 
