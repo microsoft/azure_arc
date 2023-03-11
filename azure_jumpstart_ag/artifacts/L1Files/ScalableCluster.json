@@ -26,7 +26,7 @@
         "AdapterName": "Ethernet-Null"
       },
       "LinuxNode": {
-        "CpuCount": 4,
+        "CpuCount": 2,
         "MemoryInMB": 16384,
         "DataSizeInGB": 20,
         "Ip4Address": "Ip4Address-null",
