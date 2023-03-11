@@ -84,7 +84,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Set-Location $deploymentFolder
     # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath "Config.json"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
@@ -157,7 +157,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Set-Location $deploymentFolder
     # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
@@ -230,7 +230,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Set-Location $deploymentFolder
     # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath "Config.json"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
