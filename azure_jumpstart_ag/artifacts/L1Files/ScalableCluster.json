@@ -7,7 +7,7 @@
     "ServiceIPRangeSize": 1000
   },
   "Network": {
-    "NetworkPlugin": "calico",
+    "NetworkPlugin": "flannel",
     "ControlPlaneEndpointIp": "ControlPlaneEndpointIp-null",
     "Ip4GatewayAddress": "Ip4GatewayAddress-null",
     "Ip4PrefixLength": 2000,
