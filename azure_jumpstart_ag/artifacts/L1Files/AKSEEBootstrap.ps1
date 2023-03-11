@@ -74,8 +74,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 
 
     Start-Sleep -Seconds 5
-    Set-Service -Name "WSSD Agent Service" -StartupType Automatic
-    Start-Service -Name "WSSD Agent Service"
+    Set-Service -Name "wssdagent" -StartupType Automatic
+    Start-Service -Name "wssdagent"
     Start-Sleep -Seconds 10
 
     $content = Get-Content $AKSEEConfigFilePath
