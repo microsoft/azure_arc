@@ -4,6 +4,8 @@
 # Preparing environment folders structure #
 ###########################################
 
+Start-Sleep -Seconds 120
+
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
 $kubeFolder = "$env:USERPROFILE\.kube"
