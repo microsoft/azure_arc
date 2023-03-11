@@ -107,7 +107,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 elseif ($env:COMPUTERNAME -eq "Chicago") {
 
     $NetIPAddress = "172.20.1.3"
-    $DefaultGateway = "172.20.1.1"
+    $DefaultGateway = "172.20.1.101"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
 
