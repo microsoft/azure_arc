@@ -78,11 +78,11 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         $content = $content -replace $key, $replacementParams[$key]
     }
 
-    $AKSEEConfigFilePath = (Join-Path $deploymentFolder $env:COMPUTERNAME) + ".json"
+    $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
+    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath $AKSEEConfigFilePath
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
@@ -151,11 +151,11 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         $content = $content -replace $key, $replacementParams[$key]
     }
 
-    $AKSEEConfigFilePath = (Join-Path $deploymentFolder $env:COMPUTERNAME) + ".json"
+    $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
+    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath $AKSEEConfigFilePath
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
@@ -224,12 +224,12 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
         $content = $content -replace $key, $replacementParams[$key]
     }
 
-    $AKSEEConfigFilePath = (Join-Path $deploymentFolder $env:COMPUTERNAME) + ".json"
+    $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
-    New-AksEdgeDeployment -JsonConfigFilePath $AKSEEConfigFilePath
+    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
+    New-AksEdgeDeployment -JsonConfigFilePath ".\$AKSEEConfigFilePath"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
