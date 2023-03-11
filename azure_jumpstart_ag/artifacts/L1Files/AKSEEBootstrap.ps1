@@ -72,6 +72,10 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+    Start-Sleep -Seconds 5
+    Start-Service -Name "WSSD Agent Service (wssdagent)"
+    Start-Sleep -Seconds 10
+
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -83,7 +87,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         
     Set-Location $deploymentFolder
     # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
-    New-AksEdgeDeployment -JsonConfigFilePath "Config.json"
+    New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
@@ -218,6 +222,10 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+    Start-Sleep -Seconds 5
+    Start-Service -Name "WSSD Agent Service (wssdagent)"
+    Start-Sleep -Seconds 10
+
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -229,7 +237,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
         
     Set-Location $deploymentFolder
     # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
-    New-AksEdgeDeployment -JsonConfigFilePath "Config.json"
+    New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     # kubeconfig work to change context and copy mew file to the Hyper-V host machine
