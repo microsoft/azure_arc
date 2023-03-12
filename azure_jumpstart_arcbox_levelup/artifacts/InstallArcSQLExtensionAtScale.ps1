@@ -26,15 +26,23 @@ $winCreds = New-Object System.Management.Automation.PSCredential ($remoteWindows
     
 foreach ($remoteSQLServerName in $remoteSQLServerList)
 {
-    
+    Write-Host "Onboarding $remoteSQLServerName server to Azure Arc."
+
     # Copy MSI on remote SQL server
+    Write-Host "Copying $msiSourceFile on remote server."
     Copy-VMFile $remoteSQLServerName -SourcePath $msiSourceFile -DestinationPath $msiSourceFile -CreateFullPath -FileSource Host -Force
+    Write-Host "$msiSourceFile file copied on remote server."
     
     # Remote execute MSI on remote SQL server
     $command = "msiexec.exe /i $msiSourceFile"
     $scriptblock = [Scriptblock]::Create($command)
+
+    Write-Host "Installing $msiSourceFile file on remote server."
     Invoke-Command -VMName $remoteSQLServerName -ScriptBlock $scriptblock -Credential $winCreds
+    Write-Host "Installed $msiSourceFile file on remote server."
     
     # Remote execute Arc-enabled SQL server extension
-    Invoke-Command -VMName $remoteSQLServerName -ScriptBlock {&"$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $Using:subscriptionId --resourceGroup $Using:resourceGroup --location $Using:azureRegion --tenantid $Using:servicePrincipalTenantId --service-principal-app-id $Using:servicePrincipalAppId --service-principal-secret $Using:servicePrincipalSecret --licenseType $Using:licenseType --waitTime 5} -Credential $winCreds
+    Write-Host "Installing Arc-enabled SQL Server extension on remote server."
+    Invoke-Command -VMName $remoteSQLServerName -ScriptBlock {& "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $Using:subscriptionId --resourceGroup $Using:resourceGroup --location $Using:azureRegion --tenantid $Using:servicePrincipalTenantId --service-principal-app-id $Using:servicePrincipalAppId --service-principal-secret $Using:servicePrincipalSecret --licenseType $Using:licenseType} -Credential $winCreds
+    Write-Host "Installed Arc-enabled SQL Server extension on remote server $remoteSQLServerName"
 }
