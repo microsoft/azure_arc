@@ -34,12 +34,8 @@ foreach ($remoteSQLServerName in $remoteSQLServerList)
     Write-Host "$msiSourceFile file copied on remote server."
     
     # Remote execute MSI on remote SQL server
-    $command = "msiexec.exe /i $msiSourceFile"
-    $scriptblock = [Scriptblock]::Create($command)
-
     Write-Host "Installing $msiSourceFile file on remote server."
-    Invoke-Command -VMName $remoteSQLServerName -ScriptBlock $scriptblock -Credential $winCreds
-    Write-Host "Installed $msiSourceFile file on remote server."
+    Invoke-Command -VMName $remoteSQLServerName -ScriptBlock {Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $Using:msiSourceFile /quiet /qn /L*V installation.log" -Wait -PassThru} -Credential $winCreds    Write-Host "Installed $msiSourceFile file on remote server."
     
     # Remote execute Arc-enabled SQL server extension
     Write-Host "Installing Arc-enabled SQL Server extension on remote server."
