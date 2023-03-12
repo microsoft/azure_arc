@@ -224,10 +224,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
-    Start-Sleep -Seconds 5
-    Set-Service -Name "wssdagent" -StartupType Automatic
-    Start-Service -Name "wssdagent"
-    Start-Sleep -Seconds 10
+    netsh winsock reset catalog
 
     $content = Get-Content $AKSEEConfigFilePath
 
