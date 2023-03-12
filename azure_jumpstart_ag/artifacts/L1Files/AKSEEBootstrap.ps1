@@ -225,7 +225,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Install-AksEdgeHostFeatures -Force
 
     Start-Sleep -Seconds 5
-    Start-Service -Name "WSSD Agent Service (wssdagent)"
+    Set-Service -Name "wssdagent" -StartupType Automatic
+    Start-Service -Name "wssdagent"
     Start-Sleep -Seconds 10
 
     $content = Get-Content $AKSEEConfigFilePath
