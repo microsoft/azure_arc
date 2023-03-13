@@ -28,8 +28,8 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 #########################################
 
 # Parameterizing the host, L0 username and password Required for the shared drive functionality (New-PSDrive)
-# $HVHostUsername = "arcdemo"
-# $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
+$HVHostUsername = "arcdemo"
+$HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
 if ($env:COMPUTERNAME -eq "Seattle") {
 
@@ -71,12 +71,6 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
-
-
-    Start-Sleep -Seconds 5
-    Set-Service -Name "wssdagent" -StartupType Automatic
-    Start-Service -Name "wssdagent"
-    Start-Sleep -Seconds 10
 
     $content = Get-Content $AKSEEConfigFilePath
 
@@ -223,8 +217,6 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
-
-    netsh winsock reset catalog
 
     $content = Get-Content $AKSEEConfigFilePath
 
