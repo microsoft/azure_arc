@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": {
-      "value": "AKSHost001"
+      "value": "AKS-WS-VM"
     },
     "spnClientId": {
       "value": "9cc88034-6311-4eba-9206-fb4a24dccbe8"
