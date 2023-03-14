@@ -25,6 +25,13 @@ spec:
         - {{ .Values.systemDefaultValues.image }}
         image: {{ .Values.systemDefaultValues.image }}
         name: bootstrapper
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
       imagePullSecrets:
       - name: {{ .Values.systemDefaultValues.imagePullSecret }}
       restartPolicy: Never
