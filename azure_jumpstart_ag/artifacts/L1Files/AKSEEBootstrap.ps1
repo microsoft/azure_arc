@@ -7,11 +7,10 @@ $ProgressPreference = "SilentlyContinue"
 
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
-# $kubeFolder = "$env:USERPROFILE\.kube"
+$kubeFolder = "$env:USERPROFILE\.kube"
 
 # Set up an array of folders
-# $folders = @($logsFolder, $kubeFolder)
-$folders = @($logsFolder)
+$folders = @($logsFolder, $kubeFolder)
 
 # Loop through each VM and restart it
 foreach ($Folder in $folders) {
