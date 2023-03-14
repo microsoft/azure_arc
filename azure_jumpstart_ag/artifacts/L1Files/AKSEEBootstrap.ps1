@@ -63,7 +63,12 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         Start-Sleep -Seconds 5
     }
 
-    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Write-Host
+    Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
+    New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
+    Write-Host
+
+    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
     # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
@@ -86,7 +91,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
-    # kubeconfig work to change context and copy mew file to the Hyper-V host machine
+    # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
@@ -136,7 +141,12 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         Start-Sleep -Seconds 5
     }
 
-    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Write-Host
+    Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
+    New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
+    Write-Host
+
+    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
     # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
@@ -159,7 +169,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
-    # kubeconfig work to change context and copy mew file to the Hyper-V host machine
+    # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
@@ -209,7 +219,12 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
         Start-Sleep -Seconds 5
     }
 
-    # Write-Host "Fetching latest AKS Edge Essentials MSI"
+    Write-Host
+    Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
+    New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
+    Write-Host
+
+    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
     # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
@@ -232,7 +247,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
-    # kubeconfig work to change context and copy mew file to the Hyper-V host machine
+    # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
