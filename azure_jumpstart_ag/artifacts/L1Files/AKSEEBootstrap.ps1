@@ -106,8 +106,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
@@ -195,8 +195,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
 
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
@@ -284,8 +284,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
