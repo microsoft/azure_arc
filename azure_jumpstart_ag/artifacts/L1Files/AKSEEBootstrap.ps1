@@ -89,7 +89,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     kubectx $NewKubeContext=default
     Write-Host
     # Define the source file and directory
-    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
     $directory = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
@@ -178,7 +178,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     kubectx $NewKubeContext=default
     Write-Host
     # Define the source file and directory
-    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
     $directory = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
@@ -267,7 +267,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     kubectx $NewKubeContext=default
     Write-Host
     # Define the source file and directory
-    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
     $directory = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
