@@ -31,7 +31,6 @@ $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
 if ($env:COMPUTERNAME -eq "Seattle") {
 
-    $NetIPAddress = "172.20.1.2"
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -67,7 +66,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Write-Host
 
     Write-Host "Fetching latest AKS Edge Essentials msi file"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile "$deploymentFolder\aksee-k3s.msi"
+    Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -111,7 +110,6 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 }
 elseif ($env:COMPUTERNAME -eq "Chicago") {
 
-    $NetIPAddress = "172.20.1.3"
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -147,7 +145,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Write-Host
 
     Write-Host "Fetching latest AKS Edge Essentials msi file"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile "$deploymentFolder\aksee-k3s.msi"
+    Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -191,7 +189,6 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
 }
 elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
-    $NetIPAddress = "172.20.1.4"
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -227,7 +224,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Write-Host
 
     Write-Host "Fetching latest AKS Edge Essentials msi file"
-    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile "$deploymentFolder\aksee-k3s.msi"
+    Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
