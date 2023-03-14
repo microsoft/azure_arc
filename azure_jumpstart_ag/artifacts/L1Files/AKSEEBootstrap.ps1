@@ -85,20 +85,32 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
     Write-Host
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # Define the source file and directory
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $directory = "$env:USERPROFILE\.kube"
+
+    # Define an array of new file names
+    $newFileNames = @("config", "config-$NewKubeContext")
+
+    # Loop through the new file names and copy the source file to the same directory with the new name
+    foreach ($name in $newFileNames) {
+        $destination = Join-Path $directory $name
+        Copy-Item $sourceFile $destination
+    }
+
     Write-Host
     kubectl get nodes -o wide
     Write-Host
 
-    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    # $destinationPath = "\\$DefaultGateway\kube"
-    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    # Copy-Item -Path $sourcePath -Destination $destinationPath
+    Write-Host "Coping the kubeconfig file to the L0 host machine"
+    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    $destinationPath = "\\$DefaultGateway\kube"
+    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
@@ -162,20 +174,32 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
     Write-Host
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # Define the source file and directory
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $directory = "$env:USERPROFILE\.kube"
+
+    # Define an array of new file names
+    $newFileNames = @("config", "config-$NewKubeContext")
+
+    # Loop through the new file names and copy the source file to the same directory with the new name
+    foreach ($name in $newFileNames) {
+        $destination = Join-Path $directory $name
+        Copy-Item $sourceFile $destination
+    }
+
     Write-Host
     kubectl get nodes -o wide
     Write-Host
 
-    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    # $destinationPath = "\\$DefaultGateway\kube"
-    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    # Copy-Item -Path $sourcePath -Destination $destinationPath
+    Write-Host "Coping the kubeconfig file to the L0 host machine"
+    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    $destinationPath = "\\$DefaultGateway\kube"
+    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
@@ -239,20 +263,32 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
     Write-Host
-    Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    # Define the source file and directory
+    $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config-$env:COMPUTERNAME"
+    $directory = "$env:USERPROFILE\.kube"
+
+    # Define an array of new file names
+    $newFileNames = @("config", "config-$NewKubeContext")
+
+    # Loop through the new file names and copy the source file to the same directory with the new name
+    foreach ($name in $newFileNames) {
+        $destination = Join-Path $directory $name
+        Copy-Item $sourceFile $destination
+    }
+
     Write-Host
     kubectl get nodes -o wide
     Write-Host
 
-    # $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-    # $destinationPath = "\\$DefaultGateway\kube"
-    # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-    # Copy-Item -Path $sourcePath -Destination $destinationPath
+    Write-Host "Coping the kubeconfig file to the L0 host machine"
+    $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+    $destinationPath = "\\$DefaultGateway\kube"
+    New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+    Copy-Item -Path $sourcePath -Destination $destinationPath
 
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
