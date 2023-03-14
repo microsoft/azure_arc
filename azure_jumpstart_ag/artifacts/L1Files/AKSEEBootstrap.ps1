@@ -3,17 +3,15 @@
 ###########################################
 # Preparing environment folders structure #
 ###########################################
-
-# net start w32time
-# w32tm /resync
-# Start-Sleep -Seconds 60
+$ProgressPreference = "SilentlyContinue"
 
 $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
-$kubeFolder = "$env:USERPROFILE\.kube"
+# $kubeFolder = "$env:USERPROFILE\.kube"
 
 # Set up an array of folders
-$folders = @($logsFolder, $kubeFolder)
+# $folders = @($logsFolder, $kubeFolder)
+$folders = @($logsFolder)
 
 # Loop through each VM and restart it
 foreach ($Folder in $folders) {
@@ -68,8 +66,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
     Write-Host
 
-    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
-    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    Write-Host "Fetching latest AKS Edge Essentials msi file"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -87,9 +85,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
-    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
@@ -106,6 +103,9 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     # $destinationPath = "\\$DefaultGateway\kube"
     # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     # Copy-Item -Path $sourcePath -Destination $destinationPath
+
+    Write-Host "Enabling ICMP for the cluster control plane IP address"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
@@ -146,8 +146,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
     Write-Host
 
-    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
-    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    Write-Host "Fetching latest AKS Edge Essentials msi file"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -165,9 +165,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
-    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
@@ -184,6 +183,9 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     # $destinationPath = "\\$DefaultGateway\kube"
     # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     # Copy-Item -Path $sourcePath -Destination $destinationPath
+
+    Write-Host "Enabling ICMP for the cluster control plane IP address"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
@@ -224,8 +226,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External virtual switch for AKS Edge Essentials cluster"
     Write-Host
 
-    # Write-Host "Fetching latest AKS Edge Essentials *.msi"
-    # Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
+    Write-Host "Fetching latest AKS Edge Essentials msi file"
+    Invoke-WebRequest "https://aka.ms/aks-edge/k3s-msi" -OutFile $deploymentFolder\k3s-msi.msi
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -243,9 +245,8 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Set-Content $AKSEEConfigFilePath -Value $content
         
     Set-Location $deploymentFolder
-    # $AKSEEConfigFilePath = Get-ChildItem $deploymentFolder | Where-Object ({ $_.Name -like "*$env:COMPUTERNAME*" })
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
-    # Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+    Write-Host
 
     # kubeconfig work for changing context and coping to the Hyper-V host machine
     Copy-Item -Path "$env:USERPROFILE\.kube\config" -Destination "$env:USERPROFILE\.kube\config.backup"
@@ -262,6 +263,9 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     # $destinationPath = "\\$DefaultGateway\kube"
     # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     # Copy-Item -Path $sourcePath -Destination $destinationPath
+
+    Write-Host "Enabling ICMP for the cluster control plane IP address"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
