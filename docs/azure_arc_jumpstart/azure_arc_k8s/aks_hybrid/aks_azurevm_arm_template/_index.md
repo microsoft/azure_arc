@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "AKS cluster provisioning from Azure"
-linkTitle: "AKS cluster provisioning from Azure"
+title: "AKS hybrid cluster provisioning from Azure"
+linkTitle: "AKS hybrid cluster provisioning from Azure"
 weight: 2
 description: >
 ---
@@ -210,15 +210,15 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - Upon successful run, a new Azure Arc-enabled Kubernetes cluster will be added to the resource group. You should also see an Azure Arc Resource Bridge and a Custom Location.
 
-![Screenshot Azure Arc-enabled Kubernetes cluster on resource group](./20.png)
+![Screenshot Azure resources on resource group](./20.png)
 
 ### Exploring logs from the Client VM
 
-Occasionally, you may need to review log output from scripts that run on the _AKSHos001_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on the Azure VM. A short description of the logs and their purpose can be seen in the list below:
+Occasionally, you may need to review log output from scripts that run on the _AKS-WS-VM_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on the Azure VM. A short description of the logs and their purpose can be seen in the list below:
 
 | Log file | Description |
 | ------- | ----------- |
-| _C:\Temp\Bootstrap.log_ | Output from the initial _bootstrapping.ps1_ script that runs on _AKSHos001_ Azure VM. |
+| _C:\Temp\Bootstrap.log_ | Output from the initial _bootstrapping.ps1_ script that runs on _AKS-WS-VM_ Azure VM. |
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
 |
 
