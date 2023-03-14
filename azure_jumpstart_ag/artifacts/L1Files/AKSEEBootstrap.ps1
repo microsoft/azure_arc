@@ -93,7 +93,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
-    $newFileNames = @("config", "config-$NewKubeContext")
+    $newFileNames = @("config-backup", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
@@ -181,7 +181,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
-    $newFileNames = @("config", "config-$NewKubeContext")
+    $newFileNames = @("config-backup", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
@@ -269,7 +269,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
-    $newFileNames = @("config", "config-$NewKubeContext")
+    $newFileNames = @("config-backup", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
