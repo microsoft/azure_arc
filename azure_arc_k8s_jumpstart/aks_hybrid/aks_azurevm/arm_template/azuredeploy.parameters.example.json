@@ -6,13 +6,13 @@
       "value": "AKS-WS-VM"
     },
     "spnClientId": {
-      "value": "9cc88034-6311-4eba-9206-fb4a24dccbe8"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "spnClientSecret": {
-      "value": "hon8Q~U-COZOv5GTODGPcdR3X4.Dk6skPRwVnaZO"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "spnTenantId": {
-      "value": "92bd2dce-6c48-4a50-b827-a0cbd71373b3"
+      "value": "XXXXX-XXXXX-XXXXX"
     },
     "adminUsername": {
       "value": "AzureUser"

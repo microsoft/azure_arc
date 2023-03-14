@@ -83,6 +83,7 @@ az arcappliance prepare hci --config-file $configFilePath
 az arcappliance deploy hci --config-file $configFilePath --outfile $workingDir\config
 az arcappliance create hci --config-file $configFilePath --kubeconfig $workingDir\config
 
+
 # The Arc Resource Bridge must be in Running status
 Do {
     Write-Host "Waiting for Arc Resource Bridge (Connecting Arc Resource Bridge to Azure may take up to 10 minutes to finish), hold tight..."
