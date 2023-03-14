@@ -90,15 +90,14 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Write-Host
     # Define the source file and directory
     $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $directory = "$env:USERPROFILE\.kube"
+    $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
     $newFileNames = @("config", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
-        $destination = Join-Path $directory $name
-        Copy-Item $sourceFile $destination
+        Copy-Item $sourceFile $destination -Force
     }
 
     Write-Host
@@ -179,15 +178,14 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Write-Host
     # Define the source file and directory
     $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $directory = "$env:USERPROFILE\.kube"
+    $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
     $newFileNames = @("config", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
-        $destination = Join-Path $directory $name
-        Copy-Item $sourceFile $destination
+        Copy-Item $sourceFile $destination -Force
     }
 
     Write-Host
@@ -268,15 +266,14 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Write-Host
     # Define the source file and directory
     $sourceFile = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $directory = "$env:USERPROFILE\.kube"
+    $destination = "$env:USERPROFILE\.kube"
 
     # Define an array of new file names
     $newFileNames = @("config", "config-$NewKubeContext")
 
     # Loop through the new file names and copy the source file to the same directory with the new name
     foreach ($name in $newFileNames) {
-        $destination = Join-Path $directory $name
-        Copy-Item $sourceFile $destination
+        Copy-Item $sourceFile $destination -Force
     }
 
     Write-Host
