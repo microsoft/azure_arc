@@ -24,12 +24,20 @@ The following Jumpstart scenario will show how to create an AKS cluster provisio
 
 - Create Azure service principal (SP)
 
-    To complete the scenario and its related automation, an Azure service principal with the “Contributor” role assigned is required. To create it, login to your Azure account and run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To complete the scenario and its related automation, an Azure service principal with the “Contributor” and "Group Admin" role assigned is required. To create it, login to your Azure account and run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    SP_CLIENT_ID=$(az ad sp create-for-rbac -n "<Unique SP Name>" --role Contributor --scopes /subscriptions/$subscriptionId --query appId -o tsv) 
+    SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv) 
+    BODY=$(jq -n \
+    --arg principalId "$SP_OID" \
+    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
+    --arg directoryScopeId "/" \
+    '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
+    az rest --method POST --uri https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments --headers "Content-Type=application/json" --body "$BODY" az ad sp create-for-rbac --name "<Unique SP Name>"
     ```
 
     For example:
@@ -37,7 +45,15 @@ The following Jumpstart scenario will show how to create an AKS cluster provisio
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "JumpstartArc" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    SP_CLIENT_ID=$(az ad sp create-for-rbac -n "JumpstartArc" --role Contributor --scopes /subscriptions/$subscriptionId --query appId -o tsv) 
+    SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv) 
+    BODY=$(jq -n \
+    --arg principalId "$SP_OID" \
+    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
+    --arg directoryScopeId "/" \
+    '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
+    az rest --method POST --uri https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments --headers "Content-Type=application/json" --body "$BODY" az ad sp create-for-rbac --name "JumpstartArc"
     ```
 
     Output should look like this:
@@ -64,9 +80,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   - _Virtual Network_ - Virtual Network for Azure Windows Server VM.
   - _Network Interface_ - Network Interface for Azure Windows Server VM.
-  - _Public IP_ - Public IP address for the Azure Windows Server VM.
+  - _Public IP_ - Public IP address for the Azure Windows Server VM, unless Bastion was enabled.
   - _Network Security Group_ - Network Security Group to allow RDP in Azure Windows Server VM.
   - _Virtual Machine_ - Azure Windows Server VM.
+  - _Azure Bastion_ - If boolean was set to true.
   - _Custom script and Azure Desired State Configuration extensions_ - Configure the Azure Windows Server VM to host AKS Edge Essentials.
 
 - User remotes into client Windows VM, which automatically kicks off the [_LogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_azurevm/arm_template/artifacts/LogonScript.ps1) PowerShell script to create the AKS cluster in the Windows Server VM, and onboard the cluster to Azure Arc.
@@ -118,9 +135,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Once Azure resources have been provisioned, you will be able to see them in Azure portal.
 
-    ![Screenshot ARM template output](./02.png)
+    ![Screenshot ARM template output](./01.png)
 
-    ![Screenshot resources in resource group](./03.png)
+    ![Screenshot resources in resource group](./02.png)
 
 ## Windows Login & Post Deployment
 
@@ -133,35 +150,35 @@ Various options are available to connect to _AKS-VM-Demo_ Azure VM, depending on
 
 By design, port 3389 is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
 
-- Open the _AKS-EE-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
+- Open the _AKSVMLabNSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing AKS-EE-Demo-NSG NSG with blocked RDP](./04.png)
+  ![Screenshot showing AKSVMLabNSG NSG with blocked RDP](./03.png)
 
-  ![Screenshot showing adding a new inbound security rule](./05.png)
+  ![Screenshot showing adding a new inbound security rule](./04.png)
 
 - Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
 
-  ![Screenshot showing all inbound security rule](./06.png)
+  ![Screenshot showing all inbound security rule](./05.png)
 
-  ![Screenshot showing all NSG rules after opening RDP](./07.png)
+  ![Screenshot showing all NSG rules after opening RDP](./06.png)
 
-  ![Screenshot showing connecting to the VM using RDP](./08.png)
+  ![Screenshot showing connecting to the VM using RDP](./07.png)
 
 ### Connect using just-in-time access (JIT)
 
-If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Azure Client VM, use the following steps:
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Azure VM, use the following steps:
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./10.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./08.png)
 
-  ![Screenshot showing connecting to the VM using JIT](./11.png)
+  ![Screenshot showing connecting to the VM using JIT](./09.png)
 
 ### Connect using Azure Bastion
 
 - If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the Azure VM.
 
-  ![Screenshot showing connecting to the VM using Bastion](./09.png)
+  ![Screenshot showing connecting to the VM using Bastion](./10.png)
 
   > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting with Azure Bastion.**
 
@@ -172,6 +189,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 - Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
 
     > **NOTE: The script run time is ~13min long.**
+
+    ![Screenshot script output](./11.png)
 
     ![Screenshot script output](./12.png)
 
@@ -189,44 +208,24 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
     ![Screenshot script output](./19.png)
 
-    ![Screenshot script output](./20.png)
+- Upon successful run, a new Azure Arc-enabled Kubernetes cluster will be added to the resource group. You should also see an Azure Arc Resource Bridge and a Custom Location.
 
-    ![Screenshot script output](./21.png)
-
-- Upon successful run, a new Azure Arc-enabled server and Azure Arc-enabled Kubernetes cluster will be added to the resource group.
-
-![Screenshot Azure Arc-enabled server on resource group](./22.png)
-
-- You can also run _kubectl get nodes -o wide_ to check the cluster node status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extension](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview)) are in running state.
-
-![Screenshot kubectl get nodes -o wide](./23.png)
-
-![Screenshot kubectl get pod -A](./24.png)
-
-## Cluster extensions
-
-In this scenario, Azure Arc-enabled Kubernetes cluster Azure Monitor extension was installed:
-
-- _azuremonitor-containers_ - The Azure Monitor Container Insights cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
-
-To view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
-
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./25.png)
+![Screenshot Azure Arc-enabled Kubernetes cluster on resource group](./20.png)
 
 ### Exploring logs from the Client VM
 
-Occasionally, you may need to review log output from scripts that run on the _AKS-EE-Demo_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on _AKS-EE-Demo_ Azure VM. A short description of the logs and their purpose can be seen in the list below:
+Occasionally, you may need to review log output from scripts that run on the _AKSHos001_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on the Azure VM. A short description of the logs and their purpose can be seen in the list below:
 
 | Log file | Description |
 | ------- | ----------- |
-| _C:\Temp\Bootstrap.log_ | Output from the initial _bootstrapping.ps1_ script that runs on _AKS-EE-Demo_ Azure VM. |
-| _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS Edge Essentials cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
+| _C:\Temp\Bootstrap.log_ | Output from the initial _bootstrapping.ps1_ script that runs on _AKSHos001_ Azure VM. |
+| _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
 |
 
-![Screenshot showing the Temp folder with deployment logs](./26.png)
+![Screenshot showing the Temp folder with deployment logs](./21.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./27.png)
+    ![Screenshot showing Azure resource group deletion](./22.png)
