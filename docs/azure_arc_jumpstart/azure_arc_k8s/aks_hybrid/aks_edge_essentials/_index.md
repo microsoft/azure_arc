@@ -12,11 +12,11 @@ The following Jumpstart scenario will show how to create an AKS Edge Essentials 
 
 Azure VMs leverage the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/azure/virtual-machines/windows/instance-metadata-service) by default to provide information about the VMs, and to manage and configure the VMs. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow the Azure Arc server resources to be represented as one resource when the IMDS is being used. Instead, the Azure Arc server will still "act" as a native Azure VM.
 
-![Screenshot ARM template output](./01.png)
-
 However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc. By doing so, you will be able to simulate a server that is deployed outside of Azure (i.e. "on-premises" or in other cloud platforms)
 
 > **NOTE: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
+
+![Screenshot ARM template output](./01.png)
 
 ## Prerequisites
 
