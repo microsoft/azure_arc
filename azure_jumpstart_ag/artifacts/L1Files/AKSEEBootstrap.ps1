@@ -1,23 +1,25 @@
-# L1 - Nested VM
+# Script runtime environment: Level-1 Nested Hyper-V virtual machine
 
 ###########################################
 # Preparing environment folders structure #
 ###########################################
+
 $ProgressPreference = "SilentlyContinue"
 
-$deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
+# Folders to be created
+$deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
 $logsFolder = "$deploymentFolder\Logs"
 $kubeFolder = "$env:USERPROFILE\.kube"
 
 # Set up an array of folders
 $folders = @($logsFolder, $kubeFolder)
 
-# Loop through each VM and restart it
+# Loop through each folder and create it
 foreach ($Folder in $folders) {
     New-Item -ItemType Directory $Folder -Force
 }
 
-# Log starts
+# Start logging
 Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 
 #########################################
@@ -28,8 +30,10 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 $HVHostUsername = "arcdemo"
 $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
+# Per L1 VM AKS Edge Essentials cluster bootstrap
 if ($env:COMPUTERNAME -eq "Seattle") {
 
+    # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -40,9 +44,9 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $ControlPlaneEndpointIp = "172.20.1.21"
     $LinuxNodeIp4Address = "172.20.1.11"
 
-    # $AdapterName = (Get-NetAdapter).Name
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
 
+    # Setting up replacment parameters for AKS Edge Essentials config json file
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
         "1000"                        = $ServiceIPRangeSize
@@ -54,16 +58,19 @@ if ($env:COMPUTERNAME -eq "Seattle") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    # Validating internet connectivity
     while (-not (Test-Connection -ComputerName google.com -Quiet)) {
         Write-Host "Waiting for internet connectivity..."
         Start-Sleep -Seconds 5
     }
 
+    # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
     Write-Host
     Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
     Write-Host
 
+    # Installing AKS Edge Essentials binaries and PowerShell module
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -71,6 +78,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+    # Preparing AKS Edge Essentials config json file
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -79,7 +87,8 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 
     $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
-        
+    
+    # Deploying AKS Edge Essentials cluster
     Set-Location $deploymentFolder
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     Write-Host
@@ -108,7 +117,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
 
     Set-Content $destinationPath -Value $content
 
-
+    # kubeconfig work for changing context and copying to the Hyper-V host machine
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
     $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
@@ -119,10 +128,12 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
+    # Unregistering the scheduled task responsible for start script automation
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 elseif ($env:COMPUTERNAME -eq "Chicago") {
 
+    # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -133,9 +144,9 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     $ControlPlaneEndpointIp = "172.20.1.61"
     $LinuxNodeIp4Address = "172.20.1.51"
 
-    # $AdapterName = (Get-NetAdapter).Name
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
 
+    # Setting up replacment parameters for AKS Edge Essentials config json file
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
         "1000"                        = $ServiceIPRangeSize
@@ -147,16 +158,19 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    # Validating internet connectivity
     while (-not (Test-Connection -ComputerName google.com -Quiet)) {
         Write-Host "Waiting for internet connectivity..."
         Start-Sleep -Seconds 5
     }
 
+    # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
     Write-Host
     Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
     Write-Host
 
+    # Installing AKS Edge Essentials binaries and PowerShell module
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -164,6 +178,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+    # Preparing AKS Edge Essentials config json file
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -172,7 +187,8 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
 
     $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
-        
+    
+    # Deploying AKS Edge Essentials cluster
     Set-Location $deploymentFolder
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     Write-Host
@@ -201,7 +217,7 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
 
     Set-Content $destinationPath -Value $content
 
-
+    # kubeconfig work for changing context and copying to the Hyper-V host machine
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
     $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
@@ -212,10 +228,12 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
+    # Unregistering the scheduled task responsible for start script automation
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
+    # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
     $DNSClientServerAddress = "168.63.129.16"
@@ -226,9 +244,9 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     $ControlPlaneEndpointIp = "172.20.1.91"
     $LinuxNodeIp4Address = "172.20.1.81"
 
-    # $AdapterName = (Get-NetAdapter).Name
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
 
+    # Setting up replacment parameters for AKS Edge Essentials config json file
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
         "1000"                        = $ServiceIPRangeSize
@@ -240,16 +258,19 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
         "Ip4Address-null"             = $LinuxNodeIp4Address
     }
 
+    # Validating internet connectivity
     while (-not (Test-Connection -ComputerName google.com -Quiet)) {
         Write-Host "Waiting for internet connectivity..."
         Start-Sleep -Seconds 5
     }
 
+    # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
     Write-Host
     Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
     New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
     Write-Host
 
+    # Installing AKS Edge Essentials binaries and PowerShell module
     $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
     $msiFilePath = Join-Path $deploymentFolder $msiFileName
     $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
@@ -257,6 +278,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
     Install-AksEdgeHostFeatures -Force
 
+    # Preparing AKS Edge Essentials config json file
     $content = Get-Content $AKSEEConfigFilePath
 
     foreach ($key in $replacementParams.Keys) {
@@ -265,12 +287,13 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
     $AKSEEConfigFilePath = "$deploymentFolder\Config.json"
     Set-Content $AKSEEConfigFilePath -Value $content
-        
+    
+    # Deploying AKS Edge Essentials cluster
     Set-Location $deploymentFolder
     New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
     Write-Host
 
-    # kubeconfig work for changing context and coping to the Hyper-V host machine
+    # kubeconfig work for changing context and copying to the Hyper-V host machine
     $NewKubeContext = $(hostname).ToLower()
     kubectx $NewKubeContext=default
     Write-Host
@@ -294,7 +317,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
     Set-Content $destinationPath -Value $content
 
-
+    # kubeconfig work for changing context and copying to the Hyper-V host machine
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
     $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
@@ -305,6 +328,7 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     Write-Host "Enabling ICMP for the cluster control plane IP address"
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
+    # Unregistering the scheduled task responsible for start script automation
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 else {
