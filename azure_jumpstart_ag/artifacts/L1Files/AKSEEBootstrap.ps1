@@ -91,10 +91,27 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     kubectl get nodes -o wide
     Write-Host
 
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $destinationPath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+
+    $kubeReplacementParams = @{
+        "name: default"    = "name: $NewKubeContext"
+        "cluster: default" = "cluster: $NewKubeContext"
+        "user: default"    = "user: $NewKubeContext"
+    }
+
+    $content = Get-Content $sourcePath
+
+    foreach ($key in $kubeReplacementParams.Keys) {
+        $content = $content -replace $key, $kubeReplacementParams[$key]
+    }
+
+    Set-Content $destinationPath -Value $content
+
+
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
@@ -167,10 +184,27 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     kubectl get nodes -o wide
     Write-Host
 
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $destinationPath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+
+    $kubeReplacementParams = @{
+        "name: default"    = "name: $NewKubeContext"
+        "cluster: default" = "cluster: $NewKubeContext"
+        "user: default"    = "user: $NewKubeContext"
+    }
+
+    $content = Get-Content $sourcePath
+
+    foreach ($key in $kubeReplacementParams.Keys) {
+        $content = $content -replace $key, $kubeReplacementParams[$key]
+    }
+
+    Set-Content $destinationPath -Value $content
+
+
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
@@ -243,10 +277,27 @@ elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
     kubectl get nodes -o wide
     Write-Host
 
+    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $destinationPath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+
+    $kubeReplacementParams = @{
+        "name: default"    = "name: $NewKubeContext"
+        "cluster: default" = "cluster: $NewKubeContext"
+        "user: default"    = "user: $NewKubeContext"
+    }
+
+    $content = Get-Content $sourcePath
+
+    foreach ($key in $kubeReplacementParams.Keys) {
+        $content = $content -replace $key, $kubeReplacementParams[$key]
+    }
+
+    Set-Content $destinationPath -Value $content
+
+
     Write-Host "Coping the kubeconfig file to the L0 host machine"
     $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-    # $sourcePath = "C:\Windows\System32\config\systemprofile\.kube\config"
-    $sourcePath = "$env:USERPROFILE\.kube\config"
+    $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
     $destinationPath = "\\$DefaultGateway\kube"
     New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
     Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
