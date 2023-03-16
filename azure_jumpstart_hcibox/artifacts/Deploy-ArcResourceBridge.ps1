@@ -44,18 +44,15 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
 }
 
-foreach ($VM in $SDNConfig.HostList) {
-    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin",[System.EnvironmentVariableTarget]::Machine)
-        $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-        $ErrorActionPreference = "Continue"
-        az extension add --upgrade --name arcappliance --only-show-errors
-        az extension add --upgrade --name connectedk8s --only-show-errors
-        az extension add --upgrade --name k8s-configuration --only-show-errors
-        az extension add --upgrade --name k8s-extension --only-show-errors
-        az extension add --upgrade --name customlocation --only-show-errors
-        az extension add --upgrade --name azurestackhci --only-show-errors
-    }
+Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+    az extension add --upgrade --version 0.2.29 --name arcappliance --only-show-errors
+    az extension add --upgrade --name connectedk8s --only-show-errors
+    az extension add --upgrade --name k8s-configuration --only-show-errors
+    az extension add --upgrade --name k8s-extension --only-show-errors
+    az extension add --upgrade --name customlocation --only-show-errors
+    az extension add --upgrade --name azurestackhci --only-show-errors
 }
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
@@ -82,23 +79,15 @@ if ($env:deployAKSHCI -eq $false) {
 }
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    #New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
     New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -vnetName $using:SDNConfig.AKSvSwitchName -vswitchName $using:SDNConfig.AKSvSwitchName -ipaddressprefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -vlanID $using:SDNConfig.AKSVlanID
 }
-# if ($env:deployAKSHCI -eq "false") {
-#     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-#         New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
-#     }
-# } else {
-#     Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-#         #New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
-#         New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip -vipPoolStart $using:SDNConfig.rbCpip -vipPoolEnd $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp2 -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix -vswitchName $using:SDNConfig.AKSvSwitchName -vLanID $using:SDNConfig.AKSVlanID
-#     }  
-# }
+
 $ErrorActionPreference = "Continue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Deploying Arc Resource Bridge. This will take a while."
     $WarningPreference = "SilentlyContinue"
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
     az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --only-show-errors
@@ -110,7 +99,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Do {
         Write-Host "Waiting on Arc Resource Bridge deployment to complete..."
         Start-Sleep 60
-        $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name | ConvertFrom-Json
+        $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name --only-show-errors | ConvertFrom-Json
         if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Running")) {
             $rbReady = $true
         }
@@ -126,7 +115,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Do {
         Write-Host "Waiting for custom location to provision..."
         Start-Sleep 10
-        $readiness = az k8s-extension show --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator | ConvertFrom-Json
+        $readiness = az k8s-extension show --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator --only-show-errors | ConvertFrom-Json
         if ($readiness.provisioningState -eq "Succeeded") {
             $clReady = $true
         }
@@ -149,6 +138,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $vnetName="vlan200"
     New-MocGroup -name "Default_Group" -location "MocLocation"
     New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -tags @{'VSwitch-Name' = "sdnSwitch"} -vlanID $using:SDNConfig.AKSVlanID
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName --vlan $using:SDNConfig.AKSVlanID --only-show-errors
     
     $galleryImageName = "ubuntu20"
