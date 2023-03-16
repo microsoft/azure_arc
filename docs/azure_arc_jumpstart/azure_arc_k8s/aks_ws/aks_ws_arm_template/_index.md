@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "AKS hybrid cluster provisioning from Azure"
-linkTitle: "AKS hybrid cluster provisioning from Azure"
+title: "Azure Kubernetes Service (AKS) on Windows Server"
+linkTitle: "Azure Kubernetes Service (AKS) on Windows Server"
 weight: 2
 description: >
 ---
 
-## Deploy an AKS hybrid cluster provisioned from Azure using an ARM Template
+## Deploy an AKS hybrid cluster on Windows Sercver provisioned from Azure using an ARM Template
 
 The following Jumpstart scenario will show how to create an AKS cluster provisioned from an Azure Windows Server VM and connect it to Azure Arc via resource Bridge, using an [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) for deployment. The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster)) on the Azure VM.
 
@@ -31,12 +31,11 @@ The following Jumpstart scenario will show how to create an AKS cluster provisio
     subscriptionId=$(az account show --query id --output tsv)
     az ad sp create-for-rbac -n "" --role "Contributor" --scopes /subscriptions/$subscriptionId
     SP_CLIENT_ID=$(az ad sp create-for-rbac -n "<Unique SP Name>" --role Contributor --scopes /subscriptions/$subscriptionId --query appId -o tsv) 
-    SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv) 
+    SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv)
     BODY=$(jq -n \
-    --arg principalId "$SP_OID" \
-    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
-    --arg directoryScopeId "/" \
-    '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
+    --arg principalId "$SP_OID" \
+    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
+    --arg directoryScopeId "/" '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
     az rest --method POST --uri https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments --headers "Content-Type=application/json" --body "$BODY" az ad sp create-for-rbac --name "<Unique SP Name>"
     ```
 
@@ -49,10 +48,9 @@ The following Jumpstart scenario will show how to create an AKS cluster provisio
     SP_CLIENT_ID=$(az ad sp create-for-rbac -n "JumpstartArc" --role Contributor --scopes /subscriptions/$subscriptionId --query appId -o tsv) 
     SP_OID=$(az ad sp show --id $SP_CLIENT_ID --query id -o tsv) 
     BODY=$(jq -n \
-    --arg principalId "$SP_OID" \
-    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
-    --arg directoryScopeId "/" \
-    '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
+    --arg principalId "$SP_OID" \
+    --arg roleDefinitionId "fdd7a751-b60b-444a-984c-02652fe8fa1c" \
+    --arg directoryScopeId "/" '{principalId: $principalId, roleDefinitionId: $roleDefinitionId, directoryScopeId: $directoryScopeId}')
     az rest --method POST --uri https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments --headers "Content-Type=application/json" --body "$BODY" az ad sp create-for-rbac --name "JumpstartArc"
     ```
 
@@ -210,7 +208,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - Upon successful run, a new Azure Arc-enabled Kubernetes cluster will be added to the resource group. You should also see an Azure Arc Resource Bridge and a Custom Location.
 
-![Screenshot Azure resources on resource group](./20.png)
+  ![Screenshot Azure resources on resource group](./20.png)
 
 ### Exploring logs from the Client VM
 
@@ -220,7 +218,6 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 | ------- | ----------- |
 | _C:\Temp\Bootstrap.log_ | Output from the initial _bootstrapping.ps1_ script that runs on _AKS-WS-VM_ Azure VM. |
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
-|
 
 ![Screenshot showing the Temp folder with deployment logs](./21.png)
 
