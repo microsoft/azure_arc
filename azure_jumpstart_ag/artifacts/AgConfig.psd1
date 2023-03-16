@@ -4,7 +4,22 @@
     
     # Version 1.0.0
 
-    # HCI host names
+    # Directory paths
+    AgDirectories = @{
+        AgDir = "C:\Ag"
+        AgLogsDir = "C:\Ag\Logs"
+        AgVMDir = "C:\Ag\Virtual Machines"
+        AgKVDir = "C:\Ag\KeyVault"
+        AgGitOpsDir = "C:\Ag\GitOps"
+        AgIconDir = "C:\Ag\Icons"
+        AgAgentScriptsDir = "C:\Ag\agentScripts"
+        AgToolsDir = "C:\Tools"
+        AgTempDir = "C:\Temp"
+        AgVHDXDir = "C:\Ag\VHDX"
+        AgKubeDir = "$env:USERPROFILE\.kube"
+    }
+
+    # Store location names
     StoreLocations                       = "Chicago", "New Orleans", "Seattle"                # The location names for the stores
 
     # VHDX Paths 
