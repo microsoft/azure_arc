@@ -1,4 +1,4 @@
-# Script runtime environment: Level-0 Azure virtual machine
+# Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 
 ###########################################
 # Preparing environment folders structure #
@@ -84,7 +84,7 @@ foreach ($vhdxPath in $vhdxPaths) {
     Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
     Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
       
-    # Create Checkpoint and start the virtual machine
+    # Create virtual machine snapshot and start the virtual machine
     Checkpoint-VM -Name $VMName -SnapshotName "Base"
     Start-Sleep -Seconds 5
     Start-VM -Name $VMName
@@ -96,7 +96,7 @@ Start-Sleep -Seconds 15
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
 ########################################################################
 
-# Create an array with VM names
+# Create an array with VM names    
 $VMnames = (Get-VM).Name
 
 foreach ($VMName in $VMNames) {
@@ -126,12 +126,17 @@ foreach ($VMName in $VMNames) {
         # Deploying AKS Edge Essentials clusters #
         ##########################################
 
+        # Parameterizing the host, L0 username and password Required for the shared drive functionality (New-PSDrive)
+        $HVHostUsername = "arcdemo"
+        $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
+
         if ($env:COMPUTERNAME -eq "Seattle") {
 
             $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
             $logsFolder = "$deploymentFolder\Logs"
             $kubeFolder = "$env:USERPROFILE\.kube"
 
+            # Assigning network adapter IP address
             $NetIPAddress = "172.20.1.2"
             $DefaultGateway = "172.20.1.1"
             $PrefixLength = "24"
@@ -142,6 +147,7 @@ foreach ($VMName in $VMNames) {
             New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
             Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
         
+            # Validating internet connectivity
             $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
             if ($pingResult) {
                 # Internet connection is available
@@ -169,7 +175,6 @@ foreach ($VMName in $VMNames) {
                     }
                 }
             }
-   
             Write-Host
 
             # Fetching latest AKS Edge Essentials msi file
@@ -195,7 +200,6 @@ foreach ($VMName in $VMNames) {
                 $outputFile = Join-Path $deploymentFolder $fileName
                 Invoke-WebRequest -Uri $_ -OutFile $outputFile
             }
-
         }
         elseif ($env:COMPUTERNAME -eq "Chicago") {
 
@@ -203,6 +207,7 @@ foreach ($VMName in $VMNames) {
             $logsFolder = "$deploymentFolder\Logs"
             $kubeFolder = "$env:USERPROFILE\.kube"
 
+            # Assigning network adapter IP address            
             $NetIPAddress = "172.20.1.3"
             $DefaultGateway = "172.20.1.1"
             $PrefixLength = "24"
@@ -213,6 +218,7 @@ foreach ($VMName in $VMNames) {
             New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
             Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
             
+            # Validating internet connectivity
             $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
             if ($pingResult) {
                 # Internet connection is available
@@ -240,7 +246,6 @@ foreach ($VMName in $VMNames) {
                     }
                 }
             }
-      
             Write-Host
 
             # Fetching latest AKS Edge Essentials msi file
@@ -265,118 +270,115 @@ foreach ($VMName in $VMNames) {
                 $fileName = $_.Substring($_.LastIndexOf("/") + 1)
                 $outputFile = Join-Path $deploymentFolder $fileName
                 Invoke-WebRequest -Uri $_ -OutFile $outputFile
-            
             }
-            elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
+        }
+        elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
 
-                $deploymentFolder = "C:\Deployment" # Deployment folder is already available in the VHD image
-                $logsFolder = "$deploymentFolder\Logs"
-                $kubeFolder = "$env:USERPROFILE\.kube"
+            $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+            $logsFolder = "$deploymentFolder\Logs"
+            $kubeFolder = "$env:USERPROFILE\.kube"
 
-                $NetIPAddress = "172.20.1.4"
-                $DefaultGateway = "172.20.1.1"
-                $PrefixLength = "24"
-                $DNSClientServerAddress = "168.63.129.16"
+            # Assigning network adapter IP address
+            $NetIPAddress = "172.20.1.4"
+            $DefaultGateway = "172.20.1.1"
+            $PrefixLength = "24"
+            $DNSClientServerAddress = "168.63.129.16"
 
-                $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
-                $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-                New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-                Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+            $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
+            $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+            New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
+            Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
 
+            # Validating internet connectivity
+            $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+            if ($pingResult) {
+                # Internet connection is available
+                Write-Host "Internet connection is available" -ForegroundColor Green
+            }
+            else {
+                # Wait 5 seconds and try again
+                Start-Sleep -Seconds 5
                 $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
                 if ($pingResult) {
-                    # Internet connection is available
-                    Write-Host "Internet connection is available" -ForegroundColor Green
+                    # Internet connection is available after waiting
+                    Write-Host "Internet connection is available after waiting" -ForegroundColor Green
                 }
                 else {
-                    # Wait 5 seconds and try again
+                    # Wait another 5 seconds and try again
                     Start-Sleep -Seconds 5
                     $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
                     if ($pingResult) {
-                        # Internet connection is available after waiting
-                        Write-Host "Internet connection is available after waiting" -ForegroundColor Green
+                        # Internet connection is available after waiting again
+                        Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
                     }
                     else {
-                        # Wait another 5 seconds and try again
-                        Start-Sleep -Seconds 5
-                        $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-                        if ($pingResult) {
-                            # Internet connection is available after waiting again
-                            Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
-                        }
-                        else {
-                            # Internet connection is still not available
-                            Write-Host "Error: No internet connection" -ForegroundColor Red
-                        }
+                        # Internet connection is still not available
+                        Write-Host "Error: No internet connection" -ForegroundColor Red
                     }
                 }
-   
-       
-                Write-Host
-
-                # Fetching latest AKS Edge Essentials msi file
-                Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
-                Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
-                Write-Host
-
-                ################################################################################################
-                # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
-                ################################################################################################
-
-                # Fetching required GitHub artifacts from Jumpstart repository
-                Write-Host "Fetching GitHub artifacts"
-                $repoOwner = "likamrat" # While testing, change to your GitHub user account
-                $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-                $branchName = "aksee_bootstrap" # While testing, change to your GitHub fork's repository branch name
-                $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
-                $response = Invoke-RestMethod -Uri $githubApiUrl 
-                $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-             
-                $fileUrls | ForEach-Object {
-                    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-                    $outputFile = Join-Path $deploymentFolder $fileName
-                    Invoke-WebRequest -Uri $_ -OutFile $outputFile
-                }
-
             }
-        } -Credential $Credentials
-    }
+            Write-Host
+
+            # Fetching latest AKS Edge Essentials msi file
+            Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
+            Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
+            Write-Host
+
+            ################################################################################################
+            # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
+            ################################################################################################
+
+            # Fetching required GitHub artifacts from Jumpstart repository
+            Write-Host "Fetching GitHub artifacts"
+            $repoOwner = "likamrat" # While testing, change to your GitHub user account
+            $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+            $branchName = "aksee_bootstrap" # While testing, change to your GitHub fork's repository branch name
+            $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
+            $response = Invoke-RestMethod -Uri $githubApiUrl 
+            $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+             
+            $fileUrls | ForEach-Object {
+                $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+                $outputFile = Join-Path $deploymentFolder $fileName
+                Invoke-WebRequest -Uri $_ -OutFile $outputFile
+            }
+        }
+    } -Credential $Credentials
 }
 
+# Rebooting all L1 virtual machines
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
     Remove-PSSession $Session
 }
 
+# Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
 $kubeconfig3 = "config-akseedev"
 
-# Set the names of the files you're looking for
 $fileNames = @($kubeconfig1, $kubeconfig2, $kubeconfig3)
 
-# Start monitoring the folder for the files
+# Start monitoring the .kube folder for the files on the L0 virtual machine
 $elapsedTime = Measure-Command {
     while ($true) {
         $files = Get-ChildItem $kubeFolder -ErrorAction SilentlyContinue | Where-Object { $fileNames -contains $_.Name }
 
         if ($files.Count -eq 3) {
-            # Run the commands you need to run here
             Write-Host "Found all 3 kubeconfig files!" -ForegroundColor Green
             break
         }
-
         # Wait before checking again
         Start-Sleep -Seconds 30
         Write-Host "Waiting for kubeconfig files. Checking every 30 seconds..." -ForegroundColor Yellow
     }
 }
 
-# Display the elapsed time in seconds
+# Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -ForegroundColor Blue
 
-# Merging kubeconfig files
+# Merging kubeconfig files on the L0 vistual machine
 Write-Host "All three files are present. Merging kubeconfig files." -ForegroundColor Green
 $env:KUBECONFIG = "$env:USERPROFILE\.kube\$kubeconfig1;$env:USERPROFILE\.kube\$kubeconfig2;$env:USERPROFILE\.kube\$kubeconfig3"
 kubectl config view --merge --flatten > "$env:USERPROFILE\.kube\config-raw"
@@ -400,4 +402,3 @@ kubectl get nodes -o wide
 Write-Host
 kubectx akseedev
 kubectl get nodes -o wide
-
