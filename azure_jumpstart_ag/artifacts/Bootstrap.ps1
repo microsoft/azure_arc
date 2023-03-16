@@ -19,6 +19,7 @@ param (
     [string]$templateBaseUrl
 )
 
+# Inject ARM template parameters as environment variables
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
@@ -43,34 +44,20 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 
+# Download configuration data file
+$ConfigurationDataFile = "C:\Temp\HCIBox-Config.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
+$AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
-# Creating Ag path
-Write-Output "Creating Ag path"
-$Env:AgDir = "C:\Ag"
-$Env:AgLogsDir = "$Env:AgDir\Logs"
-$Env:AgVMDir = "$Env:AgDir\Virtual Machines"
-$Env:AgKVDir = "$Env:AgDir\KeyVault"
-$Env:AgGitOpsDir = "$Env:AgDir\GitOps"
-$Env:AgIconDir = "$Env:AgDir\Icons"
-$Env:agentScript = "$Env:AgDir\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:AgRetailDir = "$Env:AgDir\Retail"
+# Creating Ag paths
+Write-Output "Creating Ag paths and set"
+foreach ($path in $AgConfig.AgDirectories) {
+    New-Item -ItemType Directory $AgConfig.AgDirectories[$path] -Force
+}
 
-New-Item -Path $Env:AgDir -ItemType directory -Force
-New-Item -Path $Env:AgLogsDir -ItemType directory -Force
-New-Item -Path $Env:AgVMDir -ItemType directory -Force
-New-Item -Path $Env:AgKVDir -ItemType directory -Force
-New-Item -Path $Env:AgGitOpsDir -ItemType directory -Force
-New-Item -Path $Env:AgIconDir -ItemType directory -Force
-New-Item -Path $Env:ToolsDir -ItemType Directory -Force
-New-Item -Path $Env:tempDir -ItemType directory -Force
-New-Item -Path $Env:agentScript -ItemType directory -Force
-New-Item -Path $Env:AgRetailDir -ItemType directory -Force
+Start-Transcript -Path $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log
 
-Start-Transcript -Path $Env:AgLogsDir\Bootstrap.log
-
-$ErrorActionPreference = 'SilentlyContinue'
+$ErrorActionPreference = 'Stop'
 
 # Copy PowerShell Profile and Reload
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
@@ -94,19 +81,17 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-$appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-
+$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
 foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
     & choco install $app /y -Force | Write-Output
-    
 }
 
 # Download artifacts
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 #Invoke-WebRequest "https://raw.githubusercontent.com/main/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $Env:AgDir\agLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $AgConfig.AgDirectories.AgDir\HCIBox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $AgConfig.AgDirectories.AgDir\agLogonScript.ps1
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
@@ -135,7 +120,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:AgDir\agLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $AgConfig.AgDirectories.AgDir\agLogonScript.ps1
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 
@@ -156,5 +141,5 @@ Stop-Transcript
 # Clean up Bootstrap.log
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:AgLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $Env:AgLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log -Force
