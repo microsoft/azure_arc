@@ -5,8 +5,8 @@
         "machineName": {
             "value": "<Name of your Azure Arc-enabled Server>"
         },
-        "configurationProfileAssignment": {
-            "value": "<environment of your Azure Arc-enabled Server Production or DevTest>"
+        "configurationProfileName": {
+            "value": "<Configuration profile to assign custom or built-in>"
         }
 
     }
