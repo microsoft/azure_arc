@@ -60,9 +60,10 @@ $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBa
 (Get-Content -Path $ConfigurationDataFile) -replace '%staging-password%',$adminPassword | Set-Content -Path $ConfigurationDataFile
 
 # Creating Ag paths
-Write-Output "Creating Ag paths and set"
-foreach ($path in $AgConfig.AgDirectories) {
-    New-Item -ItemType Directory $AgConfig.AgDirectories[$path] -Force
+Write-Output "Creating Ag paths"
+foreach ($path in $AgConfig.AgDirectories.values) {
+    Write-Output "Creating path $path"
+    New-Item -ItemType Directory $path -Force
 }
 
 Start-Transcript -Path $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log
