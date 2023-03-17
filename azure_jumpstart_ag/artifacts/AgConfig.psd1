@@ -16,7 +16,6 @@
         AgToolsDir = "C:\Tools"
         AgTempDir = "C:\Temp"
         AgVHDXDir = "C:\Ag\VHDX"
-        AgKubeDir = "$env:USERPROFILE\.kube"
         AgL1Files = "C:\Ag\L1Files"
     }
 
