@@ -82,7 +82,7 @@ foreach ($provider in $AgConfig.AzureProviders) {
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $AgConfig.L1Password)
 
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
-New-SmbShare -Name "kube" -Path $AgConfig.AgDirectories.AgKubeDir -FullAccess "Everyone"
+New-SmbShare -Name "kube" -Path "$env:USERPROFILE\.kube" -FullAccess "Everyone"
 
 # Enable Enhanced Session Mode on Host
 Write-Host "Enabling Enhanced Session Mode"
