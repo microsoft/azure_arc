@@ -87,6 +87,9 @@ param acrNameProd string = 'Agacrprod${namingGuid}'
 @description('Name of the dev Azure Container Registry')
 param acrNameDev string = 'Agacrdev${namingGuid}'
 
+@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
+param rdpPort string = '3389'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -152,11 +155,12 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksProdClusterName : aksProdClusterName
-    aksDevClusterName : aksDevClusterName
-    iotHubHostName : iotHubDeployment.outputs.iotHubHostName
-    acrNameDev : kubernestesDeployment.outputs.acrDevName
-    acrNameProd : kubernestesDeployment.outputs.acrProdName
+    aksProdClusterName: aksProdClusterName
+    aksDevClusterName: aksDevClusterName
+    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
+    acrNameDev: kubernestesDeployment.outputs.acrDevName
+    acrNameProd: kubernestesDeployment.outputs.acrProdName
+    rdpPort: rdpPort
   }
 }
 
