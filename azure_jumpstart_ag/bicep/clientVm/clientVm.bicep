@@ -73,6 +73,7 @@ param githubAccount string = 'microsoft'
 @description('Target GitHub branch')
 param githubBranch string = 'jumpstart_ag'
 
+var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'ArcBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -173,7 +174,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksProdClusterName ${aksProdClusterName} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksProdClusterName ${aksProdClusterName} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
     }
   }
 }
