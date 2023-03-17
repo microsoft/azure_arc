@@ -45,9 +45,13 @@ param (
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 
 # Download configuration data file
-$ConfigurationDataFile = "C:\Temp\HCIBox-Config.psd1"
+$ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+
+# Replace password and DNS placeholder
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+(Get-Content -Path $ConfigurationDataFile) -replace '%staging-password%',$adminPassword | Set-Content -Path $ConfigurationDataFile
 
 # Creating Ag paths
 Write-Output "Creating Ag paths and set"
@@ -90,7 +94,8 @@ foreach ($app in $appsToInstall) {
 # Download artifacts
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 #Invoke-WebRequest "https://raw.githubusercontent.com/main/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $AgConfig.AgDirectories.AgDir\HCIBox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $AgConfig.AgDirectories.AgDir\AgConfig.psd1
+[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgConfig.AgDirectories.AgDir\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $AgConfig.AgDirectories.AgDir\agLogonScript.ps1
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
