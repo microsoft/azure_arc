@@ -94,7 +94,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Flanicolas%2Fazure_arc%2Fmaster%2Fazure_arc_servers_jumpstart%2Fautomanage%2Fartifacts%2Fautomanage.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fautomanage_builtin_profile%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
   ![Screenshot showing Azure portal deployment](./03.png)
 
@@ -112,7 +112,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- To run the automation, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/automanage/artifacts) and edit [the parameters file](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/automanage/artifacts/automanage.parameters.json)
+- To run the automation, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/automanage_builtin_profile/) and edit [the parameters file](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/automanage_builtin_profile/automanage.parameters.json)
   - _`machineName`_: Name of your Azure Arc-enabled server as it is shown in the Azure Portal.
   - _`configurationProfile`_: refers to the environment of your Azure Arc-enabled server as Azure Automanage has different built-in profiles. Values can be:
     - _`Production environment`_: "/providers/Microsoft.Automanage/bestPractices/AzureBestPracticesProduction"
