@@ -16,7 +16,8 @@ param (
     [string]$acrNameProd,
     [string]$acrNameDev,
     [string]$githubUser,
-    [string]$templateBaseUrl
+    [string]$templateBaseUrl,
+    [string]$rdpPort
 )
 
 # Inject ARM template parameters as environment variables
@@ -140,6 +141,45 @@ Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+# Change RDP Port
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
+{
+    Write-Host "Configuring RDP port number to $rdpPort"
+    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+    # RDP port
+    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
+    if (!($portNumber -eq $rdpPort))
+    {
+      Write-Host Setting RDP PortNumber to $rdpPort
+      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+      Restart-Service TermService -force
+    }
+
+    #Setup firewall rules
+    if ($rdpPort -eq 3389)
+    {
+      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    } 
+    else
+    {
+      $systemroot = get-content env:systemroot
+      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    }
+
+    Write-Host "RDP port configuration complete."
+}
+
+# Install Hyper-V and reboot
+Write-Header "Installing Hyper-V"
+Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 Stop-Transcript
 
