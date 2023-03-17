@@ -172,10 +172,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Deploying AKS Edge Essentials clusters #
     ##########################################
 
-    # Parameterizing the host, L0 username and password Required for the shared drive functionality (New-PSDrive)
-    $HVHostUsername = "arcdemo"
-    $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
-
     if ($env:COMPUTERNAME -eq "Seattle") {
 
         $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
