@@ -17,7 +17,9 @@ param (
     [string]$acrNameDev,
     [string]$githubUser,
     [string]$templateBaseUrl,
-    [string]$rdpPort
+    [string]$rdpPort,
+    [string]$githubAccount,
+    [string]$githubBranch
 )
 
 # Inject ARM template parameters as environment variables
@@ -43,6 +45,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('acrNameDev', $acrNameDev, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 
 # Download configuration data file
