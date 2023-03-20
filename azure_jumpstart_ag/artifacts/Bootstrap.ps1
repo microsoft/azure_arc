@@ -54,6 +54,7 @@ $ErrorActionPreference = 'Continue'
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$AgDirectory = $AgConfig.AgDirectories.AgDir
 
 # Replace password and DNS placeholder
 $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -99,11 +100,8 @@ foreach ($app in $appsToInstall) {
 }
 
 # Download artifacts
-Write-Header "Downloading Azure Stack HCI configuration scripts"
-#Invoke-WebRequest "https://raw.githubusercontent.com/main/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $AgConfig.AgDirectories.AgDir\AgConfig.psd1
-[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgConfig.AgDirectories.AgDir\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/agLogonScript.ps1") -OutFile $AgConfig.AgDirectories.AgDir\agLogonScript.ps1
+[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
@@ -132,7 +130,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $AgConfig.AgDirectories.AgDir\agLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgDirectory\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 
@@ -192,5 +190,5 @@ Stop-Transcript
 # Clean up Bootstrap.log
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content "$AgDirectory\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content "$AgDirectory\Bootstrap.log" -Force
