@@ -54,7 +54,7 @@ $ErrorActionPreference = 'Continue'
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$AgDirectory = $AgConfig.AgDirectories.AgDir
+$AgDirectory = $AgConfig.AgDirectories["AgDir"]
 
 # Replace password and DNS placeholder
 $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -67,7 +67,7 @@ foreach ($path in $AgConfig.AgDirectories.values) {
     New-Item -ItemType Directory $path -Force
 }
 
-Start-Transcript -Path $AgConfig.AgDirectories.AgLogsDir\Bootstrap.log
+Start-Transcript -Path $AgConfig.AgDirectories["AgLogsDir"]\Bootstrap.log
 
 $ErrorActionPreference = 'Continue'
 
@@ -102,6 +102,7 @@ foreach ($app in $appsToInstall) {
 # Download artifacts
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 

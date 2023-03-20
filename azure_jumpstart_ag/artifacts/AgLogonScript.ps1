@@ -6,7 +6,7 @@ $ProgressPreference = "SilentlyContinue"
 # Initialize the environment
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-Start-Transcript -Path $AgConfig.AgDirectories.AgLogsDir\AgLogonScript.log
+Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
@@ -41,7 +41,7 @@ Remove-Item $downloadDir -Recurse -Force
 # Setup Azure CLI
 ##############################################################
 Write-Header "Set up Az CLI"
-$cliDir = New-Item -Path "$AgConfig.AgDirectories.AgLogsDir\.cli\" -Name ".Ag" -ItemType Directory
+$cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
@@ -100,10 +100,10 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "Fetching VM images" -ForegroundColor Yellow
 $sasUrl = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 Write-Host "Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor Yellow
-azcopy cp $sasUrl $AgConfig.$AgDirectories.AgVHDXDir --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $sasUrl $AgConfig.$AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
 # Create an array of VHDX file paths in the the VHDX target folder
-$vhdxPaths = Get-ChildItem $AgConfig.$AgDirectories.AgVHDXDir -Filter *.vhdx | Select-Object -ExpandProperty FullName
+$vhdxPaths = Get-ChildItem $AgConfig.$AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
 # consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
@@ -477,7 +477,7 @@ Invoke-Expression 'cmd /c start Powershell -Command {
 }'
 
 Write-Header "Changing Wallpaper"
-$imgPath="$AgConfig.AgDirectories.AgDir\wallpaper.png"
+$imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
 Add-Type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
