@@ -33,14 +33,14 @@
     
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
-    L1VMMemoryInGB                       = 16GB                                  # This value controls the amount of RAM for each AKS EE host VM
+    L1VMMemory                           = 16GB                                  # This value controls the amount of RAM for each AKS EE host VM
     L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
     InternalSwitch                       = "InternalSwitch"                      # Name of the internal switch that the L0 VM will use.
-    L1Username                           = "Administrator"
-    L1Password                           = '%staging-password%'
-    L1DefaultGateway                     = "172.20.1.1"
-    L1SwitchName                         = "AKS-Int"
-    L1NatSubnetPrefix                    = "172.20.1.0/24"
+    L1Username                           = "Administrator"                       # Admin credential for the 3 VMs that run on the Agora-Client
+    L1Password                           = 'Agora123!!'                          # 
+    L1DefaultGateway                     = "172.20.1.1"                          #
+    L1SwitchName                         = "AKS-Int"                             #
+    L1NatSubnetPrefix                    = "172.20.1.0/24"                       #
 
     # SDN Lab Domain
     SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name. 

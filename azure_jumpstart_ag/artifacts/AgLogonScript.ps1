@@ -79,7 +79,8 @@ foreach ($provider in $AgConfig.AzureProviders) {
 ##############################################################
 # Configure L1 virtualization infrastructure
 ##############################################################
-$Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $AgConfig.L1Password)
+$password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+$Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
 New-SmbShare -Name "kube" -Path "$env:USERPROFILE\.kube" -FullAccess "Everyone"
@@ -100,10 +101,10 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "Fetching VM images" -ForegroundColor Yellow
 $sasUrl = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 Write-Host "Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor Yellow
-azcopy cp $sasUrl $AgConfig.$AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
 # Create an array of VHDX file paths in the the VHDX target folder
-$vhdxPaths = Get-ChildItem $AgConfig.$AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+$vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
 # consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
@@ -117,11 +118,11 @@ foreach ($vhdxPath in $vhdxPaths) {
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "Create $VMName virtual machine" -ForegroundColor Green
     New-VM -Name $VMName `
-        -MemoryStartupBytes 24GB `
+        -MemoryStartupBytes $AgConfig.L1VMMemory `
         -BootDevice VHD `
         -VHDPath $vhd.Path `
         -Generation 2 `
-        -Switch $switchName
+        -Switch $AgConfig.L1SwitchName
     
     # Set up the virtual machine before coping all AKS Edge Essentials automation files
     Set-VMProcessor -VMName $VMName `
