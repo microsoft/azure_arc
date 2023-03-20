@@ -62,6 +62,8 @@ foreach ($path in $AgConfig.AgDirectories.values) {
     Write-Output "Creating path $path"
     New-Item -ItemType Directory $path -Force
 }
+$kubeFolder = "$env:USERPROFILE\.kube"
+New-Item -ItemType Directory $kubeFolder -Force
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\Bootstrap.log")
 
@@ -100,9 +102,9 @@ foreach ($app in $appsToInstall) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 
-# Replace password
-$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
-(Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
+# # Replace password
+# $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+# (Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
