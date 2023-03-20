@@ -18,110 +18,108 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log -Force
 ################################################
 # Setup Hyper-V server before deploying VMs for each flavr
 ################################################
-# Install and configure DHCP service (used by Hyper-V nested VMs)
-Write-Host "Configuring DHCP Service"
-$dnsClient = Get-DnsClient | Where-Object { $_.InterfaceAlias -eq "Ethernet" }
-$dhcpScope =  Get-DhcpServerv4Scope
-if ($dhcpScope.Name -ne "ArcBox"){
-    Add-DhcpServerv4Scope -Name "ArcBox" `
-    -StartRange 10.10.1.100 `
-    -EndRange 10.10.1.200 `
-    -SubnetMask 255.255.255.0 `
-    -LeaseDuration 1.00:00:00 `
-    -State Active
-}
+if ($Env:flavor -ne "DevOps") {
+    # Install and configure DHCP service (used by Hyper-V nested VMs)
+    Write-Host "Configuring DHCP Service"
+    $dnsClient = Get-DnsClient | Where-Object { $_.InterfaceAlias -eq "Ethernet" }
+    $dhcpScope =  Get-DhcpServerv4Scope
+    if ($dhcpScope.Name -ne "ArcBox"){
+        Add-DhcpServerv4Scope -Name "ArcBox" `
+        -StartRange 10.10.1.100 `
+        -EndRange 10.10.1.200 `
+        -SubnetMask 255.255.255.0 `
+        -LeaseDuration 1.00:00:00 `
+        -State Active
+    }
 
-$dhcpOptions = Get-DhcpServerv4OptionValue
-if ($dhcpOptions.Count -lt 3){
-    Set-DhcpServerv4OptionValue -ComputerName localhost `
-    -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-    -DnsServer 168.63.129.16, 10.16.2.100 `
-    -Router 10.10.1.1 `
-    -Force
-}
+    $dhcpOptions = Get-DhcpServerv4OptionValue
+    if ($dhcpOptions.Count -lt 3){
+        Set-DhcpServerv4OptionValue -ComputerName localhost `
+        -DnsDomain $dnsClient.ConnectionSpecificSuffix `
+        -DnsServer 168.63.129.16, 10.16.2.100 `
+        -Router 10.10.1.1 `
+        -Force
+    }
 
-# Update domain controller DNS when using DataOps flavor
-if ($Env:flavor -eq "DataOps"){
-    Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
-}
+    # Update domain controller DNS when using DataOps flavor
+    if ($Env:flavor -eq "DataOps"){
+        Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
+    }
 
-Restart-Service dhcpserver
+    Restart-Service dhcpserver
 
-# Create the NAT network
-Write-Host "Creating Internal NAT"
-$natName = "InternalNat"
-$netNat = Get-NetNat
-if ($netNat.Name -ne $natName){
-    New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
-}
+    # Create the NAT network
+    Write-Host "Creating Internal NAT"
+    $natName = "InternalNat"
+    $netNat = Get-NetNat
+    if ($netNat.Name -ne $natName){
+        New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
+    }
 
-# Create an internal switch with NAT
-Write-Host "Creating Internal vSwitch"
-$switchName = 'InternalNATSwitch'
- 
-# Verify if internal switch is already created, if not create a new switch
-$inernalSwitch = Get-VMSwitch
-if ($inernalSwitch.Name -ne $switchName){
-    New-VMSwitch -Name $switchName -SwitchType Internal
-    $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
+    # Create an internal switch with NAT
+    Write-Host "Creating Internal vSwitch"
+    $switchName = 'InternalNATSwitch'
+    
+    # Verify if internal switch is already created, if not create a new switch
+    $inernalSwitch = Get-VMSwitch
+    if ($inernalSwitch.Name -ne $switchName){
+        New-VMSwitch -Name $switchName -SwitchType Internal
+        $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
 
-    # Create an internal network (gateway first)
-    Write-Host "Creating Gateway"
-    New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
+        # Create an internal network (gateway first)
+        Write-Host "Creating Gateway"
+        New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
 
-    # Enable Enhanced Session Mode on Host
-    Write-Host "Enabling Enhanced Session Mode"
-    Set-VMHost -EnableEnhancedSessionMode $true
-}
+        # Enable Enhanced Session Mode on Host
+        Write-Host "Enabling Enhanced Session Mode"
+        Set-VMHost -EnableEnhancedSessionMode $true
+    }
 
+    Write-Host "Creating VM Credentials"
+    # Hard-coded username and password for the nested VMs
+    $nestedWindowsUsername = "Administrator"
+    $nestedWindowsPassword = "ArcDemo123!!"
 
-Write-Host "Creating VM Credentials"
-# Hard-coded username and password for the nested VMs
-$nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
+    # Create Windows credential object
+    $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+    $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
 
-# Create Windows credential object
-$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "Creating Hyper-V Shortcut"
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-# Creating Hyper-V Manager desktop shortcut
-Write-Host "Creating Hyper-V Shortcut"
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+    # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
+    Write-Header "Blocking IMDS"
+    Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
+    Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
+    Stop-Service WindowsAzureGuestAgent -Force -Verbose
 
-# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
-Write-Header "Blocking IMDS"
-Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
-Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-Stop-Service WindowsAzureGuestAgent -Force -Verbose
+    if(!(Get-NetFirewallRule -Name BlockAzureIMDS -ErrorAction SilentlyContinue).Enabled){
+        New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
+    }
 
-if(!(Get-NetFirewallRule -Name BlockAzureIMDS -ErrorAction SilentlyContinue).Enabled){
-    New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-}
+    $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory -Force
+    if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
+        $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
+        $folder.Attributes += [System.IO.FileAttributes]::Hidden
+    }
 
-$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory -Force
-if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
-    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
-    $folder.Attributes += [System.IO.FileAttributes]::Hidden
-}
+    $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-$Env:AZURE_CONFIG_DIR = $cliDir.FullName
+    # Install Azure CLI extensions
+    Write-Header "Az CLI extensions"
+    az extension add --yes --name ssh --only-show-errors
 
-# Install Azure CLI extensions
-Write-Header "Az CLI extensions"
-az extension add --yes --name ssh --only-show-errors
+    # Required for CLI commands
+    Write-Header "Az CLI Login"
+    az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
-az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
-az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
-az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
-
-if (($Env:flavor -eq 'Full') -or ($Env:flavor -eq 'ITPro') -or ($Env:flavor -eq 'DevOps')){
+    # Register Azure providers
+    Write-Header "Registering Providers"
+    az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
+    az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
+    az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
+    az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
 
     Write-Header "Fetching Nested VMs"
     # Verify if these images are aready downloaded
@@ -252,9 +250,7 @@ if (($Env:flavor -eq 'Full') -or ($Env:flavor -eq 'ITPro') -or ($Env:flavor -eq 
         # Allow SSH via Azure Arc agent
         azcmagent config set incomingconnections.ports 22
     } -Credential $winCreds
-}
 
-if ($Env:flavor -ne "DevOps") {
     # Enable defender for cloud for SQL Server
     Write-Header "Enabling defender for cloud for SQL Server"
     az security pricing create -n SqlServerVirtualMachines --tier 'standard' --only-show-errors
@@ -398,11 +394,12 @@ if ($Env:flavor -ne "DevOps") {
     $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
+
+    # Removing the LogonScript Scheduled Task so it won't run on next reboot
+    Write-Header "Removing Logon Task"
+    Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 }
 
-# Removing the LogonScript Scheduled Task so it won't run on next reboot
-Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
