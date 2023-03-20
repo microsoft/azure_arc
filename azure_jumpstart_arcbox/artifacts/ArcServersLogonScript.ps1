@@ -171,7 +171,7 @@ if (($Env:flavor -eq 'Full') -or ($Env:flavor -eq 'ITPro') -or ($Env:flavor -eq 
         Set-VM -Name $Win2k22vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
-    if ((Get-VM -Name $Win2k2Ubuntu01vmName2vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
+    if ((Get-VM -Name $Ubuntu01vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
         New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
         Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
@@ -219,6 +219,9 @@ if (($Env:flavor -eq 'Full') -or ($Env:flavor -eq 'ITPro') -or ($Env:flavor -eq 
     Write-Output "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
     Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+
+    # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
+    (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
     # Copy installation script to nested Linux VMs
     Write-Output "Transferring installation script to nested Linux VMs..."
@@ -282,7 +285,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Create the nested SQL VM
     Write-Host "Create Hyper-V VMs"
-    if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
+    if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne  "Running"){
         New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMProcessor -VMName $SQLvmName -Count 2
     
@@ -393,7 +396,7 @@ if ($Env:flavor -ne "DevOps") {
     # Test Defender for SQL
     Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
     $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
+    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 }
 
