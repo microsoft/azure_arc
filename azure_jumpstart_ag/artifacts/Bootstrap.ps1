@@ -62,8 +62,6 @@ foreach ($path in $AgConfig.AgDirectories.values) {
     Write-Output "Creating path $path"
     New-Item -ItemType Directory $path -Force
 }
-$kubeFolder = "$env:USERPROFILE\.kube"
-New-Item -ItemType Directory $kubeFolder -Force
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\Bootstrap.log")
 

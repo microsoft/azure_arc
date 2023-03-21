@@ -83,6 +83,8 @@ $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
+$kubeFolder = "$env:USERPROFILE\.kube"
+New-Item -ItemType Directory $kubeFolder -Force
 New-SmbShare -Name "kube" -Path "$env:USERPROFILE\.kube" -FullAccess "Everyone"
 
 # Enable Enhanced Session Mode on Host
