@@ -397,7 +397,9 @@ if ($Env:flavor -ne "DevOps") {
 
     # Removing the LogonScript Scheduled Task so it won't run on next reboot
     Write-Header "Removing Logon Task"
-    Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+    if($null -ne (Get-ScheduledTask -TaskName "ArcServersLogonScript" -ErrorAction SilentlyContinue)){
+        Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+    }
 }
 
 
