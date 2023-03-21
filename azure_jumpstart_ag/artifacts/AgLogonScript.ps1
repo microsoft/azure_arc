@@ -170,6 +170,8 @@ $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
+    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+    $logsFolder = "$deploymentFolder\Logs"
     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
     $AgConfig = $using:AgConfig
 
