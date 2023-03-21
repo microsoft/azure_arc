@@ -54,20 +54,24 @@
     natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # AKS variables
-    AKSworkloadClusterName               = "hcibox-aks" # lowercase only
-    AKSvnetname                          = "akshcivnet"
-    AKSvSwitchName                       = "sdnSwitch"
-    AKSNodeStartIP                       = "192.168.200.25"
-    AKSNodeEndIP                         = "192.168.200.100"
-    AKSVIPStartIP                        = "192.168.200.125"
-    AKSVIPEndIP                          = "192.168.200.200"
-    AKSIPPrefix                          = "192.168.200.0/24"
-    AKSGWIP                              = "192.168.200.1"
-    AKSDNSIP                             = "192.168.1.254"
-    AKSCSV                               = "C:\ClusterStorage\S2D_vDISK1"
-    AKSImagedir                          = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
-    AKSWorkingdir                        = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
-    AKSCloudConfigdir                    = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
-    AKSCloudSvcidr                       = "192.168.1.15/24"
-    AKSVlanID                            = "200"
+    $AKSVNets = @{
+        Seattle = @{
+                NetIPAddress = "172.20.1.2"
+                DefaultGateway = "172.20.1.1"
+                PrefixLength = "24"
+                DNSClientServerAddress = "168.63.129.16"
+        }
+        Chicago = @{
+            NetIPAddress = "172.20.1.3"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
+        }
+        AKSEEDev = @{
+            NetIPAddress = "172.20.1.4"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
+        }
+    }
 }
