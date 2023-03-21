@@ -147,7 +147,6 @@ Start-Sleep -Seconds 15
 # Create an array with VM names    
 $VMnames = (Get-VM).Name
 
-
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $ProgressPreference = "SilentlyContinue"
     ###########################################
@@ -165,7 +164,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     foreach ($Folder in $folders) {
         New-Item -ItemType Directory $Folder -Force
     }
+}
 
+Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 
@@ -173,218 +174,294 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Deploying AKS Edge Essentials clusters #
     ##########################################
 
-    if ($env:COMPUTERNAME -eq "Seattle") {
+    ### Rework this using the new AKSVNets config value and a loop
 
-        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-        $logsFolder = "$deploymentFolder\Logs"
-        $kubeFolder = "$env:USERPROFILE\.kube"
+    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+    $logsFolder = "$deploymentFolder\Logs"
+    $kubeFolder = "$env:USERPROFILE\.kube"
 
-        # Assigning network adapter IP address
-        $NetIPAddress = "172.20.1.2"
-        $DefaultGateway = "172.20.1.1"
-        $PrefixLength = "24"
-        $DNSClientServerAddress = "168.63.129.16"
+    # Assigning network adapter IP address
+    $NetIPAddress = $AgConfig.AKSVNets[$env:COMPUTERNAME].NetIPAddress
+    $DefaultGateway = $AgConfig.AKSVNets[$env:COMPUTERNAME].DefaultGateway
+    $PrefixLength = $AgConfig.AKSVNets[$env:COMPUTERNAME].PrefixLength
+    $DNSClientServerAddress = $AgConfig.AKSVNets[$env:COMPUTERNAME].DNSClientServerAddress
 
-        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-        $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-        New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-        Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+    $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+    New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
+    Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+
+    # Validating internet connectivity
+    $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+    if ($pingResult) {
+        # Internet connection is available
+        Write-Host "Internet connection is available" -ForegroundColor Green
+    }
+    else {
+        # Wait 5 seconds and try again
+        Start-Sleep -Seconds 5
+        $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+        if ($pingResult) {
+            # Internet connection is available after waiting
+            Write-Host "Internet connection is available after waiting" -ForegroundColor Green
+        }
+        else {
+            # Wait another 5 seconds and try again
+            Start-Sleep -Seconds 5
+            $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+            if ($pingResult) {
+                # Internet connection is available after waiting again
+                Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
+            }
+            else {
+                # Internet connection is still not available
+                Write-Host "Error: No internet connection" -ForegroundColor Red
+            }
+        }
+    }
+    Write-Host
+
+    # Fetching latest AKS Edge Essentials msi file
+    Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
+    Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
+    Write-Host
     
-        # Validating internet connectivity
-        $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-        if ($pingResult) {
-            # Internet connection is available
-            Write-Host "Internet connection is available" -ForegroundColor Green
-        }
-        else {
-            # Wait 5 seconds and try again
-            Start-Sleep -Seconds 5
-            $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-            if ($pingResult) {
-                # Internet connection is available after waiting
-                Write-Host "Internet connection is available after waiting" -ForegroundColor Green
-            }
-            else {
-                # Wait another 5 seconds and try again
-                Start-Sleep -Seconds 5
-                $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-                if ($pingResult) {
-                    # Internet connection is available after waiting again
-                    Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
-                }
-                else {
-                    # Internet connection is still not available
-                    Write-Host "Error: No internet connection" -ForegroundColor Red
-                }
-            }
-        }
-        Write-Host
-
-        # Fetching latest AKS Edge Essentials msi file
-        Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
-        Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
-        Write-Host
-
-        ################################################################################################
-        # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
-        ################################################################################################
-
-        # Fetching required GitHub artifacts from Jumpstart repository
-        Write-Host "Fetching GitHub artifacts"
-        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$githubBranch"
-        $response = Invoke-RestMethod -Uri $githubApiUrl 
-        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-            
-        $fileUrls | ForEach-Object {
-            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-            $outputFile = Join-Path $deploymentFolder $fileName
-            Invoke-WebRequest -Uri $_ -OutFile $outputFile
-        }
-    }
-    elseif ($env:COMPUTERNAME -eq "Chicago") {
-
-        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-        $logsFolder = "$deploymentFolder\Logs"
-        $kubeFolder = "$env:USERPROFILE\.kube"
-
-        # Assigning network adapter IP address            
-        $NetIPAddress = "172.20.1.3"
-        $DefaultGateway = "172.20.1.1"
-        $PrefixLength = "24"
-        $DNSClientServerAddress = "168.63.129.16"
-
-        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
-        $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-        New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-        Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+    # Fetching required GitHub artifacts from Jumpstart repository
+    Write-Host "Fetching GitHub artifacts"
+    $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+    $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl 
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
         
-        # Validating internet connectivity
-        $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-        if ($pingResult) {
-            # Internet connection is available
-            Write-Host "Internet connection is available" -ForegroundColor Green
-        }
-        else {
-            # Wait 5 seconds and try again
-            Start-Sleep -Seconds 5
-            $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-            if ($pingResult) {
-                # Internet connection is available after waiting
-                Write-Host "Internet connection is available after waiting" -ForegroundColor Green
-            }
-            else {
-                # Wait another 5 seconds and try again
-                Start-Sleep -Seconds 5
-                $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-                if ($pingResult) {
-                    # Internet connection is available after waiting again
-                    Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
-                }
-                else {
-                    # Internet connection is still not available
-                    Write-Host "Error: No internet connection" -ForegroundColor Red
-                }
-            }
-        }
-        Write-Host
-
-        # Fetching latest AKS Edge Essentials msi file
-        Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
-        Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
-        Write-Host
-
-        ################################################################################################
-        # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
-        ################################################################################################
-
-        # Fetching required GitHub artifacts from Jumpstart repository
-        Write-Host "Fetching GitHub artifacts"
-        $repoOwner = "likamrat" # While testing, change to your GitHub user account
-        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $branchName = "aksee_bootstrap" # While testing, change to your GitHub fork's repository branch name
-        $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
-        $response = Invoke-RestMethod -Uri $githubApiUrl 
-        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-            
-        $fileUrls | ForEach-Object {
-            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-            $outputFile = Join-Path $deploymentFolder $fileName
-            Invoke-WebRequest -Uri $_ -OutFile $outputFile
-        }
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $deploymentFolder $fileName
+        Invoke-WebRequest -Uri $_ -OutFile $outputFile
     }
-    elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
+}
 
-        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-        $logsFolder = "$deploymentFolder\Logs"
-        $kubeFolder = "$env:USERPROFILE\.kube"
+# Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+#     # Start logging
+#     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 
-        # Assigning network adapter IP address
-        $NetIPAddress = "172.20.1.4"
-        $DefaultGateway = "172.20.1.1"
-        $PrefixLength = "24"
-        $DNSClientServerAddress = "168.63.129.16"
+#     ##########################################
+#     # Deploying AKS Edge Essentials clusters #
+#     ##########################################
 
-        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
-        $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-        New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
-        Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+#     ### Rework this using the new AKSVNets config value and a loop
 
-        # Validating internet connectivity
-        $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-        if ($pingResult) {
-            # Internet connection is available
-            Write-Host "Internet connection is available" -ForegroundColor Green
-        }
-        else {
-            # Wait 5 seconds and try again
-            Start-Sleep -Seconds 5
-            $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-            if ($pingResult) {
-                # Internet connection is available after waiting
-                Write-Host "Internet connection is available after waiting" -ForegroundColor Green
-            }
-            else {
-                # Wait another 5 seconds and try again
-                Start-Sleep -Seconds 5
-                $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
-                if ($pingResult) {
-                    # Internet connection is available after waiting again
-                    Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
-                }
-                else {
-                    # Internet connection is still not available
-                    Write-Host "Error: No internet connection" -ForegroundColor Red
-                }
-            }
-        }
-        Write-Host
+#     if ($env:COMPUTERNAME -eq "Seattle") {
 
-        # Fetching latest AKS Edge Essentials msi file
-        Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
-        Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
-        Write-Host
+#         $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+#         $logsFolder = "$deploymentFolder\Logs"
+#         $kubeFolder = "$env:USERPROFILE\.kube"
 
-        ################################################################################################
-        # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
-        ################################################################################################
+#         # Assigning network adapter IP address
+#         $NetIPAddress = "172.20.1.2"
+#         $DefaultGateway = "172.20.1.1"
+#         $PrefixLength = "24"
+#         $DNSClientServerAddress = "168.63.129.16"
 
-        # Fetching required GitHub artifacts from Jumpstart repository
-        Write-Host "Fetching GitHub artifacts"
-        $repoOwner = $env:githubAccount # While testing, change to your GitHub user account
-        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $branchName = $env:githubBranch # While testing, change to your GitHub fork's repository branch name
-        $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
-        $response = Invoke-RestMethod -Uri $githubApiUrl 
-        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+#         $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+#         $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+#         New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
+#         Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+    
+#         # Validating internet connectivity
+#         $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#         if ($pingResult) {
+#             # Internet connection is available
+#             Write-Host "Internet connection is available" -ForegroundColor Green
+#         }
+#         else {
+#             # Wait 5 seconds and try again
+#             Start-Sleep -Seconds 5
+#             $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#             if ($pingResult) {
+#                 # Internet connection is available after waiting
+#                 Write-Host "Internet connection is available after waiting" -ForegroundColor Green
+#             }
+#             else {
+#                 # Wait another 5 seconds and try again
+#                 Start-Sleep -Seconds 5
+#                 $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#                 if ($pingResult) {
+#                     # Internet connection is available after waiting again
+#                     Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
+#                 }
+#                 else {
+#                     # Internet connection is still not available
+#                     Write-Host "Error: No internet connection" -ForegroundColor Red
+#                 }
+#             }
+#         }
+#         Write-Host
+
+#         # Fetching latest AKS Edge Essentials msi file
+#         Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
+#         Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
+#         Write-Host
+
+#         ################################################################################################
+#         # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
+#         ################################################################################################
+
+#         # Fetching required GitHub artifacts from Jumpstart repository
+#         Write-Host "Fetching GitHub artifacts"
+#         $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+#         $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$githubBranch"
+#         $response = Invoke-RestMethod -Uri $githubApiUrl 
+#         $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
             
-        $fileUrls | ForEach-Object {
-            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-            $outputFile = Join-Path $deploymentFolder $fileName
-            Invoke-WebRequest -Uri $_ -OutFile $outputFile
-        }
-    }
-} 
+#         $fileUrls | ForEach-Object {
+#             $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+#             $outputFile = Join-Path $deploymentFolder $fileName
+#             Invoke-WebRequest -Uri $_ -OutFile $outputFile
+#         }
+#     }
+#     elseif ($env:COMPUTERNAME -eq "Chicago") {
+
+#         $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+#         $logsFolder = "$deploymentFolder\Logs"
+#         $kubeFolder = "$env:USERPROFILE\.kube"
+
+#         # Assigning network adapter IP address            
+#         $NetIPAddress = "172.20.1.3"
+#         $DefaultGateway = "172.20.1.1"
+#         $PrefixLength = "24"
+#         $DNSClientServerAddress = "168.63.129.16"
+
+#         $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
+#         $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+#         New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
+#         Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+        
+#         # Validating internet connectivity
+#         $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#         if ($pingResult) {
+#             # Internet connection is available
+#             Write-Host "Internet connection is available" -ForegroundColor Green
+#         }
+#         else {
+#             # Wait 5 seconds and try again
+#             Start-Sleep -Seconds 5
+#             $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#             if ($pingResult) {
+#                 # Internet connection is available after waiting
+#                 Write-Host "Internet connection is available after waiting" -ForegroundColor Green
+#             }
+#             else {
+#                 # Wait another 5 seconds and try again
+#                 Start-Sleep -Seconds 5
+#                 $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#                 if ($pingResult) {
+#                     # Internet connection is available after waiting again
+#                     Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
+#                 }
+#                 else {
+#                     # Internet connection is still not available
+#                     Write-Host "Error: No internet connection" -ForegroundColor Red
+#                 }
+#             }
+#         }
+#         Write-Host
+
+#         # Fetching latest AKS Edge Essentials msi file
+#         Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
+#         Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
+#         Write-Host
+
+#         ################################################################################################
+#         # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
+#         ################################################################################################
+
+#         # Fetching required GitHub artifacts from Jumpstart repository
+#         Write-Host "Fetching GitHub artifacts"
+#         $repoOwner = "likamrat" # While testing, change to your GitHub user account
+#         $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+#         $branchName = "aksee_bootstrap" # While testing, change to your GitHub fork's repository branch name
+#         $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
+#         $response = Invoke-RestMethod -Uri $githubApiUrl 
+#         $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+            
+#         $fileUrls | ForEach-Object {
+#             $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+#             $outputFile = Join-Path $deploymentFolder $fileName
+#             Invoke-WebRequest -Uri $_ -OutFile $outputFile
+#         }
+#     }
+#     elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
+
+#         $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+#         $logsFolder = "$deploymentFolder\Logs"
+#         $kubeFolder = "$env:USERPROFILE\.kube"
+
+#         # Assigning network adapter IP address
+#         $NetIPAddress = "172.20.1.4"
+#         $DefaultGateway = "172.20.1.1"
+#         $PrefixLength = "24"
+#         $DNSClientServerAddress = "168.63.129.16"
+
+#         $AdapterName = (Get-NetAdapter -Name Ethernet*).Name 
+#         $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+#         New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex
+#         Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress
+
+#         # Validating internet connectivity
+#         $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#         if ($pingResult) {
+#             # Internet connection is available
+#             Write-Host "Internet connection is available" -ForegroundColor Green
+#         }
+#         else {
+#             # Wait 5 seconds and try again
+#             Start-Sleep -Seconds 5
+#             $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#             if ($pingResult) {
+#                 # Internet connection is available after waiting
+#                 Write-Host "Internet connection is available after waiting" -ForegroundColor Green
+#             }
+#             else {
+#                 # Wait another 5 seconds and try again
+#                 Start-Sleep -Seconds 5
+#                 $pingResult = Test-Connection google.com -Count 1 -ErrorAction SilentlyContinue
+#                 if ($pingResult) {
+#                     # Internet connection is available after waiting again
+#                     Write-Host "Internet connection is available after waiting again" -ForegroundColor Green
+#                 }
+#                 else {
+#                     # Internet connection is still not available
+#                     Write-Host "Error: No internet connection" -ForegroundColor Red
+#                 }
+#             }
+#         }
+#         Write-Host
+
+#         # Fetching latest AKS Edge Essentials msi file
+#         Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
+#         Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
+#         Write-Host
+
+#         ################################################################################################
+#         # Internal comment: Need to optimize the GitHub artifcats download to support $templateBaseUrl #
+#         ################################################################################################
+
+#         # Fetching required GitHub artifacts from Jumpstart repository
+#         Write-Host "Fetching GitHub artifacts"
+#         $repoOwner = $env:githubAccount # While testing, change to your GitHub user account
+#         $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+#         $branchName = $env:githubBranch # While testing, change to your GitHub fork's repository branch name
+#         $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
+#         $response = Invoke-RestMethod -Uri $githubApiUrl 
+#         $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+            
+#         $fileUrls | ForEach-Object {
+#             $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+#             $outputFile = Join-Path $deploymentFolder $fileName
+#             Invoke-WebRequest -Uri $_ -OutFile $outputFile
+#         }
+#     }
+# } 
 
 
 # Rebooting all L1 virtual machines
