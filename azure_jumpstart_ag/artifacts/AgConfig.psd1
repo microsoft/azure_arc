@@ -1,8 +1,6 @@
 @{
 
-    # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
-    
-    # Version 1.0.0
+    # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
 
     # Directory paths
     AgDirectories = @{
@@ -51,12 +49,12 @@
     natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # AKS variables
-    $AKSVNets = @{
+    AKSVNets = @{
         Seattle = @{
-                NetIPAddress = "172.20.1.2"
-                DefaultGateway = "172.20.1.1"
-                PrefixLength = "24"
-                DNSClientServerAddress = "168.63.129.16"
+            NetIPAddress = "172.20.1.2"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
         }
         Chicago = @{
             NetIPAddress = "172.20.1.3"
