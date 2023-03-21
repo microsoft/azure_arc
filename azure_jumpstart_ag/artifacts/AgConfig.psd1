@@ -22,9 +22,6 @@
     # Az CLI required extensions
     AzCLIExtensions                      = @()
 
-    # Store location names
-    StoreLocations                       = "Chicago", "New Orleans", "Seattle"                # The location names for the stores
-
     # VHDX Paths 
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
