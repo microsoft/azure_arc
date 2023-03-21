@@ -157,7 +157,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksProdClusterName: aksProdClusterName
     aksDevClusterName: aksDevClusterName
-    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
+    /*iotHubHostName: iotHubDeployment.outputs.iotHubHostName*/
     acrNameDev: kubernestesDeployment.outputs.acrDevName
     acrNameProd: kubernestesDeployment.outputs.acrProdName
     rdpPort: rdpPort

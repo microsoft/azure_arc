@@ -56,7 +56,7 @@ param aksProdClusterName string
 param aksDevClusterName string
 
 @description('The name of the IoT Hub')
-param iotHubHostName string
+param iotHubHostName string = 'Agora-IoTHub'
 
 @description('The login server name of the Azure Container Registry for dev')
 param acrNameDev string
