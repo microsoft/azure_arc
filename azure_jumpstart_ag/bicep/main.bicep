@@ -177,10 +177,10 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }*/
 
-module iotHubDeployment 'mgmt/iotHub.bicep' = {
-  name: 'iotHubDeployment'
-  params: {
-    location: location
-    iotHubName: iotHubName
-  }
-}
+// module iotHubDeployment 'mgmt/iotHub.bicep' = {
+//   name: 'iotHubDeployment'
+//   params: {
+//     location: location
+//     iotHubName: iotHubName
+//   }
+// }
