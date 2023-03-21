@@ -371,9 +371,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 
         # Fetching required GitHub artifacts from Jumpstart repository
         Write-Host "Fetching GitHub artifacts"
-        $repoOwner = "likamrat" # While testing, change to your GitHub user account
+        $repoOwner = $env:githubAccount # While testing, change to your GitHub user account
         $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $branchName = "aksee_bootstrap" # While testing, change to your GitHub fork's repository branch name
+        $branchName = $env:githubBranch # While testing, change to your GitHub fork's repository branch name
         $githubApiUrl = "https://api.github.com/repos/$repoOwner/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$branchName"
         $response = Invoke-RestMethod -Uri $githubApiUrl 
         $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
