@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "Azure Kubernetes Service (AKS) on Windows Server"
-linkTitle: "Azure Kubernetes Service (AKS) on Windows Server"
+title: "Azure Kubernetes Service (AKS) on Windows Server provisioned from Azure"
+linkTitle: "Azure Kubernetes Service (AKS) on Windows Server provisioned from Azure"
 weight: 2
 description: >
 ---
 
-## Deploy an AKS hybrid cluster on Windows Sercver provisioned from Azure using an ARM Template
+## Deploy an AKS hybrid cluster on Windows Server provisioned from Azure using an ARM Template
 
 The following Jumpstart scenario will show how to create an AKS cluster provisioned from an Azure Windows Server VM and connect it to Azure Arc via resource Bridge, using an [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) for deployment. The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster)) on the Azure VM.
 
