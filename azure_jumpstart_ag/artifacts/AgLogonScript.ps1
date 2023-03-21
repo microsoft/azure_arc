@@ -91,7 +91,7 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 # Create Internal Hyper-V switch for the L1 nested virtual machines
 New-VMSwitch -Name $AgConfig.L1SwitchName -SwitchType Internal
-$ifIndex = (Get-NetAdapter -Name "vEthernet ($AgConfig.L1SwitchName)").ifIndex
+$ifIndex = (Get-NetAdapter -Name ("vEthernet (" + $AgConfig.L1SwitchName + ")")).ifIndex
 New-NetIPAddress -IPAddress $AgConfig.L1DefaultGateway -PrefixLength 24 -InterfaceIndex $ifIndex
 New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgConfig.L1NatSubnetPrefix
 
@@ -166,9 +166,12 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 }
 
+$githubAccount = $env:githubAccount
+$githubBranch = $env:githubBranch
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
+    $AgConfig = $using:AgConfig
 
     ##########################################
     # Deploying AKS Edge Essentials clusters #
@@ -225,11 +228,11 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Write-Host "Fetching latest AKS Edge Essentials msi file" -ForegroundColor Yellow
     Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
     Write-Host
-    
+
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "Fetching GitHub artifacts"
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$githubBranch"
+    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl 
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
         
