@@ -123,7 +123,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   }
 }
 
-module kubernestesDeployment 'kubernetes/aks.bicep' = if (false) {
+module kubernetesDeployment 'kubernetes/aks.bicep' = if (false) {
   name: 'kubernetesDeployment'
   params: {
     aksProdClusterName: aksProdClusterName
@@ -155,11 +155,11 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksProdClusterName: aksProdClusterName
-    aksDevClusterName: aksDevClusterName
-    /*iotHubHostName: iotHubDeployment.outputs.iotHubHostName*/
-    // acrNameDev: kubernetesDeployment.outputs.acrDevName
-    // acrNameProd: kubernetesDeployment.outputs.acrProdName
+    //aksProdClusterName: aksProdClusterName
+    //aksDevClusterName: aksDevClusterName
+    //iotHubHostName: iotHubDeployment.outputs.iotHubHostName
+    //acrNameDev: kubernetesDeployment.outputs.acrDevName
+    //acrNameProd: kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }
 }
