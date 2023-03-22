@@ -120,6 +120,7 @@ Do {
     $state = az customlocation show --name $customLocationName --resource-group $Env:resourceGroup --query "provisioningState" -o tsv
     $state = $(if($state = "Succeeded"){"Ready!"}Else{"Nope"})
 } while ($state -eq "Nope")
+Write-Host "`n"
 
 # Create a local network for AKS hybrid clusters and connect it to Azure
     New-KvaVirtualNetwork -name hybridaks-vnet `
