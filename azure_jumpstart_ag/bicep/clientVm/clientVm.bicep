@@ -50,10 +50,10 @@ param githubUser string
 param storageAccountName string
 
 @description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string
+param aksProdClusterName string = 'Agora-AKSProd'
 
 @description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string
+param aksDevClusterName string = 'Agora-AKSDev'
 
 @description('The name of the IoT Hub')
 param iotHubHostName string = 'Agora-IoTHub'

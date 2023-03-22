@@ -123,7 +123,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   }
 }
 
-module kubernestesDeployment 'kubernetes/aks.bicep' = {
+module kubernestesDeployment 'kubernetes/aks.bicep' = if (false) {
   name: 'kubernetesDeployment'
   params: {
     aksProdClusterName: aksProdClusterName
@@ -158,8 +158,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksProdClusterName: aksProdClusterName
     aksDevClusterName: aksDevClusterName
     /*iotHubHostName: iotHubDeployment.outputs.iotHubHostName*/
-    acrNameDev: kubernestesDeployment.outputs.acrDevName
-    acrNameProd: kubernestesDeployment.outputs.acrProdName
+    // acrNameDev: kubernetesDeployment.outputs.acrDevName
+    // acrNameProd: kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }
 }
