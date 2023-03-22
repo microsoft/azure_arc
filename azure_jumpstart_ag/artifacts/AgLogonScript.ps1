@@ -305,6 +305,22 @@ Write-Host
 kubectx akseedev
 kubectl get nodes -o wide
 
+#####################################################################
+### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
+#####################################################################
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+
 ##############################################################
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
