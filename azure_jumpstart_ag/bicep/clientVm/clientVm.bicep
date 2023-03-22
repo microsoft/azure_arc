@@ -59,10 +59,10 @@ param aksDevClusterName string = 'Agora-AKSDev'
 param iotHubHostName string = 'Agora-IoTHub'
 
 @description('The login server name of the Azure Container Registry for dev')
-param acrNameDev string = ''
+param acrNameDev string = 'dummy-name-dev'
 
 @description('The login server name of the Azure Container Registry for Prod')
-param acrNameProd string = ''
+param acrNameProd string = 'dummy-name-prod'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
