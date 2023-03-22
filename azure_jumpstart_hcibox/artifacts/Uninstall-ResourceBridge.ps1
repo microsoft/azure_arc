@@ -42,4 +42,5 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     az customlocation delete --resource-group $using:rg --name $using:custom_location_name --yes
     az k8s-extension delete --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name vmss-hci --yes
     az arcappliance delete hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --yes
+    Remove-ArcHciConfigFiles
 }
