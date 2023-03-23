@@ -13,7 +13,14 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log -Force
+# Archive exising log file and crate new one
+$logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
+if ([System.IO.File]::Exists($logFilePath)){
+    $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
+    Rename-Item -Path $logFilePath -NewName $archivefile -Force
+}
+
+Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
 ################################################
 # Setup Hyper-V server before deploying VMs for each flavr
@@ -185,26 +192,30 @@ if ($Env:flavor -ne "DevOps") {
 
     # Check if VM already exists
     if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
+        Remove-VM -Name $Win2k19vmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMProcessor -VMName $Win2k19vmName -Count 2
         Set-VM -Name $Win2k19vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Win2k22vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $Win2k22vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
+        Remove-VM -Name $Win2k22vmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $Win2k22vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMProcessor -VMName $Win2k22vmName -Count 2
         Set-VM -Name $Win2k22vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Ubuntu01vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
+        Remove-VM -Name $Ubuntu01vmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
         Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
         Set-VM -Name $Ubuntu01vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Ubuntu02vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
+        Remove-VM -Name $Ubuntu02vmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
         Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
         Set-VM -Name $Ubuntu02vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
@@ -292,7 +303,8 @@ if ($Env:flavor -ne "DevOps") {
     # Create the nested SQL VM
     Write-Host "Create SQL VM"
     if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
+        Remove-VM -Name $SQLvmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
         Set-VMProcessor -VMName $SQLvmName -Count 2
     
         # We always want the VMs to start with the host and shut down cleanly with the host
