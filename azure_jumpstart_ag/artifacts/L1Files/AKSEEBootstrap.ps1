@@ -30,9 +30,6 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 $HVHostUsername = "arcdemo"
 $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
-# Set time zone to UTC
-Set-TimeZone -Id "UTC"
-
 # Per L1 VM AKS Edge Essentials cluster bootstrap
 if ($env:COMPUTERNAME -eq "Seattle") {
 
