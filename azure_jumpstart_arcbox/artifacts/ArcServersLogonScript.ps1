@@ -108,7 +108,9 @@ if ($Env:flavor -ne "DevOps") {
 
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
-    az extension add --yes --name ssh --only-show-errors
+    az extension add --name ssh --yes --only-show-errors
+    az extension add --name log-analytics-solution --yes --only-show-errors
+    az extension add --name connectedmachine --yes --only-show-errors
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
@@ -120,6 +122,31 @@ if ($Env:flavor -ne "DevOps") {
     az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
     az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
     az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
+
+    # Enable defender for cloud for SQL Server
+    # Verify existing plan and update accordingly
+    $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
+    if ($currentsqlplan.pricingTier -eq "Free"){
+        # Update to standard plan
+        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier). Updating to standard plan."
+        az security pricing create -n SqlServerVirtualMachines --tier 'standard' --subscription $subscriptionId --only-show-errors
+
+        # Set defender for cloud log analytics workspace
+        Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+        az security workspace-setting create -n default --target-workspace "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName" --only-show-errors
+    }
+    else {
+        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+    }
+
+    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
+    Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
+    $extExists = $false
+    $extensionList = az monitor log-analytics solution list --resource-group $resourceGroup | ConvertFrom-Json
+    foreach($extension in $extensionList.value){if ($extension.Name -match "SQLAdvancedThreatProtection"){$extExists = $true; break;}}
+    if (!$extExists){
+        az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
+    }
 
     Write-Header "Fetching Nested VMs"
     # Verify if these images are aready downloaded
@@ -158,26 +185,26 @@ if ($Env:flavor -ne "DevOps") {
 
     # Check if VM already exists
     if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
         Set-VMProcessor -VMName $Win2k19vmName -Count 2
         Set-VM -Name $Win2k19vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Win2k22vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $Win2k22vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $Win2k22vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
         Set-VMProcessor -VMName $Win2k22vmName -Count 2
         Set-VM -Name $Win2k22vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Ubuntu01vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
         Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
         Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
         Set-VM -Name $Ubuntu01vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
     }
 
     if ((Get-VM -Name $Ubuntu02vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
         Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
         Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
         Set-VM -Name $Ubuntu02vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
@@ -230,12 +257,10 @@ if ($Env:flavor -ne "DevOps") {
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-
     Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
     Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
     Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
-
     $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
     $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
     $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
@@ -251,21 +276,6 @@ if ($Env:flavor -ne "DevOps") {
         azcmagent config set incomingconnections.ports 22
     } -Credential $winCreds
 
-    # Enable defender for cloud for SQL Server
-    Write-Header "Enabling defender for cloud for SQL Server"
-    az security pricing create -n SqlServerVirtualMachines --tier 'standard' --only-show-errors
-
-    # Set defender for cloud log analytics workspace
-    Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-    az security workspace-setting create -n default --target-workspace "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName" --only-show-errors
-
-    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
-    Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
-
-    # Install log-analytics-solution cli extension
-    az extension add --name log-analytics-solution --yes --only-show-errors
-    az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
-
     Write-Header "Creating Nested SQL VM"
     $SQLvmName = "ArcBox-SQL"
     $SQLvmvhdPath = "$Env:ArcBoxVMDir\${SQLvmName}.vhdx"
@@ -280,9 +290,9 @@ if ($Env:flavor -ne "DevOps") {
     }
 
     # Create the nested SQL VM
-    Write-Host "Create Hyper-V VMs"
+    Write-Host "Create SQL VM"
     if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName -Force
         Set-VMProcessor -VMName $SQLvmName -Count 2
     
         # We always want the VMs to start with the host and shut down cleanly with the host
@@ -301,44 +311,28 @@ if ($Env:flavor -ne "DevOps") {
         Start-Sleep -Seconds 20
         Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Start-Sleep -Seconds 5
+
+        # Copy installtion script to nested Windows VMs
+        Write-Output "Transferring installation script to nested Windows VMs..."
+        Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+        Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+
+        # Configure SSH on the nested SQL VMs
+        Write-Output "Configuring SSH via Azure Arc agent on the SQL VMs"
+        Invoke-Command -VMName $SQLvmName -ScriptBlock {
+            # Allow SSH via Azure Arc agent
+            azcmagent config set incomingconnections.ports 22
+        } -Credential $winCreds
     }
 
-    # Enable defender for cloud for SQL Server
-    # Verify existing plan and update accordingly
-    $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
-    if ($currentsqlplan.pricingTier -eq "Free")
-    {
-        # Update to standard plan
-        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier). Updating to standard plan."
-        az security pricing create -n SqlServerVirtualMachines --tier 'standard' --subscription $subscriptionId --only-show-errors
+    # Install Log Analytics extension to support Defender for SQL
+    $mmaExtension = az connectedmachine extension show --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --resource-group $resourceGroup
+    if ($null -eq $mmaExtension){
+        # Get workspace information
+        $workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
+        $workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
+        az connectedmachine extension create --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring" --no-wait
     }
-    else {
-        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
-    }
-
-    # Set defender for cloud log analytics workspace
-    Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-    az security workspace-setting create -n default --target-workspace "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName" --only-show-errors
-
-    # Deploy SQLAdvancedThreatProtection solution to support Defender for SQL
-    Write-Host "Deploying SQLAdvancedThreatProtection solution to support Defender for SQL server."
-    
-    # Install log-analytics-solution cli extension
-    az extension add --name log-analytics-solution --yes --only-show-errors
-    az extension add --name connectedmachine --yes --only-show-errors
-    az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
-
-    # Copy installtion script to nested Windows VMs
-    Write-Output "Transferring installation script to nested Windows VMs..."
-    Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
-
-    # Configure SSH on the nested SQL VMs
-    Write-Output "Configuring SSH via Azure Arc agent on the SQL VMs"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock {
-        # Allow SSH via Azure Arc agent
-        azcmagent config set incomingconnections.ports 22
-    } -Credential $winCreds
 
     # Enable Best practices assessment
     # Create custom log analytics table for SQL assessment
