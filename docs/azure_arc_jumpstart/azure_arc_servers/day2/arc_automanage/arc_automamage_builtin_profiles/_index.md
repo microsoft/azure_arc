@@ -123,7 +123,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 - From the deployment folder run the below command:
 
   ```shell
-    az deployment group create --resource-group <your_resource_group> --template-file automanage.json --parameters automanage.parameters.json
+    az deployment group create --resource-group <your_resource_group> --template-file azuredeploy.json --parameters azuredeploy.parameters.json
   ```
 
   ![Scripts output](./07.png)
