@@ -150,6 +150,9 @@ Start-Sleep -Seconds 15
 $VMnames = (Get-VM).Name
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+    # Set time zone to UTC
+    Set-TimeZone -Id "UTC"
+    
     $ProgressPreference = "SilentlyContinue"
     ###########################################
     # Preparing environment folders structure #
