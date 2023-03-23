@@ -155,11 +155,11 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    //aksProdClusterName: aksProdClusterName
-    //aksDevClusterName: aksDevClusterName
-    //iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    //acrNameDev: kubernetesDeployment.outputs.acrDevName
-    //acrNameProd: kubernetesDeployment.outputs.acrProdName
+    aksProdClusterName: aksProdClusterName
+    aksDevClusterName: aksDevClusterName
+    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
+    acrNameDev: kubernetesDeployment.outputs.acrDevName
+    acrNameProd: kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }
 }
@@ -177,10 +177,10 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }*/
 
-// module iotHubDeployment 'mgmt/iotHub.bicep' = {
-//   name: 'iotHubDeployment'
-//   params: {
-//     location: location
-//     iotHubName: iotHubName
-//   }
-// }
+module iotHubDeployment 'mgmt/iotHub.bicep' = if (false) {
+  name: 'iotHubDeployment'
+  params: {
+    location: location
+    iotHubName: iotHubName
+  }
+}
