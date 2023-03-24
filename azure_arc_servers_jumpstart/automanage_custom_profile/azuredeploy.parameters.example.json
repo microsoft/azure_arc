@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "value": "automanage-demo"
+        },
+        "customProfileName": {
+            "value": "arc-jumpstart-profile"
+        },
+        "subscriptionId": {
+            "value": "XXXX-XXXXX-XXXX-XXXX"
+        },
+        "azureSecurityBaselineAssignmentType": {
+            "value": "Audit"
+        },
+        "logAnalyticsWorkspace": {
+            "value": "arc-automanage-law"
+        }
+    }
+}
