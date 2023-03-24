@@ -77,11 +77,7 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
     Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
 
-    Start-Sleep 60 # testing workaround for RTC time issue
-
     Install-AksEdgeHostFeatures -Force
-
-    Start-Sleep 60 # testing workaround for RTC time issue
 
     # Preparing AKS Edge Essentials config json file
     $content = Get-Content $AKSEEConfigFilePath
