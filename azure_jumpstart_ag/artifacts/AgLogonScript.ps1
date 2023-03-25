@@ -327,7 +327,6 @@ New-AzConnectedKubernetes -ClusterName Ag-AKSEE-Chicago -ResourceGroupName $env:
 kubectx akseedev
 New-AzConnectedKubernetes -ClusterName Ag-AKSEE-AKSEEDev -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
 
-
 ##############################################################
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
