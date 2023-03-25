@@ -70,6 +70,12 @@ $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
+# Install PowerShell modules
+Write-Header "Installing PowerShell modules"
+foreach ($module in $AgConfig.PowerShellModules) {
+    Install-Module -Name $module -Force
+}
+
 # Register Azure providers
 Write-Header "Registering Providers"
 foreach ($provider in $AgConfig.AzureProviders) {
@@ -312,23 +318,21 @@ kubectl get nodes -o wide
 ### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
 #####################################################################
 
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
+$ProgressPreference = "SilentlyContinue"
+Write-Header "Connect clusters to Azure with Azure Arc"
+kubectx seattle
+New-AzConnectedKubernetes -ClusterName Ag-AKSEE-Seattle -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
+kubectx chicago
+New-AzConnectedKubernetes -ClusterName Ag-AKSEE-Chicago -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
+kubectx akseedev
+New-AzConnectedKubernetes -ClusterName Ag-AKSEE-AKSEEDev -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
+
 
 ##############################################################
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
+# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
 
 kubectx aksProd="$Env:aksProdClusterName-admin"
 kubectx aksDev="$Env:aksDevClusterName-admin"
