@@ -28,7 +28,8 @@
                 },
                 "WorkspaceResourceId": "{{WORKSPACEID}}",
                 "WorkspaceLocation": "{{LOCATION}}"
-            }
+            },
+            "LicenseType": "Paid"
         }
     }
 }
