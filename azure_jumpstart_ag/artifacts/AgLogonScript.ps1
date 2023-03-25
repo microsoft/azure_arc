@@ -271,12 +271,12 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         "Ethernet-Null"               = $AdapterName
         "Ip4Address-null"             = $AgConfig.SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
         "ClusterName-null"            = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName
-        "Location-null"               = $AgConfig.SiteConfig[$using:azureLocation]
-        "ResourceGroupName-null"      = $AgConfig.SiteConfig[$using:resourceGroup]
-        "SubscriptionId-null"         = $AgConfig.Siteconfig[$using:subscriptionId]
-        "TenantId-null"               = $AgConfig.SiteConfig[$using:spnTenantId]
-        "ClientId-null"               = $AgConfig.SiteConfig[$using:spnClientId]
-        "ClientSecret-null"           = $AgConfig.SiteConfig[$using:spnClientSecret]
+        "Location-null"               = $using:azureLocation
+        "ResourceGroupName-null"      = $using:resourceGroup
+        "SubscriptionId-null"         = $using:subscriptionId
+        "TenantId-null"               = $using:spnTenantId
+        "ClientId-null"               = $using:spnClientId
+        "ClientSecret-null"           = $using:spnClientSecret
     }
 
     # Preparing AKS Edge Essentials config json file
