@@ -93,6 +93,7 @@ Set-Content $destinationPath -Value $content
 Write-Host "Coping the kubeconfig file to the L0 host machine"
 $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
 $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+$defaultGateway = (Get-NetRoute "0.0.0.0/0").NextHop
 $destinationPath = "\\$DefaultGateway\kube"
 New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
 Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
