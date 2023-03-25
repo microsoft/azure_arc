@@ -138,7 +138,12 @@ if ($env:COMPUTERNAME -eq "Seattle") {
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 elseif ($env:COMPUTERNAME -eq "Chicago") {
-
+    # Force time sync
+    $string = Get-Date
+    Write-Host "Time before forced time sync:" + $string.ToString("u")
+    W32tm /resync /force
+    $string = Get-Date
+    Write-Host "Time after forced time sync:" + $string.ToString("u")
     # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
@@ -238,7 +243,12 @@ elseif ($env:COMPUTERNAME -eq "Chicago") {
     Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
 }
 elseif ($env:COMPUTERNAME -eq "AKSEEDev") {
-
+    # Force time sync
+    $string = Get-Date
+    Write-Host "Time before forced time sync:" + $string.ToString("u")
+    W32tm /resync /force
+    $string = Get-Date
+    Write-Host "Time after forced time sync:" + $string.ToString("u")
     # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
