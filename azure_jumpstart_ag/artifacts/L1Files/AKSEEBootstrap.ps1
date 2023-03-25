@@ -47,6 +47,7 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
 Write-Host
 Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
+$AdapterName = (Get-NetAdapter -Name Ethernet*).Name
 New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
 Write-Host
 
