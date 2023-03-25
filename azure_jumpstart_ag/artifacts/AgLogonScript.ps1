@@ -200,10 +200,10 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $logsFolder = "$deploymentFolder\Logs"
 
     # Assigning network adapter IP address
-    $NetIPAddress = $AgConfig.AKSVNets[$env:COMPUTERNAME].NetIPAddress
-    $DefaultGateway = $AgConfig.AKSVNets[$env:COMPUTERNAME].DefaultGateway
-    $PrefixLength = $AgConfig.AKSVNets[$env:COMPUTERNAME].PrefixLength
-    $DNSClientServerAddress = $AgConfig.AKSVNets[$env:COMPUTERNAME].DNSClientServerAddress
+    $NetIPAddress = $AgConfig.SiteConfig[$env:COMPUTERNAME].NetIPAddress
+    $DefaultGateway = $AgConfig.SiteConfig[$env:COMPUTERNAME].DefaultGateway
+    $PrefixLength = $AgConfig.SiteConfig[$env:COMPUTERNAME].PrefixLength
+    $DNSClientServerAddress = $AgConfig.SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
 
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
