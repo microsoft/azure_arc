@@ -152,6 +152,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
     deployBastion: deployBastion
+    githubAccount: githubAccount
+    githubBranch: githubBranch
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
