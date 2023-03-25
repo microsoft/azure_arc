@@ -20,6 +20,9 @@
     # Az CLI required extensions
     AzCLIExtensions                      = @()
 
+    # PowerShell modules
+    PowerShellModules                    = @('Az.ConnectedKubernetes')
+
     # VHDX Paths 
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
