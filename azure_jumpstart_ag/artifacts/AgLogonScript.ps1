@@ -262,21 +262,21 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $replacementParams = @{
-        "ServiceIPRangeStart-null"    = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
-        "1000"                        = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
-        "ControlPlaneEndpointIp-null" = $SiteConfig[$env:COMPUTERNAME].ControlPlaneEndpointIp
-        "Ip4GatewayAddress-null"      = $SiteConfig[$env:COMPUTERNAME].DefaultGateway
-        "2000"                        = $SiteConfig[$env:COMPUTERNAME].PrefixLength
-        "DnsServer-null"              = $SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
+        "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
+        "1000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
+        "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$env:COMPUTERNAME].ControlPlaneEndpointIp
+        "Ip4GatewayAddress-null"      = $AgConfig.SiteConfig[$env:COMPUTERNAME].DefaultGateway
+        "2000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].PrefixLength
+        "DnsServer-null"              = $AgConfig.SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
         "Ethernet-Null"               = $AdapterName
-        "Ip4Address-null"             = $SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
-        "ClusterName-null"            = $SiteConfig[$env:COMPUTERNAME].ArcClusterName
-        "Location-null"               = $SiteConfig[$using:azureLocation]
-        "ResourceGroupName-null"      = $SiteConfig[$using:resourceGroup]
-        "SubscriptionId-null"         = $Siteconfig[$using:subscriptionId]
-        "TenantId-null"               = $SiteConfig[$using:spnTenantId]
-        "ClientId-null"               = $SiteConfig[$using:spnClientId]
-        "ClientSecret-null"           = $SiteConfig[$using:spnClientSecret]
+        "Ip4Address-null"             = $AgConfig.SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
+        "ClusterName-null"            = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName
+        "Location-null"               = $AgConfig.SiteConfig[$using:azureLocation]
+        "ResourceGroupName-null"      = $AgConfig.SiteConfig[$using:resourceGroup]
+        "SubscriptionId-null"         = $AgConfig.Siteconfig[$using:subscriptionId]
+        "TenantId-null"               = $AgConfig.SiteConfig[$using:spnTenantId]
+        "ClientId-null"               = $AgConfig.SiteConfig[$using:spnClientId]
+        "ClientSecret-null"           = $AgConfig.SiteConfig[$using:spnClientSecret]
     }
 
     # Preparing AKS Edge Essentials config json file
