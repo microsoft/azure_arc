@@ -33,7 +33,11 @@ $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 # Per L1 VM AKS Edge Essentials cluster bootstrap
 if ($env:COMPUTERNAME -eq "Seattle") {
     # Force time sync
+    $string = Get-Date
+    Write-Host "Time before forced time sync:" + $string.ToString("u")
     W32tm /resync /force
+    $string = Get-Date
+    Write-Host "Time after forced time sync:" + $string.ToString("u")
     # Setting up environment variables per AKS Edge Essentials cluster deployment
     $DefaultGateway = "172.20.1.1"
     $PrefixLength = "24"
