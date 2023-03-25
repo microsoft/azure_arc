@@ -30,36 +30,6 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 $HVHostUsername = "arcdemo"
 $HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
 
-$SiteConfig = @{
-    Seattle = @{
-        DefaultGateway = "172.20.1.1"
-        PrefixLength = "24"
-        DNSClientServerAddress = "168.63.129.16"
-        ServiceIPRangeStart = "172.20.1.31"
-        ServiceIPRangeSize = "10"
-        ControlPlaneEndpointIp = "172.20.1.21"
-        LinuxNodeIp4Address = "172.20.1.11"
-    }
-    Chicago = @{
-        DefaultGateway = "172.20.1.1"
-        PrefixLength = "24"
-        DNSClientServerAddress = "168.63.129.16"
-        ServiceIPRangeStart = "172.20.1.71"
-        ServiceIPRangeSize = "10"
-        ControlPlaneEndpointIp = "172.20.1.61"
-        LinuxNodeIp4Address = "172.20.1.51"
-    }
-    AKSEEDev = @{
-        DefaultGateway = "172.20.1.1"
-        PrefixLength = "24"
-        DNSClientServerAddress = "168.63.129.16"
-        ServiceIPRangeStart = "172.20.1.101"
-        ServiceIPRangeSize = "10"
-        ControlPlaneEndpointIp = "172.20.1.91"
-        LinuxNodeIp4Address = "172.20.1.81"
-    }
-}
-
 # Force time sync
 $string = Get-Date
 Write-Host "Time before forced time sync:" + $string.ToString("u")
@@ -67,30 +37,6 @@ net start w32time
 W32tm /resync
 $string = Get-Date
 Write-Host "Time after forced time sync:" + $string.ToString("u")
-# Setting up environment variables per AKS Edge Essentials cluster deployment
-$DefaultGateway = $SiteConfig[$env:COMPUTERNAME].DefaultGateway
-$PrefixLength = $SiteConfig[$env:COMPUTERNAME].PrefixLength
-$DNSClientServerAddress = $SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
-
-$AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
-$ServiceIPRangeStart = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
-$ServiceIPRangeSize = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
-$ControlPlaneEndpointIp = $SiteConfig[$env:COMPUTERNAME].ControlPlaneEndpointIp
-$LinuxNodeIp4Address = $SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
-
-$AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-
-# Setting up replacment parameters for AKS Edge Essentials config json file
-$replacementParams = @{
-    "ServiceIPRangeStart-null"    = $ServiceIPRangeStart
-    "1000"                        = $ServiceIPRangeSize
-    "ControlPlaneEndpointIp-null" = $ControlPlaneEndpointIp
-    "Ip4GatewayAddress-null"      = $DefaultGateway
-    "2000"                        = $PrefixLength
-    "DnsServer-null"              = $DNSClientServerAddress
-    "Ethernet-Null"               = $AdapterName
-    "Ip4Address-null"             = $LinuxNodeIp4Address
-}
 
 # Validating internet connectivity
 while (-not (Test-Connection -ComputerName google.com -Quiet)) {
@@ -112,16 +58,6 @@ $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
 Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
 
 Install-AksEdgeHostFeatures -Force
-
-# Preparing AKS Edge Essentials config json file
-$content = Get-Content $AKSEEConfigFilePath
-
-foreach ($key in $replacementParams.Keys) {
-    $content = $content -replace $key, $replacementParams[$key]
-}
-
-$AKSEEConfigFilePath = "$deploymentFolder\Config.json"
-Set-Content $AKSEEConfigFilePath -Value $content
 
 # Deploying AKS Edge Essentials cluster
 Set-Location $deploymentFolder
