@@ -179,6 +179,12 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
+$resourceGroup = $env:resourceGroup
+$azureLocation = $env:azureLocation
+$spnClientId = $env:spnClientId
+$spnClientSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$subscriptionId = (Get-AzSubscription).Id
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
     $ProgressPreference = "SilentlyContinue"
@@ -190,12 +196,8 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     ##########################################
     # Deploying AKS Edge Essentials clusters #
     ##########################################
-
-    ### Rework this using the new AKSVNets config value and a loop
-
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
-    $kubeFolder = "$env:USERPROFILE\.kube"
 
     # Assigning network adapter IP address
     $NetIPAddress = $AgConfig.AKSVNets[$env:COMPUTERNAME].NetIPAddress
@@ -255,6 +257,34 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $outputFile = Join-Path $deploymentFolder $fileName
         Invoke-WebRequest -Uri $_ -OutFile $outputFile
     }
+
+    # Setting up replacment parameters for AKS Edge Essentials config json file
+    $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
+    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+    $replacementParams = @{
+        "ServiceIPRangeStart-null"    = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
+        "1000"                        = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
+        "ControlPlaneEndpointIp-null" = $SiteConfig[$env:COMPUTERNAME].ControlPlaneEndpointIp
+        "Ip4GatewayAddress-null"      = $SiteConfig[$env:COMPUTERNAME].DefaultGateway
+        "2000"                        = $SiteConfig[$env:COMPUTERNAME].PrefixLength
+        "DnsServer-null"              = $SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
+        "Ethernet-Null"               = $AdapterName
+        "Ip4Address-null"             = $SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
+        "ClusterName-null"            = $SiteConfig[$env:COMPUTERNAME].ArcClusterName
+        "Location-null"               = $SiteConfig[$using:azureLocation]
+        "ResourceGroupName-null"      = $SiteConfig[$using:resourceGroup]
+        "SubscriptionId-null"         = $Siteconfig[$using:subscriptionId]
+        "TenantId-null"               = $SiteConfig[$using:spnTenantId]
+        "ClientId-null"               = $SiteConfig[$using:spnClientId]
+        "ClientSecret-null"           = $SiteConfig[$using:spnClientSecret]
+    }
+
+    # Preparing AKS Edge Essentials config json file
+    $content = Get-Content $AKSEEConfigFilePath
+    foreach ($key in $replacementParams.Keys) {
+        $content = $content -replace $key, $replacementParams[$key]
+    }
+    Set-Content "$deploymentFolder\Config.json" -Value $content
 }
 
 # Rebooting all L1 virtual machines
@@ -318,14 +348,22 @@ kubectl get nodes -o wide
 ### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
 #####################################################################
 
-$ProgressPreference = "SilentlyContinue"
-Write-Header "Connect clusters to Azure with Azure Arc"
-kubectx seattle
-New-AzConnectedKubernetes -ClusterName Ag-AKSEE-Seattle -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
-kubectx chicago
-New-AzConnectedKubernetes -ClusterName Ag-AKSEE-Chicago -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
-kubectx akseedev
-New-AzConnectedKubernetes -ClusterName Ag-AKSEE-AKSEEDev -ResourceGroupName $env:resourceGroup -Location $env:azureLocation
+Write-Header "Connect AKS Edge clusters to Azure with Azure Arc"
+Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+    # Install prerequisites
+    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+
+    Invoke-WebRequest -Uri "https://get.helm.sh/helm-v3.6.3-windows-amd64.zip" -OutFile ".\helm-v3.6.3-windows-amd64.zip"
+    Expand-Archive "helm-v3.6.3-windows-amd64.zip" C:\helm
+    $env:Path = "C:\helm\windows-amd64;$env:Path"
+    [Environment]::SetEnvironmentVariable('Path', $env:Path)
+
+    # Connect to Arc
+    $deploymentPath = "C:\Deployment\config.json"
+    Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+}
 
 ##############################################################
 # Setup Azure Container registry on cloud AKS environments
@@ -333,8 +371,8 @@ New-AzConnectedKubernetes -ClusterName Ag-AKSEE-AKSEEDev -ResourceGroupName $env
 # az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
 # az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
 
-kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx aksDev="$Env:aksDevClusterName-admin"
+# kubectx aksProd="$Env:aksProdClusterName-admin"
+# kubectx aksDev="$Env:aksDevClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Header "Attaching ACRs to AKS clusters"

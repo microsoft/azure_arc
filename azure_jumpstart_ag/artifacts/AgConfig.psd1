@@ -48,24 +48,39 @@
     natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # AKS variables
-    AKSVNets = @{
+    SiteConfig = @{
         Seattle = @{
+            ArcClusterName = "Ag-AKSEE-Seattle"
             NetIPAddress = "172.20.1.2"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
             DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.31"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.21"
+            LinuxNodeIp4Address = "172.20.1.11"
         }
         Chicago = @{
+            ArcClusterName = "Ag-AKSEE-Chicago"
             NetIPAddress = "172.20.1.3"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
             DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.71"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.61"
+            LinuxNodeIp4Address = "172.20.1.51"
         }
         AKSEEDev = @{
+            ArcClusterName = "Ag-AKSEE-Dev"
             NetIPAddress = "172.20.1.4"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
             DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.101"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.91"
+            LinuxNodeIp4Address = "172.20.1.81"
         }
     }
 }
