@@ -132,7 +132,7 @@ foreach ($vhdxPath in $vhdxPaths) {
         -ExposeVirtualizationExtensions $true
     
     Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
-    #Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
+    Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
       
     # Create virtual machine snapshot and start the virtual machine
     Checkpoint-VM -Name $VMName -SnapshotName "Base"
