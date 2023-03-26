@@ -84,7 +84,7 @@ var serviceCidr_dev = '10.21.64.0/19'
 var dnsServiceIP_dev = '10.21.64.10'
 var dockerBridgeCidr_dev = '172.18.0.1/16'
 
-resource aksProd 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource aksProd 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = if (false) {
   location: location
   name: aksProdClusterName
   identity: {
@@ -198,7 +198,7 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
   }
 }
 
-resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
   name: acrNameProd
   location: location
   sku: {
