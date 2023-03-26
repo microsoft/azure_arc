@@ -83,15 +83,6 @@ foreach ($key in $kubeReplacementParams.Keys) {
 }
 Set-Content $destinationPath -Value $content
 
-# kubeconfig work for changing context and copying to the Hyper-V host machine
-# Write-Host "Coping the kubeconfig file to the L0 host machine"
-# $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-# $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-# $defaultGateway = (Get-NetRoute "0.0.0.0/0").NextHop
-# $destinationPath = "\\$DefaultGateway\kube"
-# New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-# Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
-
 Write-Host "Enabling ICMP for the cluster control plane IP address"
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
