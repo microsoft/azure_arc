@@ -304,7 +304,8 @@ $elapsedTime = Measure-Command {
         }
         Write-Host "Got a kubeconfig - copying over config-$VMName" -ForegroundColor DarkGreen
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
-        $s = New-PSSession -VMName $VMName
+        Credentials = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
+        $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
     }
 }
@@ -366,6 +367,7 @@ kubectl get nodes -o wide
 Write-Header "Connect AKS Edge clusters to Azure with Azure Arc"
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Install prerequisites
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
     Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
     Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
