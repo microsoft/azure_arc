@@ -26,10 +26,6 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 # Deplying AKS Edge Essentials clusters #
 #########################################
 
-# Parameterizing the host, L0 username and password Required for the shared drive functionality (New-PSDrive)
-$HVHostUsername = "arcdemo"
-$HVHostPassword = ConvertTo-SecureString "ArcPassword123!!" -AsPlainText -Force
-
 # Force time sync
 $string = Get-Date
 Write-Host "Time before forced time sync:" + $string.ToString("u")
