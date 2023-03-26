@@ -131,6 +131,9 @@ foreach ($vhdxPath in $vhdxPaths) {
     # Get the virtual hard disk object from the VHDX file
     $vhd = Get-VHD -Path $vhdxPath
 
+    # Create new diff disks
+    # Add this tomorrow
+
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "Create $VMName virtual machine" -ForegroundColor Green
     New-VM -Name $VMName `
@@ -306,13 +309,14 @@ foreach ($VMName in $VMNames) {
 $elapsedTime = Measure-Command {
     foreach ($VMName in $VMNames) {
         $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
-        while (!(Invoke-Command -VMName $VMName -ScriptBlock { Test-Path $using:path })) { 
+        $credential = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
+        while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) { 
             Start-Sleep 30
             Write-Host "Waiting for kubeconfig files" 
         }
+        
         Write-Host "Got a kubeconfig - copying over config-$VMName" -ForegroundColor DarkGreen
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
-        $credential = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
         $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
     }
