@@ -24,12 +24,4 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   }
 }
 
-resource kubefilesContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2019-06-01' = if (false) {
-  name: '${storageAccountName}/default/kubefiles'
-  properties: {
-    publicAccess: 'None'
-    metadata: {}
-  }
-}
-
 output storageAccountName string = storageAccountName
