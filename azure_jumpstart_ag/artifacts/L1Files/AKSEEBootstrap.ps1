@@ -66,37 +66,37 @@ New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
 Write-Host
 
 # kubeconfig work for changing context and coping to the Hyper-V host machine
-$NewKubeContext = $(hostname).ToLower()
-kubectx $NewKubeContext=default
+$newKubeContext = $(hostname).ToLower()
+kubectx $newKubeContext=default
 Write-Host
 kubectl get nodes -o wide
 Write-Host
 
 $sourcePath = "$env:USERPROFILE\.kube\config"
-$destinationPath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+$destinationPath = "$env:USERPROFILE\.kube\config-$newKubeContext"
 
 $kubeReplacementParams = @{
-    "name: default"    = "name: $NewKubeContext"
-    "cluster: default" = "cluster: $NewKubeContext"
-    "user: default"    = "user: $NewKubeContext"
+    "name: default"    = "name: $newKubeContext"
+    "cluster: default" = "cluster: $newKubeContext"
+    "user: default"    = "user: $newKubeContext"
 }
 
 $content = Get-Content $sourcePath
-
 foreach ($key in $kubeReplacementParams.Keys) {
     $content = $content -replace $key, $kubeReplacementParams[$key]
 }
-
 Set-Content $destinationPath -Value $content
 
 # kubeconfig work for changing context and copying to the Hyper-V host machine
-Write-Host "Coping the kubeconfig file to the L0 host machine"
-$Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
-$sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
-$defaultGateway = (Get-NetRoute "0.0.0.0/0").NextHop
-$destinationPath = "\\$DefaultGateway\kube"
-New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
-Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
+# Write-Host "Coping the kubeconfig file to the L0 host machine"
+# $Credentials = New-Object System.Management.Automation.PSCredential($HVHostUsername, $HVHostPassword)
+# $sourcePath = "$env:USERPROFILE\.kube\config-$NewKubeContext"
+# $defaultGateway = (Get-NetRoute "0.0.0.0/0").NextHop
+# $destinationPath = "\\$DefaultGateway\kube"
+# New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
+# Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
+
+
 
 Write-Host "Enabling ICMP for the cluster control plane IP address"
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
