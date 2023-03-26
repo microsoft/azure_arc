@@ -414,9 +414,9 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
 }'
 
-Write-Header "Changing Wallpaper"
-$imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-Add-Type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+# Write-Header "Changing Wallpaper"
+# $imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
+# Add-Type $code 
+# [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 Stop-Transcript
