@@ -120,88 +120,24 @@ Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
 
-Write-Header "Verifying Azure AD service principal permissions"
-
-# Check if Service Principal has 'Microsoft.Authorization/roleAssignments/write' permissions to target Resource Group
-$requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
-
-$roleDefinitions = az role definition list --out json | ConvertFrom-Json
-$spnObjectId = az ad sp show --id $Env:spnClientID --query id -o tsv
-$rolePermissions = az role assignment list --include-inherited --include-groups --scope "/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}" | ConvertFrom-Json
-$authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.actions | Select-Object) -ExcludeDifferent -IncludeEqual) -and -not (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.notactions | Select-Object) -ExcludeDifferent -IncludeEqual) } } | Select-Object -ExpandProperty roleName
-$hasPermission = $rolePermissions | Where-Object {($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles)}
-
 # Copying the Azure Arc Connected Agent to nested VMs
-Write-Header "Customize Onboarding Scripts"
-Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
-(Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
-
-# Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
-if(-not $hasPermission) {
-    Write-Header "Service principal do not have Azure RM permissions"
-    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
-} else {
-    Write-Header "Service principal has required Azure RM permissions"
-    (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$myResourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" -replace '\$logAnalyticsWorkspaceName',"'$Env:workspaceName'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
-}
-
-Write-Header "Copying Onboarding Scripts"
-
-# Copy installtion script to nested Windows VMs
-Write-Output "Transferring installation script to nested Windows VM..."
-$remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host
-
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VM as Azure Arc-enabled servers"
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
+$nestedVMArcJSDir = $Env:ArcJSDir
+$spnClientId = $env:spnClientId
+$spnClientSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$subscriptionId = $env:subscriptionId
+$azureLocation = $env:azureLocation
+$resourceGroup = $env:resourceGroup
+
+$remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-# Prepare JS-Win-SQL-01 onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
-if(-not $hasPermission) {
-    Write-Header "Current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc. Creating Arc-enabled SQL Shortcut"
-
-    # Replace variables in Arc-enabled SQL onboarding scripts
-    $sqlServerName = $JSWinSQLVMName
-
-    (Get-Content -path "$Env:ArcJSDir\installArcAgentSQLUser.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<location>',"$Env:azureLocation" | Set-Content -Path "$Env:ArcJSDir\installArcAgentSQLUser.ps1"
-    (Get-Content -path "$Env:ArcJSDir\ArcSQLManualOnboarding.ps1" -Raw) -replace '<subscriptionId>',"$Env:subscriptionId" -replace '<resourceGroup>',"$Env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcJSDir\ArcSQLManualOnboarding.ps1"
-
-    # Set Edge as the Default Browser
-    & SetDefaultBrowser.exe HKLM "Microsoft Edge"
-
-    # Disable Edge 'First Run' Setup
-    $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-    $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
-    $firstRunRegistryName  = 'HideFirstRunExperience'
-    $firstRunRegistryValue = '0x00000001'
-    $savePasswordRegistryName = 'PasswordManagerEnabled'
-    $savePasswordRegistryValue = '0x00000000'
-    $autoArrangeRegistryName = 'FFlags'
-    $autoArrangeRegistryValue = '1075839525'
-
-    If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
-        New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
-    }
-
-    New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
-    New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
-    Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
-
-    # Creating Arc-enabled SQL Server onboarding desktop shortcut
-    $sourceFileLocation = "${Env:ArcJSDir}\ArcSQLManualOnboarding.ps1"
-    $shortcutLocation = "$Env:Public\Desktop\Onboard SQL Server.lnk"
-    $wScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-    $shortcut.TargetPath = "powershell.exe"
-    $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${Env:ArcJSIconDir}\arcsql.ico, 0"
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
-}
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
