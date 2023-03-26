@@ -7,6 +7,14 @@ $ProgressPreference = "SilentlyContinue"
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
+$githubAccount = $env:githubAccount
+$githubBranch = $env:githubBranch
+$resourceGroup = $env:resourceGroup
+$azureLocation = $env:azureLocation
+$spnClientId = $env:spnClientId
+$spnClientSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$subscriptionId = (Get-AzSubscription).Id
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
