@@ -14,7 +14,6 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
-$subscriptionId = (Get-AzSubscription).Id
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
@@ -77,6 +76,7 @@ Write-Header "Az PowerShell Login"
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+$subscriptionId = (Get-AzSubscription).Id
 
 # Install PowerShell modules
 Write-Header "Installing PowerShell modules"
