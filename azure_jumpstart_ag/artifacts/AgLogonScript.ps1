@@ -145,7 +145,7 @@ foreach ($vhdxPath in $vhdxPaths) {
     
     # Set up the virtual machine before coping all AKS Edge Essentials automation files
     Set-VMProcessor -VMName $VMName `
-        -Count 8 `
+        -Count $AgConfig.L1VMNumVCPU `
         -ExposeVirtualizationExtensions $true
     
     Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
