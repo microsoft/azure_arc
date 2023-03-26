@@ -309,9 +309,10 @@ foreach ($VMName in $VMNames) {
 $elapsedTime = Measure-Command {
     foreach ($VMName in $VMNames) {
         $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
-        $user = "Administrator"
-        [securestring]$secStringPassword = ConvertTo-SecureString "Agora123!!" -AsPlainText -Force
+        $user = $AgConfig.L1Username
+        [securestring]$secStringPassword = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential($user, $secStringPassword)
+        Start-Sleep 5
         while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) { 
             Start-Sleep 30
             Write-Host "Waiting for kubeconfig files" 
@@ -325,22 +326,6 @@ $elapsedTime = Measure-Command {
 }
 # Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -ForegroundColor Blue
-
-
-# # Start monitoring the .kube folder for the files on the L0 virtual machine
-# $elapsedTime = Measure-Command {
-#     while ($true) {
-#         $files = Get-ChildItem $kubeFolder -ErrorAction SilentlyContinue | Where-Object { $fileNames -contains $_.Name }
-
-#         if ($files.Count -eq 3) {
-#             Write-Host "Found all 3 kubeconfig files!" -ForegroundColor Green
-#             break
-#         }
-#         # Wait before checking again
-#         Start-Sleep -Seconds 30
-#         Write-Host "Waiting for kubeconfig files. Checking every 30 seconds..." -ForegroundColor Yellow
-#     }
-# }
 
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
@@ -379,6 +364,7 @@ kubectl get nodes -o wide
 Write-Header "Connect AKS Edge clusters to Azure with Azure Arc"
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Install prerequisites
+    $ProgressPreference = "SilentlyContinue"
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
     Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
@@ -398,15 +384,15 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
 # az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
-# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
 
 # kubectx aksProd="$Env:aksProdClusterName-admin"
-# kubectx aksDev="$Env:aksDevClusterName-admin"
+kubectx aksDev="$Env:aksDevClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Header "Attaching ACRs to AKS clusters"
 # az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
-# az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
+az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
 
 ##############################################################
 # Cleanup
@@ -418,6 +404,7 @@ Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
+$Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
 Invoke-Expression 'cmd /c start Powershell -Command { 
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
