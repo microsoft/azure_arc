@@ -309,7 +309,9 @@ foreach ($VMName in $VMNames) {
 $elapsedTime = Measure-Command {
     foreach ($VMName in $VMNames) {
         $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
-        $credential = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
+        $user = "Administrator"
+        [securestring]$secStringPassword = ConvertTo-SecureString "Agora123!!" -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential($user, $secStringPassword)
         while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) { 
             Start-Sleep 30
             Write-Host "Waiting for kubeconfig files" 
