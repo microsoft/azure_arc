@@ -157,6 +157,9 @@ if ($Env:flavor -ne "DevOps") {
 
     Write-Header "Fetching Nested VMs"
     # Verify if these images are aready downloaded
+    $SQLvmName = "ArcBox-SQL"
+    $SQLvmvhdPath = "$Env:ArcBoxVMDir\${SQLvmName}.vhdx"
+
     $Win2k19vmName = "ArcBox-Win2K19"
     $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k19vmName}.vhdx"
 
@@ -170,7 +173,7 @@ if ($Env:flavor -ne "DevOps") {
     $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 
     # Verify if VHD files already downloaded especially when re-running this script
-    if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))){
+    if (!([System.IO.File]::Exists($SQLvmvhdPath) -and [System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))){
         <# Action when all if and elseif conditions are false #>
         $sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
         $sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
@@ -189,6 +192,15 @@ if ($Env:flavor -ne "DevOps") {
 
     # Create the nested VMs if not already created
     Write-Header "Create Hyper-V VMs"
+
+    # Create the nested SQL VM
+    Write-Host "Create SQL VM"
+    if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne  "Running"){
+        Remove-VM -Name $SQLvmName -Force -ErrorAction SilentlyContinue
+        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+        Set-VMProcessor -VMName $SQLvmName -Count 2
+        Set-VM -Name $SQLvmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
+    }
 
     # Check if VM already exists
     if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne  "Running"){
@@ -226,6 +238,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Start all the VMs
     Write-Header "Starting VMs"\
+    Start-VM -Name $SQLvmName
     Start-VM -Name $Win2k19vmName
     Start-VM -Name $Win2k22vmName
     Start-VM -Name $Ubuntu01vmName
@@ -243,6 +256,7 @@ if ($Env:flavor -ne "DevOps") {
     # Restarting Windows VM Network Adapters
     Write-Header "Restarting Network Adapters"
     Start-Sleep -Seconds 20
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
@@ -253,6 +267,8 @@ if ($Env:flavor -ne "DevOps") {
 
     # Copy installation script to nested Windows VMs
     Write-Output "Transferring installation script to nested Windows VMs..."
+    Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+    Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
     Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
     Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
@@ -268,6 +284,8 @@ if ($Env:flavor -ne "DevOps") {
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
     Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
     Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
@@ -282,60 +300,10 @@ if ($Env:flavor -ne "DevOps") {
 
     # Configure SSH on the nested Windows VMs
     Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-    Invoke-Command -VMName $Win2k19vmName,$Win2k22vmName -ScriptBlock {
+    Invoke-Command -VMName $SQLvmName,$Win2k19vmName,$Win2k22vmName -ScriptBlock {
         # Allow SSH via Azure Arc agent
         azcmagent config set incomingconnections.ports 22
     } -Credential $winCreds
-
-    Write-Header "Creating Nested SQL VM"
-    $SQLvmName = "ArcBox-SQL"
-    $SQLvmvhdPath = "$Env:ArcBoxVMDir\${SQLvmName}.vhdx"
-
-    Write-Host "Fetching Nested VMs"
-    if (![System.IO.File]::Exists($SQLvmvhdPath)){
-        $sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
-        $sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
-        $Env:AZCOPY_BUFFER_GB = 4
-        Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp "$sourceFolder/${SQLvmName}.vhdx$sas" $SQLvmvhdPath --check-length=false --cap-mbps 1200 --log-level=ERROR
-    }
-
-    # Create the nested SQL VM
-    Write-Host "Create SQL VM"
-    if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne  "Running"){
-        Remove-VM -Name $SQLvmName -Force -ErrorAction SilentlyContinue
-        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-        Set-VMProcessor -VMName $SQLvmName -Count 2
-    
-        # We always want the VMs to start with the host and shut down cleanly with the host
-        Write-Host "Set VM Auto Start/Stop"
-        Set-VM -Name $SQLvmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-
-        Write-Host "Enabling Guest Integration Service"
-        Get-VM | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-VMIntegrationService -Verbose
-    
-        # Start all the VMs
-        Write-Host "Starting SQL VM"
-        Start-VM -Name $SQLvmName
-    
-        # Restarting Windows VM Network Adapters
-        Write-Host "Restarting Network Adapters"
-        Start-Sleep -Seconds 20
-        Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
-        Start-Sleep -Seconds 5
-
-        # Copy installtion script to nested Windows VMs
-        Write-Output "Transferring installation script to nested Windows VMs..."
-        Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
-        Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
-
-        # Configure SSH on the nested SQL VMs
-        Write-Output "Configuring SSH via Azure Arc agent on the SQL VMs"
-        Invoke-Command -VMName $SQLvmName -ScriptBlock {
-            # Allow SSH via Azure Arc agent
-            azcmagent config set incomingconnections.ports 22
-        } -Credential $winCreds
-    }
 
     # Install Log Analytics extension to support Defender for SQL
     $mmaExtension = az connectedmachine extension show --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --resource-group $resourceGroup
@@ -386,7 +354,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Build API request payload
     $worspaceResourceId = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
-    $sqlExtensionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer".ToLower()
+    $sqlExtensionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer"
     $sqlbpaPayloadTemplate = "$Env:templateBaseUrl/artifacts/sqlbpa.payload.json"
     $apiPayload = (Invoke-WebRequest -Uri $sqlbpaPayloadTemplate).Content -replace '{{RESOURCEID}}', $sqlExtensionId -replace '{{LOCATION}}', $azureLocation -replace '{{WORKSPACEID}}', $worspaceResourceId
 
