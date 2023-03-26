@@ -304,7 +304,7 @@ $elapsedTime = Measure-Command {
         }
         Write-Host "Got a kubeconfig - copying over config-$VMName" -ForegroundColor DarkGreen
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
-        Credentials = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
+        $credential = New-Object System.Management.Automation.PSCredential("Administrator", "Agora123!!")
         $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
     }
@@ -332,8 +332,6 @@ Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -Foregro
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
 $kubeconfig3 = "config-akseedev"
-
-
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "All three files are present. Merging kubeconfig files." -ForegroundColor Green
