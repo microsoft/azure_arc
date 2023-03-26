@@ -12,9 +12,7 @@
             "SqlManagement": {
                 "IsEnabled": true
             },
-            "ExcludedSqlInstances": [
-                ""
-            ],
+            "ExcludedSqlInstances": [],
             "AssessmentSettings": {
                 "Enable": true,
                 "RunImmediately": true,
