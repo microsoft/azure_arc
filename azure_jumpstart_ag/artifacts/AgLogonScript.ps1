@@ -294,30 +294,45 @@ foreach ($VMName in $VMNames) {
     Remove-PSSession $Session
 }
 
+# Monitor until the kubeconfig files are detected and copied over
+$elapsedTime = Measure-Command {
+    foreach ($VMName in $VMNames) {
+        $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
+        while (!(Invoke-Command -VMName $VMName -ScriptBlock { Test-Path $using:path })) { 
+            Start-Sleep 30
+            Write-Host "Waiting for kubeconfig files" 
+        }
+        Write-Host "Got a kubeconfig - copying over config-$VMName" -ForegroundColor DarkGreen
+        $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
+        $s = New-PSSession -VMName $VMName
+        Copy-Item -FromSession $s -Path $path -Destination $destinationPath
+    }
+}
+# Display the elapsed time in seconds it took for kubeconfig files to show up in folder
+Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -ForegroundColor Blue
+
+
+# # Start monitoring the .kube folder for the files on the L0 virtual machine
+# $elapsedTime = Measure-Command {
+#     while ($true) {
+#         $files = Get-ChildItem $kubeFolder -ErrorAction SilentlyContinue | Where-Object { $fileNames -contains $_.Name }
+
+#         if ($files.Count -eq 3) {
+#             Write-Host "Found all 3 kubeconfig files!" -ForegroundColor Green
+#             break
+#         }
+#         # Wait before checking again
+#         Start-Sleep -Seconds 30
+#         Write-Host "Waiting for kubeconfig files. Checking every 30 seconds..." -ForegroundColor Yellow
+#     }
+# }
+
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
 $kubeconfig3 = "config-akseedev"
 
-$fileNames = @($kubeconfig1, $kubeconfig2, $kubeconfig3)
 
-# Start monitoring the .kube folder for the files on the L0 virtual machine
-$elapsedTime = Measure-Command {
-    while ($true) {
-        $files = Get-ChildItem $kubeFolder -ErrorAction SilentlyContinue | Where-Object { $fileNames -contains $_.Name }
-
-        if ($files.Count -eq 3) {
-            Write-Host "Found all 3 kubeconfig files!" -ForegroundColor Green
-            break
-        }
-        # Wait before checking again
-        Start-Sleep -Seconds 30
-        Write-Host "Waiting for kubeconfig files. Checking every 30 seconds..." -ForegroundColor Yellow
-    }
-}
-
-# Display the elapsed time in seconds it took for kubeconfig files to show up in folder
-Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -ForegroundColor Blue
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "All three files are present. Merging kubeconfig files." -ForegroundColor Green
@@ -395,7 +410,7 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Start-Sleep -Seconds 5
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
+    7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
 }'
 
 Write-Header "Changing Wallpaper"
