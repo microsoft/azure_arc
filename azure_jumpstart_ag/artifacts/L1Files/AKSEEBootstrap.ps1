@@ -96,8 +96,6 @@ Set-Content $destinationPath -Value $content
 # New-PSDrive -Name "SharedDrive" -PSProvider FileSystem -Root $destinationPath -Credential $Credentials
 # Copy-Item -Path $sourcePath -Destination "$destinationPath\config-$NewKubeContext"
 
-
-
 Write-Host "Enabling ICMP for the cluster control plane IP address"
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
