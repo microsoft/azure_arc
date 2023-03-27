@@ -13,7 +13,7 @@ $ArcJSLogsDir = "$ArcJSDir\Logs"
 # Change working directory 
 Set-Location -Path $ArcJSDir
 
-Start-Transcript -Path $ArcJSLogsDir\installArcAgentSQL.log -Force
+Start-Transcript -Path $ArcJSLogsDir\installArcAgentSQL.log
 $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated
