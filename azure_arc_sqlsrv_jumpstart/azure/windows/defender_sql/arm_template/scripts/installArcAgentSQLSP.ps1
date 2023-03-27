@@ -7,13 +7,13 @@ param (
     [string]$Azurelocation
 )
 
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "$ArcBoxDir\Logs"
+$ArcJSDir = "C:\Jumpstart"
+$ArcJSLogsDir = "$ArcJSDir\Logs"
 
 # Change working directory 
-Set-Location -Path $ArcBoxDir
+Set-Location -Path $ArcJSDir
 
-Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+Start-Transcript -Path $ArcJSLogsDir\installArcAgentSQL.log -Force
 $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated
