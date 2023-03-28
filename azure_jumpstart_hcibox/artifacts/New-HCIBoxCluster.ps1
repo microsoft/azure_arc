@@ -34,6 +34,9 @@ function BITSRequest {
     $download = Start-BitsTransfer -Source $url -Destination $filename -Asynchronous
     $ProgressPreference = "Continue"
     while ($download.JobState -ne "Transferred") {
+        if ($download.JobState -eq "TransientError"){
+            Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
+        }
         [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
         Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
     }
@@ -221,7 +224,7 @@ function New-NestedVM {
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -VMName $AzSHOST | Out-Null
         }
     
-        Set-VM -Name $AzSHOST -ProcessorCount 4 -AutomaticStartAction Start
+        Set-VM -Name $AzSHOST -ProcessorCount 20 -AutomaticStartAction Start
         Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
         Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
         Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
