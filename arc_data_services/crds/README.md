@@ -1,4 +1,4 @@
-# CRD Change Log `v1.16.0`
+# CRD Change Log `v1.17.0`
 ## DataController
 `datacontrollers.arcdata.microsoft.com`
 - **Current Version:** `v5`
