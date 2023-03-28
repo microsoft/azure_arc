@@ -38,7 +38,7 @@ By the end of this scenario, you will have an Azure Arc-enabled server with Azur
 
 ## Prerequisites
 
-- As mentioned, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+- This scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server](./01.png)
 
