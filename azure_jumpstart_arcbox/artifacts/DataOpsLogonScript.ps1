@@ -101,9 +101,6 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/stag
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
-# Update CAPI vnet DNS server
-#az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
-
 #VNet peering with CAPI vnet
 $capiVnetName = $clusters[0].clusterName + '-vnet'
 $dcVnetId = $(az network vnet show `
