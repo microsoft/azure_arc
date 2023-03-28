@@ -43,7 +43,6 @@ Add-AppxPackage -Path $msiPath
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 
-
 ##############################################################
 # Setup Azure CLI
 ##############################################################
