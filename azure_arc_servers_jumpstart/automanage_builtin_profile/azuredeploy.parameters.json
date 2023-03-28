@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "value": "<Name of your Azure Arc-enabled Server>"
+        },
+        "configurationProfileName": {
+            "value": "<Configuration profile to assign custom or built-in>"
+        }
+
+    }
+}
