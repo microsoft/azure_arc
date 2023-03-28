@@ -406,7 +406,7 @@ namespace Win32{
 } 
 '@
 
-# Set wallpape image based on the ArcBox Flavor deployed
+# Set wallpaper image based on the ArcBox Flavor deployed
 $DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
 if (-not $DataServicesLogonScript) {
     Write-Header "Changing Wallpaper"
