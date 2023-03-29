@@ -124,7 +124,7 @@ Read the explanation below to get familiar with the automation and deployment fl
 - From the deployment folder run the below command:
 
   ```shell
-    az deployment group create --resource-group <your_resource_group> --template-file azuredploy.json --parameters azuredeploy.parameters.json
+    az deployment group create --resource-group <your_resource_group> --template-file azuredeploy.json --parameters azuredeploy.parameters.json
   ```
 
   ![Scripts output](./07.png)
