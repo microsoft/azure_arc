@@ -55,7 +55,7 @@ $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory = $AgConfig.AgDirectories["AgDir"]
-$AgToolsDir = $agConfig.AgDirectories["AgToolsDir"]
+$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 
 # Creating Ag paths
 Write-Output "Creating Ag paths"
