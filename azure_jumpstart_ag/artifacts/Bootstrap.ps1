@@ -77,8 +77,6 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light,mqtt-explorer'
-
 try {
     choco config get cacheLocation
 }
@@ -89,16 +87,18 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-foreach ($app in $appsToInstall) {
-    Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
+foreach ($app in $AgConfig.chocolateyAppList) {
+  Write-Host "Installing $app"
+  & choco install $app /y -Force | Write-Output
 }
 
 # Download artifacts
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
+Invoke-WebRequest https://aka.ms/wslubuntu -OutFile "$AgToolsDir\Ubuntu.appx"
+Invoke-WebRequest https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -OutFile "$AgToolsDir\wsl_update_x64.msi"
+Invoke-WebRequest https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
 
 # # Replace password
 # $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -179,11 +179,14 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 
     Write-Host "RDP port configuration complete."
 }
+# Install WSL latest kernel update
+msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
 
-# Install Hyper-V and reboot
+# Install Hyper-V, WSL and reboot
 Write-Header "Installing Hyper-V"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 Stop-Transcript
