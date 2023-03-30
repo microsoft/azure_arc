@@ -23,6 +23,12 @@
     # PowerShell modules
     PowerShellModules                    = @('Az.ConnectedKubernetes')
 
+    # Chocolatey app list
+    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
+
+    # VSCode extensions
+    VSCodeExtensions  = @('ms-vscode-remote.remote-containers')
+
     # VHDX Paths 
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
@@ -83,10 +89,4 @@
             LinuxNodeIp4Address = "172.20.1.81"
         }
     }
-
-    # Chocolatey app list
-    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','terraform','putty.install','kubernetes-helm','ssms','dotnetcore-3.1-sdk','setdefaultbrowser','zoomit','openssl.light','mqtt-explorer')
-
-    # VSCode extensions
-    VSCodeExtensions  = @('ms-vscode-remote.remote-containers')
 }

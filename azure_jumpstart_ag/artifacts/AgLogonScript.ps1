@@ -6,6 +6,7 @@ $ProgressPreference = "SilentlyContinue"
 # Initialize the environment
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
