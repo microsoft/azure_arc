@@ -22,7 +22,7 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
 #############################################################
-Write-Header "Installing Windows Terminal"
+Write-Header "Installing Windows Terminal, WSL2 and Ubuntu"
 If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
 $downloadDir = "C:\WinTerminal"
 $gitRepo = "microsoft/terminal"
@@ -56,7 +56,7 @@ Remove-Item $downloadDir -Recurse -Force
 #############################################################
 # Install Docker Desktop
 #############################################################
-
+Write-Header "Installing Docker Dekstop"
 # Download and Install Docker Desktop
 Invoke-WebRequest -Uri https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
 $arguments = 'install --quiet --accept-license'
