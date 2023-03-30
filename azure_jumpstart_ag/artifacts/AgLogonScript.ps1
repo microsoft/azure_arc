@@ -14,12 +14,13 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
+$adminUsername = $env:adminUsername
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 #############################################################
-# Install Windows Terminal
+# Install Windows Terminal, WSL2, and Ubuntu
 #############################################################
 Write-Header "Installing Windows Terminal"
 If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
@@ -39,10 +40,29 @@ Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
 # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
 Add-AppxPackage -Path $framworkPkgPath
 Add-AppxPackage -Path $msiPath
+Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
+
+# Setting WSL environment variables
+$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+# Initializing the wsl ubuntu app without requiring user input
+$ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+Invoke-Expression -Command "$ubuntu_path install --root"
 
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 
+#############################################################
+# Install Docker Desktop
+#############################################################
+
+# Download and Install Docker Desktop
+Invoke-WebRequest -Uri https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
+$arguments = 'install --quiet --accept-license'
+Start-Process '$AgToolsDir\DockerDesktopInstaller.exe' -Wait -ArgumentList $arguments
+Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+Start-Service com.docker.service
 
 ##############################################################
 # Setup Azure CLI
