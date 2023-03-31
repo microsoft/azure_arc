@@ -13,7 +13,8 @@ param (
     [string]$registerCluster,
     [string]$deployAKSHCI,
     [string]$deployResourceBridge,
-    [string]$natDNS
+    [string]$natDNS,
+    [string]$rdpPort
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -79,7 +80,7 @@ Install-Module -Name Posh-SSH -Force
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,azure-data-studio'
+$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,azure-data-studio'
 
 try {
     choco config get cacheLocation
@@ -100,15 +101,17 @@ foreach ($app in $appsToInstall)
 }
 
 Write-Header "Downloading Azure Stack HCI configuration scripts"
-Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HCIBoxWACDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBoxLogonScript.ps1") -OutFile $Env:HCIBoxDir\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HCIBoxDir\New-HCIBoxCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HCIBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HCIBoxDir\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-AKS.ps1") -OutFile $Env:HCIBoxDir\Uninstall-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-ResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Uninstall-ResourceBridge.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-GitOps.ps1") -OutFile $Env:HCIBoxDir\Deploy-GitOps.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HCIBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerRESTWrappers.ps1
@@ -171,6 +174,39 @@ if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
 Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
+
+# Change RDP Port
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
+{
+    Write-Host "Configuring RDP port number to $rdpPort"
+    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+    # RDP port
+    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
+    if (!($portNumber -eq $rdpPort))
+    {
+      Write-Host Setting RDP PortNumber to $rdpPort
+      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+      Restart-Service TermService -force
+    }
+
+    #Setup firewall rules
+    if ($rdpPort -eq 3389)
+    {
+      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    } 
+    else
+    {
+      $systemroot = get-content env:systemroot
+      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    }
+
+    Write-Host "RDP port configuration complete."
+}
 
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
