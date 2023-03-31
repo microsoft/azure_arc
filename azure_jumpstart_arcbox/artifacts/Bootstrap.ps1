@@ -28,7 +28,8 @@ param (
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$flavor,
-    [string]$automationTriggerAtLogon
+    [string]$rdpPort,
+    [string]$sshPort
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -249,10 +250,63 @@ if ($flavor -eq "Full") {
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
+# Disable Microsoft Edge sidebar
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+$Name         = 'HubsSidebarEnabled'
+$Value        = '00000000'
+# Create the key if it does not exist
+If (-NOT (Test-Path $RegistryPath)) {
+  New-Item -Path $RegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+
+# Disable Microsoft Edge first-run Welcome screen
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+$Name         = 'HideFirstRunExperience'
+$Value        = '00000001'
+# Create the key if it does not exist
+If (-NOT (Test-Path $RegistryPath)) {
+  New-Item -Path $RegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+
 if ($flavor -eq "Full" -Or $flavor -eq "DataOps") {
     Write-Header "Installing Azure Data Studio"
     Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
     Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /quiet"
+}
+
+# Change RDP Port
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
+{
+    Write-Host "Configuring RDP port number to $rdpPort"
+    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+    
+    # RDP port
+    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
+    if (!($portNumber -eq $rdpPort))
+    {
+      Write-Host Setting RDP PortNumber to $rdpPort
+      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+      Restart-Service TermService -force
+    }
+    
+    #Setup firewall rules
+    if ($rdpPort -eq 3389)
+    {
+      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    } 
+    else
+    {
+      $systemroot = get-content env:systemroot
+      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    }
+
+    Write-Host "RDP port configuration complete."
 }
 
 Write-Header "Configuring Logon Scripts"
@@ -347,5 +401,4 @@ else {
     Stop-Transcript
     $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
     $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
-
 }

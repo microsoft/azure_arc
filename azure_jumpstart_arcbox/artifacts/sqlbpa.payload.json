@@ -12,9 +12,7 @@
             "SqlManagement": {
                 "IsEnabled": true
             },
-            "ExcludedSqlInstances": [
-                ""
-            ],
+            "ExcludedSqlInstances": [],
             "AssessmentSettings": {
                 "Enable": true,
                 "RunImmediately": true,
@@ -28,7 +26,8 @@
                 },
                 "WorkspaceResourceId": "{{WORKSPACEID}}",
                 "WorkspaceLocation": "{{LOCATION}}"
-            }
+            },
+            "LicenseType": "Paid"
         }
     }
 }

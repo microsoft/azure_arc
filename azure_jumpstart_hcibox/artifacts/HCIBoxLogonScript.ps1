@@ -79,10 +79,6 @@ if (($env:registerCluster -eq $true) -and ($env:deployResourceBridge -eq $true))
     & "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
 }
 
-# deploy Data services
-# Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
-# & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"
-
 Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
 # Changing to Jumpstart ArcBox wallpaper

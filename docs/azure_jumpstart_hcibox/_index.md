@@ -41,6 +41,12 @@ HCIBox includes [Azure Kubernetes Services on Azure Stack HCI (AKS-HCI)](https:/
 
 <img src="./aks_hci.png" width="250" alt="AKS-HCI diagram">
 
+### Azure Arc-enabled SQL Managed Instance on Azure Stack HCI
+
+HCIBox includes [Azure Arc-enabled SQL Managed Instance on Azure Stack HCI](https://learn.microsoft.com/azure/azure-arc/data/managed-instance-overview). As part of the deployment automation, HCIBox configures AKS-HCI infrastructure including a management cluster. It then creates a [target](https://learn.microsoft.com/azure-stack/aks-hci/kubernetes-concepts), or "workload", cluster (_HCIBox-AKS-$randomguid_) and deploys an Azure Arc-enabled SQL Managed Instance.
+
+<img src="./aks_sqlmi.png" width="250" alt="AKS-HCI diagram">
+
 ### Hybrid unified operations
 
 HCIBox includes capabilities to support managing, monitoring and governing the cluster. The deployment automation configures [Azure Stack HCI Insights](https://learn.microsoft.com/azure-stack/hci/manage/monitor-hci-multi) along with [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/overview) and a [Log Analytics workspace](https://learn.microsoft.com/azure/azure-monitor/logs/log-query-overview). Additionally, [Azure Policy](https://learn.microsoft.com/azure/governance/policy/overview) can be configured to support automation configuration and remediation of resources.
@@ -73,6 +79,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - Registers the HCI Cluster with Azure
   - Deploys AKS-HCI and a target AKS cluster
   - Deploys Arc Resource Bridge and gallery VM images
+  - Deploys an Azure Arc-enabled SQL Managed Instance on top of the AKS cluster
 
 ## Prerequisites
 
@@ -95,7 +102,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
 
   > **NOTE: Some HCIBox resources will be created in regions other than the one you initially specify. This is due to limited regional availability of the various services included in HCIBox.**
 
-- **HCIBox requires 48 DSv5-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy HCIBox. You can use the below Az CLI command to check your vCPU utilization.
+- **HCIBox requires 32 ESv5-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy HCIBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -278,8 +285,6 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   > **NOTE: The _Register-AzStackHCI_ PowerShell command registers the cluster to the East US region. This region is hardcoded into the script. If you have regional limitations in your Azure subscription that prevent resource creation in East US the registration will fail.**
 
-  > **NOTE: The _Register-AzStackHCI_ PowerShell command currently does not support registering the Azure Arc-enabled server resources for each cluster node to the same resource group as the registered cluster itself. For this reason, HCIBox will create a new resource group for the HCI nodes' Arc-enabled server resources. This resource group will be named by appending "-ArcServers" to the end of the resource group used in the initial deployment.**
-  
   ![Screenshot showing HCIBox resources in Azure portal](./rg_arc_servers.png)
 
 ## Using HCIBox
@@ -292,15 +297,15 @@ HCIBox simulates a 2-node physical deployment of Azure Stack HCI by using [neste
 
   ![Screenshot showing HCIBox nested virtualization stack diagram](./nested_virtualization_arch.png)
 
-| Computer Name | Role | Domain Joined | Parent Host | OS |
-|---|---|---|---|---|
-| _HCIBox-Client_ | Primary host | No | Azure | Windows Server 2022 |
-| _AzSHOST1_ | HCI node | Yes | _HCIBox-Client_ | Azure Stack HCI |
-| _AzSHOST2_ | HCI node | Yes | _HCIBox-Client_ | Azure Stack HCI |
-| _AzSMGMT_ | Nested hypervisor | No | _HCIBox-Client_ | Windows Server 2022 |
-| _JumpstartDC_ | Domain controller | Yes (DC) | _AzSMGMT_ | Windows Server 2022 |
-| _AdminCenter_ | Windows Admin Center gateway server | Yes | _AzSMGMT_ | Windows Server 2022 |
-| _Bgp-Tor-Router_ | Remote Access Server | No | _AzSMGMT_ | Windows Server 2022 |
+| Computer Name    | Role                                | Domain Joined | Parent Host     | OS                  |
+| ---------------- | ----------------------------------- | ------------- | --------------- | ------------------- |
+| _HCIBox-Client_  | Primary host                        | No            | Azure           | Windows Server 2022 |
+| _AzSHOST1_       | HCI node                            | Yes           | _HCIBox-Client_ | Azure Stack HCI     |
+| _AzSHOST2_       | HCI node                            | Yes           | _HCIBox-Client_ | Azure Stack HCI     |
+| _AzSMGMT_        | Nested hypervisor                   | No            | _HCIBox-Client_ | Windows Server 2022 |
+| _JumpstartDC_    | Domain controller                   | Yes (DC)      | _AzSMGMT_       | Windows Server 2022 |
+| _AdminCenter_    | Windows Admin Center gateway server | Yes           | _AzSMGMT_       | Windows Server 2022 |
+| _Bgp-Tor-Router_ | Remote Access Server                | No            | _AzSMGMT_       | Windows Server 2022 |
 
 ### Active Directory domain user credentials
 
@@ -319,6 +324,10 @@ Azure Stack HCI integrates with [Azure Monitor](https://learn.microsoft.com/azur
 - On the dialog box, select the HCIBox-Workspace log analytics workspace in the dropdown, then click "Add". This will begin the process of installing the Log Analytics extensions on the host nodes and will take a few minutes. When complete, the Logs box will show as "Configured" on the Capabilities tab.
 
   ![Screenshot showing capabilities tab](./enable_monitoring_2.png)
+
+- On the "Capabilities" tab, click on "Not configured" on the "Insights" box.
+
+- On the dialog box, click "Turn on". After a few seconds, the Insights box should show as "Configured" on the Capabilities tab.
 
   ![Screenshot showing logs configured](./enable_monitoring_3.png)
 
@@ -343,6 +352,12 @@ HCIBox includes a deployment of a Windows Admin Center (WAC) gateway server. Win
 HCIBox comes pre-configured with [Azure Kubernetes Service on Azure Stack HCI](https://learn.microsoft.com/azure-stack/aks-hci/). Open the [HCIBox AKS-HCI documentation](https://azurearcjumpstart.io/azure_jumpstart_hcibox/AKS/) to get started with AKS-HCI in HCIBox.
 
 ![Screenshot showing AKS on Azure Stack HCI](./aks_portal.png)
+
+### Azure Arc-enabled SQL Managed Instance
+
+HCIBox supports deploying [Azure Arc-enabled SQL Managed Instance](https://learn.microsoft.com/azure/azure-arc/data/managed-instance-overview) on an AKS HCI cluster. Open the [HCIBox SQLMI documentation](https://azurearcjumpstart.io/azure_jumpstart_hcibox/SQLMI/) to get started with Azure Arc-enabled SQL Managed Instance in HCIBox.
+
+![Screenshot showing SQLMI on Azure Stack HCI](./sqlmi_portal.png)
 
 ### Advanced Configurations
 
@@ -389,13 +404,14 @@ If you have issues that you cannot resolve when deploying HCIBox please submit a
 
 Occasionally, you may need to review log output from scripts that run on the _HCIBox-Client_ virtual machines in case of deployment failures. To make troubleshooting easier, the HCIBox deployment scripts collect all relevant logs in the _C:\HCIBox\Logs_ folder on _HCIBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 
-| Log file | Description |
-| ------- | ----------- |
-| _C:\HCIBox\Logs\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _HCIBox-Client_. |
-| _C:\HCIBox\Logs\New-HCIBoxCluster.log_ | Output of _New-HCIBoxCluster.ps1_ which configures the Hyper-V host and builds the HCI cluster, management VMs, and other configurations. |
-| _C:\HCIBox\Logs\Register-AzSHCI.log_ | Output of _Register-AzSHCI.ps1_ which registers the cluster with Azure. |
-| _C:\HCIBox\Logs\Deploy-AKS.log_ | Output of _Deploy-AKS.ps1_ which deploys and configures AKS on HCI. |
-| _C:\HCIBox\Logs\Deploy-ArcResourceBridge.log_ | Output of _Deploy-ArcResourceBridge.ps1_ which deploys and configures Arc resource bridge and builds gallery images. |
+| Log file                                      | Description                                                                                                                               |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| _C:\HCIBox\Logs\Bootstrap.log_                | Output from the initial bootstrapping script that runs on _HCIBox-Client_.                                                                |
+| _C:\HCIBox\Logs\New-HCIBoxCluster.log_        | Output of _New-HCIBoxCluster.ps1_ which configures the Hyper-V host and builds the HCI cluster, management VMs, and other configurations. |
+| _C:\HCIBox\Logs\Register-AzSHCI.log_          | Output of _Register-AzSHCI.ps1_ which registers the cluster with Azure.                                                                   |
+| _C:\HCIBox\Logs\Deploy-AKS.log_               | Output of _Deploy-AKS.ps1_ which deploys and configures AKS on HCI.                                                                       |
+| _C:\HCIBox\Logs\Deploy-ArcResourceBridge.log_ | Output of _Deploy-ArcResourceBridge.ps1_ which deploys and configures Arc resource bridge and builds gallery images.                      |
+| _C:\HCIBox\Logs\Deploy-SQLMI.log_ | Output of _Deploy-SQLMI.ps1_ which deploys and configures Arc-enabled SQL Managed Instance.                      |
 
   ![Screenshot showing HCIBox logs folder on HCIBox-Client](./troubleshoot_logs.png)
 

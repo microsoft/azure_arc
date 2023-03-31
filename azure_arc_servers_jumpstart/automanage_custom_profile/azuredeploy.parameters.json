@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "value": "<Name of your Azure Arc-enabled Server>"
+        },
+        "customProfileName": {
+            "value": "<Name of your Azure Arc-enabled Server custom profile>"
+        },
+        "subscriptionId": {
+            "value": "<SubscriptionID where you want to create your custom profile>"
+        },
+        "azureSecurityBaselineAssignmentType": {
+            "value": "<Audit mode for the Azure Security Baseline>"
+        },
+        "logAnalyticsWorkspace": {
+            "value": "<Name for your Log Analytics workspace>"
+        }
+    }
+}

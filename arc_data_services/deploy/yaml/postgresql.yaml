@@ -7,11 +7,12 @@ metadata:
   name: pg1-login-secret
 type: Opaque
 ---
-apiVersion: arcdata.microsoft.com/v1beta2
+apiVersion: arcdata.microsoft.com/v1beta5
 kind: PostgreSql
 metadata:
   name: pg1
 spec:
+  dev: true # Options: [true, false]
   scheduling:
     default:
       resources:
