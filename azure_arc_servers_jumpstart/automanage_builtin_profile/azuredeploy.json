@@ -8,17 +8,14 @@
         "configurationProfileName": {
             "type": "String"
         }
-    },
-    "variables": {
-        "configurationProfile": "[concat('/providers/Microsoft.Automanage/bestPractices/AzureBestPractices',parameters('configurationProfileName'))]"
-    },
+    },    
     "resources": [
         {
             "type": "Microsoft.HybridCompute/machines/providers/configurationProfileAssignments",
-            "apiVersion": "2021-04-30-preview",
+            "apiVersion": "2022-05-04",
             "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/default')]",
             "properties": {
-                "configurationProfile": "[variables('configurationProfile')]"
+                "configurationProfile": "[parameters('configurationProfileName')]"
             }
         }
     ]
