@@ -76,6 +76,14 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Download artifacts
+[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
+Invoke-WebRequest https://aka.ms/wslubuntu -OutFile "$AgToolsDir\Ubuntu.appx"
+Invoke-WebRequest https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -OutFile "$AgToolsDir\wsl_update_x64.msi"
+Invoke-WebRequest https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
+
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
 try {
@@ -92,14 +100,6 @@ foreach ($app in $AgConfig.chocolateyAppList) {
   Write-Host "Installing $app"
   & choco install $app /y -Force | Write-Output
 }
-
-# Download artifacts
-[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
-Invoke-WebRequest https://aka.ms/wslubuntu -OutFile "$AgToolsDir\Ubuntu.appx"
-Invoke-WebRequest https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -OutFile "$AgToolsDir\wsl_update_x64.msi"
-Invoke-WebRequest https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
 
 # # Replace password
 # $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
