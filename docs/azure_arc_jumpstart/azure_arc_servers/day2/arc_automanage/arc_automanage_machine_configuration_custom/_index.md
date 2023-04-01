@@ -55,7 +55,7 @@ PowerShell modules:
 Install-Module -Name Az.Accounts -Force -RequiredVersion 2.12.1
 Install-Module -Name Az.PolicyInsights -Force -RequiredVersion 1.5.1
 Install-Module -Name Az.Resources -Force -RequiredVersion 6.5.2
-Install-Module -Name Az.Az.Ssh -Force -RequiredVersion 0.1.1
+Install-Module -Name Az.Ssh -Force -RequiredVersion 0.1.1
 Install-Module -Name Az.Storage -Force -RequiredVersion 5.4.0
 
 Install-Module -Name GuestConfiguration -Force -RequiredVersion 4.4.0
@@ -87,7 +87,6 @@ Desired State Configuration version 3 is currently in beta, but is the only vers
 
 The nxtools module contains DSC resources used for the demo configuration.
 
-
 ## Prerequisites - Windows
 
 Desired State Configuration version 3 is removing the dependency on MOF.
@@ -96,6 +95,7 @@ Due to using MOF-based DSC resources for the Windows demo-configuration, we are 
 
 ```powershell
 Install-Module PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
+Install-Module PSDscResources -Force -RequiredVersion 2.12.0.0
 ```
 
 
@@ -206,7 +206,7 @@ Assign the Azure Policy definition to the target resource group
 ```powershell
 $ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName
 
-New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Linux] Custom configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(ArcBox) [Linux] Custom configuration' -OutVariable PolicyAssignment
+New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Linux] Custom configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(AzureArcJumpstart) [Linux] Custom configuration' -OutVariable PolicyAssignment
 ```
 
 In order for the newly assigned policy to remediate existing resources, the policy must be assigned a managed identity and a policy remediation must be performed. Hence, the next steps are:
@@ -218,7 +218,7 @@ See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy
 
 
 ```powershell
-$PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(ArcBox) [Linux] Custom configuration'
+$PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Linux] Custom configuration'
 
 $roleDefinitionIds =  $PolicyDefinition.Properties.policyRule.then.details.roleDefinitionIds
 
@@ -286,7 +286,7 @@ To learn more, check out [Remediation options for machine configuration](https:/
 The following steps needs to be executed from PowerShell 7 on the authoring machine for Windows.
 
 ```powershell
-Import-Module PSDesiredStateConfiguration -RequiredVersion 3.0.0
+Import-Module PSDesiredStateConfiguration -RequiredVersion 2.0.5
 
 Configuration AzureArcJumpstart_Windows
 {
@@ -297,7 +297,7 @@ Configuration AzureArcJumpstart_Windows
         $PasswordCredential
     )
 
-    Import-DscResource -ModuleName 'PSDscResources'
+    Import-DscResource -ModuleName 'PSDscResources' -ModuleVersion 2.12.0.0
 
     Node localhost
     {
@@ -371,9 +371,9 @@ $StorageAccount = Get-AzStorageAccount -Name <insert-storage-account-name> -Reso
 $StorageAccountKey = Get-AzStorageAccountKey -Name $storageaccount.StorageAccountName -ResourceGroupName $storageaccount.ResourceGroupName
 $Context = New-AzStorageContext -StorageAccountName $storageaccount.StorageAccountName -StorageAccountKey $StorageAccountKey[0].Value
 
-Set-AzStorageBlobContent -Container "machineconfiguration" -File  "$OutputPath/AzureArcJumpstart_Windows" -Blob "AzureArcJumpstart_Windows" -Context $Context -Force
+Set-AzStorageBlobContent -Container "machineconfiguration" -File  "$OutputPath/AzureArcJumpstart_Windows.zip" -Blob "AzureArcJumpstart_Windows.zip" -Context $Context -Force
 
-$contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "AzureArcJumpstart_Windows" -Permission rwd
+$contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "AzureArcJumpstart_Windows.zip" -Permission rwd
 ```
 
 Create an Azure Policy definition
@@ -402,7 +402,7 @@ Assign the Azure Policy definition to the target resource group
 ```powershell
 $ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName
 
-New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(ArcBox) [Windows] Custom configuration' -OutVariable PolicyAssignment
+New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(AzureArcJumpstart) [Windows] Custom configuration' -OutVariable PolicyAssignment
 ```
 
 In order for the newly assigned policy to remediate existing resources, the policy must be assigned a managed identity and a policy remediation must be performed. Hence, the next steps are:
@@ -414,7 +414,7 @@ See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy
 
 
 ```powershell
-$PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(ArcBox) [Windows] Custom configuration'
+$PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Windows] Custom configuration'
 
 $roleDefinitionIds =  $PolicyDefinition.Properties.policyRule.then.details.roleDefinitionIds
 
@@ -440,7 +440,7 @@ Check policy compliance by following these steps:
 - Set the scope to the resource group your instance of ArcBox is deployed to
 - Filter for *(AzureArcJumpstart) [Windows] Custom configuration*
 
-![Screenshot of Azure Portal showing Azure Policy compliance](./02.png)
+![Screenshot of Azure Portal showing Azure Policy compliance](./10.png)
 
 It may take 15-20 minutes for the policy remediation to be completed.
 
@@ -450,11 +450,11 @@ Get a Machine Configuration specific view by following these steps:
 - Click on ArcBox-Win2K22 -> Machine Configuration
 - If the status for *ArcBox-Win2K22/AzureArcJumpstart_Windows* is not *Compliant*, wait a few more minutes and click *Refresh*
 
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./03.png)
+![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./11.png)
 
 Click on *ArcBox-Win2K22/AzureArcJumpstart_Windows* to get a per-resource view of the compliance state in the assigned configuration
 
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./04.png)
+![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./12.png)
 
 ### Verify that the operating system level settings are in place
 
