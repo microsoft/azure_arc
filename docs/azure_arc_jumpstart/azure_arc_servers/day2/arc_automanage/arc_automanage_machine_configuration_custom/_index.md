@@ -130,7 +130,7 @@ New-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name "arcboxmachinec
 The following steps needs to be executed from PowerShell 7 on the authoring machine for Linux.
 
 ```powershell
-Import-Module PSDesiredStateConfiguration
+Import-Module PSDesiredStateConfiguration -RequiredVersion 3.0.0
 
 Configuration AzureArcJumpstart_Linux
 {
@@ -145,27 +145,6 @@ Configuration AzureArcJumpstart_Linux
         Ensure = "Present"
       }
 
-      <#
-
-This section is temporarily disabled due to a bug in the PSDesiredConfiguration module where Get-Resource is failing if we use two different kinds of class based resources in the same mof file.
-
-      nxUser ArcBoxUser
-      {
-        UserName = 'arcboxuser1'
-        FullName = 'ArcBoxUser1'
-        Password = "ArcDemo123!!"  # In real-world scenarios this could be retrieved from an Azure Key Vault
-        Ensure = 'Present'
-      }
-
-      nxPackage powershell
-      {
-          Name = "powershell"
-          Version = "7.3.2-1.deb"
-          Ensure = "Present"
-          #PackageType = "apt"
-      }
-
-      #>
     }
 }
 
