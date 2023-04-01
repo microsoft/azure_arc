@@ -65,7 +65,6 @@ Write-Header "Installing Docker Dekstop"
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 ##############################################################
 # Setup Azure CLI
