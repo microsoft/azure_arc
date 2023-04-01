@@ -106,8 +106,8 @@ foreach ($app in $AgConfig.chocolateyAppList) {
 # (Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
 
 # Create Docker Dekstop group
-New-LocalGroup -Name 'docker-users' -Description 'docker Users Group'
-Add-LocalGroupMember -Group docker-users -Member arcdemo
+New-LocalGroup -Name "docker-users" -Description "docker Users Group"
+Add-LocalGroupMember -Group "docker-users" -Member $adminUsername
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
