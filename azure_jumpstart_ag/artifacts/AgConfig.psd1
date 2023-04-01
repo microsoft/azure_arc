@@ -27,7 +27,7 @@
     chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
 
     # VSCode extensions
-    VSCodeExtensions  = @('ms-vscode-remote.remote-containers')
+    VSCodeExtensions  = @('ms-vscode-remote.remote-containers','ms-vscode-remote.remote-wsl')
 
     # VHDX Paths 
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
