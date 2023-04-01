@@ -57,6 +57,27 @@ $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory = $AgConfig.AgDirectories["AgDir"]
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 
+function BITSRequest {
+  Param(
+      [Parameter(Mandatory=$True)]
+      [hashtable]$Params
+  )
+  $url = $Params['Uri']
+  $filename = $Params['Filename']
+  $download = Start-BitsTransfer -Source $url -Destination $filename -Asynchronous
+  $ProgressPreference = "Continue"
+  while ($download.JobState -ne "Transferred") {
+      if ($download.JobState -eq "TransientError"){
+          Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
+      }
+      [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
+      Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+  }
+  Complete-BitsTransfer $download.JobId
+  Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
+  $ProgressPreference = "SilentlyContinue"
+}
+
 # Creating Ag paths
 Write-Output "Creating Ag paths"
 foreach ($path in $AgConfig.AgDirectories.values) {
@@ -80,9 +101,10 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
-Invoke-WebRequest https://aka.ms/wslubuntu -OutFile "$AgToolsDir\Ubuntu.appx"
-Invoke-WebRequest https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi -OutFile "$AgToolsDir\wsl_update_x64.msi"
-Invoke-WebRequest https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
+
+BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
+BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
+BITSRequest -Params @{'Uri'='https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename'="$AgToolsDir\DockerDesktopInstaller.exe"}
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
