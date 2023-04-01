@@ -85,13 +85,8 @@ Install-Module nxtools -Force -RequiredVersion 0.0.4
 
 Desired State Configuration version 3 is currently in beta, but is the only version supported for Linux-based DSC configurations.
 
-The nxtools module will help in managing common tasks such as:
+The nxtools module contains DSC resources used for the demo configuration.
 
-- User and group management
-- File system operations (changing mode, owner, listing, set/replace content)
-- Service management (start, stop, restart, remove, add)
-- Archive operations (compress, extract)
-- Package Management (list, search, install, uninstall packages)
 
 ## Prerequisites - Windows
 
