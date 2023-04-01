@@ -32,11 +32,12 @@ This scenario starts at the point where you already deployed and connected VMs o
 
 ![Screenshot of Azure Portal showing Azure Arc-enabled servers](./01.png)
 
-The custom configurations needs to be authored from a machine running the target operating system for the configurations, meaning we will need 1 Windows machine and 1 Linux machine for the authoring process.
+The custom configurations are written using PowerShell Desired State Configuration (DSC), and needs to be authored from a machine running the target operating system for the configurations.
+We will need 1 Windows machine and 1 Linux machine for the authoring process, as this scenario will show-case custom configurations for both operating systems.
 After the configurations has been authored and published into your Azure environment, they can be assigned to any Linux or Windows Azure Arc-enabled server in your environment.
 This scenario will assign it to the resource group ArcBox is deployed to.
 
-## Base requirements
+## Base requirements - configuration authoring
 
 Operating systems:
 
@@ -96,7 +97,7 @@ The nxtools module will help in managing common tasks such as:
 
 Desired State Configuration version 3 is removing the dependency on MOF.
 Initially, there are only support for DSC Resources written as PowerShell classes.
-Due to using MOF-based DSC resources for the Windows-demo, we are using version 2.0.5.
+Due to using MOF-based DSC resources for the Windows demo-configuration, we are using version 2.0.5.
 
 ```powershell
 Install-Module PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
@@ -121,6 +122,8 @@ $storageaccountsuffix = -join ((97..122) | Get-Random -Count 5 | % {[char]$_})
 
 New-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name "arcboxmachineconfig$storageaccountsuffix" -SkuName 'Standard_LRS' -Location $Location -OutVariable storageaccount | New-AzStorageContainer -Name machineconfiguration -Permission Blob
 ```
+
+> *Make a note of the storage account name, as this will be needed in later steps.*
 
 ## Linux configuration
 
@@ -295,6 +298,50 @@ Enter-AzVM -ResourceGroupName $ResourceGroupName -Name Arcbox-Ubuntu-01 -LocalUs
 Verify that the local group **arcusers** exists by running ```cat /etc/group | grep arcusers```
 
 ![Screenshot of ArcBox-Ubuntu-01](./05.png)
+
+If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the group arcusers: ```groupdel arcusers```
+
+Trigger a [manual evaluation](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-9.4.0) or wait until the next policy evaluation cycle has completed and observe that the policy is now non-compliant.
+
+Next, perform the steps outlined in [Create a remediation task](https://learn.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources?tabs=azure-portal#create-a-remediation-task) for the ArcBox-policies to bring the machine back into compliance.
+
+To learn more, check out [Remediation options for machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-policy-effects) in the documentation.
+
+## Summary
+
+In this scenario you have performed the following tasks:
+
+- [Created a package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create) for machine configuration.
+- [Tested the package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-test) from your development environment.
+- [Published the package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-publish) so it is accessible to your machines.
+- Used the GuestConfiguration module to [create an Azure Policy definition](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-definition) for at-scale management of your environment.
+- [Assigned your custom policy definition](https://learn.microsoft.com/en-us/azure/governance/policy/assign-policy-portal) to the ArcBox resource group.
+
+> *NOTE: For ArcBox exploration, it is recommended to perform the assignment at the resource group level where the Azure Arc-enabled servers reside to not accidentally apply the configuration to other machines in your environment*
+
+## Next steps
+
+For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtools) will help in managing common tasks such as:
+
+- User and group management
+- File system operations (changing mode, owner, listing, set/replace content)
+- Service management (start, stop, restart, remove, add)
+- Archive operations (compress, extract)
+- Package Management (list, search, install, uninstall packages)
+
+For Windows, there are many Resource Modules provided by the [DSC Community](https://dsccommunity.org/) - such as:
+
+- **ActiveDirectoryDsc** - contains DSC resources for deployment and configuration of Active Directory. These DSC resources allow you to configure new domains, child domains, and high availability domain controllers, establish cross-domain trusts and manage users, groups and OUs.
+- **ComputerManagementDsc** - allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.
+- **SqlServerDsc** - deployment and configuration of Microsoft SQL Server.
+
+Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/en-us/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
+
+You might also want to check out the following resources:
+
+- [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
+- [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
+
 
 ## Clean up environment
 
