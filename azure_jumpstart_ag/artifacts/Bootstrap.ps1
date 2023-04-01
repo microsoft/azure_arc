@@ -105,6 +105,10 @@ Invoke-WebRequest https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20I
 # $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
 # (Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
 
+# Create Docker Dekstop group
+New-LocalGroup -Name 'docker-users' -Description 'docker Users Group'
+Add-LocalGroupMember -Group docker-users -Member arcdemo
+
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 # Disable Microsoft Edge sidebar
@@ -180,8 +184,6 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 
     Write-Host "RDP port configuration complete."
 }
-# Install WSL latest kernel update
-msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
 
 # Install Hyper-V, WSL and reboot
 Write-Header "Installing Hyper-V"

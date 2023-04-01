@@ -38,6 +38,9 @@ $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where
 Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
 Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
 
+# Install WSL latest kernel update
+msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
+
 # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
 Add-AppxPackage -Path $framworkPkgPath
 Add-AppxPackage -Path $msiPath
@@ -59,9 +62,8 @@ Remove-Item $downloadDir -Recurse -Force
 #############################################################
 Write-Header "Installing Docker Dekstop"
 # Download and Install Docker Desktop
-Invoke-WebRequest -Uri https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe -OutFile "$AgToolsDir\DockerDesktopInstaller.exe"
 $arguments = 'install --quiet --accept-license'
-Start-Process '$AgToolsDir\DockerDesktopInstaller.exe' -Wait -ArgumentList $arguments
+Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
 Start-Service com.docker.service
 
