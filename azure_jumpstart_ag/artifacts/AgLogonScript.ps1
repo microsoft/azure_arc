@@ -427,6 +427,11 @@ Write-Header "Attaching ACRs to AKS clusters"
 az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
 
 ##############################################################
+# Start Docker Desktop without dashboard
+##############################################################
+& 'C:\Program Files\Docker\Docker\Docker Desktop.exe' --hide-ui
+
+##############################################################
 # Cleanup
 ##############################################################
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
