@@ -66,6 +66,16 @@ $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
 
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Header "Installing VSCode extensions"
+# Install VSCode extensions
+foreach ($extension in $AgConfig.VSCodeExtensions) {
+  Write-Host "Installing $extension"
+  code --install-extension $extension
+}
+
 ##############################################################
 # Setup Azure CLI
 ##############################################################
