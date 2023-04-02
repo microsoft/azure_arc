@@ -10,6 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to create and assign Automanage Machine Configuration custom configurations to an Azure Arc-enabled server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
 
+While the use of custom configurations in Automanage Machine Configuration feature is based on PowerShell Desired State Configuration (DSC), there are [Changes to behavior in PowerShell DSC for Machine Configuration](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-custom?view=dsc-2.0) to be aware of, the most significant being the use of PowerShell 7.
 
 By the end of this scenario, you will have both Linux and Windows Azure Arc-enabled servers with Automanage Machine Configuration custom configurations assigned.
 
@@ -509,23 +510,33 @@ In this scenario you have performed the following tasks:
 
 ## Next steps
 
-For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtools) will help in managing common tasks such as:
+After going through this scenario you may want to write your own configurations to meet your organization`s needs and requirements.
 
-- User and group management
-- File system operations (changing mode, owner, listing, set/replace content)
-- Service management (start, stop, restart, remove, add)
-- Archive operations (compress, extract)
-- Package Management (list, search, install, uninstall packages)
+- [Desired State Configuration overview](https://learn.microsoft.com/en-us/powershell/dsc/overview?view=dsc-2.0)
+- [Installing DSC Resources](https://learn.microsoft.com/en-us/powershell/dsc/how-tos/installing-dsc-resources?view=dsc-2.0)
+- [Write and compile a DSC Configuration](https://learn.microsoft.com/en-us/powershell/dsc/how-tos/configurations/write-and-compile?view=dsc-2.0)
+
+For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtools) will help in managing common tasks - such as:
+
+
+- `nxGroup`: Resource to manage [nxLocalGroup] and group members.
+- `nxUser`: Resource to manage [nxLocalUser] accounts.
+- `nxService`: Manage the state of daemons/services.
+- `nxPackage`: Audit whether a package is installed or not in a system.
+- `nxFile`: Manage a file or a folder to make sure it's present/absent, its content, mode, owner group.
+- `nxFileLine`: Ensure an exact line is present/absent in a file, and remediate by appending, inserting, deleting as needed.
+- `nxFileContentReplace`: Replace the content in a file if a pattern is found.
+
 
 For Windows, there are many Resource Modules provided by the [DSC Community](https://dsccommunity.org/) - such as:
 
-- **ActiveDirectoryDsc** - contains DSC resources for deployment and configuration of Active Directory. These DSC resources allow you to configure new domains, child domains, and high availability domain controllers, establish cross-domain trusts and manage users, groups and OUs.
-- **ComputerManagementDsc** - allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.
-- **SqlServerDsc** - deployment and configuration of Microsoft SQL Server.
+- `ActiveDirectoryDsc`: Contains DSC resources for deployment and configuration of Active Directory. These DSC resources allow you to configure new domains, child domains, and high availability domain controllers, establish cross-domain trusts and manage users, groups and OUs.
+- `ComputerManagementDsc`: Allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.
+- `SqlServerDsc`: Deployment and configuration of Microsoft SQL Server.
 
 Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/en-us/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
 
-You might also want to check out the following resources:
+You might also want to have a look at the following resources if you have been using DSC in the past:
 
 - [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
 - [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
