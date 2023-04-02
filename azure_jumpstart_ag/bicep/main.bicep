@@ -44,29 +44,11 @@ param githubUser string = 'microsoft'
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
 
-@description('Name of the Cloud VNet')
-param virtualNetworkNameStores string = 'Ag-Stores-VNet'
-
-@description('Name of the prod AKS subnet in the cloud virtual network')
-param subnetNameCloudAksProd string = 'Ag-Cloud-Prod-Subnet'
-
 @description('Name of the dev AKS subnet in the cloud virtual network')
 param subnetNameCloudAksDev string = 'Ag-Cloud-Dev-Subnet'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloudAksInnerLoop string = 'Ag-Cloud-inner-loop-Subnet'
-
-@description('Name of the New York subnet subnet in the stores virtual network')
-param subnetNameStoresNewYork string = 'Ag-Store-NewYork-Subnet'
-
-@description('Name of the Chicago subnet subnet in the stores virtual network')
-param subnetNameStoresChicago string = 'Ag-Store-Chicago-Subnet'
-
-@description('Name of the Boston subnet subnet in the stores virtual network')
-param subnetNameStoresBoston string = 'Ag-Store-Boston-Subnet'
-
-@description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string = 'Ag-AKS-Prod'
 
 @description('The name of the Dev Kubernetes cluster resource')
 param aksDevClusterName string = 'Ag-AKS-Dev'
@@ -104,13 +86,8 @@ module networkDeployment 'network/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud : virtualNetworkNameCloud
-    subnetNameCloudAksProd : subnetNameCloudAksProd
     subnetNameCloudAksDev: subnetNameCloudAksDev
     subnetNameCloudAksInnerLoop : subnetNameCloudAksInnerLoop
-    subnetNameStoresNewYork: subnetNameStoresNewYork
-    subnetNameStoresChicago: subnetNameStoresChicago
-    subnetNameStoresBoston: subnetNameStoresBoston
-    virtualNetworkNameStores: virtualNetworkNameStores
     deployBastion: deployBastion
     location: location
   }
@@ -126,10 +103,8 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
   params: {
-    aksProdClusterName: aksProdClusterName
     aksDevClusterName: aksDevClusterName
     virtualNetworkNameCloud : networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameProd : subnetNameCloudAksProd
     aksSubnetNameDev : subnetNameCloudAksDev
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
@@ -157,7 +132,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksProdClusterName: aksProdClusterName
     aksDevClusterName: aksDevClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
     acrNameDev: kubernetesDeployment.outputs.acrDevName
