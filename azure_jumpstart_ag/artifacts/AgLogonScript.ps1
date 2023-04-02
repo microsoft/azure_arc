@@ -429,7 +429,7 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
 ##############################################################
 # Start Docker Desktop without dashboard
 ##############################################################
-& 'C:\Program Files\Docker\Docker\Docker Desktop.exe' --hide-ui
+#& 'C:\Program Files\Docker\Docker\Docker Desktop.exe' --hide-ui
 
 ##############################################################
 # Cleanup
