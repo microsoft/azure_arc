@@ -288,7 +288,6 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBas
 }
 
 output vnetId string = cloudVirtualNetwork.id
-output prodSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
-output devSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
-output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[2].id
+output devSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
 output virtualNetworkNameCloud string = cloudVirtualNetwork.name
