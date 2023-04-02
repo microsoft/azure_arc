@@ -49,9 +49,6 @@ param githubUser string
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
 
-@description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string = 'Agora-AKSProd'
-
 @description('The name of the Dev Kubernetes cluster resource')
 param aksDevClusterName string = 'Agora-AKSDev'
 
@@ -94,7 +91,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : null
         }
       }
     ]
@@ -174,7 +171,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksProdClusterName ${aksProdClusterName} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
     }
   }
 }
