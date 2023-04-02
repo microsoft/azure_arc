@@ -30,16 +30,16 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'jumpstart_ag'
+param githubBranch string = 'ag_dev_containers'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'microsoft'
+param githubUser string = 'sebassem'
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
