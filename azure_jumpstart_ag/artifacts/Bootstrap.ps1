@@ -10,7 +10,6 @@ param (
     [string]$azureLocation,
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
-    [string]$aksProdClusterName,
     [string]$aksDevClusterName,
     [string]$iotHubHostName,
     [string]$acrNameProd,
@@ -38,7 +37,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('aksProdClusterName', $aksProdClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksDevClusterName', $aksDevClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
@@ -55,6 +53,28 @@ $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory = $AgConfig.AgDirectories["AgDir"]
+$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+
+function BITSRequest {
+  Param(
+      [Parameter(Mandatory=$True)]
+      [hashtable]$Params
+  )
+  $url = $Params['Uri']
+  $filename = $Params['Filename']
+  $download = Start-BitsTransfer -Source $url -Destination $filename -Asynchronous
+  $ProgressPreference = "Continue"
+  while ($download.JobState -ne "Transferred") {
+      if ($download.JobState -eq "TransientError"){
+          Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
+      }
+      [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
+      Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+  }
+  Complete-BitsTransfer $download.JobId
+  Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
+  $ProgressPreference = "SilentlyContinue"
+}
 
 # Creating Ag paths
 Write-Output "Creating Ag paths"
@@ -75,10 +95,17 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Download artifacts
+[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
+
+BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
+BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
+BITSRequest -Params @{'Uri'='https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename'="$AgToolsDir\DockerDesktopInstaller.exe"}
+
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light,mqtt-explorer'
-
 try {
     choco config get cacheLocation
 }
@@ -89,20 +116,18 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-foreach ($app in $appsToInstall) {
-    Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
+foreach ($app in $AgConfig.chocolateyAppList) {
+  Write-Host "Installing $app"
+  & choco install $app /y -Force | Write-Output
 }
-
-# Download artifacts
-[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 
 # # Replace password
 # $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
 # (Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
+
+# Create Docker Dekstop group
+New-LocalGroup -Name "docker-users" -Description "docker Users Group"
+Add-LocalGroupMember -Group "docker-users" -Member $adminUsername
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
@@ -180,10 +205,11 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     Write-Host "RDP port configuration complete."
 }
 
-# Install Hyper-V and reboot
+# Install Hyper-V, WSL and reboot
 Write-Header "Installing Hyper-V"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
 Stop-Transcript
