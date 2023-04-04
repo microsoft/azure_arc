@@ -6,9 +6,9 @@ weight: 8
 description: >
 ---
 
-## Create Automanage Machine Configuration custom configurations
+## Create Automanage Machine Configuration custom configurations for Linux
 
-The following Jumpstart scenario will guide you on how to create and assign Automanage Machine Configuration custom configurations to an Azure Arc-enabled server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
+The following Jumpstart scenario will guide you on how to create and assign Automanage Machine Configuration custom configurations to an Azure Arc-enabled Linux server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
 
 While the use of custom configurations in Automanage Machine Configuration feature is based on PowerShell Desired State Configuration (DSC), there are [Changes to behavior in PowerShell DSC for Machine Configuration](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-custom?view=dsc-2.0) to be aware of, the most significant being the use of PowerShell 7.
 
@@ -33,24 +33,80 @@ This scenario starts at the point where you already deployed and connected VMs o
 
 ![Screenshot of Azure Portal showing Azure Arc-enabled servers](./01.png)
 
-The custom configurations are written using PowerShell Desired State Configuration (DSC), and needs to be authored from a machine running the target operating system for the configurations.
-We will need 1 Windows machine and 1 Linux machine for the authoring process, as this scenario will show-case custom configurations for both operating systems.
-After the configurations has been authored and published into your Azure environment, they can be assigned to any Linux or Windows Azure Arc-enabled server in your environment.
+The custom configurations are written using PowerShell Desired State Configuration (DSC), and needs to be authored from a machine running the target operating system for the configurations (Linux-machine for Linux configurations and Windows-machine for Windows configurations).
+
+After the configurations has been authored and published into your Azure environment, they can be assigned to any Linux-based Azure Arc-enabled server (or Azure VM) in your environment.
+
 This scenario will assign it to the resource group ArcBox is deployed to.
 
 ## Base requirements - configuration authoring
 
-Operating systems:
+Operating system:
 
-- Linux: Ubuntu 18 (required by the GuestConfiguration module)
-- Windows: [Any supported version of Windows for PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#supported-versions-of-windows)
+- Ubuntu 18 (required by the GuestConfiguration module)
 
-Software:
+In this scenario, we will be using the ArcBox Client virtual machine for the configuration authoring - and connect to a nested Linux VM.
 
-- [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.3).
-    - Run ```$PSVersionTable``` to check your currently installed version.
+You can [connect to the ArcBox machine as described in the documentation]( https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#connecting-to-the-arcbox-client-virtual-machine) and perform the following:
 
-PowerShell modules:
+- Open Visual Studio Code from the desktop shortcut.
+- Install the [Remote SSH extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh).
+
+![Screenshot of Remote SSH extension](./14.png)
+
+Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
+
+![Screenshot of Remote SSH extension](./15.png)
+
+![Screenshot of Remote SSH extension](./13.png)
+- Open VS Code and add a new Remote SSH target:
+    - Enter the value ```ssh arcdemo@10.10.1.103 -A``` and press Enter two times
+
+![Screenshot of Remote SSH extension](./16.png)
+
+- Click Connect in the following dialogue box:
+
+![Screenshot of Remote SSH extension](./17.png)
+
+- Select Linux in the following dialogue box and press Enter:
+
+![Screenshot of Remote SSH extension](./18.png)
+
+- When prompted for password, enter ```ArcDemo123!!```
+
+- As indicated in the lower left corner, VS Code should now be connected to the remote machine:
+
+![Screenshot of Remote SSH extension](./19.png)
+
+- In the VS Code menu, click Terminal -> New
+- Install [PowerShell 7 as a Snap package](https://learn.microsoft.com/en-us/powershell/scripting/install/install-other-linux?view=powershell-7.3#snap-package) by running the following in the terminal window:
+```
+wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb
+sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb
+```
+
+- Followed by ```pwsh``` to ensure PowerShell is available.
+
+![Screenshot of PowerShell installation](./20.png)
+
+- Due to a specific prerequisite (libmi) for packaging Machine Configurations, install the PSWSMan module which contains the required dependecies:
+```
+sudo pwsh
+Install-Module -Force -PassThru -Name PSWSMan
+Install-WSMan
+```
+
+![Screenshot of PowerShell installation](./24.png)
+
+- Install the PowerShell extension in VS Code.
+
+![Screenshot of PowerShell extension](./21.png)
+
+- Click *File -> New Text File*, click Ctrl + S and specify ```/home/arcdemo/MachineConfiguration.ps1``` as the path for the new file.
+
+![Screenshot of PowerShell script](./22.png)
+
+- Paste and run the following commands by pressing F5 in order to install the required PowerShell modules for this scenario:
 
 ```powershell
 Install-Module -Name Az.Accounts -Force -RequiredVersion 2.12.1
@@ -60,6 +116,9 @@ Install-Module -Name Az.Ssh -Force -RequiredVersion 0.1.1
 Install-Module -Name Az.Storage -Force -RequiredVersion 5.4.0
 
 Install-Module -Name GuestConfiguration -Force -RequiredVersion 4.4.0
+
+Install-Module PSDesiredStateConfiguration -AllowPreRelease -Force -RequiredVersion 3.0.0-beta1
+Install-Module nxtools -Force -RequiredVersion 0.4.0-preview0001 -AllowPrerelease
 ```
 
 The GuestConfiguration module automates the process of creating custom content including:
@@ -76,37 +135,22 @@ The Azure PowerShell modules is used for:
   - Publishing the policy
   - Connecting to the Azure Arc-enabled servers
 
-## Prerequisites - Linux
-
-```powershell
-Install-Module PSDesiredStateConfiguration -AllowPreRelease -Force -RequiredVersion 3.0.0-beta1
-
-Install-Module nxtools -Force -RequiredVersion 0.0.4
-```
-
 Desired State Configuration version 3 is currently in beta, but is the only version supported for Linux-based DSC configurations.
 
 The nxtools module contains DSC resources used for the demo configuration.
 
-## Prerequisites - Windows
+## Azure resources
 
-Desired State Configuration version 3 is removing the dependency on MOF.
-Initially, there are only support for DSC Resources written as PowerShell classes.
-Due to using MOF-based DSC resources for the Windows demo-configuration, we are using version 2.0.5.
+> **NOTE: For the remaining code blocks in this article, copy the code into ```/home/arcdemo/MachineConfiguration.ps1``` , mark the lines you want to run and click F8. Alternatively, right click the selected commands and click Run Selection:**
 
-```powershell
-Install-Module PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
-Install-Module PSDscResources -Force -RequiredVersion 2.12.0.0
-```
-
-
-## Shared resources
+![Screenshot of PowerShell script](./23.png)
 
 Authenticate to Azure
 
 ```powershell
-Connect-AzAccount
+Connect-AzAccount -UseDeviceAuthentication
 
+# Update the values to reflect your ArcBox deployment
 $ResourceGroupName = "arcbox-demo-rg"
 $Location = "northeurope"
 ```
@@ -282,220 +326,6 @@ Next, perform the steps outlined in [Create a remediation task](https://learn.mi
 
 To learn more, check out [Remediation options for machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-policy-effects) in the documentation.
 
-## Custom configuration for Windows
-
-The following steps needs to be executed from PowerShell 7 on the authoring machine for Windows.
-
-```powershell
-Import-Module PSDesiredStateConfiguration -RequiredVersion 2.0.5
-
-Configuration AzureArcJumpstart_Windows
-{
-    param (
-        [Parameter(Mandatory)]
-        [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()]
-        $PasswordCredential
-    )
-
-    Import-DscResource -ModuleName 'PSDscResources' -ModuleVersion 2.12.0.0
-
-    Node localhost
-    {
-        MsiPackage PS7
-        {
-            ProductId = '{323AD147-6FC4-40CB-A810-2AADF26D868A}'
-            Path = 'https://github.com/PowerShell/PowerShell/releases/download/v7.3.2/PowerShell-7.3.2-win-x64.msi'
-            Ensure = 'Present'
-        }
-        User ArcBoxUser
-        {
-            UserName = 'arcboxuser1'
-            FullName = 'ArcBox User 1'
-            Password = $PasswordCredential
-            Ensure = 'Present'
-        }
-        WindowsFeature SMB1 {
-            Name = 'FS-SMB1'
-            Ensure = 'Absent'
-        }
-    }
-}
-
-Write-Host "Creating credentials for arcbox user 1"
-$nestedWindowsUsername = "arcboxuser1"
-$nestedWindowsPassword = "ArcDemo123!!"  # In real-world scenarios this could be retrieved from an Azure Key Vault
-
-# Create Windows credential object
-$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
-
-$ConfigurationData = @{
-    AllNodes = @(
-        @{
-            NodeName = 'localhost'
-            PSDscAllowPlainTextPassword = $true
-        }
-    )
-}
-
-$OutputPath = "$HOME/arc_automanage_machine_configuration_custom_windows"
-New-Item $OutputPath -Force -ItemType Directory
-
-AzureArcJumpstart_Windows -PasswordCredential $winCreds -ConfigurationData $ConfigurationData -OutputPath $OutputPath
-
-```
-
-Create a package that will audit and apply the configuration (Set)
-
-```powershell
-New-GuestConfigurationPackage `
--Name 'AzureArcJumpstart_Windows' `
--Configuration "$OutputPath/localhost.mof" `
--Type AuditAndSet `
--Path $OutputPath `
--Force
-```
-
-Test applying the configuration to the local machine
-
-```powershell
-Start-GuestConfigurationPackageRemediation -Path "$OutputPath/AzureArcJumpstart_Windows.zip"
-```
-
-Upload the configuration package to Azure Storage.
-Insert the correct storage account name on the first line in place of the placeholder value for the -Name parameter based on the output of the storage account created in the step *"Shared resources"*.
-
-```powershell
-$StorageAccount = Get-AzStorageAccount -Name <insert-storage-account-name> -ResourceGroupName $ResourceGroupName
-
-$StorageAccountKey = Get-AzStorageAccountKey -Name $storageaccount.StorageAccountName -ResourceGroupName $storageaccount.ResourceGroupName
-$Context = New-AzStorageContext -StorageAccountName $storageaccount.StorageAccountName -StorageAccountKey $StorageAccountKey[0].Value
-
-Set-AzStorageBlobContent -Container "machineconfiguration" -File  "$OutputPath/AzureArcJumpstart_Windows.zip" -Blob "AzureArcJumpstart_Windows.zip" -Context $Context -Force
-
-$contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "AzureArcJumpstart_Windows.zip" -Permission rwd
-```
-
-Create an Azure Policy definition
-
-```powershell
-$PolicyId = (New-Guid).Guid
-
-New-GuestConfigurationPolicy `
-  -PolicyId $PolicyId `
-  -ContentUri $ContentUri `
-  -DisplayName '(AzureArcJumpstart) [Windows] Custom configuration' `
-  -Description 'Azure Arc Jumpstart Windows demo configuration' `
-  -Path  $OutputPath `
-  -Platform 'Windows' `
-  -PolicyVersion 1.0.0 `
-  -Mode ApplyAndAutoCorrect `
-  -Verbose -OutVariable Policy
-
-  $PolicyParameterObject = @{'IncludeArcMachines'='true'}
-
-  New-AzPolicyDefinition -Name '(AzureArcJumpstart) [Windows] Custom configuration' -Policy $Policy.Path -OutVariable PolicyDefinition
-```
-
-Assign the Azure Policy definition to the target resource group
-
-```powershell
-$ResourceGroup = Get-AzResourceGroup -Name $ResourceGroupName
-
-New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration' -PolicyDefinition $PolicyDefinition[0] -Scope $ResourceGroup.ResourceId -PolicyParameterObject $PolicyParameterObject -IdentityType SystemAssigned -Location $Location -DisplayName '(AzureArcJumpstart) [Windows] Custom configuration' -OutVariable PolicyAssignment
-```
-
-In order for the newly assigned policy to remediate existing resources, the policy must be assigned a managed identity and a policy remediation must be performed. Hence, the next steps are:
-
- - Grant a managed identity defined roles with PowerShell
- - Create a remediation task through Azure PowerShell
-
-See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources) for more information.
-
-
-```powershell
-$PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Windows] Custom configuration'
-
-$roleDefinitionIds =  $PolicyDefinition.Properties.policyRule.then.details.roleDefinitionIds
-
-# Wait for eventual consistency
-Start-Sleep 20
-
-if ($roleDefinitionIds.Count -gt 0)
- {
-     $roleDefinitionIds | ForEach-Object {
-         $roleDefId = $_.Split("/") | Select-Object -Last 1
-         New-AzRoleAssignment -Scope $resourceGroup.ResourceId -ObjectId $PolicyAssignment.Identity.PrincipalId -RoleDefinitionId $roleDefId
-     }
- }
-
- $job = Start-AzPolicyRemediation -AsJob -Name ($PolicyAssignment.PolicyAssignmentId -split '/')[-1] -PolicyAssignmentId $PolicyAssignment.PolicyAssignmentId -ResourceGroupName $ResourceGroup.ResourceGroupName -ResourceDiscoveryMode ReEvaluateCompliance
-
- $job | Wait-Job | Receive-Job
-```
-
-Check policy compliance by following these steps:
-
-- In the Azure Portal, navigate to *Policy* -> *Compliance*
-- Set the scope to the resource group your instance of ArcBox is deployed to
-- Filter for *(AzureArcJumpstart) [Windows] Custom configuration*
-
-![Screenshot of Azure Portal showing Azure Policy compliance](./10.png)
-
-It may take 15-20 minutes for the policy remediation to be completed.
-
-Get a Machine Configuration specific view by following these steps:
-
-- In the Azure Portal, navigate to *Azure Arc* -> *Servers*
-- Click on ArcBox-Win2K22 -> Machine Configuration
-- If the status for *ArcBox-Win2K22/AzureArcJumpstart_Windows* is not *Compliant*, wait a few more minutes and click *Refresh*
-
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./11.png)
-
-Click on *ArcBox-Win2K22/AzureArcJumpstart_Windows* to get a per-resource view of the compliance state in the assigned configuration
-
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./12.png)
-
-### Verify that the operating system level settings are in place
-
-Login to ArcBox-Win2K22 by running the below command
-- Enter the password **ArcDemo123!!** when prompted
-
-```powershell
-Enter-AzVM -ResourceGroupName $ResourceGroupName -Name ArcBox-Win2K22 -LocalUser Administrator
-```
-
-Verify that the local group **arcusers** exists by first running ```powershell``` followed by ```Get-LocalUser -Name arcboxuser1```.
-
-![Screenshot of ArcBox-Win2K22](./06.png)
-
-Verify that the SMB1 feature is not installed by running ```Get-WindowsFeature -Name FS-SMB1```.
-
-- The output should show that the feature is *Available*, not *Installed*
-
-![Screenshot of ArcBox-Win2K22](./08.png)
-
-Verify that PowerShell 7 is installed by running ```pwsh```.
-
-![Screenshot of ArcBox-Win2K22](./09.png)
-
-> *NOTE: If you prefer to log on interactively to a Remote Desktop session in order to verify the configuration settings, add -Rdp to the Enter-AzVM command:
-
-```powershell
-Enter-AzVM -ResourceGroupName $ResourceGroupName -Name ArcBox-Win2K22 -LocalUser Administrator -Rdp
-```
-
-![Screenshot of ArcBox-Win2K22](./07.png)
-
-If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the user arcboxuser1: ```Get-LocalUser -Name arcboxuser1 | Remove-LocalUser```
-
-Trigger a [manual evaluation](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-9.4.0) or wait until the next policy evaluation cycle has completed and observe that the policy is now non-compliant.
-
-Next, perform the steps outlined in [Create a remediation task](https://learn.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources?tabs=azure-portal#create-a-remediation-task) for the ArcBox-policies to bring the machine back into compliance.
-
-To learn more, check out [Remediation options for machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-policy-effects) in the documentation.
-
 ## Summary
 
 In this scenario you have performed the following tasks:
@@ -528,12 +358,6 @@ For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtoo
 - `nxFileContentReplace`: Replace the content in a file if a pattern is found.
 
 
-For Windows, there are many Resource Modules provided by the [DSC Community](https://dsccommunity.org/) - such as:
-
-- `ActiveDirectoryDsc`: Contains DSC resources for deployment and configuration of Active Directory. These DSC resources allow you to configure new domains, child domains, and high availability domain controllers, establish cross-domain trusts and manage users, groups and OUs.
-- `ComputerManagementDsc`: Allow you to perform computer management tasks, such as renaming the computer, joining a domain and scheduling tasks as well as configuring items such as virtual memory, event logs, time zones and power settings.
-- `SqlServerDsc`: Deployment and configuration of Microsoft SQL Server.
-
 Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/en-us/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
 
 You might also want to have a look at the following resources if you have been using DSC in the past:
@@ -550,10 +374,6 @@ Complete the following steps to clean up your environment. To disable Azure Auto
 Remove-AzPolicyAssignment -Name '(AzureArcJumpstart) [Linux] Custom configuration'
 
 Remove-AzPolicyDefinition -Name '(AzureArcJumpstart) [Linux] Custom configuration'
-
-Remove-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration'
-
-Remove-AzPolicyDefinition -Name '(AzureArcJumpstart) [Windows] Custom configuration'
 
 Get-AzStorageAccount -Name <insert-storage-account-name> -ResourceGroupName $ResourceGroupName | Remove-AzStorageAccount
 ```
