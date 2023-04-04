@@ -79,7 +79,7 @@ Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
 ![Screenshot of Remote SSH extension](./19.png)
 
 - In the VS Code menu, click Terminal -> New
-- Install [PowerShell 7 as a Snap package](https://learn.microsoft.com/en-us/powershell/scripting/install/install-other-linux?view=powershell-7.3#snap-package) by running the following in the terminal window:
+- Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3#installation-via-direct-download) by running the following in the terminal window:
 ```
 wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb
 sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb
