@@ -21,6 +21,7 @@ weight: 5
   - Azure Arc-enabled Kubernetes
   - Azure Arc-enabled data services
 - Multiple ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
 
 #### Azure Arc-enabled servers
 
@@ -41,6 +42,7 @@ weight: 5
 
 #### Jumpstart ArcBox
 
+- [Feature: March Kubernetes-related version bump #1764](https://github.com/microsoft/azure_arc/issues/1764)
 - [Bug fix: Onboarding role requirement is no longer needed for Arc-enabled SQL Server #1729](https://github.com/microsoft/azure_arc/issues/1729)
 
 #### Jumpstart HCIBox
