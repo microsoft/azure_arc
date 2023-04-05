@@ -364,9 +364,11 @@ You might also want to have a look at the following resources if you have been u
 Complete the following steps to clean up your environment. To disable Azure Automanage you will use the Azure portal. Go to the Automanage page that lists all of your auto-managed VMs. Select the checkbox next to the Azure Arc-enabled Server you want to disable from Automanage, then click on the _Disable_ button.
 
 ```powershell
-Remove-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration'
+$PolicyDefinition = Get-AzPolicyDefinition -Name '(AzureArcJumpstart) [Windows] Custom configuration'
 
-Remove-AzPolicyDefinition -Name '(AzureArcJumpstart) [Windows] Custom configuration'
+Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Remove-AzPolicyAssignment
+
+$PolicyDefinition  | Remove-AzPolicyDefinition
 
 Get-AzStorageAccount -Name <insert-storage-account-name> -ResourceGroupName $ResourceGroupName | Remove-AzStorageAccount
 ```
