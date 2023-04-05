@@ -7,6 +7,7 @@ $ProgressPreference = "SilentlyContinue"
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$AgDirectory = $AgConfig.AgDirectories["AgDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
@@ -332,6 +333,67 @@ kubectl get nodes -o wide
 Write-Host
 kubectx akseedev
 kubectl get nodes -o wide
+
+#####################################################################
+### Deploy Kube Prometheus Stack for Observability
+#####################################################################
+$monitoringNamespace = "observability"
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+Write-Header "Deploying Kube Prometheus Stack for aksDev"
+kubectx aksDev
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating Staging Grafana Icon on Desktop
+Write-Host "Creating Staging Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\Staging Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$stagingGrafanaLBIP"
+$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for akseeDev"
+kubectx akseedev
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$akseeDevLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating AKS EE Dev Grafana Icon on Desktop
+Write-Host "Create AKS EE Dev Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\AKS EE Dev Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$akseeDevLBIP"
+$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for Chicago"
+kubectx chicago
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $chicagoLBIP
+
+Write-Header "Deploying Kube Prometheus Stack for Seattle"
+kubectx seattle
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $seattleLBIP
 
 #####################################################################
 ### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
