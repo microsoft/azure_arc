@@ -64,7 +64,7 @@ param osType string = 'Linux'
 var tier  = 'free'
 
 @description('The version of Kubernetes')
-param kubernetesVersion string = '1.24.6'
+param kubernetesVersion string = '1.24.9'
 
 var serviceCidr_dev = '10.21.64.0/19'
 var dnsServiceIP_dev = '10.21.64.10'
