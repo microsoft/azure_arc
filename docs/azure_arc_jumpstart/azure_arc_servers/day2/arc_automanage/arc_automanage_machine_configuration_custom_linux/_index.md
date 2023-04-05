@@ -14,22 +14,7 @@ While the use of custom configurations in Automanage Machine Configuration featu
 
 By the end of this scenario, you will have both Linux and Windows Azure Arc-enabled servers with Automanage Machine Configuration custom configurations assigned.
 
-> **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
-
-- **[Azure Stack HCI Windows VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure_stack_hci/azure_stack_hci_windows/)**
-- **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
-- **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
-- **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
-- **[AWS Amazon Linux 2 EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_al2/)**
-- **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
-- **[Azure Windows VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_win/)**
-- **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
-- **[VMware vSphere Windows Server VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)**
-- **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
-- **[Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
-
-
-This scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For demonstrations in this scenario, we will be using the Azure Arc-enabled servers that are provisioned by default by [Jumpstart ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/) and is visible as resources in Azure.
+This scenario starts at the point where you already deployed **[Jumpstart ArcBox for IT Pros](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/)** and have 5 Azure Arc-enabled servers in the resource group is deployed to visible as resources in Azure.
 
 ![Screenshot of Azure Portal showing Azure Arc-enabled servers](./01.png)
 
@@ -180,10 +165,41 @@ Configuration AzureArcJumpstart_Linux
     Node localhost
     {
 
+      nxPackage nginx
+      {
+          Name = "nginx"
+          Ensure = "Present"
+      }
+      nxPackage hello
+      {
+          Name = "hello"
+          Ensure = "Present"
+      }
+<#
+
+    Due to a known issue with multiple class-based resources
+    we currently can`t leverage more than 1 DSC resource:
+    https://github.com/Azure/nxtools/issues/15
+
+      nxPackage powershell
+      {
+          Name = "powershell"
+          Version = "7.3.3"
+          Ensure = "Present"
+          #PackageType = "snap"
+      }
+
+      nxFile demo {
+        DestinationPath = "/tmp/arc-demo"
+        Ensure = "Present"
+        Contents = "Hello Arc!"
+        }
+
       nxGroup arcusers {
         GroupName = "arcusers"
         Ensure = "Present"
       }
+#>
 
     }
 }
@@ -314,11 +330,15 @@ Login to Arcbox-Ubuntu-01 by running the below command
 Enter-AzVM -ResourceGroupName $ResourceGroupName -Name Arcbox-Ubuntu-01 -LocalUser arcdemo
 ```
 
-Verify that the local group **arcusers** exists by running ```cat /etc/group | grep arcusers```
+Verify that the packages **hello** and **nginx** are installed by running ```apt list --installed | grep 'hello\|nginx/focal'```
 
 ![Screenshot of ArcBox-Ubuntu-01](./05.png)
 
-If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the group arcusers: ```groupdel arcusers```
+You can also verify that nginx is running and available by accessing http://10.10.1.103/ from Microsoft Edge on the ArcBox Client virtual machine.
+
+![Screenshot of nginx](./26.png)
+
+If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the package hello: ```sudo apt remove hello```
 
 Trigger a [manual evaluation](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-9.4.0) or wait until the next policy evaluation cycle has completed and observe that the policy is now non-compliant.
 
