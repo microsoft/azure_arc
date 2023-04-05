@@ -99,6 +99,7 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgDirectory\grafana.ico
 
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
@@ -211,6 +212,39 @@ Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+# Download & Install Grafana
+Write-Header "Installing Grafana"
+Invoke-WebRequest "https://dl.grafana.com/oss/release/grafana-9.4.7.windows-amd64.msi" -OutFile "$AgDirectory\grafana-9.4.7.windows-amd64.msi"
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgDirectory\grafana-9.4.7.windows-amd64.msi /quiet"
+
+# Creating Prod Grafana Icon on Desktop
+Write-Host "Create Prod Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://localhost:3000"
+$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Disable Edge 'First Run' Setup
+$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+$firstRunRegistryName  = 'HideFirstRunExperience'
+$firstRunRegistryValue = '0x00000001'
+$savePasswordRegistryName = 'PasswordManagerEnabled'
+$savePasswordRegistryValue = '0x00000000'
+$autoArrangeRegistryName = 'FFlags'
+$autoArrangeRegistryValue = '1075839525'
+
+ If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+}
+
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 Stop-Transcript
 
