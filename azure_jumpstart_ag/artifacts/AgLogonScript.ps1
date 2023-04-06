@@ -7,6 +7,7 @@ $ProgressPreference = "SilentlyContinue"
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
@@ -369,6 +370,82 @@ kubectx aksDev="$Env:aksDevClusterName-admin"
 Write-Header "Attaching ACRs to AKS clusters"
 # az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
 az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
+
+#####################################################################
+### Deploy Kube Prometheus Stack for Observability
+#####################################################################
+
+# Installing Grafana
+Write-Header "Installing Grafana"
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-9.4.7.windows-amd64.msi /quiet"
+
+# Creating Prod Grafana Icon on Desktop
+Write-Host "Creating Prod Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://localhost:3000"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+$monitoringNamespace = "observability"
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+Write-Header "Deploying Kube Prometheus Stack for aksDev"
+kubectx aksDev
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating Staging Grafana Icon on Desktop
+Write-Host "Creating Staging Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\Staging Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$stagingGrafanaLBIP"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for akseeDev"
+kubectx akseedev
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$akseeDevLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating AKS EE Dev Grafana Icon on Desktop
+Write-Host "Creating AKS EE Dev Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\AKS EE Dev Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$akseeDevLBIP"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for Chicago"
+kubectx chicago
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $chicagoLBIP
+
+Write-Header "Deploying Kube Prometheus Stack for Seattle"
+kubectx seattle
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $seattleLBIP
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
