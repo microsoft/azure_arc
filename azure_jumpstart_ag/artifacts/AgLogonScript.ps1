@@ -335,15 +335,52 @@ kubectx akseedev
 kubectl get nodes -o wide
 
 #####################################################################
+### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
+#####################################################################
+
+Write-Header "Connect AKS Edge clusters to Azure with Azure Arc"
+Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+    # Install prerequisites
+    $ProgressPreference = "SilentlyContinue"
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+
+    Invoke-WebRequest -Uri "https://get.helm.sh/helm-v3.6.3-windows-amd64.zip" -OutFile ".\helm-v3.6.3-windows-amd64.zip"
+    Expand-Archive "helm-v3.6.3-windows-amd64.zip" C:\helm
+    $env:Path = "C:\helm\windows-amd64;$env:Path"
+    [Environment]::SetEnvironmentVariable('Path', $env:Path)
+
+    # Connect to Arc
+    $deploymentPath = "C:\Deployment\config.json"
+    Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+}
+
+##############################################################
+# Setup Azure Container registry on cloud AKS environments
+##############################################################
+# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+
+# kubectx aksProd="$Env:aksProdClusterName-admin"
+kubectx aksDev="$Env:aksDevClusterName-admin"
+
+# Attach ACRs to AKS clusters
+Write-Header "Attaching ACRs to AKS clusters"
+# az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
+az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
+
+#####################################################################
 ### Deploy Kube Prometheus Stack for Observability
 #####################################################################
 
-# Install Grafana
+# Installing Grafana
 Write-Header "Installing Grafana"
 Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-9.4.7.windows-amd64.msi /quiet"
 
 # Creating Prod Grafana Icon on Desktop
-Write-Host "Create Prod Grafana Icon"
+Write-Host "Creating Prod Grafana Icon"
 $shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
@@ -383,7 +420,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack --set alertma
 $akseeDevLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
 # Creating AKS EE Dev Grafana Icon on Desktop
-Write-Host "Create AKS EE Dev Grafana Icon"
+Write-Host "Creating AKS EE Dev Grafana Icon"
 $shortcutLocation = "$Env:Public\Desktop\AKS EE Dev Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
@@ -409,43 +446,6 @@ helm install prometheus prometheus-community/kube-prometheus-stack --set alertma
 # Get Load Balancer IP
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Write-Host $seattleLBIP
-
-#####################################################################
-### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
-#####################################################################
-
-Write-Header "Connect AKS Edge clusters to Azure with Azure Arc"
-Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Install prerequisites
-    $ProgressPreference = "SilentlyContinue"
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
-    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
-    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-
-    Invoke-WebRequest -Uri "https://get.helm.sh/helm-v3.6.3-windows-amd64.zip" -OutFile ".\helm-v3.6.3-windows-amd64.zip"
-    Expand-Archive "helm-v3.6.3-windows-amd64.zip" C:\helm
-    $env:Path = "C:\helm\windows-amd64;$env:Path"
-    [Environment]::SetEnvironmentVariable('Path', $env:Path)
-
-    # Connect to Arc
-    $deploymentPath = "C:\Deployment\config.json"
-    Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
-}
-
-##############################################################
-# Setup Azure Container registry on cloud AKS environments
-##############################################################
-# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
-
-# kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx aksDev="$Env:aksDevClusterName-admin"
-
-# Attach ACRs to AKS clusters
-Write-Header "Attaching ACRs to AKS clusters"
-# az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
-az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
