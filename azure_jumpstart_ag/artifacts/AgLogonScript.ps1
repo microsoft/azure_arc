@@ -337,6 +337,21 @@ kubectl get nodes -o wide
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
 #####################################################################
+
+# Install Grafana
+Write-Header "Installing Grafana"
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-9.4.7.windows-amd64.msi /quiet"
+
+# Creating Prod Grafana Icon on Desktop
+Write-Host "Create Prod Grafana Icon"
+$shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://localhost:3000"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
 $monitoringNamespace = "observability"
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
