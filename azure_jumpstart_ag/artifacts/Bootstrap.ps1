@@ -54,6 +54,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $Confi
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory = $AgConfig.AgDirectories["AgDir"]
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 
 function BITSRequest {
   Param(
@@ -99,11 +100,12 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgDirectory\grafana.ico
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
 BITSRequest -Params @{'Uri'='https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename'="$AgToolsDir\DockerDesktopInstaller.exe"}
+BITSRequest -Params @{'Uri'='https://dl.grafana.com/oss/release/grafana-9.4.7.windows-amd64.msi'; 'Filename'="$AgToolsDir\grafana-9.4.7.windows-amd64.msi"}
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
@@ -213,10 +215,9 @@ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRes
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
-# Download & Install Grafana
+# Install Grafana
 Write-Header "Installing Grafana"
-Invoke-WebRequest "https://dl.grafana.com/oss/release/grafana-9.4.7.windows-amd64.msi" -OutFile "$AgDirectory\grafana-9.4.7.windows-amd64.msi"
-Start-Process msiexec.exe -Wait -ArgumentList "/I $AgDirectory\grafana-9.4.7.windows-amd64.msi /quiet"
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-9.4.7.windows-amd64.msi /quiet"
 
 # Creating Prod Grafana Icon on Desktop
 Write-Host "Create Prod Grafana Icon"
@@ -224,7 +225,7 @@ $shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://localhost:3000"
-$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
