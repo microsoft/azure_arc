@@ -7,7 +7,7 @@ $ProgressPreference = "SilentlyContinue"
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgDirectory = $AgConfig.AgDirectories["AgDir"]
+$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
@@ -355,7 +355,7 @@ $shortcutLocation = "$Env:Public\Desktop\Staging Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$stagingGrafanaLBIP"
-$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
@@ -373,7 +373,7 @@ $shortcutLocation = "$Env:Public\Desktop\AKS EE Dev Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$akseeDevLBIP"
-$shortcut.IconLocation="$AgDirectory\Icons\grafana.ico, 0"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
