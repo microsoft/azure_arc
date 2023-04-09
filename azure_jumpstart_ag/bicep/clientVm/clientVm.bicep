@@ -49,21 +49,28 @@ param githubUser string
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
 
-@description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string
-
 @description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string
+param aksDevClusterName string = 'Agora-AKSDev'
 
 @description('The name of the IoT Hub')
-param iotHubHostName string
+param iotHubHostName string = 'Agora-IoTHub'
 
 @description('The login server name of the Azure Container Registry for dev')
-param acrNameDev string
+param acrNameDev string = 'dummy-name-dev'
 
 @description('The login server name of the Azure Container Registry for Prod')
-param acrNameProd string
+param acrNameProd string = 'dummy-name-prod'
 
+@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
+param rdpPort string = '3389'
+
+@description('Target GitHub account')
+param githubAccount string = 'microsoft'
+
+@description('Target GitHub branch')
+param githubBranch string = 'jumpstart_ag'
+
+var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'ArcBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -84,7 +91,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : null
         }
       }
     ]
@@ -110,7 +117,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D16s_v4'
+      vmSize: 'Standard_E32s_v5'
     }
     storageProfile: {
       osDisk: {
@@ -164,7 +171,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksProdClusterName ${aksProdClusterName} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
     }
   }
 }

@@ -1,11 +1,33 @@
 @{
 
-    # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
-    
-    # Version 1.0.0
+    # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
 
-    # HCI host names
-    StoreLocations                       = "Chicago", "New Orleans", "Seattle"                # The location names for the stores
+    # Directory paths
+    AgDirectories = @{
+        AgDir = "C:\Ag"
+        AgLogsDir = "C:\Ag\Logs"
+        AgVMDir = "C:\Ag\Virtual Machines"
+        AgKVDir = "C:\Ag\KeyVault"
+        AgGitOpsDir = "C:\Ag\GitOps"
+        AgIconDir = "C:\Ag\Icons"
+        AgAgentScriptsDir = "C:\Ag\agentScripts"
+        AgToolsDir = "C:\Tools"
+        AgTempDir = "C:\Temp"
+        AgVHDXDir = "C:\Ag\VHDX"
+        AgL1Files = "C:\Ag\L1Files"
+    }
+
+    # Az CLI required extensions
+    AzCLIExtensions                      = @()
+
+    # PowerShell modules
+    PowerShellModules                    = @('Az.ConnectedKubernetes')
+
+    # Chocolatey app list
+    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
+
+    # VSCode extensions
+    VSCodeExtensions  = @('ms-vscode-remote.remote-containers','ms-vscode-remote.remote-wsl')
 
     # VHDX Paths 
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
@@ -15,13 +37,14 @@
     
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
-    L1VMMemoryInGB                       = 16GB                                  # This value controls the amount of RAM for each AKS EE host VM
-    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
+    L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
+    L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
     InternalSwitch                       = "InternalSwitch"                      # Name of the internal switch that the L0 VM will use.
-
-    # SDN Lab Domain
-    SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name. 
-    DCName                               = "jumpstartdc"                          # Name of the domain controller virtual machine (limit to 14 characters)
+    L1Username                           = "Administrator"                       # Admin credential for the 3 VMs that run on the Agora-Client
+    L1Password                           = 'Agora123!!'                          # 
+    L1DefaultGateway                     = "172.20.1.1"                          #
+    L1SwitchName                         = "AKS-Int"                             #
+    L1NatSubnetPrefix                    = "172.20.1.0/24"                       #
 
     # NAT Configuration
     natHostSubnet                        = "192.168.128.0/24"
@@ -31,20 +54,39 @@
     natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # AKS variables
-    AKSworkloadClusterName               = "hcibox-aks" # lowercase only
-    AKSvnetname                          = "akshcivnet"
-    AKSvSwitchName                       = "sdnSwitch"
-    AKSNodeStartIP                       = "192.168.200.25"
-    AKSNodeEndIP                         = "192.168.200.100"
-    AKSVIPStartIP                        = "192.168.200.125"
-    AKSVIPEndIP                          = "192.168.200.200"
-    AKSIPPrefix                          = "192.168.200.0/24"
-    AKSGWIP                              = "192.168.200.1"
-    AKSDNSIP                             = "192.168.1.254"
-    AKSCSV                               = "C:\ClusterStorage\S2D_vDISK1"
-    AKSImagedir                          = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
-    AKSWorkingdir                        = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
-    AKSCloudConfigdir                    = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
-    AKSCloudSvcidr                       = "192.168.1.15/24"
-    AKSVlanID                            = "200"
+    SiteConfig = @{
+        Seattle = @{
+            ArcClusterName = "Ag-AKSEE-Seattle"
+            NetIPAddress = "172.20.1.2"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.31"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.21"
+            LinuxNodeIp4Address = "172.20.1.11"
+        }
+        Chicago = @{
+            ArcClusterName = "Ag-AKSEE-Chicago"
+            NetIPAddress = "172.20.1.3"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.71"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.61"
+            LinuxNodeIp4Address = "172.20.1.51"
+        }
+        AKSEEDev = @{
+            ArcClusterName = "Ag-AKSEE-Dev"
+            NetIPAddress = "172.20.1.4"
+            DefaultGateway = "172.20.1.1"
+            PrefixLength = "24"
+            DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart = "172.20.1.101"
+            ServiceIPRangeSize = "10"
+            ControlPlaneEndpointIp = "172.20.1.91"
+            LinuxNodeIp4Address = "172.20.1.81"
+        }
+    }
 }
