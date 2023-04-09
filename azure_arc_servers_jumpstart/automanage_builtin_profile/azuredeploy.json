@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "type": "String"
+        },
+        "configurationProfileName": {
+            "type": "String"
+        }
+    },    
+    "resources": [
+        {
+            "type": "Microsoft.HybridCompute/machines/providers/configurationProfileAssignments",
+            "apiVersion": "2022-05-04",
+            "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/default')]",
+            "properties": {
+                "configurationProfile": "[parameters('configurationProfileName')]"
+            }
+        }
+    ]
+}

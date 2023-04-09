@@ -6,6 +6,15 @@
     "ServiceIPRangeStart": "ServiceIPRangeStart-null",
     "ServiceIPRangeSize": 1000
   },
+  "Arc": {
+    "ClusterName": "ClusterName-null",
+    "Location": "Location-null",
+    "ResourceGroupName": "ResourceGroupName-null",
+    "SubscriptionId": "SubscriptionId-null",
+    "TenantId": "TenantId-null",
+    "ClientId": "ClientId-null",
+    "ClientSecret": "ClientSecret-null"
+  },
   "Network": {
     "NetworkPlugin": "flannel",
     "ControlPlaneEndpointIp": "ControlPlaneEndpointIp-null",
