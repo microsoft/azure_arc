@@ -39,7 +39,7 @@ param githubBranch string = 'jumpstart_ag'
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'sebassem'
+param githubUser string = 'microsoft'
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
