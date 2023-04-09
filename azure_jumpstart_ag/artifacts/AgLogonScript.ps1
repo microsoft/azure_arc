@@ -492,6 +492,13 @@ Write-Header "Installing Docker Dekstop"
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+# Configure Docker Desktop to start without the dashboard on startup
+$dockerDekstopConfig = "$env:USERPROFILE\AppData\Roaming\Docker\settings.json"
+$tempConfigFile = Get-Content $dockerDekstopConfig | ConvertFrom-Json
+$tempConfigFile.openUIOnStartupDisabled = $true
+$tempConfigFile | ConvertTo-Json | set-content $dockerDekstopConfig
+# Start Docker Desktop
+Start-Process 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
 
 #############################################################
 # Install VSCode extensions
@@ -502,11 +509,6 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
   Write-Host "Installing $extension"
   code --install-extension $extension
 }
-
-##############################################################
-# Start Docker Desktop without dashboard
-##############################################################
-#& 'C:\Program Files\Docker\Docker\Docker Desktop.exe' --hide-ui
 
 ##############################################################
 # Cleanup
