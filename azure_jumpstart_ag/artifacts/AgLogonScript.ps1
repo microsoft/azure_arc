@@ -352,10 +352,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
     Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-    Invoke-WebRequest -Uri "https://get.helm.sh/helm-v3.6.3-windows-amd64.zip" -OutFile ".\helm-v3.6.3-windows-amd64.zip"
-    Expand-Archive "helm-v3.6.3-windows-amd64.zip" C:\helm
-    $env:Path = "C:\helm\windows-amd64;$env:Path"
-    [Environment]::SetEnvironmentVariable('Path', $env:Path)
 
     # Connect to Arc
     $deploymentPath = "C:\Deployment\config.json"
