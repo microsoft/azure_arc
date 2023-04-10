@@ -489,16 +489,6 @@ Write-Header "Installing Docker Dekstop"
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-# Configure Docker Desktop to start without the dashboard on startup
-Start-Sleep -seconds 10
-$dockerDekstopConfig = "$env:USERPROFILE\AppData\Roaming\Docker\settings.json"
-$tempConfigFile = Get-Content $dockerDekstopConfig | ConvertFrom-Json
-$tempConfigFile.openUIOnStartupDisabled = $true
-$tempConfigFile.displayedWelcomeSurvey = $true
-$tempConfigFile | ConvertTo-Json | set-content $dockerDekstopConfig
-Start-Sleep -seconds 10
-# Start Docker Desktop
-Start-Process 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
 
 #############################################################
 # Install VSCode extensions
