@@ -382,7 +382,8 @@ az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:
 
 # Installing Grafana
 Write-Header "Installing Grafana"
-Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-9.4.7.windows-amd64.msi /quiet"
+$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v','')
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
 
 # Creating Prod Grafana Icon on Desktop
 Write-Host "Creating Prod Grafana Icon"
