@@ -489,7 +489,8 @@ Write-Header "Installing Docker Dekstop"
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-
+Move-Item "$AgDirectory\settings.json" -Destination "$env:USERPROFILE\AppData\Local\Docker\settings.json" -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 #############################################################
 # Install VSCode extensions
 #############################################################
