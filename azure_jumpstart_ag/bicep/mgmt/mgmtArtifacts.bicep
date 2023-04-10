@@ -15,7 +15,7 @@ var security = {
 var automationAccountName = 'Ag-Automation-${uniqueString(resourceGroup().id)}'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 
-resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource workspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: workspaceName
   location: location
   properties: {
@@ -53,7 +53,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
   }
 }
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' = {
   name: automationAccountName
   location: automationAccountLocation
   properties: {

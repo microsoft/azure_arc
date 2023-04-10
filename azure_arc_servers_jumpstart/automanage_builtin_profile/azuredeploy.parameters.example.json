@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "machineName": {
-            "value": "<Name of your Azure Arc-enabled Server>"
+            "value": "automanage-demo"
         },
-        "configurationProfileAssignment": {
-            "value": "<environment of your Azure Arc-enabled Server Production or DevTest>"
+        "configurationProfileName": {
+            "value": "/providers/Microsoft.Automanage/bestPractices/AzureBestPracticesProduction"
         }
 
     }
