@@ -96,6 +96,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Get latest Grafana OSS release
+$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v','')
+
 # Download artifacts
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
@@ -105,7 +108,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $A
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
 BITSRequest -Params @{'Uri'='https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename'="$AgToolsDir\DockerDesktopInstaller.exe"}
-BITSRequest -Params @{'Uri'='https://dl.grafana.com/oss/release/grafana-9.4.7.windows-amd64.msi'; 'Filename'="$AgToolsDir\grafana-9.4.7.windows-amd64.msi"}
+BITSRequest -Params @{'Uri'="https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename'="$AgToolsDir\grafana-$latestRelease.windows-amd64.msi"}
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
