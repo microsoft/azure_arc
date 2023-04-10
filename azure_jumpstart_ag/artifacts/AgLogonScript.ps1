@@ -240,6 +240,17 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/ScalableCluster.json") -OutFile "$deploymentFolder\ScalableCluster.json"
     Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/StartupScan.ps1.json") -OutFile "$deploymentFolder\StartupScan.ps1.json"
 
+    <#$repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $deploymentFolder $fileName
+        Invoke-WebRequest -Uri $_ -OutFile $outputFile
+    }
+    #>
+
     # Setting up replacment parameters for AKS Edge Essentials config json file
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
