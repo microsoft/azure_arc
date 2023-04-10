@@ -68,6 +68,54 @@ foreach ($provider in $AgConfig.AzureProviders) {
     Register-AzResourceProvider -ProviderNamespace $provider
 }
 
+#############################################################
+# Install Windows Terminal, WSL2, and Ubuntu
+#############################################################
+Write-Header "Installing Windows Terminal, WSL2 and Ubuntu"
+If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+$downloadDir = "C:\WinTerminal"
+$gitRepo = "microsoft/terminal"
+$filenamePattern = "*.msixbundle"
+$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+
+# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
+Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
+
+# Install WSL latest kernel update
+msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
+
+# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+Add-AppxPackage -Path $framworkPkgPath
+Add-AppxPackage -Path $msiPath
+Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
+
+# Setting WSL environment variables
+$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+# Initializing the wsl ubuntu app without requiring user input
+$ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+Invoke-Expression -Command "$ubuntu_path install --root"
+
+# Cleanup
+Remove-Item $downloadDir -Recurse -Force
+
+#############################################################
+# Install Docker Desktop
+#############################################################
+Write-Header "Installing Docker Dekstop"
+# Download and Install Docker Desktop
+$arguments = 'install --quiet --accept-license'
+Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
+Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+
 ##############################################################
 # Configure L1 virtualization infrastructure
 ##############################################################
@@ -444,53 +492,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack --set alertma
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 Write-Host $seattleLBIP
 
-#############################################################
-# Install Windows Terminal, WSL2, and Ubuntu
-#############################################################
-Write-Header "Installing Windows Terminal, WSL2 and Ubuntu"
-If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
-$downloadDir = "C:\WinTerminal"
-$gitRepo = "microsoft/terminal"
-$filenamePattern = "*.msixbundle"
-$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
-$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
-$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
-# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
-Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
-Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
-
-# Install WSL latest kernel update
-msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
-
-# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-Add-AppxPackage -Path $framworkPkgPath
-Add-AppxPackage -Path $msiPath
-Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
-
-# Setting WSL environment variables
-$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
-[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
-
-# Initializing the wsl ubuntu app without requiring user input
-$ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
-Invoke-Expression -Command "$ubuntu_path install --root"
-
-# Cleanup
-Remove-Item $downloadDir -Recurse -Force
-
-#############################################################
-# Install Docker Desktop
-#############################################################
-Write-Header "Installing Docker Dekstop"
-# Download and Install Docker Desktop
-$arguments = 'install --quiet --accept-license'
-Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
-Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 #############################################################
 # Install VSCode extensions
 #############################################################
