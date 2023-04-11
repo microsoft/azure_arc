@@ -1,16 +1,16 @@
 ---
 type: docs
-title: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions"
-linkTitle: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions"
+title: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using cluster extensions"
+linkTitle: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using cluster extensions"
 weight: 3
 description: >
 ---
 
-## Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions
+## Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using cluster extensions
 
 The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster.
 
-in this scenario, you will hook the GKE cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
+in this scenario, you will hook the GKE cluster to Azure Monitor by deploying the Azure Monitor agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
 
 > **NOTE: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
@@ -93,7 +93,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 * You can see that the monitoring is enabled once you visit the Container Insights section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
 
-    > **NOTE: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+    > **NOTE: As the Azure Monitor agent starts collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate through the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
