@@ -1,14 +1,14 @@
 ---
 type: docs
-title: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster"
-linkTitle: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster"
+title: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster using a Shell script"
+linkTitle: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster using a Shell script"
 weight: 3
 description: >
 ---
 
-## Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster
+## Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster using a Shell script
 
-The following Jumpstart scenario will guide you on how to onboard an Azure Kubernetes Service (AKS) cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview).
+The following Jumpstart scenario will guide you on how to onboard an Azure Kubernetes Service (AKS) cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) using a Shell script.
 
 in this scenario, you will hook the AKS cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
 
