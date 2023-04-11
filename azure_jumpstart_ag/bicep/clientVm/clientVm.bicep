@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'Ag-Client'
+param vmName string = 'Ag-VM-Client'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -49,11 +49,11 @@ param githubUser string
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
 
-@description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string = 'Agora-AKSDev'
+@description('The name of the Staging Kubernetes cluster resource')
+param aksDevClusterName string = 'Ag-AKS-Staging'
 
 @description('The name of the IoT Hub')
-param iotHubHostName string = 'Agora-IoTHub'
+param iotHubHostName string = 'Ag-IoTHub'
 
 @description('The login server name of the Azure Container Registry for dev')
 param acrNameDev string = 'dummy-name-dev'
@@ -71,7 +71,7 @@ param githubAccount string = 'microsoft'
 param githubBranch string = 'jumpstart_ag'
 
 var encodedPassword = base64(windowsAdminPassword)
-var bastionName = 'ArcBox-Bastion'
+var bastionName = 'Ag-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
