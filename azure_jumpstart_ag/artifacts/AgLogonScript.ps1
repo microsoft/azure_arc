@@ -360,7 +360,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 
 # kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx aksStaging="$Env:aksStagingClusterName-admin"
+kubectx Staging="$Env:aksStagingClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Header "Attaching ACRs to AKS clusters"
@@ -391,7 +391,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 
 Write-Header "Deploying Kube Prometheus Stack for Staging"
-kubectx aksStaging
+kubectx Staging
 # Install Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
