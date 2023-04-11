@@ -44,14 +44,14 @@ param githubUser string = 'microsoft'
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
-@description('Name of the dev AKS subnet in the cloud virtual network')
+@description('Name of the Staging AKS subnet in the cloud virtual network')
 param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-innerLoop'
 
-@description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string = 'Ag-AKS-Staging'
+@description('The name of the Staging Kubernetes cluster resource')
+param aksStagingClusterName string = 'Ag-AKS-Staging'
 
 @description('The name of the synapse workspace')
 param synapseWorkspaceName string = 'ag-synapse-${namingGuid}'
@@ -67,7 +67,7 @@ param acrNameProd string = 'Agacrprod${namingGuid}'
 @minLength(5)
 @maxLength(50)
 @description('Name of the dev Azure Container Registry')
-param acrNameDev string = 'AgacrStaging${namingGuid}'
+param acrNameStaging string = 'AgacrStaging${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -103,14 +103,14 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
   params: {
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     virtualNetworkNameCloud : networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameDev : subnetNameCloudAksStaging
+    aksSubnetNameStaging : subnetNameCloudAksStaging
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrNameDev: acrNameDev
+    acrNameStaging: acrNameStaging
     acrNameProd: acrNameProd
   }
 }
@@ -132,9 +132,9 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    acrNameDev: kubernetesDeployment.outputs.acrDevName
+    acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }

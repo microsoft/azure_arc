@@ -50,13 +50,13 @@ param githubUser string
 param storageAccountName string
 
 @description('The name of the Staging Kubernetes cluster resource')
-param aksDevClusterName string = 'Ag-AKS-Staging'
+param aksStagingClusterName string = 'Ag-AKS-Staging'
 
 @description('The name of the IoT Hub')
 param iotHubHostName string = 'Ag-IoTHub'
 
-@description('The login server name of the Azure Container Registry for dev')
-param acrNameDev string = 'dummy-name-dev'
+@description('The login server name of the Azure Container Registry for staging')
+param acrNameStaging string = 'dummy-name-staging'
 
 @description('The login server name of the Azure Container Registry for Prod')
 param acrNameProd string = 'dummy-name-prod'
@@ -171,7 +171,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksDevClusterName ${aksDevClusterName} -iotHubHostName ${iotHubHostName} -acrNameDev ${acrNameDev} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksStagingClusterName ${aksStagingClusterName} -iotHubHostName ${iotHubHostName} -acrNameStaging ${acrNameStaging} -acrNameProd ${acrNameProd} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch}'
     }
   }
 }
