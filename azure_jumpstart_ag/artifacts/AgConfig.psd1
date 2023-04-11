@@ -77,7 +77,7 @@
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address = "172.20.1.51"
         }
-        Dev = @{
+        AKSEEDev = @{
             ArcClusterName = "Ag-AKSEE-Dev"
             NetIPAddress = "172.20.1.4"
             DefaultGateway = "172.20.1.1"
