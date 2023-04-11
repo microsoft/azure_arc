@@ -1,8 +1,8 @@
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string
 
-@description('Name of the dev AKS subnet in the cloud virtual network')
-param subnetNameCloudAksDev string
+@description('Name of the Staging AKS subnet in the cloud virtual network')
+param subnetNameCloudAksStaging string
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloudAksInnerLoop string
@@ -14,10 +14,10 @@ param location string = resourceGroup().location
 param deployBastion bool = false
 
 @description('Name of the prod Network Security Group')
-param networkSecurityGroupNameCloud string = 'Ag-Cloud-NSG'
+param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'Ag-Bastion-NSG'
+param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
 
 var addressPrefixCloud = '10.16.0.0/16'
 var subnetAddressPrefixAksDev = '10.16.80.0/21'
@@ -42,7 +42,7 @@ var bastionSubnet = [
 ]
 var cloudAKSDevSubnet = [
   {
-    name: subnetNameCloudAksDev
+    name: subnetNameCloudAksStaging
     properties: {
       addressPrefix: subnetAddressPrefixAksDev
       privateEndpointNetworkPolicies: 'Enabled'
