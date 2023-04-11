@@ -8,7 +8,7 @@ description: >
 
 ## Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using a Shell script
 
-The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster.
+The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster using a Shell script.
 
 in this scenario, you will hook the GKE cluster to Azure Monitor by deploying the [Azure Monitor agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
 
