@@ -104,6 +104,7 @@ $latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/grafana/g
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
@@ -217,24 +218,6 @@ Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
-
-# Disable Edge 'First Run' Setup
-$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
-$firstRunRegistryName  = 'HideFirstRunExperience'
-$firstRunRegistryValue = '0x00000001'
-$savePasswordRegistryName = 'PasswordManagerEnabled'
-$savePasswordRegistryValue = '0x00000000'
-$autoArrangeRegistryName = 'FFlags'
-$autoArrangeRegistryValue = '1075839525'
-
- If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
-    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
-}
-
-New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
-New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
-Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 Stop-Transcript
 
