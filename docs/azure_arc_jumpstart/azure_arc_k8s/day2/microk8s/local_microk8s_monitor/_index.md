@@ -6,7 +6,7 @@ weight: 2
 description: >
 ---
 
-## Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster
+## Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster using a Shell script
 
 The following Jumpstart scenario will guide you on how to onboard an microK8s cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) using a Shell script.
 
