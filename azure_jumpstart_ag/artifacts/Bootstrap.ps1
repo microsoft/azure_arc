@@ -10,10 +10,10 @@ param (
     [string]$azureLocation,
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
-    [string]$aksDevClusterName,
+    [string]$aksStagingClusterName,
     [string]$iotHubHostName,
     [string]$acrNameProd,
-    [string]$acrNameDev,
+    [string]$acrNameStaging,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
@@ -37,10 +37,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('aksDevClusterName', $aksDevClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameDev', $acrNameDev, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)

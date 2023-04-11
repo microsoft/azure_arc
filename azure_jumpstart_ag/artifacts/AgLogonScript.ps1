@@ -307,7 +307,7 @@ Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -Foregro
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-akseedev"
+$kubeconfig3 = "config-dev"
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "All three files are present. Merging kubeconfig files." -ForegroundColor Green
@@ -331,7 +331,7 @@ kubectx chicago
 kubectl get nodes -o wide
 
 Write-Host
-kubectx akseedev
+kubectx dev
 kubectl get nodes -o wide
 
 #####################################################################
@@ -357,15 +357,15 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
 # az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 
 # kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx aksDev="$Env:aksDevClusterName-admin"
+kubectx aksStaging="$Env:aksStagingClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Header "Attaching ACRs to AKS clusters"
 # az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
-az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
 
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
@@ -390,8 +390,8 @@ $monitoringNamespace = "observability"
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-Write-Header "Deploying Kube Prometheus Stack for aksDev"
-kubectx aksDev
+Write-Header "Deploying Kube Prometheus Stack for Staging"
+kubectx aksStaging
 # Install Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
@@ -408,20 +408,20 @@ $shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-Write-Header "Deploying Kube Prometheus Stack for akseeDev"
-kubectx akseedev
+Write-Header "Deploying Kube Prometheus Stack for dev"
+kubectx dev
 # Install Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
-$akseeDevLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+$devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
 # Creating AKS EE Dev Grafana Icon on Desktop
 Write-Host "Creating AKS EE Dev Grafana Icon"
-$shortcutLocation = "$Env:Public\Desktop\AKS EE Dev Grafana.lnk"
+$shortcutLocation = "$Env:Public\Desktop\Dev Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "http://$akseeDevLBIP"
+$shortcut.TargetPath = "http://$devLBIP"
 $shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
