@@ -95,7 +95,7 @@ in this scenario, you will hook the AKS cluster to Azure Monitor by deploying th
 
 * Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. At the end of it's run, the script generates URL for you to click on. This URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
-    > **NOTE: As the Azure Monitor agent start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+    > **NOTE: As the Azure Monitor agent starts collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
     ![Installing the Azure Monitor agent  agent on the cluster](./08.png)
 
