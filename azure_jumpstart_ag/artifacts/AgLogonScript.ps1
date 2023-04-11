@@ -308,7 +308,7 @@ Write-Host "Waiting on files took $($elapsedTime.TotalSeconds) seconds" -Foregro
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-dev"
+$kubeconfig3 = "config-akseedev"
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "All three files are present. Merging kubeconfig files." -ForegroundColor Green
@@ -332,6 +332,7 @@ kubectx chicago
 kubectl get nodes -o wide
 
 Write-Host
+kubectx dev=akseedev
 kubectx dev
 kubectl get nodes -o wide
 
