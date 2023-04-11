@@ -115,6 +115,9 @@ Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $argu
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
 Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+Start-Sleep -Seconds 10
+Get-Process | Where-Object {$_.name -like "Docker Desktop"} | Stop-Process -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 ##############################################################
 # Configure L1 virtualization infrastructure
