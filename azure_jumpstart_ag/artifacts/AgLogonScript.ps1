@@ -119,8 +119,7 @@ foreach ($vhdxPath in $vhdxPaths) {
         -BootDevice VHD `
         -VHDPath $vhd.Path `
         -Generation 2 `
-        -Switch $AgConfig.L1SwitchName `
-        -Path $AgConfig.AgDirectories["AgVMDir"]
+        -Switch $AgConfig.L1SwitchName
     
     # Set up the virtual machine before coping all AKS Edge Essentials automation files
     Set-VMProcessor -VMName $VMName `
