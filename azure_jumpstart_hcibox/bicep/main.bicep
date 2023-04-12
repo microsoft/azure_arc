@@ -30,7 +30,7 @@ param deployAKSHCI bool = true
 param deployResourceBridge bool = true
 
 @description('Public DNS to use for the domain')
-param natDNS string = '1.1.1.1'
+param natDNS string = '8.8.8.8'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -43,6 +43,9 @@ param deployBastion bool = false
 
 @description('Location to deploy resources')
 param location string = resourceGroup().location
+
+@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
+param rdpPort string = '3389'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
@@ -87,5 +90,6 @@ module hostDeployment 'host/host.bicep' = {
     deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
+    rdpPort: rdpPort
   }
 }

@@ -52,10 +52,10 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $ProgressPreference = "SilentlyContinue"
     Install-Module -Name AksHci -Force -AcceptLicense
-    Import-Module Az.Accounts
-    Import-Module Az.Resources
-    Import-Module AzureAD
-    Import-Module AksHci
+    Import-Module Az.Accounts -DisableNameChecking
+    Import-Module Az.Resources -DisableNameChecking
+    Import-Module AzureAD -DisableNameChecking
+    Import-Module AksHci -DisableNameChecking
     Initialize-AksHciNode
     $ProgressPreference = "Continue"
 }
@@ -69,6 +69,7 @@ for($i = 0; $i -lt $prefixLen; $i++)
     $namingPrefix += [char]$rand.Next(97,122)
 }
 $clusterName = $SDNConfig.AKSworkloadClusterName + "-" + $namingPrefix
+#$azureLocation = $env:azureLocation
 [System.Environment]::SetEnvironmentVariable('AKSClusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 
 # Install AksHci - only need to perform the following on one of the nodes
@@ -80,13 +81,13 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
     Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred -Region "eastus"
     Write-Host "Ready to Install AKS on HCI Cluster"
-    Install-AksHci 
+    Install-AksHci
 }
 
 # Create new AKS target cluster and connect it to Azure
 Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 1 -osType linux
+    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 2 -osType linux -nodeVmSize Standard_D8s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 

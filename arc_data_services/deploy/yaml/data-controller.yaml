@@ -28,6 +28,11 @@ spec:
   credentials:
     dockerRegistry: arc-private-registry # Create a registry secret named 'arc-private-registry' if you are going to pull from a private registry instead of MCR.
     serviceAccount: sa-arc-controller
+  docker:
+    imagePullPolicy: Always
+    imageTag: v1.17.0_2023-03-14
+    registry: mcr.microsoft.com
+    repository: arcdata
   infrastructure: other # Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]
   security:
     allowDumps: true # Set this to false if deploying on OpenShift

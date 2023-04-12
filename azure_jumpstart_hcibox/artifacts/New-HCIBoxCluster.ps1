@@ -34,6 +34,9 @@ function BITSRequest {
     $download = Start-BitsTransfer -Source $url -Destination $filename -Asynchronous
     $ProgressPreference = "Continue"
     while ($download.JobState -ne "Transferred") {
+        if ($download.JobState -eq "TransientError"){
+            Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
+        }
         [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
         Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
     }
@@ -221,7 +224,7 @@ function New-NestedVM {
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -VMName $AzSHOST | Out-Null
         }
     
-        Set-VM -Name $AzSHOST -ProcessorCount 4 -AutomaticStartAction Start
+        Set-VM -Name $AzSHOST -ProcessorCount 20 -AutomaticStartAction Start
         Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
         Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
         Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
@@ -845,7 +848,7 @@ function Set-AzSMGMT {
 
                 $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "PROVIDER" }
                 Rename-NetAdapter -name $NIC.name -newname "PROVIDER" | Out-Null
-                New-NetIPAddress -InterfaceAlias "PROVIDER" –IPAddress $provIP -PrefixLength $provpfx | Out-Null
+                New-NetIPAddress -InterfaceAlias "PROVIDER" -IPAddress $provIP -PrefixLength $provpfx | Out-Null
 
                 $VerbosePreference = "Continue"
                 Write-Verbose "Configuring VLAN200 NIC on $env:COMPUTERNAME"
@@ -853,7 +856,7 @@ function Set-AzSMGMT {
 
                 $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
                 Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
-                New-NetIPAddress -InterfaceAlias "VLAN200" –IPAddress $vlan200IP -PrefixLength $vlanpfx | Out-Null
+                New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $vlan200IP -PrefixLength $vlanpfx | Out-Null
 
                 $VerbosePreference = "Continue"
                 Write-Verbose "Configuring simulatedInternet NIC on $env:COMPUTERNAME"
@@ -862,7 +865,7 @@ function Set-AzSMGMT {
 
                 $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "simInternet" }
                 Rename-NetAdapter -name $NIC.name -newname "simInternet" | Out-Null
-                New-NetIPAddress -InterfaceAlias "simInternet" –IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null
+                New-NetIPAddress -InterfaceAlias "simInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null
 
                 Write-Verbose "Making NAT Work"
 
@@ -1095,6 +1098,10 @@ function New-DCVM {
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
 
+        # Add NIC for VLAN200 for DHCP server
+        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName "vSwitch-Fabric" -DeviceNaming "On"
+        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $SDNConfig.AKSVlanID
+
         # Inject Answer File
         Write-Verbose "Mounting and injecting answer file into the $VMName VM."        
         $VerbosePreference = "SilentlyContinue"
@@ -1193,9 +1200,16 @@ function New-DCVM {
             $VerbosePreference = "SilentlyContinue"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq $DCName }
             Rename-NetAdapter -name $NIC.name -newname $DCName | Out-Null 
-            New-NetIPAddress -InterfaceAlias $DCName –IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
+            New-NetIPAddress -InterfaceAlias $DCName -IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
-            Install-WindowsFeature -name AD-Domain-Services –IncludeManagementTools | Out-Null
+            Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
+
+            Write-Verbose "Configuring NIC settings for DC VLAN200"
+            $VerbosePreference = "SilentlyContinue"
+            $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
+            Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
+            New-NetIPAddress -InterfaceAlias VLAN200 -IPAddress $SDNConfig.dcVLAN200IP -PrefixLength ($SDNConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $SDNConfig.AKSGWIP | Out-Null
             $VerbosePreference = "Continue"
 
             Write-Verbose "Configuring Trusted Hosts"
@@ -1289,8 +1303,8 @@ function New-DCVM {
 
             New-ADUser @params
 
-            NEW-ADGroup –name “NCAdmins” –groupscope Global
-            NEW-ADGroup –name “NCClients” –groupscope Global
+            NEW-ADGroup -name “NCAdmins” -groupscope Global
+            NEW-ADGroup -name “NCClients” -groupscope Global
 
             add-ADGroupMember "Domain Admins" "NCAdmin"
             add-ADGroupMember "NCAdmins" "NCAdmin"
@@ -1361,7 +1375,39 @@ function New-DCVM {
 
             CMD.exe /c "certutil -SetCATemplates +WebServer"
  
-        }   
+        }
+
+        # Set up DHCP scope for Arc resource bridge
+        Invoke-Command -VMName $SDNConfig.DCName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
+            $SDNConfig = $args[0]
+
+            # Install DHCP feature
+            Install-WindowsFeature DHCP -IncludeManagementTools
+            CMD.exe /c "netsh dhcp add securitygroups"
+            Restart-Service dhcpserver
+
+            # Allow DHCP in domain
+            $dnsName = $SDNConfig.DCName
+            $fqdnsName = $SDNConfig.DCName + "." + $SDNConfig.SDNDomainFQDN
+            Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $SDNConfig.dcVLAN200IP
+            Get-DHCPServerInDC
+
+            # Configure dynamic DNS updates for DHCP records
+            #Set-DhcpServerv4DnsSetting -ComputerName "jumpstartdc.jumpstart.local" -DynamicUpdates "Always" -DeleteDnsRRonLeaseExpiry $True
+            #$Credential = Get-Credential
+            #Set-DhcpServerDnsCredential -Credential $Credential -ComputerName "jumpstartdc.jumpstart.local"
+            
+            # Bind DHCP only to VLAN200 NIC
+            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
+            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
+
+            # Add DHCP scope for Resource bridge VMs
+            Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $SDNConfig.rbVipStart -EndRange $SDNConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+            $scope = Get-DhcpServerv4Scope
+            Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $SDNConfig.rbDHCPExclusionStart -EndRange $SDNConfig.rbDHCPExclusionEnd
+            #Set-DhcpServerv4OptionValue -OptionID 3 -Value $SDNConfig.BGPRouterIP_VLAN200.Trim("/24") -ScopeID $scope.ScopeID.IPAddressToString -ComputerName $dnsName
+            Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $SDNConfig.SDNLABDNS -Router $SDNConfig.BGPRouterIP_VLAN200.Trim("/24")
+        }
     }
     $ErrorActionPreference = "Stop"
 }
@@ -1563,17 +1609,17 @@ function New-RouterVM {
             $VerbosePreference = "SilentlyContinue"  
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "Mgmt" }
             Rename-NetAdapter -name $NIC.name -newname "Mgmt" | Out-Null
-            New-NetIPAddress -InterfaceAlias "Mgmt" –IPAddress $MGMTIP -PrefixLength $MGMTPFX | Out-Null
+            New-NetIPAddress -InterfaceAlias "Mgmt" -IPAddress $MGMTIP -PrefixLength $MGMTPFX | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias “Mgmt” -ServerAddresses $DNS] | Out-Null
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "PROVIDER" }
             Rename-NetAdapter -name $NIC.name -newname "PROVIDER" | Out-Null
-            New-NetIPAddress -InterfaceAlias "PROVIDER" –IPAddress $PNVIP -PrefixLength $PNVPFX | Out-Null
+            New-NetIPAddress -InterfaceAlias "PROVIDER" -IPAddress $PNVIP -PrefixLength $PNVPFX | Out-Null
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
             Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
-            New-NetIPAddress -InterfaceAlias "VLAN200" –IPAddress $VLANIP -PrefixLength $VLANPFX | Out-Null
+            New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $VLANIP -PrefixLength $VLANPFX | Out-Null
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "SIMInternet" }
             Rename-NetAdapter -name $NIC.name -newname "SIMInternet" | Out-Null
-            New-NetIPAddress -InterfaceAlias "SIMInternet" –IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
+            New-NetIPAddress -InterfaceAlias "SIMInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
     
             # if NAT is selected, configure the adapter
        
@@ -1585,7 +1631,7 @@ function New-RouterVM {
                 $Prefix = ($natSubnet.Split("/"))[1]
                 $natIP = ($natSubnet.TrimEnd("0./$Prefix")) + (".10")
                 $natGW = ($natSubnet.TrimEnd("0./$Prefix")) + (".1")
-                New-NetIPAddress -InterfaceAlias "NAT" –IPAddress $natIP -PrefixLength $Prefix -DefaultGateway $natGW | Out-Null
+                New-NetIPAddress -InterfaceAlias "NAT" -IPAddress $natIP -PrefixLength $Prefix -DefaultGateway $natGW | Out-Null
                 if ($natDNS) {
                     Set-DnsClientServerAddress -InterfaceAlias "NAT" -ServerAddresses $natDNS | Out-Null
                 }
@@ -1662,7 +1708,29 @@ function New-RouterVM {
 
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-    
+            
+#             # Enable DHCP Relay
+#             $routerNetAdapterName = "VLAN200"
+#             $netshDhcpRelay=@"
+# pushd routing ip relay
+# install
+# set global loglevel=ERROR
+# add dhcpserver $($SDNConfig.DCIP)
+# add interface name="$routerNetAdapterName"
+# set interface name="$routerNetAdapterName" relaymode=enable maxhop=6 minsecs=6
+# popd
+# "@
+
+#             $netshDhcpRelayPath="$ENV:TEMP\netshDhcpRelay"
+
+            # # Create netsh script file
+            # New-Item -Path $netshDhcpRelayPath -Type File -ErrorAction SilentlyContinue | Out-Null
+
+            # # Populate contents of the script 
+            # Set-Content -Path $netshDhcpRelayPath -Value $netshDhcpRelay.Split("`r`n") -Encoding ASCII
+
+            # # run it
+            # CMD.exe /c "netsh -f $netshDhcpRelayPath"
         }     
     
         $ErrorActionPreference = "Continue"
@@ -1909,7 +1977,7 @@ function New-AdminCenterVM {
 
             Write-Verbose "Configuring WSMAN Trusted Hosts"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
-            Enable-WSManCredSSP -Role Client –DelegateComputer * -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
 
             Write-Verbose "Rename Network Adapter in $VMName VM" 
             Get-NetAdapter | Rename-NetAdapter -NewName Fabric
@@ -2076,7 +2144,7 @@ CertificateTemplate= WebServer
                 # Request and Accept SSL Certificate
                 Set-Location C:\WACCert
                 certreq -q -f -new WACCert.inf WACCert.req
-                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" –submit WACCert.req  WACCert.cer 
+                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" -submit WACCert.req  WACCert.cer 
                 certreq -q -accept WACCert.cer
                 certutil -q -store my
 
