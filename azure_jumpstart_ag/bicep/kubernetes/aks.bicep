@@ -1,11 +1,11 @@
-@description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string
+@description('The name of the Staging Kubernetes cluster resource')
+param aksStagingClusterName string
 
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
 
-@description('Optional DNS prefix to use with hosted Kubernetes API server FQDN dev')
-param dnsPrefixDev string = 'Ag-dev'
+@description('Optional DNS prefix to use with hosted Kubernetes API server FQDN staging')
+param dnsPrefixStaging string = 'Ag-staging'
 
 @description('Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize')
 @minValue(0)
@@ -40,8 +40,8 @@ param enableRBAC bool = true
 @description('The name of the cloud virtual network')
 param virtualNetworkNameCloud string
 
-@description('The name of the dev aks subnet')
-param aksSubnetNameDev string
+@description('The name of the staging aks subnet')
+param aksSubnetNameStaging string
 
 @minLength(5)
 @maxLength(50)
@@ -50,8 +50,8 @@ param acrNameProd string
 
 @minLength(5)
 @maxLength(50)
-@description('Name of the dev Azure Container Registry')
-param acrNameDev string
+@description('Name of the Staging Azure Container Registry')
+param acrNameStaging string
 
 @description('Provide a tier of your Azure Container Registry.')
 param acrSku string = 'Basic'
@@ -66,13 +66,13 @@ var tier  = 'free'
 @description('The version of Kubernetes')
 param kubernetesVersion string = '1.24.9'
 
-var serviceCidr_dev = '10.21.64.0/19'
-var dnsServiceIP_dev = '10.21.64.10'
-var dockerBridgeCidr_dev = '172.18.0.1/16'
+var serviceCidr_staging = '10.21.64.0/19'
+var dnsServiceIP_staging = '10.21.64.10'
+var dockerBridgeCidr_staging = '172.18.0.1/16'
 
-resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
   location: location
-  name: aksDevClusterName
+  name: aksStagingClusterName
   identity: {
     type: 'SystemAssigned'
   }
@@ -83,7 +83,7 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
   properties: {
     kubernetesVersion: kubernetesVersion
     enableRBAC: enableRBAC
-    dnsPrefix: dnsPrefixDev
+    dnsPrefix: dnsPrefixStaging
     aadProfile: {
       managed: true
     }
@@ -96,7 +96,7 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
         vmSize: agentVMSize
         osType: osType
         type: 'VirtualMachineScaleSets'
-        vnetSubnetID: resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkNameCloud, aksSubnetNameDev)
+        vnetSubnetID: resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkNameCloud, aksSubnetNameStaging)
       }
     ]
     storageProfile:{
@@ -106,9 +106,9 @@ resource aksDev 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' 
     }
     networkProfile: {
       networkPlugin: 'azure'
-      serviceCidr: serviceCidr_dev
-      dnsServiceIP: dnsServiceIP_dev
-      dockerBridgeCidr: dockerBridgeCidr_dev
+      serviceCidr: serviceCidr_staging
+      dnsServiceIP: dnsServiceIP_staging
+      dockerBridgeCidr: dockerBridgeCidr_staging
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
@@ -138,8 +138,8 @@ resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-prev
   }
 }
 
-resource acrResourceDev 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: acrNameDev
+resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+  name: acrNameStaging
   location: location
   sku: {
     name: acrSku
@@ -150,7 +150,7 @@ resource acrResourceDev 'Microsoft.ContainerRegistry/registries@2023-01-01-previ
 }
 
 @description('Output the login server property for Dev ACR')
-output acrDevName string = acrResourceDev.name
+output acrStagingName string = acrResourceStaging.name
 
 @description('Output the login server property for Prod ACR')
 output acrProdName string = acrResourceProd.name
