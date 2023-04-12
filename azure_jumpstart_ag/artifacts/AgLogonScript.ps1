@@ -519,6 +519,11 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
 ##############################################################
 # Cleanup
 ##############################################################
+
+# Creating Hyper-V Manager desktop shortcut
+Write-Host "Creating Hyper-V Shortcut"
+Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
