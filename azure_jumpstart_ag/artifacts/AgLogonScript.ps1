@@ -244,7 +244,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $fileUrls | ForEach-Object {
         $fileName = $_.Substring($_.LastIndexOf("/") + 1)
         $outputFile = Join-Path $deploymentFolder $fileName
-        Invoke-WebRequest -Uri $_ -OutFile $outputFile
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
 
     # Setting up replacment parameters for AKS Edge Essentials config json file
