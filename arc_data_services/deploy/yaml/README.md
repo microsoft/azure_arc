@@ -89,7 +89,7 @@ kubectl apply --namespace $ENV:EXTENSION_NAMESPACE -f ../../arcdata-installer.ya
 kubectl apply --namespace $ENV:EXTENSION_NAMESPACE -f ../../arcdata-runtime.yaml
 kubectl apply -f ../../azure-arc-extension-identity.yaml
 
-az k8s-extension create --cluster-name $ENV:CLUSTER_NAME --resource-group $ENV:RESOURCE_GROUP --name $ENV:EXTENSION_NAME --cluster-type connectedClusters --extension-type microsoft.arcdataservices --auto-upgrade false --scope cluster --release-namespace $ENV:EXTENSION_NAMESPACE --config service-account-extension-install="system:serviceaccount:arc:$ENV:INSTALLER_SERVICE_ACCOUNT" --config service-account-extension-runtime="system:serviceaccount:arc:$ENV:RUNTIME_SERVICE_ACCOUNT"
+az k8s-extension create --cluster-name $ENV:CLUSTER_NAME --resource-group $ENV:RESOURCE_GROUP --name $ENV:EXTENSION_NAME --cluster-type connectedClusters --extension-type microsoft.arcdataservices --auto-upgrade false --version 1.18.0 --scope cluster --release-namespace $ENV:EXTENSION_NAMESPACE --config service-account-extension-install="system:serviceaccount:arc:$ENV:INSTALLER_SERVICE_ACCOUNT" --config service-account-extension-runtime="system:serviceaccount:arc:$ENV:RUNTIME_SERVICE_ACCOUNT"
 ```
 
 Similary, the RBAC permissions for the corresponding release must be applied before running `az k8s-extension update` to upgrade the Azure Arc-enabled data services extension to a specific release.
