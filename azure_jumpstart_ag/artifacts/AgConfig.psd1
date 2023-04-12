@@ -24,7 +24,7 @@
     PowerShellModules                    = @('Az.ConnectedKubernetes')
 
     # Chocolatey app list
-    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
+    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer','grafana')
 
     # VSCode extensions
     VSCodeExtensions  = @('ms-vscode-remote.remote-containers','ms-vscode-remote.remote-wsl')
