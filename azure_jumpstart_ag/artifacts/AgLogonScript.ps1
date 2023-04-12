@@ -380,7 +380,7 @@ Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRel
 
 # Creating Prod Grafana Icon on Desktop
 Write-Host "Creating Prod Grafana Icon"
-$shortcutLocation = "$Env:Public\Desktop\Prod Grafana.lnk"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://localhost:3000"
@@ -402,7 +402,7 @@ $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prome
 
 # Creating Staging Grafana Icon on Desktop
 Write-Host "Creating Staging Grafana Icon"
-$shortcutLocation = "$Env:Public\Desktop\Staging Grafana.lnk"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Staging Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$stagingGrafanaLBIP"
@@ -420,7 +420,7 @@ $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafa
 
 # Creating AKS EE Dev Grafana Icon on Desktop
 Write-Host "Creating AKS EE Dev Grafana Icon"
-$shortcutLocation = "$Env:Public\Desktop\Dev Grafana.lnk"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Dev Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$devLBIP"
@@ -479,6 +479,14 @@ $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
 # Initializing the wsl ubuntu app without requiring user input
 $ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
 Invoke-Expression -Command "$ubuntu_path install --root"
+
+# Create Windows Terminal shortcut
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath= (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where {$_.name -eq "wt.exe"}).FullName
+$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
 
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
