@@ -2,7 +2,7 @@
 type: docs
 title: "Enable Azure Automanage on an Azure Arc-enabled server using custom profiles"
 linkTitle: "Enable Azure Automanage on an Azure Arc-enabled server using custom profiles"
-weight: 8
+weight: 2
 description: >
 ---
 
