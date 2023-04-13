@@ -109,6 +109,12 @@ if ($Env:flavor -eq "DataOps") {
 
     $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
+    # Install Azure CLI extensions
+    Write-Header "Az CLI extensions"
+    az extension add --name ssh --yes --only-show-errors
+    az extension add --name log-analytics-solution --yes --only-show-errors
+    az extension add --name connectedmachine --yes --only-show-errors
+
     # Required for CLI commands
     Write-Header "Az CLI Login"
     az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
