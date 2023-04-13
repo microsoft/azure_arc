@@ -225,10 +225,17 @@ New-GuestConfigurationPackage `
 -Force
 ```
 
-Test applying the configuration to the local machine
+Optionally, test applying the configuration to the local machine by copying and pasting the following commands into the terminal.
 
 ```powershell
-Start-GuestConfigurationPackageRemediation -Path "$OutputPath/AzureArcJumpstart_Linux.zip"
+# Need to run with elevated credentials since the configuration is performing system wide operations
+sudo pwsh
+
+Install-Module -Name GuestConfiguration -Force -RequiredVersion 4.4.0
+
+Start-GuestConfigurationPackageRemediation -Path /home/arcdemo/arc_automanage_machine_configuration_custom_linux/AzureArcJumpstart_Linux.zip -Verbose
+
+exit
 ```
 
 Upload the configuration package to Azure Storage.
