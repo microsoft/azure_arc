@@ -35,7 +35,7 @@ In this scenario, we will be using the ArcBox Client virtual machine for the con
 You can [connect to the ArcBox machine as described in the documentation]( https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#connecting-to-the-arcbox-client-virtual-machine) and perform the following:
 
 - Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.3).
-    - Run ```$PSVersionTable``` to check your currently installed version.
+  - Run ```$PSVersionTable``` to check your currently installed version.
 - Open Visual Studio Code from the desktop shortcut.
 - Install the PowerShell extension.
 - Create C:\ArcBox\MachineConfiguration.ps1, then paste and run the following commands to install the required PowerShell modules for this scenario:
@@ -52,27 +52,27 @@ Install-Module -Name GuestConfiguration -Force -RequiredVersion 4.4.0
 Install-Module PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
 Install-Module PSDscResources -Force -RequiredVersion 2.12.0.0
 ```
+
 The Azure PowerShell modules is used for:
-  - Publishing the package to Azure storage
-  - Creating a policy definition
-  - Publishing the policy
-  - Connecting to the Azure Arc-enabled servers
+
+- Publishing the package to Azure storage
+- Creating a policy definition
+- Publishing the policy
+- Connecting to the Azure Arc-enabled servers
 
 The GuestConfiguration module automates the process of creating custom content including:
 
-  - Creating a machine configuration content artifact (.zip)
-  - Validating the package meets requirements
-  - Installing the machine configuration agent locally for testing
-  - Validating the package can be used to audit settings in a machine
-  - Validating the package can be used to configure settings in a machine
+- Creating a machine configuration content artifact (.zip)
+- Validating the package meets requirements
+- Installing the machine configuration agent locally for testing
+- Validating the package can be used to audit settings in a machine
+- Validating the package can be used to configure settings in a machine
 
 Desired State Configuration version 3 is removing the dependency on MOF.
 Initially, there are only support for DSC Resources written as PowerShell classes.
 Due to using MOF-based DSC resources for the Windows demo-configuration, we are using version 2.0.5.
 
-
 ## Azure resources
-
 
 > **NOTE: For the remaining code blocks in this article, copy the code into ```C:\ArcBox\MachineConfiguration.ps1```, mark the lines you want to run and click F8.**
 
@@ -222,11 +222,10 @@ New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Windows] Custom configuration
 
 In order for the newly assigned policy to remediate existing resources, the policy must be assigned a managed identity and a policy remediation must be performed. Hence, the next steps are:
 
- - Grant a managed identity defined roles with PowerShell
- - Create a remediation task through Azure PowerShell
+- Grant a managed identity defined roles with PowerShell
+- Create a remediation task through Azure PowerShell
 
 See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources) for more information.
-
 
 ```powershell
 $PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Windows] Custom configuration'
@@ -274,6 +273,7 @@ Click on *ArcBox-Win2K22/AzureArcJumpstart_Windows* to get a per-resource view o
 ### Verify that the operating system level settings are in place
 
 Login to ArcBox-Win2K22 by running the below command
+
 - Enter the password **ArcDemo123!!** when prompted
 
 ```powershell
@@ -343,10 +343,9 @@ You might also want to have a look at the following resources if you have been u
 - [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
 - [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
 
-
 ## Clean up environment
 
-Complete the following steps to clean up your environment. To disable Azure Automanage you will use the Azure portal. Go to the Automanage page that lists all of your auto-managed VMs. Select the checkbox next to the Azure Arc-enabled Server you want to disable from Automanage, then click on the _Disable_ button.
+Complete the following steps to clean up your environment. To disable Azure Automanage you will use the Azure portal. Go to the Automanage page that lists all of your auto-managed VMs. Select the checkbox next to the Azure Arc-enabled Server you want to disable from Automanage, then click on the *Disable* button.
 
 ```powershell
 $PolicyDefinition = Get-AzPolicyDefinition -Name '(AzureArcJumpstart) [Windows] Custom configuration'

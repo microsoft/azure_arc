@@ -44,8 +44,9 @@ Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
 ![Screenshot of Remote SSH extension](./15.png)
 
 ![Screenshot of Remote SSH extension](./13.png)
+
 - Open VS Code and add a new Remote SSH target:
-    - Enter the value ```ssh arcdemo@10.10.1.103 -A``` and press Enter two times
+  - Enter the value ```ssh arcdemo@10.10.1.103 -A``` and press Enter two times
 
 ![Screenshot of Remote SSH extension](./16.png)
 
@@ -65,7 +66,8 @@ Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
 
 - In the VS Code menu, click Terminal -> New
 - Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3#installation-via-direct-download) by running the following in the terminal window:
-```
+
+```bash
 wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb
 sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb
 ```
@@ -74,8 +76,9 @@ sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb
 
 ![Screenshot of PowerShell installation](./20.png)
 
-- Due to a specific prerequisite (libmi) for packaging Machine Configurations, install the PSWSMan module which contains the required dependecies:
-```
+- Due to a specific prerequisite (libmi) for packaging Machine Configurations, install the PSWSMan module which contains the required dependencies:
+
+```bash
 sudo pwsh
 Install-Module -Force -PassThru -Name PSWSMan
 Install-WSMan
@@ -108,17 +111,18 @@ Install-Module nxtools -Force -RequiredVersion 0.4.0-preview0001 -AllowPrereleas
 
 The GuestConfiguration module automates the process of creating custom content including:
 
-  - Creating a guest configuration content artifact (.zip)
-  - Validating the package meets requirements
-  - Installing the guest configuration agent locally for testing
-  - Validating the package can be used to audit settings in a machine
-  - Validating the package can be used to configure settings in a machine
+- Creating a guest configuration content artifact (.zip)
+- Validating the package meets requirements
+- Installing the guest configuration agent locally for testing
+- Validating the package can be used to audit settings in a machine
+- Validating the package can be used to configure settings in a machine
 
 The Azure PowerShell modules is used for:
-  - Publishing the package to Azure storage
-  - Creating a policy definition
-  - Publishing the policy
-  - Connecting to the Azure Arc-enabled servers
+
+- Publishing the package to Azure storage
+- Creating a policy definition
+- Publishing the policy
+- Connecting to the Azure Arc-enabled servers
 
 Desired State Configuration version 3 is currently in beta, but is the only version supported for Linux-based DSC configurations.
 
@@ -228,7 +232,7 @@ Start-GuestConfigurationPackageRemediation -Path "$OutputPath/AzureArcJumpstart_
 ```
 
 Upload the configuration package to Azure Storage.
-Insert the correct storage account name on the first line in place of the placeholder value for the -Name parameter based on the output of the storage account created in the step _"Shared resources"_.
+Insert the correct storage account name on the first line in place of the placeholder value for the -Name parameter based on the output of the storage account created in the step *"Shared resources"*.
 
 ```powershell
 $StorageAccount = Get-AzStorageAccount -Name <insert-storage-account-name> -ResourceGroupName $ResourceGroupName
@@ -272,11 +276,10 @@ New-AzPolicyAssignment -Name '(AzureArcJumpstart) [Linux] Custom configuration' 
 
 In order for the newly assigned policy to remediate existing resources, the policy must be assigned a managed identity and a policy remediation must be performed. Hence, the next steps are:
 
- - Grant a managed identity defined roles with PowerShell
- - Create a remediation task through Azure PowerShell
+- Grant a managed identity defined roles with PowerShell
+- Create a remediation task through Azure PowerShell
 
 See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources) for more information.
-
 
 ```powershell
 $PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Linux] Custom configuration'
@@ -324,6 +327,7 @@ Click on *Arcbox-Ubuntu-01/AzureArcJumpstart_Linux* to get a per-resource view o
 ### Verify that the operating system level settings are in place
 
 Login to Arcbox-Ubuntu-01 by running the below command
+
 - Enter the password **ArcDemo123!!** when prompted
 
 ```powershell
@@ -334,7 +338,7 @@ Verify that the packages **hello** and **nginx** are installed by running ```apt
 
 ![Screenshot of ArcBox-Ubuntu-01](./05.png)
 
-You can also verify that nginx is running and available by accessing http://10.10.1.103/ from Microsoft Edge on the ArcBox Client virtual machine.
+You can also verify that nginx is running and available by accessing [http://10.10.1.103/](http://10.10.1.103/) from Microsoft Edge on the ArcBox Client virtual machine.
 
 ![Screenshot of nginx](./26.png)
 
@@ -368,7 +372,6 @@ After going through this scenario you may want to write your own configurations 
 
 For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtools) will help in managing common tasks - such as:
 
-
 - `nxGroup`: Resource to manage [nxLocalGroup] and group members.
 - `nxUser`: Resource to manage [nxLocalUser] accounts.
 - `nxService`: Manage the state of daemons/services.
@@ -377,7 +380,6 @@ For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtoo
 - `nxFileLine`: Ensure an exact line is present/absent in a file, and remediate by appending, inserting, deleting as needed.
 - `nxFileContentReplace`: Replace the content in a file if a pattern is found.
 
-
 Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/en-us/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
 
 You might also want to have a look at the following resources if you have been using DSC in the past:
@@ -385,10 +387,9 @@ You might also want to have a look at the following resources if you have been u
 - [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
 - [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
 
-
 ## Clean up environment
 
-Complete the following steps to clean up your environment. To disable Azure Automanage you will use the Azure portal. Go to the Automanage page that lists all of your auto-managed VMs. Select the checkbox next to the Azure Arc-enabled Server you want to disable from Automanage, then click on the _Disable_ button.
+Complete the following steps to clean up your environment. To disable Azure Automanage you will use the Azure portal. Go to the Automanage page that lists all of your auto-managed VMs. Select the checkbox next to the Azure Arc-enabled Server you want to disable from Automanage, then click on the *Disable* button.
 
 ```powershell
 Remove-AzPolicyAssignment -Name '(AzureArcJumpstart) [Linux] Custom configuration'
