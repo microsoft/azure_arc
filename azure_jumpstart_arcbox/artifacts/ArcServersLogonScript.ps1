@@ -353,11 +353,17 @@ if ($Env:flavor -ne "DevOps") {
     $token=(az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
     $headers = @{"Authorization"="Bearer $token"; "Content-Type"="application/json"}
 
-    # Build API request payload
+    <# Build API request payload
     $apiPayload = (Invoke-WebRequest -Method Get -Uri $armRestApiEndpoint -Headers $headers).Content | ConvertFrom-Json
     $apiPayload.properties.settings.AssessmentSettings.settingsSaveTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
     $apiPayload = $apiPayload | ConvertTo-Json -Depth 5
+    #>
 
+    $worspaceResourceId = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
+    $sqlExtensionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer"
+    $sqlbpaPayloadTemplate = "$Env:templateBaseUrl/artifacts/sqlbpa.payload.json"
+    $settingsSaveTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+    $apiPayload = (Invoke-WebRequest -Uri $sqlbpaPayloadTemplate).Content -replace '{{RESOURCEID}}', $sqlExtensionId -replace '{{LOCATION}}', $azureLocation -replace '{{WORKSPACEID}}', $worspaceResourceId -replace '{{SAVETIME}}', $settingsSaveTime
 
     # Call REST API to run best practices assessment
     Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
