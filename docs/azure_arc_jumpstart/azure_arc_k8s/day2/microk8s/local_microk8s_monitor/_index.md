@@ -1,16 +1,16 @@
 ---
 type: docs
-title: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
-linkTitle: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
+title: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster using a Shell script"
+linkTitle: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster using a Shell script"
 weight: 2
 description: >
 ---
 
-## Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster
+## Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster using a Shell script
 
-The following Jumpstart scenario will guide you on how to onboard an microK8s cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview).
+The following Jumpstart scenario will guide you on how to onboard an microK8s cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) using a Shell script.
 
-in this scenario, you will hook the microK8s cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
+in this scenario, you will hook the microK8s cluster to Azure Monitor by deploying the [Azure Monitor agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
 
 > **NOTE: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
 
@@ -85,21 +85,21 @@ in this scenario, you will hook the microK8s cluster to Azure Monitor by deployi
     The script will:
 
   * Login to your Azure subscription using the SPN credentials
-  * Download the OMS script
+  * Download the Azure Monitor agent script
   * Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
   * Retrieve the Kube config using the `microk8s config` command and append the configuration to ~/.kube/config
-  * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
+  * Execute the script which will create Azure Log Analytics workspace, deploy the Azure Monitor agent on the Kubernetes cluster and tag the cluster
   * Delete the downloaded script
 
   * Once the script will complete its run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers.
   
 At the end of its run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
-  > **NOTE: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+  > **NOTE: As the Azure Monitor agent starts collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
-  ![Installing the OMS agent on the cluster](./03.png)
+  ![Installing the Azure Monitor agent on the cluster](./03.png)
 
-  ![Installing the OMS agent on the cluster](./04.png)
+  ![Installing the Azure Monitor agent on the cluster](./04.png)
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate through the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
