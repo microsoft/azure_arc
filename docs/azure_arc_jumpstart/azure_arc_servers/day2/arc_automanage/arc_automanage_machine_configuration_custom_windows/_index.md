@@ -268,7 +268,7 @@ Get a Machine Configuration specific view by following these steps:
 
 Click on *ArcBox-Win2K22/AzureArcJumpstart_Windows* to get a per-resource view of the compliance state in the assigned configuration
 
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./12.png)
+![Screenshot of Azure Portal showing Azure Machine Configuration compliance detailed view](./12.png)
 
 ### Verify that the operating system level settings are in place
 
@@ -282,17 +282,17 @@ Enter-AzVM -ResourceGroupName $ResourceGroupName -Name ArcBox-Win2K22 -LocalUser
 
 Verify that the local group **arcusers** exists by first running ```powershell``` followed by ```Get-LocalUser -Name arcboxuser1```.
 
-![Screenshot of ArcBox-Win2K22](./06.png)
+![Screenshot of local user present on ArcBox-Win2K22](./06.png)
 
 Verify that the SMB1 feature is not installed by running ```Get-WindowsFeature -Name FS-SMB1```.
 
 - The output should show that the feature is *Available*, not *Installed*
 
-![Screenshot of ArcBox-Win2K22](./08.png)
+![Screenshot of SMB1 feature installation status on ArcBox-Win2K22](./08.png)
 
 Verify that PowerShell 7 is installed by running ```pwsh```.
 
-![Screenshot of ArcBox-Win2K22](./09.png)
+![Screenshot of PowerShell 7 presence on ArcBox-Win2K22](./09.png)
 
 > *NOTE: If you prefer to log on interactively to a Remote Desktop session in order to verify the configuration settings, add -Rdp to the Enter-AzVM command:
 
@@ -300,7 +300,7 @@ Verify that PowerShell 7 is installed by running ```pwsh```.
 Enter-AzVM -ResourceGroupName $ResourceGroupName -Name ArcBox-Win2K22 -LocalUser Administrator -Rdp
 ```
 
-![Screenshot of ArcBox-Win2K22](./07.png)
+![Screenshot of connecting to ArcBox-Win2K22 via Azure PowerShell](./07.png)
 
 If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the user arcboxuser1: ```Get-LocalUser -Name arcboxuser1 | Remove-LocalUser```
 
