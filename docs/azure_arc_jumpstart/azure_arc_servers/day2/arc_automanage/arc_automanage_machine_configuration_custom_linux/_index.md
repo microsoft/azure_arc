@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to create and assign a custom Automanage Machine Configuration to an Azure Arc-enabled Linux server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
 
-While the use of custom configurations in Automanage Machine Configuration feature is based on PowerShell Desired State Configuration (DSC), there are [Changes to behavior in PowerShell DSC for Machine Configuration](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-custom?view=dsc-2.0) to be aware of, the most significant being the use of PowerShell 7.
+While the use of custom configurations in Automanage Machine Configuration feature is based on PowerShell Desired State Configuration (DSC), there are [Changes to behavior in PowerShell DSC for Machine Configuration](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-custom?view=dsc-2.0) to be aware of, the most significant being the use of PowerShell 7.
 
 By the end of this scenario, you will have both Linux and Windows Azure Arc-enabled servers with Automanage Machine Configuration custom configurations assigned.
 
@@ -32,7 +32,7 @@ Operating system:
 
 In this scenario, we will be using the ArcBox Client virtual machine for the configuration authoring - and connect to a nested Linux VM.
 
-You can [connect to the ArcBox machine as described in the documentation]( https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#connecting-to-the-arcbox-client-virtual-machine) and perform the following:
+You can [connect to the ArcBox machine as described in the documentation](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#connecting-to-the-arcbox-client-virtual-machine) and perform the following:
 
 - Open Visual Studio Code from the desktop shortcut.
 - Install the [Remote SSH extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh).
@@ -65,7 +65,7 @@ Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
 ![Screenshot of Remote SSH extension](./19.png)
 
 - In the VS Code menu, click Terminal -> New
-- Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3#installation-via-direct-download) by running the following in the terminal window:
+- Install [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu?view=powershell-7.3#installation-via-direct-download) by running the following in the terminal window:
 
 ```bash
 wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb
@@ -279,7 +279,7 @@ In order for the newly assigned policy to remediate existing resources, the poli
 - Grant a managed identity defined roles with PowerShell
 - Create a remediation task through Azure PowerShell
 
-See the [documentation](https://docs.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources) for more information.
+See the [documentation](https://docs.microsoft.com/azure/governance/policy/how-to/remediate-resources) for more information.
 
 ```powershell
 $PolicyAssignment = Get-AzPolicyAssignment -PolicyDefinitionId $PolicyDefinition.PolicyDefinitionId | Where-Object Name -eq '(AzureArcJumpstart) [Linux] Custom configuration'
@@ -344,21 +344,21 @@ You can also verify that nginx is running and available by accessing [http://10.
 
 If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the package hello: ```sudo apt remove hello```
 
-Trigger a [manual evaluation](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-9.4.0) or wait until the next policy evaluation cycle has completed and observe that the policy is now non-compliant.
+Trigger a [manual evaluation](https://learn.microsoft.com/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-9.4.0) or wait until the next policy evaluation cycle has completed and observe that the policy is now non-compliant.
 
-Next, perform the steps outlined in [Create a remediation task](https://learn.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources?tabs=azure-portal#create-a-remediation-task) for the ArcBox-policies to bring the machine back into compliance.
+Next, perform the steps outlined in [Create a remediation task](https://learn.microsoft.com/azure/governance/policy/how-to/remediate-resources?tabs=azure-portal#create-a-remediation-task) for the ArcBox-policies to bring the machine back into compliance.
 
-To learn more, check out [Remediation options for machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-policy-effects) in the documentation.
+To learn more, check out [Remediation options for machine configuration](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-policy-effects) in the documentation.
 
 ## Summary
 
 In this scenario you have performed the following tasks:
 
-- [Created a package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create) for machine configuration.
-- [Tested the package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-test) from your development environment.
-- [Published the package artifact](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-publish) so it is accessible to your machines.
-- Used the GuestConfiguration module to [create an Azure Policy definition](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-create-definition) for at-scale management of your environment.
-- [Assigned your custom policy definition](https://learn.microsoft.com/en-us/azure/governance/policy/assign-policy-portal) to the ArcBox resource group.
+- [Created a package artifact](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-create) for machine configuration.
+- [Tested the package artifact](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-create-test) from your development environment.
+- [Published the package artifact](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-create-publish) so it is accessible to your machines.
+- Used the GuestConfiguration module to [create an Azure Policy definition](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-create-definition) for at-scale management of your environment.
+- [Assigned your custom policy definition](https://learn.microsoft.com/azure/governance/policy/assign-policy-portal) to the ArcBox resource group.
 
 > *NOTE: For ArcBox exploration, it is recommended to perform the assignment at the resource group level where the Azure Arc-enabled servers reside to not accidentally apply the configuration to other machines in your environment*
 
@@ -366,9 +366,9 @@ In this scenario you have performed the following tasks:
 
 After going through this scenario you may want to write your own configurations to meet your organization`s needs and requirements.
 
-- [Desired State Configuration overview](https://learn.microsoft.com/en-us/powershell/dsc/overview?view=dsc-2.0)
-- [Installing DSC Resources](https://learn.microsoft.com/en-us/powershell/dsc/how-tos/installing-dsc-resources?view=dsc-2.0)
-- [Write and compile a DSC Configuration](https://learn.microsoft.com/en-us/powershell/dsc/how-tos/configurations/write-and-compile?view=dsc-2.0)
+- [Desired State Configuration overview](https://learn.microsoft.com/powershell/dsc/overview?view=dsc-2.0)
+- [Installing DSC Resources](https://learn.microsoft.com/powershell/dsc/how-tos/installing-dsc-resources?view=dsc-2.0)
+- [Write and compile a DSC Configuration](https://learn.microsoft.com/powershell/dsc/how-tos/configurations/write-and-compile?view=dsc-2.0)
 
 For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtools) will help in managing common tasks - such as:
 
@@ -380,12 +380,12 @@ For Linux, the [nxtools module](https://www.powershellgallery.com/packages/nxtoo
 - `nxFileLine`: Ensure an exact line is present/absent in a file, and remediate by appending, inserting, deleting as needed.
 - `nxFileContentReplace`: Replace the content in a file if a pattern is found.
 
-Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/en-us/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
+Should your needs not be covered by an existing DSC resource module, check out [Create a class-based DSC Resource for machine configuration](https://learn.microsoft.com/powershell/dsc/tutorials/create-dsc-resource-machine-config?view=dsc-2.0) in the DSC documentation.
 
 You might also want to have a look at the following resources if you have been using DSC in the past:
 
-- [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
-- [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/en-gb/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
+- [Azure Automation state configuration to machine configuration migration planning](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-azure-automation-migration)
+- [Planning a change from Desired State Configuration extension for Linux to machine configuration](https://learn.microsoft.com/azure/governance/machine-configuration/machine-configuration-dsc-extension-migration)
 
 ## Clean up environment
 
