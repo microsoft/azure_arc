@@ -8,7 +8,7 @@ description: >
 
 ## Create Automanage Machine Configuration custom configurations for Windows
 
-The following Jumpstart scenario will guide you on how to create and assign Automanage Machine Configuration custom configurations to an Azure Arc-enabled Windows server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
+The following Jumpstart scenario will guide you on how to create and assign a custom Automanage Machine Configuration to an Azure Arc-enabled Windows server. Automanage makes it easy to follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
 
 While the use of custom configurations in Automanage Machine Configuration feature is based on PowerShell Desired State Configuration (DSC), there are [Changes to behavior in PowerShell DSC for Machine Configuration](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/machine-configuration-custom?view=dsc-2.0) to be aware of, the most significant being the use of PowerShell 7.
 
