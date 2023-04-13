@@ -188,7 +188,7 @@ $Context = New-AzStorageContext -StorageAccountName $storageaccount.StorageAccou
 
 Set-AzStorageBlobContent -Container "machineconfiguration" -File  "$OutputPath/AzureArcJumpstart_Windows.zip" -Blob "AzureArcJumpstart_Windows.zip" -Context $Context -Force
 
-$contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "AzureArcJumpstart_Windows.zip" -Permission rwd
+$contenturi = New-AzStorageBlobSASToken -Context $Context -FullUri -Container machineconfiguration -Blob "AzureArcJumpstart_Windows.zip" -Permission r
 ```
 
 Create an Azure Policy definition
