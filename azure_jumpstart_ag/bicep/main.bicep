@@ -82,7 +82,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   }
 }
 
-module networkDeployment 'network/network.bicep' = {
+module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud : virtualNetworkNameCloud
@@ -140,7 +140,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }
 
-/*module synapseDeployment 'mgmt/synapse.bicep' = {
+/*module synapseDeployment 'analytics/synapse.bicep' = {
   name: 'synapseDeployment'
   params: {
     synapseWorkspaceName: synapseWorkspaceName
@@ -153,7 +153,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }*/
 
-module iotHubDeployment 'mgmt/iotHub.bicep' = {
+module iotHubDeployment 'analytics/iotHub.bicep' = {
   name: 'iotHubDeployment'
   params: {
     location: location
