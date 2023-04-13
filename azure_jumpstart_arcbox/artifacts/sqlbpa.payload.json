@@ -6,28 +6,31 @@
     "properties": {
         "publisher": "Microsoft.AzureData",
         "type": "WindowsAgent.SqlServer",
+        "typeHandlerVersion": "1.1.2284.7",
         "autoUpgradeMinorVersion": false,
         "enableAutomaticUpgrade": true,
         "settings": {
+            "ExcludedSqlInstances": [],
             "SqlManagement": {
                 "IsEnabled": true
             },
-            "ExcludedSqlInstances": [],
+            "LicenseType": "Paid",
             "AssessmentSettings": {
                 "Enable": true,
                 "RunImmediately": true,
                 "schedule": {
+                    "dayOfWeek": "Sunday",
                     "Enable": true,
-                    "WeeklyInterval": 1,
                     "monthlyOccurrence": null,
-                    "dayOfWeek": "Monday",
                     "StartDate": null,
-                    "startTime": "09:00"
+                    "startTime": "00:00",
+                    "WeeklyInterval": 1
                 },
                 "WorkspaceResourceId": "{{WORKSPACEID}}",
-                "WorkspaceLocation": "{{LOCATION}}"
-            },
-            "LicenseType": "Paid"
+                "WorkspaceLocation": "{{LOCATION}}",
+                "ResourceNamePrefix": null,
+                "settingsSaveTime": {{SAVETIME}}
+            }
         }
     }
 }
