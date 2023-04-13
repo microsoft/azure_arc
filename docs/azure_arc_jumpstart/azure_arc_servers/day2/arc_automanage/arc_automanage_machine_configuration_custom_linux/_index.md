@@ -228,7 +228,7 @@ Start-GuestConfigurationPackageRemediation -Path "$OutputPath/AzureArcJumpstart_
 ```
 
 Upload the configuration package to Azure Storage.
-Insert the correct storage account name on the first line in place of the placeholder value for the -Name parameter based on the output of the storage account created in the step *"Shared resources"*.
+Insert the correct storage account name on the first line in place of the placeholder value for the -Name parameter based on the output of the storage account created in the step _"Shared resources"_.
 
 ```powershell
 $StorageAccount = Get-AzStorageAccount -Name <insert-storage-account-name> -ResourceGroupName $ResourceGroupName
