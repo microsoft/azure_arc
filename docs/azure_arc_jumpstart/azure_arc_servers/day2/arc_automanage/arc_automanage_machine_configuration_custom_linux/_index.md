@@ -37,32 +37,32 @@ You can [connect to the ArcBox machine as described in the documentation](https:
 - Open Visual Studio Code from the desktop shortcut.
 - Install the [Remote SSH extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh).
 
-![Screenshot of installing the Remote - SSH extension](./13.png)
+![Screenshot of installing the Remote - SSH extension](./02.png)
 
 Open Hyper-V Manager and determine the IP address of the ArcBox-Ubuntu-01 VM:
 
-![Screenshot of Hyper-V Manager](./15.png)
+![Screenshot of Hyper-V Manager](./03.png)
 
-![Screenshot of adding a new remote SSH target](./14.png)
+![Screenshot of adding a new remote SSH target](./04.png)
 
 - Open VS Code and add a new Remote SSH target:
   - Enter the value ```ssh arcdemo@10.10.1.103 -A``` and press Enter two times
 
-![Screenshot of adding SSH connection command](./16.png)
+![Screenshot of adding SSH connection command](./05.png)
 
 - Click Connect in the following dialogue box:
 
-![Screenshot of Remote SSH extension info dialogue](./17.png)
+![Screenshot of Remote SSH extension info dialogue](./06.png)
 
 - Select Linux in the following dialogue box and press Enter:
 
-![Screenshot of platform selection](./18.png)
+![Screenshot of platform selection](./07.png)
 
 - When prompted for password, enter ```ArcDemo123!!```
 
 - As indicated in the lower left corner, VS Code should now be connected to the remote machine:
 
-![Screenshot of SSH connection status](./19.png)
+![Screenshot of SSH connection status](./08.png)
 
 - In the VS Code menu, click Terminal -> New
 - Install [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu?view=powershell-7.3#installation-via-direct-download) by running the following in the terminal window:
@@ -74,7 +74,7 @@ sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb
 
 - Followed by ```pwsh``` to ensure PowerShell is available.
 
-![Screenshot of PowerShell installation command](./20.png)
+![Screenshot of PowerShell installation command](./09.png)
 
 - Due to a specific prerequisite (libmi) for packaging Machine Configurations, install the PSWSMan module which contains the required dependencies:
 
@@ -84,15 +84,15 @@ Install-Module -Force -PassThru -Name PSWSMan
 Install-WSMan
 ```
 
-![Screenshot of PowerShell module installation](./24.png)
+![Screenshot of PowerShell module installation](./10.png)
 
 - Install the PowerShell extension in VS Code.
 
-![Screenshot of PowerShell extension](./21.png)
+![Screenshot of PowerShell extension](./11.png)
 
 - Click *File -> New Text File*, click Ctrl + S and specify ```/home/arcdemo/MachineConfiguration.ps1``` as the path for the new file.
 
-![Screenshot of PowerShell script Save As dialogue](./22.png)
+![Screenshot of PowerShell script Save As dialogue](./12.png)
 
 - Paste and run the following commands by pressing F5 in order to install the required PowerShell modules for this scenario:
 
@@ -132,7 +132,7 @@ The nxtools module contains DSC resources used for the demo configuration.
 
 > **NOTE: For the remaining code blocks in this article, copy the code into ```/home/arcdemo/MachineConfiguration.ps1``` , mark the lines you want to run and click F8. Alternatively, right click the selected commands and click Run Selection:**
 
-![Screenshot of PowerShell script and Run Selection menu option](./23.png)
+![Screenshot of PowerShell script and Run Selection menu option](./13.png)
 
 Authenticate to Azure
 
@@ -308,7 +308,7 @@ Check policy compliance by following these steps:
 - Set the scope to the resource group your instance of ArcBox is deployed to
 - Filter for *(AzureArcJumpstart) [Linux] Custom configuration*
 
-![Screenshot of Azure Portal showing Azure Policy compliance](./02.png)
+![Screenshot of Azure Portal showing Azure Policy compliance](./14.png)
 
 It may take 15-20 minutes for the policy remediation to be completed.
 
@@ -318,11 +318,11 @@ Get a Machine Configuration specific view by following these steps:
 - Click on Arcbox-Ubuntu-01 -> Machine Configuration
 - If the status for *Arcbox-Ubuntu-01/AzureArcJumpstart_Linux* is not *Compliant*, wait a few more minutes and click *Refresh*
 
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./03.png)
+![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./15.png)
 
 Click on *Arcbox-Ubuntu-01/AzureArcJumpstart_Linux* to get a per-resource view of the compliance state in the assigned configuration
 
-![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./04.png)
+![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./16.png)
 
 ### Verify that the operating system level settings are in place
 
@@ -336,11 +336,11 @@ Enter-AzVM -ResourceGroupName $ResourceGroupName -Name Arcbox-Ubuntu-01 -LocalUs
 
 Verify that the packages **hello** and **nginx** are installed by running ```apt list --installed | grep 'hello\|nginx/focal'```
 
-![Screenshot of connection to ArcBox-Ubuntu-01](./05.png)
+![Screenshot of connection to ArcBox-Ubuntu-01](./17.png)
 
 You can also verify that nginx is running and available by accessing [http://10.10.1.103/](http://10.10.1.103/) from Microsoft Edge on the ArcBox Client virtual machine.
 
-![Screenshot of nginx](./26.png)
+![Screenshot of nginx](./18.png)
 
 If you want to evaluate how remediation works, try to make one of the above configuration settings non-compliant by, for example, removing the package hello: ```sudo apt remove hello```
 
