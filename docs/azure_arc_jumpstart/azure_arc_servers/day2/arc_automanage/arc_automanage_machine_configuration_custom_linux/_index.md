@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Create Automanage Machine Configuration custom configurations "
-linkTitle: "Create Automanage Machine Configuration custom configurations "
+title: "Create Automanage Machine Configuration custom configurations for Linux"
+linkTitle: "Create Automanage Machine Configuration custom configurations for Linux"
 weight: 4
 description: >
 ---
