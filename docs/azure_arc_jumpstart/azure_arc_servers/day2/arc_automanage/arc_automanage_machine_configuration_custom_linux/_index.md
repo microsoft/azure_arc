@@ -2,7 +2,7 @@
 type: docs
 title: "Create Automanage Machine Configuration custom configurations "
 linkTitle: "Create Automanage Machine Configuration custom configurations "
-weight: 8
+weight: 4
 description: >
 ---
 
