@@ -1,12 +1,11 @@
 {
     "mappings": [
         {
-            "ApiVersion": "2022-03-01-preview",
+            "ApiVersion": "2023-01-15-preview",
             "ResourceType": "datacontrollers/activeDirectoryConnectors",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1beta2",
+            "ResourceMapping": {
+                "Version": "v1",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "ActiveDirectoryConnector",
                 "Name": "activedirectoryconnectors",
@@ -21,11 +20,45 @@
         },
         {
             "ApiVersion": "2022-03-01-preview",
+            "ResourceType": "datacontrollers/activeDirectoryConnectors",
+            "ProviderName": "Microsoft.AzureArcData",
+            "ResourceMapping": {
+                "Version": "v1",
+                "Group": "arcdata.microsoft.com",
+                "Kind": "ActiveDirectoryConnector",
+                "Name": "activedirectoryconnectors",
+                "IsAsync": false,
+                "AutomaticDelete": true,
+                "Liquid": {
+                    "AzureToKubernetes": "activedirectoryconnectors/v1beta2/azure.liquid",
+                    "KubernetesToAzure": "activedirectoryconnectors/v1beta2/kubernetes.liquid",
+                    "Hydration": "activedirectoryconnectors/v1beta2/hydration.liquid"
+                }
+            }
+        },
+        {
+            "ApiVersion": "2023-01-15-preview",
             "ResourceType": "dataControllers",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v4",
+            "ResourceMapping": {
+                "Version": "v5",
+                "Group": "arcdata.microsoft.com",
+                "Kind": "DataController",
+                "Name": "datacontrollers",
+                "IsAsync": false,
+                "AutomaticDelete": true,
+                "Liquid": {
+                    "AzureToKubernetes": "datacontrollers/v2/azure.liquid",
+                    "KubernetesToAzure": "datacontrollers/v2/kubernetes.liquid"
+                }
+            }
+        },
+        {
+            "ApiVersion": "2022-03-01-preview",
+            "ResourceType": "dataControllers",
+            "ProviderName": "Microsoft.AzureArcData",
+            "ResourceMapping": {
+                "Version": "v5",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "DataController",
                 "Name": "datacontrollers",
@@ -41,9 +74,8 @@
             "ApiVersion": "2021-11-01",
             "ResourceType": "dataControllers",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v2",
+            "ResourceMapping": {
+                "Version": "v5",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "DataController",
                 "Name": "datacontrollers",
@@ -59,8 +91,7 @@
             "ApiVersion": "2021-08-01",
             "ResourceType": "dataControllers",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
+            "ResourceMapping": {
                 "Version": "v1",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "DataController",
@@ -77,9 +108,8 @@
             "ApiVersion": "2021-07-01-preview",
             "ResourceType": "dataControllers",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1beta1",
+            "ResourceMapping": {
+                "Version": "v1",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "DataController",
                 "Name": "datacontrollers",
@@ -88,6 +118,24 @@
                 "Liquid": {
                     "AzureToKubernetes": "datacontrollers/v1/azure.liquid",
                     "KubernetesToAzure": "datacontrollers/v1/kubernetes.liquid"
+                }
+            }
+        },
+        {
+            "ApiVersion": "2023-01-15-preview",
+            "ResourceType": "sqlManagedInstances",
+            "ProviderName": "Microsoft.AzureArcData",
+            "ResourceMapping": {
+                "Version": "v12",
+                "Group": "sql.arcdata.microsoft.com",
+                "Kind": "SqlManagedInstance",
+                "Name": "sqlmanagedinstances",
+                "IsAsync": false,
+                "AutomaticDelete": true,
+                "Liquid": {
+                    "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
+                    "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid",
+                    "Hydration": "sqlmanagedinstances/hydration.liquid"
                 }
             }
         },
@@ -95,18 +143,17 @@
             "ApiVersion": "2022-03-01-preview",
             "ResourceType": "sqlManagedInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v4",
+            "ResourceMapping": {
+                "Version": "v12",
                 "Group": "sql.arcdata.microsoft.com",
                 "Kind": "SqlManagedInstance",
                 "Name": "sqlmanagedinstances",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
-                  "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid",
-                  "Hydration": "sqlmanagedinstances/hydration.liquid"
+                    "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
+                    "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid",
+                    "Hydration": "sqlmanagedinstances/hydration.liquid"
                 }
             }
         },
@@ -114,18 +161,17 @@
             "ApiVersion": "2021-11-01",
             "ResourceType": "sqlManagedInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v2",
+            "ResourceMapping": {
+                "Version": "v12",
                 "Group": "sql.arcdata.microsoft.com",
                 "Kind": "SqlManagedInstance",
                 "Name": "sqlmanagedinstances",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
-                  "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid",
-                  "Hydration": "sqlmanagedinstances/hydration.liquid"
+                    "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
+                    "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid",
+                    "Hydration": "sqlmanagedinstances/hydration.liquid"
                 }
             }
         },
@@ -133,17 +179,16 @@
             "ApiVersion": "2021-08-01",
             "ResourceType": "sqlManagedInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1",
+            "ResourceMapping": {
+                "Version": "v12",
                 "Group": "sql.arcdata.microsoft.com",
                 "Kind": "SqlManagedInstance",
                 "Name": "sqlmanagedinstances",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
-                  "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid"
+                    "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
+                    "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid"
                 }
             }
         },
@@ -151,17 +196,16 @@
             "ApiVersion": "2021-07-01-preview",
             "ResourceType": "sqlManagedInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1beta1",
+            "ResourceMapping": {
+                "Version": "v12",
                 "Group": "sql.arcdata.microsoft.com",
                 "Kind": "SqlManagedInstance",
                 "Name": "sqlmanagedinstances",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
-                  "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid"
+                    "AzureToKubernetes": "sqlmanagedinstances/azure.liquid",
+                    "KubernetesToAzure": "sqlmanagedinstances/kubernetes.liquid"
                 }
             }
         },
@@ -169,8 +213,7 @@
             "ApiVersion": "2023-01-15-preview",
             "ResourceType": "sqlManagedInstances/FailoverGroups",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
+            "ResourceMapping": {
                 "Version": "v2",
                 "Group": "sql.arcdata.microsoft.com",
                 "Kind": "FailoverGroup",
@@ -179,8 +222,26 @@
                 "NamingStrategy": "UniqueUUID",
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "failovergroups/v2/azure.liquid",
-                  "KubernetesToAzure": "failovergroups/v2/kubernetes.liquid"
+                    "AzureToKubernetes": "failovergroups/v2/azure.liquid",
+                    "KubernetesToAzure": "failovergroups/v2/kubernetes.liquid"
+                }
+            }
+        },
+        {
+            "ApiVersion": "2023-01-15-preview",
+            "ResourceType": "postgresInstances",
+            "ProviderName": "Microsoft.AzureArcData",
+            "ResourceMapping": {
+                "Version": "v1beta6",
+                "Group": "arcdata.microsoft.com",
+                "Kind": "PostgreSql",
+                "Name": "postgresqls",
+                "IsAsync": false,
+                "AutomaticDelete": true,
+                "Liquid": {
+                    "AzureToKubernetes": "postgresqls/azure.liquid",
+                    "KubernetesToAzure": "postgresqls/kubernetes.liquid",
+                    "Hydration": "postgresqls/hydration.liquid"
                 }
             }
         },
@@ -188,18 +249,17 @@
             "ApiVersion": "2022-03-01-preview",
             "ResourceType": "postgresInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1beta2",
+            "ResourceMapping": {
+                "Version": "v1beta6",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "PostgreSql",
                 "Name": "postgresqls",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "postgresqls/azure.liquid",
-                  "KubernetesToAzure": "postgresqls/kubernetes.liquid",
-                  "Hydration": "postgresqls/hydration.liquid"
+                    "AzureToKubernetes": "postgresqls/azure.liquid",
+                    "KubernetesToAzure": "postgresqls/kubernetes.liquid",
+                    "Hydration": "postgresqls/hydration.liquid"
                 }
             }
         },
@@ -207,18 +267,17 @@
             "ApiVersion": "2021-07-01-preview",
             "ResourceType": "postgresInstances",
             "ProviderName": "Microsoft.AzureArcData",
-            "ResourceMapping":
-            {
-                "Version": "v1beta1",
+            "ResourceMapping": {
+                "Version": "v1beta6",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "PostgreSql",
                 "Name": "postgresqls",
                 "IsAsync": false,
                 "AutomaticDelete": true,
                 "Liquid": {
-                  "AzureToKubernetes": "postgresqls/azure.liquid",
-                  "KubernetesToAzure": "postgresqls/kubernetes.liquid",
-                  "Hydration": "postgresqls/hydration.liquid"
+                    "AzureToKubernetes": "postgresqls/azure.liquid",
+                    "KubernetesToAzure": "postgresqls/kubernetes.liquid",
+                    "Hydration": "postgresqls/hydration.liquid"
                 }
             }
         }
