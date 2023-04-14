@@ -42,37 +42,19 @@ param deployBastion bool = false
 param githubUser string = 'microsoft'
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
+param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
-@description('Name of the Cloud VNet')
-param virtualNetworkNameStores string = 'Ag-Stores-VNet'
-
-@description('Name of the prod AKS subnet in the cloud virtual network')
-param subnetNameCloudAksProd string = 'Ag-Cloud-Prod-Subnet'
-
-@description('Name of the dev AKS subnet in the cloud virtual network')
-param subnetNameCloudAksDev string = 'Ag-Cloud-Dev-Subnet'
+@description('Name of the Staging AKS subnet in the cloud virtual network')
+param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Cloud-inner-loop-Subnet'
+param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-innerLoop'
 
-@description('Name of the New York subnet subnet in the stores virtual network')
-param subnetNameStoresNewYork string = 'Ag-Store-NewYork-Subnet'
-
-@description('Name of the Chicago subnet subnet in the stores virtual network')
-param subnetNameStoresChicago string = 'Ag-Store-Chicago-Subnet'
-
-@description('Name of the Boston subnet subnet in the stores virtual network')
-param subnetNameStoresBoston string = 'Ag-Store-Boston-Subnet'
-
-@description('The name of the Prod Kubernetes cluster resource')
-param aksProdClusterName string = 'Ag-AKS-Prod'
-
-@description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string = 'Ag-AKS-Dev'
+@description('The name of the Staging Kubernetes cluster resource')
+param aksStagingClusterName string = 'Ag-AKS-Staging'
 
 @description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'agsynapse-${namingGuid}'
+param synapseWorkspaceName string = 'ag-synapse-${namingGuid}'
 
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
@@ -85,7 +67,7 @@ param acrNameProd string = 'Agacrprod${namingGuid}'
 @minLength(5)
 @maxLength(50)
 @description('Name of the dev Azure Container Registry')
-param acrNameDev string = 'Agacrdev${namingGuid}'
+param acrNameStaging string = 'AgacrStaging${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -104,13 +86,8 @@ module networkDeployment 'network/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud : virtualNetworkNameCloud
-    subnetNameCloudAksProd : subnetNameCloudAksProd
-    subnetNameCloudAksDev: subnetNameCloudAksDev
+    subnetNameCloudAksStaging: subnetNameCloudAksStaging
     subnetNameCloudAksInnerLoop : subnetNameCloudAksInnerLoop
-    subnetNameStoresNewYork: subnetNameStoresNewYork
-    subnetNameStoresChicago: subnetNameStoresChicago
-    subnetNameStoresBoston: subnetNameStoresBoston
-    virtualNetworkNameStores: virtualNetworkNameStores
     deployBastion: deployBastion
     location: location
   }
@@ -126,16 +103,14 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
   params: {
-    aksProdClusterName: aksProdClusterName
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     virtualNetworkNameCloud : networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameProd : subnetNameCloudAksProd
-    aksSubnetNameDev : subnetNameCloudAksDev
+    aksSubnetNameStaging : subnetNameCloudAksStaging
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrNameDev: acrNameDev
+    acrNameStaging: acrNameStaging
     acrNameProd: acrNameProd
   }
 }
@@ -157,10 +132,9 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksProdClusterName: aksProdClusterName
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    acrNameDev: kubernetesDeployment.outputs.acrDevName
+    acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }

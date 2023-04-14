@@ -6,6 +6,8 @@ $ProgressPreference = "SilentlyContinue"
 # Initialize the environment
 #############################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
@@ -14,6 +16,8 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
+$adminUsername = $env:adminUsername
+$templateBaseUrl = $env:templateBaseUrl
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
@@ -257,16 +261,18 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "Fetching GitHub artifacts"
-    $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+    Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/AKSEEBootstrap.ps1") -OutFile "$deploymentFolder\AKSEEBootstrap.ps1"
+    Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/ScalableCluster.json") -OutFile "$deploymentFolder\ScalableCluster.json"
+    Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/StartupScan.ps1") -OutFile "$deploymentFolder\StartupScan.ps1"
+    <#$repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
     $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl 
+    $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-        
     $fileUrls | ForEach-Object {
         $fileName = $_.Substring($_.LastIndexOf("/") + 1)
         $outputFile = Join-Path $deploymentFolder $fileName
         Invoke-WebRequest -Uri $_ -OutFile $outputFile
-    }
+    }#>
 
     # Setting up replacment parameters for AKS Edge Essentials config json file
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
@@ -353,7 +359,8 @@ kubectx chicago
 kubectl get nodes -o wide
 
 Write-Host
-kubectx akseedev
+kubectx dev=akseedev
+kubectx dev
 kubectl get nodes -o wide
 
 #####################################################################
@@ -369,10 +376,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
     Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-    Invoke-WebRequest -Uri "https://get.helm.sh/helm-v3.6.3-windows-amd64.zip" -OutFile ".\helm-v3.6.3-windows-amd64.zip"
-    Expand-Archive "helm-v3.6.3-windows-amd64.zip" C:\helm
-    $env:Path = "C:\helm\windows-amd64;$env:Path"
-    [Environment]::SetEnvironmentVariable('Path', $env:Path)
 
     # Connect to Arc
     $deploymentPath = "C:\Deployment\config.json"
@@ -383,19 +386,171 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 # Setup Azure Container registry on cloud AKS environments
 ##############################################################
 # az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksDevClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 
 # kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx aksDev="$Env:aksDevClusterName-admin"
+kubectx Staging="$Env:aksStagingClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Header "Attaching ACRs to AKS clusters"
 # az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
-az aks update -n $Env:aksDevClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameDev
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
+
+#####################################################################
+### Deploy Kube Prometheus Stack for Observability
+#####################################################################
+
+# Installing Grafana
+Write-Header "Installing Grafana"
+$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v','')
+Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
+
+# Creating Prod Grafana Icon on Desktop
+Write-Host "Creating Prod Grafana Icon"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://localhost:3000"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+$monitoringNamespace = "observability"
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+Write-Header "Deploying Kube Prometheus Stack for Staging"
+kubectx Staging
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating Staging Grafana Icon on Desktop
+Write-Host "Creating Staging Grafana Icon"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Staging Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$stagingGrafanaLBIP"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for dev"
+kubectx dev
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# Creating AKS EE Dev Grafana Icon on Desktop
+Write-Host "Creating AKS EE Dev Grafana Icon"
+$shortcutLocation = "$env:USERPROFILE\Desktop\Dev Grafana.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "http://$devLBIP"
+$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+Write-Header "Deploying Kube Prometheus Stack for Chicago"
+kubectx chicago
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $chicagoLBIP
+
+Write-Header "Deploying Kube Prometheus Stack for Seattle"
+kubectx seattle
+# Install Prometheus Operator
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+
+# Get Load Balancer IP
+$seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Write-Host $seattleLBIP
+
+#############################################################
+# Install Windows Terminal, WSL2, and Ubuntu
+#############################################################
+Write-Header "Installing Windows Terminal, WSL2 and Ubuntu"
+If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+$downloadDir = "C:\WinTerminal"
+$gitRepo = "microsoft/terminal"
+$filenamePattern = "*.msixbundle"
+$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+
+# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
+Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
+
+# Install WSL latest kernel update
+msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
+
+# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+Add-AppxPackage -Path $framworkPkgPath
+Add-AppxPackage -Path $msiPath
+Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
+
+# Setting WSL environment variables
+$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+# Initializing the wsl ubuntu app without requiring user input
+$ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+Invoke-Expression -Command "$ubuntu_path install --root"
+
+# Create Windows Terminal shortcut
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath= (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where {$_.name -eq "wt.exe"}).FullName
+$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Cleanup
+Remove-Item $downloadDir -Recurse -Force
+
+#############################################################
+# Install Docker Desktop
+#############################################################
+Write-Header "Installing Docker Dekstop"
+# Download and Install Docker Desktop
+$arguments = 'install --quiet --accept-license'
+Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
+Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+Start-Sleep -Seconds 10
+Get-Process | Where-Object {$_.name -like "Docker Desktop"} | Stop-Process -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Header "Installing VSCode extensions"
+# Install VSCode extensions
+foreach ($extension in $AgConfig.VSCodeExtensions) {
+  Write-Host "Installing $extension"
+  code --install-extension $extension
+}
 
 ##############################################################
 # Cleanup
 ##############################################################
+
+# Creating Hyper-V Manager desktop shortcut
+Write-Host "Creating Hyper-V Shortcut"
+Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
