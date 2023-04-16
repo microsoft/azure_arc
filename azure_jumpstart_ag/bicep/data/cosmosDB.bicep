@@ -11,6 +11,7 @@ param posOrdersDBName string = 'posOrders'
 resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
   name: accountName
   kind: 'GlobalDocumentDB'
+  location: location
   properties: {
     databaseAccountOfferType: 'Standard'
     locations: [
