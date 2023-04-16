@@ -48,7 +48,7 @@ param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-innerLoop'
+param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 
 @description('The name of the Staging Kubernetes cluster resource')
 param aksStagingClusterName string = 'Ag-AKS-Staging'
@@ -58,6 +58,10 @@ param synapseWorkspaceName string = 'ag-synapse-${namingGuid}'
 
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
+
+@description('The name of the Azure Data Explorer')
+param adxClusterName string = 'agadx${namingGuid}'
+
 
 @minLength(5)
 @maxLength(50)
@@ -145,5 +149,13 @@ module iotHubDeployment 'data/iotHub.bicep' = {
   params: {
     location: location
     iotHubName: iotHubName
+  }
+}
+
+module adxDeployment 'data/dataExplorer.bicep' = {
+  name: 'adxDeployment'
+  params: {
+    location: location
+    ClusterName: adxClusterName
   }
 }
