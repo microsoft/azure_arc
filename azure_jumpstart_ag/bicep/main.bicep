@@ -11,6 +11,7 @@ param spnTenantId string
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(),0,5))
 
@@ -30,10 +31,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'jumpstart_ag'
+param githubBranch string = 'ag_folder_structure'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -53,15 +54,11 @@ param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 @description('The name of the Staging Kubernetes cluster resource')
 param aksStagingClusterName string = 'Ag-AKS-Staging'
 
-@description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'ag-synapse-${namingGuid}'
-
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
 
 @description('The name of the Azure Data Explorer')
 param adxClusterName string = 'agadx${namingGuid}'
-
 
 @minLength(5)
 @maxLength(50)
