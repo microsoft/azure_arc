@@ -31,10 +31,10 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace'
 
 @description('Target GitHub account')
-param githubAccount string = 'sebassem'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'ag_folder_structure'
+param githubBranch string = 'jumpstart_ag'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -59,6 +59,9 @@ param iotHubName string = 'Ag-IotHub-${namingGuid}'
 
 @description('The name of the Azure Data Explorer')
 param adxClusterName string = 'agadx${namingGuid}'
+
+@description('The name of the Cosmos DB account')
+param accountName string = 'agcosmos${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
@@ -154,5 +157,13 @@ module adxDeployment 'data/dataExplorer.bicep' = {
   params: {
     location: location
     ClusterName: adxClusterName
+  }
+}
+
+module cosmosDBADeployment 'data/cosmosDB.bicep' = {
+  name: 'cosmosDBADeployment'
+  params: {
+    location: location
+    accountName: accountName
   }
 }
