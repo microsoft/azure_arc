@@ -168,16 +168,6 @@ $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgDirectory\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
-
-# Installing DHCP service
-#Write-Output "Installing DHCP service"
-#Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
-
-<#Write-Header "Install Az Powershell module"
-Install-Module -Name PowerShellGet -Force
-Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force
-#>
-
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
