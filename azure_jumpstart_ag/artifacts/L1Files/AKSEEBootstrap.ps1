@@ -25,24 +25,24 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 #########################################
 # Deplying AKS Edge Essentials clusters #
 #########################################
-
+Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
 # Force time sync
 $string = Get-Date
-Write-Host "Time before forced time sync:" + $string.ToString("u")
+Write-Host "INFO: Time before forced time sync:" $string.ToString("u") -ForegroundColor Gray
 net start w32time
 W32tm /resync
 $string = Get-Date
-Write-Host "Time after forced time sync:" + $string.ToString("u")
+Write-Host "INFO: Time after forced time sync:" $string.ToString("u") -ForegroundColor Gray
 
 # Validating internet connectivity
 while (-not (Test-Connection -ComputerName google.com -Quiet)) {
-    Write-Host "Waiting for internet connectivity..."
+    Write-Host "INFO: Waiting for internet connectivity..." -ForegroundColor Gray
     Start-Sleep -Seconds 5
 }
 
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
 Write-Host
-Write-Host "Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster"
+Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
 New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
 Write-Host
@@ -83,7 +83,7 @@ foreach ($key in $kubeReplacementParams.Keys) {
 }
 Set-Content $destinationPath -Value $content
 
-Write-Host "Enabling ICMP for the cluster control plane IP address"
+Write-Host "INFO: Enabling ICMP for the cluster control plane IP address" -ForegroundColor Gray
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
 # Unregistering the scheduled task responsible for start script automation
