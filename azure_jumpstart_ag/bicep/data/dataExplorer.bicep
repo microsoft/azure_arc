@@ -22,9 +22,6 @@ param iotHubId string
 @description('The name of the IoT Hub consumer group')
 param iotHubConsumerGroup string
 
-@description('The name of the Synapse Data Explorer database')
-param dxDatabaseConnection string = 'Agdxdb'
-
 resource adx 'Microsoft.Kusto/clusters@2022-12-29' = {
   name: ClusterName
   location: location

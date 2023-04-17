@@ -10,8 +10,7 @@ param skuName string = 'B1'
 @description('The capacity of the IotHub SKU')
 param capacity int = 1
 
-@description('The name of the IotHub Consumer Group')
-param consumerGroupName string = 'agconsumergroup'
+var consumerGroupName = '${iotHubName}/events/agconsumergroup'
 
 resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
   name: iotHubName
@@ -31,10 +30,13 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
 }
 
 resource iotHubConsumerGroup 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
-  name: '${iotHub.name}/events/agconsumergroup'
+  name: consumerGroupName
   properties: {
     name: consumerGroupName
   }
+  dependsOn: [
+    iotHub
+  ]
 }
 
 output iotHubHostName string = iotHub.properties.hostName
