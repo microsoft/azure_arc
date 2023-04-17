@@ -41,11 +41,13 @@ Write-Host "INFO: Logging into Az CLI using the service principal and secret pro
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
-Write-Host "INFO: Installing Azure CLI extensions: " + ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
-az config set extension.use_dynamic_install=yes_without_prompt
-# Installing Azure CLI extensions
-foreach ($extension in $AgConfig.AzCLIExtensions) {
-    az extension add --name $extension --system
+if ($AgConfig.AzCLIExtensions.Count -ne 0) {
+    Write-Host "INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+    az config set extension.use_dynamic_install=yes_without_prompt
+    # Installing Azure CLI extensions
+    foreach ($extension in $AgConfig.AzCLIExtensions) {
+        az extension add --name $extension --system
+    }
 }
 az -v
 
@@ -59,15 +61,19 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 $subscriptionId = (Get-AzSubscription).Id
 
 # Install PowerShell modules
-Write-Host "INFO: Installing PowerShell modules: " + ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
-foreach ($module in $AgConfig.PowerShellModules) {
-    Install-Module -Name $module -Force
+if ($AgConfig.PowerShellModules.Count -ne 0) {
+    Write-Host "INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+    foreach ($module in $AgConfig.PowerShellModules) {
+        Install-Module -Name $module -Force
+    }
 }
 
 # Register Azure providers
-Write-Host "INFO: Registering Azure providers in the current subscription: " + ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
-foreach ($provider in $AgConfig.AzureProviders) {
-    Register-AzResourceProvider -ProviderNamespace $provider
+if ($Agconfig.AzureProviders.Count -ne 0) {
+    Write-Host "INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
+    foreach ($provider in $AgConfig.AzureProviders) {
+        Register-AzResourceProvider -ProviderNamespace $provider
+    }
 }
 
 ##############################################################
@@ -211,9 +217,8 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
     # Fetching latest AKS Edge Essentials msi file
-    Write-Host "INFO: Fetching latest AKS Edge Essentials install file." -ForegroundColor Gray
+    Write-Host "INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
     Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
-    Write-Host " "
 
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "INFO: Fetching Agora artifacts from Jumpstart GitHub repository onto $hostname." -ForegroundColor Gray
@@ -304,21 +309,17 @@ Rename-Item -Path "$env:USERPROFILE\.kube\config-raw" -NewName "$env:USERPROFILE
 $env:KUBECONFIG = "$env:USERPROFILE\.kube\config"
 
 # Print a message indicating that the merge is complete
-Write-Host
 Write-Host "INFO: All three kubeconfig files merged successfully." -ForegroundColor Gray
 
 # Validate context switching using kubectx & kubectl
-Write-Host 
 Write-Host "INFO: Testing connectivity to kube api on Seattle cluster." -ForegroundColor Gray
 kubectx seattle
 kubectl get nodes -o wide
 
-Write-Host
 Write-Host "INFO: Testing connectivity to kube api on Chicago cluster." -ForegroundColor Gray
 kubectx chicago
 kubectl get nodes -o wide
 
-Write-Host
 Write-Host "INFO: Testing connectivity to kube api on dev cluster." -ForegroundColor Gray
 kubectx dev=akseedev
 kubectx dev
