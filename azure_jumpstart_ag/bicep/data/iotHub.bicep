@@ -32,7 +32,7 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
 resource iotHubConsumerGroup 'Microsoft.Devices/IotHubs/eventHubEndpoints/ConsumerGroups@2022-04-30-preview' = {
   name: consumerGroupName
   properties: {
-    name: consumerGroupName
+    name: 'cg1'
   }
   dependsOn: [
     iotHub
