@@ -38,14 +38,15 @@ resource posOrdersDB 'Microsoft.Kusto/clusters/databases@2022-12-29' = {
   kind: 'ReadWrite'
 }
 
-resource iotHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' ={
-  parent: posOrdersDB
-  kind: 'IotHub'
-  name: 'IoTHub'
+resource dxdatabaseConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
+  name: 'iotHubConnection'
   location: location
+  kind: 'IotHub'
+  parent: posOrdersDB
   properties: {
-    consumerGroup: iotHubConsumerGroup
     iotHubResourceId: iotHubId
+    consumerGroup: iotHubConsumerGroup
     sharedAccessPolicyName: 'iothubowner'
   }
+
 }

@@ -10,7 +10,7 @@ param skuName string = 'B1'
 @description('The capacity of the IotHub SKU')
 param capacity int = 1
 
-var consumerGroupName = '${iotHubName}/events/agconsumergroup'
+var consumerGroupName = '${iotHubName}/events/cg1'
 
 resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
   name: iotHubName
