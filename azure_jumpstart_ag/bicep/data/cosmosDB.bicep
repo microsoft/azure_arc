@@ -43,11 +43,6 @@ resource posOrdersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
   parent: posOrdersDB
   name: 'orders'
   properties: {
-    options: {
-      autoscaleSettings: {
-        maxThroughput: 4000
-      }
-    }
     resource: {
       id: 'orders'
       partitionKey: {
