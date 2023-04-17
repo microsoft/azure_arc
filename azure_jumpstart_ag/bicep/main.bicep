@@ -137,7 +137,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
     acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
-    cosmosDBConnectionString: cosmosDBADeployment.outputs.cosmosDBConnectionString
+    cosmosDBConnectionString: cosmosDBDeployment.outputs.cosmosDBConnectionString
     rdpPort: rdpPort
   }
 }
@@ -160,7 +160,7 @@ module adxDeployment 'data/dataExplorer.bicep' = {
   }
 }
 
-module cosmosDBADeployment 'data/cosmosDB.bicep' = {
+module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   name: 'cosmosDBADeployment'
   params: {
     location: location
