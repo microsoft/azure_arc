@@ -57,9 +57,6 @@ param aksStagingClusterName string = 'Ag-AKS-Staging'
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
 
-@description('The name of the Azure Data Explorer')
-param adxClusterName string = 'agadx${namingGuid}'
-
 @description('The name of the Cosmos DB account')
 param accountName string = 'agcosmos${namingGuid}'
 
@@ -140,6 +137,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
     acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
+    cosmosDBConnectionString: cosmosDBADeployment.outputs.cosmosDBConnectionString
     rdpPort: rdpPort
   }
 }
@@ -156,7 +154,9 @@ module adxDeployment 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
   params: {
     location: location
-    ClusterName: adxClusterName
+    namingGuid : namingGuid
+    iotHubId : iotHubDeployment.outputs.iotHubId
+    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
   }
 }
 
