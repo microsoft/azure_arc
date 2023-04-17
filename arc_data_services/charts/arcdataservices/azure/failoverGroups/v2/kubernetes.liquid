@@ -1,9 +1,11 @@
 {%- assign spec = content.spec -%}
+{%- assign metadata = content.metadata -%}
 {%- assign status = content.status -%}
 
 {
   "properties": {
     "spec": {{ spec }},
+    "metadata": {{ metadata }},
     "status": {{ status }}
   }
 }
