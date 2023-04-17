@@ -14,6 +14,7 @@ param (
     [string]$iotHubHostName,
     [string]$acrNameProd,
     [string]$acrNameStaging,
+    [string]$cosmosDBConnectionString,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
@@ -41,6 +42,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('cosmosDBConnectionString', $cosmosDBConnectionString, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
