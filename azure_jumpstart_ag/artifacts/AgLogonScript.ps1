@@ -353,7 +353,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 
 # kubectx aksProd="$Env:aksProdClusterName-admin"
-kubectx Staging="$Env:aksStagingClusterName-admin"
+kubectx staging="$Env:aksStagingClusterName-admin"
 
 # Attach ACRs to AKS clusters
 Write-Host "INFO: Attaching Azure Container Registry to AKS Edge Essentials clusters." -ForegroundColor Gray
