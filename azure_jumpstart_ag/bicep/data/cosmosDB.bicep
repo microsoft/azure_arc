@@ -54,5 +54,3 @@ resource posOrdersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
     }
   }
 }
-
-output cosmosDBConnectionString string = cosmosDB.listConnectionStrings().connectionStrings[0].connectionString
