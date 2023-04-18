@@ -11,6 +11,7 @@ param spnTenantId string
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(),0,5))
 
@@ -27,7 +28,7 @@ param windowsAdminPassword string
 param sshRSAPublicKey string
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'Ag-Workspace'
+param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -48,16 +49,16 @@ param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-innerLoop'
+param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 
 @description('The name of the Staging Kubernetes cluster resource')
 param aksStagingClusterName string = 'Ag-AKS-Staging'
 
-@description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'ag-synapse-${namingGuid}'
-
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
+
+@description('The name of the Cosmos DB account')
+param accountName string = 'agcosmos${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
@@ -82,7 +83,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   }
 }
 
-module networkDeployment 'network/network.bicep' = {
+module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud : virtualNetworkNameCloud
@@ -140,23 +141,28 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }
 
-/*module synapseDeployment 'mgmt/synapse.bicep' = {
-  name: 'synapseDeployment'
-  params: {
-    synapseWorkspaceName: synapseWorkspaceName
-    location: location
-    synapseAdminUserName : windowsAdminUsername
-    synapseAdminPassword : windowsAdminPassword
-    namingGuid : namingGuid
-    iotHubId : iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-  }
-}*/
-
-module iotHubDeployment 'mgmt/iotHub.bicep' = {
+module iotHubDeployment 'data/iotHub.bicep' = {
   name: 'iotHubDeployment'
   params: {
     location: location
     iotHubName: iotHubName
+  }
+}
+
+module adxDeployment 'data/dataExplorer.bicep' = {
+  name: 'adxDeployment'
+  params: {
+    location: location
+    namingGuid : namingGuid
+    iotHubId : iotHubDeployment.outputs.iotHubId
+    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
+  }
+}
+
+module cosmosDBDeployment 'data/cosmosDB.bicep' = {
+  name: 'cosmosDBDeployment'
+  params: {
+    location: location
+    accountName: accountName
   }
 }
