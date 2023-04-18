@@ -14,7 +14,7 @@ Write-Header "Adding CName Record for App"
 $dcInfo = Get-ADDomainController
 Do
 {
-	$appIpaddress= kubectl get svc "dataops-ingress-nginx-ingress" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+	$appIpaddress= kubectl get svc "dataops-ingress-nginx-ingress-controller" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
    Start-Sleep -Seconds 5
 } while ($appIpaddress -eq $null)
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
@@ -100,7 +100,7 @@ $appIngress | kubectl apply -n $appNamespace -f -
 
 Do {
     Write-Host "Waiting for Web App pod, hold tight..."
-    Start-Sleep -Seconds 240
+    Start-Sleep -Seconds 260
     $podStatus = $(if(kubectl get pods -n $appNamespace | Select-String "web-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 } while ($podStatus -eq "Nope")
 
