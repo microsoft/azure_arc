@@ -160,7 +160,7 @@ module adxDeployment 'data/dataExplorer.bicep' = {
 }
 
 module cosmosDBDeployment 'data/cosmosDB.bicep' = {
-  name: 'cosmosDBADeployment'
+  name: 'cosmosDBDeployment'
   params: {
     location: location
     accountName: accountName
