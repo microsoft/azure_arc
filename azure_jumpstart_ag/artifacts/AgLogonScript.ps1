@@ -343,18 +343,14 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
-##############################################################
-# Setup Azure Container registry on cloud AKS environments
-##############################################################
-# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
+#####################################################################
+# Setup Azure Container registry on cloud AKS staging environment
+#####################################################################
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
-
-# kubectx aksProd="$Env:aksProdClusterName-admin"
 kubectx staging="$Env:aksStagingClusterName-admin"
 
-# Attach ACRs to AKS clusters
-Write-Host "INFO: Attaching Azure Container Registry to AKS Edge Essentials clusters." -ForegroundColor Gray
-# az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
+# Attach ACRs to staging cluster
+Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
 
 #####################################################################
