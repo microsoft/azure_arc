@@ -137,7 +137,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
     acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
-    cosmosDBConnectionString: cosmosDBDeployment.outputs.cosmosDBConnectionString
     rdpPort: rdpPort
   }
 }
