@@ -1,16 +1,16 @@
 ---
 type: docs
-title: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster"
-linkTitle: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster"
+title: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using a Shell script"
+linkTitle: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using a Shell script"
 weight: 3
 description: >
 ---
 
-## Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster
+## Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using a Shell script
 
-The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster.
+The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster using a Shell script.
 
-in this scenario, you will hook the GKE cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
+in this scenario, you will hook the GKE cluster to Azure Monitor by deploying the [Azure Monitor agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
 
 > **NOTE: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
@@ -88,14 +88,14 @@ in this scenario, you will hook the GKE cluster to Azure Monitor by deploying th
     The script will:
 
   * Login to your Azure subscription using the SPN credentials
-  * Download the OMS script
+  * Download the Azure Monitor agent script
   * Retrieve cluster Azure resource ID as well as the cluster credentials (KUBECONFIG)
-  * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
+  * Execute the script which will create Azure Log Analytics workspace, deploy the Azure Monitor agent on the Kubernetes cluster and tag the cluster
   * Delete the downloaded script
 
 * Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. At the end of it's run, the script generates URL for you to click on. This URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.a
 
-    > **NOTE: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+    > **NOTE: As the Azure Monitor agent starts collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
     ![Screenshot showing script being run](./08.png)
 

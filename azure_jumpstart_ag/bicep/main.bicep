@@ -11,6 +11,7 @@ param spnTenantId string
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(),0,5))
 
@@ -27,7 +28,7 @@ param windowsAdminPassword string
 param sshRSAPublicKey string
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'Ag-Workspace'
+param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -42,22 +43,22 @@ param deployBastion bool = false
 param githubUser string = 'microsoft'
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Ag-Cloud-VNet'
+param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
-@description('Name of the dev AKS subnet in the cloud virtual network')
-param subnetNameCloudAksDev string = 'Ag-Cloud-Dev-Subnet'
+@description('Name of the Staging AKS subnet in the cloud virtual network')
+param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Cloud-inner-loop-Subnet'
+param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 
-@description('The name of the Dev Kubernetes cluster resource')
-param aksDevClusterName string = 'Ag-AKS-Dev'
-
-@description('The name of the synapse workspace')
-param synapseWorkspaceName string = 'agsynapse-${namingGuid}'
+@description('The name of the Staging Kubernetes cluster resource')
+param aksStagingClusterName string = 'Ag-AKS-Staging'
 
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
+
+@description('The name of the Cosmos DB account')
+param accountName string = 'agcosmos${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
@@ -67,7 +68,7 @@ param acrNameProd string = 'Agacrprod${namingGuid}'
 @minLength(5)
 @maxLength(50)
 @description('Name of the dev Azure Container Registry')
-param acrNameDev string = 'Agacrdev${namingGuid}'
+param acrNameStaging string = 'AgacrStaging${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -82,11 +83,11 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   }
 }
 
-module networkDeployment 'network/network.bicep' = {
+module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud : virtualNetworkNameCloud
-    subnetNameCloudAksDev: subnetNameCloudAksDev
+    subnetNameCloudAksStaging: subnetNameCloudAksStaging
     subnetNameCloudAksInnerLoop : subnetNameCloudAksInnerLoop
     deployBastion: deployBastion
     location: location
@@ -103,14 +104,14 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
   params: {
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     virtualNetworkNameCloud : networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameDev : subnetNameCloudAksDev
+    aksSubnetNameStaging : subnetNameCloudAksStaging
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrNameDev: acrNameDev
+    acrNameStaging: acrNameStaging
     acrNameProd: acrNameProd
   }
 }
@@ -132,31 +133,36 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksDevClusterName: aksDevClusterName
+    aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    acrNameDev: kubernetesDeployment.outputs.acrDevName
+    acrNameStaging: kubernetesDeployment.outputs.acrStagingName
     acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
     rdpPort: rdpPort
   }
 }
 
-/*module synapseDeployment 'mgmt/synapse.bicep' = {
-  name: 'synapseDeployment'
-  params: {
-    synapseWorkspaceName: synapseWorkspaceName
-    location: location
-    synapseAdminUserName : windowsAdminUsername
-    synapseAdminPassword : windowsAdminPassword
-    namingGuid : namingGuid
-    iotHubId : iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-  }
-}*/
-
-module iotHubDeployment 'mgmt/iotHub.bicep' = {
+module iotHubDeployment 'data/iotHub.bicep' = {
   name: 'iotHubDeployment'
   params: {
     location: location
     iotHubName: iotHubName
+  }
+}
+
+module adxDeployment 'data/dataExplorer.bicep' = {
+  name: 'adxDeployment'
+  params: {
+    location: location
+    namingGuid : namingGuid
+    iotHubId : iotHubDeployment.outputs.iotHubId
+    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
+  }
+}
+
+module cosmosDBDeployment 'data/cosmosDB.bicep' = {
+  name: 'cosmosDBDeployment'
+  params: {
+    location: location
+    accountName: accountName
   }
 }

@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "type": "String"
+        },
+        "customProfileName": {
+            "type": "String"
+        },
+        "subscriptionId": {
+            "type": "String"
+        },
+        "azureSecurityBaselineAssignmentType": {
+            "type": "string",
+            "allowedValues": [
+              "ApplyAndAutoCorrect",
+              "ApplyAndMonitor",
+              "Audit"
+            ]
+        },
+        "logAnalyticsWorkspace": {
+                "type": "String"
+        }
+    },
+    "variables": {
+        "customProfileId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Automanage/configurationProfiles/',parameters('customProfileName'))]",
+        "logAnalyticsWorkspaceId": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.OperationalInsights/workspaces/',parameters('logAnalyticsWorkspace'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2021-12-01-preview",
+            "name": "[parameters('logAnalyticsWorkspace')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+              "sku": {
+                "name": "PerGB2018"
+              },
+              "retentionInDays": "30",
+              "features": {
+              }
+            }
+        },
+        {
+            "type": "Microsoft.Automanage/configurationProfiles",
+            "apiVersion": "2022-05-04",
+            "name": "[parameters('customProfileName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+              ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "configuration": {
+                  "Antimalware/Enable": "true",
+                  "Antimalware/EnableRealTimeProtection": "true",
+                  "Antimalware/RunScheduledScan": "true",
+                  "Antimalware/ScanType": "Quick",
+                  "Antimalware/ScanDay": "7",
+                  "Antimalware/ScanTimeInMinutes": "120",
+                  "AzureSecurityBaseline/Enable": true,
+                  "AzureSecurityBaseline/AssignmentType": "[parameters('azureSecurityBaselineAssignmentType')]",
+                  "AzureSecurityCenter/Enable": true,
+                  "Backup/Enable": "true",
+                  "Backup/PolicyName": "dailyBackupPolicy",
+                  "Backup/TimeZone": "UTC",
+                  "Backup/InstantRpRetentionRangeInDays": "2",
+                  "Backup/SchedulePolicy/ScheduleRunFrequency": "Daily",
+                  "Backup/SchedulePolicy/ScheduleRunTimes": [
+                      "2017-01-26T00:00:00Z"
+                  ],
+                  "Backup/SchedulePolicy/SchedulePolicyType": "SimpleSchedulePolicy",
+                  "Backup/RetentionPolicy/RetentionPolicyType": "LongTermRetentionPolicy",
+                  "Backup/RetentionPolicy/DailySchedule/RetentionTimes": [
+                      "2017-01-26T00:00:00Z"
+                  ],
+                  "Backup/RetentionPolicy/DailySchedule/RetentionDuration/Count": "180",
+                  "Backup/RetentionPolicy/DailySchedule/RetentionDuration/DurationType": "Days",
+                  "BootDiagnostics/Enable": true,
+                  "ChangeTrackingAndInventory/Enable": true,
+                  "LogAnalytics/Enable": true,
+                  "LogAnalytics/Reprovision": "false",
+                  "LogAnalytics/Workspace": "[variables('logAnalyticsWorkspaceId')]",
+                  "UpdateManagement/Enable": true,
+                  "VMInsights/Enable": true,
+                  "Tags/ResourceGroup": {
+                    "Project": "jumpstart_azure_arc_servers"
+                  },
+                  "Tags/AzureAutomation": {
+                    "Project": "jumpstart_azure_arc_servers"
+                  },
+                  "Tags/LogAnalyticsWorkspace": {
+                    "Project": "jumpstart_azure_arc_servers"
+                  },
+                  "Tags/RecoveryVault": {
+                    "Project": "jumpstart_azure_arc_servers"
+                  }
+              }
+            }
+        },
+        {
+            "type": "Microsoft.HybridCompute/machines/providers/configurationProfileAssignments",
+            "apiVersion": "2022-05-04",
+            "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automanage/configurationProfiles/', parameters('customProfileName'))]"
+              ],
+            "properties": {
+                "configurationProfile": "[variables('customProfileId')]"
+            }
+        }
+    ]
+}

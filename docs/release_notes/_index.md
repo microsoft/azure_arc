@@ -11,6 +11,45 @@ weight: 5
 
 ## 2023
 
+### March 2023
+
+#### Release highlights
+
+- New and updated Azure Arc-enabled servers scenarios
+- Multiple enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled Kubernetes
+  - Azure Arc-enabled data services
+- Multiple ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Enable Azure Automanage custom profiles on an Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_custom_profiles/)
+- [Updated scenario: Enable Azure Automanage built-in profiles on an Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_builtin_profiles/)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: Onboarding role requirement is no longer needed for Arc-enabled SQL Server #1729](https://github.com/microsoft/azure_arc/issues/1729)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Bug fix: Missing two parameters to use Azure Arc with ARO in azure. #1716](https://github.com/microsoft/azure_arc/issues/1716)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - March release #1723](https://github.com/microsoft/azure_arc/issues/1723)
+
+#### Jumpstart ArcBox
+
+- [Feature: March Kubernetes-related version bump #1764](https://github.com/microsoft/azure_arc/issues/1764)
+- [Bug fix: Onboarding role requirement is no longer needed for Arc-enabled SQL Server #1729](https://github.com/microsoft/azure_arc/issues/1729)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: When deployAKSHCI is set to false and deployResourceBridge is set to true, RB install fails because of missing az cli path in environment variable #1726](https://github.com/microsoft/azure_arc/issues/1726)
+- [Bug fix: Resource Bridge deployments failing due to upstream issue #1731](https://github.com/microsoft/azure_arc/issues/1731)
+
 ### February 2023
 
 #### Release highlights
@@ -100,6 +139,7 @@ weight: 5
 - [Bug fix: Ubuntu VMs offline due to full disks #1601](https://github.com/microsoft/azure_arc/issues/1601)
 - [Bug fix: DevOps Scenario K3sGitOps.ps1 script references the CAPI cluster not the K3s cluster #1607](https://github.com/microsoft/azure_arc/issues/1607)
 - [Bug fix: ArcBox Full - update API call to get SQLMI primary endpoint #1609](https://github.com/microsoft/azure_arc/issues/1609)
+- [Bug fix: BadRequest UbuntuCAPIDeployment - Azure Arcbox Full #1712](https://github.com/microsoft/azure_arc/issues/1712)
 
 #### Jumpstart HCIBox
 

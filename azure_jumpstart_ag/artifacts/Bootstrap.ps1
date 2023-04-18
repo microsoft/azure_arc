@@ -10,10 +10,10 @@ param (
     [string]$azureLocation,
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
-    [string]$aksDevClusterName,
+    [string]$aksStagingClusterName,
     [string]$iotHubHostName,
     [string]$acrNameProd,
-    [string]$acrNameDev,
+    [string]$acrNameStaging,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
@@ -37,10 +37,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('aksDevClusterName', $aksDevClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameDev', $acrNameDev, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
@@ -96,16 +96,20 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Get latest Grafana OSS release
+$latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/grafana/grafana/releases/latest").tag_name.replace('v','')
+
 # Download artifacts
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri'='https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename'="$AgToolsDir\wsl_update_x64.msi"}
 BITSRequest -Params @{'Uri'='https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename'="$AgToolsDir\DockerDesktopInstaller.exe"}
-BITSRequest -Params @{'Uri'='https://dl.grafana.com/oss/release/grafana-9.4.7.windows-amd64.msi'; 'Filename'="$AgToolsDir\grafana-9.4.7.windows-amd64.msi"}
+BITSRequest -Params @{'Uri'="https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename'="$AgToolsDir\grafana-$latestRelease.windows-amd64.msi"}
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
@@ -162,16 +166,6 @@ $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgDirectory\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
-
-# Installing DHCP service
-#Write-Output "Installing DHCP service"
-#Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
-
-<#Write-Header "Install Az Powershell module"
-Install-Module -Name PowerShellGet -Force
-Install-Module -Name Az -Scope AllUsers -Repository PSGallery -Force
-#>
-
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
@@ -214,24 +208,6 @@ Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
-
-# Disable Edge 'First Run' Setup
-$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
-$firstRunRegistryName  = 'HideFirstRunExperience'
-$firstRunRegistryValue = '0x00000001'
-$savePasswordRegistryName = 'PasswordManagerEnabled'
-$savePasswordRegistryValue = '0x00000000'
-$autoArrangeRegistryName = 'FFlags'
-$autoArrangeRegistryValue = '1075839525'
-
- If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
-    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
-}
-
-New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
-New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
-Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 Stop-Transcript
 
