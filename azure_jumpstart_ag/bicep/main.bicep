@@ -28,7 +28,7 @@ param windowsAdminPassword string
 param sshRSAPublicKey string
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'Ag-Workspace'
+param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
