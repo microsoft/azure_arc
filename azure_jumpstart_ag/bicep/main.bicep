@@ -140,19 +140,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
 }
 
-/*module synapseDeployment 'mgmt/synapse.bicep' = {
-  name: 'synapseDeployment'
-  params: {
-    synapseWorkspaceName: synapseWorkspaceName
-    location: location
-    synapseAdminUserName : windowsAdminUsername
-    synapseAdminPassword : windowsAdminPassword
-    namingGuid : namingGuid
-    iotHubId : iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-  }
-}*/
-
 module iotHubDeployment 'mgmt/iotHub.bicep' = {
   name: 'iotHubDeployment'
   params: {
