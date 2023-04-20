@@ -15,6 +15,7 @@
         AgTempDir = "C:\Temp"
         AgVHDXDir = "C:\Ag\VHDX"
         AgL1Files = "C:\Ag\L1Files"
+        AgAppsRepo = "C:\Ag\AppsRepo"
     }
 
     # Az CLI required extensions
