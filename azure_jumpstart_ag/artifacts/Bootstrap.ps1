@@ -12,8 +12,7 @@ param (
     [string]$workspaceName,
     [string]$aksStagingClusterName,
     [string]$iotHubHostName,
-    [string]$acrNameProd,
-    [string]$acrNameStaging,
+    [string]$acrName,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
@@ -39,8 +38,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
