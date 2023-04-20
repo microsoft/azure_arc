@@ -38,7 +38,7 @@
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
-    L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
+    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
     InternalSwitch                       = "InternalSwitch"                      # Name of the internal switch that the L0 VM will use.
     L1Username                           = "Administrator"                       # Admin credential for the 3 VMs that run on the Agora-Client
     L1Password                           = 'Agora123!!'                          # 
