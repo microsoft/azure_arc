@@ -18,7 +18,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated
 $resourceTags= "Project=jumpstart_arcbox"
-$licenseType = "PAYG"
+$licenseType = "Paid"
 $currentDir = Get-Location
 $unattended = $spnClientId -And $spnTenantId -And $spnClientSecret
 

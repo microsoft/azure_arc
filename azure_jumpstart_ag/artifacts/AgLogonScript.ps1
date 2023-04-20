@@ -221,10 +221,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
 
     # Fetching required GitHub artifacts from Jumpstart repository
-    Write-Host "INFO: Fetching Agora artifacts from Jumpstart GitHub repository onto $hostname." -ForegroundColor Gray
-    #Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/AKSEEBootstrap.ps1") -OutFile "$deploymentFolder\AKSEEBootstrap.ps1"
-    #Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/ScalableCluster.json") -OutFile "$deploymentFolder\ScalableCluster.json"
-    #Invoke-WebRequest ($using:templateBaseUrl+"artifacts/L1Files/StartupScan.ps1") -OutFile "$deploymentFolder\StartupScan.ps1"
+    Write-Host "Fetching GitHub artifacts"
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
     $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
@@ -232,7 +229,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $fileUrls | ForEach-Object {
         $fileName = $_.Substring($_.LastIndexOf("/") + 1)
         $outputFile = Join-Path $deploymentFolder $fileName
-        Invoke-WebRequest -Uri $_ -OutFile $outputFile
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
 
     # Setting up replacment parameters for AKS Edge Essentials config json file
@@ -346,18 +343,14 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
-##############################################################
-# Setup Azure Container registry on cloud AKS environments
-##############################################################
-# az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksProdClusterName --admin
+#####################################################################
+# Setup Azure Container registry on cloud AKS staging environment
+#####################################################################
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
-
-# kubectx aksProd="$Env:aksProdClusterName-admin"
 kubectx staging="$Env:aksStagingClusterName-admin"
 
-# Attach ACRs to AKS clusters
-Write-Host "INFO: Attaching Azure Container Registry to AKS Edge Essentials clusters." -ForegroundColor Gray
-# az aks update -n $Env:aksProdClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameProd
+# Attach ACRs to staging cluster
+Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
 
 #####################################################################
