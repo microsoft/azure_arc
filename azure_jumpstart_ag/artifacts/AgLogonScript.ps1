@@ -11,6 +11,7 @@ $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
+$githubUser = $env:githubUser
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
