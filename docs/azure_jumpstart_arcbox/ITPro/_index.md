@@ -114,7 +114,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
+    $subscriptionId=$(az account show --query id --output tsv)
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
@@ -122,7 +122,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
+    $subscriptionId=$(az account show --query id --output tsv)
     az ad sp create-for-rbac -n "JumpstartArcBoxSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
@@ -308,7 +308,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`spn_client_id`_** - Your Azure service principal id
   - **_`spn_client_secret`_** - Your Azure service principal secret
   - **_`spn_tenant_id`_** - Your Azure tenant id
-  - **_`user_ip_address`_** - Your local IP address. This is used to allow remote RDP connections to the Client Windows VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
+  - _`user_ip_address`_ - Your local IP address. This is used to allow remote RDP connections to the Client Windows VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
   - **_`deployment_flavor`_** - Use the value "ITPro" to specify that you want to deploy ArcBox for IT Pros
   - _`client_admin_username`_ - Admin username for Windows & Linux VMs
@@ -321,7 +321,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ```shell
   terraform init
-  terraform plan -out=infra.out
+  terraform plan -out infra.out
   terraform apply "infra.out"
   ```
 
@@ -356,7 +356,7 @@ Various options are available to connect to _ArcBox-Client_ VM, depending on the
 
 #### Connecting directly with RDP
 
-By design, ArcBox does not open port 3389 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+By design, ArcBox does not open port 3389 or port 22 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389 and inbound 22.
 
 - Open the _ArcBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
@@ -371,6 +371,8 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
   ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+  
+ - Reapeat the above steps, but this time select SSH as the service with "Allow" as the section.
 
 #### Connect using Azure Bastion
 
@@ -406,7 +408,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing ArcBox-Client](./sql_manual_onboard_icon.png)
 
-- A pop-up box will walk you through the target SQL Server which will be onboarded to Azure Arc, as well as provide details around the flow of the onboarding automation and how to complete the Azure authentication process when prompted.
+- If SQL does does not automatically on-board with Arc, a pop-up box will walk you through the target SQL Server which will be onboarded to Azure Arc, as well as provide details around the flow of the onboarding automation and how to complete the Azure authentication process when prompted.
 
   ![Screenshot showing ArcBox-Client](./sql_manual_onboard_start.png)
 
