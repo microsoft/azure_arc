@@ -62,13 +62,8 @@ param accountName string = 'agcosmos${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
-@description('Name of the production Azure Container Registry')
-param acrNameProd string = 'Agacrprod${namingGuid}'
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the dev Azure Container Registry')
-param acrNameStaging string = 'AgacrStaging${namingGuid}'
+@description('Name of the Azure Container Registry')
+param acrName string = 'Agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -111,8 +106,7 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrNameStaging: acrNameStaging
-    acrNameProd: acrNameProd
+    acrName: acrName
   }
 }
 
@@ -135,8 +129,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    acrNameStaging: kubernetesDeployment.outputs.acrStagingName
-    acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
+    acrName: kubernetesDeployment.outputs.acrName
     rdpPort: rdpPort
   }
 }
