@@ -8,10 +8,12 @@ $ProgressPreference = "SilentlyContinue"
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
+$githubPAT = $env:githubPAT
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
@@ -76,6 +78,13 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
+
+##############################################################
+# Configure GitHub fork secrets
+##############################################################
+gh repo clone $githubAccount/jumpstart-agora-apps $AgAppsRepo
+Set-Location $AgAppsRepo\jumpstart-agora-apps
+gh secret set 'CLIENT_ID' -b "testing"
 
 ##############################################################
 # Configure L1 virtualization infrastructure
