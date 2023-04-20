@@ -350,9 +350,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 kubectx staging="$Env:aksStagingClusterName-admin"
 
-# Attach ACRs to staging cluster
+# Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
 
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
