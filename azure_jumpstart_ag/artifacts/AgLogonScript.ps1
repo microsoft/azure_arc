@@ -134,7 +134,7 @@ foreach ($vhdxPath in $vhdxPaths) {
         -Count $AgConfig.L1VMNumVCPU `
         -ExposeVirtualizationExtensions $true
     
-    Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
+    # Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
     Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
       
     # Create virtual machine snapshot and start the virtual machine
