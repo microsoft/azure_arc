@@ -56,7 +56,7 @@ param aksStagingClusterName string = 'Ag-AKS-Staging'
 param iotHubHostName string = 'Ag-IoTHub'
 
 @description('The login server name of the Azure Container Registry')
-param acrName string = 'dummy-name-staging'
+param acrName string
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
