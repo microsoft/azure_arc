@@ -15,6 +15,7 @@ param (
     [string]$acrNameProd,
     [string]$acrNameStaging,
     [string]$githubUser,
+    [string]$githubUserToken,
     [string]$templateBaseUrl,
     [string]$rdpPort,
     [string]$githubAccount,
@@ -42,6 +43,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubUserToken', $githubUserToken, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
