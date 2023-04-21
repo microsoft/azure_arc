@@ -42,9 +42,6 @@ param deployBastion bool = false
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string = 'microsoft'
 
-@description('User github account token')
-param githubUserToken string = 'DUMMY_VALUE'
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
@@ -134,7 +131,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubAccount: githubAccount
     githubBranch: githubBranch
     githubUser: githubUser
-    githubUserToken: githubUserToken
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
