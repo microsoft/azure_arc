@@ -43,7 +43,7 @@ param deployBastion bool = false
 param githubUser string = 'microsoft'
 
 @description('User github account token')
-param githubUserToken string
+param githubUserToken string = 'DUMMY_VALUE'
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
