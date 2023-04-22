@@ -212,7 +212,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $timeElapsed = 0
     do {
         Write-Host "INFO: Waiting for internet connection to be healthy on $hostname."
-        sleep 5
+        Start-Sleep 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
@@ -380,7 +380,7 @@ helm repo update
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values prometheus-additional-scrape-config.yaml
 
 # Get Load Balancer IP
 $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -398,7 +398,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
 kubectx dev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values prometheus-additional-scrape-config.yaml
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -416,7 +416,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
 kubectx chicago
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values prometheus-additional-scrape-config.yaml
 
 # Get Load Balancer IP
 $chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -425,7 +425,7 @@ Write-Host $chicagoLBIP
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values prometheus-additional-scrape-config.yaml
 
 # Get Load Balancer IP
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -471,7 +471,7 @@ Invoke-Expression -Command "$ubuntu_path install --root"
 
 # Create Windows Terminal shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath= (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where {$_.name -eq "wt.exe"}).FullName
+$WinTerminalPath= (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object {$_.name -eq "wt.exe"}).FullName
 $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
@@ -502,6 +502,48 @@ Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions 
 # Install VSCode extensions
 foreach ($extension in $AgConfig.VSCodeExtensions) {
   code --install-extension $extension
+}
+
+
+#############################################################
+# Install Apps
+#############################################################
+Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders){
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $folderPath $fileName
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+
+    If (-not $excludeFolders) {
+        $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+            $folderName = $_.name
+            $path = Join-Path $folderPath $folderName
+            New-Item $path -ItemType Directory -ErrorAction Continue
+    
+            Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+        }
+    }
+}
+
+# Fetching required GitHub artifacts from Jumpstart Apps repository
+Write-Host "Fetching GitHub artifacts"
+$appRepoName = "jumpstart-agora-apps" # While testing, change to your GitHub fork's repository name
+$githubAppAccount = "charris-msft" # While testing, use my GitHub account
+$githubAppBranch = "mqtt2prom" 
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/sensor-monitor?ref=#$githubAppBranch"
+
+$appPath = Join-Path $deploymentFolder "freezer_monitoring"
+New-Item $appPath -ItemType Directory -ErrorAction Ignore
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $appPath
+
+# Install the app
+$clusters = @('dev', 'staging', 'seattle', 'chicago')
+foreach ($cluster in $clusters) {
+    kubectx $cluster
+    helm install sensor-monitor $appPath
 }
 
 ##############################################################
