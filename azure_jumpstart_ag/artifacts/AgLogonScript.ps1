@@ -134,7 +134,7 @@ foreach ($vhdxPath in $vhdxPaths) {
         -Count $AgConfig.L1VMNumVCPU `
         -ExposeVirtualizationExtensions $true
     
-    # Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
+    Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
     Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
       
     # Create virtual machine snapshot and start the virtual machine
@@ -263,16 +263,14 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 }
 
 # Rebooting all L1 virtual machines
-# foreach ($VMName in $VMNames) {
-#     $Session = New-PSSession -VMName $VMName -Credential $Credentials
-#     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
-#     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
-#     Remove-PSSession $Session
-# }
-
 foreach ($VMName in $VMNames) {
-    Restart-VM -Name $VMName -Force
+    $Session = New-PSSession -VMName $VMName -Credential $Credentials
+    Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
+    Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
+    Remove-PSSession $Session
 }
+
+Start-Sleep -Seconds 20
 
 # Monitor until the kubeconfig files are detected and copied over
 # $elapsedTime = Measure-Command {
