@@ -267,7 +267,7 @@ foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
-    # Remove-PSSession $Session
+    Remove-PSSession $Session
 }
 
 # Monitor until the kubeconfig files are detected and copied over
