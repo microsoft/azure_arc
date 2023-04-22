@@ -143,7 +143,7 @@ foreach ($vhdxPath in $vhdxPaths) {
     Start-VM -Name $VMName
 }
 
-Start-Sleep -Seconds 15
+Start-Sleep -Seconds 20
 
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
@@ -269,8 +269,6 @@ foreach ($VMName in $VMNames) {
     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
     Remove-PSSession $Session
 }
-
-Start-Sleep -Seconds 20
 
 # Monitor until the kubeconfig files are detected and copied over
 # $elapsedTime = Measure-Command {
