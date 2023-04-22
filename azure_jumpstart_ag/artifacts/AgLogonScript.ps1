@@ -263,11 +263,15 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 }
 
 # Rebooting all L1 virtual machines
+# foreach ($VMName in $VMNames) {
+#     $Session = New-PSSession -VMName $VMName -Credential $Credentials
+#     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
+#     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
+#     Remove-PSSession $Session
+# }
+
 foreach ($VMName in $VMNames) {
-    $Session = New-PSSession -VMName $VMName -Credential $Credentials
-    Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
-    Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
-    Remove-PSSession $Session
+    Restart-VM -Name $VMName -Force
 }
 
 # Monitor until the kubeconfig files are detected and copied over
