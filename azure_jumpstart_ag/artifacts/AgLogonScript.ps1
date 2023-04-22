@@ -293,15 +293,18 @@ foreach ($VMName in $VMNames) {
 $elapsedTime = Measure-Command {
     foreach ($VMName in $VMNames) {
         $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
+        $user = $AgConfig.L1Username
+        $secStringPassword = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential($user, $secStringPassword)
         Start-Sleep 5
-        while (!(Invoke-Command -VMName $VMName -Credential $Credentials -ScriptBlock { Test-Path $using:path })) { 
+        while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) { 
             Start-Sleep 30
             Write-Host "INFO: Waiting for AKS Edge Essentials kubeconfig to be available on $VMName." -ForegroundColor Gray
         }
         
         Write-Host "INFO: $VMName's kubeconfig is ready - copying over config-$VMName" -ForegroundColor DarkGreen
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
-        $s = New-PSSession -VMName $VMName -Credential $Credentials
+        $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
     }
 }
