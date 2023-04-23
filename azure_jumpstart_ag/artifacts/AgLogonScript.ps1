@@ -277,7 +277,10 @@ foreach ($VMName in $VMNames) {
         Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
         $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\StartupScan.ps1"
         $Trigger = New-ScheduledTaskTrigger -AtStartup
-        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User "Administrator" -RunLevel Highest -Force
+        $User = "Administrator"
+        $Password = ConvertTo-SecureString 'Agora123!!' -AsPlainText -Force
+        $Credential = New-Object System.Management.Automation.PSCredential($User, $Password)
+        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $Credential.UserName -Password $Credential.Password -RunLevel Highest -Force
         Restart-Computer -Force -Confirm:$false 
     }
     Remove-PSSession $Session
