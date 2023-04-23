@@ -274,7 +274,7 @@ foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
     Invoke-Command -Session $Session -ScriptBlock { 
-        $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\StartupScan.ps1"
+        $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\AKSEEBootstrap.ps1"
         $Trigger = New-ScheduledTaskTrigger -AtStartup
         Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $env:USERNAME -Password 'Agora123!!' -RunLevel Highest
         Restart-Computer -Force -Confirm:$false
@@ -459,6 +459,12 @@ $framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
 $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
 $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+
+# Addtional Windows Terminal settings
+
+### A note to add elvated run as admin and multiLinePasteWarning 
+
+
 
 # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
 Write-Host "INFO: Downloading binaries." -ForegroundColor Gray
