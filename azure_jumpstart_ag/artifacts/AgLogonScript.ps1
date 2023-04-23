@@ -262,14 +262,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Set-Content "$deploymentFolder\Config.json" -Value $content
 }
 
-# Rebooting all L1 virtual machines
-# foreach ($VMName in $VMNames) {
-#     $Session = New-PSSession -VMName $VMName -Credential $Credentials
-#     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
-#     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
-#     Remove-PSSession $Session
-# }
-
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
@@ -460,12 +452,6 @@ $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
 $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
 $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
-# Addtional Windows Terminal settings
-
-### A note to add elvated run as admin and multiLinePasteWarning 
-
-
-
 # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
 Write-Host "INFO: Downloading binaries." -ForegroundColor Gray
 Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
@@ -497,6 +483,9 @@ $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.l
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
+
+# Replace original Windows Terminal settings file
+Move-Item "$AgToolsDir\WindowsTerminalSettings.json" -Destination "$env:USERPROFILE\Local\Packages\Microsoft.WindowsTerminal*\LocalState\settings.json" -Force
 
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
