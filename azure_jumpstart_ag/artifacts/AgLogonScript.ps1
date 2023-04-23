@@ -485,7 +485,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Replace original Windows Terminal settings file
-Move-Item "$AgToolsDir\WindowsTerminalSettings.json" -Destination "$env:USERPROFILE\Local\Packages\Microsoft.WindowsTerminal*\LocalState\settings.json" -Force
+Move-Item "$AgToolsDir\WindowsTerminalSettings.json" -Destination "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" -Force
 
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
