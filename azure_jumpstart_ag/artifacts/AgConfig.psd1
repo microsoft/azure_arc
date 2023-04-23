@@ -19,7 +19,7 @@
     }
 
     # Az CLI required extensions
-    AzCLIExtensions                      = @()
+    AzCLIExtensions                      = @('azure-iot')
 
     # PowerShell modules
     PowerShellModules                    = @('Az.ConnectedKubernetes')
