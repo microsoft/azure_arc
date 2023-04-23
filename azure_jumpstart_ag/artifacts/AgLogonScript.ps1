@@ -13,7 +13,6 @@ Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.l
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
-$githubPAT = $env:githubPAT
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
@@ -84,7 +83,6 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 ##############################################################
 Set-Location $AgAppsRepo
 #git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
-gh auth login --with-token $githubPAT
 gh repo clone "$githubUser/jumpstart-agora-apps" "$AgAppsRepo\jumpstart-agora-apps"
 Set-Location $AgAppsRepo\jumpstart-agora-apps
 gh secret set 'CLIENT_ID' -b "testing"
