@@ -270,6 +270,8 @@ foreach ($VMName in $VMNames) {
     Remove-PSSession $Session
 }
 
+Start-Sleep -Seconds 20
+
 # Monitor until the kubeconfig files are detected and copied over
 # $elapsedTime = Measure-Command {
 #     foreach ($VMName in $VMNames) {
