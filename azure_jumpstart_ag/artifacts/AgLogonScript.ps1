@@ -92,17 +92,17 @@ Set-Location $AgAppsRepo\jumpstart-agora-apps
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
 $IoTHubHostName = $env:iotHubHostName
 $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
-$sites=$AgConfig.SiteConfig
+$sites=$AgConfig.SiteConfig.Values
 
 Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
 foreach ($site in $sites){
-    $deviceId = $site.Values.FriendlyName
+    $deviceId = $site.FriendlyName
     az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
-    $deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup -o tsv)
+    #$deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup -o tsv)
     $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
-    gh variable set "$site" -b $site
-    gh secret set "connection_string_$site" -b $deviceConnectionString
-    gh secret set "sas_token_$site" -b $deviceSASToken
+    gh variable set 'device_Id' -b $deviceId
+    #gh secret set "connection_string_$site" -b $deviceConnectionString
+    gh secret set "sas_token_$deviceId" -b $deviceSASToken
 }
 
 ##############################################################
