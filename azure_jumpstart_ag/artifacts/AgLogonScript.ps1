@@ -97,11 +97,12 @@ $sites=$AgConfig.SiteConfig
 Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
 foreach ($site in $sites){
     $deviceId = $site.Values.FriendlyName
-    az iot hub device-identity create --device-id $deviceId -n $deviceId --edge-enabled --hub-name $IoTHubName
-    $deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName -o tsv)
-    $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --duration (60*60*24*30) --query sas -o tsv)
-    gh secret set "$site_connection_string" -b $deviceConnectionString
-    gh secret set "$site_sas_token" -b $deviceSASToken
+    az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
+    $deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup -o tsv)
+    $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
+    gh variable set "$site" -b $site
+    gh secret set "connection_string_$site" -b $deviceConnectionString
+    gh secret set "sas_token_$site" -b $deviceSASToken
 }
 
 ##############################################################
