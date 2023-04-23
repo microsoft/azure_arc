@@ -79,13 +79,30 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 }
 
 ##############################################################
-# Configure GitHub fork secrets
+# Configure Jumpstart AG Apps repository
 ##############################################################
+Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
 Set-Location $AgAppsRepo
-#git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
-gh repo clone "$githubUser/jumpstart-agora-apps" "$AgAppsRepo\jumpstart-agora-apps"
+git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
 Set-Location $AgAppsRepo\jumpstart-agora-apps
-gh secret set 'CLIENT_ID' -b "testing"
+
+#####################################################################
+# IotHub resources preperation
+#####################################################################
+Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
+$IoTHubHostName = $env:iotHubHostName
+$IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+$sites=$AgConfig.SiteConfig
+
+Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
+foreach ($site in $sites){
+    $deviceId = $site.Values.FriendlyName
+    az iot hub device-identity create --device-id $deviceId -n $deviceId --edge-enabled --hub-name $IoTHubName
+    $deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName -o tsv)
+    $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --duration (60*60*24*30) --query sas -o tsv)
+    gh secret set "$site_connection_string" -b $deviceConnectionString
+    gh secret set "$site_sas_token" -b $deviceSASToken
+}
 
 ##############################################################
 # Configure L1 virtualization infrastructure
