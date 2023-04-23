@@ -274,7 +274,9 @@ foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
     Invoke-Command -Session $Session -ScriptBlock { 
-        New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" -Name "Startup Scan" -Value "C:\Deployment\StartupScan.ps1" -PropertyType "String"
+        $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\StartupScan.ps1"
+        $Trigger = New-ScheduledTaskTrigger -AtStartup
+        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $env:USERNAME -Password 'Agora123!!' -RunLevel Highest
         Restart-Computer -Force -Confirm:$false
     }
     Remove-PSSession $Session
