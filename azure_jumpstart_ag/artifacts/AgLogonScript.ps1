@@ -82,7 +82,10 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 ##############################################################
 # Configure GitHub fork secrets
 ##############################################################
-gh repo clone $githubAccount/jumpstart-agora-apps $AgAppsRepo
+Set-Location $AgAppsRepo
+#git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
+gh auth login --with-token $githubPAT
+gh repo clone "$githubUser/jumpstart-agora-apps" "$AgAppsRepo\jumpstart-agora-apps"
 Set-Location $AgAppsRepo\jumpstart-agora-apps
 gh secret set 'CLIENT_ID' -b "testing"
 
