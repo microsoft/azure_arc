@@ -263,10 +263,23 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 }
 
 # Rebooting all L1 virtual machines
+# foreach ($VMName in $VMNames) {
+#     $Session = New-PSSession -VMName $VMName -Credential $Credentials
+#     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
+#     Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
+#     Remove-PSSession $Session
+# }
+
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
-    Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
+    Invoke-Command -Session $Session -ScriptBlock { 
+        Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
+        $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\StartupScan.ps1"
+        $Trigger = New-ScheduledTaskTrigger -AtStartup
+        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User "Administrator" -RunLevel Highest -Force
+        Restart-Computer -Force -Confirm:$false 
+    }
     Remove-PSSession $Session
 }
 
