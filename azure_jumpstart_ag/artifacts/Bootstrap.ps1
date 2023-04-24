@@ -105,7 +105,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/prometheus-additional-scrape-config.yaml") -OutFile "$AgDirectory\prometheus-additional-scrape-config.yaml"
 
 
 BITSRequest -Params @{'Uri'='https://aka.ms/wslubuntu'; 'Filename'="$AgToolsDir\Ubuntu.appx" }
