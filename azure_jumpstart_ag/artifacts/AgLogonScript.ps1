@@ -372,6 +372,7 @@ Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRel
 
 # Update Prometheus Helm charts
 $monitoringNamespace = $AgConfig.Monitoring["Namespace"]
+$monitoringPassword = $AgConfig.Monitoring["Password"]
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
@@ -410,11 +411,11 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 
 # Reset Grafana Password
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $AgConfig.Monitoring["Password"]
+grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $monitoringPassword
 
 Write-Host "INFO: Add Store Data Sources to Grafana"
 ## Add Data Source
-$credentials = $AgConfig.Monitoring["UserName"] + ':' + $AgConfig.Monitoring["Password"]
+$credentials = $AgConfig.Monitoring["UserName"] + ':' + $monitoringPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
 $headers = @{    
@@ -461,7 +462,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
 kubectx dev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$monitoringPassword --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Dev Grafana service to provision.." -ForegroundColor Gray
@@ -485,7 +486,7 @@ $shortcut.Save()
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$monitoringPassword --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Staging Grafana service to provision.." -ForegroundColor Gray
