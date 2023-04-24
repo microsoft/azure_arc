@@ -393,7 +393,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/prometheus-additional-scrape-co
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values $prometheusScrapeFilePath
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values $prometheusScrapeFilePath
 
 # Get Load Balancer IP
 $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -411,7 +411,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
 kubectx dev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values $prometheusScrapeFilePath
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace --values $prometheusScrapeFilePath
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -534,7 +534,7 @@ Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
         $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
             $folderName = $_.name
             $path = Join-Path $folderPath $folderName
-            New-Item $path -ItemType Directory -ErrorAction Continue
+            New-Item $path -ItemType Directory -Force -ErrorAction Continue
     
             Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
         }
@@ -546,16 +546,27 @@ Write-Host "Fetching GitHub artifacts"
 $appRepoName = "jumpstart-agora-apps" # While testing, change to your GitHub fork's repository name
 $githubAppAccount = "charris-msft" # While testing, use my GitHub account
 $githubAppBranch = "mqtt2prom" 
-$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/sensor-monitor?ref=#$githubAppBranch"
+$deploymentFolder = "C:\Deployment"
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/sensor-monitor?ref=$githubAppBranch"
 
 $appPath = Join-Path $deploymentFolder "freezer_monitoring"
-New-Item $appPath -ItemType Directory -ErrorAction Ignore
+New-Item -Path $appPath -ItemType Directory -ErrorAction Ignore
 Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $appPath
+
+# special case for mqtt2prom ConfigMap volume
+$mqtt2promConfigPath = join-path $deploymentFolder "developer\freezer_monitoring\config"
+New-Item -Path $mqtt2promConfigPath -ItemType Directory -Force
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml?ref=$githubAppBranch"
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $mqtt2promConfigPath
 
 # Install the app
 $clusters = @('dev', 'staging', 'seattle', 'chicago')
 foreach ($cluster in $clusters) {
     kubectx $cluster
+    # Create ConfigMap for mqtt2prom *** special case
+    kubectl create configmap mqtt2prom-config --from-file=$mqtt2promConfigPath
+    
+    # install the helm chart
     helm install sensor-monitor $appPath
 }
 
