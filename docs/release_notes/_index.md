@@ -34,7 +34,7 @@ weight: 5
 
 #### Azure Arc-enabled Kubernetes
 
-- [Bug fix: Missing two parameters to use Azure Arc with ARO in azure. #1716](https://github.com/microsoft/azure_arc/issues/1716)
+- [Bug fix: Missing two parameters to use Azure Arc with ARO in Azure #1716](https://github.com/microsoft/azure_arc/issues/1716)
 
 #### Azure Arc-enabled data services
 
