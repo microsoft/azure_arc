@@ -378,7 +378,7 @@ helm repo update
 Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
 kubectx chicago
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Chicago Prometheus service to provision.." -ForegroundColor Gray
@@ -392,7 +392,7 @@ Write-Host "INFO: Chicago Prometheus service IP is $chicagoPrometheusLBIP" -Fore
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Seaatle Prometheus load balancer service to provision.." -ForegroundColor Gray
@@ -461,7 +461,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
 kubectx dev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer, grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Dev Grafana service to provision.." -ForegroundColor Gray
@@ -485,7 +485,7 @@ $shortcut.Save()
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer, grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$AgConfig.Monitoring["Password"] --namespace $monitoringNamespace --create-namespace
 
 Do {
     Write-Host "INFO: Waiting for Staging Grafana service to provision.." -ForegroundColor Gray
