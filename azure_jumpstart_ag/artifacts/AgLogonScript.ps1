@@ -438,8 +438,8 @@ $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
-kubectx dev
+Write-Host "INFO: Deploying Kube Prometheus Stack for AKSEEDev" -ForegroundColor Gray
+kubectx akseedev
 # Install Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
