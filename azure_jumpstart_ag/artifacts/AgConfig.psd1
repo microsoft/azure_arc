@@ -89,4 +89,13 @@
             LinuxNodeIp4Address = "172.20.1.81"
         }
     }
+
+    # Observability variables
+    Monitoring = @{
+        UserName = "admin"
+        Password = 'Agora123!!'
+        Namespace = "observability"
+        ProdURL = "http://localhost:3000"
+        
+    }
 }
