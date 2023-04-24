@@ -108,7 +108,6 @@ azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
-# consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
 foreach ($vhdxPath in $vhdxPaths) {
     # Extract the VM name from the file name
@@ -316,21 +315,14 @@ $env:KUBECONFIG = "$env:USERPROFILE\.kube\config"
 Write-Host "INFO: All three kubeconfig files merged successfully." -ForegroundColor Gray
 
 # Validate context switching using kubectx & kubectl
-Write-Host "INFO: Testing connectivity to kube api on Seattle cluster." -ForegroundColor Gray
-kubectx seattle
-kubectl get nodes -o wide
-
-Write-Host "INFO: Testing connectivity to kube api on Chicago cluster." -ForegroundColor Gray
-kubectx chicago
-kubectl get nodes -o wide
-
-Write-Host "INFO: Testing connectivity to kube api on dev cluster." -ForegroundColor Gray
-kubectx dev=akseedev
-kubectx dev
-kubectl get nodes -o wide
+foreach ($cluster in $VMNames) {
+    Write-Host "INFO: Testing connectivity to kube api on $cluster cluster." -ForegroundColor Gray
+    kubectx $cluster.ToLower()
+    kubectl get nodes -o wide
+}
 
 #####################################################################
-### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
+### Connect the AKS Edge Essentials clusters to Azure Arc
 #####################################################################
 
 Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
@@ -349,6 +341,50 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
+
+#####################################################################
+# Setup Azure Container registry on AKS Edge Essentials clusters
+#####################################################################
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Write-Host "INFO: Configuring Azure Container registry on $cluster"
+    kubectx $cluster.ToLower()
+    kubectl create secret docker-registry acr-secret `
+    --namespace default `
+    --docker-server="${Env:acrNameStaging}.azurecr.io" `
+    --docker-username="$env:spnClientId" `
+    --docker-password="$env:spnClientSecret"
+}
+
+#####################################################################
+# Configuring applications on the clusters using GitOps
+#####################################################################
+# foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+#     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+#         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
+#         az k8s-configuration flux create `
+#             --cluster-name $cluster.ArcClusterName `
+#             --resource-group $Env:resourceGroup `
+#             --name config-supermarket `
+#             --cluster-type connectedClusters `
+#             --url $appClonedRepo `
+#             --branch main --sync-interval 3s `
+#             --kustomization name=bookstore path=./bookstore/yaml
+        
+#         az k8s-configuration create `
+#             --name $app.Name `
+#             --cluster-name $cluster.ArcClusterName `
+#             --resource-group $Env:resourceGroup `
+#             --operator-instance-name flux `
+#             --operator-namespace arc-k8s-demo `
+#             --operator-params='--git-readonly --git-path=releases' `
+#             --enable-helm-operator `
+#             --helm-operator-chart-version='1.2.0' `
+#             --helm-operator-params='--set helm.versions=v3' `
+#             --repository-url https://github.com/Azure/arc-helm-demo.git `
+#             --scope namespace `
+#             --cluster-type connectedClusters
+#     }
+# }
 
 #####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
