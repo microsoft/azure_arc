@@ -347,7 +347,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 #####################################################################
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host "INFO: Configuring Azure Container registry on $cluster"
-    kubectx $cluster.ToLower()
+    kubectx $cluster.ToString().ToLower()
     kubectl create secret docker-registry acr-secret `
     --namespace default `
     --docker-server="${Env:acrNameStaging}.azurecr.io" `
