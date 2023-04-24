@@ -40,12 +40,12 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
     Start-Sleep -Seconds 5
 }
 
-# # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
-# Write-Host
-# Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
-# $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-# New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
-# Write-Host
+# Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
+Write-Host
+Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
+$AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
+Write-Host
 
 # Installing AKS Edge Essentials binaries and PowerShell module
 $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
