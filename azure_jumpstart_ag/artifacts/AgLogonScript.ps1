@@ -349,10 +349,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host "INFO: Configuring Azure Container registry on $cluster"
     kubectx $cluster.ToString().ToLower()
     kubectl create secret docker-registry acr-secret `
-    --namespace default `
-    --docker-server="${Env:acrNameStaging}.azurecr.io" `
-    --docker-username="$env:spnClientId" `
-    --docker-password="$env:spnClientSecret"
+        --namespace default `
+        --docker-server="${Env:acrNameStaging}.azurecr.io" `
+        --docker-username="$env:spnClientId" `
+        --docker-password="$env:spnClientSecret"
 }
 
 #####################################################################
