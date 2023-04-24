@@ -273,7 +273,7 @@ foreach ($VMName in $VMNames) {
     Remove-PSSession $Session
 }
 
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 120 # Give some time for the AKS EE installs to complete. This will take a few minutes.
 
 # Monitor until the kubeconfig files are detected and copied over
 $elapsedTime = Measure-Command {
