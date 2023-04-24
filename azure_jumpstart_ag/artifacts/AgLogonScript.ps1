@@ -116,9 +116,6 @@ foreach ($vhdxPath in $vhdxPaths) {
     # Get the virtual hard disk object from the VHDX file
     $vhd = Get-VHD -Path $vhdxPath
 
-    # Create new diff disks
-    # Add this tomorrow
-
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
     New-VM -Name $VMName `
