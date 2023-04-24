@@ -18,7 +18,7 @@
     }
 
     # Az CLI required extensions
-    AzCLIExtensions                      = @()
+    AzCLIExtensions                      = @('k8s-extension', 'k8s-configuration')
 
     # PowerShell modules
     PowerShellModules                    = @('Az.ConnectedKubernetes')
@@ -88,5 +88,20 @@
             ControlPlaneEndpointIp = "172.20.1.91"
             LinuxNodeIp4Address = "172.20.1.81"
         }
+    }
+
+    AppConfig = @{
+        ContosoSupermarket = @{
+            GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+            Branch = "main"
+            GitOpsConfigName = "config-supermarket"
+            Kustomization = "name=bookstore path=./bookstore/yaml"
+        }
+        # SensorMonitor = @{
+        #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+        #     Branch = "main"
+        #     GitOpsConfigName = "config-sensormonitor"
+        #     Kustomization = "name=bookstore path=./bookstore/yaml"
+        # }
     }
 }
