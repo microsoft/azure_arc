@@ -172,7 +172,7 @@ foreach ($vhdxPath in $vhdxPaths) {
     Start-VM -Name $VMName
 }
 
-Start-Sleep -Seconds 15
+Start-Sleep -Seconds 20
 
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
@@ -291,13 +291,19 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Set-Content "$deploymentFolder\Config.json" -Value $content
 }
 
-# Rebooting all L1 virtual machines
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "INFO: Rebooting $VMName." -ForegroundColor Gray
-    Invoke-Command -Session $Session -ScriptBlock { Restart-Computer -Force -Confirm:$false }
+    Invoke-Command -Session $Session -ScriptBlock { 
+        $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\AKSEEBootstrap.ps1"
+        $Trigger = New-ScheduledTaskTrigger -AtStartup
+        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $env:USERNAME -Password 'Agora123!!' -RunLevel Highest
+        Restart-Computer -Force -Confirm:$false
+    }
     Remove-PSSession $Session
 }
+
+Start-Sleep -Seconds 30
 
 # Monitor until the kubeconfig files are detected and copied over
 $elapsedTime = Measure-Command {
@@ -318,6 +324,7 @@ $elapsedTime = Measure-Command {
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
     }
 }
+
 # Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) seconds." -ForegroundColor Gray
 
@@ -389,7 +396,7 @@ az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $
 # Installing Grafana
 Write-Header "Installing and Configuring Observability components"
 Write-Host "INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v','')
+$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
 Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
 
 # Creating Prod Grafana Icon on Desktop
@@ -398,7 +405,7 @@ $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://localhost:3000"
-$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
@@ -409,7 +416,7 @@ helm repo update
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -420,14 +427,14 @@ $shortcutLocation = "$env:USERPROFILE\Desktop\Staging Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$stagingGrafanaLBIP"
-$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
 kubectx dev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -438,14 +445,14 @@ $shortcutLocation = "$env:USERPROFILE\Desktop\Dev Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$devLBIP"
-$shortcut.IconLocation="$AgIconsDir\grafana.ico, 0"
+$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
 kubectx chicago
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -454,7 +461,7 @@ Write-Host $chicagoLBIP
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -464,7 +471,7 @@ Write-Host "INFO: Load Balancer IP is $seattleLBIP" -ForegroundColor DarkGreen
 # Install Windows Terminal, WSL2, and Ubuntu
 #############################################################
 Write-Header "Installing Windows Terminal, WSL2 and Ubuntu, Docker Desktop"
-If ($PSVersionTable.PSVersion.Major -ge 7){ Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
 $downloadDir = "C:\WinTerminal"
 $gitRepo = "microsoft/terminal"
 $filenamePattern = "*.msixbundle"
@@ -495,12 +502,12 @@ $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
 
 # Initializing the wsl ubuntu app without requiring user input
 Write-Host "INFO: Installing Ubuntu." -ForegroundColor Gray
-$ubuntu_path="c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+$ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
 Invoke-Expression -Command "$ubuntu_path install --root"
 
 # Create Windows Terminal shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath= (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where {$_.name -eq "wt.exe"}).FullName
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where { $_.name -eq "wt.exe" }).FullName
 $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
@@ -520,7 +527,7 @@ Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confi
 Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 Start-Sleep -Seconds 10
-Get-Process | Where-Object {$_.name -like "Docker Desktop"} | Stop-Process -Force
+Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 
@@ -530,7 +537,7 @@ Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
 # Install VSCode extensions
 foreach ($extension in $AgConfig.VSCodeExtensions) {
-  code --install-extension $extension
+    code --install-extension $extension
 }
 
 ##############################################################
