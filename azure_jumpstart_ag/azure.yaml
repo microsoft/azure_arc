@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: azure_jumpstart_ag
+infra:
+    provider: ""
+    path: ""
+    module: ""
+pipeline:
+    provider: ""
+hooks:
+    preprovision:
+        shell: pwsh
+        run: ./scripts/preprovision.ps1
+        continueOnError: false
+        interactive: true
+

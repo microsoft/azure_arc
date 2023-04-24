@@ -1,4 +1,3 @@
-
 @description('The name of the Cosmos DB')
 param accountName string
 
@@ -8,7 +7,7 @@ param location string
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string = 'posOrders'
 
-resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
+resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
   name: accountName
   kind: 'GlobalDocumentDB'
   location: location
