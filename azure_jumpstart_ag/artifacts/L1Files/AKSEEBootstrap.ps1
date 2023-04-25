@@ -42,17 +42,18 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
 
 Start-Sleep 30
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
-Install-Module -Repository PSGallery -AllowClobber -Name HNS
+Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
 $switchName = "aksedgesw-ext"
 $netConfig = Get-Content -Raw $deploymentFolder"\Config.Json" | ConvertFrom-Json
+$gatewayIp = $netConfig.Network.Ip4GatewayAddress
 $ipAddressPrefix = "172.20.1.0/24"
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-$subnet = @{"IpAddressPrefix"="$ipAddressPrefix";"Routes"=@(@{"NextHop"="${netConfig.Network.Ip4GatewayAddress}";"DestinationPrefix"="0.0.0.0"})}
+$subnet = @{"IpAddressPrefix"="$ipAddressPrefix";"Routes"=@(@{"NextHop"="$gatewayIp";"DestinationPrefix"="0.0.0.0"})}
 New-VMSwitch -Name $switchName -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
 Get-HnsNetwork | ForEach-Object {
-    if ($network.Name = $switchName) {
-        New-HnsSubnet -NetworkId $network.Id -Subnets $subnet
+    if ($_.Name -eq $switchName) {
+        New-HnsSubnet -NetworkId $_.Id -Subnets $subnet
     }
 }
 
@@ -62,7 +63,7 @@ $msiFilePath = Join-Path $deploymentFolder $msiFileName
 $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
 $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
 Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-
+Import-Module AksEdge
 Install-AksEdgeHostFeatures -Force
 
 # Deploying AKS Edge Essentials cluster
