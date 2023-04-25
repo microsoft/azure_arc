@@ -19,6 +19,7 @@ $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
+$acrName = $Env:acrName
 $templateBaseUrl = $env:templateBaseUrl
 
 Write-Header "Executing AgLogonScript.ps1"
@@ -85,6 +86,9 @@ Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundCol
 Set-Location $AgAppsRepo
 git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
 Set-Location $AgAppsRepo\jumpstart-agora-apps
+gh secret set "SPN_CLIENT_ID" -b $spnClientID
+gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+gh secret set "ACR_NAME" -b $acrName
 
 #####################################################################
 # IotHub resources preperation
@@ -92,16 +96,14 @@ Set-Location $AgAppsRepo\jumpstart-agora-apps
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
 $IoTHubHostName = $env:iotHubHostName
 $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
 $sites=$AgConfig.SiteConfig.Values
 
 Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
 foreach ($site in $sites){
     $deviceId = $site.FriendlyName
     az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
-    #$deviceConnectionString=$(az iot hub device-identity connection-string show --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup -o tsv)
     $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
-    gh variable set 'device_Id' -b $deviceId
-    #gh secret set "connection_string_$site" -b $deviceConnectionString
     gh secret set "sas_token_$deviceId" -b $deviceSASToken
 }
 
