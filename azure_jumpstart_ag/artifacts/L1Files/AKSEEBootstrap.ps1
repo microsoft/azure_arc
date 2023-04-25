@@ -42,6 +42,7 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
 
 Start-Sleep 5
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
+Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
