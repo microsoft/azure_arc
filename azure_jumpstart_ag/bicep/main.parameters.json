@@ -28,9 +28,6 @@
     },
     "githubBranch": {
       "value": "jumpstart_ag"
-    },
-    "githubPAT": {
-      "value": ""
     }
   }
 }
