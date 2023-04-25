@@ -13,6 +13,7 @@ Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.l
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
+$githubPat = $env:githubPat
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
@@ -89,6 +90,7 @@ Set-Location $AgAppsRepo\jumpstart-agora-apps
 gh secret set "SPN_CLIENT_ID" -b $spnClientID
 gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
 gh secret set "ACR_NAME" -b $acrName
+gh secret set "GITHUB_PAT" -b $githubPat
 
 #####################################################################
 # IotHub resources preperation
