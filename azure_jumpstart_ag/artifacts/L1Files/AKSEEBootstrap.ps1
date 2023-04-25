@@ -44,7 +44,7 @@ Start-Sleep 30
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-#New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
+New-VMSwitch -Name "aksedgesw-ext" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
 
 # Installing AKS Edge Essentials binaries and PowerShell module
 $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
