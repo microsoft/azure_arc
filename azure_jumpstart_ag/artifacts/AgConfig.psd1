@@ -15,17 +15,16 @@
         AgTempDir = "C:\Temp"
         AgVHDXDir = "C:\Ag\VHDX"
         AgL1Files = "C:\Ag\L1Files"
-        AgAppsRepo = "C:\Ag\AppsRepo"
     }
 
     # Az CLI required extensions
-    AzCLIExtensions                      = @('azure-iot')
+    AzCLIExtensions                      = @()
 
     # PowerShell modules
     PowerShellModules                    = @('Az.ConnectedKubernetes')
 
     # Chocolatey app list
-    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer','gh')
+    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
 
     # VSCode extensions
     VSCodeExtensions  = @('ms-vscode-remote.remote-containers','ms-vscode-remote.remote-wsl','ms-vscode.powershell','redhat.vscode-yaml','ZainChen.json','esbenp.prettier-vscode')
@@ -66,7 +65,6 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.21"
             LinuxNodeIp4Address = "172.20.1.11"
-            FriendlyName = "Seattle"
         }
         Chicago = @{
             ArcClusterName = "Ag-AKSEE-Chicago"
@@ -78,7 +76,6 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address = "172.20.1.51"
-            FriendlyName = "Chicago"
         }
         AKSEEDev = @{
             ArcClusterName = "Ag-AKSEE-Dev"
@@ -90,7 +87,6 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.91"
             LinuxNodeIp4Address = "172.20.1.81"
-            FriendlyName = "Dev"
         }
     }
 }
