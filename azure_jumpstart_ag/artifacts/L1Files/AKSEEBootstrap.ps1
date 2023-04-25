@@ -73,7 +73,7 @@ Write-Host
 
 # kubeconfig work for changing context and coping to the Hyper-V host machine
 $newKubeContext = $(hostname).ToLower()
-kubectx $newKubeContext=default
+kubectx ${newKubeContext}=default
 Write-Host
 kubectl get nodes -o wide
 Write-Host
