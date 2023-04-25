@@ -342,15 +342,26 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Write-Host "INFO: Configuring Azure Container registry on $cluster"
-    kubectx $cluster.ToString().ToLower()
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) 
+{
+    Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+    kubectx $cluster.Name.ToLower()
     kubectl create secret docker-registry acr-secret `
         --namespace default `
         --docker-server="${Env:acrNameStaging}.azurecr.io" `
         --docker-username="$env:spnClientId" `
         --docker-password="$env:spnClientSecret"
 }
+
+#####################################################################
+# Setup Azure Container registry on cloud AKS staging environment
+#####################################################################
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
+kubectx staging="$Env:aksStagingClusterName-admin"
+
+# Attach ACRs to staging cluster
+Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
 
 #####################################################################
 # Configuring applications on the clusters using GitOps
@@ -384,16 +395,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 # }
 
 #####################################################################
-# Setup Azure Container registry on cloud AKS staging environment
-#####################################################################
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
-kubectx staging="$Env:aksStagingClusterName-admin"
-
-# Attach ACRs to staging cluster
-Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
-
-#####################################################################
 ### Deploy Kube Prometheus Stack for Observability
 #####################################################################
 
@@ -420,7 +421,8 @@ helm repo update
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+$helmSetValue = 'alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer'
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
