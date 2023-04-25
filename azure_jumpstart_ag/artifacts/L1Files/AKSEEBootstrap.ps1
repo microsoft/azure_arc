@@ -40,7 +40,7 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
     Start-Sleep -Seconds 5
 }
 
-Start-Sleep 30
+Start-Sleep 5
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
 Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
