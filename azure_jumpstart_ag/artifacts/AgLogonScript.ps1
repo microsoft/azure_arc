@@ -433,7 +433,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack --set alertma
 
 # Get Load Balancer IP
 $chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Write-Host $chicagoLBIP
+Write-Host "INFO: Load Balancer IP is $chicagoLBIP" -ForegroundColor DarkGreen
 
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
@@ -542,7 +542,7 @@ Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
 }
 
 # Fetching required GitHub artifacts from Jumpstart Apps repository
-Write-Host "Fetching GitHub artifacts"
+Write-Host "Fetching GitHub artifacts" -ForegroundColor Gray
 $appRepoName = "jumpstart-agora-apps" # While testing, change to your GitHub fork's repository name
 $githubAppAccount = "charris-msft" # While testing, use my GitHub account
 $githubAppBranch = "mqtt2prom" 
