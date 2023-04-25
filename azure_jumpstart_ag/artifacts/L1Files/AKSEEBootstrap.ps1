@@ -40,6 +40,7 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
     Start-Sleep -Seconds 5
 }
 
+Start-Sleep 30
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
