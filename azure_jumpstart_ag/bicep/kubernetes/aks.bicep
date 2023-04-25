@@ -45,8 +45,13 @@ param aksSubnetNameStaging string
 
 @minLength(5)
 @maxLength(50)
-@description('Name of the Azure Container Registry')
-param acrName string
+@description('Name of the production Azure Container Registry')
+param acrNameProd string
+
+@minLength(5)
+@maxLength(50)
+@description('Name of the Staging Azure Container Registry')
+param acrNameStaging string
 
 @description('Provide a tier of your Azure Container Registry.')
 param acrSku string = 'Basic'
@@ -122,8 +127,19 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
   }
 }
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: acrName
+resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
+  name: acrNameProd
+  location: location
+  sku: {
+    name: acrSku
+  }
+  properties: {
+    adminUserEnabled: true
+  }
+}
+
+resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+  name: acrNameStaging
   location: location
   sku: {
     name: acrSku
@@ -134,4 +150,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
 }
 
 @description('Output the login server property for Dev ACR')
-output acrName string = acr.name
+output acrStagingName string = acrResourceStaging.name
+
+@description('Output the login server property for Prod ACR')
+output acrProdName string = acrResourceProd.name
