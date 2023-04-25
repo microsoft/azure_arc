@@ -56,8 +56,6 @@ Get-HnsNetwork | ForEach-Object {
     }
 }
 
-
-
 # Installing AKS Edge Essentials binaries and PowerShell module
 $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
 $msiFilePath = Join-Path $deploymentFolder $msiFileName
