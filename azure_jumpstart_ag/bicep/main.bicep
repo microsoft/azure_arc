@@ -39,7 +39,7 @@ param githubBranch string = 'jumpstart_ag'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+@description('User github account where they have forked https://github.com/microsoft/jumpstart-agora-apps')
 param githubUser string = 'microsoft'
 
 @description('GitHub Personal access token for the user account')
