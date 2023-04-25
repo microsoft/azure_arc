@@ -64,7 +64,7 @@ $msiFilePath = Join-Path $deploymentFolder $msiFileName
 $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
 $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
 Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-Import-Module AksEdge
+#Import-Module AksEdge
 Install-AksEdgeHostFeatures -Force
 
 # Deploying AKS Edge Essentials cluster
