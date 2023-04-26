@@ -5,9 +5,11 @@ if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADM
 
 azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 
-$JS_WINDOWS_ADMIN_PASSWORD = Read-Host "Enter the Windows Admin Password (hint: ArcPassword123!! - 12 character minimum)" -AsSecureString
+# The user will be prompted for this by azd so we can maintain the security of the password.
+# $JS_WINDOWS_ADMIN_PASSWORD = Read-Host "Enter the Windows Admin Password (hint: ArcPassword123!! - 12 character minimum)" -AsSecureString
 
-azd env set JS_WINDOWS_ADMIN_PASSWORD $JS_WINDOWS_ADMIN_PASSWORD
+# azd env set JS_WINDOWS_ADMIN_PASSWORD $JS_WINDOWS_ADMIN_PASSWORD
+
 
 ########################################################################
 Write-Host "Getting SSH RSA Public Key..."
