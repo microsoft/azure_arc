@@ -25,6 +25,14 @@ Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 #########################################
 # Deplying AKS Edge Essentials clusters #
 #########################################
+Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
+# Force time sync
+$string = Get-Date
+Write-Host "INFO: Time before forced time sync:" $string.ToString("u") -ForegroundColor Gray
+net start w32time
+W32tm /resync
+$string = Get-Date
+Write-Host "INFO: Time after forced time sync:" $string.ToString("u") -ForegroundColor Gray
 
 # Validating internet connectivity
 while (-not (Test-Connection -ComputerName google.com -Quiet)) {
@@ -42,13 +50,40 @@ $netConfig = Get-Content -Raw $deploymentFolder"\Config.Json" | ConvertFrom-Json
 $gatewayIp = $netConfig.Network.Ip4GatewayAddress
 $ipAddressPrefix = "172.20.1.0/24"
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-$subnet = @{"IpAddressPrefix"="$ipAddressPrefix";"Routes"=@(@{"NextHop"="$gatewayIp";"DestinationPrefix"="0.0.0.0"})}
-New-VMSwitch -Name $switchName -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
-Get-HnsNetwork | ForEach-Object {
-    if ($_.Name -eq $switchName) {
-        New-HnsSubnet -NetworkId $_.Id -Subnets $subnet
-    }
+$jsonString = @"
+{
+    "Policies": [
+        {
+            "Settings":
+                {
+                    "NetworkAdapterName": "$AdapterName"
+                },
+            "Type": "NetAdapterName"
+        }
+    ],
+    "SchemaVersion": { "Major": 2, "Minor": 2 },
+    "Name":  "$switchName",
+    "Type":  "Transparent",
+    "Ipams":  [
+        {
+            "Subnets":  [
+                {
+                    "Policies":  [],
+                    "Routes":  [
+                        {
+                            "NextHop":  "$gatewayIp",
+                            "DestinationPrefix":  "0.0.0.0/0"
+                        }
+                    ],
+                    "IpAddressPrefix":  "$ipAddressPrefix"
+                }
+            ],
+            "Type":  "Static"
+        }
+    ]
 }
+"@
+New-HnsNetwork -jsonString $jsonString
 
 # Installing AKS Edge Essentials binaries and PowerShell module
 $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
@@ -56,7 +91,7 @@ $msiFilePath = Join-Path $deploymentFolder $msiFileName
 $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
 $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
 Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-Import-Module AksEdge
+Import-Module AksEdge.psm1 -Force
 Install-AksEdgeHostFeatures -Force
 
 # Deploying AKS Edge Essentials cluster
