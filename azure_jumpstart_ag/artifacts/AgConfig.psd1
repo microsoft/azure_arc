@@ -65,6 +65,7 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.21"
             LinuxNodeIp4Address = "172.20.1.11"
+            Subnet = "172.20.1.0/24"
         }
         Chicago = @{
             ArcClusterName = "Ag-AKSEE-Chicago"
@@ -76,6 +77,7 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address = "172.20.1.51"
+            Subnet = "172.20.1.0/24"
         }
         AKSEEDev = @{
             ArcClusterName = "Ag-AKSEE-Dev"
@@ -87,6 +89,7 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.91"
             LinuxNodeIp4Address = "172.20.1.81"
+            Subnet = "172.20.1.0/24"
         }
     }
 
