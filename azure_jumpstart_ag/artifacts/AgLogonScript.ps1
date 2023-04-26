@@ -263,6 +263,16 @@ foreach ($VMName in $VMNames) {
     Write-Host "INFO: Building external vswitch on $VMName" -ForegroundColor Gray
     Invoke-Command -Session $Session -ScriptBlock {
         $AgConfig = $using:AgConfig
+
+        Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
+        # Force time sync
+        $string = Get-Date
+        Write-Host "INFO: Time before forced time sync:" $string.ToString("u") -ForegroundColor Gray
+        net start w32time
+        W32tm /resync
+        $string = Get-Date
+        Write-Host "INFO: Time after forced time sync:" $string.ToString("u") -ForegroundColor Gray
+        
         # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
         Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
