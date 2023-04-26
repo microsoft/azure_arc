@@ -440,7 +440,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for AKSEEDev" -ForegroundColor Gray
 kubectx akseedev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $set --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -458,7 +458,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
 kubectx chicago
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -467,7 +467,7 @@ Write-Host $chicagoLBIP
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
