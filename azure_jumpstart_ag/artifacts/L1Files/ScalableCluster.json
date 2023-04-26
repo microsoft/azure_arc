@@ -1,5 +1,5 @@
 {
-  "SchemaVersion": "1.5",
+  "SchemaVersion": "1.6",
   "Version": "1.0",
   "DeploymentType": "ScalableCluster",
   "Init": {
@@ -23,7 +23,13 @@
     "DnsServers": [
         "DnsServer-null"
     ],
-    "InternetDisabled": false
+    "InternetDisabled": false,
+    "SkipAddressFreeCheck": false,
+    "Proxy": {
+      "Http": null,
+      "Https": null,
+      "No": "localhost,127.0.0.0/8,192.168.0.0/16,172.17.0.0/16,10.42.0.0/16,10.43.0.0/16,10.96.0.0/12,10.244.0.0/16,.svc"
+    }
   },
   "User": {
     "AcceptEula": true,
@@ -32,14 +38,24 @@
   "Machines": [
     {
       "NetworkConnection": {
-        "AdapterName": "Ethernet-Null"
+        "AdapterName": "Ethernet-Null",
+        "Mtu": 0
       },
       "LinuxNode": {
         "CpuCount": 2,
         "MemoryInMB": 16384,
         "DataSizeInGB": 20,
         "Ip4Address": "Ip4Address-null",
-        "TimeoutSeconds": 300
+        "TimeoutSeconds": 300,
+        "TpmPassthrough": false,
+        "SecondaryNetworks": [
+          {
+            "VMSwitchName": null,
+            "Ip4Address": null,
+            "Ip4GatewayAddress": null,
+            "Ip4PrefixLength": null
+          }
+        ]
       }
     }
   ]
