@@ -586,6 +586,73 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
     code --install-extension $extension
 }
 
+
+#############################################################
+# Install Apps
+#############################################################
+Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $folderPath $fileName
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+
+    If (-not $excludeFolders) {
+        $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+            $folderName = $_.name
+            $path = Join-Path $folderPath $folderName
+            New-Item $path -ItemType Directory -Force -ErrorAction Continue
+
+            Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+        }
+    }
+}
+
+# Fetching required GitHub artifacts from Jumpstart Apps repository
+Write-Host "Fetching GitHub artifacts" -ForegroundColor Gray
+$appRepoName = "jumpstart-agora-apps" # While testing, change to your GitHub fork's repository name
+$githubAppAccount = "charris-msft" # While testing, use my GitHub account
+$githubAppBranch = "mqtt2prom" 
+$deploymentFolder = "C:\Deployment"
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/sensor-monitor?ref=$githubAppBranch"
+
+$appPath = Join-Path $deploymentFolder "freezer_monitoring"
+New-Item -Path $appPath -ItemType Directory -ErrorAction Ignore
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $appPath
+
+#mqtt-broker config file
+$mqttbrokerConfigPath = join-path $deploymentFolder "developer\freezer_monitoring\config\mqtt-broker"
+New-Item -Path $mqttbrokerConfigPath -ItemType Directory -Force
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf?ref=$githubAppBranch"
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $mqttbrokerConfigPath
+
+#mqtt-simulator config file
+$mqttsimulatorConfigPath = join-path $deploymentFolder "developer\freezer_monitoring\config\mqtt-simulator"
+New-Item -Path $mqttsimulatorConfigPath -ItemType Directory -Force
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json?ref=$githubAppBranch"
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $mqttsimulatorConfigPath
+
+# mqtt2prom config file
+$mqtt2promConfigPath = join-path $deploymentFolder "developer\freezer_monitoring\config\mqtt2prom"
+New-Item -Path $mqtt2promConfigPath -ItemType Directory -Force
+$githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml?ref=$githubAppBranch"
+Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $mqtt2promConfigPath
+
+# Install the app
+$clusters = @('dev', 'staging', 'seattle', 'chicago')
+foreach ($cluster in $clusters) {
+    kubectx $cluster
+    # Create ConfigMaps
+    kubectl create configmap mqtt2prom-config --from-file=$mqtt2promConfigPath
+    kubectl create configmap mqtt-broker-config --from-file=$mqttbrokerConfigPath
+    kubectl create configmap mqtt-simulator-config --from-file=$mqttsimulatorConfigPath
+
+    # install the helm chart
+    helm install sensor-monitor $appPath
+}
+
 ##############################################################
 # Cleanup
 ##############################################################
