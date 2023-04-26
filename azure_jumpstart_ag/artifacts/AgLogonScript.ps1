@@ -263,7 +263,7 @@ foreach ($VMName in $VMNames) {
     Write-Host "INFO: Building external vswitch on $VMName" -ForegroundColor Gray
     Invoke-Command -Session $Session -ScriptBlock {
         $AgConfig = $using:AgConfig
-
+        $VMName = $using:VMName
         Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
         # Force time sync
         $string = Get-Date
@@ -278,16 +278,16 @@ foreach ($VMName in $VMNames) {
         Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
         Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
         $switchName = "aksedgesw-ext"
-        # $gatewayIp = $AgConfig.SiteConfig[$VMName].DefaultGateway
-        # $ipAddressPrefix = $AgConfig.SiteConfig[$VMName].Subnet
-        # $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-        # $subnet = @{"IpAddressPrefix"="$ipAddressPrefix";"Routes"=@(@{"NextHop"="$gatewayIp";"DestinationPrefix"="0.0.0.0"})}
+        $gatewayIp = $AgConfig.SiteConfig[$VMName].DefaultGateway
+        $ipAddressPrefix = $AgConfig.SiteConfig[$VMName].Subnet
+        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+        $subnet = @{"IpAddressPrefix"="$ipAddressPrefix";"Routes"=@(@{"NextHop"="$gatewayIp";"DestinationPrefix"="0.0.0.0"})}
         New-VMSwitch -Name $switchName -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
-        # Get-HnsNetwork | ForEach-Object {
-        #     if ($_.Name -eq $switchName) {
-        #         New-HnsSubnet -NetworkId $_.Id -Subnets $subnet
-        #     }
-        # }
+        Get-HnsNetwork | ForEach-Object {
+            if ($_.Name -eq $switchName) {
+                New-HnsSubnet -NetworkId $_.Id -Subnets $subnet
+            }
+        }
 
         Restart-Computer -Force -Confirm:$false
     }
