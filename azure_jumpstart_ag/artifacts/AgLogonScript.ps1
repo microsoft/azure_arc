@@ -108,7 +108,6 @@ azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
-# consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
 foreach ($vhdxPath in $vhdxPaths) {
     # Extract the VM name from the file name
@@ -116,9 +115,6 @@ foreach ($vhdxPath in $vhdxPaths) {
 
     # Get the virtual hard disk object from the VHDX file
     $vhd = Get-VHD -Path $vhdxPath
-
-    # Create new diff disks
-    # Add this tomorrow
 
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
@@ -274,7 +270,7 @@ foreach ($VMName in $VMNames) {
     Remove-PSSession $Session
 }
 
-Start-Sleep -Seconds 30
+Start-Sleep -Seconds 120 # Give some time for the AKS EE installs to complete. This will take a few minutes.
 
 # Monitor until the kubeconfig files are detected and copied over
 $elapsedTime = Measure-Command {
@@ -316,21 +312,14 @@ $env:KUBECONFIG = "$env:USERPROFILE\.kube\config"
 Write-Host "INFO: All three kubeconfig files merged successfully." -ForegroundColor Gray
 
 # Validate context switching using kubectx & kubectl
-Write-Host "INFO: Testing connectivity to kube api on Seattle cluster." -ForegroundColor Gray
-kubectx seattle
-kubectl get nodes -o wide
-
-Write-Host "INFO: Testing connectivity to kube api on Chicago cluster." -ForegroundColor Gray
-kubectx chicago
-kubectl get nodes -o wide
-
-Write-Host "INFO: Testing connectivity to kube api on dev cluster." -ForegroundColor Gray
-kubectx dev=akseedev
-kubectx dev
-kubectl get nodes -o wide
+foreach ($cluster in $VMNames) {
+    Write-Host "INFO: Testing connectivity to kube api on $cluster cluster." -ForegroundColor Gray
+    kubectx $cluster.ToLower()
+    kubectl get nodes -o wide
+}
 
 #####################################################################
-### INTERNAL NOTE: Add Logic for Arc-enabling the clusters
+### Connect the AKS Edge Essentials clusters to Azure Arc
 #####################################################################
 
 Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
@@ -351,6 +340,20 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 }
 
 #####################################################################
+# Setup Azure Container registry on AKS Edge Essentials clusters
+#####################################################################
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) 
+{
+    Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+    kubectx $cluster.Name.ToLower()
+    kubectl create secret docker-registry acr-secret `
+        --namespace default `
+        --docker-server="${Env:acrNameStaging}.azurecr.io" `
+        --docker-username="$env:spnClientId" `
+        --docker-password="$env:spnClientSecret"
+}
+
+#####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
@@ -359,6 +362,37 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 # Attach ACRs to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
+
+#####################################################################
+# Configuring applications on the clusters using GitOps
+#####################################################################
+# foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+#     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+#         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
+#         az k8s-configuration flux create `
+#             --cluster-name $cluster.ArcClusterName `
+#             --resource-group $Env:resourceGroup `
+#             --name config-supermarket `
+#             --cluster-type connectedClusters `
+#             --url $appClonedRepo `
+#             --branch main --sync-interval 3s `
+#             --kustomization name=bookstore path=./bookstore/yaml
+        
+#         az k8s-configuration create `
+#             --name $app.Name `
+#             --cluster-name $cluster.ArcClusterName `
+#             --resource-group $Env:resourceGroup `
+#             --operator-instance-name flux `
+#             --operator-namespace arc-k8s-demo `
+#             --operator-params='--git-readonly --git-path=releases' `
+#             --enable-helm-operator `
+#             --helm-operator-chart-version='1.2.0' `
+#             --helm-operator-params='--set helm.versions=v3' `
+#             --repository-url https://github.com/Azure/arc-helm-demo.git `
+#             --scope namespace `
+#             --cluster-type connectedClusters
+#     }
+# }
 
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
@@ -387,7 +421,8 @@ helm repo update
 Write-Header "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
 kubectx staging
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+$helmSetValue = 'alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer'
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $stagingGrafanaLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -402,10 +437,10 @@ $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
-kubectx dev
+Write-Host "INFO: Deploying Kube Prometheus Stack for AKSEEDev" -ForegroundColor Gray
+kubectx akseedev
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.ingress.enabled=true, grafana.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $set --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -423,7 +458,7 @@ $shortcut.Save()
 Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
 kubectx chicago
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $chicagoLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -432,7 +467,7 @@ Write-Host $chicagoLBIP
 Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
 kubectx seattle
 # Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false, grafana.enabled=false, prometheus.service.type=LoadBalancer --namespace $monitoringNamespace --create-namespace
+helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $seattleLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
