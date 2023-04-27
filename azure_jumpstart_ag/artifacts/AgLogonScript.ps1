@@ -303,7 +303,7 @@ Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) 
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-akseedev"
+$kubeconfig3 = "config-dev"
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
@@ -551,8 +551,8 @@ $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for AKSEEDev" -ForegroundColor Gray
-kubectx akseedev
+Write-Host "INFO: Deploying Kube Prometheus Stack for Dev" -ForegroundColor Gray
+kubectx dev
 # Install Prometheus Operator
 helm install prometheus prometheus-community/kube-prometheus-stack --set $set --namespace $observabilityNamespace --create-namespace
 
