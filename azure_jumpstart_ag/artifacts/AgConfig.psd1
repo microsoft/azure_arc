@@ -18,23 +18,58 @@
     }
 
     # Az CLI required extensions
-    AzCLIExtensions                      = @('k8s-extension', 'k8s-configuration')
+    AzCLIExtensions = @(
+        'k8s-extension',
+        'k8s-configuration'
+    )
 
     # PowerShell modules
-    PowerShellModules                    = @('Az.ConnectedKubernetes')
+    PowerShellModules= @(
+        'Az.ConnectedKubernetes'
+    )
 
     # Chocolatey app list
-    chocolateyAppList = @('azure-cli','az.powershell','kubernetes-cli','vcredist140','microsoft-edge','azcopy10','vscode','git','7zip','kubectx','putty.install','kubernetes-helm','dotnetcore-3.1-sdk','zoomit','openssl.light','mqtt-explorer')
+    ChocolateyAppList = @(
+        'azure-cli',
+        'az.powershell',
+        'kubernetes-cli',
+        'vcredist140',
+        'microsoft-edge',
+        'azcopy10',
+        'vscode',
+        'git',
+        '7zip',
+        'kubectx',
+        'putty.install',
+        'kubernetes-helm',
+        'dotnetcore-3.1-sdk',
+        'zoomit',
+        'openssl.light',
+        'mqtt-explorer'
+    )
 
     # VSCode extensions
-    VSCodeExtensions  = @('ms-vscode-remote.remote-containers','ms-vscode-remote.remote-wsl','ms-vscode.powershell','redhat.vscode-yaml','ZainChen.json','esbenp.prettier-vscode')
+    VSCodeExtensions  = @(
+        'ms-vscode-remote.remote-containers',
+        'ms-vscode-remote.remote-wsl',
+        'ms-vscode.powershell',
+        'redhat.vscode-yaml',
+        'ZainChen.json',
+        'esbenp.prettier-vscode',
+        'ms-kubernetes-tools.vscode-kubernetes-tools',
+        'mindaro.mindaro'
+    )
+
+    $ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
+    $PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # VHDX Paths 
-    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
+    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"                 # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
     
-    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
-    
+    # Required Azure Providers
+    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation", "Microsoft.HybridCompute", "Microsoft.HybridConnectivity", "Microsoft.GuestConfiguration"
+
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
@@ -56,7 +91,7 @@
     # AKS variables
     SiteConfig = @{
         Seattle = @{
-            ArcClusterName = "Ag-AKSEE-Seattle"
+            ArcClusterName = "Ag-ArcK8s-Seattle"
             NetIPAddress = "172.20.1.2"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -68,7 +103,7 @@
             Subnet = "172.20.1.0/24"
         }
         Chicago = @{
-            ArcClusterName = "Ag-AKSEE-Chicago"
+            ArcClusterName = "Ag-ArcK8s-Chicago"
             NetIPAddress = "172.20.1.3"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -79,8 +114,8 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
         }
-        AKSEEDev = @{
-            ArcClusterName = "Ag-AKSEE-Dev"
+        Dev = @{
+            ArcClusterName = "Ag-ArcK8s-Dev"
             NetIPAddress = "172.20.1.4"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"

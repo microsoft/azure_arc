@@ -4,6 +4,11 @@ param ClusterName string = 'agadx${namingGuid}'
 @description('The location of the Azure Data Explorer cluster')
 param location string
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('The name of the Azure Data Explorer cluster Sku')
 param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 

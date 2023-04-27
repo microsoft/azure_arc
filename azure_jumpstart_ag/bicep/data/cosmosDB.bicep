@@ -5,6 +5,11 @@ param accountName string
 @description('The location of the Cosmos DB')
 param location string
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string = 'posOrders'
 
@@ -12,6 +17,7 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
   name: accountName
   kind: 'GlobalDocumentDB'
   location: location
+  tags: resourceTags
   properties: {
     databaseAccountOfferType: 'Standard'
     locations: [

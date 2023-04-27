@@ -16,12 +16,13 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
-
-param resourceTags object = {
-  Project: 'jumpstart_Ag'
-}
 
 @description('Client id of the service principal')
 param spnClientId string
