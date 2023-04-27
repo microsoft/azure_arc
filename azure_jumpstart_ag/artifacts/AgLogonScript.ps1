@@ -109,7 +109,6 @@ azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
-# consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
 foreach ($vhdxPath in $vhdxPaths) {
     # Extract the VM name from the file name
@@ -117,9 +116,6 @@ foreach ($vhdxPath in $vhdxPaths) {
 
     # Get the virtual hard disk object from the VHDX file
     $vhd = Get-VHD -Path $vhdxPath
-
-    # Create new diff disks
-    # Add this tomorrow
 
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
