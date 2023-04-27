@@ -109,6 +109,7 @@ azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 
+# consider diff disks here and answer files
 # Loop through each VHDX file and create a VM
 foreach ($vhdxPath in $vhdxPaths) {
     # Extract the VM name from the file name
@@ -116,6 +117,9 @@ foreach ($vhdxPath in $vhdxPaths) {
 
     # Get the virtual hard disk object from the VHDX file
     $vhd = Get-VHD -Path $vhdxPath
+
+    # Create new diff disks
+    # Add this tomorrow
 
     # Create a new virtual machine and attach the existing virtual hard disk
     Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
@@ -316,7 +320,7 @@ Write-Host "INFO: All three kubeconfig files merged successfully." -ForegroundCo
 foreach ($cluster in $VMNames) {
     Write-Host "INFO: Testing connectivity to kube api on $cluster cluster." -ForegroundColor Gray
     kubectx $cluster.ToLower()
-    kubectl get nodes -o wide
+kubectl get nodes -o wide
 }
 
 #####################################################################
@@ -684,7 +688,7 @@ Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
 Write-Host "Fetching GitHub artifacts" -ForegroundColor Gray
 $appRepoName = "jumpstart-agora-apps" # While testing, change to your GitHub fork's repository name
 $githubAppAccount = "charris-msft" # While testing, use my GitHub account
-$githubAppBranch = "mqtt2prom"
+$githubAppBranch = "mqtt2prom" 
 $deploymentFolder = "C:\Deployment"
 $githubApiUrl = "https://api.github.com/repos/$githubAppAccount/$appRepoName/contents/contoso_supermarket/developer/freezer_monitoring/src/sensor-monitor?ref=$githubAppBranch"
 
