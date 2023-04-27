@@ -5,7 +5,7 @@ param iotHubName string
 param location string
 
 @description('The name of the IotHub SKU')
-param skuName string = 'B1'
+param skuName string = 'S1'
 
 @description('The capacity of the IotHub SKU')
 param capacity int = 1
