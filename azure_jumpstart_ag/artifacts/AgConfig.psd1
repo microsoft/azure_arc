@@ -18,7 +18,7 @@
     }
 
     # Az CLI required extensions
-    AzCLIExtensions                      = @()
+    AzCLIExtensions                      = @('k8s-extension', 'k8s-configuration')
 
     # PowerShell modules
     PowerShellModules                    = @('Az.ConnectedKubernetes')
@@ -38,7 +38,7 @@
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
-    L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
+    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
     InternalSwitch                       = "InternalSwitch"                      # Name of the internal switch that the L0 VM will use.
     L1Username                           = "Administrator"                       # Admin credential for the 3 VMs that run on the Agora-Client
     L1Password                           = 'Agora123!!'                          # 
@@ -65,6 +65,7 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.21"
             LinuxNodeIp4Address = "172.20.1.11"
+            Subnet = "172.20.1.0/24"
         }
         Chicago = @{
             ArcClusterName = "Ag-AKSEE-Chicago"
@@ -76,6 +77,7 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address = "172.20.1.51"
+            Subnet = "172.20.1.0/24"
         }
         AKSEEDev = @{
             ArcClusterName = "Ag-AKSEE-Dev"
@@ -87,15 +89,29 @@
             ServiceIPRangeSize = "10"
             ControlPlaneEndpointIp = "172.20.1.91"
             LinuxNodeIp4Address = "172.20.1.81"
+            Subnet = "172.20.1.0/24"
         }
     }
-
+    
     # Observability variables
     Monitoring = @{
         UserName = "admin"
         Password = 'Agora123!!'
         Namespace = "observability"
         ProdURL = "http://localhost:3000"
-        
+
+    AppConfig = @{
+        ContosoSupermarket = @{
+            GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+            Branch = "main"
+            GitOpsConfigName = "config-supermarket"
+            Kustomization = "name=bookstore path=./bookstore/yaml"
+        }
+        # SensorMonitor = @{
+        #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+        #     Branch = "main"
+        #     GitOpsConfigName = "config-sensormonitor"
+        #     Kustomization = "name=bookstore path=./bookstore/yaml"
+        # }
     }
 }
