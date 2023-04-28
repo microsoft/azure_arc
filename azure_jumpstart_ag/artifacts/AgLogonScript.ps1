@@ -101,7 +101,6 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 # Deploying the nested L1 virtual machines 
 ############################################
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage" -ForegroundColor Gray
-# $sasUrl = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 Write-Host "INFO: Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor GRAY
 azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
@@ -339,6 +338,13 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
+# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+$clusters = Get-AzResource -ResourceGroupName $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
+# Loop through each cluster and tag it
+foreach ($cluster in $clusters) {
+    Set-AzResource -ResourceId $cluster.ResourceId -Tag @{ $AgConfig.TagName = $AgConfig.TagValue }
+}
+
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
@@ -436,11 +442,6 @@ $shortcut.TargetPath = "http://$stagingGrafanaLBIP"
 $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
-
-Write-Host "INFO: Deploying Kube Prometheus Stack for AKSEEDev" -ForegroundColor Gray
-kubectx dev
-# Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set $set --namespace $monitoringNamespace --create-namespace
 
 # Get Load Balancer IP
 $devLBIP = kubectl --namespace $monitoringNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'

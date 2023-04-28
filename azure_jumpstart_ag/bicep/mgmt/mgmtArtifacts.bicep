@@ -34,6 +34,7 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   location: location
   name: 'VMInsights(${split(workspace.id, '/')[8]})'
+  tags: resourceTags
   properties: {
     workspaceResourceId: workspace.id
   }

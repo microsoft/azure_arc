@@ -70,10 +70,8 @@
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # VHDX Paths 
-    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
+    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"                 # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
-    
-
     
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
@@ -132,6 +130,11 @@
             Subnet = "172.20.1.0/24"
         }
     }
+
+    # Universal resource tag and resource types
+    TagName = "Proget"
+    TagValue = "Jumpstart_Agora"
+    ArcK8sResourceType = "Microsoft.Kubernetes/connectedClusters"
 
     AppConfig = @{
         ContosoSupermarket = @{
