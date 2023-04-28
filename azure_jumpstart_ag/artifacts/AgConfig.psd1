@@ -92,6 +92,13 @@
             Subnet = "172.20.1.0/24"
         }
     }
+    
+    # Observability variables
+    Monitoring = @{
+        UserName = "admin"
+        Password = 'Agora123!!'
+        Namespace = "observability"
+        ProdURL = "http://localhost:3000"
 
     AppConfig = @{
         ContosoSupermarket = @{
