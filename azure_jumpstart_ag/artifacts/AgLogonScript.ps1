@@ -376,33 +376,14 @@ $observabilityPassword = $AgConfig.Monitoring["Password"]
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
-kubectx chicago
-# Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $observabilityNamespace --create-namespace
+# Update Grafana Icons
+Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
+Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
 
-Do {
-    Write-Host "INFO: Waiting for Chicago Prometheus service to provision.." -ForegroundColor Gray
-    Start-Sleep -Seconds 45
-    $chicagoPrometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($chicagoPrometheusIP -eq "Nope" )
-# Get Load Balancer IP
-$chicagoPrometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Write-Host "INFO: Chicago Prometheus service IP is $chicagoPrometheusLBIP" -ForegroundColor DarkGreen
-
-Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
-kubectx seattle
-# Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $observabilityNamespace --create-namespace
-
-Do {
-    Write-Host "INFO: Waiting for Seaatle Prometheus load balancer service to provision.." -ForegroundColor Gray
-    Start-Sleep -Seconds 45
-    $seattlePrometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($seattlePrometheusIP -eq "Nope" )
-# Get Load Balancer IP
-$seattlePrometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Write-Host "INFO: Seattle Prometheus service IP is $seattlePrometheusLBIP" -ForegroundColor DarkGreen
+Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object { 
+    (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
+}
 
 # Reset Grafana UI
 Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
@@ -413,8 +394,7 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
 grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $observabilityPassword
 
-Write-Host "INFO: Add Store Data Sources to Grafana"
-## Add Data Source
+## Get Grafana credentials
 $credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
@@ -426,28 +406,95 @@ $headers = @{
 # Grafana API endpoint
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
-# Request body with information about the chicago data source to add
-$chicagoBody = @{    
-name = 'chicago'    
-type = 'prometheus'    
-url = ("http://" + $chicagoPrometheusLBIP + ":9090")
-access = 'proxy'    
-basicAuth = $false    
-isDefault = $true} | ConvertTo-Json
+$prodStores = @('chicago','seattle')
 
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $chicagoBody
+foreach ($prodStore in $prodStores) {
+    Write-Host "INFO: Deploying Kube Prometheus Stack for $prodStore environment" -ForegroundColor Gray
+    kubectx $prodStore
+    # Install Prometheus Operator
+    helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $observabilityNamespace --create-namespace
 
-# Request body with information about the seattle data source to add
-$seattleBody = @{    
-name = 'seattle'    
-type = 'prometheus'    
-url = ("http://" + $seattlePrometheusLBIP + ":9090")    
-access = 'proxy'    
-basicAuth = $false    
-isDefault = $true} | ConvertTo-Json
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $seattleBody
+    Do {
+        Write-Host "INFO: Waiting for $prodStore Prometheus service to provision.." -ForegroundColor Gray
+        Start-Sleep -Seconds 45
+        $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($prometheusIP -eq "Nope" )
+    # Get Load Balancer IP
+    $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Write-Host "INFO: $prodStore Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
+
+    Write-Host "INFO: Add $prodStore Data Source to Grafana"
+    # Request body with information about the data source to add
+    $dsBody = @{    
+    name = $prodStore    
+    type = 'prometheus'    
+    url = ("http://" + $prometheusLBIP + ":9090")
+    access = 'proxy'    
+    basicAuth = $false    
+    isDefault = $true} | ConvertTo-Json
+    
+    # Make HTTP request to the API
+    Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
+}
+# Write-Host "INFO: Deploying Kube Prometheus Stack for Chicago" -ForegroundColor Gray
+# kubectx chicago
+# # Install Prometheus Operator
+# helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $observabilityNamespace --create-namespace
+
+# Do {
+#     Write-Host "INFO: Waiting for Chicago Prometheus service to provision.." -ForegroundColor Gray
+#     Start-Sleep -Seconds 45
+#     $chicagoPrometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+# } while ($chicagoPrometheusIP -eq "Nope" )
+# # Get Load Balancer IP
+# $chicagoPrometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+# Write-Host "INFO: Chicago Prometheus service IP is $chicagoPrometheusLBIP" -ForegroundColor DarkGreen
+
+# Write-Host "INFO: Deploying Kube Prometheus Stack for Seattle." -ForegroundColor Gray
+# kubectx seattle
+# # Install Prometheus Operator
+# helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer --namespace $observabilityNamespace --create-namespace
+
+# Do {
+#     Write-Host "INFO: Waiting for Seaatle Prometheus load balancer service to provision.." -ForegroundColor Gray
+#     Start-Sleep -Seconds 45
+#     $seattlePrometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+# } while ($seattlePrometheusIP -eq "Nope" )
+# # Get Load Balancer IP
+# $seattlePrometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+# Write-Host "INFO: Seattle Prometheus service IP is $seattlePrometheusLBIP" -ForegroundColor DarkGreen
+
+# # Reset Grafana UI
+# Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+#     (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
+#     }
+
+# # Reset Grafana Password
+# $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
+# grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $observabilityPassword
+
+# # Request body with information about the chicago data source to add
+# $chicagoBody = @{    
+# name = 'chicago'    
+# type = 'prometheus'    
+# url = ("http://" + $chicagoPrometheusLBIP + ":9090")
+# access = 'proxy'    
+# basicAuth = $false    
+# isDefault = $true} | ConvertTo-Json
+
+# # Make HTTP request to the API
+# Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $chicagoBody
+
+# # Request body with information about the seattle data source to add
+# $seattleBody = @{    
+# name = 'seattle'    
+# type = 'prometheus'    
+# url = ("http://" + $seattlePrometheusLBIP + ":9090")    
+# access = 'proxy'    
+# basicAuth = $false    
+# isDefault = $true} | ConvertTo-Json
+# # Make HTTP request to the API
+# Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $seattleBody
 
 # Creating Prod Grafana Icon on Desktop
 Write-Host "INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
@@ -459,53 +506,80 @@ $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
-kubectx dev
-# Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword --namespace $observabilityNamespace --create-namespace
+$nonProdStores = @('dev','staging')
 
-Do {
-    Write-Host "INFO: Waiting for Dev Grafana service to provision.." -ForegroundColor Gray
-    Start-Sleep -Seconds 45
-    $devGrafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($devGrafanaIP -eq "Nope" )
+foreach ($nonProdStore in $nonProdStores) {
+    Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
+    kubectx $nonProdStore
+    # Install Prometheus Operator
+    helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword --namespace $observabilityNamespace --create-namespace
 
-# Get Load Balancer IP
-$devGrafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Do {
+        Write-Host "INFO: Waiting for $nonProdStore Prometheus service to provision.." -ForegroundColor Gray
+        Start-Sleep -Seconds 45
+        $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($grafanaIP -eq "Nope" )
+    # Get Load Balancer IP
+    $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-# Creating AKS EE Dev Grafana Icon on Desktop
-Write-Host "INFO: Creating AKS EE Dev Grafana Icon." -ForegroundColor Gray
-$shortcutLocation = "$env:USERPROFILE\Desktop\Dev Grafana.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "http://$devGrafanaLBIP"
-$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+    # Creating Grafana Icon on Desktop
+    Write-Host "INFO: Creating AKS EE Dev Grafana Icon." -ForegroundColor Gray
+    $shortcutLocation = "$env:USERPROFILE\Desktop\$nonProdStore Grafana.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = "http://$grafanaLBIP"
+    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
+}
 
-Write-Host "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
-kubectx staging
-# Install Prometheus Operator
-helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword --namespace $observabilityNamespace --create-namespace
+# Write-Host "INFO: Deploying Kube Prometheus Stack for dev" -ForegroundColor Gray
+# kubectx dev
+# # Install Prometheus Operator
+# helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword --namespace $observabilityNamespace --create-namespace
 
-Do {
-    Write-Host "INFO: Waiting for Staging Grafana service to provision.." -ForegroundColor Gray
-    Start-Sleep -Seconds 45
-    $stagingGrafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($stagingGrafanaIP -eq "Nope" )
+# Do {
+#     Write-Host "INFO: Waiting for Dev Grafana service to provision.." -ForegroundColor Gray
+#     Start-Sleep -Seconds 45
+#     $devGrafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+# } while ($devGrafanaIP -eq "Nope" )
 
-# Get Load Balancer IP
-$stagingGrafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+# # Get Load Balancer IP
+# $devGrafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-# Creating Staging Grafana Icon on Desktop
-Write-Host "INFO: Creating Staging Grafana Icon." -ForegroundColor Gray
-$shortcutLocation = "$env:USERPROFILE\Desktop\Staging Grafana.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "http://$stagingGrafanaLBIP"
-$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+# # Creating AKS EE Dev Grafana Icon on Desktop
+# Write-Host "INFO: Creating AKS EE Dev Grafana Icon." -ForegroundColor Gray
+# $shortcutLocation = "$env:USERPROFILE\Desktop\Dev Grafana.lnk"
+# $wScriptShell = New-Object -ComObject WScript.Shell
+# $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+# $shortcut.TargetPath = "http://$devGrafanaLBIP"
+# $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+# $shortcut.WindowStyle = 3
+# $shortcut.Save()
+
+# Write-Host "INFO: Deploying Kube Prometheus Stack for Staging." -ForegroundColor Gray
+# kubectx staging
+# # Install Prometheus Operator
+# helm install prometheus prometheus-community/kube-prometheus-stack --set alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword --namespace $observabilityNamespace --create-namespace
+
+# Do {
+#     Write-Host "INFO: Waiting for Staging Grafana service to provision.." -ForegroundColor Gray
+#     Start-Sleep -Seconds 45
+#     $stagingGrafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+# } while ($stagingGrafanaIP -eq "Nope" )
+
+# # Get Load Balancer IP
+# $stagingGrafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+# # Creating Staging Grafana Icon on Desktop
+# Write-Host "INFO: Creating Staging Grafana Icon." -ForegroundColor Gray
+# $shortcutLocation = "$env:USERPROFILE\Desktop\Staging Grafana.lnk"
+# $wScriptShell = New-Object -ComObject WScript.Shell
+# $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+# $shortcut.TargetPath = "http://$stagingGrafanaLBIP"
+# $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+# $shortcut.WindowStyle = 3
+# $shortcut.Save()
 
 
 #############################################################
