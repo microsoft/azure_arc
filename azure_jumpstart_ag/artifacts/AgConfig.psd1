@@ -99,6 +99,7 @@
         Password = 'Agora123!!'
         Namespace = "observability"
         ProdURL = "http://localhost:3000"
+    }
 
     AppConfig = @{
         ContosoSupermarket = @{
@@ -114,4 +115,5 @@
         #     Kustomization = "name=bookstore path=./bookstore/yaml"
         # }
     }
+    
 }
