@@ -123,7 +123,7 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-foreach ($app in $AgConfig.ChocolateyAppList) {
+foreach ($app in $AgConfig.ChocolateyAppList.values) {
   Write-Host "Installing $app"
   & choco install $app /y -Force | Write-Output
 }

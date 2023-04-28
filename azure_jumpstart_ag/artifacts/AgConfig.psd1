@@ -19,12 +19,12 @@
 
     # Az CLI required extensions
     AzCLIExtensions = @(
-        'k8s-extension',
+        'k8s-extension', 
         'k8s-configuration'
     )
 
     # PowerShell modules
-    PowerShellModules= @(
+    PowerShellModules = @(
         'Az.ConnectedKubernetes'
     )
 
@@ -49,27 +49,21 @@
     )
 
     # VSCode extensions
-    VSCodeExtensions  = @(
+    VSCodeExtensions = @(
         'ms-vscode-remote.remote-containers',
         'ms-vscode-remote.remote-wsl',
         'ms-vscode.powershell',
         'redhat.vscode-yaml',
         'ZainChen.json',
-        'esbenp.prettier-vscode',
-        'ms-kubernetes-tools.vscode-kubernetes-tools',
-        'mindaro.mindaro'
+        'esbenp.prettier-vscode'
     )
 
-    $ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
-    $PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
-
     # VHDX Paths 
-    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"                 # This value controls the location of the GUI VHDX.              
+    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
     
-    # Required Azure Providers
-    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation", "Microsoft.HybridCompute", "Microsoft.HybridConnectivity", "Microsoft.GuestConfiguration"
-
+    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
+    
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
@@ -91,7 +85,7 @@
     # AKS variables
     SiteConfig = @{
         Seattle = @{
-            ArcClusterName = "Ag-ArcK8s-Seattle"
+            ArcClusterName = "Ag-AKSEE-Seattle"
             NetIPAddress = "172.20.1.2"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -103,7 +97,7 @@
             Subnet = "172.20.1.0/24"
         }
         Chicago = @{
-            ArcClusterName = "Ag-ArcK8s-Chicago"
+            ArcClusterName = "Ag-AKSEE-Chicago"
             NetIPAddress = "172.20.1.3"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -114,8 +108,8 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
         }
-        Dev = @{
-            ArcClusterName = "Ag-ArcK8s-Dev"
+        AKSEEDev = @{
+            ArcClusterName = "Ag-AKSEE-Dev"
             NetIPAddress = "172.20.1.4"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
