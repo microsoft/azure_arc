@@ -484,7 +484,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('dev','staging')
+$nonProdStores = @('akseedev','staging')
 
 foreach ($nonProdStore in $nonProdStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
