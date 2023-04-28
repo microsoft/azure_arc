@@ -4,6 +4,11 @@ param aksStagingClusterName string
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN staging')
 param dnsPrefixStaging string = 'Ag-staging'
 
@@ -73,6 +78,7 @@ var dockerBridgeCidr_staging = '172.18.0.1/16'
 resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
   location: location
   name: aksStagingClusterName
+  tags: resourceTags
   identity: {
     type: 'SystemAssigned'
   }
@@ -130,6 +136,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
 resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
   name: acrNameProd
   location: location
+  tags: resourceTags
   sku: {
     name: acrSku
   }
@@ -141,6 +148,7 @@ resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-prev
 resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
   name: acrNameStaging
   location: location
+  tags: resourceTags
   sku: {
     name: acrSku
   }
