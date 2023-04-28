@@ -490,7 +490,7 @@ foreach ($nonProdStore in $nonProdStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
     kubectx $nonProdStore
     # Install Prometheus Operator
-    $helmSetValue = 'alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword'
+    $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
     helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
     Do {
