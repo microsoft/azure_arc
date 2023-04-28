@@ -17,6 +17,13 @@
         AgL1Files = "C:\Ag\L1Files"
     }
 
+    # Azure required registered resource providers
+    AzureProviders = @(
+        "Microsoft.Kubernetes",
+        "Microsoft.KubernetesConfiguration",
+        "Microsoft.ExtendedLocation"
+    )
+
     # Az CLI required extensions
     AzCLIExtensions = @(
         'k8s-extension', 
@@ -66,7 +73,7 @@
     L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
     L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
     
-    AzureProviders                       = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
+
     
     # L1 VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
@@ -89,7 +96,7 @@
     # AKS variables
     SiteConfig = @{
         Seattle = @{
-            ArcClusterName = "Ag-AKSEE-Seattle"
+            ArcClusterName = "Ag-ArcK8s-Seattle"
             NetIPAddress = "172.20.1.2"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -101,7 +108,7 @@
             Subnet = "172.20.1.0/24"
         }
         Chicago = @{
-            ArcClusterName = "Ag-AKSEE-Chicago"
+            ArcClusterName = "Ag-ArcK8s-Chicago"
             NetIPAddress = "172.20.1.3"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"
@@ -112,8 +119,8 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
         }
-        AKSEEDev = @{
-            ArcClusterName = "Ag-AKSEE-Dev"
+        Dev = @{
+            ArcClusterName = "Ag-ArcK8s-Dev"
             NetIPAddress = "172.20.1.4"
             DefaultGateway = "172.20.1.1"
             PrefixLength = "24"

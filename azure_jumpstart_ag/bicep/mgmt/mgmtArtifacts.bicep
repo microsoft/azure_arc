@@ -48,6 +48,7 @@ resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/
 resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   name: security.name
   location: location
+  tags: resourceTags
   properties: {
     workspaceResourceId: workspace.id
   }
@@ -76,6 +77,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
 resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2020-08-01' = {
   parent: workspace
   name: 'Automation'
+  tags: resourceTags
   properties: {
     resourceId: automationAccount.id
   }
