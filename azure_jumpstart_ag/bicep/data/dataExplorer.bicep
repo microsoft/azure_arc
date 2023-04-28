@@ -30,6 +30,7 @@ param iotHubConsumerGroup string
 resource adx 'Microsoft.Kusto/clusters@2022-12-29' = {
   name: ClusterName
   location: location
+  tags: resourceTags
   sku: {
     name: skuName
     tier: skuTier
