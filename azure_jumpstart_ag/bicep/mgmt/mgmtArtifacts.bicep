@@ -4,6 +4,11 @@ param workspaceName string
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('SKU, leave default pergb2018')
 param sku string = 'pergb2018'
 
@@ -18,6 +23,7 @@ var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location
 resource workspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: workspaceName
   location: location
+  tags: resourceTags
   properties: {
     sku: {
       name: sku
@@ -28,6 +34,7 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   location: location
   name: 'VMInsights(${split(workspace.id, '/')[8]})'
+  tags: resourceTags
   properties: {
     workspaceResourceId: workspace.id
   }
@@ -42,6 +49,7 @@ resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/
 resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   name: security.name
   location: location
+  tags: resourceTags
   properties: {
     workspaceResourceId: workspace.id
   }
@@ -56,6 +64,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
 resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' = {
   name: automationAccountName
   location: automationAccountLocation
+  tags: resourceTags
   properties: {
     sku: {
       name: 'Basic'
@@ -69,6 +78,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
 resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2020-08-01' = {
   parent: workspace
   name: 'Automation'
+  tags: resourceTags
   properties: {
     resourceId: automationAccount.id
   }
