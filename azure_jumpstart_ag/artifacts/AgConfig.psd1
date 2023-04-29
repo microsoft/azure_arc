@@ -63,7 +63,9 @@
         'ms-vscode.powershell',
         'redhat.vscode-yaml',
         'ZainChen.json',
-        'esbenp.prettier-vscode'
+        'esbenp.prettier-vscode',
+        'ms-kubernetes-tools.vscode-kubernetes-tools',
+        'mindaro.mindaro'
     )
 
     # VHDX blob url

@@ -166,6 +166,16 @@ If (-NOT (Test-Path $RegistryPath)) {
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
+# Disable Microsoft Edge "Personalize your web experience" prompt 
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+$Name         = 'PersonalizationReportingEnabled'
+$Value        = '00000000'
+# Create the key if it does not exist
+If (-NOT (Test-Path $RegistryPath)) {
+  New-Item -Path $RegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+
 # Installing Posh-SSH PowerShell Module
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
