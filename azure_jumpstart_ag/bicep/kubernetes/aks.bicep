@@ -157,8 +157,8 @@ resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-p
   }
 }
 
-@description('Output the login server property for Dev ACR')
+@description('Output the login server property for Staging ACR')
 output acrStagingName string = acrResourceStaging.name
 
-@description('Output the login server property for Prod ACR')
+@description('Output the login server property for Production ACR')
 output acrProdName string = acrResourceProd.name
