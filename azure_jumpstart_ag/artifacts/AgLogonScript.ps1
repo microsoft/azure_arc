@@ -8,15 +8,19 @@ $ProgressPreference = "SilentlyContinue"
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
+$githubUser = $env:githubUser
+$githubPat = $env:githubPat
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
+$acrName = $Env:acrName
 $templateBaseUrl = $env:templateBaseUrl
 
 Write-Header "Executing AgLogonScript.ps1"
@@ -74,6 +78,45 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
     foreach ($provider in $AgConfig.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
+}
+
+##############################################################
+# Configure Jumpstart AG Apps repository
+##############################################################
+Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
+Set-Location $AgAppsRepo
+if($env:githubUser -ne "microsoft"){
+    git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
+    Set-Location $AgAppsRepo\jumpstart-agora-apps
+    Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+    gh secret set "SPN_CLIENT_ID" -b $spnClientID
+    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+    gh secret set "ACR_NAME" -b $acrName
+    gh secret set "GITHUB_PAT" -b $githubPat
+}
+else {
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+#####################################################################
+# IotHub resources preperation
+#####################################################################
+Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
+if($env:githubUser -ne "microsoft"){
+    $IoTHubHostName = $env:iotHubHostName
+    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+    gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
+    $sites=$AgConfig.SiteConfig.Values
+    Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
+    foreach ($site in $sites){
+        $deviceId = $site.FriendlyName
+        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
+        $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
+        gh secret set "sas_token_$deviceId" -b $deviceSASToken
+    }
+}
+else {
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
 
 ##############################################################
@@ -368,9 +411,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator())
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 kubectx staging="$Env:aksStagingClusterName-admin"
 
-# Attach ACRs to staging cluster
+# Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
 
 #####################################################################
 # Configuring applications on the clusters using GitOps
