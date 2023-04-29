@@ -39,8 +39,12 @@ param githubBranch string = 'jumpstart_ag'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 param githubUser string = 'microsoft'
+
+@description('GitHub Personal access token for the user account')
+@secure()
+param githubPAT string
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
@@ -62,13 +66,8 @@ param accountName string = 'agcosmos${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
-@description('Name of the production Azure Container Registry')
-param acrNameProd string = 'Agacrprod${namingGuid}'
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the dev Azure Container Registry')
-param acrNameStaging string = 'AgacrStaging${namingGuid}'
+@description('Name of the Azure Container Registry')
+param acrName string = 'Agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -111,8 +110,7 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
     spnClientSecret: spnClientSecret
     location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrNameStaging: acrNameStaging
-    acrNameProd: acrNameProd
+    acrName: acrName
   }
 }
 
@@ -131,12 +129,12 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubAccount: githubAccount
     githubBranch: githubBranch
     githubUser: githubUser
+    githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    acrNameStaging: kubernetesDeployment.outputs.acrStagingName
-    acrNameProd: 'acrprod' // kubernetesDeployment.outputs.acrProdName
+    acrName: acrName
     rdpPort: rdpPort
   }
 }
