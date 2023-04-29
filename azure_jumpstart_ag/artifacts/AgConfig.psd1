@@ -135,8 +135,8 @@
     }
 
     # Universal resource tag and resource types
-    TagName = "Proget"
-    TagValue = "Jumpstart_Agora"
+    TagName = 'Project'
+    TagValue = 'Jumpstart_Agora'
     ArcK8sResourceType = "Microsoft.Kubernetes/connectedClusters"
 
     # Observability variables

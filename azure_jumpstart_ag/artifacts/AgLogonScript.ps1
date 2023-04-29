@@ -102,7 +102,7 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 ############################################
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage" -ForegroundColor Gray
 Write-Host "INFO: Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor GRAY
-azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
@@ -338,13 +338,15 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
-# # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
-# $clusters = Get-AzResource -ResourceGroupName $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
+# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
 
-# # Loop through each cluster and tag it
-# foreach ($cluster in $clusters) {
-#     Set-AzResource -ResourceId $cluster.ResourceId -Tag @{ $AgConfig.TagName = $AgConfig.TagValue }
-# }
+# Loop through each cluster and tag it
+$TagName = $AgConfig.TagName
+$TagValue = $AgConfig.TagValue
+foreach ($cluster in $clusters) {
+    az resource tag --tags $TagName=$TagValue --ids $cluster
+}
 
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
