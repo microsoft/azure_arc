@@ -40,12 +40,50 @@ while (-not (Test-Connection -ComputerName google.com -Quiet)) {
     Start-Sleep -Seconds 5
 }
 
+Start-Sleep 5
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
-Write-Host
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Repository PSGallery -AllowClobber -Name HNS -Force
 Write-Host "INFO: Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster" -ForegroundColor Gray
+$switchName = "aksedgesw-ext"
+$netConfig = Get-Content -Raw $deploymentFolder"\Config.Json" | ConvertFrom-Json
+$gatewayIp = $netConfig.Network.Ip4GatewayAddress
+$ipAddressPrefix = "172.20.1.0/24"
 $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-New-VMSwitch -Name "AKSEE-ExtSwitch" -NetAdapterName $AdapterName -AllowManagementOS $true -Notes "External Virtual Switch for AKS Edge Essentials cluster"
-Write-Host
+$jsonString = @"
+{
+    "Policies": [
+        {
+            "Settings":
+                {
+                    "NetworkAdapterName": "$AdapterName"
+                },
+            "Type": "NetAdapterName"
+        }
+    ],
+    "SchemaVersion": { "Major": 2, "Minor": 2 },
+    "Name":  "$switchName",
+    "Type":  "Transparent",
+    "Ipams":  [
+        {
+            "Subnets":  [
+                {
+                    "Policies":  [],
+                    "Routes":  [
+                        {
+                            "NextHop":  "$gatewayIp",
+                            "DestinationPrefix":  "0.0.0.0/0"
+                        }
+                    ],
+                    "IpAddressPrefix":  "$ipAddressPrefix"
+                }
+            ],
+            "Type":  "Static"
+        }
+    ]
+}
+"@
+New-HnsNetwork -jsonString $jsonString
 
 # Installing AKS Edge Essentials binaries and PowerShell module
 $msiFileName = (Get-ChildItem -Path $deploymentFolder | Where-Object { $_.Extension -eq ".msi" }).Name
@@ -53,7 +91,7 @@ $msiFilePath = Join-Path $deploymentFolder $msiFileName
 $fileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($msiFilePath)
 $msiInstallLog = "$deploymentFolder\$fileNameWithoutExt.log"
 Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
-
+Import-Module AksEdge.psm1 -Force
 Install-AksEdgeHostFeatures -Force
 
 # Deploying AKS Edge Essentials cluster
@@ -63,7 +101,7 @@ Write-Host
 
 # kubeconfig work for changing context and coping to the Hyper-V host machine
 $newKubeContext = $(hostname).ToLower()
-kubectx $newKubeContext=default
+kubectx ${newKubeContext}=default
 Write-Host
 kubectl get nodes -o wide
 Write-Host
