@@ -48,15 +48,8 @@ param virtualNetworkNameCloud string
 @description('The name of the staging aks subnet')
 param aksSubnetNameStaging string
 
-@minLength(5)
-@maxLength(50)
-@description('Name of the production Azure Container Registry')
-param acrNameProd string
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the Staging Azure Container Registry')
-param acrNameStaging string
+@description('Name of the Azure Container Registry')
+param acrName string
 
 @description('Provide a tier of your Azure Container Registry.')
 param acrSku string = 'Basic'

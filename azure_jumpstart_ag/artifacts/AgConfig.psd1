@@ -16,6 +16,7 @@
         AgTempDir = "C:\Temp"
         AgVHDXDir = "C:\Ag\VHDX"
         AgL1Files = "C:\Ag\L1Files"
+        AgAppsRepo = "C:\Ag\AppsRepo"
     }
 
     # Azure required registered resource providers
@@ -107,6 +108,7 @@
             ControlPlaneEndpointIp = "172.20.1.21"
             LinuxNodeIp4Address = "172.20.1.11"
             Subnet = "172.20.1.0/24"
+            FriendlyName = "Seattle"
         }
         Chicago = @{
             ArcClusterName = "Ag-ArcK8s-Chicago"
@@ -119,6 +121,7 @@
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
+            FriendlyName = "Chicago"
         }
         Dev = @{
             ArcClusterName = "Ag-ArcK8s-Dev"
@@ -131,6 +134,7 @@
             ControlPlaneEndpointIp = "172.20.1.91"
             LinuxNodeIp4Address = "172.20.1.81"
             Subnet = "172.20.1.0/24"
+            FriendlyName = "Dev"
         }
     }
 
