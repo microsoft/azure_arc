@@ -127,7 +127,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
 }
 
 resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
-  name: acrNameProd
+  name: acrName
   location: location
   tags: resourceTags
   sku: {
@@ -139,7 +139,7 @@ resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-prev
 }
 
 resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: acrNameStaging
+  name: acrName
   location: location
   tags: resourceTags
   sku: {
