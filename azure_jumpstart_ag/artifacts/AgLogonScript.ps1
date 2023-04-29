@@ -338,6 +338,14 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
+# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+$clusters = Get-AzResource -ResourceGroupName $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
+
+# Loop through each cluster and tag it
+foreach ($cluster in $clusters) {
+    Set-AzResource -ResourceId $cluster.ResourceId -Tag @{ $AgConfig.TagName = $AgConfig.TagValue }
+}
+
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
