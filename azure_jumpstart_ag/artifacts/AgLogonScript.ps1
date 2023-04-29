@@ -143,10 +143,9 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 ############################################
 # Deploying the nested L1 virtual machines 
 ############################################
-Write-Host "INFO: Fetching Windows 11 VM images from Azure storage" -ForegroundColor Gray
-$sasUrl = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
+Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage" -ForegroundColor Gray
 Write-Host "INFO: Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor GRAY
-azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
@@ -341,7 +340,7 @@ Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) 
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-akseedev"
+$kubeconfig3 = "config-dev"
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
@@ -380,6 +379,16 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $deploymentPath = "C:\Deployment\config.json"
     Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+}
+
+# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
+
+# Loop through each cluster and tag it
+$TagName = $AgConfig.TagName
+$TagValue = $AgConfig.TagValue
+foreach ($cluster in $clusters) {
+    az resource tag --tags $TagName=$TagValue --ids $cluster
 }
 
 #####################################################################
@@ -527,7 +536,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('akseedev','staging')
+$nonProdStores = @('dev','staging')
 
 foreach ($nonProdStore in $nonProdStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
