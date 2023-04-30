@@ -12,13 +12,15 @@ param (
     [string]$workspaceName,
     [string]$aksStagingClusterName,
     [string]$iotHubHostName,
-    [string]$acrNameProd,
-    [string]$acrNameStaging,
+    [string]$acrName,
+    [string]$cosmosDBName,
+    [string]$cosmosDBEndpoint,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
     [string]$githubAccount,
-    [string]$githubBranch
+    [string]$githubBranch,
+    [string]$githubPAT
 )
 
 # Inject ARM template parameters as environment variables
@@ -39,12 +41,14 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameProd', $acrNameProd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrNameStaging', $acrNameStaging, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('cosmosDBName', $cosmosDBName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('cosmosDBEndpoint', $cosmosDBEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
@@ -125,7 +129,7 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-foreach ($app in $AgConfig.chocolateyAppList) {
+foreach ($app in $AgConfig.ChocolateyAppList) {
   Write-Host "Installing $app"
   & choco install $app /y -Force | Write-Output
 }
@@ -160,6 +164,16 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
 $Name         = 'HideFirstRunExperience'
 $Value        = '00000001'
+# Create the key if it does not exist
+If (-NOT (Test-Path $RegistryPath)) {
+  New-Item -Path $RegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+
+# Disable Microsoft Edge "Personalize your web experience" prompt 
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+$Name         = 'PersonalizationReportingEnabled'
+$Value        = '00000000'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
   New-Item -Path $RegistryPath -Force | Out-Null

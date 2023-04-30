@@ -4,8 +4,13 @@ param iotHubName string
 @description('The location of the Iot Hub')
 param location string
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('The name of the IotHub SKU')
-param skuName string = 'B1'
+param skuName string = 'S1'
 
 @description('The capacity of the IotHub SKU')
 param capacity int = 1
@@ -17,6 +22,7 @@ var consumerGroup = '${iotHubName}/events/${consumerGroupName}'
 resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
   name: iotHubName
   location: location
+  tags: resourceTags
   sku: {
     name: skuName
     capacity: capacity
@@ -27,6 +33,9 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
         retentionTimeInDays: 1
         partitionCount: 2
       }
+    }
+    rootCertificate: {
+      enableRootCertificateV2: true
     }
   }
 }

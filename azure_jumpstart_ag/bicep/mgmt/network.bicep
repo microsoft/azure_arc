@@ -10,6 +10,11 @@ param subnetNameCloudAksInnerLoop string
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
@@ -68,9 +73,10 @@ var cloudAKSInnerLoopSubnet = [
   }
 ]
 
-resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   name: virtualNetworkNameCloud
   location: location
+  tags: resourceTags
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -81,9 +87,10 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (deployBastion == true) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
   location: location
+  tags: resourceTags
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -94,9 +101,10 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (
   }
 }
 
-resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
+resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022-07-01' = {
   name: networkSecurityGroupNameCloud
   location: location
+  tags: resourceTags
   properties: {
     securityRules: [
       {
@@ -142,9 +150,10 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = if (deployBastion == true) {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-07-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
+  tags: resourceTags
   properties: {
     securityRules: [
       {
@@ -267,9 +276,10 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion == true) {
   name: bastionName
   location: location
+  tags: resourceTags
   properties: {
     ipConfigurations: [
       {
