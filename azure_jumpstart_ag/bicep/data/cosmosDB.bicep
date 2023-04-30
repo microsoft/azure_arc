@@ -60,3 +60,5 @@ resource posOrdersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/
     }
   }
 }
+
+output cosmosDBEndpoint string = cosmosDB.properties.documentEndpoint
