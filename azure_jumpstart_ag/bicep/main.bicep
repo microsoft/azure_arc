@@ -134,7 +134,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName : cosmosDBDeployment.outputs.cosmosDBName
+    cosmosDBName : accountName
     cosmosDBEndpoint : cosmosDBDeployment.outputs.cosmosDBEndpoint
     acrName: acrName
     rdpPort: rdpPort
