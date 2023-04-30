@@ -8,15 +8,21 @@ $ProgressPreference = "SilentlyContinue"
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
+$githubUser = $env:githubUser
+$githubPat = $env:GITHUB_TOKEN
 $resourceGroup = $env:resourceGroup
 $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
+$acrName = $Env:acrName
+$cosmosDBName = $Env:cosmosDBName
+$cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
 
 Write-Header "Executing AgLogonScript.ps1"
@@ -77,6 +83,50 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 }
 
 ##############################################################
+# Configure Jumpstart AG Apps repository
+##############################################################
+Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
+Set-Location $AgAppsRepo
+if($githubUser -ne "microsoft"){
+    git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
+    Set-Location $AgAppsRepo\jumpstart-agora-apps
+    Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+    $cosmosDBKey=$(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)    
+    Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
+    gh secret set "SPN_CLIENT_ID" -b $spnClientID
+    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+    gh secret set "ACR_NAME" -b $acrName
+    gh secret set "PAT_GITHUB" -b $githubPat
+    gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
+    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+}
+else {
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+#####################################################################
+# IotHub resources preperation
+#####################################################################
+Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
+if($env:githubUser -ne "microsoft"){
+    $IoTHubHostName = $env:iotHubHostName
+    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+    gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
+    $sites=$AgConfig.SiteConfig.Values
+    Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
+    foreach ($site in $sites){
+        $deviceId = $site.FriendlyName
+        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
+        $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
+        gh secret set "sas_token_$deviceId" -b $deviceSASToken
+    }
+}
+else {
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+##############################################################
 # Configure L1 virtualization infrastructure
 ##############################################################
 $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
@@ -100,10 +150,9 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 ############################################
 # Deploying the nested L1 virtual machines 
 ############################################
-Write-Host "INFO: Fetching Windows 11 VM images from Azure storage" -ForegroundColor Gray
-$sasUrl = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
+Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage" -ForegroundColor Gray
 Write-Host "INFO: Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor GRAY
-azcopy cp $sasUrl $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
+azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
 # Create an array of VHDX file paths in the the VHDX target folder
 $vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
@@ -298,7 +347,7 @@ Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) 
 # Set the names of the kubeconfig files you're looking for on the L0 virtual machine
 $kubeconfig1 = "config-seattle"
 $kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-akseedev"
+$kubeconfig3 = "config-dev"
 
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
@@ -339,6 +388,16 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
+# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
+
+# Loop through each cluster and tag it
+$TagName = $AgConfig.TagName
+$TagValue = $AgConfig.TagValue
+foreach ($cluster in $clusters) {
+    az resource tag --tags $TagName=$TagValue --ids $cluster
+}
+
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
@@ -359,9 +418,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator())
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
 kubectx staging="$Env:aksStagingClusterName-admin"
 
-# Attach ACRs to staging cluster
+# Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrNameStaging
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
 
 #####################################################################
 # Configuring applications on the clusters using GitOps
@@ -484,7 +543,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('akseedev','staging')
+$nonProdStores = @('dev','staging')
 
 foreach ($nonProdStore in $nonProdStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
