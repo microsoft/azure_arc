@@ -96,7 +96,7 @@ if($env:githubUser -ne "microsoft"){
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
-    gh secret set "GITHUB_PAT" -b $githubPat
+    gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
 }
