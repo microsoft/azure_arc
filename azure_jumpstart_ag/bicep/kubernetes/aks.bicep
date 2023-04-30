@@ -4,6 +4,11 @@ param aksStagingClusterName string
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN staging')
 param dnsPrefixStaging string = 'Ag-staging'
 
@@ -43,15 +48,8 @@ param virtualNetworkNameCloud string
 @description('The name of the staging aks subnet')
 param aksSubnetNameStaging string
 
-@minLength(5)
-@maxLength(50)
-@description('Name of the production Azure Container Registry')
-param acrNameProd string
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the Staging Azure Container Registry')
-param acrNameStaging string
+@description('Name of the Azure Container Registry')
+param acrName string
 
 @description('Provide a tier of your Azure Container Registry.')
 param acrSku string = 'Basic'
@@ -73,6 +71,7 @@ var dockerBridgeCidr_staging = '172.18.0.1/16'
 resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
   location: location
   name: aksStagingClusterName
+  tags: resourceTags
   identity: {
     type: 'SystemAssigned'
   }
@@ -128,8 +127,9 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
 }
 
 resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
-  name: acrNameProd
+  name: acrName
   location: location
+  tags: resourceTags
   sku: {
     name: acrSku
   }
@@ -139,8 +139,9 @@ resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-prev
 }
 
 resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: acrNameStaging
+  name: acrName
   location: location
+  tags: resourceTags
   sku: {
     name: acrSku
   }
@@ -149,8 +150,8 @@ resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-p
   }
 }
 
-@description('Output the login server property for Dev ACR')
+@description('Output the login server property for Staging ACR')
 output acrStagingName string = acrResourceStaging.name
 
-@description('Output the login server property for Prod ACR')
+@description('Output the login server property for Production ACR')
 output acrProdName string = acrResourceProd.name
