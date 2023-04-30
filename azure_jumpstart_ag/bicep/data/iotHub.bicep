@@ -34,6 +34,9 @@ resource iotHub 'Microsoft.Devices/IotHubs@2022-04-30-preview' = {
         partitionCount: 2
       }
     }
+    rootCertificate: {
+      enableRootCertificateV2: true
+    }
   }
 }
 
