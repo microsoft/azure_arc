@@ -21,6 +21,8 @@ $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
 $acrName = $Env:acrName
+$cosmosDBName = $Env:cosmosDBName
+$cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
 
 Write-Header "Executing AgLogonScript.ps1"
@@ -88,11 +90,15 @@ Set-Location $AgAppsRepo
 if($env:githubUser -ne "microsoft"){
     git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
+    Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+    $cosmosDBKey=$(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)    
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
     gh secret set "GITHUB_PAT" -b $githubPat
+    gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
+    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red

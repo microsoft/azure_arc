@@ -13,6 +13,8 @@ param (
     [string]$aksStagingClusterName,
     [string]$iotHubHostName,
     [string]$acrName,
+    [string]$cosmosDBName,
+    [string]$cosmosDBEndpoint,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$rdpPort,
@@ -40,6 +42,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('cosmosDBName', $acrName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('cosmosDBEndpoint', $acrName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
