@@ -4,6 +4,11 @@ param aksStagingClusterName string
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Optional DNS prefix to use with hosted Kubernetes API server FQDN staging')
 param dnsPrefixStaging string = 'Ag-staging'
 
@@ -66,6 +71,7 @@ var dockerBridgeCidr_staging = '172.18.0.1/16'
 resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
   location: location
   name: aksStagingClusterName
+  tags: resourceTags
   identity: {
     type: 'SystemAssigned'
   }
@@ -120,9 +126,10 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
   }
 }
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
+resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
   name: acrName
   location: location
+  tags: resourceTags
   sku: {
     name: acrSku
   }
@@ -130,5 +137,21 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (f
     adminUserEnabled: true
   }
 }
-@description('Output the login server property for ACR')
-output acrName string = acr.name
+
+resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+  name: acrName
+  location: location
+  tags: resourceTags
+  sku: {
+    name: acrSku
+  }
+  properties: {
+    adminUserEnabled: true
+  }
+}
+
+@description('Output the login server property for Staging ACR')
+output acrStagingName string = acrResourceStaging.name
+
+@description('Output the login server property for Production ACR')
+output acrProdName string = acrResourceProd.name
