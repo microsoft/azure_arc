@@ -28,8 +28,9 @@
 
     # Az CLI required extensions
     AzCLIExtensions = @(
-        'k8s-extension', 
-        'k8s-configuration'
+        'k8s-extension',
+        'k8s-configuration',
+        'azure-iot'
     )
 
     # PowerShell modules
@@ -54,7 +55,8 @@
         'dotnetcore-3.1-sdk',
         'zoomit',
         'openssl.light',
-        'mqtt-explorer'
+        'mqtt-explorer',
+        'gh'
     )
 
     # VSCode extensions
