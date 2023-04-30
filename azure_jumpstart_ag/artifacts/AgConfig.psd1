@@ -54,7 +54,8 @@
         'dotnetcore-3.1-sdk',
         'zoomit',
         'openssl.light',
-        'mqtt-explorer'
+        'mqtt-explorer',
+        'gh'
     )
 
     # VSCode extensions
