@@ -16,12 +16,13 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_Agora'
+}
+
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
-
-param resourceTags object = {
-  Project: 'jumpstart_Ag'
-}
 
 @description('Client id of the service principal')
 param spnClientId string
@@ -83,6 +84,7 @@ var PublicIPNoBastion = {
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: location
+  tags: resourceTags
   properties: {
     ipConfigurations: [
       {
@@ -102,6 +104,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
+  tags: resourceTags
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
