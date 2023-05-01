@@ -23,12 +23,6 @@
     "deployBastion": {
       "value": false
     },
-    "githubAccount": {
-      "value": "microsoft"
-    },
-    "githubBranch": {
-      "value": "jumpstart_ag"
-    },
     "githubPAT": {
       "value": ""
     },
