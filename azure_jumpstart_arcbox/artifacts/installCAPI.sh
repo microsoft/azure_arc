@@ -78,7 +78,7 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export KUBECTL_VERSION="1.26/stable" # Do not change!
+export KUBECTL_VERSION="1.24/stable" # Do not change!
 export CLUSTERCTL_VERSION="1.4.1" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.8.3" # Do not change!
