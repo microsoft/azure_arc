@@ -407,7 +407,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator())
     kubectx $cluster.Name.ToLower()
     kubectl create secret docker-registry acr-secret `
         --namespace default `
-        --docker-server="${Env:acrNameStaging}.azurecr.io" `
+        --docker-server="${Env:acrName}.azurecr.io" `
         --docker-username="$env:spnClientId" `
         --docker-password="$env:spnClientSecret"
 }
@@ -436,7 +436,7 @@ az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $
 #             --url $appClonedRepo `
 #             --branch main --sync-interval 3s `
 #             --kustomization name=bookstore path=./bookstore/yaml
-        
+
 #         az k8s-configuration create `
 #             --name $app.Name `
 #             --cluster-name $cluster.ArcClusterName `
