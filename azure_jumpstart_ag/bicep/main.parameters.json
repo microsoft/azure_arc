@@ -31,6 +31,9 @@
     },
     "githubPAT": {
       "value": ""
+    },
+    "githubUser": {
+      "value": ""
     }
   }
 }
