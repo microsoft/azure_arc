@@ -40,7 +40,7 @@ param githubBranch string = 'jumpstart_ag'
 param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
-param githubUser string = 'microsoft'
+param githubUser string
 
 @description('GitHub Personal access token for the user account')
 @secure()
