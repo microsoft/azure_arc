@@ -126,7 +126,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
   }
 }
 
-resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (false) {
+resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' ={
   name: acrName
   location: location
   tags: resourceTags
@@ -137,21 +137,3 @@ resource acrResourceProd 'Microsoft.ContainerRegistry/registries@2023-01-01-prev
     adminUserEnabled: true
   }
 }
-
-resource acrResourceStaging 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: acrName
-  location: location
-  tags: resourceTags
-  sku: {
-    name: acrSku
-  }
-  properties: {
-    adminUserEnabled: true
-  }
-}
-
-@description('Output the login server property for Staging ACR')
-output acrStagingName string = acrResourceStaging.name
-
-@description('Output the login server property for Production ACR')
-output acrProdName string = acrResourceProd.name
