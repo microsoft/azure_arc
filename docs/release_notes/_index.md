@@ -11,6 +11,40 @@ weight: 5
 
 ## 2023
 
+### April 2023
+
+#### Release highlights
+
+- New Azure Arc-enabled servers scenarios
+- Scenarios enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled data services
+- ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Create Automanage Machine Configuration custom configurations for Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows/)
+- [New scenario: Create Automanage Machine Configuration custom configurations for Linux](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_linux/)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: Arc-enabled SQL Server best practices assessment failing with error #1783](https://github.com/microsoft/azure_arc/issues/1783)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - April release #1762](https://github.com/microsoft/azure_arc/issues/1762)
+- [Bug fix: Arc data services extension creation requires a --version argument #1780](https://github.com/microsoft/azure_arc/issues/1780)
+- [Bug fix: Azure Arc-enabled SQL Managed Instance for AKS fails to deploy #1810](https://github.com/microsoft/azure_arc/issues/1810)
+
+#### Jumpstart ArcBox
+
+- [Feature: April Kubernetes-related version bump #1815](https://github.com/microsoft/azure_arc/issues/1815)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: HCIBox Microsoft.OperationalInsights #1805](https://github.com/microsoft/azure_arc/issues/1805)
+
 ### March 2023
 
 #### Release highlights
