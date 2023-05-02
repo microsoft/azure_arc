@@ -78,13 +78,13 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export KUBECTL_VERSION="1.26/stable" # Do not change!
+export KUBECTL_VERSION="1.27/stable" # Do not change!
 export CLUSTERCTL_VERSION="1.4.1" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.8.3" # Do not change!
-export KUBERNETES_VERSION="1.26.4" # Do not change!
+export KUBERNETES_VERSION="1.27.1" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.26.3" # Do not change!
-export K3S_VERSION="1.26.4+k3s1" # Do not change!
+export K3S_VERSION="1.27.1+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -210,7 +210,7 @@ sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.github
 echo ""
 CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
 export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ;
+until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
