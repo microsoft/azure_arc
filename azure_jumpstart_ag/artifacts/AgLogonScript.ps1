@@ -103,16 +103,17 @@ if ($githubUser -ne "microsoft") {
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
-        $ErrorVariable = $null
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch" -ErrorVariable ErrorVariable -ErrorAction SilentlyContinue
-        if ($ErrorVariable) {
-            Write-Host "Creating $branch branch"
-            git checkout -b $branch
-            git push origin $branch
+        try {
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+            if($response){
+                Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                git push origin --delete $branch
+                git checkout -b $branch
+                git push origin $branch
+            }
         }
-        else {
-            Write-Host "$branch branch already exists! Deleting and recreating the branch"
-            git push origin --delete $branch
+        catch {
+            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
             git checkout -b $branch
             git push origin $branch
         }
