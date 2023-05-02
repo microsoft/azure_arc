@@ -71,6 +71,13 @@
         'mindaro.mindaro'
     )
 
+    # Git branches
+    GitBranches = @(
+        'Production',
+        'Staging',
+        'Canary'
+    )
+
     # VHDX blob url
     ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'

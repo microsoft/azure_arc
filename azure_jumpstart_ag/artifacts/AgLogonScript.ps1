@@ -87,11 +87,11 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 ##############################################################
 Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
 Set-Location $AgAppsRepo
-if($githubUser -ne "microsoft"){
+if ($githubUser -ne "microsoft") {
     git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    $cosmosDBKey=$(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)    
+    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
@@ -100,6 +100,23 @@ if($githubUser -ne "microsoft"){
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+    Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
+    $branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        $ErrorVariable = $null
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch" -ErrorVariable ErrorVariable -ErrorAction SilentlyContinue
+        if ($ErrorVariable) {
+            Write-Host "Creating $branch branch"
+            git checkout -b $branch
+            git push origin $branch
+        }
+        else {
+            Write-Host "$branch branch already exists! Deleting and recreating the branch"
+            git push origin --delete $branch
+            git checkout -b $branch
+            git push origin $branch
+        }
+    }
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
@@ -109,16 +126,16 @@ else {
 # IotHub resources preperation
 #####################################################################
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
-if($env:githubUser -ne "microsoft"){
+if ($env:githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
-    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
     gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
-    $sites=$AgConfig.SiteConfig.Values
+    $sites = $AgConfig.SiteConfig.Values
     Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
-    foreach ($site in $sites){
+    foreach ($site in $sites) {
         $deviceId = $site.FriendlyName
         az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
-        $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
+        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
         gh secret set "sas_token_$deviceId" -b $deviceSASToken
     }
 }
@@ -401,8 +418,7 @@ foreach ($cluster in $clusters) {
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) 
-{
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
     kubectx $cluster.Name.ToLower()
     kubectl create secret docker-registry acr-secret `
@@ -481,7 +497,7 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 # Reset Grafana UI
 Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
     (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
-    }
+}
 
 # Reset Grafana Password
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
@@ -492,15 +508,15 @@ $credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
 $headers = @{    
-"Authorization" = ("Basic "+$encodedcredentials)    
-"Content-Type" = "application/json"
+    "Authorization" = ("Basic " + $encodedcredentials)    
+    "Content-Type"  = "application/json"
 }
 
 # Grafana API endpoint
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Deploying Kube Prometheus Stack for Prod stores
-$prodStores = @('chicago','seattle')
+$prodStores = @('chicago', 'seattle')
 
 foreach ($prodStore in $prodStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $prodStore environment" -ForegroundColor Gray
@@ -521,12 +537,13 @@ foreach ($prodStore in $prodStores) {
     Write-Host "INFO: Add $prodStore Data Source to Grafana"
     # Request body with information about the data source to add
     $dsBody = @{    
-    name = $prodStore    
-    type = 'prometheus'    
-    url = ("http://" + $prometheusLBIP + ":9090")
-    access = 'proxy'    
-    basicAuth = $false    
-    isDefault = $true} | ConvertTo-Json
+        name      = $prodStore    
+        type      = 'prometheus'    
+        url       = ("http://" + $prometheusLBIP + ":9090")
+        access    = 'proxy'    
+        basicAuth = $false    
+        isDefault = $true
+    } | ConvertTo-Json
     
     # Make HTTP request to the API
     Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
@@ -543,7 +560,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('dev','staging')
+$nonProdStores = @('dev', 'staging')
 
 foreach ($nonProdStore in $nonProdStores) {
     Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
