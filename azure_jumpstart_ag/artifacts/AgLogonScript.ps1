@@ -118,6 +118,8 @@ if ($githubUser -ne "microsoft") {
             git push origin $branch
         }
     }
+    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+    git checkout main
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
