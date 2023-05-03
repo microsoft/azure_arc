@@ -88,7 +88,7 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
-    git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
+    git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
@@ -104,7 +104,6 @@ if ($githubUser -ne "microsoft") {
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
-            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if($response){
                 Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
                 git push origin --delete $branch
