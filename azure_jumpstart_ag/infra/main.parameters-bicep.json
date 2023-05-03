@@ -9,25 +9,25 @@
       "value": "${AZURE_LOCATION}"
     },
     "spnClientId": {
-      "value": "338245b7-f268-4c07-812d-55b1d08f57e1"
+      "value": "[ClientId here - e.g. 338245b7-f268-4c07-812d-55b1d08f57e1]"
     },
     "spnClientSecret": {
-      "value": "gug8Q~gl7woPYl5~-WnyrSD9f8jBzMWHpkk-ob51"
+      "value": "[Secret here - e.g. gug8Q~gl7woPYl5~-WnyrSD9f8jBzMWHpkk-ob51]"
     },
     "spnTenantId": {
-      "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+      "value": "[Tenant Id here - e.g. 72f988bf-86f1-41af-91ab-2d7cd011db47"
     },
     "windowsAdminUsername": {
       "value": "arcdemo"
     },
     "windowsAdminPassword": {
-      "value": "ArcDemo123!!"
+      "value": "[Password here - e.g. ArcDemo123!!]"
     },
     "rdpPort": {
       "value": "13389"
     },
     "sshRSAPublicKey": {
-      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC8yTUg+J0ooM0XZJvyX5HLKLsxp0Cf9F2j2AnuOQdFYFw9mvng/7ZlA+MNYWrhfdXz6ZYPtOuQWv/shRyZ/ltMbO4W1coIED3gePdUt0+HE2M08sm43/DSh65Ax0LVk6iXEMq7ZO5rOSdq7f8vokWdmGH6vCfniFgQtBN1XOBMQsFF6JsAPeCTmPR/2Dnpr1ABA9DEO5BjT95dW0423XcSokp6ufJ+FvNoQ0x4DxonbcKxkXv385U6LrtVQHIOjNpdHJGjxzBxmoxnAl5YpvuYmsXGeyt2FfT/pRbtoeyjGErJM86De6NFIUdzgeTjrzXeZjmJ1i49ItbyV/wkuCP/r6wqU4mhk9d5jTxl9xnbrpI9b7qo1Xe0vzC3ThcWcDMwE7fN6vZyJSy+q1zfGwg9+OwNNPygOFWJyKzFugxGQ3dY0ZWswokii6E69Kkug1ByfU61mH2rMYa6/+w3dZVt3gTTrUK2nNanp1TFK5qrBjiEPWZW921OMdojtoIrhZk= charris@CHARRIS01"
+      "value": "[RSA here - e.g. ssh-rsa AAAAB3NzaC1yc2EAABAAABgQC8yTUg+J0ooM0XZJvyX5HLKLsxp0Cf9F2j2AnuFYFw9mvng/7ZlA+YWrhfdXz6ZYPtOuQWv/shRyZ/ltMbO4W1abccoIEDePdUt0+HE2M08sm43/DSh65Ax0LVk6iXEMq7ZO5rOS123dq7f8vokWdmGH6vCfniFgQtBN1XOBMQsFF6JsAPeCTmPabcR/2Dnpr1ABA9DEO5BjT95dW0423XcSokp6ufJ+FvNoQ0x4DxonbcKxkXv385123U6LrtVQHIOjNpdHJGjxzBxmoxnAl5YpvuYmsXGeyt2FfT/pRbtoeyjGErJM86De6NFIUdzgeTjrzXeZjmJ1i49ItbyV/wkuCP/r6wqU4mhk9d5jTxl9xnbrpI9b7qo1Xe0vzC3ThcWcDMwE7fN6vZyJSy+q1zfGwg9+OwNNPygOFWJyKzFugxGQ3dY0ZWswokii6E69Kkug1ByfU61mH2rMYa6/+w3dZVt3gTTrUK2nNanp1TFK5qrBjiEPWZW921OMdojtoIrhZk= charris@CHARRIS01"
     },
     "deployBastion": {
       "value": false
