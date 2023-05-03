@@ -11,7 +11,7 @@ param resourceTags object = {
 }
 
 @description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'posOrders'
+param posOrdersDBName string
 
 resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
   name: accountName
@@ -32,30 +32,27 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
       }
     ]
   }
-}
 
-resource posOrdersDB 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
-  parent: cosmosDB
-  name: posOrdersDBName
-  properties: {
-    options: {}
-    resource: {
-      id: posOrdersDBName
+  resource cosmosDbDatabase 'sqlDatabases' = {
+    name: posOrdersDBName
+    properties: {
+      resource: {
+        id: posOrdersDBName
+      }
     }
-  }
-}
 
-resource posOrdersContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
-  parent: posOrdersDB
-  name: 'orders'
-  properties: {
-    resource: {
-      id: 'orders'
-      partitionKey: {
-        paths: [
-          '/orderID'
-        ]
-        kind: 'Hash'
+    resource cosmosDbContainer 'containers' = {
+      name: 'Orders'
+      properties: {
+        resource: {
+          id: 'Orders'
+          partitionKey: {
+            kind: 'Hash'
+            paths: [
+              '/OrderId'
+            ]
+          }
+        }
       }
     }
   }

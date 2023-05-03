@@ -18,7 +18,8 @@ param (
     [string]$rdpPort,
     [string]$githubAccount,
     [string]$githubBranch,
-    [string]$githubPAT
+    [string]$githubPAT,
+    [string]$adxClusterName
 )
 
 # Inject ARM template parameters as environment variables
@@ -46,6 +47,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 # Download configuration data file
