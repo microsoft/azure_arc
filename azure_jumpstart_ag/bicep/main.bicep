@@ -62,7 +62,13 @@ param aksStagingClusterName string = 'Ag-AKS-Staging'
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
 
 @description('The name of the Cosmos DB account')
-param accountName string = 'agcosmos${namingGuid}'
+param cosmosDbAccountName string = 'agcosmos${namingGuid}'
+
+@description('The name of the Azure Data Explorer POS database')
+param posOrdersDBName string = 'Orders'
+
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string = 'agadx${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
@@ -150,17 +156,24 @@ module iotHubDeployment 'data/iotHub.bicep' = {
 module adxDeployment 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
   params: {
+    adxClusterName: adxClusterName
     location: location
-    namingGuid : namingGuid
     iotHubId : iotHubDeployment.outputs.iotHubId
     iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
+    cosmosDBAccountName: cosmosDbAccountName
+    posOrdersDBName: posOrdersDBName
   }
+  dependsOn: [
+    cosmosDBDeployment
+    iotHubDeployment
+  ]
 }
 
 module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   name: 'cosmosDBDeployment'
   params: {
     location: location
-    accountName: accountName
+    accountName: cosmosDbAccountName
+    posOrdersDBName: posOrdersDBName
   }
 }

@@ -22,6 +22,7 @@ $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
 $acrName = $Env:acrName
 $templateBaseUrl = $env:templateBaseUrl
+$adxClusterName = $env:adxClusterName
 
 Write-Header "Executing AgLogonScript.ps1"
 
@@ -117,6 +118,37 @@ if($env:githubUser -ne "microsoft"){
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+#####################################################################
+# Import dashboard reports into Azure Data Explorer
+#####################################################################
+# Get Azure Data Explorer URI
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+
+# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounded with acces token
+$token = (az account get-access-token --scope "35e917a9-4d95-4062-9d97-5781291353b9/user_impersonation" --query "accessToken") -replace "`"", ""
+
+# Prepare authorization header with access token
+$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
+# Make REST API call to the dashbord endpoint.
+$restApi = "https://dashboards.kusto.windows.net/dashboards"
+
+# Import orders dashboard report
+$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+
+# Import IoT Sensor dashboard report
+$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
+    Exit-PSSession
 }
 
 ##############################################################
