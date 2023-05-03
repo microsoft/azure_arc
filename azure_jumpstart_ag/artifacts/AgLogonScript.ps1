@@ -104,6 +104,7 @@ if ($githubUser -ne "microsoft") {
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if($response){
                 Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
                 git push origin --delete $branch
