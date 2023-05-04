@@ -144,6 +144,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     cosmosDBEndpoint : cosmosDBDeployment.outputs.cosmosDBEndpoint
     acrName: acrName
     rdpPort: rdpPort
+    adxClusterName:adxClusterName
   }
 }
 
