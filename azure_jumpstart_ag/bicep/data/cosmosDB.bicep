@@ -57,3 +57,5 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
     }
   }
 }
+
+output cosmosDBEndpoint string = cosmosDB.properties.documentEndpoint
