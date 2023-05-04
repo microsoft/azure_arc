@@ -401,7 +401,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
     Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-
     # Connect to Arc
     $deploymentPath = "C:\Deployment\config.json"
     Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
@@ -423,13 +422,15 @@ foreach ($cluster in $clusters) {
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
-    kubectx $cluster.Name.ToLower()
-    kubectl create secret docker-registry acr-secret `
-        --namespace default `
-        --docker-server="${Env:acrName}.azurecr.io" `
-        --docker-username="$env:spnClientId" `
-        --docker-password="$env:spnClientSecret"
+    if (-not $cluster.Name -eq "Staging") {
+        Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+        kubectx $cluster.Name.ToLower()
+        kubectl create secret docker-registry acr-secret `
+            --namespace default `
+            --docker-server="${Env:acrName}.azurecr.io" `
+            --docker-username="$env:spnClientId" `
+            --docker-password="$env:spnClientSecret"
+    }
 }
 
 #####################################################################
