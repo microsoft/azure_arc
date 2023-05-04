@@ -118,6 +118,7 @@
             LinuxNodeIp4Address = "172.20.1.11"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Seattle"
+            IsProduction = $true
         }
         Chicago = @{
             ArcClusterName = "Ag-ArcK8s-Chicago"
@@ -131,6 +132,7 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Chicago"
+            IsProduction = $true
         }
         Dev = @{
             ArcClusterName = "Ag-ArcK8s-Dev"
@@ -144,6 +146,11 @@
             LinuxNodeIp4Address = "172.20.1.81"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Dev"
+            IsProduction = $false
+        }
+        Staging = @{
+            FriendlyName = "Staging"
+            IsProduction = $false
         }
     }
 

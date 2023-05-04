@@ -405,6 +405,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Connect to Arc
     $deploymentPath = "C:\Deployment\config.json"
     Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+    kubectl get svc
     Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
 }
 
@@ -440,37 +441,6 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 # Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
-
-#####################################################################
-# Configuring applications on the clusters using GitOps
-#####################################################################
-# foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-#     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-#         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
-#         az k8s-configuration flux create `
-#             --cluster-name $cluster.ArcClusterName `
-#             --resource-group $Env:resourceGroup `
-#             --name config-supermarket `
-#             --cluster-type connectedClusters `
-#             --url $appClonedRepo `
-#             --branch main --sync-interval 3s `
-#             --kustomization name=bookstore path=./bookstore/yaml
-
-#         az k8s-configuration create `
-#             --name $app.Name `
-#             --cluster-name $cluster.ArcClusterName `
-#             --resource-group $Env:resourceGroup `
-#             --operator-instance-name flux `
-#             --operator-namespace arc-k8s-demo `
-#             --operator-params='--git-readonly --git-path=releases' `
-#             --enable-helm-operator `
-#             --helm-operator-chart-version='1.2.0' `
-#             --helm-operator-params='--set helm.versions=v3' `
-#             --repository-url https://github.com/Azure/arc-helm-demo.git `
-#             --scope namespace `
-#             --cluster-type connectedClusters
-#     }
-# }
 
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
@@ -519,37 +489,37 @@ $headers = @{
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Deploying Kube Prometheus Stack for Prod stores
-$prodStores = @('chicago', 'seattle')
+$AgConfig.SiteConfig | ForEach-Object {
+    if ($_.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for ${_.FriendlyName} environment" -ForegroundColor Gray
+        kubectx ${_.FriendlyName}.ToLower()
+        # Install Prometheus Operator
+        $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
-foreach ($prodStore in $prodStores) {
-    Write-Host "INFO: Deploying Kube Prometheus Stack for $prodStore environment" -ForegroundColor Gray
-    kubectx $prodStore
-    # Install Prometheus Operator
-    $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
+        Do {
+            Write-Host "INFO: Waiting for ${_.FriendlyName} Prometheus service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($prometheusIP -eq "Nope" )
+        # Get Load Balancer IP
+        $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        Write-Host "INFO: ${_.FriendlyName} Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
 
-    Do {
-        Write-Host "INFO: Waiting for $prodStore Prometheus service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($prometheusIP -eq "Nope" )
-    # Get Load Balancer IP
-    $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    Write-Host "INFO: $prodStore Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
-
-    Write-Host "INFO: Add $prodStore Data Source to Grafana"
-    # Request body with information about the data source to add
-    $dsBody = @{    
-        name      = $prodStore    
-        type      = 'prometheus'    
-        url       = ("http://" + $prometheusLBIP + ":9090")
-        access    = 'proxy'    
-        basicAuth = $false    
-        isDefault = $true
-    } | ConvertTo-Json
-    
-    # Make HTTP request to the API
-    Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
+        Write-Host "INFO: Add ${_.FriendlyName} Data Source to Grafana"
+        # Request body with information about the data source to add
+        $dsBody = @{    
+            name      = ${_.FriendlyName}    
+            type      = 'prometheus'    
+            url       = ("http://" + $prometheusLBIP + ":9090")
+            access    = 'proxy'    
+            basicAuth = $false    
+            isDefault = $true
+        } | ConvertTo-Json
+        
+        # Make HTTP request to the API
+        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
+    }
 }
 
 # Creating Prod Grafana Icon on Desktop
@@ -563,32 +533,32 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('dev', 'staging')
+$AgConfig.SiteConfig | ForEach-Object {
+    if (-Not $_.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for ${_.FriendlyName} environment" -ForegroundColor Gray
+        kubectx ${_.FriendlyName}.ToLower()
+        # Install Prometheus Operator
+        $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
-foreach ($nonProdStore in $nonProdStores) {
-    Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
-    kubectx $nonProdStore
-    # Install Prometheus Operator
-    $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
+        Do {
+            Write-Host "INFO: Waiting for ${_.FriendlyName} Prometheus service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($grafanaIP -eq "Nope" )
+        # Get Load Balancer IP
+        $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-    Do {
-        Write-Host "INFO: Waiting for $nonProdStore Prometheus service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($grafanaIP -eq "Nope" )
-    # Get Load Balancer IP
-    $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-    # Creating Grafana Icon on Desktop
-    Write-Host "INFO: Creating $nonProdStore Grafana Icon." -ForegroundColor Gray
-    $shortcutLocation = "$env:USERPROFILE\Desktop\$nonProdStore Grafana.lnk"
-    $wScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-    $shortcut.TargetPath = "http://$grafanaLBIP"
-    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
+        # Creating Grafana Icon on Desktop
+        Write-Host "INFO: Creating ${_.FriendlyName} Grafana Icon." -ForegroundColor Gray
+        $shortcutLocation = "$env:USERPROFILE\Desktop\${_.FriendlyName} Grafana.lnk"
+        $wScriptShell = New-Object -ComObject WScript.Shell
+        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+        $shortcut.TargetPath = "http://$grafanaLBIP"
+        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+        $shortcut.WindowStyle = 3
+        $shortcut.Save()
+    }
 }
 
 #############################################################
