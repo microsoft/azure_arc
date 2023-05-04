@@ -91,14 +91,12 @@ if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
     gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
@@ -440,6 +438,20 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 # Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
+
+
+#####################################################################
+# Cosmos DB preperation
+#####################################################################
+Write-Host "INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
+$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
+    kubectx $cluster.Name.ToLower()
+    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.Namespace
+    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.Namespace
+
+}
 
 #####################################################################
 # Configuring applications on the clusters using GitOps

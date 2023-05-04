@@ -118,6 +118,7 @@
             LinuxNodeIp4Address = "172.20.1.11"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Seattle"
+            Namespace = "consoto-supermarket"
         }
         Chicago = @{
             ArcClusterName = "Ag-ArcK8s-Chicago"
@@ -131,6 +132,7 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Chicago"
+            Namespace = "consoto-supermarket"
         }
         Dev = @{
             ArcClusterName = "Ag-ArcK8s-Dev"
@@ -144,6 +146,7 @@
             LinuxNodeIp4Address = "172.20.1.81"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Dev"
+            Namespace = "consoto-supermarket"
         }
     }
 
