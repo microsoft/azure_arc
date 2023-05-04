@@ -490,27 +490,27 @@ $headers = @{
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Deploying Kube Prometheus Stack for Prod stores
-$AgConfig.SiteConfig | ForEach-Object {
-    if ($_.IsProduction) {
-        Write-Host "INFO: Deploying Kube Prometheus Stack for ${_.FriendlyName} environment" -ForegroundColor Gray
-        kubectx ${_.FriendlyName}.ToLower()
+$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+    if ($_.Value.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower()
         # Install Prometheus Operator
         $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
         helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
         Do {
-            Write-Host "INFO: Waiting for ${_.FriendlyName} Prometheus service to provision.." -ForegroundColor Gray
+            Write-Host "INFO: Waiting for $($_.Value.FriendlyName) Prometheus service to provision.." -ForegroundColor Gray
             Start-Sleep -Seconds 45
             $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
         } while ($prometheusIP -eq "Nope" )
         # Get Load Balancer IP
         $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-        Write-Host "INFO: ${_.FriendlyName} Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
+        Write-Host "INFO: $($_.Value.FriendlyName) Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
 
-        Write-Host "INFO: Add ${_.FriendlyName} Data Source to Grafana"
+        Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
         # Request body with information about the data source to add
         $dsBody = @{    
-            name      = ${_.FriendlyName}    
+            name      = $_.Value.FriendlyName  
             type      = 'prometheus'    
             url       = ("http://" + $prometheusLBIP + ":9090")
             access    = 'proxy'    
@@ -534,10 +534,10 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$AgConfig.SiteConfig | ForEach-Object {
-    if (-Not $_.IsProduction) {
-        Write-Host "INFO: Deploying Kube Prometheus Stack for ${_.FriendlyName} environment" -ForegroundColor Gray
-        kubectx ${_.FriendlyName}.ToLower()
+$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+    if (-Not $_.Value.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower()
         # Install Prometheus Operator
         $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
         helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
