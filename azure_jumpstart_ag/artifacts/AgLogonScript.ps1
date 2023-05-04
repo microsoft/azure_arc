@@ -422,7 +422,7 @@ foreach ($cluster in $clusters) {
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    if (-not $cluster.Name -eq "Staging") {
+    if ($cluster.Name.Type -eq "AKSEE") {
         Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
         kubectx $cluster.Name.ToLower()
         kubectl create secret docker-registry acr-secret `
