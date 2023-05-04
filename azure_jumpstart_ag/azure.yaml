@@ -3,7 +3,7 @@
 name: azure_jumpstart_ag
 infra:
   provider: "bicep"
-  path: "bicep/main.bicep"
+  path: "bicep"
   module: ""
 hooks:
   preprovision:
