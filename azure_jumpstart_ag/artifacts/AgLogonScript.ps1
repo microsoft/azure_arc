@@ -364,14 +364,13 @@ $elapsedTime = Measure-Command {
 # Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) seconds." -ForegroundColor Gray
 
-# Set the names of the kubeconfig files you're looking for on the L0 virtual machine
-$kubeconfig1 = "config-seattle"
-$kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-dev"
-
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
-$env:KUBECONFIG = "$env:USERPROFILE\.kube\$kubeconfig1;$env:USERPROFILE\.kube\$kubeconfig2;$env:USERPROFILE\.kube\$kubeconfig3"
+$kubeconfigpath = ""
+foreach ($VMName in $VMNames) {
+    $kubeconfigpath = $kubeconfigpath + "$env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
+}
+$env:KUBECONFIG = $kubeconfigpath
 kubectl config view --merge --flatten > "$env:USERPROFILE\.kube\config-raw"
 kubectl config get-clusters --kubeconfig="$env:USERPROFILE\.kube\config-raw"
 Rename-Item -Path "$env:USERPROFILE\.kube\config-raw" -NewName "$env:USERPROFILE\.kube\config"
