@@ -390,20 +390,22 @@ foreach ($cluster in $VMNames) {
 #####################################################################
 
 Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
-Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Install prerequisites
-    $hostname = hostname
-    $ProgressPreference = "SilentlyContinue"
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
-    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
-    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+foreach ($VM in $VMNames) {
+    Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+        # Install prerequisites
+        $hostname = hostname
+        $ProgressPreference = "SilentlyContinue"
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+        Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-    # Connect to Arc
-    $deploymentPath = "C:\Deployment\config.json"
-    Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
-    kubectl get svc
-    Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+        # Connect to Arc
+        $deploymentPath = "C:\Deployment\config.json"
+        Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+        kubectl get svc
+        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+    }
 }
 
 # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
