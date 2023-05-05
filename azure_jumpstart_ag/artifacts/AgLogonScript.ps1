@@ -211,9 +211,12 @@ Start-Sleep -Seconds 20
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
-    Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
-        $site = $using:site
-        (gwmi win32_computersystem).Rename($site.Name)
+    if ($site.Value.Type -eq "AKSEE") {
+        Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
+            $site = $using:site
+            (gwmi win32_computersystem).Rename($site.Name)
+            Restart-Computer
+        }
     }
 }
 # Create an array with VM names    
