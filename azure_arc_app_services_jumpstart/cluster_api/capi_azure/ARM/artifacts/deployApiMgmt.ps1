@@ -65,7 +65,7 @@ az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clu
   --resource-group $env:resourceGroup --name apimgmt --extension-type Microsoft.ApiManagement.Gateway `
   --scope namespace --target-namespace apimgmt `
   --configuration-settings gateway.endpoint=$endpoint `
-  --configuration-protected-settings gateway.authKey=$token `
+  --config-protected-settings gateway.authKey=$token `
   --configuration-settings service.type='LoadBalancer' --release-train preview
 
 # Importing an API
