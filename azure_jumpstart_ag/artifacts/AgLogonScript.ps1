@@ -195,7 +195,7 @@ if ($null -ne $adxEndPoint -and $adxEndPoint -ne ""){
     Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
 }
 else{
-    Write-Host "ERROR: Unable to find ADX endpoint from the cluser resource in the resource group."
+    Write-Host "ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
 }
 
 ##############################################################
