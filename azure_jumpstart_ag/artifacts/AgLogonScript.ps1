@@ -147,6 +147,7 @@ else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
 
+<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
 #####################################################################
 # Import dashboard reports into Azure Data Explorer
 #####################################################################
@@ -154,7 +155,7 @@ else {
 $adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
 
 # Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounded with acces token
-$token = (az account get-access-token --scope "35e917a9-4d95-4062-9d97-5781291353b9/user_impersonation" --query "accessToken") -replace "`"", ""
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
 
 # Prepare authorization header with access token
 $httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
@@ -176,6 +177,20 @@ $httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDa
 if ($httpResponse.StatusCode -ne 200){
     Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
     Exit-PSSession
+}
+#>
+
+### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+$agDir = $AgConfig.AgDirectories["AgDir"]
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+if ($null -ne $adxEndPoint -and $adxEndPoint -ne ""){
+    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+}
+else{
+    Write-Host "ERROR: Unbaled to find ADX endpoint from the resource group."
 }
 
 ##############################################################
