@@ -335,7 +335,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $timeElapsed = 0
     do {
         Write-Host "INFO: Waiting for internet connection to be healthy on $hostname."
-        sleep 5
+        Start-Sleep -Seconds 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
