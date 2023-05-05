@@ -212,6 +212,7 @@ Start-Sleep -Seconds 20
 ########################################################################
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
+        Write-Host "INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
         Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
             $site = $using:site
             (gwmi win32_computersystem).Rename($site.Name)
