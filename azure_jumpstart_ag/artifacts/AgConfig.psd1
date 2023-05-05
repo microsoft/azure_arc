@@ -1,3 +1,4 @@
+
 @{
 
     # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
@@ -118,6 +119,8 @@
             LinuxNodeIp4Address = "172.20.1.11"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Seattle"
+            IsProduction = $true
+            Type = "AKSEE"
             Namespace = "consoto-supermarket"
         }
         Chicago = @{
@@ -132,7 +135,10 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Chicago"
+            IsProduction = $true
+            Type = "AKSEE"
             Namespace = "consoto-supermarket"
+            
         }
         Dev = @{
             ArcClusterName = "Ag-ArcK8s-Dev"
@@ -146,6 +152,14 @@
             LinuxNodeIp4Address = "172.20.1.81"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Dev"
+            IsProduction = $false
+            Type = "AKSEE"
+            Namespace = "consoto-supermarket"
+        }
+        Staging = @{
+            FriendlyName = "Staging"
+            IsProduction = $false
+            Type = "AKS"
             Namespace = "consoto-supermarket"
         }
     }
