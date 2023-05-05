@@ -57,6 +57,8 @@ if ($AgConfig.AzCLIExtensions.Count -ne 0) {
 }
 az -v
 
+Write-Host "INFO: Az CLI configuration complete!" -ForegroundColor Green
+
 ##############################################################
 # Setup Azure PowerShell and register providers
 ##############################################################
@@ -81,6 +83,7 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
+Write-Host "INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 
 ##############################################################
 # Configure Jumpstart AG Apps repository
@@ -120,6 +123,7 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
+    Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
@@ -141,6 +145,7 @@ if ($env:githubUser -ne "microsoft") {
         $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
         gh secret set "sas_token_$deviceId" -b $deviceSASToken
     }
+    Write-Host "INFO: IoT Hub configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
@@ -332,6 +337,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
     Set-Content "$deploymentFolder\Config.json" -Value $content
 }
+Write-Host "INFO: L1 virtualization infrastructure configuration complete. Now rebooting hosts and starting AKS Edge Essentials install. This may take some time while VMs reboot and installation proceeds." -ForegroundColor Green
 
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
@@ -391,6 +397,7 @@ foreach ($cluster in $VMNames) {
     kubectx $cluster.ToLower()
     kubectl get nodes -o wide
 }
+Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
 
 #####################################################################
 ### Connect the AKS Edge Essentials clusters to Azure Arc
@@ -414,6 +421,7 @@ foreach ($VM in $VMNames) {
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     }
 }
+Write-Host "INFO: AKS Edge Essentials clusters have been registered with Azure Arc!" -ForegroundColor Green
 
 # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
 $clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
@@ -568,6 +576,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         $shortcut.Save()
     }
 }
+Write-Host "INFO: Observability components setup complete!" -ForegroundColor Green
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
@@ -641,6 +650,7 @@ Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions 
 foreach ($extension in $AgConfig.VSCodeExtensions) {
     code --install-extension $extension
 }
+Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
 ##############################################################
 # Cleanup
@@ -672,6 +682,6 @@ Invoke-Expression 'cmd /c start Powershell -Command {
 # Add-Type $code 
 # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-Write-Host "INFO: Deployment is successful. Please enjoy the Agora experience!" -ForegroundColor Green
+Write-Host "INFO: Deployment is complete. Please enjoy the Agora experience!" -ForegroundColor Green
 
 Stop-Transcript
