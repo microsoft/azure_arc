@@ -173,38 +173,36 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Green
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
-# Create an array of VHDX file paths in the the VHDX target folder
-$vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+# Create three VMs from the base VHDX image
+$vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($site.Value.Type -eq "AKSEE") {
+        # Create diff disks for each site host
+        Write-Host "INFO: Creating differencing disk for site $($site.Name)" -ForegroundColor Gray
+        $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
+        
+        # Create a new virtual machine and attach the existing virtual hard disk
+        Write-Host "INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
+        New-VM -Name $site.Name `
+            -MemoryStartupBytes $AgConfig.L1VMMemory `
+            -BootDevice VHD `
+            -VHDPath $vhd.Path `
+            -Generation 2 `
+            -Switch $AgConfig.L1SwitchName
+        
+        # Set up the virtual machine before coping all AKS Edge Essentials automation files
+        Set-VMProcessor -VMName $site.Name `
+            -Count $AgConfig.L1VMNumVCPU `
+            -ExposeVirtualizationExtensions $true
 
-# Loop through each VHDX file and create a VM
-foreach ($vhdxPath in $vhdxPaths) {
-    # Extract the VM name from the file name
-    $VMName = [System.IO.Path]::GetFileNameWithoutExtension($vhdxPath)
-
-    # Get the virtual hard disk object from the VHDX file
-    $vhd = Get-VHD -Path $vhdxPath
-
-    # Create a new virtual machine and attach the existing virtual hard disk
-    Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
-    New-VM -Name $VMName `
-        -MemoryStartupBytes $AgConfig.L1VMMemory `
-        -BootDevice VHD `
-        -VHDPath $vhd.Path `
-        -Generation 2 `
-        -Switch $AgConfig.L1SwitchName
-    
-    # Set up the virtual machine before coping all AKS Edge Essentials automation files
-    Set-VMProcessor -VMName $VMName `
-        -Count $AgConfig.L1VMNumVCPU `
-        -ExposeVirtualizationExtensions $true
-    
-    Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
-    Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
-      
-    # Create virtual machine snapshot and start the virtual machine
-    Checkpoint-VM -Name $VMName -SnapshotName "Base"
-    Start-Sleep -Seconds 5
-    Start-VM -Name $VMName
+        Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On
+        Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface"
+  
+        # Create virtual machine snapshot and start the virtual machine
+        Checkpoint-VM -Name $site.Name -SnapshotName "Base"
+        Start-Sleep -Seconds 5
+        Start-VM -Name $site.Name
+    }
 }
 
 Start-Sleep -Seconds 20
@@ -212,7 +210,12 @@ Start-Sleep -Seconds 20
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
 ########################################################################
-
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
+        $site = $using:site
+        (gwmi win32_computersystem).Rename($site.Name)
+    }
+}
 # Create an array with VM names    
 $VMnames = (Get-VM).Name
 
@@ -422,7 +425,7 @@ foreach ($cluster in $clusters) {
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    if ($cluster.Name.Type -eq "AKSEE") {
+    if ($cluster.Value.Type -eq "AKSEE") {
         Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
         kubectx $cluster.Name.ToLower()
         kubectl create secret docker-registry acr-secret `
