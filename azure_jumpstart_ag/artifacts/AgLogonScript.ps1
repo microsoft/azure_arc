@@ -9,7 +9,6 @@ $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
@@ -24,7 +23,9 @@ $acrName = $Env:acrName
 $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
+$adxClusterName = $env:adxClusterName
 
+Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing AgLogonScript.ps1"
 
 # Disable Windows firewall
@@ -149,6 +150,52 @@ if ($env:githubUser -ne "microsoft") {
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
+#####################################################################
+# Import dashboard reports into Azure Data Explorer
+#####################################################################
+# Get Azure Data Explorer URI
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+
+# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
+
+# Prepare authorization header with access token
+$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
+# Make REST API call to the dashbord endpoint.
+$restApi = "https://dashboards.kusto.windows.net/dashboards"
+
+# Import orders dashboard report
+$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+
+# Import IoT Sensor dashboard report
+$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+#>
+
+### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+$agDir = $AgConfig.AgDirectories["AgDir"]
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+if ($null -ne $adxEndPoint -and $adxEndPoint -ne ""){
+    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+}
+else{
+    Write-Host "ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
 }
 
 ##############################################################
