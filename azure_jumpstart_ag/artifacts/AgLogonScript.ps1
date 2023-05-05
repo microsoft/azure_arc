@@ -159,7 +159,7 @@ else {
 # Get Azure Data Explorer URI
 $adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
 
-# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounded with acces token
+# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
 
 # Prepare authorization header with access token
