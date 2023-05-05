@@ -24,7 +24,7 @@ param iotHubId string
 @description('The name of the IoT Hub consumer group')
 param iotHubConsumerGroup string
 
-@description('The Naem of the Cosmos DB account')
+@description('The Name of the Cosmos DB account')
 param cosmosDBAccountName string
 
 @description('# of nodes')
@@ -77,7 +77,7 @@ resource posOrdersDB 'Microsoft.Kusto/clusters/databases@2022-12-29' = {
   kind: 'ReadWrite'
 }
 
-resource dxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
+resource adxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
   name: 'iotHubConnection'
   location: location
   kind: 'IotHub'
