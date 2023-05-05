@@ -249,7 +249,7 @@
   "dataSources": [
     {
       "id": "30c352ba-838d-4a10-a030-718b81b97cff",
-      "name": "Orders",
+      "name": "{{ADX_CLUSTER_NAME}}",
       "scopeId": "kusto",
       "clusterUri": "{{ADX_CLUSTER_URI}}",
       "database": "Orders",
