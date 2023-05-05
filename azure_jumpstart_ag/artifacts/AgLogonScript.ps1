@@ -208,7 +208,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 Start-Sleep -Seconds 20
 
 ########################################################################
-# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
+# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
@@ -225,7 +225,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
-    # Preparing environment folders structure #
+    # Preparing environment folders structure 
     ###########################################
     Write-Host "INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
@@ -259,7 +259,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AgConfig = $using:AgConfig
 
     ##########################################
-    # Deploying AKS Edge Essentials clusters #
+    # Deploying AKS Edge Essentials clusters 
     ##########################################
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
@@ -279,7 +279,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $timeElapsed = 0
     do {
         Write-Host "INFO: Waiting for internet connection to be healthy on $hostname."
-        sleep 5
+        Start-Sleep -Seconds 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
@@ -605,7 +605,7 @@ Invoke-Expression -Command "$ubuntu_path install --root"
 
 # Create Windows Terminal shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where { $_.name -eq "wt.exe" }).FullName
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
 $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
