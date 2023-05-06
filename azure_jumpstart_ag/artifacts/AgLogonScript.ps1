@@ -790,6 +790,22 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
 
 #############################################################
+# Contoso super market image initial build
+#############################################################
+Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
+docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+
+docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+
+docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+
+docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+
+#############################################################
 # Install VSCode extensions
 #############################################################
 Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
