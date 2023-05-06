@@ -1,4 +1,3 @@
-
 @{
     # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
 
