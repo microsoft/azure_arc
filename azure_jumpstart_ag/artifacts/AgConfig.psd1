@@ -2,42 +2,42 @@
     # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
 
     # Directory paths
-    AgDirectories = @{
-        AgDir = "C:\Ag"
-        AgLogsDir = "C:\Ag\Logs"
-        AgVMDir = "C:\Ag\Virtual Machines"
-        AgKVDir = "C:\Ag\KeyVault"
-        AgGitOpsDir = "C:\Ag\GitOps"
-        AgIconDir = "C:\Ag\Icons"
+    AgDirectories       = @{
+        AgDir             = "C:\Ag"
+        AgLogsDir         = "C:\Ag\Logs"
+        AgVMDir           = "C:\Ag\Virtual Machines"
+        AgKVDir           = "C:\Ag\KeyVault"
+        AgGitOpsDir       = "C:\Ag\GitOps"
+        AgIconDir         = "C:\Ag\Icons"
         AgAgentScriptsDir = "C:\Ag\agentScripts"
-        AgToolsDir = "C:\Tools"
-        AgTempDir = "C:\Temp"
-        AgVHDXDir = "C:\Ag\VHDX"
-        AgL1Files = "C:\Ag\L1Files"
-        AgAppsRepo = "C:\Ag\AppsRepo"
+        AgToolsDir        = "C:\Tools"
+        AgTempDir         = "C:\Temp"
+        AgVHDXDir         = "C:\Ag\VHDX"
+        AgL1Files         = "C:\Ag\L1Files"
+        AgAppsRepo        = "C:\Ag\AppsRepo"
     }
 
     # Azure required registered resource providers
-    AzureProviders = @(
+    AzureProviders      = @(
         "Microsoft.Kubernetes",
         "Microsoft.KubernetesConfiguration",
         "Microsoft.ExtendedLocation"
     )
 
     # Az CLI required extensions
-    AzCLIExtensions = @(
+    AzCLIExtensions     = @(
         'k8s-extension',
         'k8s-configuration',
         'azure-iot'
     )
 
     # PowerShell modules
-    PowerShellModules = @(
+    PowerShellModules   = @(
         'Az.ConnectedKubernetes'
     )
 
     # Chocolatey app list
-    ChocolateyAppList = @(
+    ChocolateyAppList   = @(
         'azure-cli',
         'az.powershell',
         'kubernetes-cli',
@@ -58,7 +58,7 @@
     )
 
     # VSCode extensions
-    VSCodeExtensions = @(
+    VSCodeExtensions    = @(
         'ms-vscode-remote.remote-containers',
         'ms-vscode-remote.remote-wsl',
         'ms-vscode.powershell',
@@ -70,10 +70,11 @@
     )
 
     # Git branches
-    GitBranches = @(
+    GitBranches         = @(
         'production',
         'staging',
-        'canary'
+        'canary' ,
+        'dev'
     )
 
     # VHDX blob url
@@ -92,63 +93,73 @@
     L1NatSubnetPrefix                    = "172.20.1.0/24"                       # This value controls the network subnet used by each L1 Hyper-V virtual machines that run on the Agora-Client.
 
     # NAT Configuration
-    natHostSubnet                        = "192.168.128.0/24"
-    natHostVMSwitchName                  = "InternalNAT"
-    natConfigure                         = $true
-    natSubnet                            = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
-    natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
+    natHostSubnet       = "192.168.128.0/24"
+    natHostVMSwitchName = "InternalNAT"
+    natConfigure        = $true
+    natSubnet           = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
+    natDNS              = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # AKS Edge Essentials variables
-    SiteConfig = @{
+    SiteConfig          = @{
         Seattle = @{
-            ArcClusterName = "Ag-ArcK8s-Seattle"
-            NetIPAddress = "172.20.1.2"
-            DefaultGateway = "172.20.1.1"
-            PrefixLength = "24"
+            ArcClusterName         = "Ag-ArcK8s-Seattle"
+            NetIPAddress           = "172.20.1.2"
+            DefaultGateway         = "172.20.1.1"
+            PrefixLength           = "24"
             DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart = "172.20.1.31"
-            ServiceIPRangeSize = "10"
+            ServiceIPRangeStart    = "172.20.1.31"
+            ServiceIPRangeSize     = "10"
             ControlPlaneEndpointIp = "172.20.1.21"
-            LinuxNodeIp4Address = "172.20.1.11"
-            Subnet = "172.20.1.0/24"
-            FriendlyName = "Seattle"
-            IsProduction = $true
-            Type = "AKSEE"
+            LinuxNodeIp4Address    = "172.20.1.11"
+            Subnet                 = "172.20.1.0/24"
+            FriendlyName           = "Seattle"
+            IsProduction           = $true
+            Type                   = "AKSEE"
+            Namespace              = "consoto-supermarket"
+            Branch                 = "production"
         }
         Chicago = @{
-            ArcClusterName = "Ag-ArcK8s-Chicago"
-            NetIPAddress = "172.20.1.3"
-            DefaultGateway = "172.20.1.1"
-            PrefixLength = "24"
+            ArcClusterName         = "Ag-ArcK8s-Chicago"
+            NetIPAddress           = "172.20.1.3"
+            DefaultGateway         = "172.20.1.1"
+            PrefixLength           = "24"
             DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart = "172.20.1.71"
-            ServiceIPRangeSize = "10"
+            ServiceIPRangeStart    = "172.20.1.71"
+            ServiceIPRangeSize     = "10"
             ControlPlaneEndpointIp = "172.20.1.61"
-            LinuxNodeIp4Address = "172.20.1.51"
-            Subnet = "172.20.1.0/24"
-            FriendlyName = "Chicago"
-            IsProduction = $true
-            Type = "AKSEE"
+            LinuxNodeIp4Address    = "172.20.1.51"
+            Subnet                 = "172.20.1.0/24"
+            FriendlyName           = "Chicago"
+            IsProduction           = $true
+            Type                   = "AKSEE"
+            Namespace              = "consoto-supermarket"
+            Branch                 = "canary"
+            
         }
-        Dev = @{
-            ArcClusterName = "Ag-ArcK8s-Dev"
-            NetIPAddress = "172.20.1.4"
-            DefaultGateway = "172.20.1.1"
-            PrefixLength = "24"
+        Dev     = @{
+            ArcClusterName         = "Ag-ArcK8s-Dev"
+            NetIPAddress           = "172.20.1.4"
+            DefaultGateway         = "172.20.1.1"
+            PrefixLength           = "24"
             DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart = "172.20.1.101"
-            ServiceIPRangeSize = "10"
+            ServiceIPRangeStart    = "172.20.1.101"
+            ServiceIPRangeSize     = "10"
             ControlPlaneEndpointIp = "172.20.1.91"
-            LinuxNodeIp4Address = "172.20.1.81"
-            Subnet = "172.20.1.0/24"
-            FriendlyName = "Dev"
-            IsProduction = $false
-            Type = "AKSEE"
+            LinuxNodeIp4Address    = "172.20.1.81"
+            Subnet                 = "172.20.1.0/24"
+            FriendlyName           = "Dev"
+            IsProduction           = $false
+            Type                   = "AKSEE"
+            Namespace              = "consoto-supermarket"
+            Branch                 = "dev"
         }
         Staging = @{
+            ArcClusterName = "Ag-AKS-Staging"
             FriendlyName = "Staging"
             IsProduction = $false
-            Type = "AKS"
+            Type         = "AKS"
+            Namespace    = "consoto-supermarket"
+            Branch       = "staging"
         }
     }
 
@@ -179,5 +190,4 @@
         #     Kustomization = "name=bookstore path=./bookstore/yaml"
         # }
     }
-    
 }
