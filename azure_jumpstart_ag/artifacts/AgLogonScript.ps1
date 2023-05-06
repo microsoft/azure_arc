@@ -529,11 +529,12 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
         $branch =$cluster.value.Branch
+        $clusterType = $cluster.value.ArcClusterName == "Staging" ? "managedClusters" : "connectedClusters"
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --name config-supermarket-$configName `
-            --cluster-type connectedClusters `
+            --cluster-type $clusterType `
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
             --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
