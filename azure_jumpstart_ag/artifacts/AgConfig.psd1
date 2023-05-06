@@ -120,6 +120,7 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             Namespace              = "consoto-supermarket"
+            Branch                 = "production"
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -136,6 +137,7 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             Namespace              = "consoto-supermarket"
+            Branch                 = "canary"
             
         }
         Dev     = @{
@@ -153,12 +155,14 @@
             IsProduction           = $false
             Type                   = "AKSEE"
             Namespace              = "consoto-supermarket"
+            Branch                 = "main"
         }
         Staging = @{
             FriendlyName = "Staging"
             IsProduction = $false
             Type         = "AKS"
             Namespace    = "consoto-supermarket"
+            Branch       = "staging"
         }
     }
 
