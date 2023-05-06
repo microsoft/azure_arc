@@ -225,12 +225,12 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Green
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
-# Create three VMs from the base VHDX image
+# Create three virtual machines from the base VHDX image
 $vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         # Create diff disks for each site host
-        Write-Host "INFO: Creating differencing disk for site $($site.Name)" -ForegroundColor Gray
+        Write-Host "INFO: Creating differencing disk for $($site.Name) site" -ForegroundColor Gray
         $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
         
         # Create a new virtual machine and attach the existing virtual hard disk
