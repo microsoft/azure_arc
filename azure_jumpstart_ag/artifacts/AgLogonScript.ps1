@@ -529,7 +529,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
         $branch =$cluster.value.Branch
-        if($cluster.value.ArcClusterName -eq "Staging"){
+        if($cluster.value.FriendlyName -eq "Staging"){
             $clusterType = "managedClusters"
         }else{
             $clusterType = "connectedClusters"
