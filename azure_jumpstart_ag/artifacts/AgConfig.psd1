@@ -77,7 +77,7 @@
     )
 
     # VHDX blob url
-    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-prod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
+    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/AGBase.vhdx?sp=r&st=2023-05-06T14:38:41Z&se=2033-05-06T22:38:41Z&spr=https&sv=2022-11-02&sr=b&sig=DTDZOvPlzwrjg3gppwVo1TdDZRgPt5AYBfe9YeKEobo%3D'
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # L1 virtual machine configuration
