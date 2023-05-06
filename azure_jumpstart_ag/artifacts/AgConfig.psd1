@@ -1,7 +1,5 @@
 @{
-
     # This is the PowerShell datafile used to provide configuration information for the Agora environment. Product keys and password are not encrypted and will be available on host during installation.
-
 
     # Directory paths
     AgDirectories = @{
@@ -71,8 +69,15 @@
         'mindaro.mindaro'
     )
 
+    # Git branches
+    GitBranches = @(
+        'production',
+        'staging',
+        'canary'
+    )
+
     # VHDX blob url
-    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
+    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/Dev.vhdx?sp=r&st=2023-05-05T13:41:43Z&se=2026-05-12T21:41:43Z&spr=https&sv=2022-11-02&sr=b&sig=%2Bb195yAIPfdQokWhKLNVA8LZ9pyt6MTsf9G0Fjuc7uU%3D'
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # VHDX Paths 
@@ -111,6 +116,8 @@
             LinuxNodeIp4Address = "172.20.1.11"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Seattle"
+            IsProduction = $true
+            Type = "AKSEE"
         }
         Chicago = @{
             ArcClusterName = "Ag-ArcK8s-Chicago"
@@ -124,6 +131,8 @@
             LinuxNodeIp4Address = "172.20.1.51"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Chicago"
+            IsProduction = $true
+            Type = "AKSEE"
         }
         Dev = @{
             ArcClusterName = "Ag-ArcK8s-Dev"
@@ -137,6 +146,13 @@
             LinuxNodeIp4Address = "172.20.1.81"
             Subnet = "172.20.1.0/24"
             FriendlyName = "Dev"
+            IsProduction = $false
+            Type = "AKSEE"
+        }
+        Staging = @{
+            FriendlyName = "Staging"
+            IsProduction = $false
+            Type = "AKS"
         }
     }
 

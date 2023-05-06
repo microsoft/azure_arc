@@ -9,7 +9,6 @@ $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
@@ -24,7 +23,9 @@ $acrName = $Env:acrName
 $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
+$adxClusterName = $env:adxClusterName
 
+Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing AgLogonScript.ps1"
 
 # Disable Windows firewall
@@ -57,6 +58,8 @@ if ($AgConfig.AzCLIExtensions.Count -ne 0) {
 }
 az -v
 
+Write-Host "INFO: Az CLI configuration complete!" -ForegroundColor Green
+
 ##############################################################
 # Setup Azure PowerShell and register providers
 ##############################################################
@@ -81,17 +84,18 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
+Write-Host "INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 
 ##############################################################
 # Configure Jumpstart AG Apps repository
 ##############################################################
 Write-Host "INFO: Forking and prepareing Apps repository locally" -ForegroundColor Gray
 Set-Location $AgAppsRepo
-if($githubUser -ne "microsoft"){
-    git clone "https://github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
+if ($githubUser -ne "microsoft") {
+    git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    $cosmosDBKey=$(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)    
+    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
@@ -100,6 +104,27 @@ if($githubUser -ne "microsoft"){
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+    Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
+    $branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        try {
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+            if($response){
+                Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                git push origin --delete $branch
+                git checkout -b $branch
+                git push origin $branch
+            }
+        }
+        catch {
+            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+            git checkout -b $branch
+            git push origin $branch
+        }
+    }
+    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+    git checkout main
+    Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
@@ -109,21 +134,68 @@ else {
 # IotHub resources preperation
 #####################################################################
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
-if($env:githubUser -ne "microsoft"){
+if ($env:githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
-    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net","")
+    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
     gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
-    $sites=$AgConfig.SiteConfig.Values
+    $sites = $AgConfig.SiteConfig.Values
     Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
-    foreach ($site in $sites){
+    foreach ($site in $sites) {
         $deviceId = $site.FriendlyName
         az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
-        $deviceSASToken=$(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60*60*24*30) --query sas -o tsv)
+        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
         gh secret set "sas_token_$deviceId" -b $deviceSASToken
     }
+    Write-Host "INFO: IoT Hub configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
+#####################################################################
+# Import dashboard reports into Azure Data Explorer
+#####################################################################
+# Get Azure Data Explorer URI
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+
+# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
+
+# Prepare authorization header with access token
+$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
+# Make REST API call to the dashbord endpoint.
+$restApi = "https://dashboards.kusto.windows.net/dashboards"
+
+# Import orders dashboard report
+$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+
+# Import IoT Sensor dashboard report
+$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+#>
+
+### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+$agDir = $AgConfig.AgDirectories["AgDir"]
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+if ($null -ne $adxEndPoint -and $adxEndPoint -ne ""){
+    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+}
+else{
+    Write-Host "ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
 }
 
 ##############################################################
@@ -150,50 +222,56 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 ############################################
 # Deploying the nested L1 virtual machines 
 ############################################
-Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage" -ForegroundColor Gray
-Write-Host "INFO: Downloading nested VMs VHDX files. This can take some time, hold tight..." -ForegroundColor GRAY
+Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Green
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
-# Create an array of VHDX file paths in the the VHDX target folder
-$vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+# Create three VMs from the base VHDX image
+$vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($site.Value.Type -eq "AKSEE") {
+        # Create diff disks for each site host
+        Write-Host "INFO: Creating differencing disk for site $($site.Name)" -ForegroundColor Gray
+        $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
+        
+        # Create a new virtual machine and attach the existing virtual hard disk
+        Write-Host "INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
+        New-VM -Name $site.Name `
+            -MemoryStartupBytes $AgConfig.L1VMMemory `
+            -BootDevice VHD `
+            -VHDPath $vhd.Path `
+            -Generation 2 `
+            -Switch $AgConfig.L1SwitchName
+        
+        # Set up the virtual machine before coping all AKS Edge Essentials automation files
+        Set-VMProcessor -VMName $site.Name `
+            -Count $AgConfig.L1VMNumVCPU `
+            -ExposeVirtualizationExtensions $true
 
-# Loop through each VHDX file and create a VM
-foreach ($vhdxPath in $vhdxPaths) {
-    # Extract the VM name from the file name
-    $VMName = [System.IO.Path]::GetFileNameWithoutExtension($vhdxPath)
-
-    # Get the virtual hard disk object from the VHDX file
-    $vhd = Get-VHD -Path $vhdxPath
-
-    # Create a new virtual machine and attach the existing virtual hard disk
-    Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
-    New-VM -Name $VMName `
-        -MemoryStartupBytes $AgConfig.L1VMMemory `
-        -BootDevice VHD `
-        -VHDPath $vhd.Path `
-        -Generation 2 `
-        -Switch $AgConfig.L1SwitchName
-    
-    # Set up the virtual machine before coping all AKS Edge Essentials automation files
-    Set-VMProcessor -VMName $VMName `
-        -Count $AgConfig.L1VMNumVCPU `
-        -ExposeVirtualizationExtensions $true
-    
-    Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
-    Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
-      
-    # Create virtual machine snapshot and start the virtual machine
-    Checkpoint-VM -Name $VMName -SnapshotName "Base"
-    Start-Sleep -Seconds 5
-    Start-VM -Name $VMName
+        Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On
+        Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface"
+  
+        # Create virtual machine snapshot and start the virtual machine
+        Checkpoint-VM -Name $site.Name -SnapshotName "Base"
+        Start-Sleep -Seconds 5
+        Start-VM -Name $site.Name
+    }
 }
 
 Start-Sleep -Seconds 20
 
 ########################################################################
-# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
+# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
-
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($site.Value.Type -eq "AKSEE") {
+        Write-Host "INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
+        Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
+            $site = $using:site
+            (gwmi win32_computersystem).Rename($site.Name)
+            Restart-Computer
+        }
+    }
+}
 # Create an array with VM names    
 $VMnames = (Get-VM).Name
 
@@ -203,7 +281,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
-    # Preparing environment folders structure #
+    # Preparing environment folders structure 
     ###########################################
     Write-Host "INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
@@ -237,7 +315,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AgConfig = $using:AgConfig
 
     ##########################################
-    # Deploying AKS Edge Essentials clusters #
+    # Deploying AKS Edge Essentials clusters 
     ##########################################
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
@@ -257,7 +335,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $timeElapsed = 0
     do {
         Write-Host "INFO: Waiting for internet connection to be healthy on $hostname."
-        sleep 5
+        Start-Sleep -Seconds 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
@@ -306,6 +384,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
     Set-Content "$deploymentFolder\Config.json" -Value $content
 }
+Write-Host "INFO: L1 virtualization infrastructure configuration complete. Now rebooting hosts and starting AKS Edge Essentials install. This may take some time while VMs reboot and installation proceeds." -ForegroundColor Green
 
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
@@ -344,14 +423,13 @@ $elapsedTime = Measure-Command {
 # Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "INFO: Waiting on kubeconfig files took $($elapsedTime.TotalSeconds) seconds." -ForegroundColor Gray
 
-# Set the names of the kubeconfig files you're looking for on the L0 virtual machine
-$kubeconfig1 = "config-seattle"
-$kubeconfig2 = "config-chicago"
-$kubeconfig3 = "config-dev"
-
 # Merging kubeconfig files on the L0 vistual machine
 Write-Host "INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
-$env:KUBECONFIG = "$env:USERPROFILE\.kube\$kubeconfig1;$env:USERPROFILE\.kube\$kubeconfig2;$env:USERPROFILE\.kube\$kubeconfig3"
+$kubeconfigpath = ""
+foreach ($VMName in $VMNames) {
+    $kubeconfigpath = $kubeconfigpath + "$env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
+}
+$env:KUBECONFIG = $kubeconfigpath
 kubectl config view --merge --flatten > "$env:USERPROFILE\.kube\config-raw"
 kubectl config get-clusters --kubeconfig="$env:USERPROFILE\.kube\config-raw"
 Rename-Item -Path "$env:USERPROFILE\.kube\config-raw" -NewName "$env:USERPROFILE\.kube\config"
@@ -366,27 +444,31 @@ foreach ($cluster in $VMNames) {
     kubectx $cluster.ToLower()
     kubectl get nodes -o wide
 }
+Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
 
 #####################################################################
 ### Connect the AKS Edge Essentials clusters to Azure Arc
 #####################################################################
 
 Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
-Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Install prerequisites
-    $hostname = hostname
-    $ProgressPreference = "SilentlyContinue"
-    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
-    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
-    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+foreach ($VM in $VMNames) {
+    Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+        # Install prerequisites
+        $hostname = hostname
+        $ProgressPreference = "SilentlyContinue"
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+        Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-
-    # Connect to Arc
-    $deploymentPath = "C:\Deployment\config.json"
-    Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
-    Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+        # Connect to Arc
+        $deploymentPath = "C:\Deployment\config.json"
+        Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+        kubectl get svc
+        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+    }
 }
+Write-Host "INFO: AKS Edge Essentials clusters have been registered with Azure Arc!" -ForegroundColor Green
 
 # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
 $clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
@@ -401,15 +483,16 @@ foreach ($cluster in $clusters) {
 #####################################################################
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) 
-{
-    Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
-    kubectx $cluster.Name.ToLower()
-    kubectl create secret docker-registry acr-secret `
-        --namespace default `
-        --docker-server="${Env:acrName}.azurecr.io" `
-        --docker-username="$env:spnClientId" `
-        --docker-password="$env:spnClientSecret"
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($cluster.Value.Type -eq "AKSEE") {
+        Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+        kubectx $cluster.Name.ToLower()
+        kubectl create secret docker-registry acr-secret `
+            --namespace default `
+            --docker-server="${Env:acrName}.azurecr.io" `
+            --docker-username="$env:spnClientId" `
+            --docker-password="$env:spnClientSecret"
+    }
 }
 
 #####################################################################
@@ -421,37 +504,6 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 # Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
-
-#####################################################################
-# Configuring applications on the clusters using GitOps
-#####################################################################
-# foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-#     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-#         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
-#         az k8s-configuration flux create `
-#             --cluster-name $cluster.ArcClusterName `
-#             --resource-group $Env:resourceGroup `
-#             --name config-supermarket `
-#             --cluster-type connectedClusters `
-#             --url $appClonedRepo `
-#             --branch main --sync-interval 3s `
-#             --kustomization name=bookstore path=./bookstore/yaml
-
-#         az k8s-configuration create `
-#             --name $app.Name `
-#             --cluster-name $cluster.ArcClusterName `
-#             --resource-group $Env:resourceGroup `
-#             --operator-instance-name flux `
-#             --operator-namespace arc-k8s-demo `
-#             --operator-params='--git-readonly --git-path=releases' `
-#             --enable-helm-operator `
-#             --helm-operator-chart-version='1.2.0' `
-#             --helm-operator-params='--set helm.versions=v3' `
-#             --repository-url https://github.com/Azure/arc-helm-demo.git `
-#             --scope namespace `
-#             --cluster-type connectedClusters
-#     }
-# }
 
 #####################################################################
 ### Deploy Kube Prometheus Stack for Observability
@@ -481,7 +533,7 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 # Reset Grafana UI
 Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
     (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
-    }
+}
 
 # Reset Grafana Password
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
@@ -492,44 +544,45 @@ $credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
 $headers = @{    
-"Authorization" = ("Basic "+$encodedcredentials)    
-"Content-Type" = "application/json"
+    "Authorization" = ("Basic " + $encodedcredentials)    
+    "Content-Type"  = "application/json"
 }
 
 # Grafana API endpoint
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Deploying Kube Prometheus Stack for Prod stores
-$prodStores = @('chicago','seattle')
+$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+    if ($_.Value.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower()
+        # Install Prometheus Operator
+        $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
-foreach ($prodStore in $prodStores) {
-    Write-Host "INFO: Deploying Kube Prometheus Stack for $prodStore environment" -ForegroundColor Gray
-    kubectx $prodStore
-    # Install Prometheus Operator
-    $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
+        Do {
+            Write-Host "INFO: Waiting for $($_.Value.FriendlyName) Prometheus service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($prometheusIP -eq "Nope" )
+        # Get Load Balancer IP
+        $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        Write-Host "INFO: $($_.Value.FriendlyName) Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
 
-    Do {
-        Write-Host "INFO: Waiting for $prodStore Prometheus service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($prometheusIP -eq "Nope" )
-    # Get Load Balancer IP
-    $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    Write-Host "INFO: $prodStore Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
-
-    Write-Host "INFO: Add $prodStore Data Source to Grafana"
-    # Request body with information about the data source to add
-    $dsBody = @{    
-    name = $prodStore    
-    type = 'prometheus'    
-    url = ("http://" + $prometheusLBIP + ":9090")
-    access = 'proxy'    
-    basicAuth = $false    
-    isDefault = $true} | ConvertTo-Json
-    
-    # Make HTTP request to the API
-    Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
+        Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
+        # Request body with information about the data source to add
+        $dsBody = @{    
+            name      = $_.Value.FriendlyName  
+            type      = 'prometheus'    
+            url       = ("http://" + $prometheusLBIP + ":9090")
+            access    = 'proxy'    
+            basicAuth = $false    
+            isDefault = $true
+        } | ConvertTo-Json
+        
+        # Make HTTP request to the API
+        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
+    }
 }
 
 # Creating Prod Grafana Icon on Desktop
@@ -543,33 +596,34 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Deploying Kube Prometheus Stack for Non-Prod stores
-$nonProdStores = @('dev','staging')
+$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+    if (-Not $_.Value.IsProduction) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower()
+        # Install Prometheus Operator
+        $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
-foreach ($nonProdStore in $nonProdStores) {
-    Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
-    kubectx $nonProdStore
-    # Install Prometheus Operator
-    $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
+        Do {
+            Write-Host "INFO: Waiting for ${_.FriendlyName} Prometheus service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($grafanaIP -eq "Nope" )
+        # Get Load Balancer IP
+        $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-    Do {
-        Write-Host "INFO: Waiting for $nonProdStore Prometheus service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($grafanaIP -eq "Nope" )
-    # Get Load Balancer IP
-    $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-    # Creating Grafana Icon on Desktop
-    Write-Host "INFO: Creating $nonProdStore Grafana Icon." -ForegroundColor Gray
-    $shortcutLocation = "$env:USERPROFILE\Desktop\$nonProdStore Grafana.lnk"
-    $wScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-    $shortcut.TargetPath = "http://$grafanaLBIP"
-    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
+        # Creating Grafana Icon on Desktop
+        Write-Host "INFO: Creating ${_.FriendlyName} Grafana Icon." -ForegroundColor Gray
+        $shortcutLocation = "$env:USERPROFILE\Desktop\${_.FriendlyName} Grafana.lnk"
+        $wScriptShell = New-Object -ComObject WScript.Shell
+        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+        $shortcut.TargetPath = "http://$grafanaLBIP"
+        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+        $shortcut.WindowStyle = 3
+        $shortcut.Save()
+    }
 }
+Write-Host "INFO: Observability components setup complete!" -ForegroundColor Green
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
@@ -611,7 +665,7 @@ Invoke-Expression -Command "$ubuntu_path install --root"
 
 # Create Windows Terminal shortcut
 $WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where { $_.name -eq "wt.exe" }).FullName
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
 $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
@@ -643,6 +697,7 @@ Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions 
 foreach ($extension in $AgConfig.VSCodeExtensions) {
     code --install-extension $extension
 }
+Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
 ##############################################################
 # Cleanup
@@ -674,6 +729,6 @@ Invoke-Expression 'cmd /c start Powershell -Command {
 # Add-Type $code 
 # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-Write-Host "INFO: Deployment is successful. Please enjoy the Agora experience!" -ForegroundColor Green
+Write-Host "INFO: Deployment is complete. Please enjoy the Agora experience!" -ForegroundColor Green
 
 Stop-Transcript
