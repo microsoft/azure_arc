@@ -77,23 +77,19 @@
     )
 
     # VHDX blob url
-    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/Dev.vhdx?sp=r&st=2023-05-05T13:41:43Z&se=2026-05-12T21:41:43Z&spr=https&sv=2022-11-02&sr=b&sig=%2Bb195yAIPfdQokWhKLNVA8LZ9pyt6MTsf9G0Fjuc7uU%3D'
+    ProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/AGBase.vhdx?sp=r&st=2023-05-06T14:38:41Z&se=2033-05-06T22:38:41Z&spr=https&sv=2022-11-02&sr=b&sig=DTDZOvPlzwrjg3gppwVo1TdDZRgPt5AYBfe9YeKEobo%3D'
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
-    # VHDX Paths 
-    L0VHDPath                            = "C:\Ag\VHD\L0.vhdx"              # This value controls the location of the GUI VHDX.              
-    L1VHDPath                            = "C:\Ag\VHD\L1.vhdx"                 # This value controls the location of the Azure Stack HCI VHDX. 
-    
-    # L1 VM Configuration
-    HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored the host.
-    L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS EE host VM
-    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS EE host VM
-    InternalSwitch                       = "InternalSwitch"                      # Name of the internal switch that the L0 VM will use.
-    L1Username                           = "Administrator"                       # Admin credential for the 3 VMs that run on the Agora-Client
-    L1Password                           = 'Agora123!!'                          # 
-    L1DefaultGateway                     = "172.20.1.1"                          #
-    L1SwitchName                         = "AKS-Int"                             #
-    L1NatSubnetPrefix                    = "172.20.1.0/24"                       #
+    # L1 virtual machine configuration
+    HostVMPath                           = "V:\VMs"                              # This value controls the path where the nested virtual machines will be stored the host.
+    L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
+    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
+    InternalSwitch                       = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
+    L1Username                           = "Administrator"                       # This value controls the Admin credential username for the L1 Hyper-V virtual machines that run on the Agora-Client.
+    L1Password                           = 'Agora123!!'                          # This value controls the Admin credential password for the L1 Hyper-V virtual machines that run on the Agora-Client.
+    L1DefaultGateway                     = "172.20.1.1"                          # This value controls the default gateway IP address used by each L1 Hyper-V virtual machines that run on the Agora-Client.
+    L1SwitchName                         = "AKS-Int"                             # This value controls the Hyper-V internal switch name used by each L1 Hyper-V virtual machines that run on the Agora-Client.
+    L1NatSubnetPrefix                    = "172.20.1.0/24"                       # This value controls the network subnet used by each L1 Hyper-V virtual machines that run on the Agora-Client.
 
     # NAT Configuration
     natHostSubnet                        = "192.168.128.0/24"
