@@ -154,9 +154,10 @@
             IsProduction           = $false
             Type                   = "AKSEE"
             Namespace              = "consoto-supermarket"
-            Branch                 = "main"
+            Branch                 = "dev"
         }
         Staging = @{
+            ArcClusterName = "Ag-AKS-Staging"
             FriendlyName = "Staging"
             IsProduction = $false
             Type         = "AKS"
