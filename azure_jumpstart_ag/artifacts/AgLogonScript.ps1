@@ -513,8 +513,9 @@ $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $re
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
     kubectx $cluster.Name.ToLower()
-    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.Namespace
-    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.Namespace
+    kubectl create namespace $cluster.value.Namespace
+    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.Namespace
+    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.Namespace
 
 }
 
@@ -524,15 +525,17 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Write-Host "INFO: Creating GitOps config for pos application on $cluster.Name" -ForegroundColor Gray
-        $store = $cluster.FriendlyName.ToLower()+".yaml"
-        $configName = $cluster.FriendlyName.ToLower()
+        $store = $cluster.value.Branch.ToLower()
+        $configName = $cluster.value.FriendlyName.ToLower()
+        $clusterName= $cluster.value.ArcClusterName
+        $branch =$cluster.value.Branch
         az k8s-configuration flux create `
-            --cluster-name $cluster.ArcClusterName `
+            --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --name config-supermarket-$configName `
             --cluster-type connectedClusters `
             --url $appClonedRepo `
-            --branch $cluster.Branch --sync-interval 3s `
+            --branch $Branch --sync-interval 3s `
             --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
 
     }
