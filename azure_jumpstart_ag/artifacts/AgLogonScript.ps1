@@ -532,7 +532,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --name config-supermarket-$configName `
             --cluster-type connectedClusters `
             --url $appClonedRepo `
-            --branch main --sync-interval 3s `
+            --branch $cluster.Branch --sync-interval 3s `
             --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
 
     }
