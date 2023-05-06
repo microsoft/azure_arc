@@ -789,31 +789,31 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 
-#############################################################
-# Contoso super market image initial build
-#############################################################
-Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
-docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+    #############################################################
+    # Contoso super market image initial build
+    #############################################################
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
+    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
 
-docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
-docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
 
-docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
-docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
 
-docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
-docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
 
-#############################################################
-# Install VSCode extensions
-#############################################################
-Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-# Install VSCode extensions
-foreach ($extension in $AgConfig.VSCodeExtensions) {
-    code --install-extension $extension
-}
-Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
+    #############################################################
+    # Install VSCode extensions
+    #############################################################
+    Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+    # Install VSCode extensions
+    foreach ($extension in $AgConfig.VSCodeExtensions) {
+        code --install-extension $extension
+    }
+    Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
     ##############################################################
     # Cleanup
