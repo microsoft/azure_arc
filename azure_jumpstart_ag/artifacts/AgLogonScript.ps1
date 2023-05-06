@@ -519,63 +519,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
 }
 
-#####################################################################
-# Configuring applications on the clusters using GitOps
-#####################################################################
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "INFO: Creating GitOps config for pos application on $cluster.Name" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        $configName = $cluster.value.FriendlyName.ToLower()
-        $clusterName= $cluster.value.ArcClusterName
-        $branch =$cluster.value.Branch
-        if($cluster.value.FriendlyName -eq "Staging"){
-            $clusterType = "managedClusters"
-        }else{
-            $clusterType = "connectedClusters"
-        }
-        az k8s-configuration flux create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --name config-supermarket-$configName `
-            --cluster-type $clusterType `
-            --url $appClonedRepo `
-            --branch $Branch --sync-interval 3s `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
-
-    }
-}
-
-    # foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    #     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    #         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
-    #         az k8s-configuration flux create `
-    #             --cluster-name $cluster.ArcClusterName `
-    #             --resource-group $Env:resourceGroup `
-    #             --name config-supermarket `
-    #             --cluster-type connectedClusters `
-    #             --url $appClonedRepo `
-    #             --branch main --sync-interval 3s `
-    #             --kustomization name=bookstore path=./bookstore/yaml
-### Deploy Kube Prometheus Stack for Observability
-#####################################################################
-
-    #         az k8s-configuration create `
-    #             --name $app.Name `
-    #             --cluster-name $cluster.ArcClusterName `
-    #             --resource-group $Env:resourceGroup `
-    #             --operator-instance-name flux `
-    #             --operator-namespace arc-k8s-demo `
-    #             --operator-params='--git-readonly --git-path=releases' `
-    #             --enable-helm-operator `
-    #             --helm-operator-chart-version='1.2.0' `
-    #             --helm-operator-params='--set helm.versions=v3' `
-    #             --repository-url https://github.com/Azure/arc-helm-demo.git `
-    #             --scope namespace `
-    #             --cluster-type connectedClusters
-    #     }
-    # }
-
     #####################################################################
     ### Deploy Kube Prometheus Stack for Observability
     #####################################################################
@@ -804,6 +747,63 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
     docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+
+    #####################################################################
+    # Configuring applications on the clusters using GitOps
+    #####################################################################
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Write-Host "INFO: Creating GitOps config for pos application on $cluster.Name" -ForegroundColor Gray
+        $store = $cluster.value.Branch.ToLower()
+        $configName = $cluster.value.FriendlyName.ToLower()
+        $clusterName= $cluster.value.ArcClusterName
+        $branch =$cluster.value.Branch
+        if($cluster.value.FriendlyName -eq "Staging"){
+            $clusterType = "managedClusters"
+        }else{
+            $clusterType = "connectedClusters"
+        }
+        az k8s-configuration flux create `
+            --cluster-name $clusterName `
+            --resource-group $Env:resourceGroup `
+            --name config-supermarket-$configName `
+            --cluster-type $clusterType `
+            --url $appClonedRepo `
+            --branch $Branch --sync-interval 3s `
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
+
+    }
+}
+
+    # foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    #     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    #         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
+    #         az k8s-configuration flux create `
+    #             --cluster-name $cluster.ArcClusterName `
+    #             --resource-group $Env:resourceGroup `
+    #             --name config-supermarket `
+    #             --cluster-type connectedClusters `
+    #             --url $appClonedRepo `
+    #             --branch main --sync-interval 3s `
+    #             --kustomization name=bookstore path=./bookstore/yaml
+### Deploy Kube Prometheus Stack for Observability
+#####################################################################
+
+    #         az k8s-configuration create `
+    #             --name $app.Name `
+    #             --cluster-name $cluster.ArcClusterName `
+    #             --resource-group $Env:resourceGroup `
+    #             --operator-instance-name flux `
+    #             --operator-namespace arc-k8s-demo `
+    #             --operator-params='--git-readonly --git-path=releases' `
+    #             --enable-helm-operator `
+    #             --helm-operator-chart-version='1.2.0' `
+    #             --helm-operator-params='--set helm.versions=v3' `
+    #             --repository-url https://github.com/Azure/arc-helm-demo.git `
+    #             --scope namespace `
+    #             --cluster-type connectedClusters
+    #     }
+    # }
 
     #############################################################
     # Install VSCode extensions
