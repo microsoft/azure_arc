@@ -709,7 +709,7 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     # Create Windows Terminal shortcut
     $WshShell = New-Object -comObject WScript.Shell
     $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where { $_.name -eq "wt.exe" }).FullName
-    $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
+    $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Windows Terminal.lnk")
     $Shortcut.TargetPath = $WinTerminalPath
     $shortcut.WindowStyle = 3
     $shortcut.Save()
