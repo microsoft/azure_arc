@@ -9,7 +9,6 @@ $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 $githubAccount = $env:githubAccount
 $githubBranch = $env:githubBranch
 $githubUser = $env:githubUser
@@ -25,7 +24,9 @@ $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+$adxClusterName = $env:adxClusterName
 
+Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing AgLogonScript.ps1"
 
 # Disable Windows firewall
@@ -58,6 +59,8 @@ if ($AgConfig.AzCLIExtensions.Count -ne 0) {
 }
 az -v
 
+Write-Host "INFO: Az CLI configuration complete!" -ForegroundColor Green
+
 ##############################################################
 # Setup Azure PowerShell and register providers
 ##############################################################
@@ -82,6 +85,7 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
+Write-Host "INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 
 ##############################################################
 # Configure Jumpstart AG Apps repository
@@ -119,6 +123,7 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
+    Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
@@ -140,9 +145,56 @@ if ($env:githubUser -ne "microsoft") {
         $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
         gh secret set "sas_token_$deviceId" -b $deviceSASToken
     }
+    Write-Host "INFO: IoT Hub configuration complete!" -ForegroundColor Green
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
+#####################################################################
+# Import dashboard reports into Azure Data Explorer
+#####################################################################
+# Get Azure Data Explorer URI
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+
+# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
+
+# Prepare authorization header with access token
+$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
+# Make REST API call to the dashbord endpoint.
+$restApi = "https://dashboards.kusto.windows.net/dashboards"
+
+# Import orders dashboard report
+$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+
+# Import IoT Sensor dashboard report
+$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
+    Exit-PSSession
+}
+#>
+
+### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+$agDir = $AgConfig.AgDirectories["AgDir"]
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+if ($null -ne $adxEndPoint -and $adxEndPoint -ne ""){
+    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+}
+else{
+    Write-Host "ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
 }
 
 ##############################################################
@@ -172,46 +224,53 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Green
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
-# Create an array of VHDX file paths in the the VHDX target folder
-$vhdxPaths = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+# Create three VMs from the base VHDX image
+$vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($site.Value.Type -eq "AKSEE") {
+        # Create diff disks for each site host
+        Write-Host "INFO: Creating differencing disk for site $($site.Name)" -ForegroundColor Gray
+        $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
+        
+        # Create a new virtual machine and attach the existing virtual hard disk
+        Write-Host "INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
+        New-VM -Name $site.Name `
+            -MemoryStartupBytes $AgConfig.L1VMMemory `
+            -BootDevice VHD `
+            -VHDPath $vhd.Path `
+            -Generation 2 `
+            -Switch $AgConfig.L1SwitchName
+        
+        # Set up the virtual machine before coping all AKS Edge Essentials automation files
+        Set-VMProcessor -VMName $site.Name `
+            -Count $AgConfig.L1VMNumVCPU `
+            -ExposeVirtualizationExtensions $true
 
-# Loop through each VHDX file and create a VM
-foreach ($vhdxPath in $vhdxPaths) {
-    # Extract the VM name from the file name
-    $VMName = [System.IO.Path]::GetFileNameWithoutExtension($vhdxPath)
-
-    # Get the virtual hard disk object from the VHDX file
-    $vhd = Get-VHD -Path $vhdxPath
-
-    # Create a new virtual machine and attach the existing virtual hard disk
-    Write-Host "INFO: Creating and configuring $VMName virtual machine." -ForegroundColor Gray
-    New-VM -Name $VMName `
-        -MemoryStartupBytes $AgConfig.L1VMMemory `
-        -BootDevice VHD `
-        -VHDPath $vhd.Path `
-        -Generation 2 `
-        -Switch $AgConfig.L1SwitchName
-    
-    # Set up the virtual machine before coping all AKS Edge Essentials automation files
-    Set-VMProcessor -VMName $VMName `
-        -Count $AgConfig.L1VMNumVCPU `
-        -ExposeVirtualizationExtensions $true
-    
-    Get-VMNetworkAdapter -VMName $VMName | Set-VMNetworkAdapter -MacAddressSpoofing On
-    Enable-VMIntegrationService -VMName $VMName -Name "Guest Service Interface"
-      
-    # Create virtual machine snapshot and start the virtual machine
-    Checkpoint-VM -Name $VMName -SnapshotName "Base"
-    Start-Sleep -Seconds 5
-    Start-VM -Name $VMName
+        Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On
+        Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface"
+  
+        # Create virtual machine snapshot and start the virtual machine
+        Checkpoint-VM -Name $site.Name -SnapshotName "Base"
+        Start-Sleep -Seconds 5
+        Start-VM -Name $site.Name
+    }
 }
 
 Start-Sleep -Seconds 20
 
 ########################################################################
-# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap #
+# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
-
+foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+    if ($site.Value.Type -eq "AKSEE") {
+        Write-Host "INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
+        Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
+            $site = $using:site
+            (gwmi win32_computersystem).Rename($site.Name)
+            Restart-Computer
+        }
+    }
+}
 # Create an array with VM names    
 $VMnames = (Get-VM).Name
 
@@ -221,7 +280,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
-    # Preparing environment folders structure #
+    # Preparing environment folders structure 
     ###########################################
     Write-Host "INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
@@ -255,7 +314,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AgConfig = $using:AgConfig
 
     ##########################################
-    # Deploying AKS Edge Essentials clusters #
+    # Deploying AKS Edge Essentials clusters 
     ##########################################
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
@@ -275,7 +334,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $timeElapsed = 0
     do {
         Write-Host "INFO: Waiting for internet connection to be healthy on $hostname."
-        sleep 5
+        Start-Sleep -Seconds 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
     
@@ -324,6 +383,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
     Set-Content "$deploymentFolder\Config.json" -Value $content
 }
+Write-Host "INFO: L1 virtualization infrastructure configuration complete. Now rebooting hosts and starting AKS Edge Essentials install. This may take some time while VMs reboot and installation proceeds." -ForegroundColor Green
 
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
@@ -383,6 +443,7 @@ foreach ($cluster in $VMNames) {
     kubectx $cluster.ToLower()
     kubectl get nodes -o wide
 }
+Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
 
 #####################################################################
 ### Connect the AKS Edge Essentials clusters to Azure Arc
@@ -406,6 +467,7 @@ foreach ($VM in $VMNames) {
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     }
 }
+Write-Host "INFO: AKS Edge Essentials clusters have been registered with Azure Arc!" -ForegroundColor Green
 
 # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
 $clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
@@ -421,7 +483,7 @@ foreach ($cluster in $clusters) {
 # Setup Azure Container registry on AKS Edge Essentials clusters
 #####################################################################
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    if ($cluster.Name.Type -eq "AKSEE") {
+    if ($cluster.Value.Type -eq "AKSEE") {
         Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
         kubectx $cluster.Name.ToLower()
         kubectl create secret docker-registry acr-secret `
@@ -624,6 +686,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         $shortcut.Save()
     }
 }
+Write-Host "INFO: Observability components setup complete!" -ForegroundColor Green
 
     # Deploying Kube Prometheus Stack for Non-Prod stores
     $nonProdStores = @('dev', 'staging')
@@ -718,14 +781,15 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 
-    #############################################################
-    # Install VSCode extensions
-    #############################################################
-    Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-    # Install VSCode extensions
-    foreach ($extension in $AgConfig.VSCodeExtensions) {
-        code --install-extension $extension
-    }
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+# Install VSCode extensions
+foreach ($extension in $AgConfig.VSCodeExtensions) {
+    code --install-extension $extension
+}
+Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
     ##############################################################
     # Cleanup
@@ -757,6 +821,6 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     # Add-Type $code 
     # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-    Write-Host "INFO: Deployment is successful. Please enjoy the Agora experience!" -ForegroundColor Green
+Write-Host "INFO: Deployment is complete. Please enjoy the Agora experience!" -ForegroundColor Green
 
     Stop-Transcript
