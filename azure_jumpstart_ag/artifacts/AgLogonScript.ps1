@@ -122,7 +122,7 @@ if ($githubUser -ne "microsoft") {
         }
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout main
+    git checkout dev
     Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {

@@ -73,7 +73,8 @@
     GitBranches         = @(
         'production',
         'staging',
-        'canary'
+        'canary' ,
+        'dev'
     )
 
     # VHDX blob url
