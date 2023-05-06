@@ -529,7 +529,11 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
         $branch =$cluster.value.Branch
-        $clusterType = $cluster.value.ArcClusterName == "Staging" ? "managedClusters" : "connectedClusters"
+        if($cluster.value.ArcClusterName == "Staging"){
+            $clusterType = "managedClusters"
+        }else{
+            $clusterType = "connectedClusters"
+        }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
