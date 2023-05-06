@@ -115,7 +115,7 @@
             FriendlyName           = "Seattle"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "consoto-supermarket"
+            Namespace              = "contoso-supermarket"
             Branch                 = "production"
         }
         Chicago = @{
@@ -132,7 +132,7 @@
             FriendlyName           = "Chicago"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "consoto-supermarket"
+            Namespace              = "contoso-supermarket"
             Branch                 = "canary"
             
         }
@@ -150,7 +150,7 @@
             FriendlyName           = "Dev"
             IsProduction           = $false
             Type                   = "AKSEE"
-            Namespace              = "consoto-supermarket"
+            Namespace              = "contoso-supermarket"
             Branch                 = "dev"
         }
         Staging = @{
@@ -158,7 +158,7 @@
             FriendlyName = "Staging"
             IsProduction = $false
             Type         = "AKS"
-            Namespace    = "consoto-supermarket"
+            Namespace    = "contoso-supermarket"
             Branch       = "staging"
         }
     }

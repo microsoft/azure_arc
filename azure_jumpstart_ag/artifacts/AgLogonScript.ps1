@@ -19,7 +19,7 @@ $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
-$acrName = $Env:acrName
+$acrName = $Env:acrName.ToLower()
 $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
@@ -729,12 +729,13 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
     Start-Sleep -Seconds 10
     Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" -Wait
 
 
     #############################################################
     # Contoso super market image initial build
     #############################################################
+    $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
     docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
     docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
@@ -770,6 +771,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --cluster-type $clusterType `
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
+            --namespace 'contoso-supermarket' `
             --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
 
     }
