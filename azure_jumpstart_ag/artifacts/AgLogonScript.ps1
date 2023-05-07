@@ -729,7 +729,8 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
     Start-Sleep -Seconds 10
     Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" -Wait
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    Start-Sleep -Seconds 25
 
 
     #############################################################
