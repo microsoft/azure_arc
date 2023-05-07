@@ -488,7 +488,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         kubectx $cluster.Name.ToLower()
         kubectl create secret docker-registry acr-secret `
             --namespace default `
-            --docker-server="${Env:acrName}.azurecr.io" `
+            --docker-server="$acrName.azurecr.io" `
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret"
     }
@@ -502,7 +502,7 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 
 # Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName
 
 
 #####################################################################
@@ -736,7 +736,9 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     #############################################################
     # Contoso super market image initial build
     #############################################################
+    Write-Host "INFO: Building Docker images." -ForegroundColor Gray
     $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+    az acr login --name $acrName
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
     docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
     docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
@@ -755,7 +757,7 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     #####################################################################
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "INFO: Creating GitOps config for pos application on $cluster.Name" -ForegroundColor Gray
+        Write-Host "INFO: Creating GitOps config for pos application on $cluster.value.ArcClusterName" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
