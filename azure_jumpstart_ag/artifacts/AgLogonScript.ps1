@@ -577,27 +577,27 @@ foreach($dashboard in $observabilityDashboards){
 }
 
 # Deploying Kube Prometheus Stack for stores
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Write-Host "INFO: Deploying Kube Prometheus Stack for $($cluster.FriendlyName.ToLower()) environment" -ForegroundColor Gray
-    kubectx $cluster.FriendlyName.ToLower()
-    
+$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+    Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+    kubectx $_.Value.FriendlyName.ToLower()
+
     # Install Prometheus Operator
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $cluster.HelmSetValue --namespace $observabilityNamespace --create-namespace
+    helm install prometheus prometheus-community/kube-prometheus-stack --set $cluster.Value.HelmSetValue --namespace $observabilityNamespace --create-namespace
     
     Do {
-        Write-Host "INFO: Waiting for $($cluster.FriendlyName.ToLower()) monitoring service to provision.." -ForegroundColor Gray
+        Write-Host "INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
         Start-Sleep -Seconds 10
-        $monitorIP = $(if (kubectl get $cluster.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        $monitorIP = $(if (kubectl get $cluster.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($monitorIP -eq "Nope" )
     # Get Load Balancer IP
-    $monitorLBIP = kubectl --namespace $observabilityNamespace get $cluster.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $monitorLBIP = kubectl --namespace $observabilityNamespace get $cluster.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
     
-    if ($cluster.IsProduction) {
-        Write-Host "INFO: Add $($cluster.FriendlyName.ToLower()) Data Source to Grafana"
+    if ($cluster.Value.IsProduction) {
+        Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
         # Request body with information about the data source to add
         $grafanaDSBody = @{    
-        name = $($cluster.FriendlyName.ToLower())  
-        type = 'prometheus'    
+        name = $_.Value.FriendlyName.ToLower()
+        type = 'prometheus'
         url = ("http://" + $monitorLBIP + ":9090")
         access = 'proxy'    
         basicAuth = $false    
@@ -607,13 +607,13 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody
     }
     
-    Write-Host "INFO: Importing dashboards for $($cluster.FriendlyName.ToLower()) environment" -ForegroundColor Gray
+    Write-Host "INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
     # Add Infra dashboard
     foreach($dashboard in $observabilityDashboards){
         $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
         # Replace the datasource
         $replacementParams = @{
-            "\$\{DS_PROMETHEUS}"    = $cluster.GrafanaDataSource
+            "\$\{DS_PROMETHEUS}"    = $cluster.Value.GrafanaDataSource
         }
         $content = Get-Content $grafanaDBPath
         foreach ($key in $replacementParams.Keys) {
@@ -627,16 +627,16 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         # Need to set this to null to let Grafana generate a new ID
         $dashboardObject.id = $null
         # Set dashboard title
-        $dashboardObject.title = $cluster.FriendlyName + ' - ' + $dashboardObject.title
+        $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
         # Request body with dashboard to add
         $grafanaDBBody = @{ 
                 dashboard = $dashboardObject
                 overwrite = $true
             } | ConvertTo-Json -Depth 8
         
-        if ($cluster.IsProduction) {
+        if ($cluster.Value.IsProduction) {
             # Set Grafana Dashboard endpoint
-            $grafanaDBURI = $AgConfig.Dashboard["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
         }
         else {
             # Set Grafana Dashboard endpoint
@@ -646,10 +646,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody
     }
-    if (!$cluster.IsProduction) {
+    if (!$cluster.Value.IsProduction) {
         # Creating Grafana Icon on Desktop
-        Write-Host "INFO: Creating $($cluster.FriendlyName.ToLower()) Grafana Icon." -ForegroundColor Gray 
-        $shortcutLocation = "$env:USERPROFILE\Desktop\$($cluster.FriendlyName) Grafana.lnk"
+        Write-Host "INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
+        $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName)) Grafana.lnk"
         $wScriptShell = New-Object -ComObject WScript.Shell
         $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
         $shortcut.TargetPath = "http://$monitorLBIP"
@@ -664,7 +664,7 @@ Write-Host "INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
 $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = $AgConfig.Dashboard["ProdURL"]
+$shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
 $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
