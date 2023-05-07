@@ -123,6 +123,8 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
     Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
@@ -740,17 +742,17 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
     az acr login --name $acrName
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:v1.0"
+    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:v1.0"
 
-    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:v1.0"
+    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:v1.0"
 
-    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:v1.0"
+    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:v1.0"
 
-    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:v1.0"
+    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:v1.0"
 
     #####################################################################
     # Configuring applications on the clusters using GitOps
