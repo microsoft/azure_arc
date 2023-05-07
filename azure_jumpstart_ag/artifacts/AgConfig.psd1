@@ -74,7 +74,7 @@
         'production',
         'staging',
         'canary' ,
-        'dev'
+        'main'
     )
 
     # VHDX blob url
@@ -151,7 +151,7 @@
             IsProduction           = $false
             Type                   = "AKSEE"
             Namespace              = "contoso-supermarket"
-            Branch                 = "dev"
+            Branch                 = "main"
         }
         Staging = @{
             ArcClusterName = "Ag-AKS-Staging"
