@@ -529,7 +529,7 @@ $observabilityPassword = $AgConfig.Monitoring["Password"]
 $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
 
 # Set Prod Grafana API endpoint
-$grafanaDS = $AgConfig.Dashboard["ProdURL"] + "/api/datasources"
+$grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Installing Grafana
 Write-Header "Installing and Configuring Observability components"
@@ -582,17 +582,17 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     kubectx $_.Value.FriendlyName.ToLower()
 
     # Install Prometheus Operator
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $cluster.Value.HelmSetValue --namespace $observabilityNamespace --create-namespace
+    helm install prometheus prometheus-community/kube-prometheus-stack --set $_.Value.HelmSetValue --namespace $observabilityNamespace --create-namespace
     
     Do {
         Write-Host "INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
         Start-Sleep -Seconds 10
-        $monitorIP = $(if (kubectl get $cluster.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($monitorIP -eq "Nope" )
     # Get Load Balancer IP
-    $monitorLBIP = kubectl --namespace $observabilityNamespace get $cluster.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
     
-    if ($cluster.Value.IsProduction) {
+    if ($_.Value.IsProduction) {
         Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
         # Request body with information about the data source to add
         $grafanaDSBody = @{    
@@ -613,7 +613,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
         # Replace the datasource
         $replacementParams = @{
-            "\$\{DS_PROMETHEUS}"    = $cluster.Value.GrafanaDataSource
+            "\$\{DS_PROMETHEUS}"    = $_.Value.GrafanaDataSource
         }
         $content = Get-Content $grafanaDBPath
         foreach ($key in $replacementParams.Keys) {
@@ -634,7 +634,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
                 overwrite = $true
             } | ConvertTo-Json -Depth 8
         
-        if ($cluster.Value.IsProduction) {
+        if ($_.Value.IsProduction) {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
         }
@@ -646,7 +646,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody
     }
-    if (!$cluster.Value.IsProduction) {
+    if (!$_.Value.IsProduction) {
         # Creating Grafana Icon on Desktop
         Write-Host "INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
         $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName)) Grafana.lnk"
