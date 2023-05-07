@@ -649,7 +649,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     if (!$_.Value.IsProduction) {
         # Creating Grafana Icon on Desktop
         Write-Host "INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
-        $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName)) Grafana.lnk"
+        $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
         $wScriptShell = New-Object -ComObject WScript.Shell
         $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
         $shortcut.TargetPath = "http://$monitorLBIP"
