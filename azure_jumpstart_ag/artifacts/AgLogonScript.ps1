@@ -746,7 +746,7 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
     az acr login --name $acrName
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-    branches = $AgConfig.GitBranches
+    $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
@@ -757,7 +757,6 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     Write-Host "INFO: Building cloudSync Docker image." -ForegroundColor Gray
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src\cloud_sync"
-    branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
@@ -768,7 +767,6 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     Write-Host "INFO: Building contosoAi Docker image." -ForegroundColor Gray
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\ai\src"
-    $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
@@ -779,7 +777,6 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     Write-Host "INFO: Building queue monitoring backend Docker image." -ForegroundColor Gray
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_backend\src"
-    branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
@@ -790,7 +787,6 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     Write-Host "INFO: Building queue monitoring frontend Docker image." -ForegroundColor Gray
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_frontend\src"
-    branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
