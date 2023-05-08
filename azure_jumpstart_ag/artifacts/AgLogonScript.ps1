@@ -806,6 +806,10 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $clusterName = $cluster.value.ArcClusterName
         Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
+        if($store -eq "main")
+        {
+            $store = "dev"
+        }
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
         $branch =$cluster.value.Branch
@@ -813,9 +817,6 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             $clusterType = "managedClusters"
         }else{
             $clusterType = "connectedClusters"
-        }
-        if($branch -eq "main"){
-            $branch = "dev"
         }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
