@@ -125,6 +125,9 @@ Set-Content $destinationPath -Value $content
 Write-Host "INFO: Enabling ICMP for the cluster control plane IP address" -ForegroundColor Gray
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
+Write-Host "INFO: Enabling Prometheus metrics port for the cluster control plane IP address" -ForegroundColor Gray
+Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp --dport 9100 -j ACCEPT"
+
 # Creating a file on the L1 virtual machine with the AKS Edge Essentials L2 virtual machine id
 Write-Host "INFO: Getting the AKS Edge Essentials virtual machine (L2) id" -ForegroundColor Gray
 $id = hcsdiag list | Select-Object -First 1
