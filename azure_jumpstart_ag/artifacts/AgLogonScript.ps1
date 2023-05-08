@@ -107,6 +107,39 @@ if ($githubUser -ne "microsoft") {
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        try {
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+            if ($response) {
+                if($branch -ne "main"){
+                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    git push origin --delete $branch
+                    git checkout -b $branch
+                    git push origin $branch
+                }
+            }
+        }
+        catch {
+            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+            git checkout -b $branch
+            git push origin $branch
+        }
+    }
+    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+    git checkout main
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
+}
+else {
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+}
+
+Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
+Start-Sleep -Seconds 30
+foreach ($branch in $branches) {
+    Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
     $headers = @{
         "Authorization" = "Bearer $githubPat"
         "Accept" = "application/vnd.github+json"
@@ -119,43 +152,10 @@ if ($githubUser -ne "microsoft") {
         }
         restrictions = $null
     } | ConvertTo-Json
-    foreach ($branch in $branches) {
-        try {
-            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
-            if ($response) {
-                if($branch -ne "main"){
-                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                    git push origin --delete $branch
-                    git checkout -b $branch
-                    git push origin $branch
-                }
-            Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
-            Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
-            }
-        }
-        catch {
-            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
-            git checkout -b $branch
-            git push origin $branch
-            Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
-            Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
 
-        }
-    }
-
-
-
-    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout main
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-    gh workflow run update-files.yml
-    Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
+    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
 }
-else {
-    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
-}
+Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 
 #####################################################################
 # IotHub resources preperation
