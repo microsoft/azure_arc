@@ -137,6 +137,9 @@ if ($githubUser -ne "microsoft") {
             Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
             git checkout -b $branch
             git push origin $branch
+            Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
+            Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+
         }
     }
 
