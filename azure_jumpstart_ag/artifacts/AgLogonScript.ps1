@@ -803,7 +803,8 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     #####################################################################
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "INFO: Creating GitOps config for pos application on $cluster.value.ArcClusterName" -ForegroundColor Gray
+        $clusterName = $cluster.value.ArcClusterName
+        Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
@@ -824,7 +825,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
             --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true
 
     }
 }
