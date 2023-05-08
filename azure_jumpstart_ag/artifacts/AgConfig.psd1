@@ -117,6 +117,9 @@
             Type                   = "AKSEE"
             Namespace              = "contoso-supermarket"
             Branch                 = "production"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmService            = "service/prometheus-kube-prometheus-prometheus"
+            GrafanaDataSource      = "seattle"
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -134,7 +137,9 @@
             Type                   = "AKSEE"
             Namespace              = "contoso-supermarket"
             Branch                 = "canary"
-            
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmService            = "service/prometheus-kube-prometheus-prometheus"
+            GrafanaDataSource      = "chicago"            
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -152,14 +157,20 @@
             Type                   = "AKSEE"
             Namespace              = "contoso-supermarket"
             Branch                 = "dev"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
+            HelmService            = "service/prometheus-grafana"
+            GrafanaDataSource      = "prometheus"
         }
         Staging = @{
-            ArcClusterName = "Ag-AKS-Staging"
-            FriendlyName = "Staging"
-            IsProduction = $false
-            Type         = "AKS"
-            Namespace    = "contoso-supermarket"
-            Branch       = "staging"
+            ArcClusterName      = "Ag-AKS-Staging"
+            FriendlyName        = "Staging"
+            IsProduction        = $false
+            Type                = "AKS"
+            Namespace           = "contoso-supermarket"
+            Branch              = "staging"
+            HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
+            HelmService         = "service/prometheus-grafana"
+            GrafanaDataSource   = "prometheus"
         }
     }
 
@@ -174,6 +185,7 @@
         Password = 'Agora123!!'
         Namespace = "observability"
         ProdURL = "http://localhost:3000"
+        Dashboards = @('1860','6417')
     }
 
     AppConfig = @{
