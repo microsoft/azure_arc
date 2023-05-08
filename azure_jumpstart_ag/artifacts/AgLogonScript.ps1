@@ -107,6 +107,18 @@ if ($githubUser -ne "microsoft") {
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
+    $headers = @{
+        "Authorization" = "Bearer $githubPat"
+        "Accept" = "application/vnd.github+json"
+    }
+    $body = @{
+        required_status_checks = $null
+        enforce_admins = $false
+        required_pull_request_reviews = @{
+            required_approving_review_count = 1
+        }
+        restrictions = $null
+    } | ConvertTo-Json
     foreach ($branch in $branches) {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
@@ -117,6 +129,8 @@ if ($githubUser -ne "microsoft") {
                     git checkout -b $branch
                     git push origin $branch
                 }
+            Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
+            Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
             }
         }
         catch {
@@ -125,6 +139,9 @@ if ($githubUser -ne "microsoft") {
             git push origin $branch
         }
     }
+
+
+
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
     git config --global user.email "dev@agora.com"
@@ -141,7 +158,7 @@ else {
 # IotHub resources preperation
 #####################################################################
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
-if ($env:githubUser -ne "microsoft") {
+if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
     gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
