@@ -2,26 +2,23 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "envName": {
-      "value": "${AZURE_ENV_NAME}"
-    },
-    "location": {
-      "value": "${AZURE_LOCATION}"
-    },
     "spnClientId": {
-      "value": "${SPN_CLIENT_ID}"
+      "value": ""
     },
     "spnClientSecret": {
-      "value": "${SPN_CLIENT_SECRET}"
+      "value": ""
     },
     "spnTenantId": {
-      "value": "${SPN_TENANT_ID}"
+      "value": ""
     },
     "windowsAdminUsername": {
-      "value": "${JS_WINDOWS_ADMIN_USERNAME}"
+      "value": ""
+    },
+    "windowsAdminPassword": {
+      "value": ""
     },
     "sshRSAPublicKey": {
-      "value": "${JS_SSH_RSA_PUBLIC_KEY}"
+      "value": ""
     },
     "deployBastion": {
       "value": false

@@ -4,7 +4,7 @@ name: azure_jumpstart_ag
 infra:
   provider: "bicep"
   path: "bicep"
-  module: ""
+  module: "main.azd"
 hooks:
   preprovision:
     shell: pwsh
