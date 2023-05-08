@@ -490,13 +490,15 @@ foreach ($VM in $VMNames) {
     } | Out-File -Append -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
-$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
+#$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
+$clusters = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
 
 # Loop through each cluster and tag it
 $TagName = $AgConfig.TagName
 $TagValue = $AgConfig.TagValue
 foreach ($cluster in $clusters) {
-    az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    #az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    New-AzTag -ResourceId $cluster.ResourceId -Tag "$TagName=$TagValue" | Out-File -Append -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
