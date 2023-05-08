@@ -249,9 +249,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
         Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On
         Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface"
   
-        # Create virtual machine snapshot and start the virtual machine
-        Checkpoint-VM -Name $site.Name -SnapshotName "Base"
-        Start-Sleep -Seconds 5
+        # Start the virtual machine
         Start-VM -Name $site.Name
     }
 }
@@ -861,10 +859,10 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
 }'
 
-    # Write-Header "Changing Wallpaper"
-    # $imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-    # Add-Type $code 
-    # [Win32.Wallpaper]::SetWallpaper($imgPath)
+    Write-Header "Changing Wallpaper"
+    $imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
+    Add-Type $code 
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 Write-Host "INFO: Deployment is complete. Please enjoy the Agora experience!" -ForegroundColor Green
 
