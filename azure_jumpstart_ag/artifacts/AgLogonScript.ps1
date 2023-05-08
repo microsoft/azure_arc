@@ -18,6 +18,7 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
+$spnSubscriptionId = $env:subscriptionId
 $adminUsername = $env:adminUsername
 $acrName = $Env:acrName.ToLower()
 $cosmosDBName = $Env:cosmosDBName
@@ -103,6 +104,7 @@ if ($githubUser -ne "microsoft") {
     gh secret set "ACR_NAME" -b $acrName
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+    gh secret set "SPN_TENANT_ID" -b $spnTenantId
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
@@ -738,21 +740,62 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
     #############################################################
     # Contoso super market image initial build
     #############################################################
-    Write-Host "INFO: Building Docker images." -ForegroundColor Gray
+    Write-Host "INFO: Building pos Docker image." -ForegroundColor Gray
     $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
     az acr login --name $acrName
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:v1.0"
-    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:v1.0"
+    branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:v1.0"
-    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:v1.0"
+    Write-Host "INFO: Building cloudSync Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src\cloud_sync"
+    branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:v1.0"
-    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:v1.0"
+    Write-Host "INFO: Building contosoAi Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\ai\src"
+    branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:v1.0"
-    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:v1.0"
+    Write-Host "INFO: Building queue monitoring backend Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_backend\src"
+    branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+    }
+
+    Write-Host "INFO: Building queue monitoring frontend Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_frontend\src"
+    branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+    }
 
     #####################################################################
     # Configuring applications on the clusters using GitOps
