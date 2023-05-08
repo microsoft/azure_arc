@@ -531,6 +531,14 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     ### Deploy Kube Prometheus Stack for Observability
     #####################################################################
 
+    $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+    $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
+    $observabilityPassword = $AgConfig.Monitoring["Password"]
+    $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
+
+    # Set Prod Grafana API endpoint
+    $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
+
     # Installing Grafana
     Write-Header "Installing and Configuring Observability components"
     Write-Host "INFO: Installing Grafana." -ForegroundColor Gray
@@ -538,8 +546,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
 
     # Update Prometheus Helm charts
-    $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
-    $observabilityPassword = $AgConfig.Monitoring["Password"]
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo update
 
@@ -570,111 +576,107 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         "Content-Type"  = "application/json"
     }
 
-    # Grafana API endpoint
-    $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
+    # Download dashboards
+    foreach($dashboard in $observabilityDashboards){
+        $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+        $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
+        $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
+        Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
+    }
 
-# Deploying Kube Prometheus Stack for Prod stores
-$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
-    if ($_.Value.IsProduction) {
+    # Deploying Kube Prometheus Stack for stores
+    $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
         kubectx $_.Value.FriendlyName.ToLower()
+
         # Install Prometheus Operator
-        $helmSetValue = 'alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer'
-        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
-
-        Do {
-            Write-Host "INFO: Waiting for $($_.Value.FriendlyName) Prometheus service to provision.." -ForegroundColor Gray
-            Start-Sleep -Seconds 45
-            $prometheusIP = $(if (kubectl get service/prometheus-kube-prometheus-prometheus --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($prometheusIP -eq "Nope" )
-        # Get Load Balancer IP
-        $prometheusLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-kube-prometheus-prometheus --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-        Write-Host "INFO: $($_.Value.FriendlyName) Prometheus service IP is $prometheusLBIP" -ForegroundColor DarkGreen
-
-        Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
-        # Request body with information about the data source to add
-        $dsBody = @{    
-            name      = $_.Value.FriendlyName  
-            type      = 'prometheus'    
-            url       = ("http://" + $prometheusLBIP + ":9090")
-            access    = 'proxy'    
-            basicAuth = $false    
-            isDefault = $true
-        } | ConvertTo-Json
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $_.Value.HelmSetValue --namespace $observabilityNamespace --create-namespace
         
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $dsBody
-    }
-}
-
-# Creating Prod Grafana Icon on Desktop
-Write-Host "INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
-$shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
-$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
-# Deploying Kube Prometheus Stack for Non-Prod stores
-$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
-    if (-Not $_.Value.IsProduction) {
-        Write-Host "INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        kubectx $_.Value.FriendlyName.ToLower()
-        # Install Prometheus Operator
-        $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
-        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
-
         Do {
-            Write-Host "INFO: Waiting for ${_.FriendlyName} Prometheus service to provision.." -ForegroundColor Gray
-            Start-Sleep -Seconds 45
-            $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($grafanaIP -eq "Nope" )
+            Write-Host "INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+            $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($monitorIP -eq "Nope" )
         # Get Load Balancer IP
-        $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-        # Creating Grafana Icon on Desktop
-        Write-Host "INFO: Creating ${_.FriendlyName} Grafana Icon." -ForegroundColor Gray
-        $shortcutLocation = "$env:USERPROFILE\Desktop\${_.FriendlyName} Grafana.lnk"
-        $wScriptShell = New-Object -ComObject WScript.Shell
-        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-        $shortcut.TargetPath = "http://$grafanaLBIP"
-        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-        $shortcut.WindowStyle = 3
-        $shortcut.Save()
+        $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        
+        if ($_.Value.IsProduction) {
+            Write-Host "INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
+            # Request body with information about the data source to add
+            $grafanaDSBody = @{    
+            name = $_.Value.FriendlyName.ToLower()
+            type = 'prometheus'
+            url = ("http://" + $monitorLBIP + ":9090")
+            access = 'proxy'    
+            basicAuth = $false    
+            isDefault = $true} | ConvertTo-Json
+            
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody
+        }
+        
+        Write-Host "INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        # Add Infra dashboard
+        foreach($dashboard in $observabilityDashboards){
+            $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+            # Replace the datasource
+            $replacementParams = @{
+                "\$\{DS_PROMETHEUS}"    = $_.Value.GrafanaDataSource
+            }
+            $content = Get-Content $grafanaDBPath
+            foreach ($key in $replacementParams.Keys) {
+                $content = $content -replace $key, $replacementParams[$key]
+            }
+            # Set dashboard JSON
+            $dashboardObject = $content | ConvertFrom-Json
+            # Best practice is to generate a random UID, such as a GUID
+            $dashboardObject.uid = [guid]::NewGuid().ToString()
+            
+            # Need to set this to null to let Grafana generate a new ID
+            $dashboardObject.id = $null
+            # Set dashboard title
+            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+            # Request body with dashboard to add
+            $grafanaDBBody = @{ 
+                    dashboard = $dashboardObject
+                    overwrite = $true
+                } | ConvertTo-Json -Depth 8
+            
+            if ($_.Value.IsProduction) {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            }
+            else {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+            }
+            
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody
+        }
+        if (!$_.Value.IsProduction) {
+            # Creating Grafana Icon on Desktop
+            Write-Host "INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
+            $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
+            $wScriptShell = New-Object -ComObject WScript.Shell
+            $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+            $shortcut.TargetPath = "http://$monitorLBIP"
+            $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+            $shortcut.WindowStyle = 3
+            $shortcut.Save()
+        }
     }
-}
-Write-Host "INFO: Observability components setup complete!" -ForegroundColor Green
 
-    # Deploying Kube Prometheus Stack for Non-Prod stores
-    $nonProdStores = @('dev', 'staging')
+    # Creating Prod Grafana Icon on Desktop
+    Write-Host "INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
+    $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
+    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
 
-    foreach ($nonProdStore in $nonProdStores) {
-        Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
-        kubectx $nonProdStore
-        # Install Prometheus Operator
-        $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
-        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
-
-        Do {
-            Write-Host "INFO: Waiting for $nonProdStore Prometheus service to provision.." -ForegroundColor Gray
-            Start-Sleep -Seconds 45
-            $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($grafanaIP -eq "Nope" )
-        # Get Load Balancer IP
-        $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-        # Creating Grafana Icon on Desktop
-        Write-Host "INFO: Creating $nonProdStore Grafana Icon." -ForegroundColor Gray
-        $shortcutLocation = "$env:USERPROFILE\Desktop\$nonProdStore Grafana.lnk"
-        $wScriptShell = New-Object -ComObject WScript.Shell
-        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-        $shortcut.TargetPath = "http://$grafanaLBIP"
-        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-        $shortcut.WindowStyle = 3
-        $shortcut.Save()
-    }
 
     #############################################################
     # Install Windows Terminal, WSL2, and Ubuntu
