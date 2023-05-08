@@ -19,10 +19,11 @@ $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
-$acrName = $Env:acrName
+$acrName = $Env:acrName.ToLower()
 $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
+$appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $adxClusterName = $env:adxClusterName
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
@@ -95,21 +96,19 @@ if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
     gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_KEY" -b $cosmosDBKey
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
-            if($response){
+            if ($response) {
                 Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
                 git push origin --delete $branch
                 git checkout -b $branch
@@ -123,7 +122,7 @@ if ($githubUser -ne "microsoft") {
         }
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout main
+    git checkout dev
     Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
@@ -225,12 +224,12 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 Write-Host "INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Green
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR
 
-# Create three VMs from the base VHDX image
+# Create three virtual machines from the base VHDX image
 $vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         # Create diff disks for each site host
-        Write-Host "INFO: Creating differencing disk for site $($site.Name)" -ForegroundColor Gray
+        Write-Host "INFO: Creating differencing disk for $($site.Name) site" -ForegroundColor Gray
         $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
         
         # Create a new virtual machine and attach the existing virtual hard disk
@@ -489,7 +488,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         kubectx $cluster.Name.ToLower()
         kubectl create secret docker-registry acr-secret `
             --namespace default `
-            --docker-server="${Env:acrName}.azurecr.io" `
+            --docker-server="$acrName.azurecr.io" `
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret"
     }
@@ -503,53 +502,68 @@ kubectx staging="$Env:aksStagingClusterName-admin"
 
 # Attach ACR to staging cluster
 Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $Env:acrName
+az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName
+
 
 #####################################################################
-### Deploy Kube Prometheus Stack for Observability
+# Cosmos DB preperation
 #####################################################################
+Write-Host "INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
+$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
+    kubectx $cluster.Name.ToLower()
+    kubectl create namespace $cluster.value.Namespace
+    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.Namespace
+    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.Namespace
 
-# Installing Grafana
-Write-Header "Installing and Configuring Observability components"
-Write-Host "INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
-Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
+}
 
-# Update Prometheus Helm charts
-$observabilityNamespace = $AgConfig.Monitoring["Namespace"]
-$observabilityPassword = $AgConfig.Monitoring["Password"]
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+    #####################################################################
+    ### Deploy Kube Prometheus Stack for Observability
+    #####################################################################
 
-# Update Grafana Icons
-Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
-Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
-Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+    # Installing Grafana
+    Write-Header "Installing and Configuring Observability components"
+    Write-Host "INFO: Installing Grafana." -ForegroundColor Gray
+    $latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
+    Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet"
 
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object { 
+    # Update Prometheus Helm charts
+    $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
+    $observabilityPassword = $AgConfig.Monitoring["Password"]
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo update
+
+    # Update Grafana Icons
+    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
+    Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object { 
     (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
-}
+    }
 
-# Reset Grafana UI
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+    # Reset Grafana UI
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
     (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
-}
+    }
 
-# Reset Grafana Password
-$env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $observabilityPassword
+    # Reset Grafana Password
+    $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
+    grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $observabilityPassword
 
-# Get Grafana credentials
-$credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
-$encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
+    # Get Grafana credentials
+    $credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
+    $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
-$headers = @{    
-    "Authorization" = ("Basic " + $encodedcredentials)    
-    "Content-Type"  = "application/json"
-}
+    $headers = @{    
+        "Authorization" = ("Basic " + $encodedcredentials)    
+        "Content-Type"  = "application/json"
+    }
 
-# Grafana API endpoint
-$grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
+    # Grafana API endpoint
+    $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
 # Deploying Kube Prometheus Stack for Prod stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -625,97 +639,204 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
 }
 Write-Host "INFO: Observability components setup complete!" -ForegroundColor Green
 
-#############################################################
-# Install Windows Terminal, WSL2, and Ubuntu
-#############################################################
-Write-Header "Installing Windows Terminal, WSL2 and Ubuntu, Docker Desktop"
-If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
-$downloadDir = "C:\WinTerminal"
-$gitRepo = "microsoft/terminal"
-$filenamePattern = "*.msixbundle"
-$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
-$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
-$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+    # Deploying Kube Prometheus Stack for Non-Prod stores
+    $nonProdStores = @('dev', 'staging')
 
-# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
-Write-Host "INFO: Downloading binaries." -ForegroundColor Gray
-Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
-Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
+    foreach ($nonProdStore in $nonProdStores) {
+        Write-Host "INFO: Deploying Kube Prometheus Stack for $nonProdStore environment" -ForegroundColor Gray
+        kubectx $nonProdStore
+        # Install Prometheus Operator
+        $helmSetValue = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=$observabilityPassword"
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace
 
-# Install WSL latest kernel update
-Write-Host "INFO: Installing WSL." -ForegroundColor Gray
-msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
+        Do {
+            Write-Host "INFO: Waiting for $nonProdStore Prometheus service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $grafanaIP = $(if (kubectl get service/prometheus-grafana --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($grafanaIP -eq "Nope" )
+        # Get Load Balancer IP
+        $grafanaLBIP = kubectl --namespace $observabilityNamespace get service/prometheus-grafana --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-Write-Host "INFO: Installing Windows Terminal" -ForegroundColor Gray
-Add-AppxPackage -Path $framworkPkgPath
-Add-AppxPackage -Path $msiPath
-Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
+        # Creating Grafana Icon on Desktop
+        Write-Host "INFO: Creating $nonProdStore Grafana Icon." -ForegroundColor Gray
+        $shortcutLocation = "$env:USERPROFILE\Desktop\$nonProdStore Grafana.lnk"
+        $wScriptShell = New-Object -ComObject WScript.Shell
+        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+        $shortcut.TargetPath = "http://$grafanaLBIP"
+        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+        $shortcut.WindowStyle = 3
+        $shortcut.Save()
+    }
 
-# Setting WSL environment variables
-$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
-[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+    #############################################################
+    # Install Windows Terminal, WSL2, and Ubuntu
+    #############################################################
+    Write-Header "Installing Windows Terminal, WSL2 and Ubuntu, Docker Desktop"
+    If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+    $downloadDir = "C:\WinTerminal"
+    $gitRepo = "microsoft/terminal"
+    $filenamePattern = "*.msixbundle"
+    $framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+    $framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+    $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+    $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
-# Initializing the wsl ubuntu app without requiring user input
-Write-Host "INFO: Installing Ubuntu." -ForegroundColor Gray
-$ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
-Invoke-Expression -Command "$ubuntu_path install --root"
+    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+    Write-Host "INFO: Downloading binaries." -ForegroundColor Gray
+    Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force )
+    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force )
 
-# Create Windows Terminal shortcut
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\WindowsTerminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+    # Install WSL latest kernel update
+    Write-Host "INFO: Installing WSL." -ForegroundColor Gray
+    msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn
 
-# Cleanup
-Remove-Item $downloadDir -Recurse -Force
+    # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+    Write-Host "INFO: Installing Windows Terminal" -ForegroundColor Gray
+    Add-AppxPackage -Path $framworkPkgPath
+    Add-AppxPackage -Path $msiPath
+    Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx"
 
-#############################################################
-# Install Docker Desktop
-#############################################################
-Write-Host "INFO: Installing Docker Dekstop." -ForegroundColor Gray
-# Download and Install Docker Desktop
-$arguments = 'install --quiet --accept-license'
-Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
-Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-Start-Sleep -Seconds 10
-Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    # Setting WSL environment variables
+    $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+    [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+    # Initializing the wsl ubuntu app without requiring user input
+    Write-Host "INFO: Installing Ubuntu." -ForegroundColor Gray
+    $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+    Invoke-Expression -Command "$ubuntu_path install --root"
+
+    # Create Windows Terminal shortcut
+    $WshShell = New-Object -comObject WScript.Shell
+    $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | where { $_.name -eq "wt.exe" }).FullName
+    $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Windows Terminal.lnk")
+    $Shortcut.TargetPath = $WinTerminalPath
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
+
+    # Cleanup
+    Remove-Item $downloadDir -Recurse -Force
+
+    #############################################################
+    # Install Docker Desktop
+    #############################################################
+    Write-Host "INFO: Installing Docker Dekstop." -ForegroundColor Gray
+    # Download and Install Docker Desktop
+    $arguments = 'install --quiet --accept-license'
+    Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
+    Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+    Move-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    Start-Sleep -Seconds 10
+    Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    Start-Sleep -Seconds 25
 
 
-#############################################################
-# Install VSCode extensions
-#############################################################
-Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-# Install VSCode extensions
-foreach ($extension in $AgConfig.VSCodeExtensions) {
-    code --install-extension $extension
+    #############################################################
+    # Contoso super market image initial build
+    #############################################################
+    Write-Host "INFO: Building Docker images." -ForegroundColor Gray
+    $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
+    az acr login --name $acrName
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
+    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+
+    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+
+    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+
+    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+
+    #####################################################################
+    # Configuring applications on the clusters using GitOps
+    #####################################################################
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Write-Host "INFO: Creating GitOps config for pos application on $cluster.value.ArcClusterName" -ForegroundColor Gray
+        $store = $cluster.value.Branch.ToLower()
+        $configName = $cluster.value.FriendlyName.ToLower()
+        $clusterName= $cluster.value.ArcClusterName
+        $branch =$cluster.value.Branch
+        if($cluster.value.FriendlyName -eq "Staging"){
+            $clusterType = "managedClusters"
+        }else{
+            $clusterType = "connectedClusters"
+        }
+        az k8s-configuration flux create `
+            --cluster-name $clusterName `
+            --resource-group $Env:resourceGroup `
+            --name config-supermarket-$configName `
+            --cluster-type $clusterType `
+            --url $appClonedRepo `
+            --branch $Branch --sync-interval 3s `
+            --namespace 'contoso-supermarket' `
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
+
+    }
 }
-Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
-##############################################################
-# Cleanup
-##############################################################
+    # foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    #     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    #         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
+    #         az k8s-configuration flux create `
+    #             --cluster-name $cluster.ArcClusterName `
+    #             --resource-group $Env:resourceGroup `
+    #             --name config-supermarket `
+    #             --cluster-type connectedClusters `
+    #             --url $appClonedRepo `
+    #             --branch main --sync-interval 3s `
+    #             --kustomization name=bookstore path=./bookstore/yaml
+### Deploy Kube Prometheus Stack for Observability
+#####################################################################
 
-# Creating Hyper-V Manager desktop shortcut
-Write-Host "INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+    #         az k8s-configuration create `
+    #             --name $app.Name `
+    #             --cluster-name $cluster.ArcClusterName `
+    #             --resource-group $Env:resourceGroup `
+    #             --operator-instance-name flux `
+    #             --operator-namespace arc-k8s-demo `
+    #             --operator-params='--git-readonly --git-path=releases' `
+    #             --enable-helm-operator `
+    #             --helm-operator-chart-version='1.2.0' `
+    #             --helm-operator-params='--set helm.versions=v3' `
+    #             --repository-url https://github.com/Azure/arc-helm-demo.git `
+    #             --scope namespace `
+    #             --cluster-type connectedClusters
+    #     }
+    # }
 
-# Removing the LogonScript Scheduled Task
-Write-Host "INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
-Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
-Start-Sleep -Seconds 5
+    #############################################################
+    # Install VSCode extensions
+    #############################################################
+    Write-Host "INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+    # Install VSCode extensions
+    foreach ($extension in $AgConfig.VSCodeExtensions) {
+        code --install-extension $extension
+    }
+    Write-Host "INFO: Developer tools installation complete!" -ForegroundColor Green
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Host "INFO: Uploading Log Bundle." -ForegroundColor Gray
-$Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-Invoke-Expression 'cmd /c start Powershell -Command { 
+    ##############################################################
+    # Cleanup
+    ##############################################################
+
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+    # Removing the LogonScript Scheduled Task
+    Write-Host "INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
+    Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
+    Start-Sleep -Seconds 5
+
+    # Executing the deployment logs bundle PowerShell script in a new window
+    Write-Host "INFO: Uploading Log Bundle." -ForegroundColor Gray
+    $Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
+    Invoke-Expression 'cmd /c start Powershell -Command { 
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
@@ -724,11 +845,11 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
 }'
 
-# Write-Header "Changing Wallpaper"
-# $imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-# Add-Type $code 
-# [Win32.Wallpaper]::SetWallpaper($imgPath)
+    # Write-Header "Changing Wallpaper"
+    # $imgPath=$AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
+    # Add-Type $code 
+    # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 Write-Host "INFO: Deployment is complete. Please enjoy the Agora experience!" -ForegroundColor Green
 
-Stop-Transcript
+    Stop-Transcript
