@@ -446,11 +446,17 @@ foreach ($cluster in $VMNames) {
 Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
 
 #####################################################################
-### Connect the AKS Edge Essentials clusters to Azure Arc
+### Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
 
 Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
 foreach ($VM in $VMNames) {
+    $secret = $Env:spnClientSecret
+    $clientId = $Env:spnClientId
+    $tenantId = $Env:spnTenantId
+    $location = $Env:azureLocation
+    $resourceGroup = $env:resourceGroup
+
     Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
         # Install prerequisites
         $hostname = hostname
@@ -459,8 +465,16 @@ foreach ($VM in $VMNames) {
         Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
         Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
         Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+        Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
-        # Connect to Arc
+        # Connect servers to Arc
+        $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
+        Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
+        Write-Host "INFO: Arc-enabling $hostname server." -ForegroundColor Gray
+        Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name myMachineName -Location $using:location
+
+        # Connect clusters to Arc
         $deploymentPath = "C:\Deployment\config.json"
         Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
         kubectl get svc
