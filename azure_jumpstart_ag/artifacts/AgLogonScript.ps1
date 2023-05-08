@@ -98,21 +98,25 @@ if ($githubUser -ne "microsoft") {
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
+    gh repo set-default "$githubUser/jumpstart-agora-apps"
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+    gh secret set "SPN_TENANT_ID" -b $spnTenantId
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
-                Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                git push origin --delete $branch
-                git checkout -b $branch
-                git push origin $branch
+                if($branch -ne "main"){
+                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    git push origin --delete $branch
+                    git checkout -b $branch
+                    git push origin $branch
+                }
             }
         }
         catch {
@@ -122,7 +126,11 @@ if ($githubUser -ne "microsoft") {
         }
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout dev
+    git checkout main
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
     Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
@@ -738,29 +746,72 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #############################################################
     # Contoso super market image initial build
     #############################################################
-    Write-Host "INFO: Building Docker images." -ForegroundColor Gray
+    Write-Host "INFO: Building pos Docker image." -ForegroundColor Gray
     $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
     az acr login --name $acrName
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-    docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest"
+    $branches = $AgConfig.GitBranches
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest"
+    Write-Host "INFO: Building cloudSync Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src\cloud_sync"
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest"
+    Write-Host "INFO: Building contosoAi Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\ai\src"
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+    }
 
-    docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
-    docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest"
+    Write-Host "INFO: Building queue monitoring backend Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_backend\src"
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+    }
+
+    Write-Host "INFO: Building queue monitoring frontend Docker image." -ForegroundColor Gray
+    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_frontend\src"
+    foreach ($branch in $branches) {
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
+        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+    }
+
 
     #####################################################################
     # Configuring applications on the clusters using GitOps
     #####################################################################
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "INFO: Creating GitOps config for pos application on $cluster.value.ArcClusterName" -ForegroundColor Gray
+        $clusterName = $cluster.value.ArcClusterName
+        Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
+        if($store -eq "main")
+        {
+            $store = "dev"
+        }
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName= $cluster.value.ArcClusterName
         $branch =$cluster.value.Branch
@@ -777,7 +828,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
             --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true
 
     }
 }
