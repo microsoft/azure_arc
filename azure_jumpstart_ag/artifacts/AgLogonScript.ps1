@@ -768,7 +768,7 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
 
     Write-Host "INFO: Building contosoAi Docker image." -ForegroundColor Gray
     Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\ai\src"
-    branches = $AgConfig.GitBranches
+    $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         if($branch -eq "main"){
             $branch = "dev"
