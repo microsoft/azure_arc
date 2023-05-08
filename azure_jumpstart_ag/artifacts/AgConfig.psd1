@@ -120,6 +120,7 @@
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
+            IoTDevices             = @("freezer-1","freezer-2")
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -139,7 +140,8 @@
             Branch                 = "canary"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "chicago"            
+            GrafanaDataSource      = "chicago"
+            IoTDevices             = @("freezer-1","freezer-2")
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -160,6 +162,7 @@
             HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
+            IoTDevices             = @("freezer-1","freezer-2")
         }
         Staging = @{
             ArcClusterName      = "Ag-AKS-Staging"
@@ -171,6 +174,7 @@
             HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService         = "service/prometheus-grafana"
             GrafanaDataSource   = "prometheus"
+            IoTDevices             = @("freezer-1","freezer-2")
         }
     }
 

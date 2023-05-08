@@ -138,7 +138,7 @@ else {
 }
 
 #####################################################################
-# IotHub resources preperation
+# IoTHub resources preparation
 #####################################################################
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
 if ($env:githubUser -ne "microsoft") {
@@ -148,10 +148,12 @@ if ($env:githubUser -ne "microsoft") {
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "INFO: Create an IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
-        $deviceId = $site.FriendlyName
-        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup
-        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
-        gh secret set "sas_token_$deviceId" -b $deviceSASToken
+        foreach ($device in $site.IoTDevices){
+            $deviceId = "$device-$($site.FriendlyName)"
+            Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $IoTHubName -DeviceId $deviceId -EdgeEnabled
+            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
+            gh secret set "sas_token_$deviceId" -b $deviceSASToken
+        }
     }
     Write-Host "INFO: IoT Hub configuration complete!" -ForegroundColor Green
 }
