@@ -18,7 +18,6 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
-$spnSubscriptionId = $env:subscriptionId
 $adminUsername = $env:adminUsername
 $acrName = $Env:acrName.ToLower()
 $cosmosDBName = $Env:cosmosDBName
@@ -111,10 +110,13 @@ if ($githubUser -ne "microsoft") {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
-                Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                git push origin --delete $branch
-                git checkout -b $branch
-                git push origin $branch
+                if($branch -ne "main"){
+                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    git push origin --delete $branch
+                    git checkout -b $branch
+                    git push origin $branch
+                }
+                
             }
         }
         catch {
