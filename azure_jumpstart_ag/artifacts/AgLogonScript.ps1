@@ -828,7 +828,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
             --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true `
+            --sync-interval 1m
 
     }
 }
