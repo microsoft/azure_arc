@@ -803,48 +803,37 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #####################################################################
     # Configuring applications on the clusters using GitOps
     #####################################################################
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.value.ArcClusterName
-        Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        if($store -eq "main")
-        {
-            $store = "dev"
+    foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+        foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+            $clusterName = $cluster.value.ArcClusterName
+            Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
+            $store = $cluster.value.Branch.ToLower()
+            if($store -eq "main")
+            {
+                $store = "dev"
+            }
+            $configName = $cluster.value.FriendlyName.ToLower()
+            $clusterName= $cluster.value.ArcClusterName
+            $branch =$cluster.value.Branch
+            if($cluster.value.FriendlyName -eq "Staging"){
+                $clusterType = "managedClusters"
+            }else{
+                $clusterType = "connectedClusters"
+            }
+            az k8s-configuration flux create `
+                --cluster-name $clusterName `
+                --resource-group $Env:resourceGroup `
+                --name config-supermarket-$configName `
+                --cluster-type $clusterType `
+                --url $appClonedRepo `
+                --branch $Branch --sync-interval 3s `
+                --namespace 'contoso-supermarket' `
+                --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true `
+                --sync-interval 1m `
+                --no-wait
         }
-        $configName = $cluster.value.FriendlyName.ToLower()
-        $clusterName= $cluster.value.ArcClusterName
-        $branch =$cluster.value.Branch
-        if($cluster.value.FriendlyName -eq "Staging"){
-            $clusterType = "managedClusters"
-        }else{
-            $clusterType = "connectedClusters"
-        }
-        az k8s-configuration flux create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --name config-supermarket-$configName `
-            --cluster-type $clusterType `
-            --url $appClonedRepo `
-            --branch $Branch --sync-interval 3s `
-            --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true `
-            --sync-interval 1m
-
-    }
 }
 
-    # foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    #     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    #         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
-    #         az k8s-configuration flux create `
-    #             --cluster-name $cluster.ArcClusterName `
-    #             --resource-group $Env:resourceGroup `
-    #             --name config-supermarket `
-    #             --cluster-type connectedClusters `
-    #             --url $appClonedRepo `
-    #             --branch main --sync-interval 3s `
-    #             --kustomization name=bookstore path=./bookstore/yaml
 ### Deploy Kube Prometheus Stack for Observability
 #####################################################################
 
