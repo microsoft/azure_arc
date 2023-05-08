@@ -98,6 +98,7 @@ if ($githubUser -ne "microsoft") {
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
+    gh repo set-default "$githubUser/jumpstart-agora-apps"
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
@@ -116,7 +117,6 @@ if ($githubUser -ne "microsoft") {
                     git checkout -b $branch
                     git push origin $branch
                 }
-                
             }
         }
         catch {
@@ -129,6 +129,8 @@ if ($githubUser -ne "microsoft") {
     git checkout main
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
     Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 }
 else {
@@ -794,6 +796,7 @@ Write-Host "INFO: Observability components setup complete!" -ForegroundColor Gre
         docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
         docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
     }
+
 
     #####################################################################
     # Configuring applications on the clusters using GitOps
