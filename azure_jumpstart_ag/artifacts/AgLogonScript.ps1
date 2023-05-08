@@ -813,6 +813,9 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         }else{
             $clusterType = "connectedClusters"
         }
+        if($branch -eq "main"){
+            $branch = "dev"
+        }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
