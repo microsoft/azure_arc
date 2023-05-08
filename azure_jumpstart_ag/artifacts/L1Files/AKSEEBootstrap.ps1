@@ -121,8 +121,16 @@ foreach ($key in $kubeReplacementParams.Keys) {
 }
 Set-Content $destinationPath -Value $content
 
+# Configuring required firewall rules for AKS Edge Essentials
 Write-Host "INFO: Enabling ICMP for the cluster control plane IP address" -ForegroundColor Gray
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
+
+# Creating a file on the L1 virtual machine with the AKS Edge Essentials L2 virtual machine id
+Write-Host "INFO: Getting the AKS Edge Essentials virtual machine (L2) id" -ForegroundColor Gray
+$id = hcsdiag list | Select-Object -First 1
+$firstLine = "The AKS Edge Essentials virtual machine id is: $id"
+$secondLine = "To access it, use the 'hcsdiag console $id' command using the Windows Terminal."
+$firstLine, $secondLine | Out-File "$logsFolder\aksee-id.txt"
 
 # Unregistering the scheduled task responsible for start script automation
 Unregister-ScheduledTask -TaskName "Startup Scan" -Confirm:$false
