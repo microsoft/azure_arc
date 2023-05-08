@@ -74,7 +74,7 @@
         'production',
         'staging',
         'canary' ,
-        'dev'
+        'main'
     )
 
     # VHDX blob url
@@ -156,7 +156,7 @@
             IsProduction           = $false
             Type                   = "AKSEE"
             Namespace              = "contoso-supermarket"
-            Branch                 = "dev"
+            Branch                 = "main"
             HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
