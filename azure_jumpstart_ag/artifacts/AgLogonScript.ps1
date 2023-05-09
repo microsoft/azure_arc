@@ -189,7 +189,8 @@ if ($githubUser -ne "microsoft") {
             $deviceId = "$device-$($site.FriendlyName)"
             Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $IoTHubName -DeviceId $deviceId -EdgeEnabled
             $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv)
-            gh secret set "sas_token_$deviceId" -b $deviceSASToken
+            $ghDeviceId = $deviceId -replace '[^\w_]', '_'
+            gh secret set "sas_token_$ghDeviceId" -b $deviceSASToken
         }
     }
     Write-Host "INFO: IoT Hub configuration complete!" -ForegroundColor Green
