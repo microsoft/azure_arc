@@ -300,13 +300,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
-$githubAccount = $env:githubAccount
-$githubBranch = $env:githubBranch
-$resourceGroup = $env:resourceGroup
-$azureLocation = $env:azureLocation
-$spnClientId = $env:spnClientId
-$spnClientSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
 $subscriptionId = (Get-AzSubscription).Id
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
