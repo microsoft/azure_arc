@@ -778,19 +778,19 @@ Start-Sleep -Seconds 25
 #############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Building Docker images." -ForegroundColor Gray
 $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
-az acr login --name $acrName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+az acr login --name $acrName --only-show-errors
 Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 
-docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 
-docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 
-docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 
 Write-Host "[$(Get-Date -Format t)] INFO: Docker setup and image builds complete." -ForegroundColor Green
 Write-Host
@@ -820,7 +820,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch --sync-interval 3s `
             --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store --only-show-errors #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
 
     }
 }
