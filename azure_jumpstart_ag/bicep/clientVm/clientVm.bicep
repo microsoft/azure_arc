@@ -182,7 +182,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+        uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
       commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksStagingClusterName ${aksStagingClusterName} -iotHubHostName ${iotHubHostName} -acrName ${acrName} -cosmosDBName ${cosmosDBName} -cosmosDBEndpoint ${cosmosDBEndpoint} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -adxClusterName ${adxClusterName}'
     }
