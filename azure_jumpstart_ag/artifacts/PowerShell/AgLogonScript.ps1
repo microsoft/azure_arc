@@ -191,7 +191,7 @@ if ($httpResponse.StatusCode -ne 200){
 ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
 
 $agDir = $AgConfig.AgDirectories["AgDir"]
-$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
+$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv --only-show-errors)
 if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
     $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
     Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
@@ -490,7 +490,7 @@ $TagName = $AgConfig.TagName
 $TagValue = $AgConfig.TagValue
 foreach ($cluster in $clusters) {
     #az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    New-AzTag -ResourceId $cluster.ResourceId -Tag "$TagName=$TagValue" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    New-AzTag -ResourceId $cluster.ResourceId -Name $TagName -Value $TagValue | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
