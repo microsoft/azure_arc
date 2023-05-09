@@ -4,6 +4,7 @@
     # Directory paths
     AgDirectories       = @{
         AgDir             = "C:\Ag"
+        AgPowerShellDir   = "C:\Ag\PowerShell"
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgKVDir           = "C:\Ag\KeyVault"
