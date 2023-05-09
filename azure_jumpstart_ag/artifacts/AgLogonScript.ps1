@@ -58,7 +58,6 @@ if ($AgConfig.AzCLIExtensions.Count -ne 0) {
         az extension add --name $extension --system --only-show-errors
     }
 }
-az -v
 
 Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
 Write-Host
@@ -100,12 +99,12 @@ if ($githubUser -ne "microsoft") {
     Set-Location $AgAppsRepo\jumpstart-agora-apps
     Write-Host "[$(Get-Date -Format t)] INFO: Getting Cosmos DB access key" -ForegroundColor Gray 
     Write-Host "[$(Get-Date -Format t)] INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "ACR_NAME" -b $acrName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "PAT_GITHUB" -b $githubPat | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh secret set "SPN_CLIENT_ID" -b $spnClientID #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh secret set "ACR_NAME" -b $acrName #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh secret set "PAT_GITHUB" -b $githubPat #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
     Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
@@ -113,19 +112,19 @@ if ($githubUser -ne "microsoft") {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
                 Write-Host "[$(Get-Date -Format t)] INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                git push origin --delete $branch | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-                git checkout -b $branch | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-                git push origin $branch | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+                git push origin --delete $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+                git checkout -b $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+                git push origin $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
             }
         }
         catch {
             Write-Host "[$(Get-Date -Format t)] INFO: Creating $branch branch" -ForegroundColor Gray
-            git checkout -b $branch | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-            git push origin $branch | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+            git checkout -b $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+            git push origin $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
         }
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout dev | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    git checkout dev #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
     Write-Host "[$(Get-Date -Format t)] INFO: GitHub repo configuration complete!" -ForegroundColor Green
     Write-Host
 }
@@ -147,7 +146,7 @@ if ($env:githubUser -ne "microsoft") {
         $deviceId = $site.FriendlyName
         az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
         $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-        gh secret set "sas_token_$deviceId" -b $deviceSASToken | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        gh secret set "sas_token_$deviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
     }
     Write-Host "[$(Get-Date -Format t)] INFO: IoT Hub configuration complete!" -ForegroundColor Green
     Write-Host
