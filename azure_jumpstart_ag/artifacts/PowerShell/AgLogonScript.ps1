@@ -817,7 +817,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 11/12)" -ForegroundColor DarkGreen
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $cluster.value.ArcClusterName" -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName = $cluster.value.ArcClusterName
