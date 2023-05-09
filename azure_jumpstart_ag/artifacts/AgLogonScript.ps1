@@ -115,6 +115,8 @@ if ($githubUser -ne "microsoft") {
       $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
       Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
     git pull
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
@@ -142,8 +144,6 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
