@@ -74,7 +74,7 @@ param posOrdersDBName string = 'Orders'
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
-param acrName string = 'Agacr${namingGuid}'
+param acrName string = 'agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
