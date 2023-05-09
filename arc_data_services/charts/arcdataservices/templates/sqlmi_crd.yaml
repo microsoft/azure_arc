@@ -3325,7 +3325,7 @@ spec:
       jsonPath: .metadata.creationTimestamp
   - name: v12
     served: true
-    storage: true
+    storage: false
     schema:
       openAPIV3Schema:
         type: object
@@ -3401,6 +3401,804 @@ spec:
                     type: object
                     properties:
                       mode:
+                        type: string
+              scheduling:
+                type: object
+                properties:
+                  default:
+                    type: object
+                    properties:
+                      resources:
+                        type: object
+                        properties:
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                  affinity:
+                    type: object
+                    properties:
+                      nodeAffinity:
+                        type: object
+                        properties:
+                          preferredDuringSchedulingIgnoredDuringExecution:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                preference:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchFields:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                weight:
+                                  type: integer
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            type: object
+                            properties:
+                              nodeSelectorTerms:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchFields:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                      podAffinity:
+                        type: object
+                        properties:
+                          preferredDuringSchedulingIgnoredDuringExecution:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                podAffinityTerm:
+                                  type: object
+                                  properties:
+                                    labelSelector:
+                                      type: object
+                                      properties:
+                                        matchExpressions:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                type: array
+                                                items:
+                                                  type: string
+                                        matchLabels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                    namespaceSelector:
+                                      type: object
+                                      properties:
+                                        matchExpressions:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                type: array
+                                                items:
+                                                  type: string
+                                        matchLabels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                    namespaces:
+                                      type: array
+                                      items:
+                                        type: string
+                                    topologyKey:
+                                      type: string
+                                weight:
+                                  type: integer
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                labelSelector:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchLabels:
+                                      type: object
+                                      additionalProperties:
+                                        type: string
+                                namespaceSelector:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchLabels:
+                                      type: object
+                                      additionalProperties:
+                                        type: string
+                                namespaces:
+                                  type: array
+                                  items:
+                                    type: string
+                                topologyKey:
+                                  type: string
+                      podAntiAffinity:
+                        type: object
+                        properties:
+                          preferredDuringSchedulingIgnoredDuringExecution:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                podAffinityTerm:
+                                  type: object
+                                  properties:
+                                    labelSelector:
+                                      type: object
+                                      properties:
+                                        matchExpressions:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                type: array
+                                                items:
+                                                  type: string
+                                        matchLabels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                    namespaceSelector:
+                                      type: object
+                                      properties:
+                                        matchExpressions:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              key:
+                                                type: string
+                                              operator:
+                                                type: string
+                                              values:
+                                                type: array
+                                                items:
+                                                  type: string
+                                        matchLabels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                    namespaces:
+                                      type: array
+                                      items:
+                                        type: string
+                                    topologyKey:
+                                      type: string
+                                weight:
+                                  type: integer
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                labelSelector:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchLabels:
+                                      type: object
+                                      additionalProperties:
+                                        type: string
+                                namespaceSelector:
+                                  type: object
+                                  properties:
+                                    matchExpressions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          key:
+                                            type: string
+                                          operator:
+                                            type: string
+                                          values:
+                                            type: array
+                                            items:
+                                              type: string
+                                    matchLabels:
+                                      type: object
+                                      additionalProperties:
+                                        type: string
+                                namespaces:
+                                  type: array
+                                  items:
+                                    type: string
+                                topologyKey:
+                                  type: string
+                  topologySpreadConstraints:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        labelSelector:
+                          type: object
+                          properties:
+                            matchExpressions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                  operator:
+                                    type: string
+                                  values:
+                                    type: array
+                                    items:
+                                      type: string
+                            matchLabels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                        maxSkew:
+                          type: integer
+                        topologyKey:
+                          type: string
+                        whenUnsatisfiable:
+                          type: string
+                  nodeSelector:
+                    type: object
+                    additionalProperties:
+                      type: string
+              preferredPrimaryReplicaSpec:
+                type: object
+                properties:
+                  preferredPrimaryReplica:
+                    type: string
+                  primaryReplicaFailoverInterval:
+                    type: integer
+              storage:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  logs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  datalogs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  backups:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  haOrchestratorData:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+                  haOrchestratorLogs:
+                    type: object
+                    properties:
+                      volumes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            className:
+                              type: string
+                            labels:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            annotations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                            accessMode:
+                              type: string
+                            size:
+                              type: string
+                            claimName:
+                              type: string
+              backup:
+                type: object
+                properties:
+                  retentionPeriodInDays:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    x-kubernetes-int-or-string: true
+              monitoringProfile:
+                type: string
+              dev:
+                type: boolean
+              tier:
+                type: string
+              licenseType:
+                type: string
+              replicas:
+                type: integer
+              orchestratorReplicas:
+                type: integer
+              readableSecondaries:
+                type: integer
+              syncSecondaryToCommit:
+                type: integer
+              settings:
+                description: 'Configure SQL Server on Linux with the mssql-conf tool.
+                  All supported properties: https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-configure-mssql-conf?view=sql-server-ver16'
+                x-kubernetes-preserve-unknown-fields: true
+              update:
+                type: object
+                properties:
+                  desiredVersion:
+                    type: string
+                  managedCredentialsGeneration:
+                    type: integer
+              parentResource:
+                type: object
+                properties:
+                  apiGroup:
+                    type: string
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+          status:
+            type: object
+            properties:
+              highAvailability:
+                type: object
+                properties:
+                  mirroringCertificate:
+                    type: string
+                  replicas:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        healthState:
+                          type: string
+                        replicaName:
+                          type: string
+                        role:
+                          type: string
+                        connectedState:
+                          type: string
+                        synchronizationState:
+                          type: string
+                        availabilityMode:
+                          type: string
+                        secondaryRoleAllowConnections:
+                          type: string
+                  state:
+                    type: string
+                  healthState:
+                    type: string
+                  reason:
+                    type: string
+                  message:
+                    type: string
+                  lastUpdateTime:
+                    type: string
+                    format: date-time
+              roles:
+                type: object
+                properties:
+                  sql:
+                    type: object
+                    properties:
+                      runningVersion:
+                        type: string
+                      readyReplicas:
+                        type: integer
+                      replicas:
+                        type: integer
+                      state:
+                        type: string
+                      healthState:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      lastUpdateTime:
+                        type: string
+                        format: date-time
+                  state:
+                    type: string
+                  healthState:
+                    type: string
+                  reason:
+                    type: string
+                  message:
+                    type: string
+                  lastUpdateTime:
+                    type: string
+                    format: date-time
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+              runningManagedCredentialsGeneration:
+                type: integer
+          apiVersion:
+            type: string
+          kind:
+            type: string
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: .status.state
+    - name: Replicas
+      type: string
+      jsonPath: .status.roles.sql.readyReplicas
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: .status.endpoints.primary
+    - jsonPath: .spec.update.desiredVersion
+      name: Desired-Version
+      type: string
+    - jsonPath: .status.runningVersion
+      name: Running-Version
+      type: string
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
+  - name: v13
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              fileOverrideConfigMap:
+                type: string
+              serverConfigurations:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: integer
+              services:
+                type: object
+                properties:
+                  primary:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      port:
+                        type: integer
+                      dnsName:
+                        type: string
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+                  readableSecondaries:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      port:
+                        type: integer
+                      dnsName:
+                        type: string
+                      labels:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+              security:
+                type: object
+                properties:
+                  adminLoginSecret:
+                    type: string
+                  serviceCertificateSecret:
+                    type: string
+                  activeDirectory:
+                    type: object
+                    properties:
+                      connector:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                      accountName:
+                        type: string
+                      keytabSecret:
+                        type: string
+                      encryptionTypes:
+                        type: array
+                        items:
+                          type: string
+                  transparentDataEncryption:
+                    type: object
+                    properties:
+                      mode:
+                        type: string
+                      protectorSecret:
                         type: string
               scheduling:
                 type: object
