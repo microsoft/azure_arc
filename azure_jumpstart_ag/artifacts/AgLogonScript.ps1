@@ -131,17 +131,39 @@ if ($githubUser -ne "microsoft") {
     git config --global user.name "Agora Dev"
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
-    Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
+    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+    gh workflow run pos-app-initial-images-build.yml
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
 
+Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
+Start-Sleep -Seconds 30
+foreach ($branch in $branches) {
+    Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
+    $headers = @{
+        "Authorization" = "Bearer $githubPat"
+        "Accept" = "application/vnd.github+json"
+    }
+    $body = @{
+        required_status_checks = $null
+        enforce_admins = $false
+        required_pull_request_reviews = @{
+            required_approving_review_count = 1
+        }
+        restrictions = $null
+    } | ConvertTo-Json
+
+    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+}
+Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
+
 #####################################################################
 # IotHub resources preperation
 #####################################################################
 Write-Host "INFO: Creating IoT resources" -ForegroundColor Gray
-if ($env:githubUser -ne "microsoft") {
+if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
     gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName
@@ -453,78 +475,114 @@ foreach ($cluster in $VMNames) {
 }
 Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
 
-#####################################################################
-### Connect the AKS Edge Essentials clusters to Azure Arc
-#####################################################################
+    #####################################################################
+    ### Connect the AKS Edge Essentials clusters to Azure Arc
+    #####################################################################
 
-Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
-foreach ($VM in $VMNames) {
-    Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
-        # Install prerequisites
-        $hostname = hostname
-        $ProgressPreference = "SilentlyContinue"
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
-        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
-        Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+    Write-Header "Connecting AKS Edge clusters to Azure with Azure Arc"
+    foreach ($VM in $VMNames) {
+        Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+            # Install prerequisites
+            $hostname = hostname
+            $ProgressPreference = "SilentlyContinue"
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+            Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
 
-        # Connect to Arc
-        $deploymentPath = "C:\Deployment\config.json"
-        Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
-        kubectl get svc
-        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+            # Connect to Arc
+            $deploymentPath = "C:\Deployment\config.json"
+            Write-Host "INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+            kubectl get svc
+            Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+        }
     }
-}
-Write-Host "INFO: AKS Edge Essentials clusters have been registered with Azure Arc!" -ForegroundColor Green
+    Write-Host "INFO: AKS Edge Essentials clusters have been registered with Azure Arc!" -ForegroundColor Green
 
-# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
-$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
+    # Get all the Azure Arc-enabled Kubernetes clusters in the resource group
+    $clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
 
-# Loop through each cluster and tag it
-$TagName = $AgConfig.TagName
-$TagValue = $AgConfig.TagValue
-foreach ($cluster in $clusters) {
-    az resource tag --tags $TagName=$TagValue --ids $cluster
-}
+    # Loop through each cluster and tag it
+    $TagName = $AgConfig.TagName
+    $TagValue = $AgConfig.TagValue
+    foreach ($cluster in $clusters) {
+        az resource tag --tags $TagName=$TagValue --ids $cluster
+    }
 
-#####################################################################
-# Setup Azure Container registry on AKS Edge Essentials clusters
-#####################################################################
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    if ($cluster.Value.Type -eq "AKSEE") {
-        Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+    #####################################################################
+    ### Setup Azure Container registry on AKS Edge Essentials clusters
+    #####################################################################
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        if ($cluster.Value.Type -eq "AKSEE") {
+            Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
+            kubectx $cluster.Name.ToLower()
+            kubectl create secret docker-registry acr-secret `
+                --namespace default `
+                --docker-server="$acrName.azurecr.io" `
+                --docker-username="$env:spnClientId" `
+                --docker-password="$env:spnClientSecret"
+        }
+    }
+
+    #####################################################################
+    # Setup Azure Container registry on cloud AKS staging environment
+    #####################################################################
+    az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
+    kubectx staging="$Env:aksStagingClusterName-admin"
+
+    # Attach ACR to staging cluster
+    Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
+    az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName
+
+
+    #####################################################################
+    # Cosmos DB preperation
+    #####################################################################
+    Write-Host "INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
+    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
         kubectx $cluster.Name.ToLower()
-        kubectl create secret docker-registry acr-secret `
-            --namespace default `
-            --docker-server="$acrName.azurecr.io" `
-            --docker-username="$env:spnClientId" `
-            --docker-password="$env:spnClientSecret"
+        kubectl create namespace $cluster.value.Namespace
+        kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.Namespace
+        kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.Namespace
+
     }
-}
-
-#####################################################################
-# Setup Azure Container registry on cloud AKS staging environment
-#####################################################################
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
-kubectx staging="$Env:aksStagingClusterName-admin"
-
-# Attach ACR to staging cluster
-Write-Host "INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName
 
 
-#####################################################################
-# Cosmos DB preperation
-#####################################################################
-Write-Host "INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
-$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
-    kubectx $cluster.Name.ToLower()
-    kubectl create namespace $cluster.value.Namespace
-    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.Namespace
-    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.Namespace
 
+    #####################################################################
+    # Configuring applications on the clusters using GitOps
+    #####################################################################
+    foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+        foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+            $clusterName = $cluster.value.ArcClusterName
+            Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
+            $store = $cluster.value.Branch.ToLower()
+            if($store -eq "main")
+            {
+                $store = "dev"
+            }
+            $configName = $cluster.value.FriendlyName.ToLower()
+            $clusterName= $cluster.value.ArcClusterName
+            $branch =$cluster.value.Branch
+            if($cluster.value.FriendlyName -eq "Staging"){
+                $clusterType = "managedClusters"
+            }else{
+                $clusterType = "connectedClusters"
+            }
+            az k8s-configuration flux create `
+                --cluster-name $clusterName `
+                --resource-group $Env:resourceGroup `
+                --name config-supermarket-$configName `
+                --cluster-type $clusterType `
+                --url $appClonedRepo `
+                --branch $Branch --sync-interval 3s `
+                --namespace 'contoso-supermarket' `
+                --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true `
+                --sync-interval 1m `
+                --no-wait
+        }
 }
 
     #####################################################################
@@ -740,110 +798,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Sleep -Seconds 10
     Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-    Start-Sleep -Seconds 25
 
 
-    #############################################################
-    # Contoso super market image initial build
-    #############################################################
-    Write-Host "INFO: Building pos Docker image." -ForegroundColor Gray
-    $env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
-    az acr login --name $acrName
-    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-    $branches = $AgConfig.GitBranches
-    foreach ($branch in $branches) {
-        if($branch -eq "main"){
-            $branch = "dev"
-        }
-        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
-        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos:v1.0"
-    }
-
-    Write-Host "INFO: Building cloudSync Docker image." -ForegroundColor Gray
-    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src\cloud_sync"
-    foreach ($branch in $branches) {
-        if($branch -eq "main"){
-            $branch = "dev"
-        }
-        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
-        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
-    }
-
-    Write-Host "INFO: Building contosoAi Docker image." -ForegroundColor Gray
-    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\ai\src"
-    foreach ($branch in $branches) {
-        if($branch -eq "main"){
-            $branch = "dev"
-        }
-        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
-        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
-    }
-
-    Write-Host "INFO: Building queue monitoring backend Docker image." -ForegroundColor Gray
-    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_backend\src"
-    foreach ($branch in $branches) {
-        if($branch -eq "main"){
-            $branch = "dev"
-        }
-        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
-        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
-    }
-
-    Write-Host "INFO: Building queue monitoring frontend Docker image." -ForegroundColor Gray
-    Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\queue_monitoring_frontend\src"
-    foreach ($branch in $branches) {
-        if($branch -eq "main"){
-            $branch = "dev"
-        }
-        docker build . -t "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
-        docker push "$acrName.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
-    }
-
-
-    #####################################################################
-    # Configuring applications on the clusters using GitOps
-    #####################################################################
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.value.ArcClusterName
-        Write-Host "INFO: Creating GitOps config for pos application on $clusterName" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        if($store -eq "main")
-        {
-            $store = "dev"
-        }
-        $configName = $cluster.value.FriendlyName.ToLower()
-        $clusterName= $cluster.value.ArcClusterName
-        $branch =$cluster.value.Branch
-        if($cluster.value.FriendlyName -eq "Staging"){
-            $clusterType = "managedClusters"
-        }else{
-            $clusterType = "connectedClusters"
-        }
-        az k8s-configuration flux create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --name config-supermarket-$configName `
-            --cluster-type $clusterType `
-            --url $appClonedRepo `
-            --branch $Branch --sync-interval 3s `
-            --namespace 'contoso-supermarket' `
-            --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store prune=true
-
-    }
-}
-
-    # foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    #     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    #         Write-Host "INFO: Creating GitOps config for NGINX Ingress Controller on $cluster.Name" -ForegroundColor Gray
-    #         az k8s-configuration flux create `
-    #             --cluster-name $cluster.ArcClusterName `
-    #             --resource-group $Env:resourceGroup `
-    #             --name config-supermarket `
-    #             --cluster-type connectedClusters `
-    #             --url $appClonedRepo `
-    #             --branch main --sync-interval 3s `
-    #             --kustomization name=bookstore path=./bookstore/yaml
 ### Deploy Kube Prometheus Stack for Observability
 #####################################################################
 
