@@ -95,6 +95,7 @@ Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
+    New-Item -ItemType Directory ".github/workflows"
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
@@ -105,7 +106,6 @@ if ($githubUser -ne "microsoft") {
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
     Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
     $githubApiUrl = "https://api.github.com/repos/microsoft/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
