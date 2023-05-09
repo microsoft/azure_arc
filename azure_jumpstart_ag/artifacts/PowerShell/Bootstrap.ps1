@@ -56,11 +56,12 @@ param (
 $ErrorActionPreference = 'Continue'
 # Download configuration data file
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile $ConfigurationDataFile
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile $ConfigurationDataFile
 $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory = $AgConfig.AgDirectories["AgDir"]
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$AgPowerShellDir = $AgConfig.AgDirectories["AgPowerShellDir"]
 
 function BITSRequest {
   Param(
@@ -95,7 +96,7 @@ Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\Bootstrap.log")
 $ErrorActionPreference = 'Continue'
 
 # Copy PowerShell Profile and Reload
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
 
 # Extending C:\ partition to the maximum size
@@ -106,9 +107,9 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 $latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/grafana/grafana/releases/latest").tag_name.replace('v','')
 
 # Download artifacts
-[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgDirectory\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgLogonScript.ps1") -OutFile "$AgDirectory\AgLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AgConfig.psd1") -OutFile "$AgDirectory\AgConfig.psd1"
+[System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgPowerShellDir\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile "$AgPowerShellDir\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
@@ -136,10 +137,6 @@ foreach ($app in $AgConfig.ChocolateyAppList) {
   Write-Host "Installing $app"
   & choco install $app /y -Force | Write-Output
 }
-
-# # Replace password
-# $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
-# (Get-Content -Path "$AgDirectory\AgConfig.psd1") -replace '%staging-password%',$adminPassword | Set-Content -Path "$AgDirectory\AgConfig.psd1"
 
 # Create Docker Dekstop group
 New-LocalGroup -Name "docker-users" -Description "docker Users Group"
@@ -188,7 +185,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgDirectory\AgLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
