@@ -525,22 +525,6 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
     }
 
     #####################################################################
-    ### Setup Azure Container registry on AKS Edge Essentials clusters
-    #####################################################################
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        if ($cluster.Value.Type -eq "AKSEE") {
-            $clusterName = $cluster.Name
-            Write-Host "INFO: Configuring Azure Container registry on $clusterName"
-            kubectx $cluster.Name.ToLower()
-            kubectl create secret docker-registry acr-secret `
-                --namespace contoso-supermarket `
-                --docker-server="$acrName.azurecr.io" `
-                --docker-username="$env:spnClientId" `
-                --docker-password="$env:spnClientSecret"
-        }
-    }
-
-    #####################################################################
     # Setup Azure Container registry on cloud AKS staging environment
     #####################################################################
     az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin
@@ -565,7 +549,21 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
 
     }
 
-
+    #####################################################################
+    ### Setup Azure Container registry on AKS Edge Essentials clusters
+    #####################################################################
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        if ($cluster.Value.Type -eq "AKSEE") {
+            $clusterName = $cluster.Name
+            Write-Host "INFO: Configuring Azure Container registry on $clusterName"
+            kubectx $cluster.Name.ToLower()
+            kubectl create secret docker-registry acr-secret `
+                --namespace contoso-supermarket `
+                --docker-server="$acrName.azurecr.io" `
+                --docker-username="$env:spnClientId" `
+                --docker-password="$env:spnClientSecret"
+        }
+    }
 
     #####################################################################
     # Configuring applications on the clusters using GitOps
