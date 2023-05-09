@@ -530,7 +530,7 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         if ($cluster.Value.Type -eq "AKSEE") {
             Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
-            kubectx $cluster.Name.ToLower()
+            kubectx $cluster.Value.Name.ToLower()
             kubectl create secret docker-registry acr-secret `
                 --namespace contoso-supermarket `
                 --docker-server="$acrName.azurecr.io" `
@@ -556,8 +556,8 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
     Write-Host "INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
     $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Name}" -ForegroundColor Gray
-        kubectx $cluster.Name.ToLower()
+        Write-Host "INFO: Creating Cosmos DB Kubernetes secrets on ${cluster.Value.Name}" -ForegroundColor Gray
+        kubectx $cluster.value.Name.ToLower()
         kubectl create namespace $cluster.value.Namespace
         kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.Namespace
         kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.Namespace
