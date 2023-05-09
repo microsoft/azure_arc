@@ -92,51 +92,96 @@ Write-Host
 ##############################################################
 # Configure Jumpstart AG Apps repository
 ##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Forking and prepareing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
+Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor Gray
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
-    git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+    git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
     Set-Location $AgAppsRepo\jumpstart-agora-apps
-    Write-Host "[$(Get-Date -Format t)] INFO: Getting Cosmos DB access key" -ForegroundColor Gray 
-    Write-Host "[$(Get-Date -Format t)] INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "ACR_NAME" -b $acrName #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "PAT_GITHUB" -b $githubPat #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
+    New-Item -ItemType Directory ".github/workflows"
+    Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+    Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
+    gh repo set-default "$githubUser/jumpstart-agora-apps"
+    gh secret set "SPN_CLIENT_ID" -b $spnClientID
+    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+    gh secret set "ACR_NAME" -b $acrName
+    gh secret set "PAT_GITHUB" -b $githubPat
+    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+    gh secret set "SPN_TENANT_ID" -b $spnTenantId
+    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+    $githubApiUrl = "https://api.github.com/repos/microsoft/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+      $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
+      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    git pull
+    git add .
+    git commit -m "Pushing GitHub actions to apps fork"
+    git push
+
+    Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
-                Write-Host "[$(Get-Date -Format t)] INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                git push origin --delete $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-                git checkout -b $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-                git push origin $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+                if($branch -ne "main"){
+                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    git push origin --delete $branch
+                    git checkout -b $branch
+                    git push origin $branch
+                }
             }
         }
         catch {
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating $branch branch" -ForegroundColor Gray
-            git checkout -b $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-            git push origin $branch #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
+            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+            git checkout -b $branch
+            git push origin $branch
         }
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout dev #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Git.log")
-    Write-Host "[$(Get-Date -Format t)] INFO: GitHub repo configuration complete!" -ForegroundColor Green
-    Write-Host
+    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+    git checkout main
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
+    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+    gh workflow run pos-app-initial-images-build.yml
 }
 else {
-    Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
+
+Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
+Start-Sleep -Seconds 30
+foreach ($branch in $branches) {
+    Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
+    $headers = @{
+        "Authorization" = "Bearer $githubPat"
+        "Accept" = "application/vnd.github+json"
+    }
+    $body = @{
+        required_status_checks = $null
+        enforce_admins = $false
+        required_pull_request_reviews = @{
+            required_approving_review_count = 1
+        }
+        restrictions = $null
+    } | ConvertTo-Json
+
+    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+}
+Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
+Write-Host
 
 #####################################################################
 # IotHub resources preperation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating IoT resources (Step 4/13)" -ForegroundColor DarkGreen
-if ($env:githubUser -ne "microsoft") {
+if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
     gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
@@ -763,30 +808,6 @@ Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Ap
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-Start-Sleep -Seconds 25
-
-
-#############################################################
-# Contoso super market image initial build
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Building Docker images." -ForegroundColor Gray
-$env:Path += ";C:\Program Files\Docker\Docker\resources\bin"
-az acr login --name $acrName --only-show-errors
-Set-Location "$AgAppsRepo\jumpstart-agora-apps\contoso_supermarket\developer\pos\src"
-docker build . -t "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/dev/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-
-docker build . -t "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/staging/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-
-docker build . -t "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/canary/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-
-docker build . -t "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-docker push "$acrName.azurecr.io/production/contoso-supermarket/pos:latest" #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-
-Write-Host "[$(Get-Date -Format t)] INFO: Docker setup and image builds complete." -ForegroundColor Green
-Write-Host
 
 #####################################################################
 # Configuring applications on the clusters using GitOps
