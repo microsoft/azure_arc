@@ -115,6 +115,7 @@ if ($githubUser -ne "microsoft") {
       $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
       Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
+    git pull
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
     git push
