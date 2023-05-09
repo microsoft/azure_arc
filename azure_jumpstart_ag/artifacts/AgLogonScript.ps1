@@ -531,7 +531,7 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
         if ($cluster.Value.Type -eq "AKSEE") {
             $clusterName = $cluster.Name
             Write-Host "INFO: Configuring Azure Container registry on $clusterName"
-            kubectx $cluster.Value.Name.ToLower()
+            kubectx $cluster.Name.ToLower()
             kubectl create secret docker-registry acr-secret `
                 --namespace contoso-supermarket `
                 --docker-server="$acrName.azurecr.io" `
