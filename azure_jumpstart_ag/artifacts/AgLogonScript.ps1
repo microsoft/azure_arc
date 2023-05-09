@@ -532,7 +532,7 @@ Write-Host "INFO: AKS Edge Essentials installs are complete!" -ForegroundColor G
             Write-Host "INFO: Configuring Azure Container registry on ${cluster.Name}"
             kubectx $cluster.Name.ToLower()
             kubectl create secret docker-registry acr-secret `
-                --namespace default `
+                --namespace contoso-supermarket `
                 --docker-server="$acrName.azurecr.io" `
                 --docker-username="$env:spnClientId" `
                 --docker-password="$env:spnClientSecret"
