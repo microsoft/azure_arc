@@ -145,7 +145,7 @@ if ($env:githubUser -ne "microsoft") {
     foreach ($site in $sites) {
         $deviceId = $site.FriendlyName
         az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
         gh secret set "sas_token_$deviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
     }
     Write-Host "[$(Get-Date -Format t)] INFO: IoT Hub configuration complete!" -ForegroundColor Green
