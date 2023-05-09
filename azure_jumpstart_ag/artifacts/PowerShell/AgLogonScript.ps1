@@ -489,6 +489,7 @@ foreach ($cluster in $VMNames) {
     kubectl get nodes -o wide
 }
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials installs are complete!" -ForegroundColor Green
+Write-Host
 
 #####################################################################
 ### Connect the AKS Edge Essentials clusters and hosts to Azure Arc
@@ -535,7 +536,8 @@ $TagName = $AgConfig.TagName
 $TagValue = $AgConfig.TagValue
 foreach ($cluster in $clusters) {
     #az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    New-AzTag -ResourceId $cluster.ResourceId -Name $TagName -Value $TagValue | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    $Tag = @{$TagName=$TagValue}
+    New-AzTag -ResourceId $cluster.ResourceId -Tag $Tag | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
