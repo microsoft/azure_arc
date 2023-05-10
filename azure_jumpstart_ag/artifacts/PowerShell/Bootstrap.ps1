@@ -229,37 +229,6 @@ while (-not $success -and $retryCount -lt $maxRetries) {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Installing tools
-# Write-Header "Installing Chocolatey Apps"
-# try {
-#     choco config get cacheLocation
-# }
-# catch {
-#     Write-Output "Chocolatey not detected, trying to install now"
-#     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-# }
-
-# Write-Host "Chocolatey Apps Specified"
-
-# foreach ($app in $AgConfig.ChocolateyAppList) {
-#   Write-Host "Installing $app"
-#   & choco install $app /y -Force | Write-Output
-# }
-
 ##############################################################
 # Create Docker Dekstop group
 ##############################################################
@@ -277,11 +246,10 @@ if (-not (Test-Path $RegistryPath)) {
 }
 
 ##############################################################
-# Disable Microsoft Edge sidebar
+# Updating Microsoft Edge startup settings
 ##############################################################
-# $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+# Disable Microsoft Edge sidebar
 $Name = 'HubsSidebarEnabled'
-# $Value = '00000000'
 # Create the key if it does not exist
 If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
   New-Item -Path $AgConfig.EdgeSettingRegistryPath -Force | Out-Null
@@ -289,9 +257,7 @@ If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
 New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgConfig.EdgeSettingValueFalse -PropertyType DWORD -Force
 
 # Disable Microsoft Edge first-run Welcome screen
-# $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
 $Name = 'HideFirstRunExperience'
-# $Value = '00000001'
 # Create the key if it does not exist
 If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
   New-Item -Path $AgConfig.EdgeSettingRegistryPath -Force | Out-Null
@@ -300,14 +266,15 @@ New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgC
 
 # Disable Microsoft Edge "Personalize your web experience" prompt 
 $Name = 'PersonalizationReportingEnabled'
-# $Value = '00000000'
 # Create the key if it does not exist
 If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
   New-Item -Path $AgConfig.EdgeSettingRegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgConfig.EdgeSettingValueFalse -PropertyType DWORD -Force
 
+##############################################################
 # Installing Posh-SSH PowerShell Module
+##############################################################
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
@@ -315,10 +282,14 @@ $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
+##############################################################
 # Disabling Windows Server Manager Scheduled Task
+##############################################################
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
+##############################################################
 # Change RDP Port
+##############################################################
 Write-Host "RDP port number from configuration is $rdpPort"
 if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "Configuring RDP port number to $rdpPort"
@@ -347,7 +318,9 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+##############################################################
 # Install Hyper-V, WSL and reboot
+##############################################################
 Write-Header "Installing Hyper-V"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
@@ -356,7 +329,9 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 
 Stop-Transcript
 
+##############################################################
 # Clean up Bootstrap.log
+##############################################################
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
 $logSuppress = Get-Content "$AgDirectory\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 

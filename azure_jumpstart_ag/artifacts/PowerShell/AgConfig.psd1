@@ -27,7 +27,7 @@
         dockerUrl = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
         githubAPIUrl = 'https://api.github.com'
         grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
-        azurePortalUrl = 'https://portal.azure.com'
+        azurePortalUrl = 'https://portal.zure.com'
     }
 
     # Azure required registered resource providers
@@ -202,7 +202,7 @@
         Dashboards = @('1860','6417')
     }
 
-    # Microsoft Edge startup settings
+    # Microsoft Edge startup settings variables
     EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
     EdgeSettingValueTrue = '00000001'
     EdgeSettingValueFalse = '00000000'
