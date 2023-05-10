@@ -851,7 +851,12 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName = $cluster.value.ArcClusterName
         $branch = $cluster.value.Branch
-        $clusterType= $cluster.value.ClusterType
+        $clusterType= $cluster.value.Type
+        if($clusterType -eq "AKS"){
+            $type = "managedClusters"
+        }else{
+            $type = "connectedClusters"
+        }
         $namespace = $app.value.Namespace
         $configName = $app.value.GitOpsConfigName
         $kustomization = ($app.value.Kustomization).ToString() + "/$store"
@@ -859,7 +864,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --name $configName `
-            --cluster-type $clusterType `
+            --cluster-type $type `
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 3s `
