@@ -338,14 +338,13 @@ function Install-ChocolateyPackages {
         }
         else {
           Write-Output "Maximum attempts reached. I need all Chocolatey package to continue. Exiting..."
-          exit 1
         }
       }
     }
 
     if (-not $installed) {
       Write-Output "Failed to install package: $package. I need all Chocolatey package to continue. Exiting..."
-      exit 1
+      return
     }
   }
 }
