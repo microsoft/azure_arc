@@ -18,6 +18,19 @@
         AgAppsRepo        = "C:\Ag\AppsRepo"
     }
 
+    # Required URLs
+    URL           = @{
+        chocoPackagesUrl = 'https://community.chocolatey.org/api/v2'
+        chocoInstallScriptUrl = 'https://chocolatey.org/install.ps1'
+        wslUbuntuUrl = 'https://aka.ms/wslubuntu'
+        wslStoreStorageUrl = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+        dockerUrl = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
+        githubAPIUrl = 'https://api.github.com'
+        grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
+        azurePortalUrl = 'https://portal.azure.com'
+        aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
+    }
+
     # Azure required registered resource providers
     AzureProviders      = @(
         "Microsoft.Kubernetes",
@@ -116,7 +129,7 @@
             FriendlyName           = "Seattle"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
             Branch                 = "production"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -136,11 +149,11 @@
             FriendlyName           = "Chicago"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
             Branch                 = "canary"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "chicago"            
+            GrafanaDataSource      = "chicago"
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -156,7 +169,7 @@
             FriendlyName           = "Dev"
             IsProduction           = $false
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
             Branch                 = "main"
             HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService            = "service/prometheus-grafana"
@@ -167,7 +180,7 @@
             FriendlyName        = "Staging"
             IsProduction        = $false
             Type                = "AKS"
-            Namespace           = "contoso-supermarket"
+            posNamespace        = "contoso-supermarket"
             Branch              = "staging"
             HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService         = "service/prometheus-grafana"
@@ -178,7 +191,8 @@
     # Universal resource tag and resource types
     TagName = 'Project'
     TagValue = 'Jumpstart_Agora'
-    ArcK8sResourceType = "Microsoft.Kubernetes/connectedClusters"
+    ArcServerResourceType = 'Microsoft.HybridCompute/machines'
+    ArcK8sResourceType = 'Microsoft.Kubernetes/connectedClusters'
 
     # Observability variables
     Monitoring = @{
@@ -189,12 +203,23 @@
         Dashboards = @('1860','6417')
     }
 
+    # Microsoft Edge startup settings variables
+    EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+    EdgeSettingValueTrue = '00000001'
+    EdgeSettingValueFalse = '00000000'
+
+    Namespaces = @(
+        "contoso-supermarket"
+        "observability"
+    )
+
     AppConfig = @{
         ContosoSupermarket = @{
-            GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-            Branch = "main"
+            #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+            #Branch = "main"
             GitOpsConfigName = "config-supermarket"
-            Kustomization = "name=bookstore path=./bookstore/yaml"
+            Kustomization = "name=pos path=./contoso_supermarket/operations/contoso_supermarket/release"
+            Namespace = "contoso-supermarket"
         }
         # SensorMonitor = @{
         #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
