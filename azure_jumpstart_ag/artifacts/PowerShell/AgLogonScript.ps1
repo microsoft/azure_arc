@@ -165,6 +165,7 @@ if ($githubUser -ne "microsoft") {
     gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
     gh workflow run pos-app-initial-images-build.yml
+    Start-Sleep -Seconds 30
 
 }
 else {
