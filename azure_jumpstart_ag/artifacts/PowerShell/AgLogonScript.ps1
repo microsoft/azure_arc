@@ -2,9 +2,9 @@
 
 $ProgressPreference = "SilentlyContinue"
 
-#############################################################
+#####################################################################
 # Initialize the environment
-#############################################################
+#####################################################################
 $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
@@ -34,9 +34,9 @@ $startTime = Get-Date
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
-##############################################################
+#####################################################################
 # Setup Azure CLI
-##############################################################
+#####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/12)" -ForegroundColor DarkGreen
 $cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
 
@@ -63,9 +63,9 @@ if ($AgConfig.AzCLIExtensions.Count -ne 0) {
 Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
 Write-Host
 
-##############################################################
+#####################################################################
 # Setup Azure PowerShell and register providers
-##############################################################
+#####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell. (Step 2/12)" -ForegroundColor DarkGreen
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
@@ -90,9 +90,9 @@ if ($Agconfig.AzureProviders.Count -ne 0) {
 Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
 
-##############################################################
-# Configure Jumpstart AG Apps repository
-##############################################################
+#####################################################################
+# Configure Jumpstart Agora Apps repository
+#####################################################################
 Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor Gray
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
@@ -265,9 +265,9 @@ else {
     Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
 }
 
-##############################################################
+#####################################################################
 # Configure L1 virtualization infrastructure
-##############################################################
+#####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 5/12)" -ForegroundColor DarkGreen
 $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
@@ -287,9 +287,9 @@ $ifIndex = (Get-NetAdapter -Name ("vEthernet (" + $AgConfig.L1SwitchName + ")"))
 New-NetIPAddress -IPAddress $AgConfig.L1DefaultGateway -PrefixLength 24 -InterfaceIndex $ifIndex | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgConfig.L1NatSubnetPrefix | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
-############################################
+#####################################################################
 # Deploying the nested L1 virtual machines 
-############################################
+#####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Yellow
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
@@ -390,7 +390,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex | Out-Null
     Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress | Out-Null
 
+    ###########################################
     # Validating internet connectivity
+    ###########################################
     $timeElapsed = 0
     do {
         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for internet connection to be healthy on $hostname." -ForegroundColor Gray
@@ -414,7 +416,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
 
+    ###############################################################################
     # Setting up replacment parameters for AKS Edge Essentials config json file
+    ###############################################################################
     Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
@@ -436,7 +440,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         "ClientSecret-null"           = $using:spnClientSecret
     }
 
+    ###################################################
     # Preparing AKS Edge Essentials config json file
+    ###################################################
     $content = Get-Content $AKSEEConfigFilePath
     foreach ($key in $replacementParams.Keys) {
         $content = $content -replace $key, $replacementParams[$key]
@@ -462,7 +468,9 @@ foreach ($VMName in $VMNames) {
 Write-Host "[$(Get-Date -Format t)] INFO: Sleeping for three (3) minutes to allow for AKS EE installs to complete." -ForegroundColor Gray
 Start-Sleep -Seconds 180 # Give some time for the AKS EE installs to complete. This will take a few minutes.
 
+#####################################################################
 # Monitor until the kubeconfig files are detected and copied over
+#####################################################################
 $elapsedTime = Measure-Command {
     foreach ($VMName in $VMNames) {
         $path = "C:\Users\Administrator\.kube\config-" + $VMName.ToLower()
@@ -485,7 +493,9 @@ $elapsedTime = Measure-Command {
 # Display the elapsed time in seconds it took for kubeconfig files to show up in folder
 Write-Host "[$(Get-Date -Format t)] INFO: Waiting on kubeconfig files took $($elapsedTime.ToString("g"))." -ForegroundColor Gray
 
+#####################################################################
 # Merging kubeconfig files on the L0 vistual machine
+#####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
 $kubeconfigpath = ""
 foreach ($VMName in $VMNames) {
@@ -510,9 +520,8 @@ Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials installs are compl
 Write-Host
 
 #####################################################################
-### Connect the AKS Edge Essentials clusters and hosts to Azure Arc
+# Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-
 Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 7/12)" -ForegroundColor DarkGreen
 foreach ($VM in $VMNames) {
     $secret = $Env:spnClientSecret
@@ -545,18 +554,21 @@ foreach ($VM in $VMNames) {
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
-# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
-#$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
-$clusters = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
 
-# Loop through each cluster and tag it
-$TagName = $AgConfig.TagName
-$TagValue = $AgConfig.TagValue
-foreach ($cluster in $clusters) {
-    #az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    $Tag = @{$TagName=$TagValue}
-    New-AzTag -ResourceId $cluster.ResourceId -Tag $Tag | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+#####################################################################
+# Tag Azure Arc resources
+#####################################################################
+$arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
+$Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
+
+# Iterate over the Arc resources and tag it
+foreach ($arcResourceType in $arcResourceTypes) {
+    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
+    foreach ($arcResource in $arcResources) {
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    }
 }
+
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
 
@@ -601,7 +613,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 #####################################################################
-# Cosmos DB preparation
+# Azure Cosmos DB preparation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Cosmos DB Kubernetes secrets" -ForegroundColor Gray
 $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
@@ -615,9 +627,8 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete
 Write-Host
 
 #####################################################################
-### Deploy Kube Prometheus Stack for Observability
+# Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-
 $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
 $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
 $observabilityPassword = $AgConfig.Monitoring["Password"]
@@ -755,7 +766,9 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     }
 }
 
+#############################################################
 # Creating Prod Grafana Icon on Desktop
+#############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
 $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
