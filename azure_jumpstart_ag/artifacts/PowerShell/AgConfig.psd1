@@ -116,7 +116,8 @@
             FriendlyName           = "Seattle"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
+            clusterType            = "connectedClusters"
             Branch                 = "production"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -136,11 +137,12 @@
             FriendlyName           = "Chicago"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
+            clusterType            = "connectedClusters"
             Branch                 = "canary"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "chicago"            
+            GrafanaDataSource      = "chicago"
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -156,7 +158,8 @@
             FriendlyName           = "Dev"
             IsProduction           = $false
             Type                   = "AKSEE"
-            Namespace              = "contoso-supermarket"
+            posNamespace           = "contoso-supermarket"
+            clusterType            = "connectedClusters"
             Branch                 = "main"
             HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService            = "service/prometheus-grafana"
@@ -167,7 +170,8 @@
             FriendlyName        = "Staging"
             IsProduction        = $false
             Type                = "AKS"
-            Namespace           = "contoso-supermarket"
+            posNamespace        = "contoso-supermarket"
+            clusterType         = "managedClusters"
             Branch              = "staging"
             HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService         = "service/prometheus-grafana"
@@ -189,12 +193,18 @@
         Dashboards = @('1860','6417')
     }
 
+    Namespaces = @(
+        "contoso-supermarket"
+        "observability"
+    )
+
     AppConfig = @{
         ContosoSupermarket = @{
-            GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-            Branch = "main"
+            #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
+            #Branch = "main"
             GitOpsConfigName = "config-supermarket"
-            Kustomization = "name=bookstore path=./bookstore/yaml"
+            Kustomization = "name=pos path=./contoso_supermarket/operations/contoso_supermarket/release"
+            Namespace = "contoso-supermarket"
         }
         # SensorMonitor = @{
         #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
