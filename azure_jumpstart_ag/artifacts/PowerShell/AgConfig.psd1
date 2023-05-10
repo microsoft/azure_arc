@@ -28,6 +28,7 @@
         githubAPIUrl = 'https://api.github.com'
         grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
         azurePortalUrl = 'https://portal.azure.com'
+        aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
     }
 
     # Azure required registered resource providers
