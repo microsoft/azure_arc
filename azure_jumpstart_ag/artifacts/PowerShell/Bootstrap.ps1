@@ -111,7 +111,8 @@ $websiteUrls = @(
   $AgConfig.URL.dockerUrl,
   $AgConfig.URL.grafanaUrl,
   $AgConfig.URL.githubAPIUrl,
-  $AgConfig.URL.azurePortalUrl
+  $AgConfig.URL.azurePortalUrl,
+  $AgConfig.URL.aksEEk3sUrl
 )
 
 $maxRetries = 3
