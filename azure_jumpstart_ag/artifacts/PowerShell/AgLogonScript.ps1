@@ -99,7 +99,7 @@ Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
     Set-Location "$AgAppsRepo\$appsRepo"
-    New-Item -ItemType Directory ".github/workflows"
+    New-Item -ItemType Directory ".github/workflows" -Force
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
     gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
@@ -417,6 +417,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+    $namingGuid = $using:namingGuid
     $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName+"-$namingGuid"
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
