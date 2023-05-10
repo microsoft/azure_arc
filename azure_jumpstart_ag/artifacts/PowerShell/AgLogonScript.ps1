@@ -187,7 +187,7 @@ Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
 
 #####################################################################
-# IotHub resources preperation
+# Azure IoT Hub resources preperation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating IoT resources (Step 4/12)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
