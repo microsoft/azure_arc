@@ -117,7 +117,6 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
-            clusterType            = "connectedClusters"
             Branch                 = "production"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -138,7 +137,6 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
-            clusterType            = "connectedClusters"
             Branch                 = "canary"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -159,7 +157,6 @@
             IsProduction           = $false
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
-            clusterType            = "connectedClusters"
             Branch                 = "main"
             HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService            = "service/prometheus-grafana"
@@ -171,7 +168,6 @@
             IsProduction        = $false
             Type                = "AKS"
             posNamespace        = "contoso-supermarket"
-            clusterType         = "managedClusters"
             Branch              = "staging"
             HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
             HelmService         = "service/prometheus-grafana"
