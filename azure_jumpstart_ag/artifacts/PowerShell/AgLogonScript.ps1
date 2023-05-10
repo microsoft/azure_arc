@@ -124,6 +124,25 @@ if ($githubUser -ne "microsoft") {
         Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
     }
 
+    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+    $githubApiUrl = "https://api.github.com/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    git config --global core.autocrlf false
+    git pull
+    git add .
+    git commit -m "Pushing GitHub actions to apps fork"
+    git push
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
+
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
@@ -145,24 +164,6 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
-    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "https://api.github.com/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
-    }
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    git config --global core.autocrlf false
-    git pull
-    git add .
-    git commit -m "Pushing GitHub actions to apps fork"
-    git push
-    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-    gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
     gh workflow run pos-app-initial-images-build.yml
     Start-Sleep -Seconds 30
