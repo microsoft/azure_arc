@@ -131,7 +131,16 @@ if ($githubUser -ne "microsoft") {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
                 if($branch -ne "main"){
-                    Write-Host "INFO: $branch branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                    # Remove branch protection policy if exists
+                    try {
+                        Write-Host "INFO: Checking if $branch branch has a branch protection policy in-place" -ForegroundColor Gray
+                        $branchProtectionEndpoint="https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection"
+                        $response = Invoke-RestMethod -Uri ($branchProtectionEndpoint -f $githubUser, "jumpstart-agora-apps", $branch) -Method DELETE -Headers $headers
+                    }
+                    catch {
+                        Write-Host "INFO: No branch protection policy found on $branch branch" -ForegroundColor Gray
+                    }
                     git push origin --delete $branch
                     git checkout -b $branch
                     git push origin $branch
