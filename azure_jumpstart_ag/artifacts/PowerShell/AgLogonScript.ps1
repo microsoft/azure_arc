@@ -110,7 +110,6 @@ if ($githubUser -ne "microsoft") {
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
-    Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
     Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
     $headers = @{
         Authorization = "token $githubPat"
@@ -142,7 +141,11 @@ if ($githubUser -ne "microsoft") {
     git push
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
+    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+    gh workflow run pos-app-initial-images-build.yml
+    Start-Sleep -Seconds 30
 
+    Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
@@ -164,9 +167,6 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
-    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
-    gh workflow run pos-app-initial-images-build.yml
-    Start-Sleep -Seconds 30
 
 }
 else {
