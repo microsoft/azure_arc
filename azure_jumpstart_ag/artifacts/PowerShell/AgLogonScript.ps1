@@ -19,6 +19,7 @@ $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
+$namingGuid=$env:namingGuid
 $acrName = $Env:acrName.ToLower()
 $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
@@ -416,6 +417,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName+"-$namingGuid"
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
@@ -425,7 +427,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         "DnsServer-null"              = $AgConfig.SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
         "Ethernet-Null"               = $AdapterName
         "Ip4Address-null"             = $AgConfig.SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
-        "ClusterName-null"            = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName
+        "ClusterName-null"            = $arcClusterName
         "Location-null"               = $using:azureLocation
         "ResourceGroupName-null"      = $using:resourceGroup
         "SubscriptionId-null"         = $using:subscriptionId
