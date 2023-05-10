@@ -115,26 +115,76 @@ $websiteUrls = @(
   $AgConfig.URL.aksEEk3sUrl
 )
 
+
+# $maxRetries = 3
+# $retryDelaySeconds = 5
+# $retryCount = 0
+
+# foreach ($url in $websiteUrls) {
+#   do {
+#     try {
+#       $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
+#       $statusCode = $response.StatusCode
+
+#       if ($statusCode -eq 200) {
+#         Write-Host "$url is reachable."
+#         break  # Break out of the loop if website is reachable
+#       }
+#       else {
+#         Write-Host "$_ is unreachable. Status code: $statusCode"
+#       }
+#     }
+#     catch {
+#       Write-Host "An error occurred while testing the website: $_"
+#     }
+
+#     $retryCount++
+#     if ($retryCount -le $maxRetries) {
+#       Write-Host "Retrying in $retryDelaySeconds seconds..."
+#       Start-Sleep -Seconds $retryDelaySeconds
+#     }
+#   } while ($retryCount -le $maxRetries)
+
+#   if ($retryCount -gt $maxRetries) {
+#     Write-Host "Exceeded maximum number of retries. Exiting..."
+#     return  # Stop script execution if maximum retries reached
+#   }
+# }
+
+
+
+
+
 $maxRetries = 3
 $retryDelaySeconds = 5
+$timeoutSeconds = 10
 $retryCount = 0
 
 foreach ($url in $websiteUrls) {
   do {
     try {
-      $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
+      $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing -TimeoutSec $timeoutSeconds
       $statusCode = $response.StatusCode
 
       if ($statusCode -eq 200) {
         Write-Host "$url is reachable."
-        break  # Break out of the loop if website is reachable
+        break  # Break out of the loop if the website is reachable
+      }
+      elseif ($statusCode -ne 500) {
+        Write-Host "$url returned an Internal Server Error."
+        break  # Break out of the loop if the website returned a 500 error
       }
       else {
-        Write-Host "$_ is unreachable. Status code: $statusCode"
+        Write-Host "$url is unreachable. Status code: $statusCode"
       }
     }
     catch {
-      Write-Host "An error occurred while testing the website: $_"
+      if ($null -ne $_.Exception.Response -and 500 -eq $_.Exception.Response.StatusCode) {
+        Write-Host "$url returned an Internal Server Error."
+      }
+      else {
+        Write-Host "An error occurred while testing the website: $_"
+      }
     }
 
     $retryCount++
@@ -145,10 +195,15 @@ foreach ($url in $websiteUrls) {
   } while ($retryCount -le $maxRetries)
 
   if ($retryCount -gt $maxRetries) {
-    Write-Host "Exceeded maximum number of retries. Exiting..."
-    return  # Stop script execution if maximum retries reached
+    Write-Host "Exceeded the maximum number of retries. Exiting..."
+    return  # Stop script execution if the maximum retries are reached
   }
 }
+
+
+
+
+
 
 ##############################################################
 # Copy PowerShell Profile and Reload
@@ -187,48 +242,135 @@ BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$lates
 ##############################################################
 # Install Chocolatey packages
 ##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
+# $maxRetries = 3
+# $retryDelay = 30  # seconds
 
-$retryCount = 0
-$success = $false
+# $retryCount = 0
+# $success = $false
 
-while (-not $success -and $retryCount -lt $maxRetries) {
-  try {
-    Write-Header "Installing Chocolatey packages"
+# while (-not $success -and $retryCount -lt $maxRetries) {
+#   try {
+#     Write-Header "Installing Chocolatey packages"
+#     try {
+#       choco config get cacheLocation
+#     }
+#     catch {
+#       Write-Output "Chocolatey not detected, trying to install now"
+#       Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URL.chocoInstallScriptUrl))
+#     }
+    
+#     Write-Host "Chocolatey packages specified"
+    
+#     foreach ($app in $AgConfig.ChocolateyAppList) {
+#       Write-Host "Installing $app"
+#       & choco install $app /y -Force | Write-Output
+#     }
+      
+#     # If the command succeeds, set $success to $true to exit the loop
+#     $success = $true
+#   }
+#   catch {
+#     # If an exception occurs, increment the retry count
+#     $retryCount++
+
+#     # If the maximum number of retries is not reached yet, display an error message
+#     if ($retryCount -lt $maxRetries) {
+#       Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
+#       Start-Sleep -Seconds $retryDelay
+#     }
+#     else {
+#       Write-Host "All attempts failed. Exiting..."
+#       return  # Stop script execution if maximum retries reached      
+#     }
+#   }
+# }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Install-ChocolateyPackages {
+  param (
+    [Parameter(Mandatory = $true)]
+    [string[]]$Packages
+  )
+
+  # Check if Chocolatey is installed, and if not, install it
+  if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+    Write-Output "Chocolatey is not installed. Installing Chocolatey..."
     try {
-      choco config get cacheLocation
+      &([scriptblock]::Create((Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URL.chocoInstallScriptUrl)))))
+      Write-Output "Chocolatey installed successfully."
     }
     catch {
-      Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URL.chocoInstallScriptUrl))
+      Write-Output "Failed to install Chocolatey. Exiting the script."
+      exit 1
     }
-    
-    Write-Host "Chocolatey packages specified"
-    
-    foreach ($app in $AgConfig.ChocolateyAppList) {
-      Write-Host "Installing $app"
-      & choco install $app /y -Force | Write-Output
-    }
-      
-    # If the command succeeds, set $success to $true to exit the loop
-    $success = $true
   }
-  catch {
-    # If an exception occurs, increment the retry count
-    $retryCount++
 
-    # If the maximum number of retries is not reached yet, display an error message
-    if ($retryCount -lt $maxRetries) {
-      Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-      Start-Sleep -Seconds $retryDelay
+  foreach ($package in $AgConfig.ChocolateyPackagesList) {
+    $attempts = 0
+    $installed = $false
+
+    while ($attempts -lt 3 -and (-not $installed)) {
+      try {
+        Write-Output "Installing package: $package"
+        choco install $package -y
+        $installed = $true
+        Write-Output "Package installed: $package"
+      }
+      catch {
+        Write-Output "Failed to install package: $package"
+        $attempts++
+        if ($attempts -lt 3) {
+          Write-Output "Retrying in 10 seconds..."
+          Start-Sleep -Seconds 10
+        }
+        else {
+          Write-Output "Maximum attempts reached. I need all Chocolatey package to continue. Exiting..."
+          exit 1
+        }
+      }
     }
-    else {
-      Write-Host "All attempts failed. Exiting..."
-      return  # Stop script execution if maximum retries reached      
+
+    if (-not $installed) {
+      Write-Output "Failed to install package: $package. I need all Chocolatey package to continue. Exiting..."
+      exit 1
     }
   }
 }
+
+Install-ChocolateyPackages
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##############################################################
 # Create Docker Dekstop group
