@@ -157,7 +157,7 @@ module iotHubDeployment 'data/iotHub.bicep' = {
   }
 }
 
-module adxDeployment 'data/dataExplorer.bicep' = {
+/*module adxDeployment 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
   params: {
     location: location
@@ -167,7 +167,7 @@ module adxDeployment 'data/dataExplorer.bicep' = {
     cosmosDBAccountName: accountName
     posOrdersDBName: posOrdersDBName
   }
-}
+}*/
 
 module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   name: 'cosmosDBDeployment'
