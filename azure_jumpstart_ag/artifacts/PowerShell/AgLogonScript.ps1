@@ -156,6 +156,7 @@ if ($githubUser -ne "microsoft") {
     }
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
+    git config --global core.autocrlf false
     git pull
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
