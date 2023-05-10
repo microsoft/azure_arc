@@ -1,5 +1,10 @@
 # Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 
+# Changing PowerShell console settings
+Set-ConsoleSize -Width 200 -Height 50
+$Host.UI.RawUI.BackgroundColor = "Black"
+Clear-Host
+
 $ProgressPreference = "SilentlyContinue"
 
 #############################################################
@@ -492,7 +497,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials installs are compl
 Write-Host
 
 #####################################################################
-### Connect the AKS Edge Essentials clusters and hosts to Azure Arc
+# Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
 
 Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 7/12)" -ForegroundColor DarkGreen
@@ -527,18 +532,21 @@ foreach ($VM in $VMNames) {
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
-# Get all the Azure Arc-enabled Kubernetes clusters in the resource group
-#$clusters = az resource list --resource-group $env:resourceGroup --resource-type $AgConfig.ArcK8sResourceType --query "[].id" --output tsv
-$clusters = Get-AzResource -ResourceGroup $env:resourceGroup -ResourceType $AgConfig.ArcK8sResourceType
 
-# Loop through each cluster and tag it
-$TagName = $AgConfig.TagName
-$TagValue = $AgConfig.TagValue
-foreach ($cluster in $clusters) {
-    #az resource tag --tags $TagName=$TagValue --ids $cluster | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    $Tag = @{$TagName=$TagValue}
-    New-AzTag -ResourceId $cluster.ResourceId -Tag $Tag | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+##############################################################
+# Tag Azure Arc-enabled Kubernetes clusters
+##############################################################
+$arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
+$Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
+
+# Iterate over the Arc resources and tag it
+foreach ($arcResourceType in $arcResourceTypes) {
+    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
+    foreach ($arcResource in $arcResources) {
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace
+    }
 }
+
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
 
@@ -584,7 +592,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete
 Write-Host
 
 #####################################################################
-### Deploy Kube Prometheus Stack for Observability
+# Deploy Kube Prometheus Stack for Observability
 #####################################################################
 
 $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
