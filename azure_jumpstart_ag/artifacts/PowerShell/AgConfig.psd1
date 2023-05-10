@@ -18,6 +18,18 @@
         AgAppsRepo        = "C:\Ag\AppsRepo"
     }
 
+    # Required URLs
+    URL           = @{
+        chocoPackagesUrl = 'https://community.chocolatey.org/api/v2'
+        chocoInstallScriptUrl = 'https://chocolatey.org/install.ps1'
+        wslUbuntuUrl = 'https://aka.ms/wslubuntu'
+        wslStoreStorageUrl = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+        dockerUrl = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
+        githubAPIUrl = 'https://api.github.com'
+        grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
+        azurePortalUrl = 'https://portal.azure.com'
+    }
+
     # Azure required registered resource providers
     AzureProviders      = @(
         "Microsoft.Kubernetes",
@@ -178,7 +190,8 @@
     # Universal resource tag and resource types
     TagName = 'Project'
     TagValue = 'Jumpstart_Agora'
-    ArcK8sResourceType = "Microsoft.Kubernetes/connectedClusters"
+    ArcServerResourceType = 'Microsoft.HybridCompute/machines'
+    ArcK8sResourceType = 'Microsoft.Kubernetes/connectedClusters'
 
     # Observability variables
     Monitoring = @{
@@ -188,6 +201,13 @@
         ProdURL = "http://localhost:3000"
         Dashboards = @('1860','6417')
     }
+
+    # Microsoft Edge startup settings
+    EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
+    EdgeSettingValueTrue = '00000001'
+    EdgeSettingValueFalse = '00000000'
+
+
 
     AppConfig = @{
         ContosoSupermarket = @{
