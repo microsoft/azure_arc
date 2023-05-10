@@ -195,7 +195,9 @@ foreach ($key in $kubeReplacementParams.Keys) {
 }
 Set-Content $destinationPath -Value $content
 
+################################################################
 # Configuring required firewall rules for AKS Edge Essentials
+################################################################
 Write-Host "INFO: Enabling ICMP for the cluster control plane IP address" -ForegroundColor Gray
 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p ICMP -j ACCEPT"
 
