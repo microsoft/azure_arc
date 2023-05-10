@@ -25,6 +25,7 @@ $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $adxClusterName = $env:adxClusterName
+$appsRepo = "jumpstart-agora-apps"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -95,13 +96,13 @@ Write-Host
 Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor Gray
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
-    git clone "https://$githubPat@github.com/$githubUser/jumpstart-agora-apps.git" $AgAppsRepo\jumpstart-agora-apps
-    Set-Location $AgAppsRepo\jumpstart-agora-apps
+    git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
+    Set-Location "$AgAppsRepo\$appsRepo"
     New-Item -ItemType Directory ".github/workflows"
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-    gh api -X PUT /repos/$githubUser/jumpstart-agora-apps/actions/permissions/workflow -F can_approve_pull_request_reviews=true
-    gh repo set-default "$githubUser/jumpstart-agora-apps"
+    gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
+    gh repo set-default "$githubUser/$appsRepo"
     gh secret set "SPN_CLIENT_ID" -b $spnClientID
     gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
     gh secret set "ACR_NAME" -b $acrName
@@ -109,7 +110,20 @@ if ($githubUser -ne "microsoft") {
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
-    Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
+    Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
+    Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+    $headers = @{
+        Authorization = "token $githubPat"
+        "Content-Type" = "application/json"
+    }
+    $protectedBranches = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+    foreach ($branch in $protectedBranches) {
+        $branchName = $branch.name
+        $deleteProtectionUrl = "https://api.github.com/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+        Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+        Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+    }
+
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
@@ -117,15 +131,6 @@ if ($githubUser -ne "microsoft") {
             if ($response) {
                 if($branch -ne "main"){
                     Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                    # Remove branch protection policy if exists
-                    try {
-                        Write-Host "INFO: Checking if $branch branch has a branch protection policy in-place" -ForegroundColor Gray
-                        $branchProtectionEndpoint="https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection"
-                        $response = Invoke-RestMethod -Uri ($branchProtectionEndpoint -f $githubUser, "jumpstart-agora-apps", $branch) -Method DELETE -Headers $headers
-                    }
-                    catch {
-                        Write-Host "INFO: No branch protection policy found on $branch branch" -ForegroundColor Gray
-                    }
                     git push origin --delete $branch
                     git checkout -b $branch
                     git push origin $branch
@@ -140,18 +145,13 @@ if ($githubUser -ne "microsoft") {
     }
     Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
     git checkout main
-    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-    gh workflow run update-files.yml
-    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
-    gh workflow run pos-app-initial-images-build.yml
-
     Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "https://api.github.com/repos/microsoft/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $githubApiUrl = "https://api.github.com/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
       $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
+      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
       Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
     git config --global user.email "dev@agora.com"
@@ -160,13 +160,17 @@ if ($githubUser -ne "microsoft") {
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
     git push
+    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+    gh workflow run update-files.yml
+    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+    gh workflow run pos-app-initial-images-build.yml
+
 }
 else {
-    Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
+    Write-Host "ERROR: You have to fork the $appsRepo repository!" -ForegroundColor Red
 }
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
-Start-Sleep -Seconds 30
 foreach ($branch in $branches) {
     Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
     $headers = @{
@@ -180,9 +184,10 @@ foreach ($branch in $branches) {
             required_approving_review_count = 1
         }
         dismiss_stale_reviews = $true
+        restrictions  = $null
     } | ConvertTo-Json
 
-    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
 }
 Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
@@ -572,9 +577,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($cluster.Value.Type -eq "AKSEE") {
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on ${cluster.Name}"
         kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        foreach ($namespace in $AgConfig.Namespaces) {
+        foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             kubectl create secret docker-registry acr-secret `
-            --namespace $namespace `
+            --namespace $app.value.$namespace `
             --docker-server="$acrName.azurecr.io" `
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
