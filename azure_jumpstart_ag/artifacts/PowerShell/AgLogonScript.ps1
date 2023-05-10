@@ -169,7 +169,7 @@ foreach ($branch in $branches) {
         required_pull_request_reviews = @{
             required_approving_review_count = 1
         }
-        restrictions = $null
+        dismiss_stale_reviews = $true
     } | ConvertTo-Json
 
     Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
