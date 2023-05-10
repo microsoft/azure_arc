@@ -27,7 +27,7 @@
         dockerUrl = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
         githubAPIUrl = 'https://api.github.com'
         grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
-        azurePortalUrl = 'https://portal.zure.com'
+        azurePortalUrl = 'https://portal.azure.com'
     }
 
     # Azure required registered resource providers

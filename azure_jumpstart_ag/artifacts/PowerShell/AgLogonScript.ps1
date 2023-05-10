@@ -547,7 +547,7 @@ $Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
 foreach ($arcResourceType in $arcResourceTypes) {
     $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
     foreach ($arcResource in $arcResources) {
-        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
     }
 }
 
