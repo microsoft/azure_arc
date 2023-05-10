@@ -93,7 +93,7 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor Gray
+Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor DarkGreen
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
