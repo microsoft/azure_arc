@@ -108,21 +108,6 @@ if ($githubUser -ne "microsoft") {
     gh secret set "PAT_GITHUB" -b $githubPat
     gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
     gh secret set "SPN_TENANT_ID" -b $spnTenantId
-    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "https://api.github.com/repos/microsoft/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
-    }
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    git pull
-    git add .
-    git commit -m "Pushing GitHub actions to apps fork"
-    git push
 
     Write-Host "INFO: Creating GitHub branches to apps fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
@@ -159,6 +144,22 @@ if ($githubUser -ne "microsoft") {
     gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
     gh workflow run pos-app-initial-images-build.yml
+
+    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+    $githubApiUrl = "https://api.github.com/repos/microsoft/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+      $outputFile = Join-Path "$AgAppsRepo\jumpstart-agora-apps\.github\workflows" $fileName
+      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    git pull
+    git add .
+    git commit -m "Pushing GitHub actions to apps fork"
+    git push
 }
 else {
     Write-Host "ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
