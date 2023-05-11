@@ -18,22 +18,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Replace text and commit changes
-      run: |
-        SEARCH_TEXT="old-text"
-        REPLACE_TEXT="new-text"
-        FILE_PATTERN="*.txt"
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
-        for branch in $(git branch -r | grep -v HEAD); do
-          git checkout "${branch#origin/}"
-          git pull
-          find . -type f -name "$FILE_PATTERN" -exec sed -i "s/$SEARCH_TEXT/$REPLACE_TEXT/g" {} +
-          git add -u
-          git diff --quiet && git diff --staged --quiet || git commit -m "Replace text in files"
-          git push
-        done
-
     - name: Replace variables with the correct names
       env:
         ACR_NAME: ${{ secrets.ACR_NAME }}
