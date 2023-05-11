@@ -1,9 +1,36 @@
 $debug = $true
+
+########################################################################
+# Check for available capacity in region
+########################################################################
+$location = $env:AZURE_LOCATION
+$requiredCores = 32
+
+$usage = (az vm list-usage --location $location --subscription "Azure Arc Jumpstart Subscription" --output json) | ConvertFrom-Json
+
+$usage = $usage | 
+    Where-Object {$_.localname -match "Standard ESv5 Family vCPUs|Total Regional vCPUs"} 
+
+$available = $usage |
+        ForEach-Object {
+            $_ | Add-Member -MemberType NoteProperty -Name available -Value 0 -Force -PassThru
+            $_.available = $_.limit - $_.currentValue 
+        }
+
+If ($available | Where-Object {$_.available -lt $requiredCores}) {
+    Throw "There is not enough capacity in the $location region to deploy the Jumpstart environment. Please choose another region."
+} else {
+    Write-Host "There is enough VM capacity in the $location region to deploy the Jumpstart environment."
+}
+
+
 ########################################################################
 # Get Windows Admin Username and Password
+########################################################################
 $JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
+# set the env variable
 azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 
 # The user will be prompted for this by azd so we can maintain the security of the password.
@@ -12,6 +39,8 @@ azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 # azd env set JS_WINDOWS_ADMIN_PASSWORD $JS_WINDOWS_ADMIN_PASSWORD
 
 
+########################################################################
+# Create SSH RSA Public Key
 ########################################################################
 Write-Host "Creating SSH RSA Public Key..."
 $file = "js_rsa"
@@ -26,9 +55,12 @@ $JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
 # Escape the backslashes 
 $JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
 
+# set the env variable
 azd env set JS_SSH_RSA_PUBLIC_KEY $JS_SSH_RSA_PUBLIC_KEY
 
 
+########################################################################
+# Create Azure Service Principal
 ########################################################################
 # TODO - consider moving SPN creation to Bicep
 Write-Host "Creating Azure Service Principal..."
