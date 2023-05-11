@@ -144,7 +144,7 @@ if ($githubUser -ne "microsoft") {
     gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
     gh workflow run pos-app-initial-images-build.yml
-    Start-Sleep -Seconds 30
+    Start-Sleep -Seconds 45
 
     Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
@@ -599,7 +599,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/12)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    if ($cluster.Value.Type -eq "AKSEE") {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -610,7 +609,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }
-    }
 }
 
 #####################################################################
@@ -633,15 +631,24 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/12)" -ForegroundColor DarkGreen
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        # --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
         Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
         $clusterName = $cluster.value.ArcClusterName
         $branch = $cluster.value.Branch.ToLower()
         $configName = $app.value.GitOpsConfigName.ToLower()
-        $clusterType= $cluster.value.Type
-        $kustomizationPath = $app.value.KustomizationPath+"/"+$store
-        $kustomizationName = $app.value.KustomizationName
+        $clusterType = $cluster.value.Type
         $namespace = $app.value.Namespace
+
+        $kustomizeName = $app.value.KustomizationName
+        $kustomizePath = ($app.value.KustomizationPath+"/"+$store).ToString()
+        $kustomizePrune = $app.value.KustomizationPrune
+        $kustomizeInterval = $app.value.KustomizationInterval
+
+        $kustomizationPath = "path=$kustomizePath"
+        $kustomizationName = "name=$kustomizeName"
+        $kustomizationPrune = "prune=$kustomizePrune"
+        $kustomizationInterval = "interval=$kustomizeInterval"
 
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
@@ -660,24 +667,10 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 3s `
+            --kustomization $kustomizationName $kustomizationPath $kustomizationPrune $kustomizationInterval `
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-
-        az k8s-configuration flux kustomization create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --kustomization-name $kustomizationName `
-            --name $configName `
-            --path $kustomizationPath `
-            --cluster-type $type `
-            --interval 10s `
-            --retry-interval 10s `
-            --prune true `
-            --no-wait `
-            --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-
     }
 }
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
