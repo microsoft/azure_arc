@@ -134,6 +134,7 @@
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -154,6 +155,7 @@
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "chicago"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -171,9 +173,10 @@
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
             Branch                 = "main"
-            HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
         Staging = @{
             ArcClusterName      = "Ag-AKS-Staging"
@@ -182,9 +185,10 @@
             Type                = "AKS"
             posNamespace        = "contoso-supermarket"
             Branch              = "staging"
-            HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=Agora123!!"
+            HelmSetValue        = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
             HelmService         = "service/prometheus-grafana"
             GrafanaDataSource   = "prometheus"
+            HelmValuesFile      = "prometheus-additional-scrape-config.yaml"
         }
     }
 
@@ -196,11 +200,15 @@
 
     # Observability variables
     Monitoring = @{
-        UserName = "admin"
-        Password = 'Agora123!!'
-        Namespace = "observability"
-        ProdURL = "http://localhost:3000"
-        Dashboards = @('1860','6417')
+        AdminUser = "admin"
+        User   = "Contoso Operator"
+        Email   = "operator@contoso.com"
+        Namespace  = "observability"
+        ProdURL    = "http://localhost:3000"
+        Dashboards = @{
+            "grafana.com" = @('1860') # Dashboards from https://grafana.com/grafana/dashboards
+            "custom"      = @('freezer-monitoring') # Dashboards from https://github.com/microsoft/azure_arc/tree/jumpstart_ag/azure_jumpstart_ag/artifacts/monitoring
+        }
     }
 
     # Microsoft Edge startup settings variables
