@@ -69,10 +69,10 @@ param cosmosDBEndpoint string
 param rdpPort string = '3389'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string
 
 @description('Target GitHub branch')
-param githubBranch string = 'jumpstart_ag'
+param githubBranch string
 
 @description('GitHub Personal access token for the user account')
 @secure()
