@@ -638,10 +638,15 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $branch = $cluster.value.Branch.ToLower()
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType= $cluster.value.Type
+        $kustomizationPath = $app.value.KustomizationPath+"/"+$store
+        $kustomizationName = $app.value.KustomizationName
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
         }else{
             $type = "connectedClusters"
+        }
+        if($branch -eq "main"){
+            $branch = "dev"
         }
         $namespace = $app.value.Namespace
         $kustomization = ($app.value.Kustomization).ToString() + "/$store"
@@ -655,6 +660,20 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --sync-interval 3s `
             --namespace $namespace `
             --kustomization $kustomization `
+            --no-wait `
+            --only-show-errors `
+            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+
+        az k8s-configuration flux kustomization create `
+            --cluster-name $clusterName `
+            --resource-group $Env:resourceGroup `
+            --kustomization-name $kustomizationName `
+            --name $configName `
+            --path $kustomizationPath `
+            --cluster-type $type `
+            --interval 10s `
+            --retry-interval 10s `
+            --prune true `
             --no-wait `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
