@@ -156,6 +156,9 @@ if ($githubUser -ne "microsoft") {
                 if($branch -ne "main"){
                     Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
                     git push origin --delete $branch
+                    git fetch origin
+                    git checkout main
+                    git pull origin main
                     git checkout -b $branch
                     git push origin $branch
                 }
@@ -163,6 +166,9 @@ if ($githubUser -ne "microsoft") {
         }
         catch {
             Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+            git fetch origin
+            git checkout main
+            git pull origin main
             git checkout -b $branch
             git push origin $branch
         }
