@@ -26,6 +26,7 @@ $templateBaseUrl = $env:templateBaseUrl
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $adxClusterName = $env:adxClusterName
 $appsRepo = "jumpstart-agora-apps"
+$adminPassword = $env:adminPassword
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -630,8 +631,8 @@ Write-Host
 #####################################################################
 $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
 $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
-$observabilityPassword = $AgConfig.Monitoring["Password"]
 $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
 
 # Set Prod Grafana API endpoint
 $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
@@ -662,10 +663,10 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 
 # Reset Grafana Password
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $observabilityPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Get Grafana credentials
-$credentials = $AgConfig.Monitoring["UserName"] + ':' + $observabilityPassword
+$credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
 $headers = @{    
@@ -674,12 +675,16 @@ $headers = @{
 }
 
 # Download dashboards
-foreach ($dashboard in $observabilityDashboards) {
-    $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+foreach ($dashboard in $observabilityDashboards.'grafana.com') {
+    $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
     $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
     $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
     Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
 }
+
+$observabilityDashboardstoImport = @()
+$observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
+$observabilityDashboardstoImport += $observabilityDashboards.'custom'
 
 # Deploying Kube Prometheus Stack for stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -687,11 +692,12 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
     # Install Prometheus Operator
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $_.Value.HelmSetValue --namespace $observabilityNamespace --create-namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        
+    $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder',$adminPassword
+    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
     Do {
         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 45
         $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($monitorIP -eq "Nope" )
     # Get Load Balancer IP
@@ -714,9 +720,9 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     }
         
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-    # Add Infra dashboard
-    foreach ($dashboard in $observabilityDashboards) {
-        $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+    # Add dashboards
+    foreach ($dashboard in $observabilityDashboardstoImport) {
+        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
         # Replace the datasource
         $replacementParams = @{
             "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
@@ -752,7 +758,18 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     }
+
     if (!$_.Value.IsProduction) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
+        $grafanaUserBody = @{    
+            name = $AgConfig.Monitoring["User"] # Display Name
+            email = $AgConfig.Monitoring["Email"]
+            login = $adminUsername    
+            password = $adminPassword} | ConvertTo-Json
+        
+        # Make HTTP request to the API
+        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
         # Creating Grafana Icon on Desktop
         Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
         $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
@@ -765,9 +782,21 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     }
 }
 
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
+# Add Contoso Operator User
+$grafanaUserBody = @{    
+    name = $AgConfig.Monitoring["User"] # Display Name
+    email = $AgConfig.Monitoring["Email"]
+    login = $adminUsername    
+    password = $adminPassword} | ConvertTo-Json
+
+# Make HTTP request to the API
+Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
 #############################################################
 # Creating Prod Grafana Icon on Desktop
 #############################################################
+
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
 $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
