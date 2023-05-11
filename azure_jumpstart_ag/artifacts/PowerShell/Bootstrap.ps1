@@ -67,6 +67,7 @@ $AgDirectory = $AgConfig.AgDirectories["AgDir"]
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgPowerShellDir = $AgConfig.AgDirectories["AgPowerShellDir"]
+$AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
 
 function BITSRequest {
   Param(
