@@ -136,6 +136,7 @@ if ($githubUser -ne "microsoft") {
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
     git config --global core.autocrlf false
+    git fetch
     git pull
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
@@ -639,16 +640,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType = $cluster.value.Type
         $namespace = $app.value.Namespace
-
-        $kustomizeName = $app.value.KustomizationName
-        $kustomizePath = ($app.value.KustomizationPath+"/"+$store).ToString()
-        $kustomizePrune = $app.value.KustomizationPrune
-        $kustomizeInterval = $app.value.KustomizationInterval
-
-        $kustomizationPath = "path=$kustomizePath"
-        $kustomizationName = "name=$kustomizeName"
-        $kustomizationPrune = "prune=$kustomizePrune"
-        $kustomizationInterval = "interval=$kustomizeInterval"
+        $appPath= $app.Value.AppPath
 
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
@@ -658,7 +650,6 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         if($branch -eq "main"){
             $branch = "dev"
         }
-
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
@@ -667,7 +658,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 3s `
-            --kustomization $kustomizationName $kustomizationPath $kustomizationPrune $kustomizationInterval `
+            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store `
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
