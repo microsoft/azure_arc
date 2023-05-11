@@ -155,7 +155,6 @@ echo ""
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
-kustomize edit fix capz_kustomize/kustomization.yaml
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
@@ -205,6 +204,7 @@ until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do
 echo ""
 sudo kubectl get kubeadmcontrolplane --all-namespaces
 clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+sleep 120
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
 
