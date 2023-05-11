@@ -532,6 +532,8 @@ foreach ($VM in $VMNames) {
     $location = $Env:azureLocation
     $resourceGroup = $env:resourceGroup
 
+    Invoke-Command -VMName $VM -Credential $Credentials -FilePath .$PsHome\Profile.ps1
+
     Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
         # Install prerequisites
         $hostname = hostname
