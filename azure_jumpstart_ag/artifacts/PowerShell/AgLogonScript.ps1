@@ -599,8 +599,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/12)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($cluster.Value.Type -eq "AKSEE") {
-        Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on ${cluster.Name}"
-        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             kubectl create secret docker-registry acr-secret `
             --namespace $app.value.$namespace `
