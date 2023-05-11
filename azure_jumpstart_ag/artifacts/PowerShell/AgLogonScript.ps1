@@ -547,7 +547,7 @@ foreach ($VM in $VMNames) {
         $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
         Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
         Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
-        Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location
+        Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
 
         # Connect clusters to Arc
         $deploymentPath = "C:\Deployment\config.json"
