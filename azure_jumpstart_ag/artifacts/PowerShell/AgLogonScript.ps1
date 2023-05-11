@@ -676,7 +676,7 @@ $headers = @{
 
 # Download dashboards
 foreach ($dashboard in $observabilityDashboards.'grafana.com') {
-    $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+    $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
     $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
     $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
     Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
@@ -722,7 +722,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
     # Add dashboards
     foreach ($dashboard in $observabilityDashboardstoImport) {
-        $grafanaDBPath = "$AgTempDir\grafana_dashboard_$dashboard.json"
+        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
         # Replace the datasource
         $replacementParams = @{
             "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
