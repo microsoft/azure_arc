@@ -3,24 +3,84 @@ $debug = $true
 ########################################################################
 # Check for available capacity in region
 ########################################################################
-$location = $env:AZURE_LOCATION
-$requiredCores = 32
+#region Functions
+Function Get-AzAvailableCores ($location, $skuFriendlyNames, $minCores = 0) {
+    # using az command because there is currently a bug in various versions of PowerShell that affects Get-AzVMUsage
+    $usage = (az vm list-usage --location $location --output json --only-show-errors) | ConvertFrom-Json
 
-$usage = (az vm list-usage --location $location --subscription "Azure Arc Jumpstart Subscription" --output json) | ConvertFrom-Json
+    $usage = $usage | 
+        Where-Object {$_.localname -match $skuFriendlyNames} 
 
-$usage = $usage | 
-    Where-Object {$_.localname -match "Standard ESv5 Family vCPUs|Total Regional vCPUs"} 
-
-$available = $usage |
+    $enhanced = $usage |
         ForEach-Object {
             $_ | Add-Member -MemberType NoteProperty -Name available -Value 0 -Force -PassThru
-            $_.available = $_.limit - $_.currentValue 
+            $_.available = $_.limit - $_.currentValue
         }
 
-If ($available | Where-Object {$_.available -lt $requiredCores}) {
-    Throw "There is not enough capacity in the $location region to deploy the Jumpstart environment. Please choose another region."
+    $enhanced = $enhanced |
+        ForEach-Object {
+            $_ | Add-Member -MemberType NoteProperty -Name usableLocation -Value $false -Force -PassThru
+            If ($_.available -ge $minCores) {
+                $_.usableLocation = $true
+            } 
+            else {
+                $_.usableLocation = $false
+            }
+        }
+
+    $enhanced
+
+}
+
+Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) {
+    $allLocations = get-AzLocation
+    $geographyGroup = ($allLocations | Where-Object {$_.location -eq $location}).GeographyGroup
+    $locations = $allLocations | Where-Object { `
+            $_.GeographyGroup -eq $geographyGroup `
+            -and $_.Location -ne $location `
+            -and $_.RegionCategory -eq "Recommended" `
+            -and $_.PhysicalLocation -ne ""
+        }
+
+    $usableLocations = $locations | 
+        ForEach-Object {
+            $available = Get-AzAvailableCores -location $_.location -skuFriendlyNames $skuFriendlyNames -minCores $minCores |
+                Where-Object {$_.localName -ne "Total Regional vCPUs"}
+            If ($available.usableLocation) {
+                $_ | Add-Member -MemberType NoteProperty -Name TotalCores     -Value $available.limit -Force 
+                $_ | Add-Member -MemberType NoteProperty -Name AvailableCores -Value $available.available -Force 
+                $_ | Add-Member -MemberType NoteProperty -Name usableLocation -Value $available.usableLocation -Force -PassThru
+            }
+        }
+
+    $usableLocations
+}
+#endregion Functions
+
+$location = $env:AZURE_LOCATION
+$minCores = 32
+$skuFriendlyNames = "Standard DSv5 Family vCPUs|Total Regional vCPUs"
+
+Write-Host "`nChecking for available capacity in $location region..."
+
+$available = Get-AzAvailableCores -location $location -skuFriendlyNames $skuFriendlyNames -minCores $minCores
+
+If ($available.usableLocation -contains $false) {
+    Write-Host "`n`u{274C} There is not enough VM capacity in the $location region to deploy the Jumpstart environment." -ForegroundColor Red
+    
+    Write-Host "`nChecking for other regions in the same geography with enough capacity ($minCores cores)...`n"
+
+    $locations = Get-AzAvailableLocations -location $location -skuFriendlyNames $skuFriendlyNames -minCores $minCores | 
+        Format-Table Location, DisplayName, TotalCores, AvailableCores, UsableLocation -AutoSize | Out-String
+    
+    Write-Host $locations
+
+    Write-Host "Please run ``azd env`` to create a new environment and select the new location.`n"
+
+    Throw "Not enough capacity in $location region."
+    
 } else {
-    Write-Host "There is enough VM capacity in the $location region to deploy the Jumpstart environment."
+    Write-Host "`n`u{2705} There is enough VM capacity in the $location region to deploy the Jumpstart environment.`n"
 }
 
 
