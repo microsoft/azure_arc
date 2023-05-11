@@ -342,6 +342,9 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 # Create an array with VM names    
 $VMnames = (Get-VM).Name
+foreach ($VM in $VMNames) {
+    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
+}
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Set time zone to UTC
@@ -532,10 +535,9 @@ foreach ($VM in $VMNames) {
     $location = $Env:azureLocation
     $resourceGroup = $env:resourceGroup
 
-    Invoke-Command -VMName $VM -Credential $Credentials -FilePath .$PsHome\Profile.ps1
-
     Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
         # Install prerequisites
+        . C:\Deployment\Profile.ps1
         $hostname = hostname
         $ProgressPreference = "SilentlyContinue"
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
