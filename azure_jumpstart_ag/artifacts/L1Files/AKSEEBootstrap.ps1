@@ -21,8 +21,6 @@ foreach ($Folder in $folders) {
 # Start logging
 Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
 
-
-
 ##############################################################
 # Testing internet connectivity
 ##############################################################
@@ -71,7 +69,6 @@ foreach ($url in $websiteUrls) {
     }
 }
 
-
 ##############################################################
 # Deplying AKS Edge Essentials clusters 
 ##############################################################
@@ -83,32 +80,6 @@ net start w32time
 W32tm /resync
 $string = Get-Date
 Write-Host "INFO: Time after forced time sync:" $string.ToString("u") -ForegroundColor Gray
-
-# Validating internet connectivity
-# while (-not (Test-Connection -ComputerName google.com -Quiet)) {
-#     Write-Host "INFO: Waiting for internet connectivity..." -ForegroundColor Gray
-#     Start-Sleep -Seconds 5
-# }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ########################################################################################
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
