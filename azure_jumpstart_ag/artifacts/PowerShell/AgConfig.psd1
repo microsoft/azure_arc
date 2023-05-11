@@ -50,8 +50,8 @@
         'Az.ConnectedKubernetes'
     )
 
-    # Chocolatey app list
-    ChocolateyAppList   = @(
+    # Chocolatey packages list
+    ChocolateyPackagesList   = @(
         'azure-cli',
         'az.powershell',
         'kubernetes-cli',
@@ -98,7 +98,7 @@
     # L1 virtual machine configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the nested virtual machines will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
-    L1VMNumVCPU                          = 4                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
+    L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
     InternalSwitch                       = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
     L1Username                           = "Administrator"                       # This value controls the Admin credential username for the L1 Hyper-V virtual machines that run on the Agora-Client.
     L1Password                           = 'Agora123!!'                          # This value controls the Admin credential password for the L1 Hyper-V virtual machines that run on the Agora-Client.
@@ -111,7 +111,7 @@
     natHostVMSwitchName = "InternalNAT"
     natConfigure        = $true
     natSubnet           = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
-    natDNS              = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
+    natDNS              = "%staging-natDNS%"                     # Do not change - can be configured by passing the optional natDNS parameter to the ARM deployment.
 
     # AKS Edge Essentials variables
     SiteConfig          = @{
