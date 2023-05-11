@@ -660,6 +660,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --sync-interval 3s `
             --kustomization name=pos path=./$appPath/operations/$appPath/release/$store `
             --namespace $namespace `
+            --no-wait `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
     }
