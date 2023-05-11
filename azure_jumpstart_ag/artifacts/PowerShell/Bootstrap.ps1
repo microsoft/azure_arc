@@ -231,7 +231,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
 }
 
 ##############################################################
-# Create Docker Dekstop group
+# Create Docker Desktop group
 ##############################################################
 New-LocalGroup -Name "docker-users" -Description "docker Users Group"
 Add-LocalGroupMember -Group "docker-users" -Member $adminUsername
