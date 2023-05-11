@@ -79,9 +79,9 @@ sudo snap install kustomize
 
 # Set CAPI deployment environment variables
 export KUBECTL_VERSION="1.27/stable" # Do not change!
-export CLUSTERCTL_VERSION="1.4.1" # Do not change!
+export CLUSTERCTL_VERSION="1.4.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.7.5" # Do not change!
+export CAPI_PROVIDER_VERSION="1.9.1" # Do not change!
 export KUBERNETES_VERSION="1.27.1" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.26.3" # Do not change!
 export K3S_VERSION="1.27.1+k3s1" # Do not change!
@@ -155,6 +155,7 @@ echo ""
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
+kustomize edit fix
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
