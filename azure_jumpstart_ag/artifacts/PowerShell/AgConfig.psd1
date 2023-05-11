@@ -221,11 +221,10 @@
             Kustomization = "name=pos path=./contoso_supermarket/operations/contoso_supermarket/release"
             Namespace = "contoso-supermarket"
         }
-        # SensorMonitor = @{
-        #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-        #     Branch = "main"
-        #     GitOpsConfigName = "config-sensormonitor"
-        #     Kustomization = "name=bookstore path=./bookstore/yaml"
-        # }
+        SensorMonitor = @{
+            GitOpsConfigName = "config-sensormonitor"
+            Kustomization = "name=sensor-monitor path=./contoso_supermarket/operations/sensor-monitor/release"
+            Namespace = "sensor-monitor"
+        }
     }
 }

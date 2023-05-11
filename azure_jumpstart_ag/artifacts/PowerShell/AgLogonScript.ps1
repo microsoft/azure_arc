@@ -863,7 +863,6 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
-        $configName = $cluster.value.FriendlyName.ToLower()
         $clusterName = $cluster.value.ArcClusterName
         $branch = $cluster.value.Branch
         $clusterType= $cluster.value.Type
@@ -881,13 +880,12 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --name $configName `
             --cluster-type $type `
             --url $appClonedRepo `
-            --branch $Branch `
+            --branch $branch `
             --sync-interval 3s `
             --namespace $namespace `
             --kustomization $kustomization `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-
     }
 }
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
