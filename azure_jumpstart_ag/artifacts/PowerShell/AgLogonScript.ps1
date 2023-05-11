@@ -697,7 +697,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
 
     Do {
         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 45
         $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($monitorIP -eq "Nope" )
     # Get Load Balancer IP
