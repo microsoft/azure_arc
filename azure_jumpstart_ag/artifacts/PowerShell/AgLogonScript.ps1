@@ -326,7 +326,11 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 Start-Sleep -Seconds 20
-
+# Create an array with VM names    
+$VMnames = (Get-VM).Name
+foreach ($VM in $VMNames) {
+    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
+}
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
@@ -339,11 +343,6 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
             Restart-Computer
         } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
     }
-}
-# Create an array with VM names    
-$VMnames = (Get-VM).Name
-foreach ($VM in $VMNames) {
-    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
 }
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
