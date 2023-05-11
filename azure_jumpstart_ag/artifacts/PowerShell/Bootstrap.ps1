@@ -146,7 +146,7 @@ foreach ($url in $websiteUrls) {
 
   if ($retryCount -gt $maxRetries) {
     Write-Host "Exceeded maximum number of retries. Exiting..."
-    return  # Stop script execution if maximum retries reached
+    exit 1  # Stop script execution if maximum retries reached
   }
 }
 
@@ -206,7 +206,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     
     Write-Host "Chocolatey packages specified"
     
-    foreach ($app in $AgConfig.ChocolateyAppList) {
+    foreach ($app in $AgConfig.ChocolateyPackagesList) {
       Write-Host "Installing $app"
       & choco install $app /y -Force | Write-Output
     }
@@ -225,10 +225,11 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
     else {
       Write-Host "All attempts failed. Exiting..."
-      return  # Stop script execution if maximum retries reached      
+      exit 1  # Stop script execution if maximum retries reached      
     }
   }
 }
+
 
 ##############################################################
 # Create Docker Desktop group
