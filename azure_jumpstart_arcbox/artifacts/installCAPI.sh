@@ -155,7 +155,7 @@ echo ""
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
-kustomize edit fix
+kustomize edit fix capz_kustomize/kustomization.yaml
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
@@ -166,6 +166,7 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
+sudo kustomize edit fix capz_kustomize/kustomization.yaml
 sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
