@@ -604,7 +604,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             kubectl create secret docker-registry acr-secret `
-            --namespace $app.value.$namespace `
+            --namespace $app.value.namespace `
             --docker-server="$acrName.azurecr.io" `
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -625,6 +625,45 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
 Write-Host
+
+#####################################################################
+# Configuring applications on the clusters using GitOps
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/12)" -ForegroundColor DarkGreen
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
+        $store = $cluster.value.Branch.ToLower()
+        $clusterName = $cluster.value.ArcClusterName
+        $branch = $cluster.value.Branch.ToLower()
+        $configName = $app.value.GitOpsConfigName.ToLower()
+        $clusterType= $cluster.value.Type
+        if($clusterType -eq "AKS"){
+            $type = "managedClusters"
+        }else{
+            $type = "connectedClusters"
+        }
+        $namespace = $app.value.Namespace
+        $kustomization = ($app.value.Kustomization).ToString() + "/$store"
+        az k8s-configuration flux create `
+            --cluster-name $clusterName `
+            --resource-group $Env:resourceGroup `
+            --name $configName `
+            --cluster-type $type `
+            --url $appClonedRepo `
+            --branch $Branch `
+            --sync-interval 3s `
+            --namespace $namespace `
+            --kustomization $kustomization `
+            --no-wait `
+            --only-show-errors `
+            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+
+    }
+}
+Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+Write-Host
+
 
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
@@ -853,44 +892,6 @@ Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
-Write-Host
-
-#####################################################################
-# Configuring applications on the clusters using GitOps
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/12)" -ForegroundColor DarkGreen
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        $configName = $cluster.value.FriendlyName.ToLower()
-        $clusterName = $cluster.value.ArcClusterName
-        $branch = $cluster.value.Branch
-        $clusterType= $cluster.value.Type
-        if($clusterType -eq "AKS"){
-            $type = "managedClusters"
-        }else{
-            $type = "connectedClusters"
-        }
-        $namespace = $app.value.Namespace
-        $configName = $app.value.GitOpsConfigName
-        $kustomization = ($app.value.Kustomization).ToString() + "/$store"
-        az k8s-configuration flux create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --name $configName `
-            --cluster-type $type `
-            --url $appClonedRepo `
-            --branch $Branch `
-            --sync-interval 3s `
-            --namespace $namespace `
-            --kustomization $kustomization `
-            --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-
-    }
-}
-Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
 
 ##############################################################
