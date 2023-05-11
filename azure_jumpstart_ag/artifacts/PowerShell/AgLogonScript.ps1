@@ -93,7 +93,7 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor Gray
+Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/12)" -ForegroundColor DarkGreen
 Set-Location $AgAppsRepo
 if ($githubUser -ne "microsoft") {
     git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
@@ -196,7 +196,7 @@ Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
 
 #####################################################################
-# Azure IoT Hub resources preperation
+# Azure IoT Hub resources preparation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/12)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
@@ -262,7 +262,7 @@ if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
     Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
 }
 else {
-    Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluser resource in the resource group."
+    Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
 }
 
 #####################################################################
@@ -788,15 +788,15 @@ If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be r
 $downloadDir = "C:\WinTerminal"
 $gitRepo = "microsoft/terminal"
 $filenamePattern = "*.msixbundle"
-$framworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$framworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
 $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
 $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
 # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
 Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
-Invoke-WebRequest -Uri $framworkPkgUrl -OutFile ( New-Item -Path $framworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+Invoke-WebRequest -Uri $frameworkPkgUrl -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
 # Install WSL latest kernel update
@@ -805,7 +805,7 @@ msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($A
 
 # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
-Add-AppxPackage -Path $framworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 Add-AppxPackage -Path $msiPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
@@ -839,7 +839,7 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
 #############################################################
 # Install Docker Desktop
 #############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Dekstop." -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
 # Download and Install Docker Desktop
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
