@@ -218,7 +218,8 @@
             #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
             #Branch = "main"
             GitOpsConfigName = "config-supermarket"
-            Kustomization = "name=pos path=./contoso_supermarket/operations/contoso_supermarket/release"
+            KustomizationName = "pos"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/release"
             Namespace = "contoso-supermarket"
         }
         # SensorMonitor = @{
