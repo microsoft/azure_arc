@@ -50,8 +50,8 @@
         'Az.ConnectedKubernetes'
     )
 
-    # Chocolatey app list
-    ChocolateyAppList   = @(
+    # Chocolatey packages list
+    ChocolateyPackagesList   = @(
         'azure-cli',
         'az.powershell',
         'kubernetes-cli',
