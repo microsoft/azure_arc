@@ -582,7 +582,6 @@ kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath 
 Write-Host "[$(Get-Date -Format t)] INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
 az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 
-
 #####################################################################
 # Creating Kubernetes namespaces on clusters
 #####################################################################
@@ -590,7 +589,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     foreach ($namespace in $AgConfig.Namespaces) {
-        kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")s
+        kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     }
 }
 
