@@ -146,6 +146,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     acrName: acrName
     rdpPort: rdpPort
     adxClusterName: adxClusterName
+    namingGuid: namingGuid
   }
 }
 
