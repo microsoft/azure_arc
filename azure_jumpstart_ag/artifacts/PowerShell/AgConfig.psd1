@@ -13,7 +13,7 @@
         AgAgentScriptsDir = "C:\Ag\agentScripts"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
-        AgVHDXDir         = "V:\VHDX"
+        AgVHDXDir         = "V:\VMs"
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
     }
