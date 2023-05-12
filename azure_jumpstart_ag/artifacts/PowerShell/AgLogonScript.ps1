@@ -311,7 +311,7 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 #####################################################################
 # Deploying the nested L1 virtual machines 
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Yellow
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM image from Azure storage. This may take a few minutes." -ForegroundColor Yellow
 #azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
@@ -322,15 +322,18 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
         # Create disks for each site host
         Write-Host "[$(Get-Date -Format t)] INFO: Creating $($site.Name) disk." -ForegroundColor Gray
         $volume = Get-Volume | Where-Object FileSystemLabel -eq $site.Name
-        $destPath = "$($volume.DriveLetter):\$($site.Name)Disk.vhdx"
-        Copy-Item $vhdxPath -Destination $destPath
+        $destVhdxPath = "$($volume.DriveLetter):\$($site.Name)Disk.vhdx"
+        $destPath = "$($volume.DriveLetter):\VM"
+        New-Item -ItemType Directory -Path $destPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        Copy-Item $vhdxPath -Destination $destVhdxPath
 
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
+            -Path $destPath `
             -MemoryStartupBytes $AgConfig.L1VMMemory `
             -BootDevice VHD `
-            -VHDPath $destPath `
+            -VHDPath $destVhdxPath `
             -Generation 2 `
             -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
         
