@@ -306,8 +306,8 @@ if ($Env:flavor -eq "DataOps") {
     
         # Call REST API to run best practices assessment
         $httpResp = Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
-        if ($httpResp.StatusCode -eq 200){
-            Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for assessment to complete to view results."
+        if (($httpResp.StatusCode -eq 200) -or ($httpResp.StatusCode -eq 202)){
+            Write-Host "Arc-enabled SQL server best practices assessment executed. Wait for assessment to complete to view results."
         }
         else {
             <# Action when all if and elseif conditions are false #>
