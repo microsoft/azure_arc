@@ -77,11 +77,9 @@ $subscriptionId = (Get-AzSubscription).Id
 # Install PowerShell modules
 if ($AgConfig.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
-    $WarningPreference = "SilentlyContinue"
     foreach ($module in $AgConfig.PowerShellModules) {  
         Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     }
-    $WarningPreference = "Continue"
 }
 
 # Register Azure providers
