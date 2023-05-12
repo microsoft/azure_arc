@@ -239,4 +239,3 @@
             AppPath = "freezer-monitoring"
         }
     }
-}
