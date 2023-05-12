@@ -104,7 +104,7 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 $disk = Get-Disk | Where-Object partitionstyle -eq 'raw' | sort number
 $disk | Initialize-Disk -PartitionStyle MBR -PassThru |
         New-Partition -UseMaximumSize -DriveLetter $AgConfig.HostVMDrive |
-        Format-Volume -FileSystem NTFS -NewFileSystemLabel "VMs" -Confirm:$false -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel "VMs" -Confirm:$false -Force
 
 ##############################################################
 # Creating Ag paths
