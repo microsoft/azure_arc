@@ -267,40 +267,53 @@ if ($Env:flavor -eq "DataOps") {
         }
         else {
             # Arc SQL Server extension is not installed or still in progress.
-            Write-Error "SQL server extension is not installed and can't run SQL BPA."
+            Write-Host "SQL server extension is not installed and can't run SQL BPA."
             Exit
         }
     }
     else {
         # ArcBox-SQL Arc-enabled server resource not found
-        Write-Error "ArcBox-SQL Arc-enabled server resource not found. Re-run onboard script to fix this issue."
+        Write-Host "ArcBox-SQL Arc-enabled server resource not found. Re-run onboard script to fix this issue."
         Exit
     }
 
-    Write-Host "Enabling SQL server best practices assessment"
-    $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
-    az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
-
-    # Run Best practices assessment
-    Write-Host "Execute SQL server best practices assessment"
-
-    # Wait for a minute to finish everyting and run assessment
-    Start-Sleep(60)
-
-    # Get access token to make ARM REST API call for SQL server BPA
-    $armRestApiEndpoint = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
-    $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
-    $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-
-    # Build API request payload
-    $apiPayload = (Invoke-WebRequest -Method Get -Uri $armRestApiEndpoint -Headers $headers).Content | ConvertFrom-Json
-    $apiPayload.properties.settings.AssessmentSettings.settingsSaveTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-    $apiPayload = $apiPayload | ConvertTo-Json -Depth 5
-
-
-    # Call REST API to run best practices assessment
-    Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
-    Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for assessment to complete to view results."
+    # Verify if ArcBox SQL resource is created
+    $arcSQLStatus = az resource list --resource-group $resourceGroup --query "[?name=='$SQLvmName'] | [?type=='Microsoft.AzureArcData/SqlServerInstances'].[provisioningState]" -o tsv
+    if ($arcSQLStatus -ne "Succeeded"){
+        Write-Host "ArcBox-SQL Arc-enabled server resource not found. Wait for the resource to be created and follow troubleshooting guide to run assessment manually."
+    }
+    else {
+        <# Action when all if and elseif conditions are false #>
+        Write-Host "Enabling SQL server best practices assessment"
+        $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
+        az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
+    
+        # Run Best practices assessment
+        Write-Host "Execute SQL server best practices assessment"
+    
+        # Wait for a minute to finish everyting and run assessment
+        Start-Sleep(60)
+    
+        # Get access token to make ARM REST API call for SQL server BPA
+        $armRestApiEndpoint = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
+        $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
+        $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+    
+        # Build API request payload
+        $apiPayload = (Invoke-WebRequest -Method Get -Uri $armRestApiEndpoint -Headers $headers).Content | ConvertFrom-Json
+        $apiPayload.properties.settings.AssessmentSettings.settingsSaveTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+        $apiPayload = $apiPayload | ConvertTo-Json -Depth 5
+    
+        # Call REST API to run best practices assessment
+        $httpResp = Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
+        if ($httpResp.StatusCode -eq 200){
+            Write-Host "Arc-enabled SQL server best practices assessment complete. Wait for assessment to complete to view results."
+        }
+        else {
+            <# Action when all if and elseif conditions are false #>
+            Write-Host "SQL Best Practices Assessment faild. Please refer troubleshooting guide to run manually."
+        }
+    }
 
     # Test Defender for SQL
     Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
