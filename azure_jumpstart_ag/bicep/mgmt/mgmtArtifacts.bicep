@@ -42,3 +42,11 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     publisher: 'Microsoft'
   }
 }
+
+module policyDeployment './policyAzureArc.bicep' = {
+  name: 'policyDeployment'
+  params: {
+    azureLocation: location
+    logAnalyticsWorkspaceId: workspace.id
+  }
+}
