@@ -21,7 +21,8 @@ param (
   [string]$githubAccount,
   [string]$githubBranch,
   [string]$githubPAT,
-  [string]$adxClusterName
+  [string]$adxClusterName,
+  [string]$namingGuid
 )
 
 ##############################################################
@@ -54,6 +55,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
