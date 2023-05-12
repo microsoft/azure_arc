@@ -85,7 +85,7 @@ if ($AgConfig.PowerShellModules.Count -ne 0) {
 }
 
 # Register Azure providers
-if ($Agconfig.AzureProviders.Count -ne 0) {
+if ($AgConfig.AzureProviders.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
     foreach ($provider in $AgConfig.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
@@ -231,13 +231,13 @@ else {
 # Get Azure Data Explorer URI
 $adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
 
-# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
+# Get access token to make REST API call to Azure Data Explorer Dashboard API. Replace double quotes surrounding access token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
 
 # Prepare authorization header with access token
 $httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
 
-# Make REST API call to the dashbord endpoint.
+# Make REST API call to the dashboard endpoint.
 $restApi = "https://dashboards.kusto.windows.net/dashboards"
 
 # Import orders dashboard report
@@ -278,6 +278,21 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastr
 $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
+# Initialize the three data disks
+$disks = Get-Disk | Where-Object partitionstyle -eq 'raw' | sort number
+$labels = $AgConfig.SiteConfig.GetEnumerator() | Where-Object { $_.Value.Type -eq "AKSEE" } | Select-Object -ExpandProperty Name
+$letters = 70..89 | ForEach-Object { [char]$_ }
+$count = 0
+
+foreach ($disk in $disks) {
+    $driveLetter = $letters[$count].ToString()
+    $disk |
+        Initialize-Disk -PartitionStyle MBR -PassThru |
+        New-Partition -UseMaximumSize -DriveLetter $driveLetter |
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel $labels[$count] -Confirm:$false -Force
+    $count++
+}
+
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
 $kubeFolder = "$env:USERPROFILE\.kube"
 New-Item -ItemType Directory $kubeFolder -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
@@ -304,16 +319,18 @@ azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recurs
 $vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
-        # Create diff disks for each site host
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating differencing disk for $($site.Name) site" -ForegroundColor Gray
-        $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
-        
+        # Create disks for each site host
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($site.Name) disk." -ForegroundColor Gray
+        $volume = Get-Volume | Where-Object FileSystemLabel -eq $site.Name
+        $destPath = "$($volume.DriveLetter):\$($site.Name)Disk.vhdx"
+        Copy-Item $vhdxPath -Destination $destPath
+
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
             -MemoryStartupBytes $AgConfig.L1VMMemory `
             -BootDevice VHD `
-            -VHDPath $vhd.Path `
+            -VHDPath $destPath `
             -Generation 2 `
             -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
         
@@ -426,7 +443,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 
     ###############################################################################
-    # Setting up replacment parameters for AKS Edge Essentials config json file
+    # Setting up replacement parameters for AKS Edge Essentials config json file
     ###############################################################################
     Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
@@ -505,7 +522,7 @@ $elapsedTime = Measure-Command {
 Write-Host "[$(Get-Date -Format t)] INFO: Waiting on kubeconfig files took $($elapsedTime.ToString("g"))." -ForegroundColor Gray
 
 #####################################################################
-# Merging kubeconfig files on the L0 vistual machine
+# Merging kubeconfig files on the L0 virtual machine
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
 $kubeconfigpath = ""
