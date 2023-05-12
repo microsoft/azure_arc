@@ -153,7 +153,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       }
       dataDisks: [
         {
-          diskSizeGB: 128
+          diskSizeGB: 256
           lun: 0
           createOption: 'Empty'
           managedDisk: {
@@ -161,7 +161,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          diskSizeGB: 128
+          diskSizeGB: 256
           lun: 1
           createOption: 'Empty'
           managedDisk: {
@@ -169,7 +169,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           }
         }
         {
-          diskSizeGB: 128
+          diskSizeGB: 256
           lun: 2
           createOption: 'Empty'
           managedDisk: {
