@@ -641,9 +641,9 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 10/13)" -For
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         # --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName)" -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName
+        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
         $branch = $cluster.value.Branch.ToLower()
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType = $cluster.value.Type
