@@ -235,7 +235,7 @@
         }
         SensorMonitor = @{
             GitOpsConfigName = "config-sensormonitor"
-            Kustomization = "name=sensor-monitor path=./contoso_supermarket/operations/sensor-monitor/release"
+            Kustomization = "name=sensor-monitor path=./contoso_supermarket/operations/freezer-monitoring/release"
             Namespace = "sensor-monitor"
         }
     }
