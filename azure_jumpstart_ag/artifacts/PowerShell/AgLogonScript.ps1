@@ -276,21 +276,6 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastr
 $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
-# Initialize the three data disks
-$disks = Get-Disk | Where-Object partitionstyle -eq 'raw' | sort number
-$labels = $AgConfig.SiteConfig.GetEnumerator() | Where-Object { $_.Value.Type -eq "AKSEE" } | Select-Object -ExpandProperty Name
-$letters = 70..89 | ForEach-Object { [char]$_ }
-$count = 0
-
-foreach ($disk in $disks) {
-    $driveLetter = $letters[$count].ToString()
-    $disk |
-        Initialize-Disk -PartitionStyle MBR -PassThru |
-        New-Partition -UseMaximumSize -DriveLetter $driveLetter |
-        Format-Volume -FileSystem NTFS -NewFileSystemLabel $labels[$count] -Confirm:$false -Force
-    $count++
-}
-
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
 $kubeFolder = "$env:USERPROFILE\.kube"
 New-Item -ItemType Directory $kubeFolder -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
@@ -319,11 +304,9 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         # Create disks for each site host
         Write-Host "[$(Get-Date -Format t)] INFO: Creating $($site.Name) disk." -ForegroundColor Gray
-        $volume = Get-Volume | Where-Object FileSystemLabel -eq $site.Name
-        $destVhdxPath = "$($volume.DriveLetter):\$($site.Name)Disk.vhdx"
-        $destPath = "$($volume.DriveLetter):\VM"
-        New-Item -ItemType Directory -Path $destPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-        Copy-Item $vhdxPath -Destination $destVhdxPath
+        $destVhdxPath = "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)Disk.vhdx"
+        $destPath = $AgConfig.AgDirectories["AgVHDXDir"]
+        New-VHD -ParentPath $vhdxPath -Path $destVhdxPath -Differencing | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
