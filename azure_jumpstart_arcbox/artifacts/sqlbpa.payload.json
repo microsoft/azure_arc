@@ -6,7 +6,7 @@
     "properties": {
         "publisher": "Microsoft.AzureData",
         "type": "WindowsAgent.SqlServer",
-        "typeHandlerVersion": "1.1.2284.7",
+        "typeHandlerVersion": "1.1.2313.14",
         "autoUpgradeMinorVersion": false,
         "enableAutomaticUpgrade": true,
         "settings": {
