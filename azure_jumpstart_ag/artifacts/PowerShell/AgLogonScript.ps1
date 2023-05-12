@@ -604,7 +604,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 #####################################################################
-# Setup Azure Container registry on AKS Edge Essentials clusters
+# Setup Azure Container registry pull secret on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/13)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -652,6 +652,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
 
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
+            $clusterName= $cluster.value.ArcClusterName
         }else{
             $type = "connectedClusters"
         }
@@ -665,8 +666,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --cluster-type $type `
             --url $appClonedRepo `
             --branch $Branch `
-            --sync-interval 3s `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store `
+            --sync-interval 1m `
+            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `
