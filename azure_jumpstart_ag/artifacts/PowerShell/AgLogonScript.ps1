@@ -299,6 +299,7 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 # Deploying the nested L1 virtual machines 
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Yellow
+#azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
 # Create three virtual machines from the base VHDX image
@@ -332,7 +333,11 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 Start-Sleep -Seconds 20
-
+# Create an array with VM names    
+$VMnames = (Get-VM).Name
+foreach ($VM in $VMNames) {
+    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
+}
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
 ########################################################################
@@ -346,8 +351,6 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
         } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
     }
 }
-# Create an array with VM names    
-$VMnames = (Get-VM).Name
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Set time zone to UTC
@@ -540,6 +543,7 @@ foreach ($VM in $VMNames) {
 
     Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
         # Install prerequisites
+        . C:\Deployment\Profile.ps1
         $hostname = hostname
         $ProgressPreference = "SilentlyContinue"
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -553,7 +557,7 @@ foreach ($VM in $VMNames) {
         $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
         Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
         Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
-        Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location
+        Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
 
         # Connect clusters to Arc
         $deploymentPath = "C:\Deployment\config.json"
@@ -926,7 +930,7 @@ Move-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\Ap
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" -WindowStyle Minimized
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
