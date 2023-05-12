@@ -135,7 +135,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("freezer-1","freezer-2")
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -157,7 +156,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("freezer-1","freezer-2")
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -179,7 +177,6 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("freezer-1","freezer-2")
         }
         Staging = @{
             ArcClusterName      = "Ag-AKS-Staging"
@@ -192,7 +189,6 @@
             HelmService         = "service/prometheus-grafana"
             GrafanaDataSource   = "prometheus"
             HelmValuesFile      = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("freezer-1","freezer-2")
         }
     }
 
@@ -230,13 +226,17 @@
             #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
             #Branch = "main"
             GitOpsConfigName = "config-supermarket"
-            Kustomization = "name=pos path=./contoso_supermarket/operations/contoso_supermarket/release"
+            KustomizationName = "pos"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/release"
             Namespace = "contoso-supermarket"
+            AppPath = "contoso_supermarket"
         }
         SensorMonitor = @{
             GitOpsConfigName = "config-sensormonitor"
-            Kustomization = "name=sensor-monitor path=./contoso_supermarket/operations/freezer-monitoring/release"
+            KustomizationName = "sensor-monitor"
+            KustomizationPath = "./contoso_supermarket/operations/freezer-monitoring/release"
             Namespace = "sensor-monitor"
+            AppPath = "freezer-monitoring"
         }
     }
 }

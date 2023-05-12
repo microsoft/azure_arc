@@ -13,39 +13,18 @@ jobs:
     if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Replace text and commit changes
-      run: |
-        SEARCH_TEXT="old-text"
-        REPLACE_TEXT="new-text"
-        FILE_PATTERN="*.txt"
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
-        for branch in $(git branch -r | grep -v HEAD); do
-          git checkout "${branch#origin/}"
+      - name: Replace the correct ACR name
+        continue-on-error: true
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
           git pull
-          find . -type f -name "$FILE_PATTERN" -exec sed -i "s/$SEARCH_TEXT/$REPLACE_TEXT/g" {} +
-          git add -u
-          git diff --quiet && git diff --staged --quiet || git commit -m "Replace text in files"
-          git push
-        done
-
-    - name: Replace variables with the correct names
-      env:
-        ACR_NAME: ${{ secrets.ACR_NAME }}
-        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
-      run: |
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
-        for branch in $(git branch -r | grep -v HEAD); do
-          git checkout "${branch#origin/}"
-          git pull
-          # Update ACR name
+          # Update ACR name in staging
           FILE_PATH=$(find . -name "staging.yaml")
           newLine="    acr_name: $ACR_NAME"
           if [ ! -z "$FILE_PATH" ]; then
@@ -54,6 +33,7 @@ jobs:
             echo "staging.yaml not found"
           fi
 
+          # Update ACR name in canary
           FILE_PATH=$(find . -name "chicago.yaml")
           newLine="    acr_name: $ACR_NAME"
           if [ ! -z "$FILE_PATH" ]; then
@@ -62,6 +42,7 @@ jobs:
             echo "chicago.yaml not found"
           fi
 
+          # Update ACR name in production
           FILE_PATH=$(find . -name "seattle.yaml")
           newLine="    acr_name: $ACR_NAME"
           if [ ! -z "$FILE_PATH" ]; then
@@ -70,6 +51,7 @@ jobs:
             echo "seattle.yaml not found"
           fi
 
+          # Update ACR name in main
           FILE_PATH=$(find . -name "dev.yaml")
           newLine="    acr_name: $ACR_NAME"
           if [ ! -z "$FILE_PATH" ]; then
@@ -77,10 +59,23 @@ jobs:
           else
             echo "dev.yaml not found"
           fi
-          # Update GitHub account in Chart.yaml
-          find . -type f -name "Chart.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
 
-          # Update Cosmos DB endpoint
+          # Push changes
+          git add .
+          git commit -m "Update ACR name"
+          git push
+
+      - name: Replace the correct Cosmos DB endpoint
+        continue-on-error: true
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git pull
+
           FILE_PATH=$(find . -name "staging.yaml")
           newLine="      endpoint: $COSMOS_ENDPOINT"
           if [ ! -z "$FILE_PATH" ]; then
@@ -112,7 +107,8 @@ jobs:
           else
             echo "dev.yaml not found"
           fi
-          git add -u
-          git diff --quiet && git diff --staged --quiet || git commit -m "Replace text in files"
+
+          # Push changes
+          git add .
+          git commit -m "Update Cosmos DB endpoint"
           git push
-        done

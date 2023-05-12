@@ -77,11 +77,10 @@ param adxClusterName string = 'agadx${namingGuid}'
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string = 'Orders'
 
-
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
-param acrName string = 'Agacr${namingGuid}'
+param acrName string = 'agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -160,11 +159,12 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName : accountName
-    cosmosDBEndpoint : cosmosDBDeployment.outputs.cosmosDBEndpoint
+    cosmosDBName: accountName
+    cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
     acrName: acrName
     rdpPort: rdpPort
     adxClusterName: adxClusterName
+    namingGuid: namingGuid
   }
 }
 
@@ -182,8 +182,8 @@ module adxDeployment 'data/dataExplorer.bicep' = {
   scope: rg
   params: {
     location: location
-    adxClusterName : adxClusterName
-    iotHubId : iotHubDeployment.outputs.iotHubId
+    adxClusterName: adxClusterName
+    iotHubId: iotHubDeployment.outputs.iotHubId
     iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
     cosmosDBAccountName: accountName
     posOrdersDBName: posOrdersDBName
@@ -196,6 +196,6 @@ module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   params: {
     location: location
     accountName: accountName
-    posOrdersDBName:posOrdersDBName
+    posOrdersDBName: posOrdersDBName
   }
 }
