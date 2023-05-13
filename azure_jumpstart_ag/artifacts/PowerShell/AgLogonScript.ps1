@@ -659,8 +659,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         }else{
             $type = "connectedClusters"
         }
-        if($branch -eq "main"){
-            $branch = "dev"
+        if($branch -eq "dev"){
+            $branch = "main"
         }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
