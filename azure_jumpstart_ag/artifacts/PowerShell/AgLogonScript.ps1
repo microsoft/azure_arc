@@ -659,8 +659,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         }else{
             $type = "connectedClusters"
         }
-        if($branch -eq "dev"){
-            $branch = "main"
+        if($branch -eq "main"){
+            $store = "dev"
         }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
@@ -670,7 +670,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 1m `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m `
+            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `
