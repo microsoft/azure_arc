@@ -672,7 +672,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --cluster-type $type `
             --url $appClonedRepo `
             --branch $Branch `
-            --sync-interval 1m `
+            --sync-interval 3s `
             --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")`
             --namespace $namespace `
             --only-show-errors `
@@ -934,7 +934,7 @@ Move-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\Ap
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" -WindowStyle Minimized
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
