@@ -13,8 +13,7 @@ jobs:
   promote-to-canary:
     runs-on: ubuntu-latest
     if: |
-      github.event.client_payload.metadata.summary == 'env=canary' &&
-      github.event.client_payload.severity == 'info' && [[github.event.client_payload.message =~ "Health check passed" ]]
+      github.event.client_payload.metadata.summary == 'env=canary' && github.event.client_payload.severity == 'info' && contains(github.event.client_payload.message,'Health check passed')
 
     steps:
     - name: 'Checkout repository'
