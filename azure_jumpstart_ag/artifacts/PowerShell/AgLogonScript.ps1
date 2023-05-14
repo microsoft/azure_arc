@@ -98,7 +98,7 @@ Write-Host
 #####################################################################
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
-    Write-Host "INFO: Checking if fork exists" -ForegroundColor Gray
+    Write-Host "INFO: Checking if the jumpstart-agora-repo is forked" -ForegroundColor Gray
     do {
         try {
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$appsRepo"
@@ -193,6 +193,7 @@ Write-Host
                 Write-Host "Error: No permissions to create a secret, please assign the right permissions" -ForegroundColor Red
             } else {
                 Write-Host "INFO:  Write permissions to secrets is enabled" -ForegroundColor Gray
+                gh secret delete test
                 $secretsPermissions = true
             }
         }
