@@ -2,7 +2,6 @@ name: Promote-to-canary
 on:
   repository_dispatch:
     types:
-      - HelmRelease/pos.contoso-supermarket
       - Kustomization/config-supermarket-pos.contoso-supermarket
 
 permissions:
@@ -18,11 +17,6 @@ jobs:
     steps:
     - name: 'Checkout repository'
       uses: actions/checkout@v3
-
-    - name: Run tests
-      uses: mscoutermarsh/ascii-art-action@master
-      with:
-        text: 'Testing complete!'
 
     - name: 'Login to ACR'
       uses: azure/docker-login@v1
@@ -43,16 +37,26 @@ jobs:
         echo $NEW_VERSION
         echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+    - name: Run tests
+      uses: mscoutermarsh/ascii-art-action@master
+      if: ${{ env.latest_tag != 'v1.0' }}
+      with:
+        text: 'Testing complete!'
+
     - name: 'Build and push new images'
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         namespace: "canary"
+      if: ${{ env.latest_tag != 'v1.0' }}
       run: |
-        docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
+        if [ "$latest_tag" != "v1.0" ]; then
+          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
+        fi
 
     - name: 'Checkout canary branch'
       uses: actions/checkout@v3
+      if: ${{ env.latest_tag != 'v1.0' }}
       with:
         ref: 'canary'
 
@@ -60,6 +64,7 @@ jobs:
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ env.latest_tag != 'v1.0' }}
       run: |
         FILE_PATH=$(find . -name "chicago.yaml")
         newLine="    image_tag: $latest_tag"
