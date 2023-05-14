@@ -123,7 +123,7 @@ jobs:
         git pull
 
         FILE_PATH=$(find . -name "staging.yaml")
-        newLine="      github_User: $GITHUB_REPOSITORY_OWNER"
+        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
         if [ ! -z "$FILE_PATH" ]; then
           sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
         else
@@ -131,7 +131,7 @@ jobs:
         fi
 
         FILE_PATH=$(find . -name "chicago.yaml")
-        newLine="      github_User: $GITHUB_REPOSITORY_OWNER"
+        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
         if [ ! -z "$FILE_PATH" ]; then
           sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
         else
@@ -139,7 +139,7 @@ jobs:
         fi
 
         FILE_PATH=$(find . -name "seattle.yaml")
-        newLine="      github_User: $GITHUB_REPOSITORY_OWNER"
+        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
         if [ ! -z "$FILE_PATH" ]; then
           sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
         else
@@ -147,7 +147,7 @@ jobs:
         fi
 
         FILE_PATH=$(find . -name "dev.yaml")
-        newLine="      github_User: $GITHUB_REPOSITORY_OWNER"
+        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
         if [ ! -z "$FILE_PATH" ]; then
           sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
         else
