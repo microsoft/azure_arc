@@ -77,10 +77,11 @@ jobs:
         fi
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
-        git checkout -b update-production-image-tag production
+        newBranch="update-production-image-tag-${latest_tag}"
+        git checkout -b $newBranch production
         git config pull.rebase false
         git add --all
         git commit -m "Update Image Tag on production to $latest_tag"
-        git push --set-upstream origin update-production-image-tag
+        git push --set-upstream origin $newBranch
         gh pr create --title "Update production Image Tag to $latest_tag" --body "Update production Image Tag to $latest_tag"
 
