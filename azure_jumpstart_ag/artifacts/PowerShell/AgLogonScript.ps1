@@ -107,7 +107,7 @@ Write-Host
             }
         }
         catch {
-            Write-Host "Wa: Please fork the https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds"
+            Write-Host "ERROR: Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
             start-sleep -Seconds 45
         }
     } until (
@@ -116,99 +116,6 @@ Write-Host
 
     git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
     Set-Location "$AgAppsRepo\$appsRepo"
-    Write-Host "INFO: Checking if the GitHub personal access token is valid" -ForegroundColor Gray
-    do {
-        $status = 'failed'
-        try {
-            $Headers = @{
-                "Authorization" = "Bearer $githubPAT"
-            }
-            $Response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$appsRepo" -Headers $Headers -ErrorAction Stop
-            $status = 'Success'
-            Write-Host "INFO: Login successful using Personal access token" -ForegroundColor Gray
-        }
-        catch {
-            if ($_.Exception.Response.StatusCode -eq 401) {
-                Write-Host "ERROR: Login failed, invalid personal access token. Please make sure the token is assigned on https://api.github.com/repos/$githubUser/$appsRepo ...... the waiting 45 seconds" -ForegroundColor Red
-                Start-Sleep -Seconds 5
-            }
-            else {
-                Write-Host "Error: $($_.Exception.Message)"
-            }
-        }
-    } until (
-        $status -eq 'Success'
-    )
-    Write-Host "INFO: Checking if the GitHub personal access token has the right permissions" -ForegroundColor Gray
-    $repoPermissions = $false
-    $userPermissions = $false
-    $adminPermissions = $false
-    $secretsPermissions = $false
-    $workflowPermissions = $false
-    $pullRequestsPermissions = $false
-
-    $Headers = @{
-        "Authorization" = "token $$githubpat"
-        "Accept"        = "application/vnd.github+json"
-    }
-    do {
-        try {
-            Invoke-WebRequest -Uri "$baseUri/repos/$owner/$repo" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: Repo permission: Yes" -ForegroundColor Gray
-            $repoPermissions = true
-        }
-        catch {
-            Write-Host "Error: Repo permission: No" -ForegroundColor Red
-        }
-        try {
-            Invoke-WebRequest -Uri "$baseUri/user" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: User permission: Yes" -ForegroundColor Gray
-            $userPermissions = true
-        }
-        catch {
-            Write-Host "Error: User permission: No" -ForegroundColor Red
-        }
-        try {
-            Invoke-WebRequest -Uri "$baseUriuser/orgs" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: Admin:org permission: Yes" -ForegroundColor Gray
-            $adminPermissions = true
-        }
-        catch {
-            Write-Host "Error: Admin:org permission: No" -ForegroundColor Red
-        }
-        try {
-            Invoke-WebRequest -Uri "$baseUri/repos/$githubUser/$appsRepo/actions/workflows" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: Workflows permission: Yes" -ForegroundColor Gray
-            $workflowPermissions = true
-        }
-        catch {
-            Write-Host "Error: Workflows permission: No" -ForegroundColor Red
-        }
-        try {
-            Invoke-WebRequest -Uri "$baseUri/repos/$githubUser/$appsRepo/actions/secrets" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: Secrets permission: Yes" -ForegroundColor Gray
-            Write-Host "INFO: Attempting to create a test secret" -ForegroundColor Gray
-            $response = gh secret set test -b "test" 2>&1
-            if ($response -match "error") {
-                Write-Host "Error: No permissions to create a secret, please assign the right permissions" -ForegroundColor Red
-            } else {
-                Write-Host "INFO:  Write permissions to secrets is enabled" -ForegroundColor Gray
-                gh secret delete test
-                $secretsPermissions = true
-            }
-        }
-        catch {
-            Write-Host "Error: Secrets permission: No" -ForegroundColor Red
-        }
-        try {
-            Invoke-WebRequest -Uri "$baseUri/repos/$githubUser/$appsRepo/pulls" -Headers $Headers -ErrorAction Stop
-            Write-Host "INFO: Pull requests permission: Yes" -ForegroundColor Gray
-            $pullRequestsPermissions = true
-        } catch {
-            Write-Host "Error: Pull requests permission: No" -ForegroundColor Red
-        }
-    } until ($repoPermissions -eq $true -and $userPermissions -eq $true -and $adminPermissions -eq $true -and $workflowPermissions -eq $true -and $secretsPermissions -eq $true -and $pullRequestsPermissions -eq $true)
-
     New-Item -ItemType Directory ".github/workflows" -Force
     Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
     Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
