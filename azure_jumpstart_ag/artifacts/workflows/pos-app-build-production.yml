@@ -1,4 +1,4 @@
-name: promote-to-production
+name: Promote-to-production
 on:
   repository_dispatch:
     types:

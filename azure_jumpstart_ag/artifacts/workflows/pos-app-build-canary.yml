@@ -1,4 +1,4 @@
-name: promote-to-canary
+name: Promote-to-canary
 on:
   repository_dispatch:
     types:

@@ -1,4 +1,4 @@
-name: Build contososupermarket app - staging
+name: Promote-to-staging
 
 on:
   pull_request:
