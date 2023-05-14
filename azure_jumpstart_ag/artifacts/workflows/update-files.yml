@@ -1,4 +1,4 @@
-name: Update ACR and Cosmos DB values in all branches
+name: Update-helm-values
 
 on:
   workflow_dispatch:
