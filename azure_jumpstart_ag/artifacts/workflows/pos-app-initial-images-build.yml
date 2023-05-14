@@ -1,5 +1,4 @@
-name: Initial Contoso supermarket applications image build
-
+name: Build-and-push-v1.0-images
 on:
   workflow_dispatch:
 
