@@ -146,9 +146,13 @@ Write-Host
     Start-Sleep -Seconds 20
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
+    while ($workflowStatus.status -ne "completed") {
+        Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
+        Start-Sleep -Seconds 10
+        $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
+    }
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
     gh workflow run pos-app-initial-images-build.yml
-    Start-Sleep -Seconds 45
 
     Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
     $branches = $AgConfig.GitBranches
