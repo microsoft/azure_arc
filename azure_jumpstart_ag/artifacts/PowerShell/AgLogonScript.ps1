@@ -95,8 +95,8 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
-Set-Location $AgAppsRepo
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
+    Set-Location $AgAppsRepo
     git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
     Set-Location "$AgAppsRepo\$appsRepo"
     New-Item -ItemType Directory ".github/workflows" -Force
@@ -124,6 +124,13 @@ Set-Location $AgAppsRepo
         Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
     }
 
+    Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
+    git config --global user.email "dev@agora.com"
+    git config --global user.name "Agora Dev"
+    git config --global core.autocrlf false
+    git fetch
+    git pull
+
     Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
     $githubApiUrl = "https://api.github.com/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
@@ -133,14 +140,10 @@ Set-Location $AgAppsRepo
       $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
       Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    git config --global core.autocrlf false
-    git fetch
-    git pull
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
     git push
+    Start-Sleep -Seconds 20
     Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
     gh workflow run update-files.yml
     Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
@@ -660,7 +663,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             $type = "connectedClusters"
         }
         if($branch -eq "main"){
-            $branch = "dev"
+            $store = "dev"
         }
         az k8s-configuration flux create `
             --cluster-name $clusterName `
@@ -670,7 +673,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 1m `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m `
+            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `
