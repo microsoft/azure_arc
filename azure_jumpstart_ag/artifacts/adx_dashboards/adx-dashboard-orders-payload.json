@@ -249,9 +249,9 @@
   "dataSources": [
     {
       "id": "30c352ba-838d-4a10-a030-718b81b97cff",
-      "name": "agadxa93f2",
+      "name": "{{ADX_CLUSTER_NAME}}",
       "scopeId": "kusto",
-      "clusterUri": "https://agadxa93f2.eastus.kusto.windows.net",
+      "clusterUri": "{{ADX_CLUSTER_URI}}",
       "database": "Orders",
       "kind": "manual-kusto"
     }
