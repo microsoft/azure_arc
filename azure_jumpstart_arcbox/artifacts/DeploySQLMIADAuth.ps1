@@ -437,7 +437,7 @@ $sqlServerConnection = @"
         "server": "10.10.1.100",
         "database": "",
         "authenticationType": "SqlLogin",
-        "user": "$sa_username",
+        "user": "sa",
         "password": "$sa_password",
         "applicationName": "azdata",
         "groupId": "C777F06B-202E-4480-B475-FA416154D458",
