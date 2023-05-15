@@ -49,7 +49,8 @@
 
     # PowerShell modules
     PowerShellModules   = @(
-        'Az.ConnectedKubernetes'
+        'Az.ConnectedKubernetes',
+        'Az.Kusto'
     )
 
     # Chocolatey packages list
