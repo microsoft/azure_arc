@@ -16,6 +16,8 @@
         AgVHDXDir         = "C:\Ag\VHDX"
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
+        AgAdxDashboards   = "C:\Ag\AdxDashboards"
+        AgDataEmulator    = "C:\Ag\DataEmulator"
     }
 
     # Required URLs

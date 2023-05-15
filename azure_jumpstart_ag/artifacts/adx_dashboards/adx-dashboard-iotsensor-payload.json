@@ -150,8 +150,8 @@
   "dataSources": [
     {
       "id": "a047cfcb-722a-49e0-af1c-b57f30309d6b",
-      "name": "agadxa93f2",
-      "clusterUri": "https://agadxa93f2.eastus.kusto.windows.net",
+      "name": "{{ADX_CLUSTER_NAME}}",
+      "clusterUri": "{{ADX_CLUSTER_URI}}",
       "database": "Orders",
       "queryResultsCacheMaxAge": 1800000,
       "kind": "manual-kusto",
