@@ -651,7 +651,9 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType = $cluster.value.Type
         $namespace = $app.value.Namespace
-        $appPath= $app.Value.AppPath
+        $appPath = $app.Value.AppPath
+        $kustomizationName = $app.Value.KustomizationName
+        $kustomizationPath = $app.Value.KustomizationPath
 
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
@@ -670,7 +672,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 1m `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m `
+            --kustomization name=$kustomizationName path=$kustomizationPath/$store prune=true sync_interval=1m retry_interval=1m `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `

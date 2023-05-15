@@ -234,9 +234,9 @@
         SensorMonitor = @{
             GitOpsConfigName = "config-sensormonitor"
             KustomizationName = "sensor-monitor"
-            KustomizationPath = "./contoso_supermarket/operations/freezer-monitoring/release"
+            KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
             Namespace = "sensor-monitor"
-            AppPath = "freezer-monitoring"
+            AppPath = "freezer_monitoring"
         }
     }
 }
