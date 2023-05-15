@@ -156,7 +156,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
           diskSizeGB: 1024
           lun: 0
           createOption: 'Empty'
-          caching: 'ReadOnly'
+          caching: 'ReadWrite'
           managedDisk: {
             storageAccountType: 'Premium_LRS'
           }
