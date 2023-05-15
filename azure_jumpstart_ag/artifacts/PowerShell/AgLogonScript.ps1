@@ -707,7 +707,7 @@ Write-Host
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-<#$AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+$AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
 $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
 $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
 $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -933,7 +933,6 @@ $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-#>
 #############################################################
 # Install VSCode extensions
 #############################################################
