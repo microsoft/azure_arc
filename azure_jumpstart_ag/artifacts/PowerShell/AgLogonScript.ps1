@@ -263,15 +263,21 @@ if ($httpResponse.StatusCode -ne 200){
 $agDir = $AgConfig.AgDirectories["AgDir"]
 $adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv --only-show-errors)
 if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
-    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/dashboards/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
     Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
-    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
     Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
 }
 else {
     Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
 }
 
+# Download DataEmulator.zip into Agora folder and unzip
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/emulator/DataEmulator.zip" -OutFile "$agDir\DataEmulator.zip"
+
+# Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
+Expand-Archive -Path "$agDir\DataEmulator.zip" -DestinationPath "$agDir\DataEmulator" -ErrorAction SilentlyContinue -Force
+ 
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
