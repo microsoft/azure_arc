@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "AKS Edge Essentials"
-linkTitle: "AKS Edge Essentials"
+title: "AKS Edge Essentials single machine deployment"
+linkTitle: "AKS Edge Essentials single machine deployment"
 weight: 1
 description: >
 ---
