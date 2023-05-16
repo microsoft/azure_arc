@@ -68,17 +68,18 @@ $available = Get-AzAvailableCores -location $location -skuFriendlyNames $skuFrie
 If ($available.usableLocation -contains $false) {
     Write-Host "`n`u{274C} There is not enough VM capacity in the $location region to deploy the Jumpstart environment." -ForegroundColor Red
     
-    Write-Host "`nChecking for other regions in the same geography with enough capacity ($minCores cores)...`n"
+    Write-Host "`nChecking other regions in the same geography with enough capacity ($minCores cores)...`n"
 
     $locations = Get-AzAvailableLocations -location $location -skuFriendlyNames $skuFriendlyNames -minCores $minCores | 
         Format-Table Location, DisplayName, TotalCores, AvailableCores, UsableLocation -AutoSize | Out-String
     
     Write-Host $locations
 
-    Write-Host "Please run ``azd env`` to create a new environment and select the new location.`n"
+    Write-Host "Please run ``azd env --new`` to create a new environment and select the new location.`n"
 
-    Throw "Not enough capacity in $location region."
-    
+    $message = "Not enough capacity in $location region."
+    Throw $message
+
 } else {
     Write-Host "`n`u{2705} There is enough VM capacity in the $location region to deploy the Jumpstart environment.`n"
 }
