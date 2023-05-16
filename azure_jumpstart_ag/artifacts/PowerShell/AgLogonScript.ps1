@@ -369,10 +369,10 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 foreach ($VM in $VMNames) {
-    $L1host = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-    while ($L1host.PrimaryStatusDescription -ne "OK")
+    $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+    while ($VMStatus.PrimaryStatusDescription -ne "OK")
     {
-        $L1host = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+        $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "Waiting for $VM to finish booting."
         sleep 5
     }
