@@ -143,7 +143,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         managedDisk: {
           storageAccountType: osDiskType
         }
-        diskSizeGB: 1024
+        diskSizeGB: 256
       }
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
@@ -151,6 +151,17 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         sku: windowsOSVersion
         version: 'latest'
       }
+      dataDisks: [
+        {
+          diskSizeGB: 1024
+          lun: 0
+          createOption: 'Empty'
+          caching: 'ReadWrite'
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+      ]
     }
     networkProfile: {
       networkInterfaces: [
