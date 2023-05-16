@@ -28,7 +28,7 @@ $adxClusterName = $env:adxClusterName
 $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
 $adminPassword = $env:adminPassword
-$gitHubBaseUri = "https://api.github.com"
+$gitHubAPIBaseUri = "https://api.github.com"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -101,7 +101,7 @@ Write-Host
     Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
     do {
         try {
-            $response = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo"
+            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
             if ($response) {
                 write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
             }
@@ -133,10 +133,10 @@ Write-Host
         Authorization = "token $githubPat"
         "Content-Type" = "application/json"
     }
-    $protectedBranches = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+    $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
     foreach ($branch in $protectedBranches) {
         $branchName = $branch.name
-        $deleteProtectionUrl = "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+        $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
         Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
         Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
     }
@@ -149,7 +149,7 @@ Write-Host
     git pull
 
     Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "$gitHubBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
@@ -175,7 +175,7 @@ Write-Host
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
-            $response = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
                 if($branch -ne "main"){
                     Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
@@ -218,7 +218,7 @@ foreach ($branch in $branches) {
         restrictions  = $null
     } | ConvertTo-Json
 
-    Invoke-WebRequest -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
 }
 Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
@@ -438,7 +438,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "$gitHubBaseUri/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
+    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
