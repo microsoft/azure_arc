@@ -373,14 +373,12 @@ foreach ($VM in $VMNames) {
     while ($VMStatus.PrimaryStatusDescription -ne "OK")
     {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-        write-host "Waiting for $VM to finish booting."
+        write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
         sleep 5
     }
 }
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Set time zone to UTC
-    Set-TimeZone -Id "UTC"
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
