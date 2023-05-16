@@ -230,8 +230,8 @@ if ($Env:flavor -ne "DevOps") {
     } -Credential $winCreds
 
     # Install Log Analytics extension to support Defender for SQL
-    $mmaExtension = az connectedmachine extension show --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --resource-group $resourceGroup
-    if ($null -eq $mmaExtension) {
+    $mmaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='MicrosoftMonitoringAgent']" | ConvertFrom-Json
+    if ($mmaExtension.Count -le 0) {
         # Get workspace information
         $workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
         $workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
