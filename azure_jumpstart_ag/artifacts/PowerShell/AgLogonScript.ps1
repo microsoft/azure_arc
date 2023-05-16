@@ -28,7 +28,7 @@ $adxClusterName = $env:adxClusterName
 $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
 $adminPassword = $env:adminPassword
-$gitHubBaseUri = "$gitHubBaseUri"
+$gitHubBaseUri = "https://api.github.com"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
