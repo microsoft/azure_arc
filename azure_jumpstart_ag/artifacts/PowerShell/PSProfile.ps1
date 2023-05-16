@@ -99,9 +99,9 @@ Function Invoke-CommandLineTool {
             
             @($stdOutPath, $stdErrPath) | Remove-BlankLines | Out-Null
             
-            $result = "" | Select-Object Result, ExitCode, StdOut, StdErr, StartTime, ExitTime, ElapsedTime
+            $result = "" | Select Result, ExitCode, StdOut, StdErr, StartTime, ExitTime, ElapsedTime
             $result.ExitCode = $proc.ExitCode
-            $result.StdOut = Get-Content $stdOutPath | Select-Object -Skip 1 # skip prevents command line from being returned in stdOut
+            $result.StdOut = Get-Content $stdOutPath | select -Skip 1 # skip prevents command line from being returned in stdOut
             $result.StdErr = Get-Content $stdErrPath
             $result.StartTime = $proc.StartTime
             $result.ExitTime = $proc.ExitTime
