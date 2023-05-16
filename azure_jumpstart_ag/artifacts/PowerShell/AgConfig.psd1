@@ -223,8 +223,6 @@
 
     AppConfig = @{
         ContosoSupermarket = @{
-            #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-            #Branch = "main"
             GitOpsConfigName = "config-supermarket"
             KustomizationName = "pos"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/release"

@@ -28,7 +28,7 @@ $adxClusterName = $env:adxClusterName
 $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
 $adminPassword = $env:adminPassword
-$baseUri = "https://api.github.com"
+$gitHubBaseUri = "$gitHubBaseUri"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -98,16 +98,16 @@ Write-Host
 #####################################################################
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
-    Write-Host "INFO: Checking if the jumpstart-agora-repo is forked" -ForegroundColor Gray
+    Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
     do {
         try {
-            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$appsRepo"
+            $response = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo"
             if ($response) {
                 write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
             }
         }
         catch {
-            Write-Host "ERROR: Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
             start-sleep -Seconds 45
         }
     } until (
@@ -133,10 +133,10 @@ Write-Host
         Authorization = "token $githubPat"
         "Content-Type" = "application/json"
     }
-    $protectedBranches = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+    $protectedBranches = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
     foreach ($branch in $protectedBranches) {
         $branchName = $branch.name
-        $deleteProtectionUrl = "https://api.github.com/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+        $deleteProtectionUrl = "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
         Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
         Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
     }
@@ -149,7 +149,7 @@ Write-Host
     git pull
 
     Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "https://api.github.com/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+    $githubApiUrl = "$gitHubBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
@@ -175,7 +175,7 @@ Write-Host
     $branches = $AgConfig.GitBranches
     foreach ($branch in $branches) {
         try {
-            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+            $response = Invoke-RestMethod -Uri "$gitHubBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
             if ($response) {
                 if($branch -ne "main"){
                     Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
@@ -218,7 +218,7 @@ foreach ($branch in $branches) {
         restrictions  = $null
     } | ConvertTo-Json
 
-    Invoke-WebRequest -Uri "https://api.github.com/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    Invoke-WebRequest -Uri "$gitHubBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
 }
 Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
@@ -438,7 +438,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
+    $githubApiUrl = "$gitHubBaseUri/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
@@ -675,7 +675,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType = $cluster.value.Type
         $namespace = $app.value.Namespace
-        $appPath= $app.Value.AppPath
+        $appName = $app.Value.KustomizationName
 
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
@@ -686,6 +686,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
         if($branch -eq "main"){
             $store = "dev"
         }
+        $appPath= $app.Value.KustomizationPath+"/$store"
+
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
@@ -694,7 +696,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 3s `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true sync_interval=1m retry_interval=1m `
+            --kustomization name=$appName path=$appPath prune=true sync_interval=1m retry_interval=1m `
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
@@ -718,7 +720,7 @@ $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 # Installing Grafana
 Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 11/13)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
+$latestRelease = (Invoke-WebRequest -Uri "$gitHubBaseUri/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
 Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Update Prometheus Helm charts
@@ -898,7 +900,7 @@ $filenamePattern = "*.msixbundle"
 $frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
-$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+$releasesUri = "$gitHubBaseUri/repos/$gitRepo/releases/latest"
 $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
 # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
