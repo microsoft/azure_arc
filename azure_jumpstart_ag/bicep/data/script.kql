@@ -22,10 +22,10 @@
 .create table environmentSensor ingestion json mapping "EnvironmentSensorMapping"
 ```
 [
-    {"column":"iothub-enqueuedtime","path":"$['iothub-enqueuedtime']"},
-    {"column":"device-id","path":"$['iothub-connection-device-id']"},
-    {"column":"Humidity","path":"$['Humidity']"},
-    {"column":"Temperature_F","path":"$['Temperature_F']"},
+    {"column":"iothub-enqueuedtime","path":"$.iothub-enqueuedtime"},
+    {"column":"device-id","path":"$.iothub-connection-device-id"},
+    {"column":"Humidity","path":"$.Humidity"},
+    {"column":"Temperature_F","path":"$.Temperature_F"},
 ]
 ```
 
