@@ -359,13 +359,12 @@ foreach ($VM in $VMNames) {
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         Write-Host "[$(Get-Date -Format t)] INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
-        $ErrorActionPreference = "SilentlyContinue"
         Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
             $site = $using:site
             (gwmi win32_computersystem).Rename($site.Name)
-            Restart-Computer
         } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-        $ErrorActionPreference = "Continue"
+        Stop-VM -Name $site.Name -Force -Confirm:$false
+        Start-VM -Name $site.Name
     }
 }
 
