@@ -662,20 +662,63 @@ Write-Host
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 10/13)" -ForegroundColor DarkGreen
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        # --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
-        $branch = $cluster.value.Branch.ToLower()
-        $configName = $app.value.GitOpsConfigName.ToLower()
-        $clusterType = $cluster.value.Type
-        $namespace = $app.value.Namespace
-        $appPath = $app.Value.AppPath
-        $kustomizationName = $app.Value.KustomizationName
-        $kustomizationPath = $app.Value.KustomizationPath
+# TODO - move vars up to initialize
+$deploymentFolder = "C:\Deployment"
 
+Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $folderPath $fileName
+        # TODO - Add Retry here
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+
+    If (-not $excludeFolders) {
+        $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+            $folderName = $_.name
+            $path = Join-Path $folderPath $folderName
+            New-Item $path -ItemType Directory -Force -ErrorAction Continue
+
+            Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+        }
+    }
+}
+
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+
+    $appPath            = $app.value.AppPath
+    $kustomizationName  = $app.value.KustomizationName
+    $kustomizationPath  = $app.value.KustomizationPath
+    $configName         = $app.value.GitOpsConfigName.ToLower()
+    $namespace          = $app.value.Namespace
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+
+        $storeType   = $cluster.value.Branch.ToLower()
+        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
+        $branch      = $cluster.value.Branch.ToLower()
+        $clusterType = $cluster.value.Type
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $($app.Name) application on $clusterName" -ForegroundColor Gray
+
+        If ($app.Value.ConfigMaps){
+            # download the config files
+            foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
+                $repoPath   = $configMap.value.RepoPath
+                $configPath = "$deploymentFolder\$appPath\config\$($configMap.Name)\$branch"
+                New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+
+                $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
+                Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
+
+                # create the configmap
+                kubectx $cluster.name.ToLower()
+                Start-Sleep 1 # required to prevent kubectx from erroring when called too frequently
+                kubectl create configmap $configMap.name --from-file=$configPath
+            }
+        }
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
             $clusterName= $cluster.value.ArcClusterName
@@ -683,17 +726,18 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             $type = "connectedClusters"
         }
         if($branch -eq "main"){
-            $store = "dev"
+            $storeType = "dev"
         }
+
         az k8s-configuration flux create `
             --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --name $configName `
             --cluster-type $type `
             --url $appClonedRepo `
-            --branch $Branch `
+            --branch $branch `
             --sync-interval 1m `
-            --kustomization name=$kustomizationName path=$kustomizationPath/$store prune=true sync_interval=1m retry_interval=1m `
+            --kustomization name=$kustomizationName path=$kustomizationPath/$storeType prune=true sync_interval=1m retry_interval=1m `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `
@@ -702,7 +746,6 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
 }
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
-
 
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability

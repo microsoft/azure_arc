@@ -246,6 +246,20 @@
             KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
             Namespace = "sensor-monitor"
             AppPath = "freezer_monitoring"
+            ConfigMaps = @{
+                "mqtt-broker-config" = @{
+                    ContainerName = "mqtt-broker"
+                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+                }
+                "mqtt-simulator-config" = @{
+                    ContainerName = "mqtt-simulator"
+                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+                }
+                "mqtt2prom-config" = @{
+                    ContainerName = "mqtt2prom"
+                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
+                }
+            }
         }
     }
 }
