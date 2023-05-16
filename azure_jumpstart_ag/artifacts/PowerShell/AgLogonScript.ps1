@@ -359,19 +359,26 @@ foreach ($VM in $VMNames) {
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         Write-Host "[$(Get-Date -Format t)] INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
-        $ErrorActionPreference = "SilentlyContinue"
         Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
             $site = $using:site
             (gwmi win32_computersystem).Rename($site.Name)
-            Restart-Computer
         } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-        $ErrorActionPreference = "Continue"
+        Stop-VM -Name $site.Name -Force -Confirm:$false
+        Start-VM -Name $site.Name
+    }
+}
+
+foreach ($VM in $VMNames) {
+    $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+    while ($VMStatus.PrimaryStatusDescription -ne "OK")
+    {
+        $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+        write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
+        sleep 5
     }
 }
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Set time zone to UTC
-    Set-TimeZone -Id "UTC"
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
