@@ -368,6 +368,16 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     }
 }
 
+foreach ($VM in $VMNames) {
+    $L1host = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+    while ($L1host.PrimaryStatusDescription -ne "OK")
+    {
+        $L1host = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+        write-host "Waiting for $VM to finish booting."
+        sleep 5
+    }
+}
+
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Set time zone to UTC
     Set-TimeZone -Id "UTC"
