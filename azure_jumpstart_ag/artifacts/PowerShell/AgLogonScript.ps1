@@ -281,7 +281,7 @@ $emulatorPath = "$dataEmulatorDir\DataEmulator.zip"
 Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/DataEmulator.zip" -OutFile $emulatorPath
 
 # Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
-if ([System.IO.File]::Exists($emulatorPath)) {
+if (Test-Path -Path $emulatorPath) {
     Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
 }
  
