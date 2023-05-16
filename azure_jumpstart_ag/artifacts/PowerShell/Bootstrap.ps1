@@ -92,7 +92,23 @@ function BITSRequest {
   $ProgressPreference = "SilentlyContinue"
 }
 
+##############################################################
+# Extending C:\ partition to the maximum size
+##############################################################
+Write-Host "Extending C:\ partition to the maximum size"
+Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
+
+##############################################################
+# Initialize and format the data disk
+##############################################################
+$disk = Get-Disk | Where-Object partitionstyle -eq 'raw' | sort number
+$disk | Initialize-Disk -PartitionStyle MBR -PassThru |
+        New-Partition -UseMaximumSize -DriveLetter $AgConfig.HostVMDrive |
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel "VMs" -Confirm:$false -Force
+
+##############################################################
 # Creating Ag paths
+##############################################################
 Write-Output "Creating Ag paths"
 foreach ($path in $AgConfig.AgDirectories.values) {
   Write-Output "Creating path $path"
@@ -158,12 +174,6 @@ foreach ($url in $websiteUrls) {
 ##############################################################
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
-
-##############################################################
-# Extending C:\ partition to the maximum size
-##############################################################
-Write-Host "Extending C:\ partition to the maximum size"
-Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 ##############################################################
 # Get latest Grafana OSS release

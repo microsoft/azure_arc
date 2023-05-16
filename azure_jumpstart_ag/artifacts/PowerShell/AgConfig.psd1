@@ -13,9 +13,11 @@
         AgAgentScriptsDir = "C:\Ag\agentScripts"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
-        AgVHDXDir         = "C:\Ag\VHDX"
+        AgVHDXDir         = "V:\VMs"
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
+        AgAdxDashboards   = "C:\Ag\AdxDashboards"
+        AgDataEmulator    = "C:\Ag\DataEmulator"
     }
 
     # Required URLs
@@ -47,7 +49,8 @@
 
     # PowerShell modules
     PowerShellModules   = @(
-        'Az.ConnectedKubernetes'
+        'Az.ConnectedKubernetes',
+        'Az.Kusto'
     )
 
     # Chocolatey packages list
@@ -96,7 +99,7 @@
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # L1 virtual machine configuration
-    HostVMPath                           = "V:\VMs"                              # This value controls the path where the nested virtual machines will be stored the host.
+    HostVMDrive                          = "V"                                   # This value controls the drive letter where the nested virtual machines will be stored the host.
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
     L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
     InternalSwitch                       = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
