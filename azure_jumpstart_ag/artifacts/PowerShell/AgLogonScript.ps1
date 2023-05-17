@@ -669,8 +669,9 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --cluster-type $type `
             --url $appClonedRepo `
             --branch $Branch `
-            --sync-interval 1m `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true `
+            --sync-interval 5s `
+            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true retry_interval=1m `
+            --timeout 10m `
             --namespace $namespace `
             --no-wait `
             --only-show-errors `
