@@ -145,6 +145,7 @@ Write-Host
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
     git config --global core.autocrlf false
+    git config --global core.eol lf
     git fetch
     git pull
 
@@ -281,16 +282,29 @@ if ($httpResponse.StatusCode -ne 200){
 
 ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
 
-$agDir = $AgConfig.AgDirectories["AgDir"]
-$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv --only-show-errors)
-if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
-    $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-    Set-Content -Path "$agDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
-    $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-    Set-Content -Path "$agDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+$adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
+$dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
+$kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
+if ($null -ne $kustoCluster) {
+    $adxEndPoint = $kustoCluster.Uri
+    if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
+        $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+        Set-Content -Path "$adxDashBoardsDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+        $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+        Set-Content -Path "$adxDashBoardsDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+    }
+    else {
+        Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
+    }
 }
-else {
-    Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
+
+# Download DataEmulator.zip into Agora folder and unzip
+$emulatorPath = "$dataEmulatorDir\DataEmulator.zip"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/DataEmulator.zip" -OutFile $emulatorPath
+
+# Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
+if (Test-Path -Path $emulatorPath) {
+    Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
 }
 
 #####################################################################
@@ -709,8 +723,26 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete." -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+            do {
+                $releaseStatus = kubectl get helmreleases -n $namespace $appName -o json | ConvertFrom-Json
+                $readyCondition = $releaseStatus.status.conditions | Where-Object { $_.type -eq "Released" }
+                if ($readyCondition.message -eq "Helm install succeeded") {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is installed" -ForegroundColor Gray
+                }
+                else {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is not ready...waiting 45 seconds" -ForegroundColor Gray
+                    Start-Sleep -Seconds 45
+                }
+            } until (
+                $readyCondition.message -eq "Helm install succeeded"
+            )
     }
 }
+
+
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
 
