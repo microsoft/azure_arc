@@ -56,7 +56,7 @@ az login --service-principal --username $Env:spnClientID --password $Env:spnClie
 # Tagging resource group w/ deployment complete
 Write-Host "INFO: Setting RG tag"
 $resource=az group show -n $resourceGroup --query id --output tsv
-az tag create --resource-id $resource --tags AgoraClientVMDeploymentStatus=Started
+az tag create --resource-id $resource --tags Project=Jumpstart_Agora AgoraClientVMLogonScript=Started
 
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
@@ -1048,6 +1048,6 @@ Write-Host
 # Tagging resource group w/ deployment complete
 Write-Host "INFO: Setting RG tag"
 $resource=az group show -n $resourceGroup --query id --output tsv
-az tag create --resource-id $resource --tags AgoraClientVMDeploymentStatus=Completed
+az tag create --resource-id $resource --tags Project=Jumpstart_Agora AgoraClientVMLogonScript=Completed
 
 Stop-Transcript
