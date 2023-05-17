@@ -92,23 +92,7 @@ function BITSRequest {
   $ProgressPreference = "SilentlyContinue"
 }
 
-##############################################################
-# Extending C:\ partition to the maximum size
-##############################################################
-Write-Host "Extending C:\ partition to the maximum size"
-Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
-
-##############################################################
-# Initialize and format the data disk
-##############################################################
-$disk = Get-Disk | Where-Object partitionstyle -eq 'raw' | sort number
-$disk | Initialize-Disk -PartitionStyle MBR -PassThru |
-        New-Partition -UseMaximumSize -DriveLetter $AgConfig.HostVMDrive |
-        Format-Volume -FileSystem NTFS -NewFileSystemLabel "VMs" -Confirm:$false -Force
-
-##############################################################
 # Creating Ag paths
-##############################################################
 Write-Output "Creating Ag paths"
 foreach ($path in $AgConfig.AgDirectories.values) {
   Write-Output "Creating path $path"
@@ -176,6 +160,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -Out
 .$PsHome\Profile.ps1
 
 ##############################################################
+# Extending C:\ partition to the maximum size
+##############################################################
+Write-Host "Extending C:\ partition to the maximum size"
+Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
+
+##############################################################
 # Get latest Grafana OSS release
 ##############################################################
 $latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/grafana/grafana/releases/latest").tag_name.replace('v', '')
@@ -189,7 +179,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -Out
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/img/jumpstart_ag.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgTempDir\grafana-freezer-monitoring.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgTempDir\prometheus-additional-scrape-config.yaml"
