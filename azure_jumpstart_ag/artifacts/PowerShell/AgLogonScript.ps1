@@ -29,6 +29,7 @@ $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
 $adminPassword = $env:adminPassword
 $gitHubAPIBaseUri = "https://api.github.com"
+$iotDeviceSasTokens = @{}
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -228,6 +229,7 @@ Write-Host
 # Azure IoT Hub resources preparation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/13)" -ForegroundColor DarkGreen
+
 if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
@@ -239,6 +241,7 @@ if ($githubUser -ne "microsoft") {
             $deviceId = "$device-$($site.FriendlyName)"
             Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $IoTHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
             $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
+            $iotDeviceSasTokens.Add($deviceId, $deviceSASToken)
             $ghDeviceId = $deviceId -replace '[^\w_]', '_'
             gh secret set "sas_token_$ghDeviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
         }
@@ -725,12 +728,12 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     $configName         = $app.value.GitOpsConfigName.ToLower()
     $namespace          = $app.value.Namespace
 
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    foreach ($site in $AgConfig.SiteConfig.Values) {
 
-        $storeType   = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
-        $branch      = $cluster.value.Branch.ToLower()
-        $clusterType = $cluster.value.Type
+        $storeType   = $site.Branch.ToLower()
+        $clusterName = $site.ArcClusterName+"-$namingGuid"
+        $branch      = $site.Branch.ToLower()
+        $clusterType = $site.Type
 
         Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $appName application on $clusterName" -ForegroundColor Gray
 
@@ -744,15 +747,29 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
                 $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
                 Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
 
+                # TODO - replace with better approach - perhaps via GH Action
+                # replace the IoT Hub name and the SAS Tokens with the deployment specific values
+                If ($configMap.Name -eq "mqtt-broker-config"){
+                    $configFile = "$configPath\mosquitto.conf"
+                    $update = (Get-Content $configFile -Raw) 
+                    $update = $update -replace "Ag-IotHub-\w*", $IoTHubName
+                    foreach ($device in $site.IoTDevices) {
+                        $deviceId = "$device-$($site.FriendlyName)"
+                        $update = $update -replace "Chicago", $site.FriendlyName
+                        $update = $update -replace "SharedAccessSignature.*$($deviceId).*", $iotDeviceSasTokens[$deviceId]
+                    }
+                    $update | Set-Content $configFile
+                }
+
                 # create the configmap
-                kubectx $cluster.name.ToLower()
+                kubectx $site.FriendlyName.ToLower()
                 Start-Sleep 1 # required to prevent kubectx from erroring when called too frequently
                 kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace
             }
         }
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
-            $clusterName= $cluster.value.ArcClusterName
+            $clusterName= $site.ArcClusterName
         }else{
             $type = "connectedClusters"
         }

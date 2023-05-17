@@ -138,7 +138,7 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1-Seattle", "Freezer-2-Seattle")
+            IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -160,7 +160,7 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1-Chicago", "Freezer-2-Chicago")
+            IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -182,7 +182,7 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1-Dev", "Freezer-2-Dev")
+            IoTDevices             = @("Freezer-1", "Freezer-2")
 
         }
         Staging = @{
@@ -196,7 +196,7 @@
             HelmService         = "service/prometheus-grafana"
             GrafanaDataSource   = "prometheus"
             HelmValuesFile      = "prometheus-additional-scrape-config.yaml"
-            IoTDevices          = @("Freezer-1-Staging", "Freezer-2-Staging")
+            IoTDevices          = @("Freezer-1", "Freezer-2")
 
         }
     }
