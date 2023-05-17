@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## AKS Edge Essentials single node deployment with Azure Arc using Azure Bicep
+## AKS Edge Essentials single node deployment with Azure Arc using ARM Template
 
 The following Jumpstart scenario will show how to create an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster)) on the Azure VM.
 
