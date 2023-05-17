@@ -101,7 +101,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri <The main.bicep file location> \
+    --template-file <The main.bicep file location> \
     --parameters <The main.parameters.json parameters file location>
     ```
 
@@ -112,7 +112,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
     az deployment group create \
     --resource-group AKS-EE-Full-Demo \
     --name akseefulldemo \
-    --template-uri main.bicep \
+    --template-file main.bicep \
     --parameters main.parameters.json
     ```
 
