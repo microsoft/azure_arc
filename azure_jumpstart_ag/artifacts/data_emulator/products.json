@@ -1,0 +1,106 @@
+[
+  {
+    "id": "1",
+    "name": "Red Apple",
+    "price": 0.5,
+    "stock": 10000,
+    "photopath": "static/img/product1.jpg",
+    "category": "Fruits"
+  },
+  {
+    "id": "2",
+    "name": "Banana",
+    "price": 1,
+    "stock": 10000,
+    "photopath": "static/img/product2.jpg",
+    "category": "Fruits"
+  },
+  {
+    "id": "3",
+    "name": "Avocado",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product3.jpg",
+    "category": "Vegetables"
+  },
+  {
+    "id": "4",
+    "name": "Bread",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product4jpg",
+    "category": "Bread"
+  },
+  {
+    "id": "5",
+    "name": "Milk",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product5.jpg",
+    "category": "Dairy"
+  },
+  {
+    "id": "6",
+    "name": "Orange Juice",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product6.jpg",
+    "category": "Beverages"
+  },
+  {
+    "id": "7",
+    "name": "Chips",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product7.jpg",
+    "category": "Snacks"
+  },
+  {
+    "id": "8",
+    "name": "Red Pepper",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product8.jpg",
+    "category": "Vegetables"
+  },
+  {
+    "id": "9",
+    "name": "Lettuce",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product9.jpg",
+    "category": "Vegetables"
+  },
+  {
+    "id": "10",
+    "name": "Tomato",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product10.jpg",
+    "category": "Vegetables"
+  },
+  {
+    "id": "11",
+    "name": "Strawberry",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product11.jpg",
+    "category": "Fruit"
+  },
+  {
+    "id": "12",
+    "name": "Eggs",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product12.jpg",
+    "category": "Eggs"
+  },
+  {
+    "id": "13",
+    "name": "Lemon",
+    "price": 1.5,
+    "stock": 10000,
+    "photopath": "static/img/product13.jpg",
+    "category": "Fruit"
+  }
+]
