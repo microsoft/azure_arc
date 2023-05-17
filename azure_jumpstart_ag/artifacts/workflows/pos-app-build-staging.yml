@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-and-deploy-staging-image:
-      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && github.event.pull_request.merged == true
+      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && ${{toJson(github.event.pull_request.merged) == true }}
       runs-on: ubuntu-latest
       steps:
       # checkout the repo
@@ -50,7 +50,6 @@ jobs:
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
           docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
-          
 
       - name: 'Update Image tag on main branch'
         env:
