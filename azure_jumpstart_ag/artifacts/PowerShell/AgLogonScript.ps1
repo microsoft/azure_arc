@@ -377,7 +377,7 @@ foreach ($VM in $VMNames) {
     {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
-        sleep 5
+        Start-Sleep 5
     }
 }
 

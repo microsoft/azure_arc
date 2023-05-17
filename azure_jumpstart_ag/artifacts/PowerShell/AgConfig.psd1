@@ -22,15 +22,15 @@
 
     # Required URLs
     URL           = @{
-        chocoPackagesUrl = 'https://community.chocolatey.org/api/v2'
+        chocoPackagesUrl      = 'https://community.chocolatey.org/api/v2'
         chocoInstallScriptUrl = 'https://chocolatey.org/install.ps1'
-        wslUbuntuUrl = 'https://aka.ms/wslubuntu'
-        wslStoreStorageUrl = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
-        dockerUrl = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
-        githubAPIUrl = 'https://api.github.com'
-        grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
-        azurePortalUrl = 'https://portal.azure.com'
-        aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
+        wslUbuntuUrl          = 'https://aka.ms/wslubuntu'
+        wslStoreStorageUrl    = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+        dockerUrl             = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
+        githubAPIUrl          = 'https://api.github.com'
+        grafanaUrl            = 'https://api.github.com/repos/grafana/grafana/releases/latest'
+        azurePortalUrl        = 'https://portal.azure.com'
+        aksEEk3sUrl           = 'https://aka.ms/aks-edge/k3s-msi'
     }
 
     # Azure required registered resource providers
@@ -209,9 +209,9 @@
 
     # Observability variables
     Monitoring = @{
-        AdminUser = "admin"
-        User   = "Contoso Operator"
-        Email   = "operator@contoso.com"
+        AdminUser  = "admin"
+        User       = "Contoso Operator"
+        Email      = "operator@contoso.com"
         Namespace  = "observability"
         ProdURL    = "http://localhost:3000"
         Dashboards = @{
@@ -222,8 +222,8 @@
 
     # Microsoft Edge startup settings variables
     EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-    EdgeSettingValueTrue = '00000001'
-    EdgeSettingValueFalse = '00000000'
+    EdgeSettingValueTrue    = '00000001'
+    EdgeSettingValueFalse   = '00000000'
 
     Namespaces = @(
         "contoso-supermarket"
@@ -234,30 +234,30 @@
         ContosoSupermarket = @{
             #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
             #Branch = "main"
-            GitOpsConfigName = "config-supermarket"
+            GitOpsConfigName  = "config-supermarket"
             KustomizationName = "pos"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/release"
-            Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket"
+            KustomizationPath = "./contoso_supermarket/operations/contoso_supermarket/release"
+            Namespace         = "contoso-supermarket"
+            AppPath           = "contoso_supermarket"
         }
         SensorMonitor = @{
-            GitOpsConfigName = "config-sensormonitor"
+            GitOpsConfigName  = "config-sensormonitor"
             KustomizationName = "sensor-monitor"
             KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
-            Namespace = "sensor-monitor"
-            AppPath = "freezer_monitoring"
+            Namespace         = "sensor-monitor"
+            AppPath           = "freezer_monitoring"
             ConfigMaps = @{
                 "mqtt-broker-config" = @{
                     ContainerName = "mqtt-broker"
-                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
                 }
                 "mqtt-simulator-config" = @{
                     ContainerName = "mqtt-simulator"
-                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
                 }
                 "mqtt2prom-config" = @{
                     ContainerName = "mqtt2prom"
-                    RepoPath = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
                 }
             }
         }
