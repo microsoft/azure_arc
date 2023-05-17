@@ -145,7 +145,6 @@ Write-Host
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
     git config --global core.autocrlf false
-    git config --global core.eol lf
     git fetch
     git pull
 
