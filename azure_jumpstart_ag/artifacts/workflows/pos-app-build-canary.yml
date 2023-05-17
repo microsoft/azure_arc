@@ -12,7 +12,7 @@ jobs:
   promote-to-canary:
     runs-on: ubuntu-latest
     if: |
-      github.event.client_payload.metadata.summary == 'env=staging' && github.event.client_payload.severity == 'info' && contains(github.event.client_payload.message,'Health check passed')
+      ${{ toJson(github.event.client_payload.metadata.summary) == 'env=staging'}} && ${{ toJson(github.event.client_payload.severity) == 'info' }} && ${{ contains(toJson(github.event.client_payload.message),'Health check passed') }}
 
     steps:
     - name: 'Checkout repository'
