@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "AKS Edge Essentials full deployment"
-linkTitle: "AKS Edge Essentials full deployment"
+title: "AKS Edge Essentials multi-node deployment"
+linkTitle: "AKS Edge Essentials multi-node deployment"
 weight: 2
 description: >
 ---
 
-## Create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using Azure Bicep
+## Create an AKS Edge Essentials multi-node deployment, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using Azure Bicep
 
 The following Jumpstart scenario will show how to Create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview). The provided Azure Bicep templates are responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Hyper-V VMs and AKS Edge Essentials cluster)) on the Azure Windows Server VM.
 
