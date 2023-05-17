@@ -25,7 +25,7 @@ jobs:
         username: ${{ secrets.SPN_CLIENT_ID }}
         password: ${{ secrets.SPN_CLIENT_SECRET }}
 
-    - name: Increment Image Tag
+    - name: Get latest Staging Image Tag
       id: latestImageTag
       env:
         ACR_NAME: ${{ secrets.ACR_NAME }}
@@ -33,9 +33,8 @@ jobs:
       run: |
         az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
         LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
-        NEW_VERSION=$(echo $LATEST_TAG | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
-        echo $NEW_VERSION
-        echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo $LATEST_TAG
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
     - name: Run tests
       uses: mscoutermarsh/ascii-art-action@master
