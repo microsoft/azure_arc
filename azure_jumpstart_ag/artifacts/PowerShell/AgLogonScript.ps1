@@ -84,7 +84,7 @@ if ($AgConfig.PowerShellModules.Count -ne 0) {
 }
 
 # Register Azure providers
-if ($Agconfig.AzureProviders.Count -ne 0) {
+if ($AgConfig.AzureProviders.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
     foreach ($provider in $AgConfig.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
@@ -254,13 +254,13 @@ else {
 # Get Azure Data Explorer URI
 $adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
 
-# Get access token to make REST API call to Azure Data Exploer Dashabord API. Replace double quotes surrounding acces token
+# Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
 
 # Prepare authorization header with access token
 $httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
 
-# Make REST API call to the dashbord endpoint.
+# Make REST API call to the dashboard endpoint.
 $restApi = "https://dashboards.kusto.windows.net/dashboards"
 
 # Import orders dashboard report
@@ -332,7 +332,7 @@ New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgCon
 #####################################################################
 # Deploying the nested L1 virtual machines
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Yellow
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM image from Azure storage. This may take a few minutes." -ForegroundColor Yellow
 #azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
@@ -340,16 +340,19 @@ azcopy cp $AgConfig.ProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recurs
 $vhdxPath = Get-ChildItem $AgConfig.AgDirectories["AgVHDXDir"] -Filter *.vhdx | Select-Object -ExpandProperty FullName
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
-        # Create diff disks for each site host
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating differencing disk for $($site.Name) site" -ForegroundColor Gray
-        $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
+        # Create disks for each site host
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($site.Name) disk." -ForegroundColor Gray
+        $destVhdxPath = "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)Disk.vhdx"
+        $destPath = $AgConfig.AgDirectories["AgVHDXDir"]
+        New-VHD -ParentPath $vhdxPath -Path $destVhdxPath -Differencing | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
+            -Path $destPath `
             -MemoryStartupBytes $AgConfig.L1VMMemory `
             -BootDevice VHD `
-            -VHDPath $vhd.Path `
+            -VHDPath $destVhdxPath `
             -Generation 2 `
             -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
@@ -378,10 +381,12 @@ foreach ($VM in $VMNames) {
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
         Write-Host "[$(Get-Date -Format t)] INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
+        $ErrorActionPreference = "SilentlyContinue"
         Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
             $site = $using:site
             (gwmi win32_computersystem).Rename($site.Name)
         } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        $ErrorActionPreference = "Continue"
         Stop-VM -Name $site.Name -Force -Confirm:$false
         Start-VM -Name $site.Name
     }
@@ -471,7 +476,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 
     ###############################################################################
-    # Setting up replacment parameters for AKS Edge Essentials config json file
+    # Setting up replacement parameters for AKS Edge Essentials config json file
     ###############################################################################
     Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
@@ -550,7 +555,7 @@ $elapsedTime = Measure-Command {
 Write-Host "[$(Get-Date -Format t)] INFO: Waiting on kubeconfig files took $($elapsedTime.ToString("g"))." -ForegroundColor Gray
 
 #####################################################################
-# Merging kubeconfig files on the L0 vistual machine
+# Merging kubeconfig files on the L0 virtual machine
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
 $kubeconfigpath = ""
