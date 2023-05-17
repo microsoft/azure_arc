@@ -330,7 +330,7 @@ New-NetIPAddress -IPAddress $AgConfig.L1DefaultGateway -PrefixLength 24 -Interfa
 New-NetNat -Name $AgConfig.L1SwitchName -InternalIPInterfaceAddressPrefix $AgConfig.L1NatSubnetPrefix | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
 #####################################################################
-# Deploying the nested L1 virtual machines 
+# Deploying the nested L1 virtual machines
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching Windows 11 IoT Enterprise VM images from Azure storage. This may take a few minutes." -ForegroundColor Yellow
 #azcopy cp $AgConfig.PreProdVHDBlobURL $AgConfig.AgDirectories["AgVHDXDir"] --recursive=true --check-length=false --log-level=ERROR | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
@@ -343,7 +343,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
         # Create diff disks for each site host
         Write-Host "[$(Get-Date -Format t)] INFO: Creating differencing disk for $($site.Name) site" -ForegroundColor Gray
         $vhd = New-VHD -ParentPath $vhdxPath -Path "$($AgConfig.AgDirectories["AgVHDXDir"])\$($site.Name)DiffDisk.vhdx" -Differencing
-        
+
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
@@ -352,7 +352,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
             -VHDPath $vhd.Path `
             -Generation 2 `
             -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-        
+
         # Set up the virtual machine before coping all AKS Edge Essentials automation files
         Set-VMProcessor -VMName $site.Name `
             -Count $AgConfig.L1VMNumVCPU `
@@ -360,20 +360,20 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 
         Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
         Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-  
+
         # Start the virtual machine
         Start-VM -Name $site.Name | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
     }
 }
 
 Start-Sleep -Seconds 20
-# Create an array with VM names    
+# Create an array with VM names
 $VMnames = (Get-VM).Name
 foreach ($VM in $VMNames) {
     Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
 }
 ########################################################################
-# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap 
+# Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap
 ########################################################################
 foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
     if ($site.Value.Type -eq "AKSEE") {
@@ -401,7 +401,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
-    # Preparing environment folders structure 
+    # Preparing environment folders structure
     ###########################################
     Write-Host "[$(Get-Date -Format t)] INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
@@ -428,7 +428,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AgConfig = $using:AgConfig
 
     ##########################################
-    # Deploying AKS Edge Essentials clusters 
+    # Deploying AKS Edge Essentials clusters
     ##########################################
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
@@ -453,7 +453,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         Start-Sleep -Seconds 5
         $timeElapsed = $timeElapsed + 10
     } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
-    
+
     # Fetching latest AKS Edge Essentials msi file
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
     Invoke-WebRequest 'https://aka.ms/aks-edge/k3s-msi' -OutFile $deploymentFolder\AKSEEK3s.msi
@@ -512,7 +512,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials (Step 6
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "[$(Get-Date -Format t)] INFO: Rebooting $VMName." -ForegroundColor Gray
-    Invoke-Command -Session $Session -ScriptBlock { 
+    Invoke-Command -Session $Session -ScriptBlock {
         $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\AKSEEBootstrap.ps1"
         $Trigger = New-ScheduledTaskTrigger -AtStartup
         Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $env:USERNAME -Password 'Agora123!!' -RunLevel Highest | Out-Null
@@ -534,11 +534,11 @@ $elapsedTime = Measure-Command {
         [securestring]$secStringPassword = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
         $credential = New-Object System.Management.Automation.PSCredential($user, $secStringPassword)
         Start-Sleep 5
-        while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) { 
+        while (!(Invoke-Command -VMName $VMName -Credential $credential -ScriptBlock { Test-Path $using:path })) {
             Start-Sleep 30
             Write-Host "[$(Get-Date -Format t)] INFO: Waiting for AKS Edge Essentials kubeconfig to be available on $VMName." -ForegroundColor Gray
         }
-        
+
         Write-Host "[$(Get-Date -Format t)] INFO: $VMName's kubeconfig is ready - copying over config-$VMName" -ForegroundColor DarkGreen
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
         $s = New-PSSession -VMName $VMName -Credential $credential
@@ -592,8 +592,8 @@ foreach ($VM in $VMNames) {
         $hostname = hostname
         $ProgressPreference = "SilentlyContinue"
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
-        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
         Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
         Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
@@ -773,7 +773,7 @@ Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLa
 Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
 Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
 
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object { 
+Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
     (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
 }
 
@@ -790,8 +790,8 @@ grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-
 $credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
 $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
 
-$headers = @{    
-    "Authorization" = ("Basic " + $encodedcredentials)    
+$headers = @{
+    "Authorization" = ("Basic " + $encodedcredentials)
     "Content-Type"  = "application/json"
 }
 
@@ -812,6 +812,24 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
     kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
+    # Wait for Kubernetes API server to become available
+    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+    $apiServerAddress = $apiServer -replace '.*https://| .*$'
+    $apiServerFqdn = ($apiServerAddress -split ":")[0]
+    $apiServerPort = ($apiServerAddress -split ":")[1]
+
+    do {
+        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+        if ($result.TcpTestSucceeded) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+            break
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+        }
+    } while ($true)
+
     # Install Prometheus Operator
     $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder',$adminPassword
     helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
@@ -823,23 +841,23 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     } while ($monitorIP -eq "Nope" )
     # Get Load Balancer IP
     $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-        
+
     if ($_.Value.IsProduction) {
         Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
         # Request body with information about the data source to add
-        $grafanaDSBody = @{    
+        $grafanaDSBody = @{
             name      = $_.Value.FriendlyName.ToLower()
             type      = 'prometheus'
             url       = ("http://" + $monitorLBIP + ":9090")
-            access    = 'proxy'    
-            basicAuth = $false    
+            access    = 'proxy'
+            basicAuth = $false
             isDefault = $true
         } | ConvertTo-Json
-            
+
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     }
-        
+
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
     # Add dashboards
     foreach ($dashboard in $observabilityDashboardstoImport) {
@@ -856,17 +874,17 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         $dashboardObject = $content | ConvertFrom-Json
         # Best practice is to generate a random UID, such as a GUID
         $dashboardObject.uid = [guid]::NewGuid().ToString()
-            
+
         # Need to set this to null to let Grafana generate a new ID
         $dashboardObject.id = $null
         # Set dashboard title
         $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
         # Request body with dashboard to add
-        $grafanaDBBody = @{ 
+        $grafanaDBBody = @{
             dashboard = $dashboardObject
             overwrite = $true
         } | ConvertTo-Json -Depth 8
-            
+
         if ($_.Value.IsProduction) {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
@@ -875,24 +893,24 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
         }
-            
+
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     }
 
     if (!$_.Value.IsProduction) {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
-        $grafanaUserBody = @{    
+        $grafanaUserBody = @{
             name = $AgConfig.Monitoring["User"] # Display Name
             email = $AgConfig.Monitoring["Email"]
-            login = $adminUsername    
+            login = $adminUsername
             password = $adminPassword} | ConvertTo-Json
-        
+
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         # Creating Grafana Icon on Desktop
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray 
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray
         $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
         $wScriptShell = New-Object -ComObject WScript.Shell
         $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
@@ -905,10 +923,10 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
 
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
 # Add Contoso Operator User
-$grafanaUserBody = @{    
+$grafanaUserBody = @{
     name = $AgConfig.Monitoring["User"] # Display Name
     email = $AgConfig.Monitoring["Email"]
-    login = $adminUsername    
+    login = $adminUsername
     password = $adminPassword} | ConvertTo-Json
 
 # Make HTTP request to the API
@@ -1020,7 +1038,7 @@ Start-Sleep -Seconds 5
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Host "[$(Get-Date -Format t)] INFO: Uploading Log Bundle." -ForegroundColor Gray
 $Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-Invoke-Expression 'cmd /c start Powershell -Command { 
+Invoke-Expression 'cmd /c start Powershell -Command {
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
@@ -1031,19 +1049,19 @@ Invoke-Expression 'cmd /c start Powershell -Command {
 
 Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
 $imgPath = $AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+$code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+    public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+            public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
             }
         }
-    } 
+    }
 '@
 Add-Type $code | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
 [Win32.Wallpaper]::SetWallpaper($imgPath) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
