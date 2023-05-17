@@ -722,7 +722,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --url $appClonedRepo `
             --branch $Branch `
             --sync-interval 5s `
-            --kustomization name=pos path=./$appPath/operations/$appPath/release/$store prune=true retry_interval=1m `
+            --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
             --timeout 10m `
             --namespace $namespace `
             --only-show-errors `
@@ -767,7 +767,7 @@ $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 # Installing Grafana
 Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 11/13)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri "$gitHubBaseUri/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
+$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
 Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Update Prometheus Helm charts
