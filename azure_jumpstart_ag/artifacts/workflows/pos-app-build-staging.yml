@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-and-deploy-staging-image:
-      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && github.event.pull_request.merged == true
+      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && ${{toJson(github.event.pull_request.merged) == true }}
       runs-on: ubuntu-latest
       steps:
       # checkout the repo
