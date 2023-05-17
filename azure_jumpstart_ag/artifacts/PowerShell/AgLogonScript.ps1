@@ -965,7 +965,7 @@ $filenamePattern = "*.msixbundle"
 $frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
 $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
-$releasesUri = "$gitHubBaseUri/repos/$gitRepo/releases/latest"
+$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
 $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
 
 # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
