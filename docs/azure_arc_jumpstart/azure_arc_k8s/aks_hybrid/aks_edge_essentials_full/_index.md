@@ -101,7 +101,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/main.parameters.json \
+    --template-uri <The main.bicep file location> \
     --parameters <The main.parameters.json parameters file location>
     ```
 
@@ -112,7 +112,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
     az deployment group create \
     --resource-group AKS-EE-Full-Demo \
     --name akseefulldemo \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/main.parameters.json \
+    --template-uri main.bicep \
     --parameters main.parameters.json
     ```
 
@@ -124,7 +124,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
 
 ## Windows Login & Post Deployment
 
-Various options are available to connect to _AKS-EE-Full-VM_ Azure VM, depending on the parameters you supplied during deployment.
+Various options are available to connect to the _AKS-EE-Full-VM_ Azure VM, depending on the parameters you supplied during deployment.
 
 - [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Win-Demo-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connect-using-just-in-time-access-jit).
 - [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
@@ -205,9 +205,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - You can also run _kubectl get nodes -o wide_ to check the cluster nodes status and _kubectl get pod -A_ to see that the cluster is running and all the needed pods (system, [Azure Arc](https://learn.microsoft.com/azure/azure-arc/kubernetes/overview) and [extension](https://learn.microsoft.com/azure/azure-arc/kubernetes/extensions) [Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/containers/container-insights-overview)) are in running state.
 
-![Screenshot kubectl get nodes -o wide](./26.png)
+![Screenshot _kubectl get nodes -o wide_ command](./26.png)
 
-![Screenshot kubectl get pod -A](./27.png)
+![Screenshot _kubectl get pod -A_ command](./27.png)
 
 ## Cluster extensions
 

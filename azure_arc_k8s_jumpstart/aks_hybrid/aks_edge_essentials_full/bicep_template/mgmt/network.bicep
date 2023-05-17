@@ -9,7 +9,7 @@ param subnetNameCloud string
 
 @description('Resource tag for Jumpstart AKS-EE-Full')
 param resourceTags object = {
-  Project: 'Jumpstart_AKS-EE-Full'
+  Project: 'Jumpstart'
 }
 
 @description('Choice to deploy Bastion to connect to the client VM')

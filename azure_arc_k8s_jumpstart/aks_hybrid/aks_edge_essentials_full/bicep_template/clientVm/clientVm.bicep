@@ -18,7 +18,7 @@ param location string = resourceGroup().location
 
 @description('Resource tag for Jumpstart AKS-EE-Full')
 param resourceTags object = {
-  Project: 'Jumpstart_AKS-EE-Full'
+  Project: 'Jumpstart'
 }
 
 @description('Resource Id of the subnet in the virtual network')
