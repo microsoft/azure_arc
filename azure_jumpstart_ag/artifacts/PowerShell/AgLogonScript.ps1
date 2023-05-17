@@ -768,7 +768,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
                 # create the configmap
                 kubectx $site.FriendlyName.ToLower()
                 Start-Sleep 1 # required to prevent kubectx from erroring when called too frequently
-                kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace
+                kubectl create namespace $namespace
+                kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace 
             }
         }
         if($clusterType -eq "AKS"){
