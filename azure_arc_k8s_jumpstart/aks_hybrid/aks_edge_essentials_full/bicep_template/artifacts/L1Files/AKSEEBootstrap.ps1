@@ -1,7 +1,7 @@
 # Script runtime environment: Level-1 Nested Hyper-V virtual machine
 
 ##############################################################
-# Preparing environment folders structure #
+# Preparing environment folders structure
 ##############################################################
 $ProgressPreference = "SilentlyContinue"
 
