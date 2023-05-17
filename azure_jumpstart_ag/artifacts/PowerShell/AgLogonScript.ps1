@@ -781,7 +781,6 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
     # Wait for Kubernetes API server to become available
-
     $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
     $apiServerAddress = $apiServer -replace '.*https://| .*$'
     $apiServerFqdn = ($apiServerAddress -split ":")[0]
