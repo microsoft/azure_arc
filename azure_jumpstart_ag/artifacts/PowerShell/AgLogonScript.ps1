@@ -780,6 +780,25 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
     kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
+    # Wait for Kubernetes API server to become available
+
+    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+    $apiServerAddress = $apiServer -replace '.*https://| .*$'
+    $apiServerFqdn = ($apiServerAddress -split ":")[0]
+    $apiServerPort = ($apiServerAddress -split ":")[1]
+
+    do {
+        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+        if ($result.TcpTestSucceeded) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+            break
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+        }
+    } while ($true)
+
     # Install Prometheus Operator
     $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder',$adminPassword
     helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
