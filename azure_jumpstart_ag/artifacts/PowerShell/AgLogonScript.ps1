@@ -53,6 +53,11 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 
+# Tagging resource group w/ deployment complete
+Write-Host "INFO: Setting RG tag"
+$resource=az group show -n $resourceGroup --query id --output tsv
+az tag create --resource-id $resource --tags AgoraClientVMDeploymentStatus=Started
+
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -1041,8 +1046,8 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment tim
 Write-Host
 
 # Tagging resource group w/ deployment complete
-Write-Host "Resource group name: $resourceGroup"
+Write-Host "INFO: Setting RG tag"
 $resource=az group show -n $resourceGroup --query id --output tsv
-az tag create --resource-id $resource --tags AgoraDeploymentStatus=Completed
+az tag create --resource-id $resource --tags AgoraClientVMDeploymentStatus=Completed
 
 Stop-Transcript
