@@ -308,7 +308,7 @@ if ($Env:flavor -ne "DevOps") {
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
 
-    if (($Env:flavor -eq "Full") -or ($Env:flavor -eq "ITOps")) {
+    if (($Env:flavor -eq "Full") -or ($Env:flavor -eq "ITPro")) {
         Write-Header "Fetching Nested VMs"
 
         $Win2k19vmName = "ArcBox-Win2K19"
