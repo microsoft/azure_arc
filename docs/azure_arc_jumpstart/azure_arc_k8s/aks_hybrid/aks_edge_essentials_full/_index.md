@@ -8,7 +8,7 @@ description: >
 
 ## Create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using Azure Bicep
 
-The following Jumpstart scenario will show how to Create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep_template/overview). The provided Azure Bicep templates are responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Hyper-V VMs and AKS Edge Essentials cluster)) on the Azure Windows Server VM.
+The following Jumpstart scenario will show how to Create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview). The provided Azure Bicep templates are responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation and Azure Arc onboarding (Hyper-V VMs and AKS Edge Essentials cluster)) on the Azure Windows Server VM.
 
 > **NOTE: It is not expected to use a nested virtualization in a production environment, let alone using an Azure VM to do so. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
@@ -126,8 +126,8 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
 
 Various options are available to connect to the _AKS-EE-Full-VM_ Azure VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Win-Demo-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connect-using-just-in-time-access-jit).
-- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+- [RDP](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_full/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _Arc-Win-Demo-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_full/#connect-using-just-in-time-access-jit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_full/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 ### Connecting directly with RDP
 
