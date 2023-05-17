@@ -1040,4 +1040,9 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Please enjoy the Agora experience!" -ForegroundColor Green
 Write-Host
 
+# Tagging resource group w/ deployment complete
+Write-Host "Resource group name: $resourceGroup"
+$resource=az group show -n $resourceGroup --query id --output tsv
+az tag create --resource-id $resource --tags AgoraDeploymentStatus=Completed
+
 Stop-Transcript
