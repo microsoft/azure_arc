@@ -690,7 +690,6 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 10/13)" -ForegroundColor DarkGreen
 foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        # --kustomization name=pos path=./contoso_supermarket/operations/contoso_supermarket/release/$store
         Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
         $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
@@ -723,25 +722,27 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-
-            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete." -ForegroundColor Gray
-            Start-Sleep -Seconds 10
-            do {
-                $releaseStatus = kubectl get helmreleases -n $namespace $appName -o json | ConvertFrom-Json
-                $readyCondition = $releaseStatus.status.conditions | Where-Object { $_.type -eq "Released" }
-                if ($readyCondition.message -eq "Helm install succeeded") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is installed" -ForegroundColor Gray
-                }
-                else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is not ready...waiting 45 seconds" -ForegroundColor Gray
-                    Start-Sleep -Seconds 45
-                }
-            } until (
-                $readyCondition.message -eq "Helm install succeeded"
-            )
     }
 }
 
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    $releaseName = "pos"
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on $clusterName." -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    do {
+        $releaseStatus = kubectl get helmreleases -n $namespace $appName -o json | ConvertFrom-Json
+        $readyCondition = $releaseStatus.status.conditions | Where-Object { $_.type -eq "Released" }
+        if ($readyCondition.message -eq "Helm install succeeded") {
+            Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is installed $clusterName" -ForegroundColor Gray
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            }
+        } until ($readyCondition.message -eq "Helm install succeeded")
+}
 
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
