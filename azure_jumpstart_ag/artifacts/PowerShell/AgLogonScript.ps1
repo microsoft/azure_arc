@@ -709,7 +709,10 @@ Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
         $fileName = $_.Substring($_.LastIndexOf("/") + 1)
         $outputFile = Join-Path $folderPath $fileName
         # TODO - Add Retry here
-        Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        # if SSL/TLS errors persist, consider disabling the certificate validation:
+        # [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+        Redo-Command {Invoke-RestMethod -Uri $_ -OutFile $outputFile}
     }
 
     If (-not $excludeFolders) {
