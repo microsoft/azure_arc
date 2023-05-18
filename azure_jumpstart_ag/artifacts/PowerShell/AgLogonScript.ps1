@@ -144,7 +144,6 @@ Write-Host
     Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
-    git config --global core.autocrlf false
     git fetch
     git pull
 
