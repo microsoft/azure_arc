@@ -85,4 +85,3 @@ jobs:
         git commit -m "Update Image Tag on Canary to $latest_tag"
         git push --set-upstream origin $newBranch
         gh pr create --title "Update Canary Image Tag to $latest_tag" --body "Update Canary Image Tag to $latest_tag"
-
