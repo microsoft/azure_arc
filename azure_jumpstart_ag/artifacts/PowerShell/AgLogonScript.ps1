@@ -154,9 +154,9 @@ Write-Host
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
