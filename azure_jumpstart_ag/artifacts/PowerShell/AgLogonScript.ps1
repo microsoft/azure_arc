@@ -144,7 +144,6 @@ Write-Host
     Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
     git config --global user.email "dev@agora.com"
     git config --global user.name "Agora Dev"
-    git config --global core.autocrlf false
     git fetch
     git pull
 
@@ -212,7 +211,7 @@ foreach ($branch in $branches) {
         required_status_checks = $null
         enforce_admins = $false
         required_pull_request_reviews = @{
-            required_approving_review_count = 1
+            required_approving_review_count = 0
         }
         dismiss_stale_reviews = $true
         restrictions  = $null
@@ -734,8 +733,23 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $releaseName = "pos"
     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+    $apiServerAddress = $apiServer -replace '.*https://| .*$'
+    $apiServerFqdn = ($apiServerAddress -split ":")[0]
+    $apiServerPort = ($apiServerAddress -split ":")[1]
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on $clusterName." -ForegroundColor Gray
-    Start-Sleep -Seconds 10
+    do {
+        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+        if ($result.TcpTestSucceeded) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+            break
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+        }
+    } while ($true)
+
     do {
         $releaseStatus = kubectl get helmreleases -n $namespace $appName -o json | ConvertFrom-Json
         $readyCondition = $releaseStatus.status.conditions | Where-Object { $_.type -eq "Released" }
@@ -1018,10 +1032,12 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -Foregroun
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Move-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
+Copy-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker Desktop\settings.json" -Force
+Copy-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+
 Start-Sleep -Seconds 5
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # Cleanup
