@@ -117,4 +117,3 @@ jobs:
               docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0
             done
-
