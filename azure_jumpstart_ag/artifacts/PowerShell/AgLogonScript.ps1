@@ -212,7 +212,7 @@ foreach ($branch in $branches) {
         required_status_checks = $null
         enforce_admins = $false
         required_pull_request_reviews = @{
-            required_approving_review_count = 1
+            required_approving_review_count = 0
         }
         dismiss_stale_reviews = $true
         restrictions  = $null
@@ -622,7 +622,7 @@ foreach ($VM in $VMNames) {
 Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 8/14)" -ForegroundColor DarkGreen
 $retryCount = 0
 $maxRetries = 3
-
+$resources=(az resource list --query "[?contains(type, 'Microsoft.Kubernetes/connectedClusters') || contains(type, 'Microsoft.ContainerService/managedClusters')].{Name:name, Type:type}"  --resource-group $env:resourceGroup) | ConvertFrom-Json
 foreach ($resource in $resources) {
     # Retrieve the resource name
     $resourceName = $resource.Name
