@@ -15,7 +15,7 @@ permissions:
     id-token: write
 
 jobs:
-  build-and-deploy-staging-image:
+  promote-to-staging:
       if: github.repository != 'microsoft/jumpstart-agora-apps' && github.event.pull_request.merged == true
       runs-on: ubuntu-latest
       steps:

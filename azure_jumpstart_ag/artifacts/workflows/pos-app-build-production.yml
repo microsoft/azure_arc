@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  promote-to-canary:
+  promote-to-production:
     runs-on: ubuntu-latest
     if: |
       github.event.client_payload.metadata.summary == 'env=canary' && github.event.client_payload.severity == 'info' && contains(github.event.client_payload.message,'Health check passed')
