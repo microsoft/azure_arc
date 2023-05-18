@@ -53,11 +53,6 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 
-# Tagging resource group w/ deployment complete
-Write-Host "INFO: Setting RG tag"
-$resource=az group show -n $resourceGroup --query id --output tsv
-az tag create --resource-id $resource --tags Project=Jumpstart_Agora AgoraClientVMLogonScript=Started
-
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -627,6 +622,10 @@ foreach ($VM in $VMNames) {
 $arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
 $Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
 
+# Tag the resource group w/ the Agora Tags
+Write-Host "INFO: Setting RG tag"
+Update-AzTag -ResourceId ((Get-AzResourceGroup -Name $env:resourceGroup).ResourceId) -Tag $Tag -Operation Merge 
+
 # Iterate over the Arc resources and tag it
 foreach ($arcResourceType in $arcResourceTypes) {
     $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
@@ -1085,8 +1084,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment tim
 Write-Host
 
 # Tagging resource group w/ deployment complete
-Write-Host "INFO: Setting RG tag"
-$resource=az group show -n $resourceGroup --query id --output tsv
-az tag create --resource-id $resource --tags Project=Jumpstart_Agora AgoraClientVMLogonScript=Completed
+Write-Host "INFO: Setting RG tag to signal completion of Client VM Setup"
+Update-AzTag -ResourceId ((Get-AzResourceGroup -Name $env:resourceGroup).ResourceId) -Tag @{JumpstartAgoraClientVMLogonScript = Completed} -Operation Merge 
 
 Stop-Transcript
