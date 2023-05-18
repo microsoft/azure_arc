@@ -29,6 +29,7 @@ $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
 $adminPassword = $env:adminPassword
 $gitHubAPIBaseUri = "https://api.github.com"
+$iotDeviceSasTokens = @{}
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -152,9 +153,9 @@ Write-Host
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
     }
     git add .
     git commit -m "Pushing GitHub actions to apps fork"
@@ -226,6 +227,7 @@ Write-Host
 # Azure IoT Hub resources preparation
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/13)" -ForegroundColor DarkGreen
+
 if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
@@ -233,10 +235,14 @@ if ($githubUser -ne "microsoft") {
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
-        $deviceId = $site.FriendlyName
-        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-        gh secret set "sas_token_$deviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        foreach ($device in $site.IoTDevices){
+            $deviceId = "$device-$($site.FriendlyName)"
+            Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $IoTHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
+            $iotDeviceSasTokens.Add($deviceId, $deviceSASToken)
+            $ghDeviceId = $deviceId -replace '[^\w_]', '_'
+            gh secret set "sas_token_$ghDeviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        }
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
     Write-Host
@@ -362,6 +368,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
         Get-VMNetworkAdapter -VMName $site.Name | Set-VMNetworkAdapter -MacAddressSpoofing On | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
         Enable-VMIntegrationService -VMName $site.Name -Name "Guest Service Interface" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
+
         # Start the virtual machine
         Start-VM -Name $site.Name | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
     }
@@ -396,7 +403,7 @@ foreach ($VM in $VMNames) {
     {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
-        sleep 5
+        Start-Sleep 5
     }
 }
 
@@ -691,26 +698,90 @@ Write-Host
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 10/13)" -ForegroundColor DarkGreen
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
-        $branch = $cluster.value.Branch.ToLower()
-        $configName = $app.value.GitOpsConfigName.ToLower()
-        $clusterType = $cluster.value.Type
-        $namespace = $app.value.Namespace
-        $appName = $app.Value.KustomizationName
-        $appPath= $app.Value.KustomizationPath
+# TODO - move vars up to initialize
+$deploymentFolder = "C:\Deployment"
 
+Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $folderPath $fileName
+        # TODO - Add Retry here
+        # if SSL/TLS errors persist, consider disabling the certificate validation:
+        # [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+
+        Redo-Command {Invoke-RestMethod -Uri $_ -OutFile $outputFile}
+    }
+
+    If (-not $excludeFolders) {
+        $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+            $folderName = $_.name
+            $path = Join-Path $folderPath $folderName
+            New-Item $path -ItemType Directory -Force -ErrorAction Continue
+
+            Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+        }
+    }
+}
+
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+
+    $appName            = $app.Value.KustomizationName
+    $appPath            = $app.value.AppPath
+    $kustomizationName  = $app.value.KustomizationName
+    $kustomizationPath  = $app.value.KustomizationPath
+    $configName         = $app.value.GitOpsConfigName.ToLower()
+    $namespace          = $app.value.Namespace
+
+    foreach ($site in $AgConfig.SiteConfig.Values) {
+
+        $storeType   = $site.Branch.ToLower()
+        $clusterName = $site.ArcClusterName+"-$namingGuid"
+        $branch      = $site.Branch.ToLower()
+        $clusterType = $site.Type
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $appName application on $clusterName" -ForegroundColor Gray
+
+        If ($app.Value.ConfigMaps){
+            # download the config files
+            foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
+                $repoPath   = $configMap.value.RepoPath
+                $configPath = "$deploymentFolder\$appPath\config\$($configMap.Name)\$branch"
+                New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+
+                $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
+                Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
+
+                # TODO - replace with better approach - perhaps via GH Action
+                # replace the IoT Hub name and the SAS Tokens with the deployment specific values
+                If ($configMap.Name -eq "mqtt-broker-config"){
+                    $configFile = "$configPath\mosquitto.conf"
+                    $update = (Get-Content $configFile -Raw) 
+                    $update = $update -replace "Ag-IotHub-\w*", $IoTHubName
+                    foreach ($device in $site.IoTDevices) {
+                        $deviceId = "$device-$($site.FriendlyName)"
+                        $update = $update -replace "Chicago", $site.FriendlyName
+                        $update = $update -replace "SharedAccessSignature.*$($deviceId).*", $iotDeviceSasTokens[$deviceId]
+                    }
+                    $update | Set-Content $configFile
+                }
+
+                # create the configmap
+                kubectx $site.FriendlyName.ToLower()
+                Start-Sleep 1 # required to prevent kubectx from erroring when called too frequently
+                kubectl create namespace $namespace
+                kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace 
+            }
+        }
         if($clusterType -eq "AKS"){
             $type = "managedClusters"
-            $clusterName= $cluster.value.ArcClusterName
+            $clusterName= $site.ArcClusterName
         }else{
             $type = "connectedClusters"
         }
         if($branch -eq "main"){
-            $store = "dev"
+            $storeType = "dev"
         }
 
         az k8s-configuration flux create `
@@ -719,9 +790,9 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --name $configName `
             --cluster-type $type `
             --url $appClonedRepo `
-            --branch $Branch `
+            --branch $branch `
             --sync-interval 5s `
-            --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+            --kustomization name=$kustomizationName path=$kustomizationPath/$storeType prune=true retry_interval=1m `
             --timeout 10m `
             --namespace $namespace `
             --only-show-errors `
@@ -765,7 +836,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
-
 
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
