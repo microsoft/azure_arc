@@ -82,4 +82,4 @@ jobs:
         git add --all
         git commit -m "Update Image Tag on production to $latest_tag"
         git push --set-upstream origin $newBranch
-        gh pr create --title "Update production Image Tag to $latest_tag" --body "Update production Image Tag to $latest_tag"
+        gh pr create --title "Update production Image Tag to $latest_tag" --body "Update production Image Tag to $latest_tag" --base production
