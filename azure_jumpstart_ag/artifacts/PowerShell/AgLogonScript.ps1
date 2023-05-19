@@ -96,108 +96,108 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-    Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
-    Set-Location $AgAppsRepo
-    Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
-    do {
-        try {
-            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
-            if ($response) {
-                write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/13)" -ForegroundColor DarkGreen
+Set-Location $AgAppsRepo
+Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+do {
+    try {
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
+        if ($response) {
+            write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+        }
+    }
+    catch {
+        Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+        start-sleep -Seconds 45
+    }
+} until (
+    $response.full_name -eq "$githubUser/$appsRepo"
+)
+
+git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
+Set-Location "$AgAppsRepo\$appsRepo"
+New-Item -ItemType Directory ".github/workflows" -Force
+Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
+gh repo set-default "$githubUser/$appsRepo"
+gh secret set "SPN_CLIENT_ID" -b $spnClientID
+gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+gh secret set "ACR_NAME" -b $acrName
+gh secret set "PAT_GITHUB" -b $githubPat
+gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+gh secret set "SPN_TENANT_ID" -b $spnTenantId
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+$headers = @{
+    Authorization  = "token $githubPat"
+    "Content-Type" = "application/json"
+}
+$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+foreach ($branch in $protectedBranches) {
+    $branchName = $branch.name
+    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+}
+
+Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
+git config --global user.email "dev@agora.com"
+git config --global user.name "Agora Dev"
+git fetch
+git pull
+
+Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+$response = Invoke-RestMethod -Uri $githubApiUrl
+$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+$fileUrls | ForEach-Object {
+    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+}
+git add .
+git commit -m "Pushing GitHub actions to apps fork"
+git push
+Start-Sleep -Seconds 20
+Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+gh workflow run update-files.yml
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
+}
+Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+gh workflow run pos-app-initial-images-build.yml
+
+Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
+$branches = $AgConfig.GitBranches
+foreach ($branch in $branches) {
+    try {
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+        if ($response) {
+            if ($branch -ne "main") {
+                Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                git push origin --delete $branch
+                git fetch origin
+                git checkout main
+                git pull origin main
+                git checkout -b $branch
+                git push origin $branch
             }
         }
-        catch {
-            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
-            start-sleep -Seconds 45
-        }
-    } until (
-        $response.full_name -eq "$githubUser/$appsRepo"
-    )
-
-    git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
-    Set-Location "$AgAppsRepo\$appsRepo"
-    New-Item -ItemType Directory ".github/workflows" -Force
-    Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-    gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
-    gh repo set-default "$githubUser/$appsRepo"
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-    gh secret set "ACR_NAME" -b $acrName
-    gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-    gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
-    Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-    $headers = @{
-        Authorization = "token $githubPat"
-        "Content-Type" = "application/json"
     }
-    $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-    foreach ($branch in $protectedBranches) {
-        $branchName = $branch.name
-        $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-        Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-        Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+    catch {
+        Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+        git fetch origin
+        git checkout main
+        git pull origin main
+        git checkout -b $branch
+        git push origin $branch
     }
-
-    Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    git fetch
-    git pull
-
-    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
-    }
-    git add .
-    git commit -m "Pushing GitHub actions to apps fork"
-    git push
-    Start-Sleep -Seconds 20
-    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-    gh workflow run update-files.yml
-    while ($workflowStatus.status -ne "completed") {
-        Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
-        Start-Sleep -Seconds 10
-        $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
-    }
-    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
-    gh workflow run pos-app-initial-images-build.yml
-
-    Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
-    $branches = $AgConfig.GitBranches
-    foreach ($branch in $branches) {
-        try {
-            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
-            if ($response) {
-                if($branch -ne "main"){
-                    Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                    git push origin --delete $branch
-                    git fetch origin
-                    git checkout main
-                    git pull origin main
-                    git checkout -b $branch
-                    git push origin $branch
-                }
-            }
-        }
-        catch {
-            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
-            git fetch origin
-            git checkout main
-            git pull origin main
-            git checkout -b $branch
-            git push origin $branch
-        }
-    }
-    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout main
+}
+Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+git checkout main
 
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
@@ -205,16 +205,16 @@ foreach ($branch in $branches) {
     Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
     $headers = @{
         "Authorization" = "Bearer $githubPat"
-        "Accept" = "application/vnd.github+json"
+        "Accept"        = "application/vnd.github+json"
     }
     $body = @{
-        required_status_checks = $null
-        enforce_admins = $false
+        required_status_checks        = $null
+        enforce_admins                = $false
         required_pull_request_reviews = @{
             required_approving_review_count = 0
         }
-        dismiss_stale_reviews = $true
-        restrictions  = $null
+        dismiss_stale_reviews         = $true
+        restrictions                  = $null
     } | ConvertTo-Json
 
     Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
@@ -392,8 +392,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 
 foreach ($VM in $VMNames) {
     $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-    while ($VMStatus.PrimaryStatusDescription -ne "OK")
-    {
+    while ($VMStatus.PrimaryStatusDescription -ne "OK") {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
         sleep 5
@@ -480,7 +479,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $namingGuid = $using:namingGuid
-    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName+"-$namingGuid"
+    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
@@ -619,7 +618,7 @@ foreach ($VM in $VMNames) {
 # Tag Azure Arc resources
 #####################################################################
 $arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
-$Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
+$Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
 
 # Iterate over the Arc resources and tag it
 foreach ($arcResourceType in $arcResourceTypes) {
@@ -658,16 +657,16 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/13)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-            kubectl create secret docker-registry acr-secret `
+    $clusterName = $cluster.Name.ToLower()
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+        kubectl create secret docker-registry acr-secret `
             --namespace $app.value.namespace `
             --docker-server="$acrName.azurecr.io" `
             --docker-username="$env:spnClientId" `
             --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+    }
 }
 
 #####################################################################
@@ -695,21 +694,22 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
         $store = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
+        $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
         $branch = $cluster.value.Branch.ToLower()
         $configName = $app.value.GitOpsConfigName.ToLower()
         $clusterType = $cluster.value.Type
         $namespace = $app.value.Namespace
         $appName = $app.Value.KustomizationName
-        $appPath= $app.Value.KustomizationPath
+        $appPath = $app.Value.KustomizationPath
 
-        if($clusterType -eq "AKS"){
+        if ($clusterType -eq "AKS") {
             $type = "managedClusters"
-            $clusterName= $cluster.value.ArcClusterName
-        }else{
+            $clusterName = $cluster.value.ArcClusterName
+        }
+        else {
             $type = "connectedClusters"
         }
-        if($branch -eq "main"){
+        if ($branch -eq "main") {
             $store = "dev"
         }
 
@@ -725,7 +725,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --timeout 10m `
             --namespace $namespace `
             --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+        | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
     }
 }
 
@@ -759,8 +759,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         else {
             Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
             Start-Sleep -Seconds 45
-            }
-        } until ($readyCondition.message -eq "Helm install succeeded")
+        }
+    } until ($readyCondition.message -eq "Helm install succeeded")
 }
 
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
@@ -851,7 +851,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     } while ($true)
 
     # Install Prometheus Operator
-    $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder',$adminPassword
+    $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
     helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
     Do {
@@ -921,10 +921,11 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     if (!$_.Value.IsProduction) {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
         $grafanaUserBody = @{
-            name = $AgConfig.Monitoring["User"] # Display Name
-            email = $AgConfig.Monitoring["Email"]
-            login = $adminUsername
-            password = $adminPassword} | ConvertTo-Json
+            name     = $AgConfig.Monitoring["User"] # Display Name
+            email    = $AgConfig.Monitoring["Email"]
+            login    = $adminUsername
+            password = $adminPassword
+        } | ConvertTo-Json
 
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
@@ -944,10 +945,11 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
 # Add Contoso Operator User
 $grafanaUserBody = @{
-    name = $AgConfig.Monitoring["User"] # Display Name
-    email = $AgConfig.Monitoring["Email"]
-    login = $adminUsername
-    password = $adminPassword} | ConvertTo-Json
+    name     = $AgConfig.Monitoring["User"] # Display Name
+    email    = $AgConfig.Monitoring["Email"]
+    login    = $adminUsername
+    password = $adminPassword
+} | ConvertTo-Json
 
 # Make HTTP request to the API
 Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
@@ -1027,7 +1029,7 @@ foreach ($extension in $AgConfig.VSCodeExtensions) {
 #############################################################
 # Install Docker Desktop
 #############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor Gray
 # Download and Install Docker Desktop
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
