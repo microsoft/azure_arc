@@ -722,6 +722,8 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --branch $Branch `
             --sync-interval 5s `
             --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+            --config source-controller.resources.limits.memory=2Gi `
+            --config source-controller.resources.requests.memory=300Mi `
             --timeout 10m `
             --namespace $namespace `
             --only-show-errors `
