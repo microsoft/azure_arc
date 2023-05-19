@@ -28,6 +28,13 @@
     },
     "githubUser": {
       "value": ""
+    },
+    "githubBranch": {
+      "value": ""
+    },
+    "githubAccount": {
+      "value": ""
     }
+    
   }
 }
