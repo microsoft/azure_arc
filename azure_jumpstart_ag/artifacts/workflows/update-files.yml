@@ -65,6 +65,55 @@ jobs:
         git commit -m "Update ACR name"
         git push
 
+    - name: Replace the correct image tag
+      continue-on-error: true
+      env:
+        IMAGE_TAG: "v1.0"
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+        # Update image tag in staging
+        FILE_PATH=$(find . -name "staging.yaml")
+        newLine="    image_tag: $IMAGE_TAG"
+        if [ ! -z "$FILE_PATH" ]; then
+          sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+        else
+          echo "staging.yaml not found"
+        fi
+
+        # Update image tag in canary
+        FILE_PATH=$(find . -name "chicago.yaml")
+        newLine="    image_tag: $IMAGE_TAG"
+        if [ ! -z "$FILE_PATH" ]; then
+          sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+        else
+          echo "chicago.yaml not found"
+        fi
+
+        # Update image tag in production
+        FILE_PATH=$(find . -name "seattle.yaml")
+        newLine="    image_tag: $IMAGE_TAG"
+        if [ ! -z "$FILE_PATH" ]; then
+          sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+        else
+          echo "seattle.yaml not found"
+        fi
+
+        # Update image tag in main
+        FILE_PATH=$(find . -name "dev.yaml")
+        newLine="    image_tag: $IMAGE_TAG"
+        if [ ! -z "$FILE_PATH" ]; then
+          sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+        else
+          echo "dev.yaml not found"
+        fi
+
+        # Push changes
+        git add .
+        git commit -m "Update ACR name"
+        git push
+
     - name: Replace the correct Cosmos DB endpoint
       continue-on-error: true
       env:
