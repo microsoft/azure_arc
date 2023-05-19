@@ -724,7 +724,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
             --config source-controller.resources.limits.memory=2Gi `
             --config source-controller.resources.requests.memory=300Mi `
-            --timeout 10m `
+            --timeout 20m `
             --namespace $namespace `
             --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
