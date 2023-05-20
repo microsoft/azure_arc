@@ -738,10 +738,11 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
 
 Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration complaince on each cluster." -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
+    $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
     $clusterType = $cluster.value.Type
     if ($clusterType -eq "AKS") {
         $type = "managedClusters"
+        $clusterName = $cluster.value.ArcClusterName
     }
     else {
         $type = "connectedClusters"
