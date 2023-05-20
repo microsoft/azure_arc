@@ -24,7 +24,7 @@ jobs:
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
         git pull
-        branches=("production.yaml" "staging.yaml" "canary.yaml" "main.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATH=$(find . -name $branch)
           newLine="    acr_name: $ACR_NAME"
@@ -49,7 +49,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("production.yaml" "staging.yaml" "canary.yaml" "main.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATH=$(find . -name $branch)
           newLine="    image_tag: $IMAGE_TAG"
@@ -75,7 +75,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("production.yaml" "staging.yaml" "canary.yaml" "main.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATH=$(find . -name $branch)
           newLine="      endpoint: $COSMOS_ENDPOINT"
@@ -101,7 +101,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("production.yaml" "staging.yaml" "canary.yaml" "main.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATH=$(find . -name $branch)
           newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
