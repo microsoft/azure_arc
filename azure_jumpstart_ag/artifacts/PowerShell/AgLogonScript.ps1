@@ -751,23 +751,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         else {
             $type = "connectedClusters"
         }
-        $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
-        $apiServerAddress = $apiServer -replace '.*https://| .*$'
-        $apiServerFqdn = ($apiServerAddress -split ":")[0]
-        $apiServerPort = ($apiServerAddress -split ":")[1]
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to be compliant on $clusterName." -ForegroundColor Gray
-        do {
-            $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-            if ($result.TcpTestSucceeded) {
-                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
-                break
-            }
-            else {
-                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
-                Start-Sleep -Seconds 10
-            }
-        } while ($true)
-
         $configStatus = $(az k8s-configuration flux list --cluster-name $clusterName --cluster-type $type -g $resourceGroup -o json) | convertFrom-JSON
         foreach ($config in $configStatus) {
             do {
