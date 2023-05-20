@@ -24,15 +24,22 @@ jobs:
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
         git pull
+
         branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
-          FILE_PATH=$(find . -name $branch)
-          newLine="    acr_name: $ACR_NAME"
-          if [ ! -z "$FILE_PATH" ]; then
-            sed -i "s/.*acr_name.*/$newLine/" $FILE_PATH
-          else
-            echo "$branch not found"
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
           fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    acr_name: $ACR_NAME"
+            if grep -q "acr_name" "$FILE_PATH"; then
+              sed -i "s/.*acr_name.*/$newLine/" "$FILE_PATH"
+            else
+              echo "acr_name not found in $FILE_PATH"
+            fi
+          done
         done
 
         # Push changes
@@ -50,14 +57,21 @@ jobs:
         git pull
 
         branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+
         for branch in "${branches[@]}"; do
-          FILE_PATH=$(find . -name $branch)
-          newLine="    image_tag: $IMAGE_TAG"
-          if [ ! -z $FILE_PATH ]; then
-            sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
-          else
-            echo "$branch not found"
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
           fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    image_tag: $IMAGE_TAG"
+            if grep -q "image_tag" "$FILE_PATH"; then
+              sed -i "s/.*image_tag.*/$newLine/" "$FILE_PATH"
+            else
+              echo "image_tag not found in $FILE_PATH"
+            fi
+          done
         done
 
         # Push changes
@@ -77,13 +91,19 @@ jobs:
 
         branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
-          FILE_PATH=$(find . -name $branch)
-          newLine="      endpoint: $COSMOS_ENDPOINT"
-          if [ ! -z "$FILE_PATH" ]; then
-            sed -i "s#.*endpoint.*#$newLine#" $FILE_PATH
-          else
-            echo "$branch not found"
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
           fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="      endpoint: $COSMOS_ENDPOINT"
+            if grep -q "endpoint" "$FILE_PATH"; then
+              sed -i "s#.*endpoint.*#$newLine#" "$FILE_PATH"
+            else
+              echo "endpoint not found in $FILE_PATH"
+            fi
+          done
         done
 
         # Push changes
@@ -103,15 +123,35 @@ jobs:
 
         branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
         for branch in "${branches[@]}"; do
-          FILE_PATH=$(find . -name $branch)
-          newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
-          if [ ! -z "$FILE_PATH" ]; then
-            sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
-          else
-            echo "$branch not found"
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
           fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
+            if grep -q "github_User" "$FILE_PATH"; then
+              sed -i "s#.*github_User.*#$newLine#" "$FILE_PATH"
+            else
+              echo "github_User not found in $FILE_PATH"
+            fi
+          done
         done
 
+        # Push changes
+        git add .
+        git commit -m "Update GitHub account"
+        git push
+
+    - name: Replace the correct GitHub account in requirements files
+      continue-on-error: true
+      env:
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+        find . -type f -name "requirements.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
         # Push changes
         git add .
         git commit -m "Update GitHub account"
