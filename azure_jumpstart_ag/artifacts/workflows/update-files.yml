@@ -143,7 +143,7 @@ jobs:
         git commit -m "Update GitHub account"
         git push
 
-    - name: Replace the correct GitHub account in requirements files
+    - name: Replace the correct GitHub account in Chart.yaml files
       continue-on-error: true
       env:
         GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
@@ -151,7 +151,7 @@ jobs:
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
         git pull
-        find . -type f -name "requirements.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
+        find . -type f -name "Chart.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
         # Push changes
         git add .
         git commit -m "Update GitHub account"
