@@ -35,3 +35,13 @@ resource policy_defender_servers 'Microsoft.Authorization/roleAssignments@2020-1
     principalType: 'ServicePrincipal'
   }
 }
+
+resource policy_defender_servers_remediation 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
+  name: guid( policies[0].name, policies[0].roleDefinition,subscription().id)
+  scope: subscription()
+  properties: {
+    policyAssignmentId: policies_name[0].id
+    policyDefinitionReferenceId: policies[0].definitionId
+    resourceDiscoveryMode: 'ReEvaluateCompliance'
+  }
+}
