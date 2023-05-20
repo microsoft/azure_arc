@@ -646,8 +646,10 @@ az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 8/13)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    $clusterName = $cluster.Name.ToLower()
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     foreach ($namespace in $AgConfig.Namespaces) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on $clusterName (Step 8/13)" -ForegroundColor Gray
         kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     }
 }
@@ -655,18 +657,17 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/13)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring contoso-supermarket secrets on clusters (Step 9/13)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
+    $namespace = $cluster.value.posNamespace
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-        kubectl create secret docker-registry acr-secret `
-            --namespace $app.value.namespace `
-            --docker-server="$acrName.azurecr.io" `
-            --docker-username="$env:spnClientId" `
-            --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    }
+    kubectl create secret docker-registry acr-secret `
+        --namespace $namespace `
+        --docker-server="$acrName.azurecr.io" `
+        --docker-username="$env:spnClientId" `
+        --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 }
 
 #####################################################################
