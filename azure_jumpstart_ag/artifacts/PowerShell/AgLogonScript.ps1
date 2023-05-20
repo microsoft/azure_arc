@@ -736,6 +736,7 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
     }
 }
 
+Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration complaince on each cluster." -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $clusterType = $cluster.value.Type
@@ -749,7 +750,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $apiServerAddress = $apiServer -replace '.*https://| .*$'
     $apiServerFqdn = ($apiServerAddress -split ":")[0]
     $apiServerPort = ($apiServerAddress -split ":")[1]
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on $clusterName." -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to be compliant on $clusterName." -ForegroundColor Gray
     do {
         $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
         if ($result.TcpTestSucceeded) {
