@@ -31,6 +31,7 @@
         grafanaUrl = 'https://api.github.com/repos/grafana/grafana/releases/latest'
         azurePortalUrl = 'https://portal.azure.com'
         aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
+        nginxUrl = 'https://kubernetes.github.io/ingress-nginx'
     }
 
     # Azure required registered resource providers
