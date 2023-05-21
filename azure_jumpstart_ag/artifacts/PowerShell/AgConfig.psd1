@@ -200,6 +200,16 @@
     TagValue = 'Jumpstart_Agora'
     ArcServerResourceType = 'Microsoft.HybridCompute/machines'
     ArcK8sResourceType = 'Microsoft.Kubernetes/connectedClusters'
+    AksResourceType = 'Microsoft.ContainerService/managedClusters'
+
+    # nginx variables
+    nginx = @{
+        RepoName = "ingress-nginx"
+        RepoURL = "https://kubernetes.github.io/ingress-nginx"
+        ReleaseName = "ingress-nginx"
+        ChartName = "ingress-nginx/ingress-nginx"
+        Namespace  = "ingress-nginx"
+    }
 
     # Observability variables
     Monitoring = @{

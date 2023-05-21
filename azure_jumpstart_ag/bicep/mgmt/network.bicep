@@ -146,6 +146,32 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
           destinationPortRange: '443'
         }
       }
+      {
+        name: 'allow_pos_5000'
+        properties: {
+          priority: 1006
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '5000'
+        }
+      }
+      {
+        name: 'test_caps'
+        properties: {
+          priority: 1007
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '6000'
+        }
+      }        
     ]
   }
 }
