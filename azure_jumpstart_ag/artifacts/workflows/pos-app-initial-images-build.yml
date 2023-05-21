@@ -28,7 +28,7 @@ jobs:
           latest_tag: "v1.0"
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 5
+          timeout_minutes: 25
           retry_on: error
           max_attempts: 3
           command: |
@@ -47,7 +47,7 @@ jobs:
             latest_tag: "v1.0"
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 3
+          timeout_minutes: 25
           retry_on: error
           max_attempts: 3
           command: |
@@ -66,7 +66,7 @@ jobs:
             latest_tag: "v1.0"
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 10
+          timeout_minutes: 25
           retry_on: error
           max_attempts: 3
           command: |
@@ -85,7 +85,7 @@ jobs:
             latest_tag: "v1.0"
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 3
+          timeout_minutes: 25
           retry_on: error
           max_attempts: 3
           command: |
@@ -104,7 +104,7 @@ jobs:
             latest_tag: "v1.0"
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 5
+          timeout_minutes: 25
           retry_on: error
           max_attempts: 3
           command: |
@@ -117,4 +117,3 @@ jobs:
               docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
               docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0
             done
-
