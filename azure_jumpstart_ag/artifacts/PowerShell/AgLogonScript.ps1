@@ -701,6 +701,7 @@ while ($workflowStatus.status -ne "completed") {
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression={$_.value.Order}; Ascending=$true} | ForEach-Object{
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+            $app = $_
             $store = $cluster.value.Branch.ToLower()
             $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
             $branch = $cluster.value.Branch.ToLower()
