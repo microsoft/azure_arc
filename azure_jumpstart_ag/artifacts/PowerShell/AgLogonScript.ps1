@@ -678,14 +678,14 @@ foreach ($resource in $resources) {
                 --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
-                --auto-upgrade false | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\FluxInstallation.log")
+                --auto-upgrade false
             
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --name flux `
                 --query provisioningState `
-                --output tsv | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\FluxInstallation.log")
+                --output tsv
             
             [PSCustomObject]@{
                 ResourceName = $resourceName
@@ -706,15 +706,15 @@ foreach ($resource in $resources) {
                 --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
-                --auto-upgrade false | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\FluxInstallation.log")
+                --auto-upgrade false
             
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --name flux `
                 --query provisioningState `
-                --output tsv | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\FluxInstallation.log")
-            
+                --output tsv
+                
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
