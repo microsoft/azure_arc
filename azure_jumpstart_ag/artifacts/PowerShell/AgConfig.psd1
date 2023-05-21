@@ -230,7 +230,6 @@
             KustomizationName = "contosodb"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosodb"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/contosodb"
             Order = 1
         }
         ContosoSupermarket_contosoai = @{
@@ -238,7 +237,6 @@
             KustomizationName = "contosoai"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosoai"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/contosoai"
             Order = 2
         }
         ContosoSupermarket_cloudsync = @{
@@ -246,7 +244,6 @@
             KustomizationName = "cloudsync"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/cloudsync"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/cloudsync"
             Order = 3
         }
         ContosoSupermarket_contosopos = @{
@@ -254,7 +251,6 @@
             KustomizationName = "contosopos"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosopos"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/contosopos"
             Order = 4
         }
         ContosoSupermarket_queue_monitoring_backend = @{
@@ -262,7 +258,6 @@
             KustomizationName = "queuebackend"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-backend"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/queue-monitoring-backend"
             Order = 5
         }
         ContosoSupermarket_queue_monitoring_frontend = @{
@@ -270,7 +265,6 @@
             KustomizationName = "queuefrontend"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend"
             Namespace = "contoso-supermarket"
-            AppPath = "contoso_supermarket/queue-monitoring-frontend"
             Order = 6
         }
         # SensorMonitor = @{
