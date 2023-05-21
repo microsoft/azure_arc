@@ -179,10 +179,12 @@ foreach ($branch in $branches) {
             if ($branch -ne "main") {
                 Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
                 git push origin --delete $branch
+                git branch -d $branch
                 git fetch origin
                 git checkout main
                 git pull origin main
-                git checkout -b $branch
+                git checkout -b $branch main
+                git pull origin main
                 git push origin $branch
             }
         }
@@ -192,7 +194,8 @@ foreach ($branch in $branches) {
         git fetch origin
         git checkout main
         git pull origin main
-        git checkout -b $branch
+        git checkout -b $branch main
+        git pull origin main
         git push origin $branch
     }
 }
@@ -700,7 +703,6 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression={$_.value.Order}; Ascending=$true} | ForEach-Object{
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             $app = $_
             $store = $cluster.value.Branch.ToLower()
             $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
@@ -710,6 +712,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $namespace = $app.value.Namespace
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+
 
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -730,26 +734,23 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --url $appClonedRepo `
                 --branch $Branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m sync_interval=1m `
                 --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
 
-            $configStatus = $(az k8s-configuration flux list --cluster-name $clusterName --cluster-type $type --resource-group $Env:resourceGroup -o json) | convertFrom-JSON
-            foreach ($config in $configStatus) {
-                do {
-                    $configName = $config.Name
-                    if ($config.ComplianceState -eq "Compliant") {
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor Gray
-                    }
-                    else {
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
-                        Start-Sleep -Seconds 45
-                    }
-                } until ($config.ComplianceState -eq "Compliant")
-            }
-        }
+            do {
+                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $Env:resourceGroup -o json) | convertFrom-JSON
+                if ($configStatus.ComplianceState -eq "Compliant") {
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen
+                }
+                else {
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not ready on $clusterName...waiting 10 seconds" -ForegroundColor Gray
+                    Start-Sleep -Seconds 10
+                }
+            } until ($configStatus.ComplianceState -eq "Compliant")
+    }
 }
 
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
