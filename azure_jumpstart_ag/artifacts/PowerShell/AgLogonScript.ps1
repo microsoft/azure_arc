@@ -709,7 +709,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $namespace = $app.value.Namespace
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
-            $dependencies = $app.Value.dependsOn
 
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -721,9 +720,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             if ($branch -eq "main") {
                 $store = "dev"
             }
-            if($null -eq $dependencies) {
-                $dependencies = ""
-            }
 
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
@@ -733,40 +729,27 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --url $appClonedRepo `
                 --branch $Branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m depends_on=$dependencies `
+                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
                 --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-    }
+
+            $configStatus = $(az k8s-configuration flux list --cluster-name $clusterName --cluster-type $type --resource-group $Env:resourceGroup -o json) | convertFrom-JSON
+            foreach ($config in $configStatus) {
+                do {
+                    $configName = $config.Name
+                    if ($config.ComplianceState -eq "Compliant") {
+                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor Gray
+                    }
+                    else {
+                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
+                        Start-Sleep -Seconds 45
+                    }
+                } until ($config.ComplianceState -eq "Compliant")
+            }
+        }
 }
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration complaince on each cluster." -ForegroundColor DarkGreen
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-        $clusterType = $cluster.value.Type
-        if ($clusterType -eq "AKS") {
-            $type = "managedClusters"
-            $clusterName = $cluster.value.ArcClusterName
-        }
-        else {
-            $type = "connectedClusters"
-        }
-        $configStatus = $(az k8s-configuration flux list --cluster-name $clusterName --cluster-type $type -g $resourceGroup -o json) | convertFrom-JSON
-        foreach ($config in $configStatus) {
-            do {
-                $configName = $config.Name
-                if ($config.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor Gray
-                }
-                else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
-                    Start-Sleep -Seconds 45
-                }
-            } until ($config.ComplianceState -eq "Compliant")
-        }
-
-    }
 
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
