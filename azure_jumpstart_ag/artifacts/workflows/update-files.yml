@@ -24,41 +24,55 @@ jobs:
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
         git pull
-        # Update ACR name in staging
-        FILE_PATH=$(find . -name "staging.yaml")
-        newLine="    acr_name: $ACR_NAME"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s/.*acr_name.*/$newLine/" $FILE_PATH
-        else
-          echo "staging.yaml not found"
-        fi
 
-        # Update ACR name in canary
-        FILE_PATH=$(find . -name "chicago.yaml")
-        newLine="    acr_name: $ACR_NAME"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s/.*acr_name.*/$newLine/" $FILE_PATH
-        else
-          echo "chicago.yaml not found"
-        fi
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    acr_name: $ACR_NAME"
+            if grep -q "acr_name" "$FILE_PATH"; then
+              sed -i "s/.*acr_name.*/$newLine/" "$FILE_PATH"
+            else
+              echo "acr_name not found in $FILE_PATH"
+            fi
+          done
+        done
 
-        # Update ACR name in production
-        FILE_PATH=$(find . -name "seattle.yaml")
-        newLine="    acr_name: $ACR_NAME"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s/.*acr_name.*/$newLine/" $FILE_PATH
-        else
-          echo "seattle.yaml not found"
-        fi
+        # Push changes
+        git add .
+        git commit -m "Update ACR name"
+        git push
 
-        # Update ACR name in main
-        FILE_PATH=$(find . -name "dev.yaml")
-        newLine="    acr_name: $ACR_NAME"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s/.*acr_name.*/$newLine/" $FILE_PATH
-        else
-          echo "dev.yaml not found"
-        fi
+    - name: Replace the correct image tag
+      continue-on-error: true
+      env:
+        IMAGE_TAG: "v1.0"
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    image_tag: $IMAGE_TAG"
+            if grep -q "image_tag" "$FILE_PATH"; then
+              sed -i "s/.*image_tag.*/$newLine/" "$FILE_PATH"
+            else
+              echo "image_tag not found in $FILE_PATH"
+            fi
+          done
+        done
 
         # Push changes
         git add .
@@ -75,38 +89,23 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        FILE_PATH=$(find . -name "staging.yaml")
-        newLine="      endpoint: $COSMOS_ENDPOINT"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*endpoint.*#$newLine#" $FILE_PATH
-        else
-          echo "staging.yaml not found"
-        fi
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="      endpoint: $COSMOS_ENDPOINT"
+            if grep -q "endpoint" "$FILE_PATH"; then
+              sed -i "s#.*endpoint.*#$newLine#" "$FILE_PATH"
+            else
+              echo "endpoint not found in $FILE_PATH"
+            fi
+          done
+        done
 
-        FILE_PATH=$(find . -name "chicago.yaml")
-        newLine="      endpoint: $COSMOS_ENDPOINT"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*endpoint.*#$newLine#" $FILE_PATH
-        else
-          echo "chicago.yaml not found"
-        fi
-
-        FILE_PATH=$(find . -name "seattle.yaml")
-        newLine="      endpoint: $COSMOS_ENDPOINT"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*endpoint.*#$newLine#" $FILE_PATH
-        else
-          echo "seattle.yaml not found"
-        fi
-
-        FILE_PATH=$(find . -name "dev.yaml")
-        newLine="      endpoint: $COSMOS_ENDPOINT"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*endpoint.*#$newLine#" $FILE_PATH
-        else
-          echo "dev.yaml not found"
-        fi
-  
         # Push changes
         git add .
         git commit -m "Update Cosmos DB endpoint"
@@ -122,38 +121,37 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        FILE_PATH=$(find . -name "staging.yaml")
-        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
-        else
-          echo "staging.yaml not found"
-        fi
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
+            if grep -q "github_User" "$FILE_PATH"; then
+              sed -i "s#.*github_User.*#$newLine#" "$FILE_PATH"
+            else
+              echo "github_User not found in $FILE_PATH"
+            fi
+          done
+        done
 
-        FILE_PATH=$(find . -name "chicago.yaml")
-        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
-        else
-          echo "chicago.yaml not found"
-        fi
+        # Push changes
+        git add .
+        git commit -m "Update GitHub account"
+        git push
 
-        FILE_PATH=$(find . -name "seattle.yaml")
-        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
-        else
-          echo "seattle.yaml not found"
-        fi
-
-        FILE_PATH=$(find . -name "dev.yaml")
-        newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
-        if [ ! -z "$FILE_PATH" ]; then
-          sed -i "s#.*github_User.*#$newLine#" $FILE_PATH
-        else
-          echo "dev.yaml not found"
-        fi
-  
+    - name: Replace the correct GitHub account in Chart.yaml files
+      continue-on-error: true
+      env:
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+        find . -type f -name "Chart.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
         # Push changes
         git add .
         git commit -m "Update GitHub account"
