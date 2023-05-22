@@ -20,7 +20,7 @@ param osDiskSizeGB int = 0
 @description('The number of nodes for the cluster')
 @minValue(1)
 @maxValue(50)
-param agentCount int = 2
+param agentCount int = 3
 
 @description('The size of the Virtual Machine')
 param agentVMSize string = 'Standard_D4s_v4'
