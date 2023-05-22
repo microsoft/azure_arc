@@ -730,8 +730,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-
-
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
                 $clusterName = $cluster.value.ArcClusterName
@@ -742,7 +740,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             if ($branch -eq "main") {
                 $store = "dev"
             }
-
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
                 --resource-group $Env:resourceGroup `
@@ -758,7 +755,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
 
             do {
-                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $Env:resourceGroup -o json) | convertFrom-JSON
+                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
                 if ($configStatus.ComplianceState -eq "Compliant") {
                     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen
                 }
@@ -772,7 +769,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
-
 
     #####################################################################
     # Deploy Kubernetes Prometheus Stack for Observability
