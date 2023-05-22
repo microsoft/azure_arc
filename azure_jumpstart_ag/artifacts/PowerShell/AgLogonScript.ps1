@@ -667,7 +667,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     foreach ($namespace in $AgConfig.Namespaces) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on $clusterName (Step 8/15)" -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on $clusterName" -ForegroundColor Gray
         kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     }
 }
