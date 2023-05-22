@@ -232,31 +232,31 @@
             Namespace = "contoso-supermarket"
             Order = 1
         }
-        ContosoSupermarket_contosoai = @{
-            GitOpsConfigName = "config-supermarket-ai"
-            KustomizationName = "contosoai"
-            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosoai"
-            Namespace = "contoso-supermarket"
-            Order = 2
-        }
         ContosoSupermarket_cloudsync = @{
             GitOpsConfigName = "config-supermarket-cloudsync"
             KustomizationName = "cloudsync"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/cloudsync"
             Namespace = "contoso-supermarket"
-            Order = 3
+            Order = 2
         }
         ContosoSupermarket_contosopos = @{
             GitOpsConfigName = "config-supermarket-pos"
             KustomizationName = "contosopos"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosopos"
             Namespace = "contoso-supermarket"
-            Order = 4
+            Order = 3
         }
         ContosoSupermarket_queue_monitoring_backend = @{
             GitOpsConfigName = "config-supermarket-queue-backend"
             KustomizationName = "queuebackend"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-backend"
+            Namespace = "contoso-supermarket"
+            Order = 4
+        }
+        ContosoSupermarket_contosoai = @{
+            GitOpsConfigName = "config-supermarket-ai"
+            KustomizationName = "contosoai"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosoai"
             Namespace = "contoso-supermarket"
             Order = 5
         }
