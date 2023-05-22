@@ -808,6 +808,19 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete
 Write-Host
 
 #####################################################################
+# Deploying nginx on AKS cluster
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 11/15)" -ForegroundColor DarkGreen
+kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+
+helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
+  --create-namespace `
+  --namespace $AgConfig.nginx.Namespace `
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+
+#####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 10/13)" -ForegroundColor DarkGreen
