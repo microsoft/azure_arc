@@ -242,13 +242,48 @@
         "observability"
     )
 
-    AppConfig               = @{
-        ContosoSupermarket = @{
-            GitOpsConfigName  = "config-supermarket"
-            KustomizationName = "pos"
-            KustomizationPath = "./contoso_supermarket/operations/contoso_supermarket/release"
-            Namespace         = "contoso-supermarket"
-            AppPath           = "contoso_supermarket"
+    AppConfig = @{
+        ContosoSupermarket_contosodb = @{
+            GitOpsConfigName = "config-supermarket-db"
+            KustomizationName = "contosodb"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosodb"
+            Namespace = "contoso-supermarket"
+            Order = 1
+        }
+        ContosoSupermarket_cloudsync = @{
+            GitOpsConfigName = "config-supermarket-cloudsync"
+            KustomizationName = "cloudsync"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/cloudsync"
+            Namespace = "contoso-supermarket"
+            Order = 2
+        }
+        ContosoSupermarket_contosopos = @{
+            GitOpsConfigName = "config-supermarket-pos"
+            KustomizationName = "contosopos"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosopos"
+            Namespace = "contoso-supermarket"
+            Order = 3
+        }
+        ContosoSupermarket_queue_monitoring_backend = @{
+            GitOpsConfigName = "config-supermarket-queue-backend"
+            KustomizationName = "queuebackend"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-backend"
+            Namespace = "contoso-supermarket"
+            Order = 4
+        }
+        ContosoSupermarket_contosoai = @{
+            GitOpsConfigName = "config-supermarket-ai"
+            KustomizationName = "contosoai"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/contosoai"
+            Namespace = "contoso-supermarket"
+            Order = 5
+        }
+        ContosoSupermarket_queue_monitoring_frontend = @{
+            GitOpsConfigName = "config-supermarket-queue-frontend"
+            KustomizationName = "queuefrontend"
+            KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend"
+            Namespace = "contoso-supermarket"
+            Order = 6
         }
         # SensorMonitor = @{
         #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
