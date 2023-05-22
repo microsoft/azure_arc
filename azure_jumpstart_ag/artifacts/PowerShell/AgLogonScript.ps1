@@ -675,6 +675,106 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 #####################################################################
+# Installing flux extension on clusters
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 9/15)" -ForegroundColor DarkGreen
+$retryCount = 0
+$maxRetries = 3
+$resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
+$resources = Get-AzResource -ResourceGroupName $env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+
+$jobs = @()
+
+foreach ($resource in $resources) {
+    $resourceName = $resource.Name
+    $resourceType = $resource.Type
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
+    if ($resourceType -eq $AgConfig.ArcK8sResourceType) {
+        $job = Start-Job -ScriptBlock {
+            param($resourceName, $resourceType)
+
+            az k8s-extension create --name flux `
+                --extension-type Microsoft.flux `
+                --scope cluster `
+                --cluster-name $resourceName `
+                --resource-group $env:resourceGroup `
+                --cluster-type connectedClusters `
+                --auto-upgrade false
+
+            $provisioningState = az k8s-extension show --cluster-name $resourceName `
+                --resource-group $env:resourceGroup `
+                --cluster-type connectedClusters `
+                --name flux `
+                --query provisioningState `
+                --output tsv
+
+            [PSCustomObject]@{
+                ResourceName = $resourceName
+                ResourceType = $resourceType
+                ProvisioningState = $provisioningState
+            }
+        } -ArgumentList $resourceName, $resourceType
+
+        $jobs += $job
+    }
+    else {
+        $job = Start-Job -ScriptBlock {
+            param($resourceName, $resourceType)
+
+            az k8s-extension create --name flux `
+                --extension-type Microsoft.flux `
+                --scope cluster `
+                --cluster-name $resourceName `
+                --resource-group $env:resourceGroup `
+                --cluster-type managedClusters `
+                --auto-upgrade false
+
+            $provisioningState = az k8s-extension show --cluster-name $resourceName `
+                --resource-group $env:resourceGroup `
+                --cluster-type managedClusters `
+                --name flux `
+                --query provisioningState `
+                --output tsv
+
+            [PSCustomObject]@{
+                ResourceName = $resourceName
+                ResourceType = $resourceType
+                ProvisioningState = $provisioningState
+            }
+        } -ArgumentList $resourceName, $resourceType
+
+        $jobs += $job
+    }
+}
+
+# Wait for all jobs to complete
+$null = $jobs | Wait-Job
+
+# Check provisioning states for each resource
+foreach ($job in $jobs) {
+    $result = Receive-Job -Job $job
+    $resourceName = $result.ResourceName
+    $resourceType = $result.ResourceType
+    $provisioningState = $result.ProvisioningState
+
+    if ($provisioningState -ne "Succeeded") {
+        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds..." -ForegroundColor Gray
+        Start-Sleep -Seconds 10
+        $retryCount++
+    }
+    else {
+        Write-Host "[$(Get-Date -Format t)] INFO: flux extension installed successfully on $resourceName" -ForegroundColor Gray
+    }
+}
+
+if ($retryCount -eq $maxRetries) {
+    Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached. Exiting..." -ForegroundColor White -BackgroundColor Red
+}
+
+# Clean up jobs
+$jobs | Remove-Job
+
+#####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring contoso-supermarket secrets on clusters (Step 9/13)" -ForegroundColor DarkGreen
