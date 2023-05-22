@@ -868,11 +868,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             do {
                 $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
                 if ($result.TcpTestSucceeded) {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
                     break
                 }
                 else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 5 seconds..." -ForegroundColor Gray
                     Start-Sleep -Seconds 5
                 }
             } while ($true)
