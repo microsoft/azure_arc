@@ -700,7 +700,7 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --auto-upgrade false
-            
+
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
@@ -742,7 +742,7 @@ foreach ($resource in $resources) {
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-     
+
         $jobs += $job
     }
 }
