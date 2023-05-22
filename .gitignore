@@ -52,3 +52,4 @@ terraform.rc
 
 *.out
 .VSCodeCounter/*
+.local
