@@ -692,7 +692,6 @@ foreach ($resource in $resources) {
     if ($resourceType -eq $AgConfig.ArcK8sResourceType) {
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
-
             az k8s-extension create --name flux `
                 --extension-type Microsoft.flux `
                 --scope cluster `
@@ -700,27 +699,23 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --auto-upgrade false
-
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --name flux `
                 --query provisioningState `
                 --output tsv
-
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-
         $jobs += $job
     }
     else {
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
-
             az k8s-extension create --name flux `
                 --extension-type Microsoft.flux `
                 --scope cluster `
@@ -728,21 +723,18 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --auto-upgrade false
-
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --name flux `
                 --query provisioningState `
                 --output tsv
-
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-
         $jobs += $job
     }
 }
