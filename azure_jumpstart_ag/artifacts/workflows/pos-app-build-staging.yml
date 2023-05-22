@@ -1,4 +1,4 @@
-name: Build contososupermarket app - staging
+name: Promote-to-staging
 
 on:
   pull_request:
@@ -15,8 +15,8 @@ permissions:
     id-token: write
 
 jobs:
-  build-and-deploy-staging-image:
-      if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }} && github.event.pull_request.merged == true
+  promote-to-staging:
+      if: github.repository != 'microsoft/jumpstart-agora-apps' && github.event.pull_request.merged == true
       runs-on: ubuntu-latest
       steps:
       # checkout the repo
@@ -42,6 +42,15 @@ jobs:
           echo $NEW_VERSION
           echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+      - name: 'Build and push new images'
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        run: |
+          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
+          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
+
       - name: 'Update Image tag on main branch'
         env:
             latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
@@ -58,25 +67,19 @@ jobs:
         continue-on-error: true
         env:
           latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
             git config --global user.name "GitHub Action"
             git config --global user.email "action@github.com"
-            git add .
+            newBranch="update-dev-image-tag-${latest_tag}"
+            git checkout -b $newBranch main
+            git config pull.rebase false
+            git add --all
             git commit -m "Update Image Tag on dev to $latest_tag"
-            git push
-
-      - name: 'Build and push new images'
-        env:
-          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
-        run: |
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/canary/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/canary/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/production/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/production/contoso-supermarket/pos:$latest_tag
+            git push --set-upstream origin $newBranch
+            pr=$(gh pr create --title "Update dev Image Tag to $latest_tag" --body "Update dev Image Tag to $latest_tag")
+            pr_number=$(echo "${url}" | awk -F'/' '{print $NF}')
+            gh pr merge $pr_number --merge --delete-branch
 
       - name: 'Checkout staging branch'
         uses: actions/checkout@v3
@@ -99,35 +102,16 @@ jobs:
         continue-on-error: true
         env:
           latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
             git config --global user.name "GitHub Action"
             git config --global user.email "action@github.com"
-            git add .
-            git commit -m "Update Image Tag on Canary to $latest_tag"
-            git push
-
-      - name: 'Checkout canary branch'
-        uses: actions/checkout@v3
-        with:
-          ref: 'canary'
-
-      - name: 'Update Image tag on canary branch and submit PR'
-        env:
-          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          FILE_PATH=$(find . -name "chicago.yaml")
-          newLine="    image_tag: $latest_tag"
-          if [ ! -z "$FILE_PATH" ]; then
-            sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
-          else
-            echo "chicago.yaml not found"
-          fi
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git checkout -b update-canary-image-tag canary
-          git config pull.rebase false
-          git add --all
-          git commit -m "Update Image Tag on Canary to $latest_tag"
-          git push --set-upstream origin update-canary-image-tag
-          gh pr create --title "Update Canary Image Tag to $latest_tag" --body "Update Canary Image Tag to $latest_tag"
+            newBranch="update-staging-image-tag-${latest_tag}"
+            git checkout -b $newBranch staging
+            git config pull.rebase false
+            git add --all
+            git commit -m "Update Image Tag on Staging to $latest_tag"
+            git push --set-upstream origin $newBranch
+            pr=$(gh pr create --title "Update Staging Image Tag to $latest_tag" --body "Update Staging Image Tag to $latest_tag" --base staging)
+            pr_number=$(echo "${url}" | awk -F'/' '{print $NF}')
+            gh pr merge $pr_number --merge --delete-branch

@@ -23,7 +23,7 @@ param osDiskSizeGB int = 0
 param agentCount int = 2
 
 @description('The size of the Virtual Machine')
-param agentVMSize string = 'Standard_D2s_v4'
+param agentVMSize string = 'Standard_D4s_v4'
 
 @description('User name for the Linux Virtual Machines')
 param linuxAdminUsername string = 'arcdemo'
