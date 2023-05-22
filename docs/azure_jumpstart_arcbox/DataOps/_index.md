@@ -11,6 +11,8 @@ ArcBox for DataOps is a special "flavor" of ArcBox that is intended for users wh
 
 ![ArcBox architecture diagram](./arc_dataops.png)
 
+> **WARNING: Per May 22 2023, there is a [known issue](https://github.com/microsoft/azure_arc/issues/1861) causing deployments of the ArcBox Flavors "Full", "DevOps" and "DataOps" to fail. Until further notice, you may deploy the "IT Pro" flavor of ArcBox.**
+
 ### Use cases
 
 - Sandbox environment for getting hands-on with Azure Arc technologies and [Azure Arc-enabled SQL Managed Instance landing zone accelerator](https://aka.ms/ArcLZAcceleratorReady)
