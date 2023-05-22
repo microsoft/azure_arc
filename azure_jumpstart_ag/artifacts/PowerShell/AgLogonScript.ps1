@@ -930,7 +930,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries){
                         Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        exit
+                        break
                     }
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
