@@ -106,14 +106,11 @@ Write-Host
                 write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
             }
         }
-    }
-    catch {
-        Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
-        start-sleep -Seconds 45
-    }
-} until (
-    $response.full_name -eq "$githubUser/$appsRepo"
-)
+        catch {
+            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+            start-sleep -Seconds 45
+        }
+    } until ($response.full_name -eq "$githubUser/$appsRepo")
 
 Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
 do {
@@ -824,27 +821,6 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/15)" -ForegroundColor DarkGreen
-foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-        $store = $cluster.value.Branch.ToLower()
-        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
-        $branch = $cluster.value.Branch.ToLower()
-        $configName = $app.value.GitOpsConfigName.ToLower()
-        $clusterType = $cluster.value.Type
-        $namespace = $app.value.Namespace
-        $appName = $app.Value.KustomizationName
-        $appPath= $app.Value.KustomizationPath
-
-        if($clusterType -eq "AKS"){
-            $type = "managedClusters"
-            $clusterName= $cluster.value.ArcClusterName
-        }else{
-            $type = "connectedClusters"
-        }
-        if($branch -eq "main"){
-            $store = "dev"
-        }
 
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
