@@ -754,8 +754,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --url $appClonedRepo `
                 --branch $Branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m sync_interval=1m `
-                --timeout 10m `
+                --kustomization name=$appName path=$appPath/$store prune=true `
+                --timeout 30m `
                 --namespace $namespace `
                 --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -775,9 +775,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
     while ($(Get-Job -Name gitops).State -eq 'Running') {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configurations to complete on all clusters...waiting 45 seconds" -ForegroundColor Gray
+        #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
         Receive-Job -Name gitops -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 45
+        Start-Sleep -Seconds 60
     }
 
     Get-Job -name gitops | Remove-Job
