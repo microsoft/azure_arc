@@ -719,7 +719,13 @@ while ($workflowStatus.status -ne "completed") {
 }
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression={$_.value.Order}; Ascending=$true} | ForEach-Object{
+    Start-Job -Name gitops -ScriptBlock {
+        $AgConfig = $using:AgConfig
+        $cluster = $using:cluster
+        $namingGuid = $using:namingGuid
+        $resourceGroup = $using:resourceGroup
+        $appClonedRepo = $using:appClonedRepo
+        $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
             $app = $_
             $store = $cluster.value.Branch.ToLower()
             $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
@@ -742,7 +748,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             }
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
-                --resource-group $Env:resourceGroup `
+                --resource-group $resourceGroup `
                 --name $configName `
                 --cluster-type $type `
                 --url $appClonedRepo `
@@ -752,7 +758,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
+            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
             do {
                 $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
@@ -764,9 +770,16 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Start-Sleep -Seconds 20
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
+        }
     }
 }
 
+    while ($(Get-Job -Name gitops).State -eq 'Running') {
+        Receive-Job -Name gitops -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 10
+    }
+
+    Get-Job -name gitops | Remove-Job
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 
