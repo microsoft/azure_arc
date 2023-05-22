@@ -96,14 +96,15 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/15)" -ForegroundColor DarkGreen
-Set-Location $AgAppsRepo
-Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
-do {
-    try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
-        if ($response) {
-            write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/15)" -ForegroundColor DarkGreen
+    Set-Location $AgAppsRepo
+    Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+    do {
+        try {
+            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
+            if ($response) {
+                write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+            }
         }
     }
     catch {
@@ -699,23 +700,27 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --auto-upgrade false
+            
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --name flux `
                 --query provisioningState `
                 --output tsv
+
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
+
         $jobs += $job
     }
     else {
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
+
             az k8s-extension create --name flux `
                 --extension-type Microsoft.flux `
                 --scope cluster `
@@ -723,18 +728,21 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --auto-upgrade false
+
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --name flux `
                 --query provisioningState `
                 --output tsv
+
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
+     
         $jobs += $job
     }
 }
@@ -769,7 +777,7 @@ $jobs | Remove-Job
 #####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring contoso-supermarket secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $namespace = $cluster.value.posNamespace
@@ -816,6 +824,27 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/15)" -ForegroundColor DarkGreen
+foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for pos application on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+        $store = $cluster.value.Branch.ToLower()
+        $clusterName = $cluster.value.ArcClusterName+"-$namingGuid"
+        $branch = $cluster.value.Branch.ToLower()
+        $configName = $app.value.GitOpsConfigName.ToLower()
+        $clusterType = $cluster.value.Type
+        $namespace = $app.value.Namespace
+        $appName = $app.Value.KustomizationName
+        $appPath= $app.Value.KustomizationPath
+
+        if($clusterType -eq "AKS"){
+            $type = "managedClusters"
+            $clusterName= $cluster.value.ArcClusterName
+        }else{
+            $type = "connectedClusters"
+        }
+        if($branch -eq "main"){
+            $store = "dev"
+        }
 
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
@@ -1099,7 +1128,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #############################################################
     # Creating Prod Grafana Icon on Desktop
     #############################################################
-
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
     $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
     $wScriptShell = New-Object -ComObject WScript.Shell
@@ -1108,9 +1136,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
     $shortcut.WindowStyle = 3
     $shortcut.Save()
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
-    Write-Host
 
     #############################################################
     # Install Windows Terminal, WSL2, and Ubuntu
@@ -1166,7 +1191,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     foreach ($extension in $AgConfig.VSCodeExtensions) {
         code --install-extension $extension | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
-
 
     #############################################################
     # Install Docker Desktop
