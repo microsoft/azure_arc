@@ -114,6 +114,23 @@ do {
     $response.full_name -eq "$githubUser/$appsRepo"
 )
 
+Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
+do {
+    $response = gh auth status 2>&1
+    if ($response -match "authentication failed") {
+        write-host "ERROR: The GitHub Personal access token is not valid" -ForegroundColor Red
+        Write-Host "INFO: Please try to re-generate the personal access token and provide it here [Placeholder for readme]: "
+        do {
+            $githubPAT = Read-Host "GitHub personal access token"
+        } while ($githubPAT -eq "")
+    }
+} until (
+    $response -notmatch "authentication failed"
+)
+$env:GITHUB_TOKEN=$githubPAT
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
+write-host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
+
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 New-Item -ItemType Directory ".github/workflows" -Force
