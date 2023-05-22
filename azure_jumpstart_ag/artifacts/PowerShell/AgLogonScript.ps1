@@ -760,8 +760,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen
                 }
                 else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not ready on $clusterName...waiting 10 seconds" -ForegroundColor Gray
-                    Start-Sleep -Seconds 10
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 20 seconds" -ForegroundColor Gray
+                    Start-Sleep -Seconds 20
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
     }
