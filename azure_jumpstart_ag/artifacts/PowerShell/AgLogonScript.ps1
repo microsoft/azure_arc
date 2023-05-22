@@ -830,6 +830,7 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name gitops -ScriptBlock {
+        $WarningPreference = "SilentlyContinue"
         $AgConfig = $using:AgConfig
         $cluster = $using:cluster
         $namingGuid = $using:namingGuid
@@ -846,7 +847,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
             $retryCount = 0
-            $maxRetries = 2
+            $maxRetries = 1
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -900,7 +901,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        retryCount++
+                        $retryCount++
                         Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         az k8s-configuration flux delete `
@@ -908,6 +909,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         --cluster-name $clusterName `
                         --cluster-type $type `
                         --name $configName `
+                        --force `
                         --yes `
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
