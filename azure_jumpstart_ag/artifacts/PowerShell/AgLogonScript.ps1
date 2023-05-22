@@ -913,6 +913,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         --yes `
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
+                        Start-Sleep -Seconds 10
                         Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
                         az k8s-configuration flux create `
