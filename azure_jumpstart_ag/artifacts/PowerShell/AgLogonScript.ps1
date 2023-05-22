@@ -106,98 +106,119 @@ Write-Host
                 write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
             }
         }
-        catch {
-            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
-            start-sleep -Seconds 45
-        }
-    } until (
-        $response.full_name -eq "$githubUser/$appsRepo"
-    )
-
-    git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
-    Set-Location "$AgAppsRepo\$appsRepo"
-    New-Item -ItemType Directory ".github/workflows" -Force
-    Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-    Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-    gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
-    gh repo set-default "$githubUser/$appsRepo"
-    gh secret set "SPN_CLIENT_ID" -b $spnClientID
-    gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-    gh secret set "ACR_NAME" -b $acrName
-    gh secret set "PAT_GITHUB" -b $githubPat
-    gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-    gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
-    Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-    $headers = @{
-        Authorization = "token $githubPat"
-        "Content-Type" = "application/json"
     }
-    $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-    foreach ($branch in $protectedBranches) {
-        $branchName = $branch.name
-        $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-        Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-        Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+    catch {
+        Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+        start-sleep -Seconds 45
     }
+} until (
+    $response.full_name -eq "$githubUser/$appsRepo"
+)
 
-    Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
-    git config --global user.email "dev@agora.com"
-    git config --global user.name "Agora Dev"
-    git fetch
-    git pull
-
-    Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-    $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-      $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-      $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-      Invoke-RestMethod -Uri $_ -OutFile $outputFile
+Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
+do {
+    $response = gh auth status 2>&1
+    if ($response -match "authentication failed") {
+        write-host "ERROR: The GitHub Personal access token is not valid" -ForegroundColor Red
+        Write-Host "INFO: Please try to re-generate the personal access token and provide it here [Placeholder for readme]: "
+        do {
+            $githubPAT = Read-Host "GitHub personal access token"
+        } while ($githubPAT -eq "")
     }
-    git add .
-    git commit -m "Pushing GitHub actions to apps fork"
-    git push
-    Start-Sleep -Seconds 20
-    Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-    gh workflow run update-files.yml
-    while ($workflowStatus.status -ne "completed") {
-        Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
-        Start-Sleep -Seconds 10
-        $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
-    }
-    Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
-    gh workflow run pos-app-initial-images-build.yml
+} until (
+    $response -notmatch "authentication failed"
+)
+$env:GITHUB_TOKEN=$githubPAT
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
+write-host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
 
-    Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
-    $branches = $AgConfig.GitBranches
-    foreach ($branch in $branches) {
-        try {
-            $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
-            if ($response) {
-                if($branch -ne "main"){
-                    Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                    git push origin --delete $branch
-                    git fetch origin
-                    git checkout main
-                    git pull origin main
-                    git checkout -b $branch
-                    git push origin $branch
-                }
+git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
+Set-Location "$AgAppsRepo\$appsRepo"
+New-Item -ItemType Directory ".github/workflows" -Force
+Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
+gh repo set-default "$githubUser/$appsRepo"
+gh secret set "SPN_CLIENT_ID" -b $spnClientID
+gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+gh secret set "ACR_NAME" -b $acrName
+gh secret set "PAT_GITHUB" -b $githubPat
+gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+gh secret set "SPN_TENANT_ID" -b $spnTenantId
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+$headers = @{
+    Authorization  = "token $githubPat"
+    "Content-Type" = "application/json"
+}
+$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+foreach ($branch in $protectedBranches) {
+    $branchName = $branch.name
+    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+}
+
+Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
+git config --global user.email "dev@agora.com"
+git config --global user.name "Agora Dev"
+git fetch
+git pull
+
+Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+$response = Invoke-RestMethod -Uri $githubApiUrl
+$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+$fileUrls | ForEach-Object {
+    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+}
+git add .
+git commit -m "Pushing GitHub actions to apps fork"
+git push
+Start-Sleep -Seconds 20
+Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
+gh workflow run update-files.yml
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
+}
+Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
+gh workflow run pos-app-initial-images-build.yml
+
+Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
+$branches = $AgConfig.GitBranches
+foreach ($branch in $branches) {
+    try {
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+        if ($response) {
+            if ($branch -ne "main") {
+                Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
+                git push origin --delete $branch
+                git branch -d $branch
+                git fetch origin
+                git checkout main
+                git pull origin main
+                git checkout -b $branch main
+                git pull origin main
+                git push origin $branch
             }
         }
-        catch {
-            Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
-            git fetch origin
-            git checkout main
-            git pull origin main
-            git checkout -b $branch
-            git push origin $branch
-        }
     }
-    Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-    git checkout main
+    catch {
+        Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
+        git fetch origin
+        git checkout main
+        git pull origin main
+        git checkout -b $branch main
+        git pull origin main
+        git push origin $branch
+    }
+}
+Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
+git checkout main
 
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
@@ -205,16 +226,16 @@ foreach ($branch in $branches) {
     Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
     $headers = @{
         "Authorization" = "Bearer $githubPat"
-        "Accept" = "application/vnd.github+json"
+        "Accept"        = "application/vnd.github+json"
     }
     $body = @{
-        required_status_checks = $null
-        enforce_admins = $false
+        required_status_checks        = $null
+        enforce_admins                = $false
         required_pull_request_reviews = @{
             required_approving_review_count = 0
         }
-        dismiss_stale_reviews = $true
-        restrictions  = $null
+        dismiss_stale_reviews         = $true
+        restrictions                  = $null
     } | ConvertTo-Json
 
     Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
@@ -392,8 +413,7 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 
 foreach ($VM in $VMNames) {
     $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-    while ($VMStatus.PrimaryStatusDescription -ne "OK")
-    {
+    while ($VMStatus.PrimaryStatusDescription -ne "OK") {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
         sleep 5
@@ -480,7 +500,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $namingGuid = $using:namingGuid
-    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName+"-$namingGuid"
+    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
     $replacementParams = @{
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
@@ -619,7 +639,7 @@ foreach ($VM in $VMNames) {
 # Tag Azure Arc resources
 #####################################################################
 $arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
-$Tag = @{$AgConfig.TagName = $AgConfig.TagValue}
+$Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
 
 # Iterate over the Arc resources and tag it
 foreach ($arcResourceType in $arcResourceTypes) {
@@ -647,8 +667,10 @@ az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 8/15)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    $clusterName = $cluster.Name.ToLower()
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     foreach ($namespace in $AgConfig.Namespaces) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on $clusterName (Step 8/15)" -ForegroundColor Gray
         kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     }
 }
@@ -671,7 +693,6 @@ foreach ($resource in $resources) {
     if ($resourceType -eq $AgConfig.ArcK8sResourceType) {
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
-            
             az k8s-extension create --name flux `
                 --extension-type Microsoft.flux `
                 --scope cluster `
@@ -686,20 +707,20 @@ foreach ($resource in $resources) {
                 --name flux `
                 --query provisioningState `
                 --output tsv
-            
+
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-        
+
         $jobs += $job
     }
     else {
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
-            
+
             az k8s-extension create --name flux `
                 --extension-type Microsoft.flux `
                 --scope cluster `
@@ -707,21 +728,21 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --auto-upgrade false
-            
+
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type managedClusters `
                 --name flux `
                 --query provisioningState `
                 --output tsv
-                
+
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-        
+     
         $jobs += $job
     }
 }
@@ -735,7 +756,7 @@ foreach ($job in $jobs) {
     $resourceName = $result.ResourceName
     $resourceType = $result.ResourceType
     $provisioningState = $result.ProvisioningState
-    
+
     if ($provisioningState -ne "Succeeded") {
         Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds..." -ForegroundColor Gray
         Start-Sleep -Seconds 10
@@ -758,16 +779,15 @@ $jobs | Remove-Job
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
-            kubectl create secret docker-registry acr-secret `
-            --namespace $app.value.namespace `
-            --docker-server="$acrName.azurecr.io" `
-            --docker-username="$env:spnClientId" `
-            --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+    $clusterName = $cluster.Name.ToLower()
+    $namespace = $cluster.value.posNamespace
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    kubectl create secret docker-registry acr-secret `
+        --namespace $namespace `
+        --docker-server="$acrName.azurecr.io" `
+        --docker-username="$env:spnClientId" `
+        --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 }
 
 #####################################################################
@@ -826,355 +846,390 @@ foreach ($app in $AgConfig.AppConfig.GetEnumerator()) {
             $store = "dev"
         }
 
-        az k8s-configuration flux create `
-            --cluster-name $clusterName `
-            --resource-group $Env:resourceGroup `
-            --name $configName `
-            --cluster-type $type `
-            --url $appClonedRepo `
-            --branch $Branch `
-            --sync-interval 5s `
-            --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
-            --timeout 10m `
-            --namespace $namespace `
-            --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-    }
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
 }
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    $releaseName = "pos"
-    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps.log")
-    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
-    $apiServerAddress = $apiServer -replace '.*https://| .*$'
-    $apiServerFqdn = ($apiServerAddress -split ":")[0]
-    $apiServerPort = ($apiServerAddress -split ":")[1]
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on $clusterName." -ForegroundColor Gray
-    do {
-        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-        if ($result.TcpTestSucceeded) {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
-            break
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
-            Start-Sleep -Seconds 10
-        }
-    } while ($true)
-
-    do {
-        $releaseStatus = kubectl get helmreleases -n $namespace $appName -o json | ConvertFrom-Json
-        $readyCondition = $releaseStatus.status.conditions | Where-Object { $_.type -eq "Released" }
-        if ($readyCondition.message -eq "Helm install succeeded") {
-            Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is installed $clusterName" -ForegroundColor Gray
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] INFO: Helm release $releaseName is not ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray
-            Start-Sleep -Seconds 45
+    Start-Job -Name gitops -ScriptBlock {
+        $AgConfig = $using:AgConfig
+        $cluster = $using:cluster
+        $namingGuid = $using:namingGuid
+        $resourceGroup = $using:resourceGroup
+        $appClonedRepo = $using:appClonedRepo
+        $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
+            $app = $_
+            $store = $cluster.value.Branch.ToLower()
+            $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
+            $branch = $cluster.value.Branch.ToLower()
+            $configName = $app.value.GitOpsConfigName.ToLower()
+            $clusterType = $cluster.value.Type
+            $namespace = $app.value.Namespace
+            $appName = $app.Value.KustomizationName
+            $appPath = $app.Value.KustomizationPath
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+            if ($clusterType -eq "AKS") {
+                $type = "managedClusters"
+                $clusterName = $cluster.value.ArcClusterName
             }
-        } until ($readyCondition.message -eq "Helm install succeeded")
-}
+            else {
+                $type = "connectedClusters"
+            }
+            if ($branch -eq "main") {
+                $store = "dev"
+            }
 
-Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
-Write-Host
+            kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+            # Wait for Kubernetes API server to become available
+            $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+            $apiServerAddress = $apiServer -replace '.*https://| .*$'
+            $apiServerFqdn = ($apiServerAddress -split ":")[0]
+            $apiServerPort = ($apiServerAddress -split ":")[1]
 
+            do {
+                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+                if ($result.TcpTestSucceeded) {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+                    break
+                }
+                else {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 5 seconds..." -ForegroundColor Gray
+                    Start-Sleep -Seconds 5
+                }
+            } while ($true)
 
-#####################################################################
-# Deploy Kubernetes Prometheus Stack for Observability
-#####################################################################
-$AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
-$observabilityNamespace = $AgConfig.Monitoring["Namespace"]
-$observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
-$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+            az k8s-configuration flux create `
+                --cluster-name $clusterName `
+                --resource-group $resourceGroup `
+                --name $configName `
+                --cluster-type $type `
+                --url $appClonedRepo `
+                --branch $Branch `
+                --sync-interval 5s `
+                --kustomization name=$appName path=$appPath/$store prune=true `
+                --timeout 30m `
+                --namespace $namespace `
+                --only-show-errors `
+            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
-# Set Prod Grafana API endpoint
-$grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
-
-# Installing Grafana
-Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 13/15)" -ForegroundColor DarkGreen
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
-Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Update Prometheus Helm charts
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Update Grafana Icons
-Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
-Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
-Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
-
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
-    (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
-}
-
-# Reset Grafana UI
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
-    (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
-}
-
-# Reset Grafana Password
-$env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Get Grafana credentials
-$credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
-$encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
-
-$headers = @{
-    "Authorization" = ("Basic " + $encodedcredentials)
-    "Content-Type"  = "application/json"
-}
-
-# Download dashboards
-foreach ($dashboard in $observabilityDashboards.'grafana.com') {
-    $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
-    $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
-    $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
-    Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
-}
-
-$observabilityDashboardstoImport = @()
-$observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
-$observabilityDashboardstoImport += $observabilityDashboards.'custom'
-
-# Deploying Kube Prometheus Stack for stores
-$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-    kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    # Wait for Kubernetes API server to become available
-    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
-    $apiServerAddress = $apiServer -replace '.*https://| .*$'
-    $apiServerFqdn = ($apiServerAddress -split ":")[0]
-    $apiServerPort = ($apiServerAddress -split ":")[1]
-
-    do {
-        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-        if ($result.TcpTestSucceeded) {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
-            break
+            do {
+                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
+                if ($configStatus.ComplianceState -eq "Compliant") {
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                }
+                else {
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                    Start-Sleep -Seconds 45
+                }
+            } until ($configStatus.ComplianceState -eq "Compliant")
         }
-        else {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
-            Start-Sleep -Seconds 10
-        }
-    } while ($true)
+    }
+}
 
-    # Install Prometheus Operator
-    $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder',$adminPassword
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    Do {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($monitorIP -eq "Nope" )
-    # Get Load Balancer IP
-    $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-    if ($_.Value.IsProduction) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
-        # Request body with information about the data source to add
-        $grafanaDSBody = @{
-            name      = $_.Value.FriendlyName.ToLower()
-            type      = 'prometheus'
-            url       = ("http://" + $monitorLBIP + ":9090")
-            access    = 'proxy'
-            basicAuth = $false
-            isDefault = $true
-        } | ConvertTo-Json
-
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    while ($(Get-Job -Name gitops).State -eq 'Running') {
+        #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+        Receive-Job -Name gitops -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 60
     }
 
-    Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-    # Add dashboards
-    foreach ($dashboard in $observabilityDashboardstoImport) {
-        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
-        # Replace the datasource
-        $replacementParams = @{
-            "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
-        }
-        $content = Get-Content $grafanaDBPath
-        foreach ($key in $replacementParams.Keys) {
-            $content = $content -replace $key, $replacementParams[$key]
-        }
-        # Set dashboard JSON
-        $dashboardObject = $content | ConvertFrom-Json
-        # Best practice is to generate a random UID, such as a GUID
-        $dashboardObject.uid = [guid]::NewGuid().ToString()
+    Get-Job -name gitops | Remove-Job
+    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+    Write-Host
 
-        # Need to set this to null to let Grafana generate a new ID
-        $dashboardObject.id = $null
-        # Set dashboard title
-        $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
-        # Request body with dashboard to add
-        $grafanaDBBody = @{
-            dashboard = $dashboardObject
-            overwrite = $true
-        } | ConvertTo-Json -Depth 8
+    #####################################################################
+    # Deploy Kubernetes Prometheus Stack for Observability
+    #####################################################################
+    $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+    $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
+    $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
+    $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+
+    # Set Prod Grafana API endpoint
+    $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
+
+    # Installing Grafana
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 13/15)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
+    $latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
+    Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Update Prometheus Helm charts
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Update Grafana Icons
+    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
+    Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+    (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
+    }
+
+    # Reset Grafana UI
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+    (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
+    }
+
+    # Reset Grafana Password
+    $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
+    grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Get Grafana credentials
+    $credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
+    $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
+
+    $headers = @{
+        "Authorization" = ("Basic " + $encodedcredentials)
+        "Content-Type"  = "application/json"
+    }
+
+    # Download dashboards
+    foreach ($dashboard in $observabilityDashboards.'grafana.com') {
+        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+        $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
+        $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
+        Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
+    }
+
+    $observabilityDashboardstoImport = @()
+    $observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
+    $observabilityDashboardstoImport += $observabilityDashboards.'custom'
+
+    # Deploying Kube Prometheus Stack for stores
+    $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+        # Wait for Kubernetes API server to become available
+        $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+        $apiServerAddress = $apiServer -replace '.*https://| .*$'
+        $apiServerFqdn = ($apiServerAddress -split ":")[0]
+        $apiServerPort = ($apiServerAddress -split ":")[1]
+
+        do {
+            $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+            if ($result.TcpTestSucceeded) {
+                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+                break
+            }
+            else {
+                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
+                Start-Sleep -Seconds 10
+            }
+        } while ($true)
+
+        # Install Prometheus Operator
+        $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+        Do {
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($monitorIP -eq "Nope" )
+        # Get Load Balancer IP
+        $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
         if ($_.Value.IsProduction) {
-            # Set Grafana Dashboard endpoint
-            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-        }
-        else {
-            # Set Grafana Dashboard endpoint
-            $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+            Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
+            # Request body with information about the data source to add
+            $grafanaDSBody = @{
+                name      = $_.Value.FriendlyName.ToLower()
+                type      = 'prometheus'
+                url       = ("http://" + $monitorLBIP + ":9090")
+                access    = 'proxy'
+                basicAuth = $false
+                isDefault = $true
+            } | ConvertTo-Json
+
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
         }
 
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        # Add dashboards
+        foreach ($dashboard in $observabilityDashboardstoImport) {
+            $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+            # Replace the datasource
+            $replacementParams = @{
+                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+            }
+            $content = Get-Content $grafanaDBPath
+            foreach ($key in $replacementParams.Keys) {
+                $content = $content -replace $key, $replacementParams[$key]
+            }
+            # Set dashboard JSON
+            $dashboardObject = $content | ConvertFrom-Json
+            # Best practice is to generate a random UID, such as a GUID
+            $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+            # Need to set this to null to let Grafana generate a new ID
+            $dashboardObject.id = $null
+            # Set dashboard title
+            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+            # Request body with dashboard to add
+            $grafanaDBBody = @{
+                dashboard = $dashboardObject
+                overwrite = $true
+            } | ConvertTo-Json -Depth 8
+
+            if ($_.Value.IsProduction) {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            }
+            else {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+            }
+
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
+
+        if (!$_.Value.IsProduction) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
+            $grafanaUserBody = @{
+                name     = $AgConfig.Monitoring["User"] # Display Name
+                email    = $AgConfig.Monitoring["Email"]
+                login    = $adminUsername
+                password = $adminPassword
+            } | ConvertTo-Json
+
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+            # Creating Grafana Icon on Desktop
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray
+            $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
+            $wScriptShell = New-Object -ComObject WScript.Shell
+            $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+            $shortcut.TargetPath = "http://$monitorLBIP"
+            $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+            $shortcut.WindowStyle = 3
+            $shortcut.Save()
+        }
     }
 
-    if (!$_.Value.IsProduction) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
-        $grafanaUserBody = @{
-            name = $AgConfig.Monitoring["User"] # Display Name
-            email = $AgConfig.Monitoring["Email"]
-            login = $adminUsername
-            password = $adminPassword} | ConvertTo-Json
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
+    # Add Contoso Operator User
+    $grafanaUserBody = @{
+        name     = $AgConfig.Monitoring["User"] # Display Name
+        email    = $AgConfig.Monitoring["Email"]
+        login    = $adminUsername
+        password = $adminPassword
+    } | ConvertTo-Json
 
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    # Make HTTP request to the API
+    Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-        # Creating Grafana Icon on Desktop
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray
-        $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
-        $wScriptShell = New-Object -ComObject WScript.Shell
-        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-        $shortcut.TargetPath = "http://$monitorLBIP"
-        $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-        $shortcut.WindowStyle = 3
-        $shortcut.Save()
+    #############################################################
+    # Creating Prod Grafana Icon on Desktop
+    #############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
+    $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
+    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
+
+    #############################################################
+    # Install Windows Terminal, WSL2, and Ubuntu
+    #############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/15)" -ForegroundColor DarkGreen
+    If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+    $downloadDir = "C:\WinTerminal"
+    $gitRepo = "microsoft/terminal"
+    $filenamePattern = "*.msixbundle"
+    $frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
+    $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+    $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+    $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
+    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+
+    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+    Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
+    Invoke-WebRequest -Uri $frameworkPkgUrl -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+    # Install WSL latest kernel update
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
+    msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+    # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+    Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    Add-AppxPackage -Path $msiPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+    # Setting WSL environment variables
+    $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+    [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+    # Initializing the wsl ubuntu app without requiring user input
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu." -ForegroundColor Gray
+    $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+    Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+    # Create Windows Terminal shortcut
+    $WshShell = New-Object -comObject WScript.Shell
+    $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+    $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Windows Terminal.lnk")
+    $Shortcut.TargetPath = $WinTerminalPath
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
+
+    #############################################################
+    # Install VSCode extensions
+    #############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+    # Install VSCode extensions
+    foreach ($extension in $AgConfig.VSCodeExtensions) {
+        code --install-extension $extension | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
-}
 
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
-# Add Contoso Operator User
-$grafanaUserBody = @{
-    name = $AgConfig.Monitoring["User"] # Display Name
-    email = $AgConfig.Monitoring["Email"]
-    login = $adminUsername
-    password = $adminPassword} | ConvertTo-Json
+    #############################################################
+    # Install Docker Desktop
+    #############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
+    # Download and Install Docker Desktop
+    $arguments = 'install --quiet --accept-license'
+    Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+    Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
+    Start-Sleep -Seconds 10
+    Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
+    Copy-Item "$AgToolsDir\settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker Desktop\settings.json" -Force
+    Copy-Item "$AgToolsDir\settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    Start-Sleep -Seconds 5
+    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    # Cleanup
+    Remove-Item $downloadDir -Recurse -Force
+    Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
+    Write-Host
 
-#############################################################
-# Creating Prod Grafana Icon on Desktop
-#############################################################
+    ##############################################################
+    # Cleanup
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs. (Step 15/15)" -ForegroundColor DarkGreen
+    # Creating Hyper-V Manager desktop shortcut
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
-$shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
-$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+    # Removing the LogonScript Scheduled Task
+    Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
+    Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
+    Start-Sleep -Seconds 5
 
-Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
-Write-Host
-
-#############################################################
-# Install Windows Terminal, WSL2, and Ubuntu
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/15)" -ForegroundColor DarkGreen
-If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
-$downloadDir = "C:\WinTerminal"
-$gitRepo = "microsoft/terminal"
-$filenamePattern = "*.msixbundle"
-$frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
-$releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
-$downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
-
-# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
-Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
-Invoke-WebRequest -Uri $frameworkPkgUrl -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Install WSL latest kernel update
-Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
-msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
-Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-Add-AppxPackage -Path $msiPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Setting WSL environment variables
-$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
-[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
-
-# Initializing the wsl ubuntu app without requiring user input
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu." -ForegroundColor Gray
-$ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
-Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Create Windows Terminal shortcut
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
-#############################################################
-# Install VSCode extensions
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-# Install VSCode extensions
-foreach ($extension in $AgConfig.VSCodeExtensions) {
-    code --install-extension $extension | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-}
-
-
-#############################################################
-# Install Docker Desktop
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
-# Download and Install Docker Desktop
-$arguments = 'install --quiet --accept-license'
-Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
-Start-Sleep -Seconds 10
-Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Copy-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker Desktop\settings.json" -Force
-Copy-Item "$AgToolsDir\Settings\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
-
-Start-Sleep -Seconds 5
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-# Cleanup
-Remove-Item $downloadDir -Recurse -Force
-Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
-Write-Host
-
-##############################################################
-# Cleanup
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs. (Step 15/15)" -ForegroundColor DarkGreen
-# Creating Hyper-V Manager desktop shortcut
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-# Removing the LogonScript Scheduled Task
-Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
-Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
-Start-Sleep -Seconds 5
-
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Host "[$(Get-Date -Format t)] INFO: Uploading Log Bundle." -ForegroundColor Gray
-$Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-Invoke-Expression 'cmd /c start Powershell -Command {
+    # Executing the deployment logs bundle PowerShell script in a new window
+    Write-Host "[$(Get-Date -Format t)] INFO: Uploading Log Bundle." -ForegroundColor Gray
+    $Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
+    Invoke-Expression 'cmd /c start Powershell -Command {
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
@@ -1183,9 +1238,9 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
 }' | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
 
-Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
-$imgPath = $AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-$code = @'
+    Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
+    $imgPath = $AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
+    $code = @'
 using System.Runtime.InteropServices;
 namespace Win32{
 
@@ -1199,13 +1254,13 @@ namespace Win32{
         }
     }
 '@
-Add-Type $code | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
-[Win32.Wallpaper]::SetWallpaper($imgPath) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
+    Add-Type $code | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
+    [Win32.Wallpaper]::SetWallpaper($imgPath) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Cleanup.log")
 
-$endTime = Get-Date
-$timeSpan = New-TimeSpan -Start $starttime -End $endtime
-Write-Host
-Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Please enjoy the Agora experience!" -ForegroundColor Green
-Write-Host
+    $endTime = Get-Date
+    $timeSpan = New-TimeSpan -Start $starttime -End $endtime
+    Write-Host
+    Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Please enjoy the Agora experience!" -ForegroundColor Green
+    Write-Host
 
-Stop-Transcript
+    Stop-Transcript
