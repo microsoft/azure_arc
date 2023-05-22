@@ -1,5 +1,4 @@
-name: Initial Contoso supermarket applications image build
-
+name: Build-and-push-v1.0-images
 on:
   workflow_dispatch:
 
@@ -27,70 +26,94 @@ jobs:
       - name: 'Build and push pos v1.0 images'
         env:
           latest_tag: "v1.0"
-        run: |
-          branches=("production" "staging" "canary" "main")
-          # Build pos image for each branch
-          for branch in "${branches[@]}"; do
-            if [ $branch == "main" ]; then
-              branch="dev"
-            fi
-            docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag"
-            docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag
-          done
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          retry_on: error
+          max_attempts: 3
+          command: |
+            branches=("production" "staging" "canary" "main")
+            # Build pos image for each branch
+            for branch in "${branches[@]}"; do
+              if [ $branch == "main" ]; then
+                branch="dev"
+              fi
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos:$latest_tag
+            done
 
       - name: 'Build and push cloudSync v1.0 images'
         env:
             latest_tag: "v1.0"
-        run: |
-          # Build cloudSync image for each branch
-          branches=("production" "staging" "canary" "main")
-          for branch in "${branches[@]}"; do
-            if [ $branch == "main" ]; then
-              branch="dev"
-            fi
-            docker build ./contoso_supermarket/developer/pos/src/cloud_sync -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
-            docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0
-          done
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          retry_on: error
+          max_attempts: 3
+          command: |
+            # Build cloudSync image for each branch
+            branches=("production" "staging" "canary" "main")
+            for branch in "${branches[@]}"; do
+              if [ $branch == "main" ]; then
+                branch="dev"
+              fi
+              docker build ./contoso_supermarket/developer/pos/src/cloud_sync -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/pos-cloudsync:v1.0
+            done
 
       - name: 'Build and push contosoAi v1.0 images'
         env:
             latest_tag: "v1.0"
-        run: |
-          # Build contosoAi image for each branch
-          branches=("production" "staging" "canary" "main")
-          for branch in "${branches[@]}"; do
-            if [ $branch == "main" ]; then
-              branch="dev"
-            fi
-            docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
-            docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0
-          done
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          retry_on: error
+          max_attempts: 3
+          command: |
+            # Build contosoAi image for each branch
+            branches=("production" "staging" "canary" "main")
+            for branch in "${branches[@]}"; do
+              if [ $branch == "main" ]; then
+                branch="dev"
+              fi
+              docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/contosoai:v1.0
+            done
 
       - name: 'Build and push queue monitoring backend v1.0 images'
         env:
             latest_tag: "v1.0"
-        run: |
-          # Build queue monitoring backend image for each branch
-          branches=("production" "staging" "canary" "main")
-          for branch in "${branches[@]}"; do
-            if [ $branch == "main" ]; then
-              branch="dev"
-            fi
-            docker build ./contoso_supermarket/developer/queue_monitoring_backend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
-            docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0
-          done
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          retry_on: error
+          max_attempts: 3
+          command: |
+            # Build queue monitoring backend image for each branch
+            branches=("production" "staging" "canary" "main")
+            for branch in "${branches[@]}"; do
+              if [ $branch == "main" ]; then
+                branch="dev"
+              fi
+              docker build ./contoso_supermarket/developer/queue_monitoring_backend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-backend:v1.0
+            done
 
       - name: 'Build and push queue monitoring frontend v1.0 images'
         env:
             latest_tag: "v1.0"
-        run: |
-          # Build queue monitoring frontend image for each branch
-          branches=("production" "staging" "canary" "main")
-          for branch in "${branches[@]}"; do
-            if [ $branch == "main" ]; then
-              branch="dev"
-            fi
-            docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
-            docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0
-          done
-
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 25
+          retry_on: error
+          max_attempts: 3
+          command: |
+            # Build queue monitoring frontend image for each branch
+            branches=("production" "staging" "canary" "main")
+            for branch in "${branches[@]}"; do
+              if [ $branch == "main" ]; then
+                branch="dev"
+              fi
+              docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/$branch/contoso-supermarket/queue-monitoring-frontend:v1.0
+            done

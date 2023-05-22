@@ -49,7 +49,7 @@
 
     # PowerShell modules
     PowerShellModules   = @(
-        'Az.ConnectedKubernetes',
+        'Az.ConnectedKubernetes'
         'Az.Kusto'
     )
 
@@ -99,7 +99,7 @@
     PreProdVHDBlobURL = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
 
     # L1 virtual machine configuration
-    HostVMDrive                          = "V"                                   # This value controls the drive letter where the nested virtual machines will be stored the host.
+    HostVMDrive                          = "V"                                   # This value controls the drive letter where the nested virtual
     L1VMMemory                           = 24GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
     L1VMNumVCPU                          = 8                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
     InternalSwitch                       = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
@@ -226,8 +226,6 @@
 
     AppConfig = @{
         ContosoSupermarket = @{
-            #GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-            #Branch = "main"
             GitOpsConfigName = "config-supermarket"
             KustomizationName = "pos"
             KustomizationPath="./contoso_supermarket/operations/contoso_supermarket/release"
