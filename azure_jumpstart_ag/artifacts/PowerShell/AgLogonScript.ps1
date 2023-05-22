@@ -763,10 +763,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             do {
                 $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
                 if ($configStatus.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
                 else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 20 seconds" -ForegroundColor Gray
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 20 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                     Start-Sleep -Seconds 20
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
@@ -775,8 +775,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
     while ($(Get-Job -Name gitops).State -eq 'Running') {
+        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configurations to complete on all clusters...waiting 45 seconds" -ForegroundColor Gray
         Receive-Job -Name gitops -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 45
     }
 
     Get-Job -name gitops | Remove-Job
