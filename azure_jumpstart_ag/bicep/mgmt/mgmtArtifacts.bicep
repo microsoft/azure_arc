@@ -51,10 +51,7 @@ module policyDeploymentRGScope './policyAzureArcRGScope.bicep' = {
   }
 }
 
-module policyDeploymentSubScope './policyAzureArcSubScope.bicep' = {
-  name: 'policyDeploymentSub'
+module defenderForServersSubScope './defenderForServersSubScope.bicep' = {
+  name: 'defenderForServersSubScope'
   scope: subscription()
-  params: {
-    azureLocation: location
-  }
 }
