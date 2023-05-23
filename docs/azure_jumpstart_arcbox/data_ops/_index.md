@@ -6,8 +6,6 @@ toc_hide: true
 
 # Jumpstart ArcBox - Data Services Operations
 
-> **WARNING: Per May 22 2023, there is a [known issue](https://github.com/microsoft/azure_arc/issues/1861) causing deployments of the ArcBox Flavors "Full", "DevOps" and "DataOps" to fail. Until further notice, you may deploy the "IT Pro" flavor of ArcBox.**
-
 ## Azure Arc-enabled SQL Managed Instance Stress Simulation
 
 Included in ArcBox, is a dedicated SQL stress simulation tool named _SqlQueryStress_ automatically installed for you on the Client VM. _SqlQueryStress_ will allow you to generate load on the Azure Arc-enabled SQL Managed Instance that can be done used to showcase how the SQL database and services are performing as well to highlight operational practices described in the next section.
