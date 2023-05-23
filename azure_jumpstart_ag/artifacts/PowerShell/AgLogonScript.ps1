@@ -99,6 +99,8 @@ Write-Host
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/15)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+    $retryCount = 0
+    $maxRetries = 5
     do {
         try {
             $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
@@ -107,8 +109,15 @@ Write-Host
             }
         }
         catch {
-            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
-            start-sleep -Seconds 45
+            if($retryCount -lt $maxRetries) {
+                Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+                $retryCount++
+                start-sleep -Seconds 45
+            }
+            else {
+                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/jumpstart-agora-apps Fork doesn't exist.  Exiting..." -ForegroundColor Red
+                Exit
+            }
         }
     } until ($response.full_name -eq "$githubUser/$appsRepo")
 
@@ -830,7 +839,6 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name gitops -ScriptBlock {
-        $WarningPreference = "SilentlyContinue"
         $AgConfig = $using:AgConfig
         $cluster = $using:cluster
         $namingGuid = $using:namingGuid
@@ -911,6 +919,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         --name $configName `
                         --force `
                         --yes `
+                        --only-show-errors `
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
                         Start-Sleep -Seconds 10
