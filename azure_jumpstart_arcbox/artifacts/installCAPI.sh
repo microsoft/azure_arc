@@ -70,9 +70,9 @@ echo ""
 sudo apt install snapd
 
 # Installing Docker
-sudo snap install docker
-sudo groupadd docker
-sudo usermod -aG docker $adminUsername
+# sudo snap install docker
+# sudo groupadd docker
+# sudo usermod -aG docker $adminUsername
 
 # Installing kustomize
 sudo snap install kustomize
