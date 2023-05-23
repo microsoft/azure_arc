@@ -99,6 +99,8 @@ Write-Host
      Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/15)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+    $retryCount = 0
+    $maxRetries = 5
     do {
         try {
             $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
@@ -107,8 +109,15 @@ Write-Host
             }
         }
         catch {
-            Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
-            start-sleep -Seconds 45
+            if($retryCount -lt $maxRetries) {
+                Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+                $retryCount++
+                start-sleep -Seconds 45
+            }
+            else {
+                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/jumpstart-agora-apps Fork doesn't exist.  Exiting..." -ForegroundColor Red
+                Exit
+            }
         }
     } until ($response.full_name -eq "$githubUser/$appsRepo")
 
@@ -667,7 +676,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     foreach ($namespace in $AgConfig.Namespaces) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on $clusterName (Step 8/15)" -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating namespace $namespace on $clusterName" -ForegroundColor Gray
         kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     }
 }
@@ -697,7 +706,7 @@ foreach ($resource in $resources) {
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
                 --auto-upgrade false
-            
+
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
                 --resource-group $env:resourceGroup `
                 --cluster-type connectedClusters `
@@ -739,7 +748,7 @@ foreach ($resource in $resources) {
                 ProvisioningState = $provisioningState
             }
         } -ArgumentList $resourceName, $resourceType
-     
+
         $jobs += $job
     }
 }
@@ -845,6 +854,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $namespace = $app.value.Namespace
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
+            $retryCount = 0
+            $maxRetries = 1
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -857,9 +868,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 $store = "dev"
             }
 
-            kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
             # Wait for Kubernetes API server to become available
-            $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+            $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
             $apiServerAddress = $apiServer -replace '.*https://| .*$'
             $apiServerFqdn = ($apiServerAddress -split ":")[0]
             $apiServerPort = ($apiServerAddress -split ":")[1]
@@ -867,11 +877,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             do {
                 $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
                 if ($result.TcpTestSucceeded) {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
                     break
                 }
                 else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 5 seconds..." -ForegroundColor Gray
                     Start-Sleep -Seconds 5
                 }
             } while ($true)
@@ -896,8 +904,45 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
                 else {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                    Start-Sleep -Seconds 45
+                    if($configStatus.ComplianceState -ne "Non-compliant"){
+                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 20 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        Start-Sleep -Seconds 20
+                    }
+                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                        $retryCount++
+                        Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        az k8s-configuration flux delete `
+                        --resource-group $resourceGroup `
+                        --cluster-name $clusterName `
+                        --cluster-type $type `
+                        --name $configName `
+                        --force `
+                        --yes `
+                        --only-show-errors `
+                        | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                        Start-Sleep -Seconds 10
+                        Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                        az k8s-configuration flux create `
+                        --cluster-name $clusterName `
+                        --resource-group $resourceGroup `
+                        --name $configName `
+                        --cluster-type $type `
+                        --url $appClonedRepo `
+                        --branch $Branch `
+                        --sync-interval 5s `
+                        --kustomization name=$appName path=$appPath/$store prune=true `
+                        --timeout 30m `
+                        --namespace $namespace `
+                        --only-show-errors `
+                    | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                    }
+                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries){
+                        Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        break
+                    }
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
         }
