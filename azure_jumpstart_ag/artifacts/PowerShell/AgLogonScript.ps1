@@ -905,8 +905,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 }
                 else {
                     if($configStatus.ComplianceState -ne "Non-compliant"){
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 20 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        Start-Sleep -Seconds 20
+                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        Start-Sleep -Seconds 45
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         $retryCount++
