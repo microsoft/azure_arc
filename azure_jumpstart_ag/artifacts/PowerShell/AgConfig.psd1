@@ -84,7 +84,8 @@
         'ZainChen.json',
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
-        'mindaro.mindaro'
+        'mindaro.mindaro',
+        'github.vscode-pull-request-github'
     )
 
     # Git branches
