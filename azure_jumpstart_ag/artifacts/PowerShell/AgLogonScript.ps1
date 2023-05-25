@@ -682,6 +682,83 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 }
 
 #####################################################################
+# Setup Azure Container registry pull secret on clusters
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    foreach ($namespace in $AgConfig.Namespaces) {
+        if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
+            Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
+            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+            kubectl create secret docker-registry acr-secret `
+                --namespace $namespace `
+                --docker-server="$acrName.azurecr.io" `
+                --docker-username="$env:spnClientId" `
+                --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        }
+    }
+}
+
+#####################################################################
+# Create secrets for GitHub actions
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
+$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    foreach ($namespace in $AgConfig.Namespaces) {
+        if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating Cosmos DB Kubernetes secrets on $clusterName" -ForegroundColor Gray
+            kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+            kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+            kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub personal access token Kubernetes secret on $clusterName" -ForegroundColor Gray
+            kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        }
+    }
+}
+Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
+Write-Host
+
+#####################################################################
+# Cache images on all clusters
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+Start-Job -Name imagesCache -ScriptBlock {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        az acr repository list --n $acrname -o tsv | ForEach-Object {
+            $imagename = $_
+            $name = $imagename.split('/')[2]
+            $imageToPull = $acrname+".azurecr.io/"+$imageName+":v1.0"
+            $yaml = @"
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: images-cache-$name
+spec:
+  selector:
+    matchLabels:
+      app: images-cache-$name
+  template:
+    metadata:
+      labels:
+        app: images-cache-$name
+    spec:
+      containers:
+        - name: images-cache-$name
+          image: $imageToPull
+          imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+        - name: acr-secret
+"@
+            $yaml | kubectl apply -f - --context $clusterName -n images-cache
+        }
+    }
+}
+
+#####################################################################
 # Installing flux extension on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 9/15)" -ForegroundColor DarkGreen
@@ -781,39 +858,6 @@ if ($retryCount -eq $maxRetries) {
 $jobs | Remove-Job
 
 #####################################################################
-# Setup Azure Container registry pull secret on clusters
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    $namespace = $cluster.value.posNamespace
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    kubectl create secret docker-registry acr-secret `
-        --namespace $namespace `
-        --docker-server="$acrName.azurecr.io" `
-        --docker-username="$env:spnClientId" `
-        --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-}
-
-#####################################################################
-# Create secrets for GitHub actions
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
-$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Cosmos DB Kubernetes secrets on $clusterName" -ForegroundColor Gray
-    kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $cluster.value.posNamespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $cluster.value.posNamespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub personal access token Kubernetes secret on $clusterName" -ForegroundColor Gray
-    kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $cluster.value.posNamespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-}
-Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
-Write-Host
-
-#####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 11/15)" -ForegroundColor DarkGreen
@@ -830,7 +874,13 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images caching to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+while ($(Get-Job -Name imagesCache).State -eq 'Running') {
+    Receive-Job -Name imagesCache -WarningAction SilentlyContinue
+    Start-Sleep -Seconds 60
+}
 
+Get-Job -name imagesCache | Remove-Job
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
