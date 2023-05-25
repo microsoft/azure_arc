@@ -66,7 +66,7 @@ param cosmosDBName string
 param cosmosDBEndpoint string
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
-param rdpPort string = '3389'
+param rdpPort string = '8888'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'

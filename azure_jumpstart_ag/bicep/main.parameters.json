@@ -3,19 +3,19 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "spnClientId": {
-      "value": ""
+      "value": "81f02602-6af4-412f-bc1a-46134a416676"
     },
     "spnClientSecret": {
       "value": ""
     },
     "spnTenantId": {
-      "value": ""
+      "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
     },
     "windowsAdminUsername": {
-      "value": ""
+      "value": "jumpstart"
     },
     "windowsAdminPassword": {
-      "value": ""
+      "value": "Microsoft2023!!"
     },
     "sshRSAPublicKey": {
       "value": ""
@@ -27,13 +27,13 @@
       "value": ""
     },
     "githubUser": {
-      "value": ""
+      "value": "brauliomsft"
     },
     "githubBranch": {
-      "value": ""
+      "value": "jumpstart_ag"
     },
     "githubAccount": {
-      "value": ""
+      "value": "brauliomsft"
     }
     
   }
