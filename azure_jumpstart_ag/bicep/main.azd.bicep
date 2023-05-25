@@ -8,8 +8,13 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
+@minLength(1)
+@maxLength(17)
+@description('Prefix for resource group, i.e. {name}-rg')
+param envName string
+
 @description('Location for all resources')
-param location string = resourceGroup().location
+param location string
 
 @maxLength(5)
 @description('Random GUID')
@@ -82,8 +87,16 @@ param rdpPort string = '3389'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
+targetScope = 'subscription'
+
+resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+  name: '${envName}-rg'
+  location: location
+}
+
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
+  scope: rg
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
@@ -92,6 +105,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
 
 module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
+  scope: rg
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
     subnetNameCloudAksStaging: subnetNameCloudAksStaging
@@ -103,6 +117,7 @@ module networkDeployment 'mgmt/network.bicep' = {
 
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
+  scope: rg
   params: {
     location: location
   }
@@ -110,6 +125,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
+  scope: rg
   params: {
     aksStagingClusterName: aksStagingClusterName
     virtualNetworkNameCloud: networkDeployment.outputs.virtualNetworkNameCloud
@@ -124,6 +140,7 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
+  scope: rg
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
@@ -153,6 +170,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
 
 module iotHubDeployment 'data/iotHub.bicep' = {
   name: 'iotHubDeployment'
+  scope: rg
   params: {
     location: location
     iotHubName: iotHubName
@@ -161,6 +179,7 @@ module iotHubDeployment 'data/iotHub.bicep' = {
 
 module adxDeployment 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
+  scope: rg
   params: {
     location: location
     adxClusterName: adxClusterName
@@ -173,9 +192,21 @@ module adxDeployment 'data/dataExplorer.bicep' = {
 
 module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   name: 'cosmosDBDeployment'
+  scope: rg
   params: {
     location: location
     accountName: accountName
     posOrdersDBName: posOrdersDBName
   }
 }
+
+output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_RESOURCE_GROUP string = rg.name
+
+output NAMING_GUID string = namingGuid
+output RDP_PORT string = rdpPort
+
+output ADX_CLUSTER_NAME string = adxClusterName
+output IOT_HUB_NAME string = iotHubName
+output COSMOS_DB_NAME string = accountName
+output ACR_NAME string = acrName
