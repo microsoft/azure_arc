@@ -671,14 +671,13 @@ Write-Host
 # Cache images on all clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
-Start-Job -Name imagesCache -ScriptBlock {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        az acr repository list --n $acrname -o tsv | ForEach-Object {
-            $imagename = $_
-            $name = $imagename.split('/')[2]
-            $imageToPull = $acrname+".azurecr.io/"+$imageName+":v1.0"
-            $yaml = @"
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    az acr repository list --n $acrname -o tsv | ForEach-Object {
+        $imagename = $_
+        $name = $imagename.split('/')[2]
+        $imageToPull = $acrname+".azurecr.io/"+$imageName+":v1.0"
+        $yaml = @"
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -699,8 +698,7 @@ spec:
       imagePullSecrets:
         - name: acr-secret
 "@
-            $yaml | kubectl apply -f - --context $clusterName -n images-cache
-        }
+        $yaml | kubectl apply -f - --context $clusterName -n images-cache
     }
 }
 
@@ -874,13 +872,6 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/15)" -ForegroundColor DarkGreen
-Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images caching to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-while ($(Get-Job -Name imagesCache).State -eq 'Running') {
-    Receive-Job -Name imagesCache -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 60
-}
-
-Get-Job -name imagesCache | Remove-Job
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
