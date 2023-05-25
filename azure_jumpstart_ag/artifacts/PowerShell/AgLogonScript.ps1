@@ -605,60 +605,6 @@ Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials installs are compl
 Write-Host
 
 #####################################################################
-# Connect the AKS Edge Essentials clusters and hosts to Azure Arc
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 7/15)" -ForegroundColor DarkGreen
-foreach ($VM in $VMNames) {
-    $secret = $Env:spnClientSecret
-    $clientId = $Env:spnClientId
-    $tenantId = $Env:spnTenantId
-    $location = $Env:azureLocation
-    $resourceGroup = $env:resourceGroup
-
-    Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
-        # Install prerequisites
-        . C:\Deployment\Profile.ps1
-        $hostname = hostname
-        $ProgressPreference = "SilentlyContinue"
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-        Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-        Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
-
-        # Connect servers to Arc
-        $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
-        $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
-        Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
-        Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
-        Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
-
-        # Connect clusters to Arc
-        $deploymentPath = "C:\Deployment\config.json"
-        Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
-        kubectl get svc
-        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
-    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-}
-
-#####################################################################
-# Tag Azure Arc resources
-#####################################################################
-$arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
-$Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
-
-# Iterate over the Arc resources and tag it
-foreach ($arcResourceType in $arcResourceTypes) {
-    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
-    foreach ($arcResource in $arcResources) {
-        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    }
-}
-
-Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
-Write-Host
-
-#####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -757,6 +703,60 @@ spec:
         }
     }
 }
+
+#####################################################################
+# Connect the AKS Edge Essentials clusters and hosts to Azure Arc
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 7/15)" -ForegroundColor DarkGreen
+foreach ($VM in $VMNames) {
+    $secret = $Env:spnClientSecret
+    $clientId = $Env:spnClientId
+    $tenantId = $Env:spnTenantId
+    $location = $Env:azureLocation
+    $resourceGroup = $env:resourceGroup
+
+    Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+        # Install prerequisites
+        . C:\Deployment\Profile.ps1
+        $hostname = hostname
+        $ProgressPreference = "SilentlyContinue"
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+        Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+        Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+        Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
+
+        # Connect servers to Arc
+        $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
+        Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
+        Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
+        Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
+
+        # Connect clusters to Arc
+        $deploymentPath = "C:\Deployment\config.json"
+        Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+        kubectl get svc
+        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+}
+
+#####################################################################
+# Tag Azure Arc resources
+#####################################################################
+$arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
+$Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
+
+# Iterate over the Arc resources and tag it
+foreach ($arcResourceType in $arcResourceTypes) {
+    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
+    foreach ($arcResource in $arcResources) {
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    }
+}
+
+Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
+Write-Host
 
 #####################################################################
 # Installing flux extension on clusters
