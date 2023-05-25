@@ -241,6 +241,7 @@
     Namespaces              = @(
         "contoso-supermarket"
         "observability"
+        "images-cache"
     )
 
     AppConfig = @{
