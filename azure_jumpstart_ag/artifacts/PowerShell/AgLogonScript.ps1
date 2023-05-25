@@ -1164,18 +1164,23 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
     $downloadDir = "C:\WinTerminal"
     $gitRepo = "microsoft/terminal"
-    $filenamePattern = "*.msixbundle"
     $frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
     $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-    $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+    $WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
+    $windowsTerminalPath = "$downloadDir\WindowsTerminal"
     $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
-    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+    $filenamePattern = "*PreinstallKit.zip"
+    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
 
-    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
     Invoke-WebRequest -Uri $frameworkPkgUrl -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
+    # Extract Windows Terminal PreinstallKit
+    Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
+    Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    
     # Install WSL latest kernel update
     Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
     msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
@@ -1183,7 +1188,17 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    Add-AppxPackage -Path $msiPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    # Install the prereqs
+    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
+        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    }
+    # Install Windows Terminal
+    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
+        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    }
+    
+    # Install Ubuntu
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
     # Setting WSL environment variables
