@@ -96,7 +96,7 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/17)" -ForegroundColor DarkGreen
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/17)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
     $retryCount = 0
