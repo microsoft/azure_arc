@@ -2,7 +2,7 @@ name: Promote-to-production
 on:
   repository_dispatch:
     types:
-      - Kustomization/contosopos.contoso-supermarket
+      - Kustomization/Kustomization/config-supermarket-pos-contosopos.contoso-supermarket
 
 permissions:
   contents: write
