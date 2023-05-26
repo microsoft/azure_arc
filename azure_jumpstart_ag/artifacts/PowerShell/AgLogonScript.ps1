@@ -263,18 +263,12 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/1
 if ($githubUser -ne "microsoft") {
     $iotHubHostName = $env:iotHubHostName
     $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
-    # gh secret set "IOTHUB_HOSTNAME" -b $iotHubHostName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
         foreach ($device in $site.IoTDevices){
             $deviceId = "$device-$($site.FriendlyName)"
             Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-            # $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-            # $iotDeviceSasTokens.Add($deviceId, $deviceSASToken)
-            # $ghDeviceId = $deviceId -replace '[^\w_]', '_'
-            # TODO - remove gh secret set after confirming the secrets are not needed in GH
-            # gh secret set "sas_token_$ghDeviceId" -b $deviceSASToken | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
         }
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
