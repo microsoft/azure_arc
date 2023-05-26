@@ -48,7 +48,7 @@ resource adxCluster 'Microsoft.Kusto/clusters@2022-12-29' = {
     tier: skuTier
     capacity: skuCapacity
   }
-  
+
   // Assign system assigned identity
   identity: {
     type: 'SystemAssigned'
@@ -86,8 +86,14 @@ resource adxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnec
     iotHubResourceId: iotHubId
     consumerGroup: iotHubConsumerGroup
     sharedAccessPolicyName: 'iothubowner'
-    tableName:'environmentSensor'
+    tableName: 'environmentSensor'
     dataFormat: 'JSON'
+    eventSystemProperties: [
+      'iothub-enqueuedtime'
+      'iothub-connection-device-id'
+      'iothub-creation-time-utc'
+    ]
+    mappingRuleName: 'EnvironmentSensorMapping'
   }
 }
 
