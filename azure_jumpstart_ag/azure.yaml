@@ -11,8 +11,8 @@ hooks:
     run: ./scripts/preprovision.ps1
     continueOnError: false
     interactive: true
-  # postprovision:
-  #   shell: pwsh
-  #   run: ./scripts/postprovision.ps1
-  #   continueOnError: false
-  #   interactive: true
+  postprovision:
+    shell: pwsh
+    run: ./scripts/postprovision.ps1
+    continueOnError: false
+    interactive: true
