@@ -11,6 +11,7 @@
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"
+        AgConfigMapDir    = "C:\Ag\ConfigMaps"
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgAdxDashboards   = "C:\Ag\AdxDashboards"
@@ -137,6 +138,7 @@
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             POSUrlBookmark         = "POS-Seattle-URL"
+            IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -159,6 +161,7 @@
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             POSUrlBookmark         = "POS-Chicago-URL"
+            IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -183,6 +186,7 @@
             POSUrlBookmark         = "POS-Dev-URL"
             GrafanaUrlBookmark     = "Grafana-Dev-URL"
 
+            IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Staging = @{
             ArcClusterName     = "Ag-AKS-Staging"
@@ -197,6 +201,7 @@
             HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
             POSUrlBookmark     = "POS-Staging-URL"
             GrafanaUrlBookmark = "Grafana-Staging-URL"
+            IoTDevices          = @("Freezer-1", "Freezer-2")
         }
     }
 
@@ -237,6 +242,7 @@
     Namespaces              = @(
         "contoso-supermarket"
         "observability"
+        "sensor-monitor"
     )
 
     AppConfig = @{
@@ -282,11 +288,26 @@
             Namespace = "contoso-supermarket"
             Order = 6
         }
-        # SensorMonitor = @{
-        #     GithubRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-        #     Branch = "main"
-        #     GitOpsConfigName = "config-sensormonitor"
-        #     Kustomization = "name=bookstore path=./bookstore/yaml"
-        # }
+        SensorMonitor = @{
+            GitOpsConfigName  = "config-sensormonitor"
+            KustomizationName = "sensor-monitor"
+            KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
+            Namespace         = "sensor-monitor"
+            AppPath           = "freezer_monitoring"
+            ConfigMaps = @{
+                "mqtt-broker-config" = @{
+                    ContainerName = "mqtt-broker"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+                }
+                "mqtt-simulator-config" = @{
+                    ContainerName = "mqtt-simulator"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+                }
+                "mqtt2prom-config" = @{
+                    ContainerName = "mqtt2prom"
+                    RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
+                }
+            }
+        }
     }
 }
