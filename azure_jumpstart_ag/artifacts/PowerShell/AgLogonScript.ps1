@@ -682,7 +682,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $imageName = "contosoai"
     $imageTag = "v1.0"
     $imagePullSecret = "acr-secret"
-    $namespace = "contoso-supermarket"
+    $namespace = "images-cache"
     if($branch -eq "chicago"){
         $branch = "canary"
     }
@@ -690,30 +690,28 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $branch = "production"
     }
     $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
-    $yaml = @"
+$yaml = @"
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-name: images-cache-$imageName
+  name: images-cache-$imageName
 spec:
-selector:
-matchLabels:
-  app: images-cache-$imageName
-template:
-metadata:
-  labels:
-    app: images-cache-$imageName
-spec:
-  containers:
-    - name: images-cache-$imageName
-      image: $imageToPull
-      imagePullPolicy: IfNotPresent
-  imagePullSecrets:
-    - name: $imagePullSecret
+  selector:
+    matchLabels:
+      app: images-cache-$imageName
+  template:
+    metadata:
+      labels:
+        app: images-cache-$imageName
+    spec:
+      containers:
+        - name: images-cache-$imageName
+          image: $imageToPull
+          imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+        - name: $imagePullSecret
 "@
-
     $yaml | kubectl apply -f - --context $context -n $namespace
-
 }
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
@@ -963,11 +961,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         #Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         Start-Sleep -Seconds 60
                     }
-                    elseif($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq 0){
-                        Start-Sleep -Seconds 240
-                        $retryCount++
-                    }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries -and $retryCount -gt 0) {
+                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         $retryCount++
                         Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
