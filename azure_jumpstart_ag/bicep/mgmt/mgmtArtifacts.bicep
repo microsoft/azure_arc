@@ -43,10 +43,15 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
   }
 }
 
-module policyDeployment './policyAzureArc.bicep' = {
+module policyDeploymentRGScope './policyAzureArcRGScope.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
     logAnalyticsWorkspaceId: workspace.id
   }
+}
+
+module defenderForServersSubScope './defenderForServersSubScope.bicep' = {
+  name: 'defenderForServersSubScope'
+  scope: subscription()
 }

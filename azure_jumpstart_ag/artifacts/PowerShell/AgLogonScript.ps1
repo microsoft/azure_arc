@@ -40,7 +40,7 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 #####################################################################
 # Setup Azure CLI
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
 $cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -69,7 +69,7 @@ Write-Host
 #####################################################################
 # Setup Azure PowerShell and register providers
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell. (Step 2/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
@@ -96,7 +96,7 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/15)" -ForegroundColor DarkGreen
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/17)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
     $retryCount = 0
@@ -252,7 +252,7 @@ Write-Host
 #####################################################################
 # Azure IoT Hub resources preparation
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/17)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
     $IoTHubHostName = $env:iotHubHostName
     $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
@@ -335,7 +335,7 @@ if (Test-Path -Path $emulatorPath) {
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 5/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 5/17)" -ForegroundColor DarkGreen
 $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
@@ -422,7 +422,7 @@ foreach ($VM in $VMNames) {
     while ($VMStatus.PrimaryStatusDescription -ne "OK") {
         $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
-        sleep 5
+        Start-Sleep -Seconds 5
     }
 }
 
@@ -537,7 +537,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 Write-Host "[$(Get-Date -Format t)] INFO: Initial L1 virtualization infrastructure configuration complete." -ForegroundColor Green
 Write-Host
 
-Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials (Step 6/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials (Step 6/17)" -ForegroundColor DarkGreen
 foreach ($VMName in $VMNames) {
     $Session = New-PSSession -VMName $VMName -Credential $Credentials
     Write-Host "[$(Get-Date -Format t)] INFO: Rebooting $VMName." -ForegroundColor Gray
@@ -617,7 +617,7 @@ az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $
 #####################################################################
 # Creating Kubernetes namespaces on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 8/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 7/17)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -630,7 +630,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 10/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 8/17)" -ForegroundColor DarkGreen
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     foreach ($namespace in $AgConfig.Namespaces) {
@@ -679,7 +679,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 7/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 9/17)" -ForegroundColor DarkGreen
 foreach ($VM in $VMNames) {
     $secret = $Env:spnClientSecret
     $clientId = $Env:spnClientId
@@ -730,10 +730,11 @@ foreach ($arcResourceType in $arcResourceTypes) {
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
 
+
 #####################################################################
 # Installing flux extension on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 9/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 10/17)" -ForegroundColor DarkGreen
 $retryCount = 0
 $maxRetries = 3
 $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
@@ -832,7 +833,7 @@ $jobs | Remove-Job
 #####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 11/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 11/17)" -ForegroundColor DarkGreen
 kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
@@ -845,7 +846,7 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps. (Step 12/15)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
@@ -986,7 +987,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
 
     # Installing Grafana
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 13/15)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 13/17)" -ForegroundColor DarkGreen
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
     $latestRelease = (Invoke-WebRequest -Uri "https://api.github.com/repos/grafana/grafana/releases/latest" | ConvertFrom-Json).tag_name.replace('v', '')
     Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
@@ -997,7 +998,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
     # Update Grafana Icons
     Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
-    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\fav32.png"
     Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
 
     Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
@@ -1176,22 +1176,27 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #############################################################
     # Install Windows Terminal, WSL2, and Ubuntu
     #############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/15)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/17)" -ForegroundColor DarkGreen
     If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
     $downloadDir = "C:\WinTerminal"
     $gitRepo = "microsoft/terminal"
-    $filenamePattern = "*.msixbundle"
     $frameworkPkgUrl = "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx"
     $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-    $msiPath = "$downloadDir\Microsoft.WindowsTerminal.msixbundle"
+    $WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
+    $windowsTerminalPath = "$downloadDir\WindowsTerminal"
     $releasesUri = "https://api.github.com/repos/$gitRepo/releases/latest"
-    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -SkipLast 1
+    $filenamePattern = "*PreinstallKit.zip"
+    $downloadUri = ((Invoke-RestMethod -Method GET -Uri $releasesUri).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
 
-    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release msixbundle
+    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
     Invoke-WebRequest -Uri $frameworkPkgUrl -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $msiPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    Invoke-WebRequest -Uri $downloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
+    # Extract Windows Terminal PreinstallKit
+    Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
+    Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    
     # Install WSL latest kernel update
     Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
     msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
@@ -1199,7 +1204,17 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    Add-AppxPackage -Path $msiPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    # Install the prereqs
+    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
+        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    }
+    # Install Windows Terminal
+    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
+        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+    }
+    
+    # Install Ubuntu
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
     # Setting WSL environment variables
@@ -1249,9 +1264,69 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host
 
     ##############################################################
+    # Creating bookmarks
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
+    $bookmarksFileName = "$AgToolsDir\Bookmarks"
+    $edgeBookmarksPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+    
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+        $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
+    
+        # First matching service: pos
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 5000 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+    
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':5000'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+    
+            # Replace matching value in a bookmarks.json
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+    
+            Start-Sleep -Seconds 2
+        }
+    
+        # Second matching service: prometheus-grafana
+        if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
+            $matchingServices = $services.items | Where-Object {
+                $_.metadata.name -eq 'prometheus-grafana'
+            }
+            $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
+    
+            foreach ($grafanaIp in $grafanaIps) {
+                $output = "http://$grafanaIp"
+                $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+    
+                # Replace matching value in a bookmarks.json
+                $content = Get-Content -Path $bookmarksFileName
+                $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
+                $newContent | Set-Content -Path $bookmarksFileName
+    
+                Start-Sleep -Seconds 2
+            }
+        }
+    }
+    Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
+
+    ##############################################################
+    # Pinning important directories to Quick access
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Pinning important directories to Quick access (Step 16/17)" -ForegroundColor DarkGreen
+    $quickAccess = new-object -com shell.application
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+
+    ##############################################################
     # Cleanup
     ##############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs. (Step 15/15)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs (Step 17/17)" -ForegroundColor DarkGreen
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
