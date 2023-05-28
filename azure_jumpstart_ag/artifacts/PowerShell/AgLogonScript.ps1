@@ -891,7 +891,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $apiServerPort = ($apiServerAddress -split ":")[1]
 
             do {
-                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue -InformationLevel Quiet
                 if ($result.TcpTestSucceeded) {
                     break
                 }
@@ -908,7 +908,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --url $appClonedRepo `
                 --branch $Branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true `
+                --kustomization name=$appName path=$appPath/$store prune=true sync_interval=1m `
                 --timeout 30m `
                 --namespace $namespace `
                 --only-show-errors `
@@ -917,14 +917,18 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             do {
                 $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
                 if ($configStatus.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
                 else {
                     if($configStatus.ComplianceState -ne "Non-compliant"){
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        Start-Sleep -Seconds 45
+                        #Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        Start-Sleep -Seconds 60
                     }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                    elseif($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq 0){
+                        Start-Sleep -Seconds 240
+                        $retryCount++
+                    }
+                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries -and $retryCount -gt 0) {
                         $retryCount++
                         Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
