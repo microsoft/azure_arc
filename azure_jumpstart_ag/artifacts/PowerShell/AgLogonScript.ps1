@@ -678,6 +678,7 @@ Write-Host
 #####################################################################
 # Cache contoso-supermarket images on all clusters
 #####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
@@ -692,7 +693,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     if($branch -eq "seattle"){
         $branch = "production"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
     cacheImage -applicationName $applicationName -imageName $imageName -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 #####################################################################
