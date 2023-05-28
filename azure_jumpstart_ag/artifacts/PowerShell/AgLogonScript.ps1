@@ -670,12 +670,12 @@ Write-Host
 #####################################################################
 # Cache images on all clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+<#Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     cache-image -imageName "contosoai" -namespace "contoso-supermarket" -acrName $acrName -branch $clusterName -imagePullSecret "acr-secret" -applicationName "contoso-supermarket" -imageTag "v1.0"
 }
-
+#>
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
