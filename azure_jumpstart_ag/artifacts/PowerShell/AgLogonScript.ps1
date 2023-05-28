@@ -931,7 +931,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $apiServerPort = ($apiServerAddress -split ":")[1]
 
             do {
-                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue -InformationLevel Quiet
+                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
                 if ($result.TcpTestSucceeded) {
                     break
                 }
