@@ -927,7 +927,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --url $appClonedRepo `
                 --branch $Branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true sync_interval=1m `
+                --kustomization name=$appName path=$appPath/$store prune=true `
                 --timeout 30m `
                 --namespace $namespace `
                 --only-show-errors `
