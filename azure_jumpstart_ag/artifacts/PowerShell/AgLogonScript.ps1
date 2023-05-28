@@ -678,7 +678,6 @@ Write-Host
 #####################################################################
 # Cache contoso-supermarket images on all clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
@@ -693,29 +692,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     if($branch -eq "seattle"){
         $branch = "production"
     }
-    $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
-    $yaml = @"
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: images-cache-$imageName
-spec:
-  selector:
-    matchLabels:
-      app: images-cache-$imageName
-  template:
-    metadata:
-      labels:
-        app: images-cache-$imageName
-    spec:
-      containers:
-        - name: images-cache-$imageName
-          image: $imageToPull
-          imagePullPolicy: IfNotPresent
-      imagePullSecrets:
-        - name: $imagePullSecret
-"@
-    $yaml | kubectl apply -f - --context $context -n $namespace
+    Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+    cacheImage -applicationName $applicationName -imageName $imageName -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
