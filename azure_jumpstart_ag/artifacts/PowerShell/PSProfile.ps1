@@ -131,4 +131,44 @@ Function Invoke-CommandLineTool {
     }
 }
 
-  
+function cache-image {
+    param (
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$imageName,
+
+        [string]$namespace,
+        [string]$acrname,
+        [string]$branch,
+        [string]$imagePullSecret,
+        [string]$applicationName,
+        [string]$imageTag
+    )
+
+    $imageToPull = "${acrname}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
+    $yaml = @"
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: images-cache-$imageName
+spec:
+  selector:
+    matchLabels:
+      app: images-cache-$imageName
+  template:
+    metadata:
+      labels:
+        app: images-cache-$imageName
+    spec:
+      containers:
+        - name: images-cache-$imageName
+          image: $imageToPull
+          imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+        - name: $imagePullSecret
+"@
+
+$yaml | kubectl apply -f - --context $branch -n $namespace
+
+}
