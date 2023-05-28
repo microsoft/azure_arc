@@ -161,26 +161,25 @@ function cacheImage {
     )
     $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
 $yaml = @"
-$yaml = @"
-  apiVersion: apps/v1
-  kind: DaemonSet
-  metadata:
-    name: images-cache-$imageName
-  spec:
-    selector:
-      matchLabels:
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: images-cache-$imageName
+spec:
+  selector:
+    matchLabels:
+      app: images-cache-$imageName
+  template:
+    metadata:
+      labels:
         app: images-cache-$imageName
-    template:
-      metadata:
-        labels:
-          app: images-cache-$imageName
-      spec:
-        containers:
-          - name: images-cache-$imageName
-            image: $imageToPull
-            imagePullPolicy: IfNotPresent
-        imagePullSecrets:
-          - name: $imagePullSecret
+    spec:
+      containers:
+      - image: $imageToPull
+        imagePullPolicy: IfNotPresent
+        name: images-cache-$imageName
+      imagePullSecrets:
+      - name: $imagePullSecret
 "@
     $yaml | kubectl apply -f - --context $context -n $namespace
 
