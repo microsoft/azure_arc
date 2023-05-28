@@ -142,25 +142,17 @@ function cacheImage {
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True)]
         [string]$imageName,
-        [Parameter(Mandatory = $True,
-            ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $True)]
         [string]$imageTag,
-        [Parameter(Mandatory = $True,
-            ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $True)]
         [string]$namespace,
-        [Parameter(Mandatory = $True,
-            ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $True)]
         [string]$imagePullSecret,
         [Parameter(Mandatory = $True,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True)]
         [string]$branch,
-        [Parameter(Mandatory = $True,
-            ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $True)]
         [string]$acrName,
         [Parameter(Mandatory = $True,
             ValueFromPipeline = $True,
