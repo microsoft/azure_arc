@@ -130,3 +130,66 @@ Function Invoke-CommandLineTool {
     End {
     }
 }
+
+
+function cacheImage {
+    param (
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$applicationName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$imageName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$imageTag,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$namespace,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$imagePullSecret,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$branch,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$acrName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$context
+    )
+    $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
+$yaml = @"
+$yaml = @"
+  apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    name: images-cache-$imageName
+  spec:
+    selector:
+      matchLabels:
+        app: images-cache-$imageName
+    template:
+      metadata:
+        labels:
+          app: images-cache-$imageName
+      spec:
+        containers:
+          - name: images-cache-$imageName
+            image: $imageToPull
+            imagePullPolicy: IfNotPresent
+        imagePullSecrets:
+          - name: $imagePullSecret
+"@
+    $yaml | kubectl apply -f - --context $context -n $namespace
+
+}
