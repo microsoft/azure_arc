@@ -871,7 +871,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $appName = $app.Value.KustomizationName
             $appPath = $app.Value.KustomizationPath
             $retryCount = 0
-            $maxRetries = 1
+            $maxRetries = 2
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
