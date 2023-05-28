@@ -676,8 +676,9 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete
 Write-Host
 
 #####################################################################
-# Cache images on all clusters
+# Cache contoso-supermarket images on all clusters
 #####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
@@ -1368,6 +1369,15 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $cluster = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
+        kubectl delete namespace "images-cache" --context $cluster
+    }
 
     # Removing the LogonScript Scheduled Task
     Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
