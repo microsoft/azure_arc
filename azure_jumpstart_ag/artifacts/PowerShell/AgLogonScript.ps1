@@ -138,21 +138,8 @@ do {
 $env:GITHUB_TOKEN=$githubPAT
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 write-host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
-
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
-New-Item -ItemType Directory ".github/workflows" -Force
-Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
-gh repo set-default "$githubUser/$appsRepo"
-gh secret set "SPN_CLIENT_ID" -b $spnClientID
-gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-gh secret set "ACR_NAME" -b $acrName
-gh secret set "PAT_GITHUB" -b $githubPat
-gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
 Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
 $headers = @{
     Authorization  = "token $githubPat"
@@ -175,6 +162,19 @@ git checkout main
 git reset --hard upstream/main
 git push origin main -f
 git pull
+
+write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
+New-Item -ItemType Directory ".github/workflows" -Force
+Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
+gh repo set-default "$githubUser/$appsRepo"
+gh secret set "SPN_CLIENT_ID" -b $spnClientID
+gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+gh secret set "ACR_NAME" -b $acrName
+gh secret set "PAT_GITHUB" -b $githubPat
+gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
