@@ -1241,8 +1241,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
     Start-Sleep -Seconds 10
     Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-    Copy-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker Desktop\settings.json" -Force
-    Copy-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
     Start-Sleep -Seconds 5
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
     # Cleanup
