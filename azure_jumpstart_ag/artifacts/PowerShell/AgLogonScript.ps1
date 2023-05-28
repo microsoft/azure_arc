@@ -673,33 +673,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
-    az acr repository list --n $acrname -o tsv | ForEach-Object {
-        $imagename = $_
-        $name = $imagename.split('/')[2]
-        $imageToPull = $acrname+".azurecr.io/"+$imageName+":v1.0"
-        $yaml = @"
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: images-cache-$name
-spec:
-  selector:
-    matchLabels:
-      app: images-cache-$name
-  template:
-    metadata:
-      labels:
-        app: images-cache-$name
-    spec:
-      containers:
-        - name: images-cache-$name
-          image: $imageToPull
-          imagePullPolicy: IfNotPresent
-      imagePullSecrets:
-        - name: acr-secret
-"@
-        $yaml | kubectl apply -f - --context $clusterName -n images-cache
-    }
+    cache-image -imageName "contosoai" -namespace "contoso-supermarket" -acrName $acrName -branch $clusterName -imagePullSecret "acr-secret" -applicationName "contoso-supermarket" -imageTag "v1.0"
 }
 
 #####################################################################
