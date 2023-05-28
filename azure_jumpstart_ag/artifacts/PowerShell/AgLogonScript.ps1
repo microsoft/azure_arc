@@ -694,7 +694,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $branch = "production"
     }
     $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
-$yaml = @"
+    $yaml = @"
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
