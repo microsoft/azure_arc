@@ -24,6 +24,7 @@ $cosmosDBName = $Env:cosmosDBName
 $cosmosDBEndpoint = $Env:cosmosDBEndpoint
 $templateBaseUrl = $env:templateBaseUrl
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo= "https://github.com/microsoft/jumpstart-agora-apps"
 $adxClusterName = $env:adxClusterName
 $namingGuid = $env:namingGuid
 $appsRepo = "jumpstart-agora-apps"
@@ -168,7 +169,11 @@ foreach ($branch in $protectedBranches) {
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
 git config --global user.name "Agora Dev"
-git fetch
+git remote add upstream $appUpstreamRepo
+git fetch upstream
+git checkout main
+git reset --hard upstream/main
+git push origin main -f
 git pull
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
