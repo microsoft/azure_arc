@@ -1,0 +1,106 @@
+{
+   "checksum": "d6c126622ba5c8f0ecf86e539949d8fd",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "children": [ {
+               "id": "4",
+               "name": "POS Dev",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "POS-Dev-URL"
+            }, {
+               "id": "5",
+               "name": "POS Staging",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "POS-Staging-URL"
+            }, {
+               "id": "3",
+               "name": "POS Chicago",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "POS-Chicago-URL"
+            }, {
+               "id": "2",
+               "name": "POS Seattle",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "POS-Seattle-URL"
+            } ],
+            "id": "16",
+            "name": "POS",
+            "source": "unknown",
+            "type": "folder"
+         }, {
+            "children": [ {
+               "id": "7",
+               "name": "Grafana Dev",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Grafana-Dev-URL"
+            }, {
+               "id": "8",
+               "name": "Grafana Staging",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Grafana-Staging-URL"
+            }, {
+               "id": "6",
+               "name": "Grafana Prod",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "http://localhost:3000/"
+            } ],
+            "id": "14",
+            "name": "Grafana",
+            "source": "unknown",
+            "type": "folder"
+         }, {
+            "id": "9",
+            "name": "ADX Dashboards",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://dataexplorer.azure.com/dashboards"
+         }, {
+            "id": "15",
+            "name": "Azure Arc Jumpstart",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://azurearcjumpstart.io/"
+         } ],
+         "id": "1",
+         "name": "Favorites bar",
+         "source": "unknown",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_last_used": "0",
+         "date_modified": "0",
+         "id": "10",
+         "name": "Other favorites",
+         "source": "unknown",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_last_used": "0",
+         "date_modified": "0",
+         "id": "11",
+         "name": "Mobile favorites",
+         "source": "unknown",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
