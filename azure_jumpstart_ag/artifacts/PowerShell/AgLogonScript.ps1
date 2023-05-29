@@ -167,7 +167,7 @@ do {
             Exit
         }
     }
-} until ($response == $true)
+} until ($PatAssigned == $true)
 
 
 Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
