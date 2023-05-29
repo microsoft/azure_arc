@@ -971,7 +971,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 }
                 else {
                     if($configStatus.ComplianceState -ne "Non-compliant"){
-                        Start-Sleep -Seconds 30
+                        Start-Sleep -Seconds 10
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         $retryCount++
