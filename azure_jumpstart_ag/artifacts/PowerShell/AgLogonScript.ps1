@@ -958,7 +958,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --branch $Branch `
                 --sync-interval 5s `
                 --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
-                --timeout 30m `
+                --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
