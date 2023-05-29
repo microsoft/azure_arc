@@ -136,7 +136,7 @@ do {
     $response -notmatch "authentication failed"
 )
 
-Write-Host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
+Write-Host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor DarkGreen
 $env:GITHUB_TOKEN=$githubPAT
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 
@@ -149,7 +149,6 @@ $retryCount = 0
 $maxRetries = 5
 $uri = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/actions/secrets"
 do {
-    $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
     try {
         $response=Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
         Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo Fork" -ForegroundColor DarkGreen
