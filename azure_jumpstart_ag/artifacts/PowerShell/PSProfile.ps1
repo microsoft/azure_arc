@@ -132,7 +132,7 @@ Function Invoke-CommandLineTool {
 }
 
 
-function cacheImage {
+function cache-K8sImage {
     param (
         [Parameter(Mandatory = $True,
             ValueFromPipeline = $True,
