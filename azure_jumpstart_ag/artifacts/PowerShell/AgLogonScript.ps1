@@ -111,9 +111,9 @@ Write-Host
         }
         catch {
             if($retryCount -lt $maxRetries) {
-                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 60 seconds" -ForegroundColor Red
                 $retryCount++
-                start-sleep -Seconds 45
+                start-sleep -Seconds 60
             }
             else {
                 Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist.  Exiting..." -ForegroundColor Red
