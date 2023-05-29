@@ -689,13 +689,12 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -Foregrou
 $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
     foreach ($namespace in $AgConfig.Namespaces) {
         if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating Cosmos DB Kubernetes secrets on $clusterName" -ForegroundColor Gray
             kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub personal access token Kubernetes secret on $clusterName" -ForegroundColor Gray
             kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }
     }
