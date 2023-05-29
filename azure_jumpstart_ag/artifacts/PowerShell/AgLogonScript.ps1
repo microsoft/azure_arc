@@ -99,7 +99,7 @@ Write-Host
 #####################################################################
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/17)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
-    Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+    Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
     $retryCount = 0
     $maxRetries = 5
     do {
@@ -111,12 +111,12 @@ Write-Host
         }
         catch {
             if($retryCount -lt $maxRetries) {
-                Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
                 $retryCount++
                 start-sleep -Seconds 45
             }
             else {
-                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/jumpstart-agora-apps Fork doesn't exist.  Exiting..." -ForegroundColor Red
+                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist.  Exiting..." -ForegroundColor Red
                 Exit
             }
         }
@@ -135,17 +135,46 @@ do {
 } until (
     $response -notmatch "authentication failed"
 )
+
+Write-Host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
 $env:GITHUB_TOKEN=$githubPAT
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
-write-host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
-git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
-Set-Location "$AgAppsRepo\$appsRepo"
 
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
 $headers = @{
     Authorization  = "token $githubPat"
     "Content-Type" = "application/json"
 }
+$retryCount = 0
+$maxRetries = 5
+$uri = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/actions/secrets"
+do {
+    $response = Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+    try {
+        $response=Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo Fork" -ForegroundColor DarkGreen
+        $PatAssigned = $true
+    }
+    catch {
+        if($retryCount -lt $maxRetries) {
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo Fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            $PatAssigned = $false
+            $retryCount++
+            start-sleep -Seconds 60
+        }
+        else{
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo.  Exiting..." -ForegroundColor Red
+            Exit
+        }
+    }
+} until ($response == $true)
+
+
+Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
+git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
+Set-Location "$AgAppsRepo\$appsRepo"
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
 $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
 foreach ($branch in $protectedBranches) {
     $branchName = $branch.name
