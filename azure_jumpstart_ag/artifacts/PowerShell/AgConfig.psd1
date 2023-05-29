@@ -15,6 +15,7 @@
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgAdxDashboards   = "C:\Ag\AdxDashboards"
         AgDataEmulator    = "C:\Ag\DataEmulator"
+        AgMonitoringDir      = "C:\Ag\Monitoring"
     }
 
     # Required URLs
