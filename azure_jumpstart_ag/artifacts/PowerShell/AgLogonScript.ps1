@@ -683,7 +683,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
     $applicationName = "contoso-supermarket"
-    $imageName = "contosoai"
     $imageTag = "v1.0"
     $imagePullSecret = "acr-secret"
     $namespace = "images-cache"
@@ -693,7 +692,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     if($branch -eq "seattle"){
         $branch = "production"
     }
-    cacheImage -applicationName $applicationName -imageName $imageName -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    cache-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
