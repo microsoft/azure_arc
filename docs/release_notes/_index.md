@@ -25,7 +25,7 @@ weight: 5
 #### Jumpstart ArcBox
 
 - [Bug fix: azuredeploy.parameters.json file has incorrect names that do not correlate with the azuredeploy.json file #1827](https://github.com/microsoft/azure_arc/issues/1827)
-- [Bug fix: patchesstrategicmerge is deprecated. in kustomize #1840](https://github.com/microsoft/azure_arc/issues/1840)
+- [Bug fix: patchesstrategicmerge is deprecated in kustomize #1840](https://github.com/microsoft/azure_arc/issues/1840)
 - [Bug fix: ArcBox deployment fails #1861](https://github.com/microsoft/azure_arc/issues/1861)
 - [Feature: Move ArcBox VHDs to new Jumpstart blob storage #1839](https://github.com/microsoft/azure_arc/issues/1839)
 - [Docs update: Add Nested VMs credentials to guide #1829](https://github.com/microsoft/azure_arc/issues/1829)
