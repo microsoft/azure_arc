@@ -156,7 +156,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo Fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
             start-sleep -Seconds 60
