@@ -36,11 +36,23 @@ jobs:
         echo $LATEST_TAG
         echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
+    - name: Get latest Production Image Tag
+      id: prodLatestImageTag
+      env:
+        ACR_NAME: ${{ secrets.ACR_NAME }}
+        namespace: "production"
+      run: |
+        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+        PROD_LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
+        echo $PROD_LATEST_TAG
+        echo "latest_tag=$PROD_LATEST_TAG" >> $GITHUB_OUTPUT
+
     - name: Run tests
       uses: mscoutermarsh/ascii-art-action@master
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
-      if: ${{ env.latest_tag != 'v1.0' }}
+        prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       with:
         text: 'Testing complete!'
 
@@ -48,7 +60,8 @@ jobs:
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         namespace: "production"
-      if: ${{ env.latest_tag != 'v1.0' }}
+        prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       run: |
         docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
@@ -57,7 +70,8 @@ jobs:
       uses: actions/checkout@v3
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
-      if: ${{ env.latest_tag != 'v1.0' }}
+        prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       with:
         ref: 'production'
 
@@ -65,7 +79,8 @@ jobs:
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      if: ${{ env.latest_tag != 'v1.0' }}
+        prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       run: |
         FILE_PATH=$(find . -name "seattle.yaml")
         newLine="    image_tag: $latest_tag"
