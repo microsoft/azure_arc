@@ -162,7 +162,7 @@ do {
             start-sleep -Seconds 60
         }
         else{
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo.  Exiting..." -ForegroundColor Red
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo. Exiting." -ForegroundColor Red
             Exit
         }
     }
