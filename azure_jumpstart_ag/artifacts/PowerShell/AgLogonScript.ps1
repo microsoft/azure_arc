@@ -272,41 +272,7 @@ else {
     Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
 
-<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
-#####################################################################
-# Import dashboard reports into Azure Data Explorer
-#####################################################################
-# Get Azure Data Explorer URI
-$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
-
-# Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
-$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
-
-# Prepare authorization header with access token
-$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-
-# Make REST API call to the dashboard endpoint.
-$restApi = "https://dashboards.kusto.windows.net/dashboards"
-
-# Import orders dashboard report
-$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200){
-    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
-    Exit-PSSession
-}
-
-# Import IoT Sensor dashboard report
-$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200){
-    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
-    Exit-PSSession
-}
-#>
-
 ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
-
 $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
 $dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
 $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
@@ -330,6 +296,19 @@ Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/Dat
 # Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
 if (Test-Path -Path $emulatorPath) {
     Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
+}
+
+# Download products.json and stores.json file to use in Data Emulator
+$productsJsonPath = "$dataEmulatorDir\products.json"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/products.json" -OutFile $productsJsonPath
+if (!(Test-Path -Path $productsJsonPath)) {
+    Write-Host "Unabled to download products.json file. Please download manually from GitHub into the data_emulator folder."
+}
+
+$storesJsonPath = "$dataEmulatorDir\stores.json"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/stores.json" -OutFile $storesJsonPath
+if (!(Test-Path -Path $storesJsonPath)) {
+    Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
 }
 
 #####################################################################
