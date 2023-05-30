@@ -131,23 +131,36 @@ Function Invoke-CommandLineTool {
     }
 }
 
-function cache-image {
+
+function Save-K8sImage {
     param (
-        [Parameter(Mandatory = $False,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$applicationName,
+        [Parameter(Mandatory = $True,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True)]
         [string]$imageName,
-
+        [Parameter(Mandatory = $True)]
+        [string]$imageTag,
+        [Parameter(Mandatory = $True)]
         [string]$namespace,
-        [string]$acrname,
-        [string]$branch,
+        [Parameter(Mandatory = $True)]
         [string]$imagePullSecret,
-        [string]$applicationName,
-        [string]$imageTag
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$branch,
+        [Parameter(Mandatory = $True)]
+        [string]$acrName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$context
     )
-
-    $imageToPull = "${acrname}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
-    $yaml = @"
+    $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
+$yaml = @"
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -162,13 +175,12 @@ spec:
         app: images-cache-$imageName
     spec:
       containers:
-        - name: images-cache-$imageName
-          image: $imageToPull
-          imagePullPolicy: IfNotPresent
+      - image: $imageToPull
+        imagePullPolicy: IfNotPresent
+        name: images-cache-$imageName
       imagePullSecrets:
-        - name: $imagePullSecret
+      - name: $imagePullSecret
 "@
-
-$yaml | kubectl apply -f - --context $branch -n $namespace
+    $yaml | kubectl apply -f - --context $context -n $namespace
 
 }
