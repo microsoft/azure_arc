@@ -136,7 +136,7 @@ do {
     $response -notmatch "authentication failed"
 )
 
-Write-Host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor DarkGreen
+Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
 $env:GITHUB_TOKEN=$githubPAT
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 
