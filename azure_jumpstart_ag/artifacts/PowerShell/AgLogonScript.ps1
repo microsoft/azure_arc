@@ -151,7 +151,7 @@ $uri = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/actions/secrets"
 do {
     try {
         $response=Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
-        Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo Fork" -ForegroundColor DarkGreen
+        Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo fork" -ForegroundColor DarkGreen
         $PatAssigned = $true
     }
     catch {
