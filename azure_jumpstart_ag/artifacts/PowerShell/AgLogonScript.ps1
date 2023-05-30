@@ -116,7 +116,7 @@ Write-Host
                 start-sleep -Seconds 60
             }
             else {
-                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist.  Exiting..." -ForegroundColor Red
+                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist. Exiting." -ForegroundColor Red
                 Exit
             }
         }
