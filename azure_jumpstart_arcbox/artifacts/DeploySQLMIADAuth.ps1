@@ -362,23 +362,23 @@ Write-Host "Configuring the primary cluster DAG"
 New-Item -Path "$Env:ArcBoxDir/sqlcerts" -ItemType Directory
 Write-Host "`n"
 kubectx $sqlInstances[0].context
-$primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+$primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc
 Write-Host "`n"
 
 Write-Host "Configuring the secondary cluster DAG"
 Write-Host "`n"
 kubectx $sqlInstances[2].context
-$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc
 Write-Host "`n"
 
 Write-Host "`n"
 kubectx $sqlInstances[0].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[2].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[2].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc
 Write-Host "`n"
 kubectx $sqlInstances[2].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc
 
 $cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
 Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
