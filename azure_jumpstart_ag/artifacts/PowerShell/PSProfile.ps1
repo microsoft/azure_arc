@@ -132,7 +132,7 @@ Function Invoke-CommandLineTool {
 }
 
 
-function save-K8sImage {
+function Save-K8sImage {
     param (
         [Parameter(Mandatory = $True,
             ValueFromPipeline = $True,
