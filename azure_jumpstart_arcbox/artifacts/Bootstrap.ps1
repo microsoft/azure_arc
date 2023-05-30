@@ -142,8 +142,6 @@ foreach ($app in $appsToInstall) {
     
 }
 
-# choco install azure-cli --version="2.47.0" -y
-
 Write-Header "Fetching GitHub Artifacts"
 
 # All flavors
