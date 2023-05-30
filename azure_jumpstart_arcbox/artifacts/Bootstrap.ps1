@@ -122,7 +122,7 @@ if ($flavor -eq "DataOps") {
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light'
+$chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light'
 
 try {
     choco config get cacheLocation
@@ -134,13 +134,15 @@ catch {
 
 Write-Host "Chocolatey Apps Specified"
 
-$appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
 
 foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
     & choco install $app /y -Force | Write-Output
     
 }
+
+choco install azure-cli --version="2.47.0" -y
 
 Write-Header "Fetching GitHub Artifacts"
 
@@ -372,7 +374,7 @@ if ($flavor -eq "DataOps") {
 
     # Clean up Bootstrap.log
     Stop-Transcript
-    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" }
+    $logSuppress = Get-Content $bootstrapLogFile | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
     $logSuppress | Set-Content $bootstrapLogFile -Force
 
     # Restart computer
@@ -399,6 +401,6 @@ else {
     # Clean up Bootstrap.log
     Write-Host "Clean up Bootstrap.log"
     Stop-Transcript
-    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
     $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
 }
