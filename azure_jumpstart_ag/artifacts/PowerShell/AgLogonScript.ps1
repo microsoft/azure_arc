@@ -1232,7 +1232,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 
-        #############################################################
+    #############################################################
     # Install Windows Terminal, WSL2, and Ubuntu
     #############################################################
     Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/17)" -ForegroundColor DarkGreen
@@ -1263,17 +1263,19 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    # Install the prereqs
+    
+    # Install the Windows Terminal prereqs
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
+    
     # Install Windows Terminal
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
     
     # Install Ubuntu
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
     Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
     # Setting WSL environment variables
@@ -1281,7 +1283,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
 
     # Initializing the wsl ubuntu app without requiring user input
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu." -ForegroundColor Gray
     $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
     Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
