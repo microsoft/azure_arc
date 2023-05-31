@@ -687,6 +687,11 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name cache-images -ScriptBlock {
+        while ($workflowStatus.status -ne "completed") {
+            Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+            Start-Sleep -Seconds 10
+            $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+        }
         $cluster = $using:cluster
         $acrName = $using:acrName
         $branch = $cluster.Name.ToLower()
