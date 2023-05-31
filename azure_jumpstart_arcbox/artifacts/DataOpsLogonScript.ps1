@@ -345,8 +345,10 @@ if (-not $ArcServersLogonScript) {
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
-Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+if ($null -ne (Get-ScheduledTask -TaskName "DataOpsLogonScript" -ErrorAction SilentlyContinue)) {
+    Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
+}
+
 Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
