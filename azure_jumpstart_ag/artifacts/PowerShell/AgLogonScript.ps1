@@ -999,6 +999,17 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     }
 
     Get-Job -name gitops | Remove-Job
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Start-Job -Name images-cache-cleanup -ScriptBlock {
+            $cluster = $cluster.Name.ToLower()
+            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
+            kubectl delete namespace "images-cache" --context $cluster
+        }
+    }
+
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 
@@ -1357,14 +1368,13 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-    # Cleaning up images-cache namespace on all clusters
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $cluster = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
-        kubectl delete namespace "images-cache" --context $cluster
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
+    while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
+        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+        Receive-Job -Name images-cache-cleanup -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 60
     }
+    Get-Job -name images-cache-cleanup | Remove-Job
 
     # Removing the LogonScript Scheduled Task
     Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
