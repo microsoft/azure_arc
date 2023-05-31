@@ -1,18 +1,18 @@
 [
   {
-    "storeId": 1,
+    "id": 1,
     "StoreLocation": "Seattle"
   },
   {
-    "storeId": 2,
+    "id": 2,
     "StoreLocation": "Chicago"
   },
   {
-    "storeId": 3,
+    "id": 3,
     "StoreLocation": "Boston"
   },
   {
-    "storeId": 4,
+    "id": 4,
     "StoreLocation": "Dallas"
   }
 ]
