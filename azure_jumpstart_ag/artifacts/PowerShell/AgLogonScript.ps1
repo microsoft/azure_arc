@@ -686,23 +686,27 @@ Write-Host
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $branch = $cluster.Name.ToLower()
-    $context = $cluster.Name.ToLower()
-    $applicationName = "contoso-supermarket"
-    $imageTag = "v1.0"
-    $imagePullSecret = "acr-secret"
-    $namespace = "images-cache"
-    if($branch -eq "chicago"){
-        $branch = "canary"
+    Start-Job -Name cache-images -ScriptBlock {
+        $cluster = $using:cluster
+        $acrName = $using:acrName
+        $branch = $cluster.Name.ToLower()
+        $context = $cluster.Name.ToLower()
+        $applicationName = "contoso-supermarket"
+        $imageTag = "v1.0"
+        $imagePullSecret = "acr-secret"
+        $namespace = "images-cache"
+        if($branch -eq "chicago"){
+            $branch = "canary"
+        }
+        if($branch -eq "seattle"){
+            $branch = "production"
+        }
+        Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
     }
-    if($branch -eq "seattle"){
-        $branch = "production"
-    }
-    Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
@@ -874,6 +878,12 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
+while ($(Get-Job -Name cache-images).State -eq 'Running') {
+    Receive-Job -Name cache-images -WarningAction SilentlyContinue
+    Start-Sleep -Seconds 60
+}
+Get-Job -name cache-images | Remove-Job
+
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
