@@ -50,6 +50,10 @@ jobs:
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
           docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
+          docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag
+          docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag
 
       - name: 'Update Image tag on main branch'
         env:
