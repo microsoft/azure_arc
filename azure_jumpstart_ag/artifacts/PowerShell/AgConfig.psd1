@@ -7,10 +7,7 @@
         AgPowerShellDir   = "C:\Ag\PowerShell"
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
-        AgKVDir           = "C:\Ag\KeyVault"
-        AgGitOpsDir       = "C:\Ag\GitOps"
         AgIconDir         = "C:\Ag\Icons"
-        AgAgentScriptsDir = "C:\Ag\agentScripts"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"
@@ -84,7 +81,8 @@
         'ZainChen.json',
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
-        'mindaro.mindaro'
+        'mindaro.mindaro',
+        'github.vscode-pull-request-github'
     )
 
     # Git branches
@@ -240,6 +238,7 @@
     Namespaces              = @(
         "contoso-supermarket"
         "observability"
+        "images-cache"
     )
 
     AppConfig = @{

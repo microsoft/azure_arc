@@ -191,6 +191,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks") -OutFile "$AgToolsDir\Bookmarks"
 Invoke-WebRequest "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/img/jumpstart_ag.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgTempDir\grafana-freezer-monitoring.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgTempDir\prometheus-additional-scrape-config.yaml"
@@ -289,6 +290,14 @@ If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
   New-Item -Path $AgConfig.EdgeSettingRegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgConfig.EdgeSettingValueFalse -PropertyType DWORD -Force
+
+# Show Favorites Bar in Microsoft Edge
+$Name = 'FavoritesBarEnabled'
+# Create the key if it does not exist
+If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
+  New-Item -Path $AgConfig.EdgeSettingRegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgConfig.EdgeSettingValueTrue -PropertyType DWORD -Force
 
 ##############################################################
 # Installing Posh-SSH PowerShell Module
