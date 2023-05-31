@@ -363,14 +363,14 @@ New-Item -Path "$Env:ArcBoxDir/sqlcerts" -ItemType Directory
 Write-Host "`n"
 kubectx $sqlInstances[0].context
 $primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc
 Write-Host "`n"
 
 Write-Host "Configuring the secondary cluster DAG"
 Write-Host "`n"
 kubectx $sqlInstances[2].context
 $secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc
 Write-Host "`n"
 
 Write-Host "`n"
