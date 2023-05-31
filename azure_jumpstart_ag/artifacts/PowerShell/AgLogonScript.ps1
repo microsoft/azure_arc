@@ -880,7 +880,7 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 while ($(Get-Job -Name cache-images).State -eq 'Running') {
     Receive-Job -Name cache-images -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 60
+    Start-Sleep -Seconds 30
 }
 Get-Job -name cache-images | Remove-Job
 
