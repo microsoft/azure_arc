@@ -25,5 +25,8 @@ az deployment group create --resource-group $Env:resourceGroup --template-file "
 Write-Host "`n"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
-Unregister-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Confirm:$false
+if ($null -ne (Get-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -ErrorAction SilentlyContinue)) {
+  Unregister-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Confirm:$false
+}
+
 Start-Sleep -Seconds 5
