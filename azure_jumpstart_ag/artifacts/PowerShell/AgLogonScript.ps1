@@ -685,33 +685,31 @@ Write-Host
 # Cache contoso-supermarket images on all clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+}
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name cache-images -ScriptBlock {
-        while ($workflowStatus.status -ne "completed") {
-            Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-            Start-Sleep -Seconds 10
-            $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-        }
-        $cluster = $using:cluster
-        $acrName = $using:acrName
-        $branch = $cluster.Name.ToLower()
-        $context = $cluster.Name.ToLower()
-        $applicationName = "contoso-supermarket"
-        $imageTag = "v1.0"
-        $imagePullSecret = "acr-secret"
-        $namespace = "images-cache"
-        if($branch -eq "chicago"){
-            $branch = "canary"
-        }
-        if($branch -eq "seattle"){
-            $branch = "production"
-        }
-        Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-        Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-        Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    $cluster = $using:cluster
+    $acrName = $using:acrName
+    $branch = $cluster.Name.ToLower()
+    $context = $cluster.Name.ToLower()
+    $applicationName = "contoso-supermarket"
+    $imageTag = "v1.0"
+    $imagePullSecret = "acr-secret"
+    $namespace = "images-cache"
+    if($branch -eq "chicago"){
+        $branch = "canary"
     }
+    if($branch -eq "seattle"){
+        $branch = "production"
+    }
+    Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
@@ -883,12 +881,6 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-while ($(Get-Job -Name cache-images).State -eq 'Running') {
-    Receive-Job -Name cache-images -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 30
-}
-Get-Job -name cache-images | Remove-Job
-
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
