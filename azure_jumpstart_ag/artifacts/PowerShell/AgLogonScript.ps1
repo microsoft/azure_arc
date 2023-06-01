@@ -1,35 +1,38 @@
 # Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 
 $ProgressPreference = "SilentlyContinue"
+Set-PSDebug -Strict
 
 #####################################################################
 # Initialize the environment
 #####################################################################
-$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
-$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-$githubAccount = $env:githubAccount
-$githubBranch = $env:githubBranch
-$githubUser = $env:githubUser
-$githubPat = $env:GITHUB_TOKEN
-$resourceGroup = $env:resourceGroup
-$azureLocation = $env:azureLocation
-$spnClientId = $env:spnClientId
-$spnClientSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
-$adminUsername = $env:adminUsername
-$acrName = $Env:acrName.ToLower()
-$cosmosDBName = $Env:cosmosDBName
-$cosmosDBEndpoint = $Env:cosmosDBEndpoint
-$templateBaseUrl = $env:templateBaseUrl
-$appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-$appUpstreamRepo= "https://github.com/microsoft/jumpstart-agora-apps"
-$adxClusterName = $env:adxClusterName
-$namingGuid = $env:namingGuid
-$appsRepo = "jumpstart-agora-apps"
-$adminPassword = $env:adminPassword
-$gitHubAPIBaseUri = "https://api.github.com"
+$AgConfig           = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
+$configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
+$githubAccount      = $env:githubAccount
+$githubBranch       = $env:githubBranch
+$githubUser         = $env:githubUser
+$githubPat          = $env:GITHUB_TOKEN
+$resourceGroup      = $env:resourceGroup
+$azureLocation      = $env:azureLocation
+$spnClientId        = $env:spnClientId
+$spnClientSecret    = $env:spnClientSecret
+$spnTenantId        = $env:spnTenantId
+$adminUsername      = $env:adminUsername
+$acrName            = $Env:acrName.ToLower()
+$cosmosDBName       = $Env:cosmosDBName
+$cosmosDBEndpoint   = $Env:cosmosDBEndpoint
+$templateBaseUrl    = $env:templateBaseUrl
+$appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+$adxClusterName     = $env:adxClusterName
+$namingGuid         = $env:namingGuid
+$appsRepo           = "jumpstart-agora-apps"
+$adminPassword      = $env:adminPassword
+$gitHubAPIBaseUri   = "https://api.github.com"
+$workflowStatus     = ""
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -37,6 +40,10 @@ $startTime = Get-Date
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
+
+# Force TLS 1.2 for connections to prevent TLS/SSL errors
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 
 #####################################################################
 # Setup Azure CLI
@@ -290,16 +297,15 @@ Write-Host
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/17)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
-    $IoTHubHostName = $env:iotHubHostName
-    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
-    gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+    $iotHubHostName = $env:iotHubHostName
+    $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
-        $deviceId = $site.FriendlyName
-        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-        gh secret set "sas_token_$deviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        foreach ($device in $site.IoTDevices){
+            $deviceId = "$device-$($site.FriendlyName)"
+            Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        }
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
     Write-Host
@@ -875,6 +881,8 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
+
+#  TODO - this looks app-specific so should perhaps be moved to the app loop 
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
@@ -883,23 +891,51 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name gitops -ScriptBlock {
-        $AgConfig = $using:AgConfig
-        $cluster = $using:cluster
-        $namingGuid = $using:namingGuid
-        $resourceGroup = $using:resourceGroup
-        $appClonedRepo = $using:appClonedRepo
+        
+        Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+            # Force TLS 1.2 for connections to prevent TLS/SSL errors
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            
+            $response = Invoke-RestMethod -Uri $githubApiUrl
+            $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+            $fileUrls | ForEach-Object {
+                $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+                $outputFile = Join-Path $folderPath $fileName
+                Invoke-RestMethod -Uri $_ -OutFile $outputFile
+            }
+        
+            If (-not $excludeFolders) {
+                $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+                    $folderName = $_.name
+                    $path = Join-Path $folderPath $folderName
+                    New-Item $path -ItemType Directory -Force -ErrorAction Continue
+                    Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+                }
+            }
+        }
+        
+        $AgConfig       = $using:AgConfig
+        $cluster        = $using:cluster
+        $site           = $cluster.Value
+        $siteName       = $site.FriendlyName.ToLower()
+        $namingGuid     = $using:namingGuid
+        $resourceGroup  = $using:resourceGroup
+        $appClonedRepo  = $using:appClonedRepo
+        $appsRepo       = $using:appsRepo
+        
         $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
-            $app = $_
-            $store = $cluster.value.Branch.ToLower()
+            $app         = $_
+            $store       = $cluster.value.Branch.ToLower()
             $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-            $branch = $cluster.value.Branch.ToLower()
-            $configName = $app.value.GitOpsConfigName.ToLower()
+            $branch      = $cluster.value.Branch.ToLower()
+            $configName  = $app.value.GitOpsConfigName.ToLower()
             $clusterType = $cluster.value.Type
-            $namespace = $app.value.Namespace
-            $appName = $app.Value.KustomizationName
-            $appPath = $app.Value.KustomizationPath
-            $retryCount = 0
-            $maxRetries = 2
+            $namespace   = $app.value.Namespace
+            $appName     = $app.Value.KustomizationName
+            $appPath     = $app.Value.KustomizationPath
+            $retryCount  = 0
+            $maxRetries  = 2
+
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -915,8 +951,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             # Wait for Kubernetes API server to become available
             $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
             $apiServerAddress = $apiServer -replace '.*https://| .*$'
-            $apiServerFqdn = ($apiServerAddress -split ":")[0]
-            $apiServerPort = ($apiServerAddress -split ":")[1]
+            $apiServerFqdn    = ($apiServerAddress -split ":")[0]
+            $apiServerPort    = ($apiServerAddress -split ":")[1]
 
             do {
                 $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
@@ -927,14 +963,53 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Start-Sleep -Seconds 5
                 }
             } while ($true)
-
+            If ($app.Value.ConfigMaps){
+                # download the config files
+                foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
+                    $repoPath     = $configMap.value.RepoPath
+                    $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
+                    $iotHubName   = $env:iotHubHostName.replace(".azure-devices.net", "")
+                    $gitHubUser   = $env:gitHubUser
+                    $githubBranch = $env:githubBranch
+                    
+                    New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+                    
+                    $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
+                    Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
+                    
+                    # replace the IoT Hub name and the SAS Tokens with the deployment specific values
+                    # this is a one-off for the broker, but needs to be generalized if/when another app needs it
+                    If ($configMap.Name -eq "mqtt-broker-config"){
+                        $configFile = "$configPath\mosquitto.conf"
+                        $update     = (Get-Content $configFile -Raw) 
+                        $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
+                        
+                        foreach ($device in $site.IoTDevices) {
+                            $deviceId = "$device-$($site.FriendlyName)"
+                            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
+                            $update = $update -replace "Chicago", $site.FriendlyName
+                            $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
+                        }
+                        
+                        $update | Set-Content $configFile
+                    }
+                    
+                    # create the namespace if needed
+                    If (-not (kubectl get namespace $namespace --context $siteName)){
+                        kubectl create namespace $namespace --context $siteName
+                    }
+                    # create the configmap
+                    kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
+                }
+            }
+            
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
                 --resource-group $resourceGroup `
                 --name $configName `
                 --cluster-type $type `
                 --url $appClonedRepo `
-                --branch $Branch `
+                --branch $branch `
                 --sync-interval 5s `
                 --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
                 --timeout 10m `
@@ -974,7 +1049,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         --name $configName `
                         --cluster-type $type `
                         --url $appClonedRepo `
-                        --branch $Branch `
+                        --branch $branch `
                         --sync-interval 5s `
                         --kustomization name=$appName path=$appPath/$store prune=true `
                         --timeout 30m `
@@ -1231,17 +1306,19 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    # Install the prereqs
+    
+    # Install the Windows Terminal prereqs
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
+    
     # Install Windows Terminal
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
     
     # Install Ubuntu
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
     Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
     # Setting WSL environment variables
@@ -1249,7 +1326,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
 
     # Initializing the wsl ubuntu app without requiring user input
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu." -ForegroundColor Gray
     $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
     Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
