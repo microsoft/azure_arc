@@ -691,8 +691,6 @@ while ($workflowStatus.status -ne "completed") {
     $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
 }
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $cluster = $using:cluster
-    $acrName = $using:acrName
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
     $applicationName = "contoso-supermarket"
