@@ -310,6 +310,7 @@
                     RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
                 }
             }
+            Order = 7
         }
     }
 }
