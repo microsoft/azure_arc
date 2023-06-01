@@ -1009,9 +1009,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Cleaning up images-cache namespace on all clusters
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name images-cache-cleanup -ScriptBlock {
-            $cluster = $cluster.Name.ToLower()
-            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
-            kubectl delete namespace "images-cache" --context $cluster
+            $cluster = $using:cluster
+            $clusterName = $cluster.Name.ToLower()
+            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+            kubectl delete namespace "images-cache" --context $clusterName
         }
     }
 
