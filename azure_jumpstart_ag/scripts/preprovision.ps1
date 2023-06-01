@@ -123,7 +123,6 @@ azd env set JS_SSH_RSA_PUBLIC_KEY $JS_SSH_RSA_PUBLIC_KEY
 ########################################################################
 # Create Azure Service Principal
 ########################################################################
-# TODO - consider moving SPN creation to Bicep
 Write-Host "Creating Azure Service Principal..."
 # Install Azure module if not already installed
 if (-not (Get-Command -Name Get-AzContext)) {
@@ -137,8 +136,6 @@ if (-not (Get-AzContext)) {
 }
 
 $uniqueSpnName = "jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
-# TODO - check for success and exit if failure
-#        provide instructions for getting the correct permissions
 try {
     $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
 }
