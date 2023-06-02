@@ -353,6 +353,15 @@ if (!(Test-Path -Path $storesJsonPath)) {
     Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
 }
 
+# Create desktop shortcut
+$shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
+$shortcut.IconLocation="$AgIconsDir\dashboard.ico, 0"
+$shortcut.WindowStyle = 7
+$shortcut.Save()
+
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
