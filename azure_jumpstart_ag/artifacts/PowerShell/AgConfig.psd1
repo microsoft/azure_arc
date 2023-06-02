@@ -231,7 +231,7 @@
         Namespace  = "observability"
         ProdURL    = "http://localhost:3000"
         Dashboards = @{
-            "grafana.com" = @('') # Dashboards from https://grafana.com/grafana/dashboards
+            "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
             "custom"      = @('freezer-monitoring','node-exporter-full') # Dashboards from https://github.com/microsoft/azure_arc/tree/jumpstart_ag/azure_jumpstart_ag/artifacts/monitoring
         }
     }
