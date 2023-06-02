@@ -353,12 +353,19 @@ if (!(Test-Path -Path $storesJsonPath)) {
     Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
 }
 
+# Download icon file
+$iconPath = "$AgIconsDir\dashboard.ico"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/dashboard.ico" -OutFile $iconPath
+if (!(Test-Path -Path $iconPath)) {
+    Write-Host "Unabled to download dashboard.ico file. Please download manually from GitHub into the $AgIconsDir folder."
+}
+
 # Create desktop shortcut
 $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
-$shortcut.IconLocation="$AgIconsDir\dashboard.ico, 0"
+$shortcut.IconLocation="$iconPath, 0"
 $shortcut.WindowStyle = 7
 $shortcut.Save()
 
