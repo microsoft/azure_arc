@@ -60,6 +60,38 @@ param (
 $ErrorActionPreference = 'Continue'
 
 ##############################################################
+# Change RDP Port
+##############################################################
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
+  Write-Host "Configuring RDP port number to $rdpPort"
+  $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+  $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+  Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+  # RDP port
+  $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+  Write-Host "Current RDP PortNumber: $portNumber"
+  if (!($portNumber -eq $rdpPort)) {
+    Write-Host Setting RDP PortNumber to $rdpPort
+    Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+    Restart-Service TermService -force
+  }
+
+  #Setup firewall rules
+  if ($rdpPort -eq 3389) {
+    netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+  } 
+  else {
+    $systemroot = get-content env:systemroot
+    netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+  }
+
+  Write-Host "RDP port configuration complete."
+}
+
+
+##############################################################
 # Download configuration data file and declaring directories 
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
@@ -213,7 +245,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
     catch {
       Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URL.chocoInstallScriptUrl))
+      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
     }
     
     Write-Host "Chocolatey packages specified"
@@ -308,37 +340,6 @@ Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminU
 # Disabling Windows Server Manager Scheduled Task
 ##############################################################
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-
-##############################################################
-# Change RDP Port
-##############################################################
-Write-Host "RDP port number from configuration is $rdpPort"
-if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
-  Write-Host "Configuring RDP port number to $rdpPort"
-  $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
-  $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
-  Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
-
-  # RDP port
-  $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
-  Write-Host "Current RDP PortNumber: $portNumber"
-  if (!($portNumber -eq $rdpPort)) {
-    Write-Host Setting RDP PortNumber to $rdpPort
-    Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
-    Restart-Service TermService -force
-  }
-
-  #Setup firewall rules
-  if ($rdpPort -eq 3389) {
-    netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-  } 
-  else {
-    $systemroot = get-content env:systemroot
-    netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
-  }
-
-  Write-Host "RDP port configuration complete."
-}
 
 ##############################################################
 # Install Hyper-V, WSL and reboot
