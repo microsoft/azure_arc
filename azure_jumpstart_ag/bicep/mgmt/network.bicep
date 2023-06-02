@@ -158,7 +158,20 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
           destinationAddressPrefix: '*'
           destinationPortRange: '5000'
         }
-      }    
+      }
+      {
+        name: 'allow_pos_81'
+        properties: {
+          priority: 1007
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '81'
+        }
+      }       
     ]
   }
 }
