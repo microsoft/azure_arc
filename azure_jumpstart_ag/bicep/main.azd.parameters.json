@@ -27,10 +27,19 @@
       "value": false
     },
     "githubPAT": {
-      "value": ""
+      "value": "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"
     },
     "githubUser": {
-      "value": ""
+      "value": "charris-msft"
+    },
+    "githubAccount": {
+      "value": "charris-msft"
+    },
+    "githubBranch": {
+      "value": "urls"
+    },
+    "rdpPort": {
+      "value": "13389"
     }
   }
 }
