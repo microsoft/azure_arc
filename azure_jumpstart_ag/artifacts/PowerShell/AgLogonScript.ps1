@@ -1,34 +1,38 @@
 # Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 
 $ProgressPreference = "SilentlyContinue"
+Set-PSDebug -Strict
 
 #####################################################################
 # Initialize the environment
 #####################################################################
-$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
-$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-$githubAccount = $env:githubAccount
-$githubBranch = $env:githubBranch
-$githubUser = $env:githubUser
-$githubPat = $env:GITHUB_TOKEN
-$resourceGroup = $env:resourceGroup
-$azureLocation = $env:azureLocation
-$spnClientId = $env:spnClientId
-$spnClientSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
-$adminUsername = $env:adminUsername
-$acrName = $Env:acrName.ToLower()
-$cosmosDBName = $Env:cosmosDBName
-$cosmosDBEndpoint = $Env:cosmosDBEndpoint
-$templateBaseUrl = $env:templateBaseUrl
-$appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-$adxClusterName = $env:adxClusterName
-$namingGuid = $env:namingGuid
-$appsRepo = "jumpstart-agora-apps"
-$adminPassword = $env:adminPassword
-$gitHubAPIBaseUri = "https://api.github.com"
+$AgConfig           = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
+$configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
+$githubAccount      = $env:githubAccount
+$githubBranch       = $env:githubBranch
+$githubUser         = $env:githubUser
+$githubPat          = $env:GITHUB_TOKEN
+$resourceGroup      = $env:resourceGroup
+$azureLocation      = $env:azureLocation
+$spnClientId        = $env:spnClientId
+$spnClientSecret    = $env:spnClientSecret
+$spnTenantId        = $env:spnTenantId
+$adminUsername      = $env:adminUsername
+$acrName            = $Env:acrName.ToLower()
+$cosmosDBName       = $Env:cosmosDBName
+$cosmosDBEndpoint   = $Env:cosmosDBEndpoint
+$templateBaseUrl    = $env:templateBaseUrl
+$appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+$adxClusterName     = $env:adxClusterName
+$namingGuid         = $env:namingGuid
+$appsRepo           = "jumpstart-agora-apps"
+$adminPassword      = $env:adminPassword
+$gitHubAPIBaseUri   = "https://api.github.com"
+$workflowStatus     = ""
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -36,6 +40,10 @@ $startTime = Get-Date
 
 # Disable Windows firewall
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
+
+# Force TLS 1.2 for connections to prevent TLS/SSL errors
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 
 #####################################################################
 # Setup Azure CLI
@@ -98,7 +106,7 @@ Write-Host
 #####################################################################
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 3/17)" -ForegroundColor DarkGreen
     Set-Location $AgAppsRepo
-    Write-Host "INFO: Checking if the jumpstart-agora-apps repository is forked" -ForegroundColor Gray
+    Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
     $retryCount = 0
     $maxRetries = 5
     do {
@@ -110,12 +118,12 @@ Write-Host
         }
         catch {
             if($retryCount -lt $maxRetries) {
-                Write-Host "ERROR: $githubUser/jumpstart-agora-apps Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed....waiting 45 seconds" -ForegroundColor Red
+                Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed . . . waiting 60 seconds" -ForegroundColor Red
                 $retryCount++
-                start-sleep -Seconds 45
+                start-sleep -Seconds 60
             }
             else {
-                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/jumpstart-agora-apps Fork doesn't exist.  Exiting..." -ForegroundColor Red
+                Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist. Exiting." -ForegroundColor Red
                 Exit
             }
         }
@@ -134,29 +142,45 @@ do {
 } until (
     $response -notmatch "authentication failed"
 )
+
+Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
 $env:GITHUB_TOKEN=$githubPAT
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
-write-host "INFO: The GitHub Personal access token is valid...Proceeding" -ForegroundColor Gray
 
-git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
-Set-Location "$AgAppsRepo\$appsRepo"
-New-Item -ItemType Directory ".github/workflows" -Force
-Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
-gh repo set-default "$githubUser/$appsRepo"
-gh secret set "SPN_CLIENT_ID" -b $spnClientID
-gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-gh secret set "ACR_NAME" -b $acrName
-gh secret set "PAT_GITHUB" -b $githubPat
-gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
 $headers = @{
     Authorization  = "token $githubPat"
     "Content-Type" = "application/json"
 }
+$retryCount = 0
+$maxRetries = 5
+$uri = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/actions/secrets"
+do {
+    try {
+        $response=Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
+        Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo fork" -ForegroundColor DarkGreen
+        $PatAssigned = $true
+    }
+    catch {
+        if($retryCount -lt $maxRetries) {
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            $PatAssigned = $false
+            $retryCount++
+            start-sleep -Seconds 60
+        }
+        else{
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo. Exiting." -ForegroundColor Red
+            Exit
+        }
+    }
+} until ($PatAssigned -eq $true)
+
+
+Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
+git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
+Set-Location "$AgAppsRepo\$appsRepo"
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
 $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
 foreach ($branch in $protectedBranches) {
     $branchName = $branch.name
@@ -168,8 +192,27 @@ foreach ($branch in $protectedBranches) {
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
 git config --global user.name "Agora Dev"
-git fetch
+git remote add upstream $appUpstreamRepo
+git fetch upstream
+git checkout main
+git reset --hard upstream/main
+git push origin main -f
 git pull
+git remote remove upstream
+git remote add upstream $appsRepo
+
+write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
+New-Item -ItemType Directory ".github/workflows" -Force
+Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
+Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
+gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
+gh repo set-default "$githubUser/$appsRepo"
+gh secret set "SPN_CLIENT_ID" -b $spnClientID
+gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
+gh secret set "ACR_NAME" -b $acrName
+gh secret set "PAT_GITHUB" -b $githubPat
+gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
+gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
@@ -254,16 +297,15 @@ Write-Host
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/17)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
-    $IoTHubHostName = $env:iotHubHostName
-    $IoTHubName = $IoTHubHostName.replace(".azure-devices.net", "")
-    gh secret set "IOTHUB_HOSTNAME" -b $IoTHubHostName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+    $iotHubHostName = $env:iotHubHostName
+    $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
-        $deviceId = $site.FriendlyName
-        az iot hub device-identity create --device-id $deviceId --edge-enabled --hub-name $IoTHubName --resource-group $resourceGroup | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
-        $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $IoTHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-        gh secret set "sas_token_$deviceId" -b $deviceSASToken #| Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        foreach ($device in $site.IoTDevices){
+            $deviceId = "$device-$($site.FriendlyName)"
+            Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+        }
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
     Write-Host
@@ -272,41 +314,7 @@ else {
     Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
 }
 
-<# THIS CODE IS TEMPORARY COMMENTED DUE TO IMPORT ISSUES WITH SPN.
-#####################################################################
-# Import dashboard reports into Azure Data Explorer
-#####################################################################
-# Get Azure Data Explorer URI
-$adxEndPoint = (az kusto cluster show --name $adxClusterName --resource-group $resourceGroup --query "uri" -o tsv)
-
-# Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
-$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
-
-# Prepare authorization header with access token
-$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-
-# Make REST API call to the dashboard endpoint.
-$restApi = "https://dashboards.kusto.windows.net/dashboards"
-
-# Import orders dashboard report
-$ordersDashboardBody = (Get-Content -Path .\adx-dashboard-orders-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $ordersDashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200){
-    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer"
-    Exit-PSSession
-}
-
-# Import IoT Sensor dashboard report
-$iotSensorsDashboardBody = (Get-Content -Path .\adx-dashboard-iotsensor-payload.json) -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-$httpResponse = Invoke-WebRequest -Method Post -Uri $restApi -Body $iotSensorsDashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200){
-    Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer"
-    Exit-PSSession
-}
-#>
-
 ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
-
 $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
 $dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
 $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
@@ -330,6 +338,19 @@ Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/Dat
 # Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
 if (Test-Path -Path $emulatorPath) {
     Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
+}
+
+# Download products.json and stores.json file to use in Data Emulator
+$productsJsonPath = "$dataEmulatorDir\products.json"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/products.json" -OutFile $productsJsonPath
+if (!(Test-Path -Path $productsJsonPath)) {
+    Write-Host "Unabled to download products.json file. Please download manually from GitHub into the data_emulator folder."
+}
+
+$storesJsonPath = "$dataEmulatorDir\stores.json"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/stores.json" -OutFile $storesJsonPath
+if (!(Test-Path -Path $storesJsonPath)) {
+    Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
 }
 
 #####################################################################
@@ -653,13 +674,12 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -Foregrou
 $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
     foreach ($namespace in $AgConfig.Namespaces) {
         if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating Cosmos DB Kubernetes secrets on $clusterName" -ForegroundColor Gray
             kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitHub personal access token Kubernetes secret on $clusterName" -ForegroundColor Gray
             kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }
     }
@@ -668,14 +688,28 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete
 Write-Host
 
 #####################################################################
-# Cache images on all clusters
+# Cache contoso-supermarket images on all clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    cache-image -imageName "contosoai" -namespace "contoso-supermarket" -acrName $acrName -branch $clusterName -imagePullSecret "acr-secret" -applicationName "contoso-supermarket" -imageTag "v1.0"
+    $branch = $cluster.Name.ToLower()
+    $context = $cluster.Name.ToLower()
+    $applicationName = "contoso-supermarket"
+    $imageTag = "v1.0"
+    $imagePullSecret = "acr-secret"
+    $namespace = "images-cache"
+    if($branch -eq "chicago"){
+        $branch = "canary"
+    }
+    if($branch -eq "seattle"){
+        $branch = "production"
+    }
+    Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
-
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
@@ -847,6 +881,8 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 # Configuring applications on the clusters using GitOps
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
+
+#  TODO - this looks app-specific so should perhaps be moved to the app loop 
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
@@ -855,23 +891,51 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name gitops -ScriptBlock {
-        $AgConfig = $using:AgConfig
-        $cluster = $using:cluster
-        $namingGuid = $using:namingGuid
-        $resourceGroup = $using:resourceGroup
-        $appClonedRepo = $using:appClonedRepo
+        
+        Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+            # Force TLS 1.2 for connections to prevent TLS/SSL errors
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            
+            $response = Invoke-RestMethod -Uri $githubApiUrl
+            $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+            $fileUrls | ForEach-Object {
+                $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+                $outputFile = Join-Path $folderPath $fileName
+                Invoke-RestMethod -Uri $_ -OutFile $outputFile
+            }
+        
+            If (-not $excludeFolders) {
+                $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+                    $folderName = $_.name
+                    $path = Join-Path $folderPath $folderName
+                    New-Item $path -ItemType Directory -Force -ErrorAction Continue
+                    Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+                }
+            }
+        }
+        
+        $AgConfig       = $using:AgConfig
+        $cluster        = $using:cluster
+        $site           = $cluster.Value
+        $siteName       = $site.FriendlyName.ToLower()
+        $namingGuid     = $using:namingGuid
+        $resourceGroup  = $using:resourceGroup
+        $appClonedRepo  = $using:appClonedRepo
+        $appsRepo       = $using:appsRepo
+        
         $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
-            $app = $_
-            $store = $cluster.value.Branch.ToLower()
+            $app         = $_
+            $store       = $cluster.value.Branch.ToLower()
             $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-            $branch = $cluster.value.Branch.ToLower()
-            $configName = $app.value.GitOpsConfigName.ToLower()
+            $branch      = $cluster.value.Branch.ToLower()
+            $configName  = $app.value.GitOpsConfigName.ToLower()
             $clusterType = $cluster.value.Type
-            $namespace = $app.value.Namespace
-            $appName = $app.Value.KustomizationName
-            $appPath = $app.Value.KustomizationPath
-            $retryCount = 0
-            $maxRetries = 1
+            $namespace   = $app.value.Namespace
+            $appName     = $app.Value.KustomizationName
+            $appPath     = $app.Value.KustomizationPath
+            $retryCount  = 0
+            $maxRetries  = 2
+
             Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
             if ($clusterType -eq "AKS") {
                 $type = "managedClusters"
@@ -887,8 +951,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             # Wait for Kubernetes API server to become available
             $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
             $apiServerAddress = $apiServer -replace '.*https://| .*$'
-            $apiServerFqdn = ($apiServerAddress -split ":")[0]
-            $apiServerPort = ($apiServerAddress -split ":")[1]
+            $apiServerFqdn    = ($apiServerAddress -split ":")[0]
+            $apiServerPort    = ($apiServerAddress -split ":")[1]
 
             do {
                 $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
@@ -899,17 +963,56 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Start-Sleep -Seconds 5
                 }
             } while ($true)
-
+            If ($app.Value.ConfigMaps){
+                # download the config files
+                foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
+                    $repoPath     = $configMap.value.RepoPath
+                    $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
+                    $iotHubName   = $env:iotHubHostName.replace(".azure-devices.net", "")
+                    $gitHubUser   = $env:gitHubUser
+                    $githubBranch = $env:githubBranch
+                    
+                    New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+                    
+                    $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
+                    Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
+                    
+                    # replace the IoT Hub name and the SAS Tokens with the deployment specific values
+                    # this is a one-off for the broker, but needs to be generalized if/when another app needs it
+                    If ($configMap.Name -eq "mqtt-broker-config"){
+                        $configFile = "$configPath\mosquitto.conf"
+                        $update     = (Get-Content $configFile -Raw) 
+                        $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
+                        
+                        foreach ($device in $site.IoTDevices) {
+                            $deviceId = "$device-$($site.FriendlyName)"
+                            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
+                            $update = $update -replace "Chicago", $site.FriendlyName
+                            $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
+                        }
+                        
+                        $update | Set-Content $configFile
+                    }
+                    
+                    # create the namespace if needed
+                    If (-not (kubectl get namespace $namespace --context $siteName)){
+                        kubectl create namespace $namespace --context $siteName
+                    }
+                    # create the configmap
+                    kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
+                }
+            }
+            
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
                 --resource-group $resourceGroup `
                 --name $configName `
                 --cluster-type $type `
                 --url $appClonedRepo `
-                --branch $Branch `
+                --branch $branch `
                 --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true `
-                --timeout 30m `
+                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+                --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -917,12 +1020,11 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             do {
                 $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
                 if ($configStatus.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is compliant on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
                 else {
                     if($configStatus.ComplianceState -ne "Non-compliant"){
-                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is not yet ready on $clusterName...waiting 45 seconds" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        Start-Sleep -Seconds 45
+                        Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         $retryCount++
@@ -947,7 +1049,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         --name $configName `
                         --cluster-type $type `
                         --url $appClonedRepo `
-                        --branch $Branch `
+                        --branch $branch `
                         --sync-interval 5s `
                         --kustomization name=$appName path=$appPath/$store prune=true `
                         --timeout 30m `
@@ -1204,17 +1306,19 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
     Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    # Install the prereqs
+    
+    # Install the Windows Terminal prereqs
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
+    
     # Install Windows Terminal
     foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
         Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
     }
     
     # Install Ubuntu
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
     Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
     # Setting WSL environment variables
@@ -1222,7 +1326,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
 
     # Initializing the wsl ubuntu app without requiring user input
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu." -ForegroundColor Gray
     $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
     Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 
@@ -1251,7 +1354,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $arguments = 'install --quiet --accept-license'
     Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
     Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-    Copy-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker Desktop\settings.json" -Force
     Copy-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
     Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Docker.log")
     Start-Sleep -Seconds 10
@@ -1330,6 +1432,15 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $cluster = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
+        kubectl delete namespace "images-cache" --context $cluster
+    }
 
     # Removing the LogonScript Scheduled Task
     Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
