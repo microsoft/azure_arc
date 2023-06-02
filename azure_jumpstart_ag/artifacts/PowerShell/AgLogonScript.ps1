@@ -1392,7 +1392,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
         $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
     
-        # First matching service: pos
+        # Matching url: pos - customer
         $matchingServices = $services.items | Where-Object {
             $_.spec.ports.port -contains 5000 -and
             $_.spec.type -eq "LoadBalancer"
@@ -1403,15 +1403,34 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $output = "http://$posIp" + ':5000'
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
     
-            # Replace matching value in a bookmarks.json
+            # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+    
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: pos - manager
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 81 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+    
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':81'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+    
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
             $newContent | Set-Content -Path $bookmarksFileName
     
             Start-Sleep -Seconds 2
         }
     
-        # Second matching service: prometheus-grafana
+        # Matching url: prometheus-grafana
         if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
             $matchingServices = $services.items | Where-Object {
                 $_.metadata.name -eq 'prometheus-grafana'
@@ -1422,7 +1441,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 $output = "http://$grafanaIp"
                 $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
     
-                # Replace matching value in a bookmarks.json
+                # Replace matching value in the Bookmarks file
                 $content = Get-Content -Path $bookmarksFileName
                 $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
                 $newContent | Set-Content -Path $bookmarksFileName
@@ -1431,6 +1450,19 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             }
         }
     }
+
+        # Matching url: Agora apps forked repo
+        $output = $appClonedRepo
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
+        $newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
+
     Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
 
     ##############################################################
