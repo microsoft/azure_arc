@@ -1080,7 +1080,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #####################################################################
     # Deploy Kubernetes Prometheus Stack for Observability
     #####################################################################
-    $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
     $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
     $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
     $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -1126,7 +1126,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
     # Download dashboards
     foreach ($dashboard in $observabilityDashboards.'grafana.com') {
-        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+        $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
         $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
         $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
         Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
@@ -1161,7 +1161,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
         # Install Prometheus Operator
         $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
-        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         Do {
             Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
@@ -1190,7 +1190,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
         # Add dashboards
         foreach ($dashboard in $observabilityDashboardstoImport) {
-            $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+            $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
                 "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
