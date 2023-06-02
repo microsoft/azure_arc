@@ -354,7 +354,7 @@ if (!(Test-Path -Path $storesJsonPath)) {
 }
 
 # Create desktop shortcut
-$shortcutLocation = "$Env:Public\Desktop\Orders Dashboard Data Emulator.lnk"
+$shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
