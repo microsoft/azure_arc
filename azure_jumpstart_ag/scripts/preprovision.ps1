@@ -135,7 +135,8 @@ if (-not (Get-AzContext)) {
     Connect-AzAccount
 }
 
-$uniqueSpnName = "jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
+$user = (get-azcontext).Account.Id.split("@")[0]
+$uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
 try {
     $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
 }
