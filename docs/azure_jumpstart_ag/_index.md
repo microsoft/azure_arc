@@ -25,7 +25,7 @@ Each Agora scenario includes a comprehensive deployment stack, all the way from 
 To achieve the goal of providing end-to-end “cloud to edge" hands-on experience, each Agora scenario incorporate application development concepts and delivery models, all as part of driving towards showing how developers can implement edge-based applications while increasing velocity. Our aspiration is for each scenario to have as many of the below concepts and design patterns.
 
 - Distributed applications and cloud services integration
-- Service discoverability
+- Service discovery
 - Performance
 - Data plane design
 - Scalability
