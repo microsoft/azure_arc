@@ -1255,15 +1255,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             # Make HTTP request to the API
             Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-            # Creating Grafana Icon on Desktop
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana Icon." -ForegroundColor Gray
-            $shortcutLocation = "$env:USERPROFILE\Desktop\$($_.Value.FriendlyName) Grafana.lnk"
-            $wScriptShell = New-Object -ComObject WScript.Shell
-            $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-            $shortcut.TargetPath = "http://$monitorLBIP"
-            $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-            $shortcut.WindowStyle = 3
-            $shortcut.Save()
         }
     }
 
@@ -1278,18 +1269,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
     # Make HTTP request to the API
     Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    #############################################################
-    # Creating Prod Grafana Icon on Desktop
-    #############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
-    $shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
-    $wScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-    $shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
-    $shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
 
     #############################################################
     # Install Windows Terminal, WSL2, and Ubuntu
