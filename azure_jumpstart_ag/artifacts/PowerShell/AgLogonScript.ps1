@@ -353,6 +353,22 @@ if (!(Test-Path -Path $storesJsonPath)) {
     Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
 }
 
+# Download icon file
+$iconPath = "$AgIconsDir\dashboard.ico"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/dashboard.ico" -OutFile $iconPath
+if (!(Test-Path -Path $iconPath)) {
+    Write-Host "Unabled to download dashboard.ico file. Please download manually from GitHub into the icons folder."
+}
+
+# Create desktop shortcut
+$shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
+$shortcut.IconLocation="$iconPath, 0"
+$shortcut.WindowStyle = 7
+$shortcut.Save()
+
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
@@ -1097,7 +1113,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     #####################################################################
     # Deploy Kubernetes Prometheus Stack for Observability
     #####################################################################
-    $AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
     $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
     $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
     $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
@@ -1143,7 +1159,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
     # Download dashboards
     foreach ($dashboard in $observabilityDashboards.'grafana.com') {
-        $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+        $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
         $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
         $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
         Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
@@ -1178,7 +1194,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
         # Install Prometheus Operator
         $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
-        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgTempDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         Do {
             Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
@@ -1207,7 +1223,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
         # Add dashboards
         foreach ($dashboard in $observabilityDashboardstoImport) {
-            $grafanaDBPath = "$AgTempDir\grafana-$dashboard.json"
+            $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
                 "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
@@ -1393,7 +1409,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
         $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
     
-        # First matching service: pos
+        # Matching url: pos - customer
         $matchingServices = $services.items | Where-Object {
             $_.spec.ports.port -contains 5000 -and
             $_.spec.type -eq "LoadBalancer"
@@ -1404,15 +1420,34 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             $output = "http://$posIp" + ':5000'
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
     
-            # Replace matching value in a bookmarks.json
+            # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+    
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: pos - manager
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 81 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+    
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':81'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+    
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
             $newContent | Set-Content -Path $bookmarksFileName
     
             Start-Sleep -Seconds 2
         }
     
-        # Second matching service: prometheus-grafana
+        # Matching url: prometheus-grafana
         if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
             $matchingServices = $services.items | Where-Object {
                 $_.metadata.name -eq 'prometheus-grafana'
@@ -1423,7 +1458,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 $output = "http://$grafanaIp"
                 $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
     
-                # Replace matching value in a bookmarks.json
+                # Replace matching value in the Bookmarks file
                 $content = Get-Content -Path $bookmarksFileName
                 $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
                 $newContent | Set-Content -Path $bookmarksFileName
@@ -1432,6 +1467,19 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             }
         }
     }
+
+        # Matching url: Agora apps forked repo
+        $output = $appClonedRepo
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
+        $newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
+
     Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
 
     ##############################################################
