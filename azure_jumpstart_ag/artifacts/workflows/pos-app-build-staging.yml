@@ -6,6 +6,10 @@ on:
             - main
         types:
             - closed
+        paths:
+        - 'contoso_supermarket/developer/pos/**'
+        - 'contoso_supermarket/operations/contoso_supermarket/releases/contosoai/**'
+        - 'contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend/**'
 
   workflow_dispatch: {}
 
@@ -22,6 +26,8 @@ jobs:
       # checkout the repo
       - name: 'Checkout repository'
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: 'Login to ACR'
         uses: azure/docker-login@v1
@@ -42,18 +48,36 @@ jobs:
           echo $NEW_VERSION
           echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v36
+        with:
+          dir_names: true
+
       - name: 'Build and push new images'
         env:
           latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         run: |
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag
-          docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag
+          for file in ${{ steps.changed-files-specific.outputs.all_changed_and_modified_files }}; do
+            if [$file == "contoso_supermarket/developer/pos"]; then
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
+            fi
+            if [$file == "contoso_supermarket/operations/contoso_supermarket/releases/contosoai"]; then
+              docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/contosoai:$latest_tag
+              docker build ./contoso_supermarket/developer/ai/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/contosoai:$latest_tag
+            fi
+            if [$file == "contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend"]; then
+              docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/queue-monitoring-frontend:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/queue-monitoring-frontend:$latest_tag
+              docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/queue-monitoring-frontend:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/queue-monitoring-frontend:$latest_tag
+            fi
+          done
 
       - name: 'Update Image tag on main branch'
         env:
