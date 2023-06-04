@@ -768,6 +768,17 @@ foreach ($VM in $VMNames) {
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Start-Job -Name images-cache-cleanup -ScriptBlock {
+            $cluster = $using:cluster
+            $clusterName = $cluster.Name.ToLower()
+            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+            kubectl delete namespace "images-cache" --context $clusterName
+        }
+    }
+
 #####################################################################
 # Tag Azure Arc resources
 #####################################################################
@@ -1095,17 +1106,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     }
 
     Get-Job -name gitops | Remove-Job
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-    # Cleaning up images-cache namespace on all clusters
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Start-Job -Name images-cache-cleanup -ScriptBlock {
-            $cluster = $using:cluster
-            $clusterName = $cluster.Name.ToLower()
-            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-            kubectl delete namespace "images-cache" --context $clusterName
-        }
-    }
 
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
