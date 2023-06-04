@@ -8,6 +8,7 @@ on:
             - closed
         paths:
         - 'contoso_supermarket/developer/pos/**'
+        - 'contoso_supermarket/operations/contoso_supermarket/releases/contosopos/**'
         - 'contoso_supermarket/operations/contoso_supermarket/releases/contosoai/**'
         - 'contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend/**'
 
