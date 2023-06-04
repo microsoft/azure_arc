@@ -69,7 +69,7 @@ $AgDirectory = $AgConfig.AgDirectories["AgDir"]
 $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgPowerShellDir = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgTempDir = $AgConfig.AgDirectories["AgTempDir"]
+$AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
 
 function BITSRequest {
   Param(
@@ -193,8 +193,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks") -OutFile "$AgToolsDir\Bookmarks"
 Invoke-WebRequest "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/img/jumpstart_ag.png" -OutFile $AgDirectory\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgTempDir\grafana-freezer-monitoring.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgTempDir\prometheus-additional-scrape-config.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
