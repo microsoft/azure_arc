@@ -24,11 +24,19 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
 - Fork the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-    ![Screenshot #1 showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
 
-    ![Screenshot #1 showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
 
-    ![Screenshot #1 showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+
+- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify *only* the Jumpstart Agora Apps repo that you forked. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, Workflows.
+
+    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
+
+    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
+
+    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
 
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
@@ -38,9 +46,9 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
 - Login to Azure CLI using the ```az login``` command.
 
-- Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
+- Ensure that you have selected the correct subscription you want to deploy Agora to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
 
-- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
+- Agora must be deployed to one of the following regions. **Deploying Agora outside of these regions may result in unexpected results or deployment errors.**
 
   - East US
   - East US 2
@@ -48,14 +56,8 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   - West US 2
   - North Europe
   - West Europe
-  - France Central
-  - UK South
-  - Australia East
-  - Japan East
-  - Korea Central
-  - Southeast Asia
 
-- **ArcBox Full requires 44 B-series and 16 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+- **Agora requires XXX XXX-series and XXX XXX-series vCPUs**. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy Agora. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -63,19 +65,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
   ![Screenshot showing az vm list-usage](./azvmlistusage.png)
 
-- Register necessary Azure resource providers by running the following commands.
-
-  ```shell
-  az provider register --namespace Microsoft.HybridCompute --wait
-  az provider register --namespace Microsoft.GuestConfiguration --wait
-  az provider register --namespace Microsoft.Kubernetes --wait
-  az provider register --namespace Microsoft.KubernetesConfiguration --wait
-  az provider register --namespace Microsoft.ExtendedLocation --wait
-  az provider register --namespace Microsoft.AzureArcData --wait
-  az provider register --namespace Microsoft.OperationsManagement --wait
-  ```
-
-- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
+- Create Azure service principal (SP). An Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
   - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
 
@@ -90,7 +80,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
     ```shell
     az login
     subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "JumpstartArcBoxSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartAgoraSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look similar to this:
@@ -98,7 +88,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "JumpstartArcBox",
+    "displayName": "JumpstartAgora",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
@@ -117,7 +107,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
     ```PowerShell
     $account = Connect-AzAccount
-    $spn = New-AzADServicePrincipal -DisplayName "JumpstartArcBoxSPN" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
+    $spn = New-AzADServicePrincipal -DisplayName "JumpstartAgoraSPN" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
     ```
@@ -126,7 +116,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
     ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
-    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.**
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
@@ -146,55 +136,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
   ```
 
-## Deployment Option 1: Azure portal
-
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
-
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy.png)
-
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeployinprogress.png)
-
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploymentcomplete.png)
-
-    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
-
-## Deployment Option 2: ARM template with Azure CLI
-
-- Clone the Azure Arc Jumpstart repository
-
-    ```shell
-    git clone https://github.com/microsoft/azure_arc.git
-    ```
-
-- Edit the [azuredeploy.parameters.json](https://github.com/microsoft/azure_arc/blob/main/azure_jumpstart_arcbox/ARM/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
-  - _`sshRSAPublicKey`_ - Your SSH public key
-  - _`spnClientId`_ - Your Azure service principal id
-  - _`spnClientSecret`_ - Your Azure service principal secret
-  - _`spnTenantId`_ - Your Azure tenant id
-  - _`windowsAdminUsername`_ - Client Windows VM Administrator name
-  - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
-  - _`flavor`_ - Use the value "Full" to specify that you want to deploy the full version of ArcBox
-
-  ![Screenshot showing example parameters](./parameters.png)
-
-- Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox) and run the below command:
-
-  ```shell
-  az group create --name <Name of the Azure resource group> --location <Azure Region>
-  az deployment group create \
-  --resource-group <Name of the Azure resource group> \
-  --template-file azuredeploy.json \
-  --parameters azuredeploy.parameters.json
-  ```
-
-  ![Screenshot showing az group create](./azgroupcreate.png)
-
-  ![Screenshot showing az deployment group create](./azdeploy.png)
-
-    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
-
-## Deployment Option 3: Bicep deployment via Azure CLI
+## Deployment: Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -208,19 +150,21 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   az bicep upgrade
   ```
 
-- Edit the [main.parameters.json](https://github.com/microsoft/azure_arc/blob/main/azure_jumpstart_arcbox/bicep/main.parameters.json) template parameters file and supply some values for your environment.
+- Edit the [main.parameters.json](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/azure_jumpstart_ag/bicep/main.parameters.json) template parameters file and supply some values for your environment.
   - _`sshRSAPublicKey`_ - Your SSH public key
   - _`spnClientId`_ - Your Azure service principal id
   - _`spnClientSecret`_ - Your Azure service principal secret
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
-  - _`flavor`_ - Use the value "Full" to specify that you want to deploy the full version of ArcBox
+  - _`deployBastion`_ - Option to deploy using Azure Bastion instead of traditional RDP. Set to true or false.
+  - _`githubUser`_ - The name of the user account on GitHub where you have forked the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps)
+  - _`githubPAT`_ - The GitHub PAT token that you created as part of the prerequisites.
+
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
-- Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the below command:
+- Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/bicep) and run the below command:
 
   ```shell
   az login
@@ -228,4 +172,81 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
-    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting).**
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://placeholder).**
+
+## Start post-deployment automation
+
+Once your deployment is complete, you can open the Azure portal and see the Agora resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
+
+  ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
+
+   > **NOTE: For enhanced Agora security posture, RDP (3389) and SSH (22) ports are not open by default in Agora deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
+
+### Connecting to the Agora Client virtual machine
+
+Various options are available to connect to _Agora-Client-VM_, depending on the parameters you supplied during deployment.
+
+- [RDP](https://placeholder) - available after configuring access to port 3389 on the _Agora-NSG-Prod_, or by enabling [Just-in-Time access (JIT)](https://placeholder).
+- [Azure Bastion](https://placeholder) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+
+#### Connecting directly with RDP
+
+By design, Agora does not open port 3389 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _Agora-NSG-Prod_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing Agora NSG with blocked RDP](./rdp_nsg_blocked.png)
+
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
+
+- Select My IP address from the dropdown.
+
+  <img src="./nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
+
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+#### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _Agora-Client-VM_ with Azure Bastion.**
+
+#### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
+
+### The Logon scripts
+
+- Once you log into the _Agora-Client-VM_, multiple automated scripts will open and start running. These scripts usually take around thirty minutes to finish, and once completed, the script windows will close automatically. At this point, the deployment is complete.
+
+  ![Screenshot showing Agora-Client-VM](./automation.png)
+
+- Deployment is complete! Let's begin exploring the features of Agora!
+
+  ![Screenshot showing complete deployment](./arcbox_complete.png)
+
+  ![Screenshot showing Agora resources in Azure portal](./rg_arc.png)
+
+## Next steps
+
+Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases.
+
+- [POS](https://placeholder)
+- [Freezer Monitor](https://placeholder)
+- [CICD](https://placeholder)
+- [Basic GitOps](https://placeholder)
+- [Analytics](https://analytics)
+- [Troubleshooting](https://troubleshooting)
+- [Cleanup](https://placeholder)
