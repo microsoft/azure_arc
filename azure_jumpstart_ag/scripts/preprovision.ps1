@@ -1,4 +1,3 @@
-$debug = $true
 
 ########################################################################
 # Check for available capacity in region
@@ -104,8 +103,8 @@ azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 # RDP Port
 ########################################################################
 $JS_RDP_PORT = '3389'
-If ($debug) {
-    $JS_RDP_PORT = '13389'
+If ($env:JS_RDP_PORT) {
+    $JS_RDP_PORT = $env:JS_RDP_PORT
 }
 if ($promptOutput = Read-Host "Enter the RDP Port for remote connection [$JS_RDP_PORT]") { $JS_RDP_PORT = $promptOutput }
 
@@ -116,13 +115,23 @@ azd env set JS_RDP_PORT $JS_RDP_PORT
 ########################################################################
 # GitHub User
 ########################################################################
-$JS_GITHUB_USER = (git remote show origin | select-string "Fetch URL")[0].toString().split("/")[-2]
+$JS_GITHUB_USER = $env:JS_GITHUB_USER
 
-If (-not $debug) {
-    if ($promptOutput = Read-Host "Enter your GitHub user name [$JS_GITHUB_USER]") { $JS_GITHUB_USER = $promptOutput }
-}
+if ($promptOutput = Read-Host "Enter your GitHub user name [$JS_GITHUB_USER]") { $JS_GITHUB_USER = $promptOutput }
+
 # set the env variable
 azd env set JS_GITHUB_USER $JS_GITHUB_USER
+
+
+########################################################################
+# GitHub Personal Access Token
+########################################################################
+$JS_GITHUB_PAT = $env:JS_GITHUB_PAT
+
+if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT) [$JS_GITHUB_PAT]") { $JS_GITHUB_PAT = $promptOutput }
+
+# set the env variable
+azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
 
 
 ########################################################################
@@ -179,7 +188,6 @@ $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
 $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
 
 # Set environment variables
-If ($debug){Write-Host "Setting environment variables..."}
 azd env set SPN_CLIENT_ID $SPN_CLIENT_ID
 azd env set SPN_CLIENT_SECRET $SPN_CLIENT_SECRET
 azd env set SPN_TENANT_ID $SPN_TENANT_ID
