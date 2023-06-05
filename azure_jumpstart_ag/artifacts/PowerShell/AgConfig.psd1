@@ -139,7 +139,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Seattle-URL"
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Chicago = @{
@@ -162,7 +161,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Chicago-URL"
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Dev     = @{
@@ -185,8 +183,6 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Dev-URL"
-            GrafanaUrlBookmark     = "Grafana-Dev-URL"
 
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
@@ -201,8 +197,6 @@
             HelmService        = "service/prometheus-grafana"
             GrafanaDataSource  = "prometheus"
             HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark     = "POS-Staging-URL"
-            GrafanaUrlBookmark = "Grafana-Staging-URL"
             IoTDevices          = @("Freezer-1", "Freezer-2")
         }
     }
