@@ -1256,8 +1256,8 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         # Make HTTP request to the API
         Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-        }
     }
+}
 
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
 # Add Contoso Operator User
@@ -1270,18 +1270,6 @@ $grafanaUserBody = @{
 
 # Make HTTP request to the API
 Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-#############################################################
-# Creating Prod Grafana Icon on Desktop
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana Icon" -ForegroundColor Gray
-$shortcutLocation = "$env:USERPROFILE\Desktop\Prod Grafana.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = $AgConfig.Monitoring["ProdURL"]
-$shortcut.IconLocation = "$AgIconsDir\grafana.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
@@ -1370,76 +1358,89 @@ Remove-Item $downloadDir -Recurse -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
 Write-Host
 
-    ##############################################################
-    # Creating bookmarks
-    ##############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-    $bookmarksFileName = "$AgToolsDir\Bookmarks"
-    $edgeBookmarksPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
-    
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-        $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
-    
-        # Matching url: pos - customer
+##############################################################
+# Creating bookmarks
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
+$bookmarksFileName = "$AgToolsDir\Bookmarks"
+$edgeBookmarksPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+    $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
+
+    # Matching url: pos - customer
+    $matchingServices = $services.items | Where-Object {
+        $_.spec.ports.port -contains 5000 -and
+        $_.spec.type -eq "LoadBalancer"
+    }
+    $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+    foreach ($posIp in $posIps) {
+        $output = "http://$posIp" + ':5000'
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
+    }
+
+    # Matching url: pos - manager
+    $matchingServices = $services.items | Where-Object {
+        $_.spec.ports.port -contains 81 -and
+        $_.spec.type -eq "LoadBalancer"
+    }
+    $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+    foreach ($posIp in $posIps) {
+        $output = "http://$posIp" + ':81'
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
+    }
+
+    # Matching url: prometheus-grafana
+    if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
         $matchingServices = $services.items | Where-Object {
-            $_.spec.ports.port -contains 5000 -and
-            $_.spec.type -eq "LoadBalancer"
+            $_.metadata.name -eq 'prometheus-grafana'
         }
-        $posIps = $matchingServices.status.loadBalancer.ingress.ip
-    
-        foreach ($posIp in $posIps) {
-            $output = "http://$posIp" + ':5000'
+        $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($grafanaIp in $grafanaIps) {
+            $output = "http://$grafanaIp"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-    
+
             # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+            $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
             $newContent | Set-Content -Path $bookmarksFileName
-    
+
             Start-Sleep -Seconds 2
-        }
-    
-        # Matching url: pos - manager
-        $matchingServices = $services.items | Where-Object {
-            $_.spec.ports.port -contains 81 -and
-            $_.spec.type -eq "LoadBalancer"
-        }
-        $posIps = $matchingServices.status.loadBalancer.ingress.ip
-    
-        foreach ($posIp in $posIps) {
-            $output = "http://$posIp" + ':81'
-            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-    
-            # Replace matching value in the Bookmarks file
-            $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
-            $newContent | Set-Content -Path $bookmarksFileName
-    
-            Start-Sleep -Seconds 2
-        }
-    
-        # Matching url: prometheus-grafana
-        if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
-            $matchingServices = $services.items | Where-Object {
-                $_.metadata.name -eq 'prometheus-grafana'
-            }
-            $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
-    
-            foreach ($grafanaIp in $grafanaIps) {
-                $output = "http://$grafanaIp"
-                $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-    
-                # Replace matching value in the Bookmarks file
-                $content = Get-Content -Path $bookmarksFileName
-                $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
-                $newContent | Set-Content -Path $bookmarksFileName
-    
-                Start-Sleep -Seconds 2
-            }
         }
     }
-    Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
+}
+
+# Matching url: Agora apps forked repo
+$output = $appClonedRepo
+$output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+# Replace matching value in the Bookmarks file
+$content = Get-Content -Path $bookmarksFileName
+$newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
+$newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+$newContent | Set-Content -Path $bookmarksFileName
+
+Start-Sleep -Seconds 2
+
+Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
 
 ##############################################################
 # Pinning important directories to Quick access
