@@ -27,6 +27,7 @@ $cosmosDBName       = $Env:cosmosDBName
 $cosmosDBEndpoint   = $Env:cosmosDBEndpoint
 $templateBaseUrl    = $env:templateBaseUrl
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
 $adxClusterName     = $env:adxClusterName
 $namingGuid         = $env:namingGuid
 $appsRepo           = "jumpstart-agora-apps"
