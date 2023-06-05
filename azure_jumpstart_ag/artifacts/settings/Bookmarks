@@ -1,82 +1,161 @@
 {
-   "checksum": "d6c126622ba5c8f0ecf86e539949d8fd",
+   "checksum": "3c708a24df9801b8c327d32475f95fbe",
    "roots": {
       "bookmark_bar": {
          "children": [ {
             "children": [ {
-               "id": "4",
-               "name": "POS Dev",
-               "show_icon": false,
+               "children": [ {
+                  "id": "5",
+                  "name": "POS Chicago - Customer",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Chicago-URL-Customer"
+               }, {
+                  "id": "21",
+                  "name": "POS Chicago - Manager",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Chicago-URL-Manager"
+               } ],
+               "id": "16",
+               "name": "Chicago",
                "source": "unknown",
-               "type": "url",
-               "url": "POS-Dev-URL"
+               "type": "folder"
             }, {
-               "id": "5",
-               "name": "POS Staging",
-               "show_icon": false,
+               "children": [ {
+                  "id": "6",
+                  "name": "POS Seattle - Customer",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Seattle-URL-Customer"
+               }, {
+                  "id": "22",
+                  "name": "POS Seattle - Manager",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Seattle-URL-Manager"
+               } ],
+               "id": "17",
+               "name": "Seattle",
                "source": "unknown",
-               "type": "url",
-               "url": "POS-Staging-URL"
+               "type": "folder"
             }, {
-               "id": "3",
-               "name": "POS Chicago",
-               "show_icon": false,
+               "children": [ {
+                  "id": "3",
+                  "name": "POS Dev - Customer",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Dev-URL-Customer"
+               }, {
+                  "id": "23",
+                  "name": "POS Dev - Manager",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Dev-URL-Manager"
+               } ],
+               "id": "18",
+               "name": "Dev",
                "source": "unknown",
-               "type": "url",
-               "url": "POS-Chicago-URL"
+               "type": "folder"
             }, {
-               "id": "2",
-               "name": "POS Seattle",
-               "show_icon": false,
+               "children": [ {
+                  "id": "4",
+                  "name": "POS Staging - Customer",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Staging-URL-Customer"
+               }, {
+                  "id": "24",
+                  "name": "POS Staging - Manager",
+                  "show_icon": false,
+                  "source": "unknown",
+                  "type": "url",
+                  "url": "POS-Staging-URL-Manager"
+               } ],
+               "id": "19",
+               "name": "Staging",
                "source": "unknown",
-               "type": "url",
-               "url": "POS-Seattle-URL"
+               "type": "folder"
             } ],
-            "id": "16",
+            "id": "2",
             "name": "POS",
             "source": "unknown",
             "type": "folder"
          }, {
             "children": [ {
-               "id": "7",
+               "id": "8",
                "name": "Grafana Dev",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "Grafana-Dev-URL"
             }, {
-               "id": "8",
+               "id": "9",
                "name": "Grafana Staging",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "Grafana-Staging-URL"
             }, {
-               "id": "6",
+               "id": "10",
                "name": "Grafana Prod",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "http://localhost:3000/"
             } ],
-            "id": "14",
+            "id": "7",
             "name": "Grafana",
             "source": "unknown",
             "type": "folder"
+         },  {
+            "children": [ {
+               "id": "26",
+               "name": "Agora Apps Repo - Microsoft",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "https://github.com/microsoft/jumpstart-agora-apps"
+            }, {
+               "id": "27",
+               "name": "Agora-Apps-Repo-Your-Fork",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Agora-Apps-Repo-Clone-URL"
+            } ],
+            "id": "25",
+            "name": "GitHub",
+            "source": "unknown",
+            "type": "folder"
          }, {
-            "id": "9",
+            "id": "11",
             "name": "ADX Dashboards",
             "show_icon": false,
             "source": "unknown",
             "type": "url",
-            "url": "https://dataexplorer.azure.com/dashboards"
+            "url": "https://dataexplorer.azure.com/dashboards/"
          }, {
-            "id": "15",
+            "id": "12",
             "name": "Azure Arc Jumpstart",
             "show_icon": false,
             "source": "unknown",
             "type": "url",
             "url": "https://azurearcjumpstart.io/"
+         }, {
+            "id": "20",
+            "name": "Azure Portal",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://portal.azure.com/"
          } ],
          "id": "1",
          "name": "Favorites bar",
@@ -85,18 +164,14 @@
       },
       "other": {
          "children": [  ],
-         "date_last_used": "0",
-         "date_modified": "0",
-         "id": "10",
+         "id": "13",
          "name": "Other favorites",
          "source": "unknown",
          "type": "folder"
       },
       "synced": {
          "children": [  ],
-         "date_last_used": "0",
-         "date_modified": "0",
-         "id": "11",
+         "id": "14",
          "name": "Mobile favorites",
          "source": "unknown",
          "type": "folder"
