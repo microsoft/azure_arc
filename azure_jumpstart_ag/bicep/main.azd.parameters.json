@@ -33,7 +33,7 @@
       "value": "${JS_GITHUB_USER}"
     },
     "githubPAT": {
-      "value": ""
+      "value": "${JS_GITHUB_PAT}"
     }
   }
 }
