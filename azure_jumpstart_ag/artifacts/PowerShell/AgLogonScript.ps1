@@ -181,15 +181,6 @@ Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-foreach ($branch in $protectedBranches) {
-    $branchName = $branch.name
-    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
-}
-
 Write-Host "INFO: Verifying permissions assigned to the Personal acccess token" -ForegroundColor Gray
 Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
 $retryCount = 0
@@ -227,6 +218,46 @@ do {
         }
     }
 } while ($response -match "failed" -or $retryCount -ge $maxRetries)
+
+Write-Host "INFO: Verifying 'Administration' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+
+$body = @{
+    required_status_checks        = $null
+    enforce_admins                = $false
+    required_pull_request_reviews = @{
+        required_approving_review_count = 0
+    }
+    dismiss_stale_reviews         = $true
+    restrictions                  = $null
+} | ConvertTo-Json
+
+do {
+    try {
+        $response= Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    }
+    catch {
+        if($retryCount -lt $maxRetries) {
+            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            $retryCount++
+            start-sleep -Seconds 60
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Administration' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+    }
+} until ($response)
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+foreach ($branch in $protectedBranches) {
+    $branchName = $branch.name
+    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+}
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
