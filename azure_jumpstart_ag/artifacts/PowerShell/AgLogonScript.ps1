@@ -314,7 +314,7 @@ Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor G
 $branches = $AgConfig.GitBranches
 foreach ($branch in $branches) {
     try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch"
         if ($response) {
             if ($branch -ne "main") {
                 Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
@@ -339,9 +339,18 @@ foreach ($branch in $branches) {
         git push origin $branch
     }
 }
+Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
+$existingBranches = gh api "repos/$githubUser/$appsRepo/branches" | ConvertFrom-Json
+$branches = $AgConfig.GitBranches
+foreach ($branch in $existingBranches) {
+    if($branches -notcontains $branch.name){
+        $branchToDelete = $branch.name
+        git push origin --delete $branchToDelete
+    }
+}
+
 Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
 git checkout main
-
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
 foreach ($branch in $branches) {
