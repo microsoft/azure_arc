@@ -20,17 +20,19 @@
     }
 
     # Required URLs
-    URL                     = @{
-        chocoPackagesUrl      = 'https://community.chocolatey.org/api/v2'
-        chocoInstallScriptUrl = 'https://chocolatey.org/install.ps1'
-        wslUbuntuUrl          = 'https://aka.ms/wslubuntu'
-        wslStoreStorageUrl    = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
-        dockerUrl             = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
-        githubAPIUrl          = 'https://api.github.com'
-        grafanaUrl            = 'https://api.github.com/repos/grafana/grafana/releases/latest'
-        azurePortalUrl        = 'https://portal.azure.com'
-        aksEEk3sUrl           = 'https://aka.ms/aks-edge/k3s-msi'
-        nginxUrl              = 'https://kubernetes.github.io/ingress-nginx'
+    URLs                    = @{
+        chocoInstallScript = 'https://chocolatey.org/install.ps1'
+        wslUbuntu          = 'https://aka.ms/wslubuntu'
+        wslStoreStorage    = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+        docker             = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
+        githubAPI          = 'https://api.github.com'
+        grafana            = 'https://api.github.com/repos/grafana/grafana/releases/latest'
+        azurePortal        = 'https://portal.azure.com'
+        aksEEk3s           = 'https://aka.ms/aks-edge/k3s-msi'
+        nginx              = 'https://kubernetes.github.io/ingress-nginx'
+        prometheus         = 'https://prometheus-community.github.io/helm-charts'
+        vcLibs             = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+        windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
     }
 
     # Azure required registered resource providers
@@ -139,7 +141,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Seattle-URL"
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Chicago = @{
@@ -162,7 +163,6 @@
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Chicago-URL"
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
         Dev     = @{
@@ -185,8 +185,6 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark         = "POS-Dev-URL"
-            GrafanaUrlBookmark     = "Grafana-Dev-URL"
 
             IoTDevices             = @("Freezer-1", "Freezer-2")
         }
@@ -201,8 +199,6 @@
             HelmService        = "service/prometheus-grafana"
             GrafanaDataSource  = "prometheus"
             HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
-            POSUrlBookmark     = "POS-Staging-URL"
-            GrafanaUrlBookmark = "Grafana-Staging-URL"
             IoTDevices          = @("Freezer-1", "Freezer-2")
         }
     }
@@ -311,6 +307,7 @@
                     RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
                 }
             }
+            Order = 7
         }
     }
 }
