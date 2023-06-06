@@ -60,16 +60,49 @@ param (
 $ErrorActionPreference = 'Continue'
 
 ##############################################################
+# Change RDP Port
+##############################################################
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
+  Write-Host "Configuring RDP port number to $rdpPort"
+  $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+  $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+  Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+  # RDP port
+  $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+  Write-Host "Current RDP PortNumber: $portNumber"
+  if (!($portNumber -eq $rdpPort)) {
+    Write-Host Setting RDP PortNumber to $rdpPort
+    Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+    Restart-Service TermService -force
+  }
+
+  #Setup firewall rules
+  if ($rdpPort -eq 3389) {
+    netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+  } 
+  else {
+    $systemroot = get-content env:systemroot
+    netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+  }
+
+  Write-Host "RDP port configuration complete."
+}
+
+
+##############################################################
 # Download configuration data file and declaring directories 
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile $ConfigurationDataFile
-$AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$AgDirectory = $AgConfig.AgDirectories["AgDir"]
-$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
-$AgPowerShellDir = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
+$AgConfig         = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$AgDirectory      = $AgConfig.AgDirectories["AgDir"]
+$AgToolsDir       = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir       = $AgConfig.AgDirectories["AgIconDir"]
+$AgPowerShellDir  = $AgConfig.AgDirectories["AgPowerShellDir"]
+$AgMonitoringDir  = $AgConfig.AgDirectories["AgMonitoringDir"]
+$websiteUrls      = $AgConfig.URLs
 
 function BITSRequest {
   Param(
@@ -123,52 +156,46 @@ $ErrorActionPreference = 'Continue'
 ##############################################################
 # Testing connectivity to required URLs
 ##############################################################
-$websiteUrls = @(
-  $AgConfig.URL.chocoPackagesUrl,
-  $AgConfig.URL.chocoInstallScriptUrl,
-  $AgConfig.URL.wslUbuntuUrl,
-  $AgConfig.URL.wslStoreStorageUrl,
-  $AgConfig.URL.dockerUrl,
-  $AgConfig.URL.grafanaUrl,
-  $AgConfig.URL.githubAPIUrl,
-  $AgConfig.URL.azurePortalUrl,
-  $AgConfig.URL.aksEEk3sUrl
-)
 
-$maxRetries = 3
-$retryDelaySeconds = 5
-$retryCount = 0
-
-foreach ($url in $websiteUrls) {
+Function Test-Url($url, $maxRetries = 3, $retryDelaySeconds = 5) {
+  $retryCount = 0
   do {
-    try {
-      $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
-      $statusCode = $response.StatusCode
-
-      if ($statusCode -eq 200) {
-        Write-Host "$url is reachable."
-        break  # Break out of the loop if website is reachable
+      try {
+        $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
+        $statusCode = $response.StatusCode
+  
+        if ($statusCode -eq 200) {
+          Write-Host "$url is reachable."
+          break  # Break out of the loop if website is reachable
+        }
+        else {
+          Write-Host "$url is unreachable. Status code: $statusCode"
+        }
       }
-      else {
-        Write-Host "$_ is unreachable. Status code: $statusCode"
+      catch {
+        Write-Host "An error occurred while testing the website: $url - $_"
       }
+  
+      $retryCount++
+      if ($retryCount -le $maxRetries) {
+        Write-Host "Retrying in $retryDelaySeconds seconds..."
+        Start-Sleep -Seconds $retryDelaySeconds
+      }
+    } while ($retryCount -le $maxRetries)
+  
+    if ($retryCount -gt $maxRetries) {
+      Write-Host "Exceeded maximum number of retries. Exiting..."
+      exit 1  # Stop script execution if maximum retries reached
     }
-    catch {
-      Write-Host "An error occurred while testing the website: $_"
-    }
-
-    $retryCount++
-    if ($retryCount -le $maxRetries) {
-      Write-Host "Retrying in $retryDelaySeconds seconds..."
-      Start-Sleep -Seconds $retryDelaySeconds
-    }
-  } while ($retryCount -le $maxRetries)
-
-  if ($retryCount -gt $maxRetries) {
-    Write-Host "Exceeded maximum number of retries. Exiting..."
-    exit 1  # Stop script execution if maximum retries reached
   }
+
+foreach ($url in $websiteUrls.Values) {
+  $maxRetries = 3
+  $retryDelaySeconds = 5
+
+  Test-Url $url -maxRetries $maxRetries -retryDelaySeconds $retryDelaySeconds
 }
+
 
 ##############################################################
 # Copy PowerShell Profile and Reload
@@ -179,7 +206,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -Out
 ##############################################################
 # Get latest Grafana OSS release
 ##############################################################
-$latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/grafana/grafana/releases/latest").tag_name.replace('v', '')
+$latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.replace('v', '')
 
 ##############################################################
 # Download artifacts
@@ -198,8 +225,8 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporte
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
-BITSRequest -Params @{'Uri' = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
-BITSRequest -Params @{'Uri' = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
+BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
+BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
 ##############################################################
@@ -219,7 +246,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
     catch {
       Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URL.chocoInstallScriptUrl))
+      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
     }
     
     Write-Host "Chocolatey packages specified"
@@ -314,37 +341,6 @@ Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminU
 # Disabling Windows Server Manager Scheduled Task
 ##############################################################
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-
-##############################################################
-# Change RDP Port
-##############################################################
-Write-Host "RDP port number from configuration is $rdpPort"
-if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
-  Write-Host "Configuring RDP port number to $rdpPort"
-  $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
-  $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
-  Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
-
-  # RDP port
-  $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
-  Write-Host "Current RDP PortNumber: $portNumber"
-  if (!($portNumber -eq $rdpPort)) {
-    Write-Host Setting RDP PortNumber to $rdpPort
-    Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
-    Restart-Service TermService -force
-  }
-
-  #Setup firewall rules
-  if ($rdpPort -eq 3389) {
-    netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-  } 
-  else {
-    $systemroot = get-content env:systemroot
-    netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
-  }
-
-  Write-Host "RDP port configuration complete."
-}
 
 ##############################################################
 # Install Hyper-V, WSL and reboot
