@@ -901,7 +901,7 @@ foreach ($job in $jobs) {
     $provisioningState = $result.ProvisioningState
 
     if ($provisioningState -ne "Succeeded") {
-        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds..." -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds (attempt $retryCount/$maxRetries)..." -ForegroundColor Gray
         Start-Sleep -Seconds 10
         $retryCount++
     }
