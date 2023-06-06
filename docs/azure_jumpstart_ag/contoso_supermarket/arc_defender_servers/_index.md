@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-# Microsoft Defender for Servers
+# Infrastructure security with Microsoft Defender for Servers
 
 Microsoft Defender for Cloud provides unified security management and threat protection across your hybrid and multi-cloud workloads. To get all of the Microsoft Defender for Servers protections, you will need to enable the Microsoft Defender for Servers plan at subscription level.
 
