@@ -108,7 +108,7 @@ resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sql
   }
 }
 
-resource eventConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
+resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
   location: location
   name: 'OrdersConnection'
   parent: posOrdersDB
@@ -119,8 +119,10 @@ resource eventConnection 'Microsoft.Kusto/clusters/databases/dataConnections@202
   dependsOn: [
     //  We need the table to be present in the database
     ordersScript
+
     //  We need the cluster to be receiver on the Event Hub
     clusterCosmosDbAuthorization
+
   ]
 
   kind: 'CosmosDb'
