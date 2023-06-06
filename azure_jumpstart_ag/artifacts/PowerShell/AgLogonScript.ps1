@@ -214,7 +214,7 @@ do {
         else {
             $retryCount++
             write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 60
         }
     }
 } while ($response -match "failed" -or $retryCount -ge $maxRetries)
