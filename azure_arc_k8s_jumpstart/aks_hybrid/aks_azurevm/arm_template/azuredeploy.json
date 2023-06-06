@@ -363,7 +363,7 @@
         }
     },
     "variables": {
-        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'),'/azure_arc_k8s_jumpstart/aks_ws/arm_template/')]",
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'),'/azure_arc_k8s_jumpstart/aks_hybrid/aks_azurevm/arm_template/')]",
         "dataDisksCount": 8,
         "dscUri": "https://github.com/Azure/aks-hci/raw/main/eval/dsc/akshcihost.zip",
         "artifactsLocation": "https://raw.githubusercontent.com/Azure/aks-hci/main/eval/",
