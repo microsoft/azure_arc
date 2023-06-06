@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "value": "AKSHost001"
+    },
+    "spnClientId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "spnClientSecret": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "spnTenantId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "adminUsername": {
+      "value": "AzureUser"
+    },
+    "adminPassword": {
+      "value": "Pa$$word123!!"
+    },
+    "bastionHostName": {
+      "value": "Arc-AKS-Demo-Bastion"
+    },
+    "deployBastion": {
+      "value": "(true/false)"
+    }
+  }
+}
