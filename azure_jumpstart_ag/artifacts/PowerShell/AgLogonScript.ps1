@@ -145,8 +145,8 @@ do {
 )
 
 Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
-$env:GITHUB_TOKEN=$githubPAT
-[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
+$env:GITHUB_TOKEN=$githubPAT.Trim()
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT.Trim(), [System.EnvironmentVariableTarget]::Machine)
 
 Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
 $headers = @{
@@ -192,7 +192,7 @@ foreach ($branch in $protectedBranches) {
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
-git config --global user.name "Agora Dev"
+git config --global user.name $githubUser
 git remote add upstream $appUpstreamRepo
 git fetch upstream
 git checkout main
@@ -709,6 +709,11 @@ Write-Host
 # Cache contoso-supermarket images on all clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+}
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
@@ -764,6 +769,17 @@ foreach ($VM in $VMNames) {
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
+
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Start-Job -Name images-cache-cleanup -ScriptBlock {
+            $cluster = $using:cluster
+            $clusterName = $cluster.Name.ToLower()
+            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+            kubectl delete namespace "images-cache" --context $clusterName
+        }
+    }
 
 #####################################################################
 # Tag Azure Arc resources
@@ -1451,6 +1467,7 @@ $quickAccess = new-object -com shell.application
 $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
 $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
 
+
 ##############################################################
 # Cleanup
 ##############################################################
@@ -1460,13 +1477,13 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -F
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-# Cleaning up images-cache namespace on all clusters
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $cluster = $cluster.Name.ToLower()
-    Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
-    kubectl delete namespace "images-cache" --context $cluster
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
+while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
+  Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+  Receive-Job -Name images-cache-cleanup -WarningAction SilentlyContinue
+  Start-Sleep -Seconds 60
 }
+Get-Job -name images-cache-cleanup | Remove-Job
 
 # Removing the LogonScript Scheduled Task
 Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
