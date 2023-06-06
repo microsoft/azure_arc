@@ -181,7 +181,7 @@ Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 
-Write-Host "INFO: Verifying permissions assigned to the Personal acccess token" -ForegroundColor Gray
+Write-Host "INFO: Verifying permissions assigned to the Personal access token" -ForegroundColor Gray
 Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
 $retryCount = 0
 $maxRetries = 5
