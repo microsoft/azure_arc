@@ -851,17 +851,6 @@ foreach ($VM in $VMNames) {
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-    # Cleaning up images-cache namespace on all clusters
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Start-Job -Name images-cache-cleanup -ScriptBlock {
-            $cluster = $using:cluster
-            $clusterName = $cluster.Name.ToLower()
-            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-            kubectl delete namespace "images-cache" --context $clusterName
-        }
-    }
-
 #####################################################################
 # Tag Azure Arc resources
 #####################################################################
@@ -997,7 +986,18 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 
-#  TODO - this looks app-specific so should perhaps be moved to the app loop 
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+# Cleaning up images-cache namespace on all clusters
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Start-Job -Name images-cache-cleanup -ScriptBlock {
+        $cluster = $using:cluster
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+        kubectl delete namespace "images-cache" --context $clusterName
+    }
+}
+
+#  TODO - this looks app-specific so should perhaps be moved to the app loop
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
