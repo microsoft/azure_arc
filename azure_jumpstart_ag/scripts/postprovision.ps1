@@ -1,13 +1,20 @@
 if ($null -ne $env:AZURE_RESOURCE_GROUP){
     $resourceGroup  = $env:AZURE_RESOURCE_GROUP
     $adxClusterName = $env:ADX_CLUSTER_NAME
-    Select-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID
+    Select-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID | out-null
+    $rdpPort = $env:JS_RDP_PORT
 } else {
     # This section is for testing only
     $resourceGroup  = "charris-js-ag-43-rg"
     $adxClusterName = "agadx2827a"
     Get-AzSubscription -SubscriptionName "Azure Arc Jumpstart Subscription" | Select-AzSubscription
 }
+
+########################################################################
+# ADX Dashboards
+########################################################################
+
+Write-Host "Importing Azure Data Explorer dashboards..."
 
 # Get the ADX/Kusto cluster info
 $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
@@ -38,3 +45,40 @@ $httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $iotSens
 if ($httpResponse.StatusCode -ne 200){
     Write-Host "ERROR: Failed import IoT Sensor dashboard report into Azure Data Explorer" -ForegroundColor Red
 }
+
+
+########################################################################
+# RDP Port
+########################################################################
+
+# Configure NSG Rule for RDP (if needed)
+If ($rdpPort -ne "3389") {
+
+    Write-Host "Configuring NSG Rule for RDP..."
+    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name Ag-NSG-Prod
+
+    Add-AzNetworkSecurityRuleConfig `
+        -NetworkSecurityGroup $nsg `
+        -Name "RDP-$rdpPort" `
+        -Description "Allow RDP" `
+        -Access Allow `
+        -Protocol Tcp `
+        -Direction Inbound `
+        -Priority 100 `
+        -SourceAddressPrefix * `
+        -SourcePortRange * `
+        -DestinationAddressPrefix * `
+        -DestinationPortRange $rdpPort `
+        | Out-Null
+
+    Set-AzNetworkSecurityGroup -NetworkSecurityGroup $nsg | Out-Null
+    # az network nsg rule create -g $resourceGroup --nsg-name Ag-NSG-Prod --name "RDC-$rdpPort" --priority 100 --source-address-prefixes * --destination-port-ranges $rdpPort --access Allow --protocol Tcp
+}
+
+
+# Client VM IP address
+$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "Ag-VM-Client-PIP").IpAddress
+
+Write-Host "You can now connect to the client VM using the following command: " -NoNewline
+WRite-Host "mstsc /v:$($ip):$($rdpPort)" -ForegroundColor Green -BackgroundColor Black
+Write-Host "Remember to use the Windows admin user name [$env:JS_WINDOWS_ADMIN_USERNAME] and the password you specified."
