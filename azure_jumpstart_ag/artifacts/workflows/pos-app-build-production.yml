@@ -65,6 +65,9 @@ jobs:
       run: |
         docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
+        docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/queue-monitoring-frontend:$latest_tag"
+        docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/queue-monitoring-frontend:$latest_tag
+
 
     - name: 'Checkout production branch'
       uses: actions/checkout@v3
