@@ -200,6 +200,7 @@ do {
     }
 } while ($response -match "error" -or $retryCount -ge $maxRetries)
 gh secret delete test
+Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
 
 Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
 $retryCount = 0
@@ -218,6 +219,7 @@ do {
         }
     }
 } while ($response -match "failed" -or $retryCount -ge $maxRetries)
+Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
 
 Write-Host "INFO: Verifying 'Administration' permissions" -ForegroundColor Gray
 $retryCount = 0
@@ -249,6 +251,7 @@ do {
         }
     }
 } until ($response)
+Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
 
 Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
 $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
