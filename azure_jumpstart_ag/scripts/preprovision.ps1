@@ -1,4 +1,3 @@
-$debug = $true
 
 ########################################################################
 # Check for available capacity in region
@@ -101,6 +100,41 @@ azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 
 
 ########################################################################
+# RDP Port
+########################################################################
+$JS_RDP_PORT = '3389'
+If ($env:JS_RDP_PORT) {
+    $JS_RDP_PORT = $env:JS_RDP_PORT
+}
+if ($promptOutput = Read-Host "Enter the RDP Port for remote connection [$JS_RDP_PORT]") { $JS_RDP_PORT = $promptOutput }
+
+# set the env variable
+azd env set JS_RDP_PORT $JS_RDP_PORT
+
+
+########################################################################
+# GitHub User
+########################################################################
+$JS_GITHUB_USER = $env:JS_GITHUB_USER
+
+if ($promptOutput = Read-Host "Enter your GitHub user name [$JS_GITHUB_USER]") { $JS_GITHUB_USER = $promptOutput }
+
+# set the env variable
+azd env set JS_GITHUB_USER $JS_GITHUB_USER
+
+
+########################################################################
+# GitHub Personal Access Token
+########################################################################
+$JS_GITHUB_PAT = $env:JS_GITHUB_PAT
+
+if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT) [$JS_GITHUB_PAT]") { $JS_GITHUB_PAT = $promptOutput }
+
+# set the env variable
+azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
+
+
+########################################################################
 # Create SSH RSA Public Key
 ########################################################################
 Write-Host "Creating SSH RSA Public Key..."
@@ -135,7 +169,8 @@ if (-not (Get-AzContext)) {
     Connect-AzAccount
 }
 
-$uniqueSpnName = "jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
+$user = (get-azcontext).Account.Id.split("@")[0]
+$uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
 try {
     $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
 }
@@ -153,7 +188,7 @@ $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
 $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
 
 # Set environment variables
-If ($debug){Write-Host "Setting environment variables..."}
 azd env set SPN_CLIENT_ID $SPN_CLIENT_ID
 azd env set SPN_CLIENT_SECRET $SPN_CLIENT_SECRET
 azd env set SPN_TENANT_ID $SPN_TENANT_ID
+
