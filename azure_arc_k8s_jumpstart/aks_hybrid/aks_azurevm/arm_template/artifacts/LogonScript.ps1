@@ -57,14 +57,11 @@ Wait-Process -Id $nid
 $nid = (Start-Process -PassThru PowerShell {for (0 -lt 1) {Install-Module -Name ArcHci -Repository PSGallery -AcceptLicense -Force; Exit}}).id
 Wait-Process -Id $nid
 
-Update-Module -Name AksHci -Force -AcceptLicense
-[string]('Updated AksHci Powershell Module to version ' + (Get-InstalledModule -Name "AksHci").version)
 
 # Install Moc on the Azure VM & download Kubernetes VHD image
 
 Set-MocConfig -workingDir "V:\AKS-HCI\WorkDir" 
 Install-Moc
-Add-ArcHcik8sGalleryImage -k8sVersion $kubernetesVersion -version $aksHciConfigVersion
 curl.exe -LO "https://dl.k8s.io/release/v1.25.0/bin/windows/amd64/kubectl.exe"
 $config = Get-MocConfig
 cp .\kubectl.exe $config.installationPackageDir
