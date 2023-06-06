@@ -119,7 +119,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed . . . waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
             $retryCount++
             start-sleep -Seconds 60
         }
@@ -164,7 +164,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme] (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
             start-sleep -Seconds 60
@@ -189,6 +189,25 @@ foreach ($branch in $protectedBranches) {
     Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
     Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
 }
+
+Write-Host "INFO: Verifying permissions assigned to the Personal acccess token" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh secret set "test" -b "test" 2>&1
+    if ($response -match "error") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets write permissions assigned'. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 60
+        }
+    }
+} while ($response -match "error" -or $retryCount -ge $maxRetries)
+gh secret delete test
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
