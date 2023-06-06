@@ -10,6 +10,8 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 ![Deployment flow diagram](./placeholder.png)
 
+A high-level overview of the deployment process
+
 Deploying Agora consists of the following steps.
 
     - Prerequisite - User creates or already has access to a service principal with Owner role
