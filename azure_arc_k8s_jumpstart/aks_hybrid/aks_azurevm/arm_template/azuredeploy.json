@@ -7,14 +7,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "lanicola-org"
+            "defaultValue": "microsoft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "aks_ws"
+            "defaultValue": "main"
         },
         "spnClientId": {
             "type": "string",
