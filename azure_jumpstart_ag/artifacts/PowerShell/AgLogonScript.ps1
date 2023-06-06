@@ -191,13 +191,14 @@ foreach ($branch in $protectedBranches) {
 }
 
 Write-Host "INFO: Verifying permissions assigned to the Personal acccess token" -ForegroundColor Gray
+Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
 $retryCount = 0
 $maxRetries = 5
 do {
     $response = gh secret set "test" -b "test" 2>&1
     if ($response -match "error") {
         if ($retryCount -eq $maxRetries) {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets write permissions assigned'. Exiting." -ForegroundColor Red
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
             Exit
         }
         else {
@@ -208,6 +209,24 @@ do {
     }
 } while ($response -match "error" -or $retryCount -ge $maxRetries)
 gh secret delete test
+
+Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh workflow enable update-files.yml 2>&1
+    if ($response -match "failed") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Actions' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 10
+        }
+    }
+} while ($response -match "failed" -or $retryCount -ge $maxRetries)
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
