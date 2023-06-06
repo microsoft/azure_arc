@@ -47,14 +47,14 @@ jobs:
         echo $PROD_LATEST_TAG
         echo "latest_tag=$PROD_LATEST_TAG" >> $GITHUB_OUTPUT
 
-    - name: Run tests
+    - name: Run integration tests
       uses: mscoutermarsh/ascii-art-action@master
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
       if: ${{ env.latest_tag != 'v1.0' && env.prod_latest_tag != env.latest_tag}}
       with:
-        text: 'Testing complete!'
+        text: 'Integration tests complete!'
 
     - name: 'Build and push new images'
       env:
@@ -65,9 +65,6 @@ jobs:
       run: |
         docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
-        docker build ./contoso_supermarket/developer/queue_monitoring_frontend/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/queue-monitoring-frontend:$latest_tag"
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/queue-monitoring-frontend:$latest_tag
-
 
     - name: 'Checkout production branch'
       uses: actions/checkout@v3
