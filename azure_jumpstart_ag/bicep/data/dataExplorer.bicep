@@ -34,6 +34,7 @@ param skuCapacity int = 1
 
 //  Id of the Cosmos DB data reader role
 var cosmosDataReader = '00000000-0000-0000-0000-000000000001'
+var cosmosDBAccountReader = 'fbdf93bf-df7d-467e-a4d2-9458aa1360c8'
 
 resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' existing = {
   name: cosmosDBAccountName
@@ -108,6 +109,21 @@ resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sql
   }
 }
 
+resource cosmosReaderRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: subscription()
+  name: cosmosDBAccountReader
+}
+
+// Assign "Cosmos DB Account Reader Role"
+resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2021-04-01-preview' = {
+  name: guid(adxCluster.id, cosmosDBAccountName, cosmosDBAccountReader)
+  properties: {
+    roleDefinitionId: cosmosReaderRoleDefinition.id
+    principalId: adxCluster.identity.principalId
+    scope: resourceGroup().id
+  }
+}
+
 resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
   location: location
   name: 'OrdersConnection'
@@ -122,7 +138,7 @@ resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@20
 
     //  We need the cluster to be receiver on the Event Hub
     clusterCosmosDbAuthorization
-
+    cosmosDBAccountReaderRoleAssignment
   ]
 
   kind: 'CosmosDb'
