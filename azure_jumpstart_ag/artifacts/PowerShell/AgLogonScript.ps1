@@ -1230,12 +1230,21 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
 grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-# Get Grafana credentials
-$credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
-$encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
+# Get Grafana Admin credentials
+$adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
+$adminEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($adminCredentials))
 
-$headers = @{
-    "Authorization" = ("Basic " + $encodedcredentials)
+$adminHeaders = @{
+    "Authorization" = ("Basic " + $adminEncodedcredentials)
+    "Content-Type"  = "application/json"
+}
+
+# Get Contoso User credentials
+$userCredentials = $adminUsername + ':' + $adminPassword
+$userEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($userCredentials))
+
+$userHeaders = @{
+    "Authorization" = ("Basic " + $userEncodedcredentials)
     "Content-Type"  = "application/json"
 }
 
@@ -1261,7 +1270,7 @@ $grafanaUserBody = @{
 } | ConvertTo-Json
 
 # Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Deploying Kube Prometheus Stack for stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -1311,7 +1320,21 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         } | ConvertTo-Json
 
         # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    }
+
+    # Add Contoso Operator User
+    if (!$_.Value.IsProduction) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
+        $grafanaUserBody = @{
+            name     = $AgConfig.Monitoring["User"] # Display Name
+            email    = $AgConfig.Monitoring["Email"]
+            login    = $adminUsername
+            password = $adminPassword
+        } | ConvertTo-Json
+
+        # Make HTTP request to the API
+        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
@@ -1344,54 +1367,19 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         if ($_.Value.IsProduction) {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
         }
         else {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+            $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
         }
 
         # Make HTTP request to the API
-        $dashboardID=(Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody).id 
+        $dashboardID=(Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id 
 
-        # Add each dashboard to Contoso Operator's Home Page
-        if (!$_.Value.IsProduction) {
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
-            $grafanaUserBody = @{
-                name     = $AgConfig.Monitoring["User"] # Display Name
-                email    = $AgConfig.Monitoring["Email"]
-                login    = $adminUsername
-                password = $adminPassword
-            } | ConvertTo-Json
-    
-            # Make HTTP request to the API
-            Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-            # Get Contoso User credentials
-            $credentials = $adminUsername + ':' + $adminPassword
-            $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
-        
-            $headers = @{
-                "Authorization" = ("Basic " + $encodedcredentials)
-                "Content-Type"  = "application/json"
-            }
-    
-            # Add each dashboard to Contoso Operator Home Page
-            Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/user/stars/dashboard/$dashboardID" -Headers $headers | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
-
-        if ($_.Value.Branch == "production") {
-            # Get Contoso User credentials
-            $credentials = $adminUsername + ':' + $adminPassword
-            $encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
-        
-            $headers = @{
-                "Authorization" = ("Basic " + $encodedcredentials)
-                "Content-Type"  = "application/json"
-            }
-    
-            # Add each dashboard to Contoso Operator Home Page
-            Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/user/stars/dashboard/$dashboardID" -Headers $headers | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
     }
 
 }
