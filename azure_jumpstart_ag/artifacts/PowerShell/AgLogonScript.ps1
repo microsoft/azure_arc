@@ -436,10 +436,10 @@ if (!(Test-Path -Path $storesJsonPath)) {
 }
 
 # Download icon file
-$iconPath = "$AgIconsDir\dashboard.ico"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/dashboard.ico" -OutFile $iconPath
+$iconPath = "$AgIconsDir\emulator.ico"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
 if (!(Test-Path -Path $iconPath)) {
-    Write-Host "Unabled to download dashboard.ico file. Please download manually from GitHub into the icons folder."
+    Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
 }
 
 # Create desktop shortcut
