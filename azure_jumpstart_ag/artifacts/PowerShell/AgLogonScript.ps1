@@ -119,7 +119,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed . . . waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
             $retryCount++
             start-sleep -Seconds 60
         }
@@ -145,8 +145,8 @@ do {
 )
 
 Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
-$env:GITHUB_TOKEN=$githubPAT
-[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
+$env:GITHUB_TOKEN=$githubPAT.Trim()
+[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT.Trim(), [System.EnvironmentVariableTarget]::Machine)
 
 Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
 $headers = @{
@@ -164,7 +164,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme] (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
             start-sleep -Seconds 60
@@ -181,6 +181,78 @@ Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 
+Write-Host "INFO: Verifying permissions assigned to the Personal access token" -ForegroundColor Gray
+Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh secret set "test" -b "test" 2>&1
+    if ($response -match "error") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 60
+        }
+    }
+} while ($response -match "error" -or $retryCount -ge $maxRetries)
+gh secret delete test
+Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
+
+Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh workflow enable update-files.yml 2>&1
+    if ($response -match "failed") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Actions' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 60
+        }
+    }
+} while ($response -match "failed" -or $retryCount -ge $maxRetries)
+Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
+
+Write-Host "INFO: Verifying 'Administration' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+
+$body = @{
+    required_status_checks        = $null
+    enforce_admins                = $false
+    required_pull_request_reviews = @{
+        required_approving_review_count = 0
+    }
+    dismiss_stale_reviews         = $true
+    restrictions                  = $null
+} | ConvertTo-Json
+
+do {
+    try {
+        $response= Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    }
+    catch {
+        if($retryCount -lt $maxRetries) {
+            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            $retryCount++
+            start-sleep -Seconds 60
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Administration' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+    }
+} until ($response)
+Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
+
 Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
 $protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
 foreach ($branch in $protectedBranches) {
@@ -192,7 +264,7 @@ foreach ($branch in $protectedBranches) {
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
-git config --global user.name "Agora Dev"
+git config --global user.name $githubUser
 git remote add upstream $appUpstreamRepo
 git fetch upstream
 git checkout main
@@ -242,7 +314,7 @@ Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor G
 $branches = $AgConfig.GitBranches
 foreach ($branch in $branches) {
     try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch"
         if ($response) {
             if ($branch -ne "main") {
                 Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
@@ -267,9 +339,18 @@ foreach ($branch in $branches) {
         git push origin $branch
     }
 }
+Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
+$existingBranches = gh api "repos/$githubUser/$appsRepo/branches" | ConvertFrom-Json
+$branches = $AgConfig.GitBranches
+foreach ($branch in $existingBranches) {
+    if($branches -notcontains $branch.name){
+        $branchToDelete = $branch.name
+        git push origin --delete $branchToDelete
+    }
+}
+
 Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
 git checkout main
-
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
 foreach ($branch in $branches) {
@@ -709,6 +790,11 @@ Write-Host
 # Cache contoso-supermarket images on all clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+while ($workflowStatus.status -ne "completed") {
+    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+}
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $branch = $cluster.Name.ToLower()
     $context = $cluster.Name.ToLower()
@@ -866,7 +952,7 @@ foreach ($job in $jobs) {
     $provisioningState = $result.ProvisioningState
 
     if ($provisioningState -ne "Succeeded") {
-        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds..." -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds (attempt $retryCount/$maxRetries)..." -ForegroundColor Gray
         Start-Sleep -Seconds 10
         $retryCount++
     }
@@ -900,7 +986,18 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 
-#  TODO - this looks app-specific so should perhaps be moved to the app loop 
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+# Cleaning up images-cache namespace on all clusters
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Start-Job -Name images-cache-cleanup -ScriptBlock {
+        $cluster = $using:cluster
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+        kubectl delete namespace "images-cache" --context $clusterName
+    }
+}
+
+#  TODO - this looks app-specific so should perhaps be moved to the app loop
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
@@ -1451,6 +1548,7 @@ $quickAccess = new-object -com shell.application
 $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
 $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
 
+
 ##############################################################
 # Cleanup
 ##############################################################
@@ -1460,13 +1558,13 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -F
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-# Cleaning up images-cache namespace on all clusters
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $cluster = $cluster.Name.ToLower()
-    Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $cluster" -ForegroundColor Gray
-    kubectl delete namespace "images-cache" --context $cluster
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
+while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
+  Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+  Receive-Job -Name images-cache-cleanup -WarningAction SilentlyContinue
+  Start-Sleep -Seconds 60
 }
+Get-Job -name images-cache-cleanup | Remove-Job
 
 # Removing the LogonScript Scheduled Task
 Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray

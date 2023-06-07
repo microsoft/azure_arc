@@ -9,7 +9,7 @@ param spnClientSecret string
 param spnTenantId string
 
 @minLength(1)
-@maxLength(17)
+@maxLength(77)
 @description('Prefix for resource group, i.e. {name}-rg')
 param envName string
 
