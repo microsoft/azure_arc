@@ -6,6 +6,8 @@ on:
             - main
         types:
             - closed
+        paths:
+        - 'contoso_supermarket/developer/pos/**'
 
   workflow_dispatch: {}
 
@@ -42,14 +44,22 @@ jobs:
           echo $NEW_VERSION
           echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Run unit tests
+        uses: mscoutermarsh/ascii-art-action@master
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+        with:
+          text: 'Unit Tests complete!'
+
       - name: 'Build and push new images'
         env:
           latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         run: |
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
-          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
 
       - name: 'Update Image tag on main branch'
         env:
