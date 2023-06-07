@@ -1,4 +1,3 @@
-
 {
   "$schema": "https://dataexplorer.azure.com/static/d/schema/35/dashboard.json",
   "id": "2db2cda4-1563-4cba-9bbd-92e6a81c3e27",
@@ -28,9 +27,9 @@
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
         "usedVariables": [
-	    "_endTime",
-	    "_startTime",
-	    "site"
+          "_endTime",
+          "_startTime",
+          "site"
         ],
         "text": "environmentSensor\n//| where ['iothub-enqueuedtime'] > now(-1h)\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| where ['device-id'] has ['site']\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F"
       },
@@ -43,12 +42,12 @@
             "yAxisMaximumValue": null,
             "yAxisMinimumValue": null,
             "yAxisScale": "linear",
-                "horizontalLines": [
-                    {
-                        "id": "85904966-6ba4-4c22-8e2c-a47933cc1bb1",
-                        "value": 20
-                    }
-                ]
+            "horizontalLines": [
+              {
+                "id": "85904966-6ba4-4c22-8e2c-a47933cc1bb1",
+                "value": 20
+              }
+            ]
           },
           "additional": [],
           "showMultiplePanels": false
@@ -96,9 +95,9 @@
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
         "usedVariables": [
-            "_endTime",
-            "_startTime",
-            "site"
+          "_endTime",
+          "_startTime",
+          "site"
         ],
         "text": "environmentSensor\n//| where ['iothub-enqueuedtime'] > now(-1h)\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| where ['device-id'] has ['site']\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
       },
@@ -157,36 +156,36 @@
       "showOnPages": {
         "kind": "all"
       }
+    },
+    {
+      "kind": "string",
+      "id": "e60de914-f88f-44f3-9314-81ae01a0cc4e",
+      "displayName": "Site",
+      "variableName": "site",
+      "selectionType": "scalar",
+      "includeAllOption": true,
+      "defaultValue": {
+        "kind": "all"
+      },
+      "dataSource": {
+        "kind": "query",
+        "query": {
+          "kind": "inline",
+          "dataSource": {
+            "kind": "inline",
+            "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
+          },
+          "usedVariables": [],
+          "text": "environmentSensor\n| project site = tostring(split(['device-id'],\"-\")[2])\n| distinct site\n"
         },
-        {
-            "kind": "string",
-            "id": "e60de914-f88f-44f3-9314-81ae01a0cc4e",
-            "displayName": "Site",
-            "variableName": "site",
-            "selectionType": "scalar",
-            "includeAllOption": true,
-            "defaultValue": {
-                "kind": "all"
-            },
-            "dataSource": {
-                "kind": "query",
-                "query": {
-                    "kind": "inline",
-                    "dataSource": {
-                        "kind": "inline",
-                        "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
-                    },
-                    "usedVariables": [],
-                    "text": "environmentSensor\n| project site = tostring(split(['device-id'],\"-\")[2])\n| distinct site\n"
-                },
-                "columns": {
-                    "value": "site"
-                }
-            },
-            "showOnPages": {
-                "kind": "all"
-            }
+        "columns": {
+          "value": "site"
         }
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    }
   ],
   "dataSources": [
     {
