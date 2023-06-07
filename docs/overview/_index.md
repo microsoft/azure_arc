@@ -25,9 +25,7 @@ Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jum
 
 ## Jumpstart Agora
 
-Always wanted to have a full-stack deployment, from the infrastructure layer all the way to the line of business applications? Wanted Well, now you can!
-
-[Jumpstart Agora](https://aka.ms/JumpstartAgora) is a marketplace of various “cloud to edge” industry scenarios, designed to provide an automated end-to-end user experience.
+[Jumpstart Agora](https://aka.ms/JumpstartAgora) is a marketplace of various “cloud to edge” industry scenarios, designed to provide an automated end-to-end user experience. It provides a rich and comprehensive experience while getting started with a full-stack deployment, from the infrastructure layer all the way to the line of business applications and the operational and development process around them.
 
 <p align="center"><a href="https://aka.ms/JumpstartAgora" target="_blank"><img src="/img/agora_logo.png" alt="jumpstart-agora-logo" width="250"></a></p>
 
