@@ -1408,6 +1408,20 @@ foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
     Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 }
 
+# Configure Windows Terminal
+Set-Location $env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
+
+# Launch Windows Terminal for default settings.json to be created
+Start-Process wt.exe -WindowStyle Hidden
+
+$settings = Get-Content .\settings.json | ConvertFrom-Json
+$settings.profiles.defaults.elevate
+
+# Configure the default profile setting "Run this profile as Administrator" to "true"
+$settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
+
+$settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
+
 # Install Ubuntu
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
 Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
