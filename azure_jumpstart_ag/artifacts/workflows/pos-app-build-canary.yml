@@ -47,14 +47,14 @@ jobs:
         echo $CANARY_LATEST_TAG
         echo "latest_tag=$CANARY_LATEST_TAG" >> $GITHUB_OUTPUT
 
-    - name: Run tests
+    - name: Run integration tests
       uses: mscoutermarsh/ascii-art-action@master
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
       if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
       with:
-        text: 'Testing complete!'
+        text: 'Integration tests complete!'
 
     - name: 'Build and push new images'
       env:
