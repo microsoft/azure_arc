@@ -50,8 +50,3 @@ module policyDeploymentRGScope './policyAzureArcRGScope.bicep' = {
     logAnalyticsWorkspaceId: workspace.id
   }
 }
-
-module defenderForServersSubScope './defenderForServersSubScope.bicep' = {
-  name: 'defenderForServersSubScope'
-  scope: subscription()
-}
