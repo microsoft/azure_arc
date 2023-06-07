@@ -1,6 +1,8 @@
-
 {
-  "schema_version": "35",
+  "$schema": "https://dataexplorer.azure.com/static/d/schema/37/dashboard.json",
+  "id": "b55ad60a-f8ad-4c29-81ad-1be986ed2e77",
+  "eTag": "5SpbYi2YrBoubNsn18L5ZA==",
+  "schema_version": "37",
   "title": "POS Orders",
   "autoRefresh": {
     "enabled": false
@@ -24,11 +26,13 @@
           "kind": "inline",
           "dataSourceId": "30c352ba-838d-4a10-a030-718b81b97cff"
         },
-        "usedVariables": [],
-        "text": "Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n|project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n|where orderDate != \"\"\n| summarize OrderCount = count() by bin(orderDate, 1d), name\n| render linechart\n"
+        "usedVariables": [
+          "_endTime",
+          "_startTime"
+        ],
+        "text": "Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n| project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| where orderDate != \"\"\n| where orderDate between (_startTime.._endTime)\n| summarize OrderCount = count() by bin(orderDate, 1d), name\n| render linechart\n"
       },
       "visualOptions": {
-        "hideTileTitle": false,
         "multipleYAxes": {
           "base": {
             "id": "-1",
@@ -85,12 +89,14 @@
           "kind": "inline",
           "dataSourceId": "30c352ba-838d-4a10-a030-718b81b97cff"
         },
-        "usedVariables": [],
-        "text": " Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n|project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| summarize OrderCount = count() by name\n| render piechart\n"
+        "usedVariables": [
+          "_endTime",
+          "_startTime"
+        ],
+        "text": " Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n| project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| where orderDate != \"\"\n| where orderDate between (_startTime.._endTime)\n| summarize OrderCount = count() by name\n| render piechart\n"
       },
       "visualOptions": {
         "hideLegend": false,
-        "hideTileTitle": false,
         "xColumn": {
           "type": "infer"
         },
@@ -137,11 +143,13 @@
           "kind": "inline",
           "dataSourceId": "30c352ba-838d-4a10-a030-718b81b97cff"
         },
-        "usedVariables": [],
-        "text": "Orders\n| project orderDate, storeId=tostring(storeId), d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n|project orderDate, storeId, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| summarize OrderCount = count() by storeId\n| order by storeId asc\n| render linechart\n\n"
+        "usedVariables": [
+          "_endTime",
+          "_startTime"
+        ],
+        "text": "Orders\n| project orderDate, storeId=tostring(storeId), d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n| project orderDate, storeId, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| where orderDate != \"\"\n| where orderDate between (_startTime.._endTime)\n| summarize OrderCount = count() by storeId\n| order by storeId asc\n| render linechart\n\n"
       },
       "visualOptions": {
-        "hideTileTitle": false,
         "hideLegend": false,
         "xColumn": {
           "type": "infer"
@@ -188,12 +196,14 @@
           "kind": "inline",
           "dataSourceId": "30c352ba-838d-4a10-a030-718b81b97cff"
         },
-        "usedVariables": [],
-        "text": "Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n|project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n|where orderDate != \"\"\n| summarize OrderCount = count() by bin(orderDate, 1d)\n| render columnchart \n"
+        "usedVariables": [
+          "_endTime",
+          "_startTime"
+        ],
+        "text": "Orders\n| project orderDate, d=parse_json(tostring(orderdetails))\n| mv-expand bagexpansion=array d\n| project orderDate, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| where orderDate != \"\"\n| where orderDate between (_startTime.._endTime)\n| summarize OrderCount = count() by bin(orderDate, 1d)\n| render columnchart \n"
       },
       "visualOptions": {
         "hideLegend": true,
-        "hideTileTitle": false,
         "multipleYAxes": {
           "base": {
             "id": "-1",
@@ -259,7 +269,7 @@
   ],
   "pages": [
     {
-      "name": "Page 1",
+      "name": "POS Reports",
       "id": "dbd36190-ec40-494d-b55c-2c7aa06c2240"
     }
   ]
