@@ -1414,6 +1414,12 @@ Set-Location $env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
 # Launch Windows Terminal for default settings.json to be created
 Start-Process wt.exe -WindowStyle Hidden
 
+# Give process time to initiate and create settings file
+Start-Sleep 2
+
+# Stop Windows Terminal process
+Get-Process WindowsTerminal | Stop-Process
+
 $settings = Get-Content .\settings.json | ConvertFrom-Json
 $settings.profiles.defaults.elevate
 
