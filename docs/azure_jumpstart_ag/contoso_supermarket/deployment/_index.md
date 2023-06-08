@@ -6,9 +6,9 @@ toc_hide: true
 
 ## Jumpstart Agora - Deployment guide
 
-Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Agora environment, including the infrastructure, applications, and CI/CD. The diagram below details the automation workflow.
+Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Agora environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components.
 
-![Deployment flow diagram](./placeholder.png)
+![Deployment flow diagram](./architecture_diagram.png)
 
 A high-level overview of the deployment process
 
