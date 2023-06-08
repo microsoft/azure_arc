@@ -1577,7 +1577,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
         # Replace matching value in the Bookmarks file
         $content = Get-Content -Path $bookmarksFileName
-        $newContent = $content -replace ("Prometheus" + $cluster.Name + "Prod-URL"), $output
+        $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
         $newContent | Set-Content -Path $bookmarksFileName
 
         Start-Sleep -Seconds 2
