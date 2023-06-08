@@ -181,6 +181,20 @@ Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 
+Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+$response = Invoke-RestMethod -Uri $githubApiUrl
+$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+$fileUrls | ForEach-Object {
+    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+}
+git add .
+git commit -m "Pushing GitHub actions to apps fork"
+git push
+Start-Sleep -Seconds 20
+
 Write-Host "INFO: Verifying permissions assigned to the Personal access token" -ForegroundColor Gray
 Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
 $retryCount = 0
@@ -287,19 +301,6 @@ gh secret set "PAT_GITHUB" -b $githubPat
 gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
 gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
-Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-$response = Invoke-RestMethod -Uri $githubApiUrl
-$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-$fileUrls | ForEach-Object {
-    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-    Invoke-RestMethod -Uri $_ -OutFile $outputFile
-}
-git add .
-git commit -m "Pushing GitHub actions to apps fork"
-git push
-Start-Sleep -Seconds 20
 Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
 gh workflow run update-files.yml
 while ($workflowStatus.status -ne "completed") {
