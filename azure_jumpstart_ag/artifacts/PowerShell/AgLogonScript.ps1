@@ -111,6 +111,7 @@ Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundCol
 $retryCount = 0
 $maxRetries = 5
 do {
+    $forkExists = $false
     try {
         $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
         if ($response) {
