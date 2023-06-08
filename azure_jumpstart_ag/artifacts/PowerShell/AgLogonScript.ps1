@@ -213,6 +213,17 @@ do {
 } until ($response)
 Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
 
+Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
+git config --global user.email "dev@agora.com"
+git config --global user.name "Agora Dev"
+git remote add upstream $appUpstreamRepo
+git fetch upstream
+git checkout main
+git reset --hard upstream/main
+git push origin main -f
+git pull
+git remote remove upstream
+git remote add upstream $appsRepo
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
@@ -277,18 +288,6 @@ foreach ($branch in $protectedBranches) {
     Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
     Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
 }
-
-Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
-git config --global user.email "dev@agora.com"
-git config --global user.name "Agora Dev"
-git remote add upstream $appUpstreamRepo
-git fetch upstream
-git checkout main
-git reset --hard upstream/main
-git push origin main -f
-git pull
-git remote remove upstream
-git remote add upstream $appsRepo
 
 write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
 Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
