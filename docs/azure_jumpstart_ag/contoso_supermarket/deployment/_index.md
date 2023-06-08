@@ -6,19 +6,19 @@ toc_hide: true
 
 ## Jumpstart Agora - Deployment guide
 
-Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Agora environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components.
+Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Agora environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components. The diagram below details the high-level architecture that is deployed and configured as part of the automation.
 
-![Deployment flow diagram](./architecture_diagram.png)
-
-A high-level overview of the deployment process
+![Architecture diagram](./img/architecture_diagram.png)
 
 Deploying Agora consists of the following steps.
 
     - Prerequisite - User creates or already has access to a service principal with Owner role
     - Prerequisite - User forks the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into their own GitHub account
     - Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group
-    - Login to the Agora-VM-Client Azure virtual machine - On first logon to the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD
+    - Login to the Agora-VM-Client Azure virtual machine - On first logon to the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run as they 
     - Automation completes - The PowerShell windows automatically close and the Agora desktop background is visible
+
+![Architecture diagram](./img/deployment_flow.png)
 
 Once automation is complete, users can immediately start enjoying the Agora experience.
 
@@ -26,19 +26,55 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
 - Fork the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+  - Open the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
 
-    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo1.png)
+  
+  - Use the default settings to create your fork. Ensure that your user is selected in the dropdown and then click the "Create Fork" button.
 
-    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./placeholder.png)
+    ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo2.png)
 
-- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify *only* the Jumpstart Agora Apps repo that you forked. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, Workflows.
+- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify *only* the Jumpstart Agora Apps repo that you forked.
 
-    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
+  - In the top right of the GitHub website, click on the dropdown on your user icon and then click "Settings".
 
-    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT1.png)
 
-    ![Screenshot showing how to create the GitHub PAT](./placeholder.png)
+  - In the left menu navigation click on "Developer settings".
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT2.png)
+
+  - Under "Personal access tokens" select "Fine-grained tokens".
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT3.png)
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT4.png)
+
+  - Give your token a name and select an expiry period.
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT5.png)
+
+  - Under "Repository access" select "Only select repositories" and then choose the jumpstart-agora-apps repo that you forked in the previous steps.
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT6.png)
+
+  - Assign "Read and write" permissions for your fork of the jumpstart-agora-apps repo. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, Workflows.
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT7.png)
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT8.png)
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT9.png)
+
+  - Once the correct permissions are assigned click the "Generate token" button.
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT10.png)
+
+  - Copy the token value to a temporary location such as in Notepad. You will need this value in a later step.
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT11.png)
+
+    > **NOTE: The token shown in the above screenshot is a placeholder value for example purposes only and not a working token.**
 
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
@@ -65,7 +101,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   az vm list-usage --location <your location> --output table
   ```
 
-  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
+  ![Screenshot showing az vm list-usage](./img/az_vm_list_usage.png)
 
 - Create Azure service principal (SP). An Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
@@ -116,7 +152,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
     Output should look similar to this:
 
-    ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
+    ![Screenshot showing creating an SPN with PowerShell](./img/create_spn_powershell.png)
 
     > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.**
 
@@ -164,7 +200,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
   - _`githubPAT`_ - The GitHub PAT token that you created as part of the prerequisites.
 
 
-  ![Screenshot showing example parameters](./parameters_bicep.png)
+  ![Screenshot showing example parameters](./img/parameters_bicep.png)
 
 - Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/bicep) and run the below command:
 
