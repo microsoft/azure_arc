@@ -136,14 +136,14 @@
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Prometheus-Chicago-Prod-URL"
+               "url": "Prometheus-Chicago-URL"
             }, {
                "id": "33",
                "name": "Prometheus Prod - Seattle",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Prometheus-Seattle-Prod-URL"
+               "url": "Prometheus-Seattle-URL"
             } ],
             "id": "29",
             "name": "Prometheus",
