@@ -111,11 +111,11 @@ Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundCol
 $retryCount = 0
 $maxRetries = 5
 do {
-    $response = $null
     try {
         $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
         if ($response) {
             write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+            $forkExists = $true
         }
     }
     catch {
@@ -129,7 +129,7 @@ do {
             Exit
         }
     }
-} until ($response)
+} until ($forkExists -eq $true)
 
 Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
 do {
