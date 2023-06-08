@@ -123,6 +123,7 @@ do {
         if($retryCount -lt $maxRetries) {
             Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
             $retryCount++
+            $forkExists = $false
             start-sleep -Seconds 60
         }
         else {
