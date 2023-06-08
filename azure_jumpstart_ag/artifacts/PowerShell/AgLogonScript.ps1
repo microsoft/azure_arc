@@ -239,7 +239,7 @@ $fileUrls | ForEach-Object {
     Invoke-RestMethod -Uri $_ -OutFile $outputFile
 }
 git add .
-git commit -m "Pushing GitHub actions to apps fork"
+git commit -m "Pushing GitHub Actions to apps fork"
 git push
 Start-Sleep -Seconds 20
 
