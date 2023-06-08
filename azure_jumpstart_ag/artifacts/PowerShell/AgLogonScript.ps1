@@ -128,7 +128,7 @@ do {
             Exit
         }
     }
-} until ($response.full_name -eq "$githubUser/$appsRepo")
+} until ($response)
 
 Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
 do {
