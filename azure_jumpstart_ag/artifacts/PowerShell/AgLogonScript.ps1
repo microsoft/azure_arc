@@ -215,6 +215,7 @@ Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor 
 
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
+New-Item -ItemType Directory ".github/workflows" -Force
 $githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
 $response = Invoke-RestMethod -Uri $githubApiUrl
 $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
@@ -290,7 +291,6 @@ git remote remove upstream
 git remote add upstream $appsRepo
 
 write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
-New-Item -ItemType Directory ".github/workflows" -Force
 Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
 Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
 gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
