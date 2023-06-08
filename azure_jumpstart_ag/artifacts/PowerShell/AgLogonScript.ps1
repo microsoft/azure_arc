@@ -279,7 +279,7 @@ foreach ($branch in $protectedBranches) {
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
-git config --global user.name $githubUser
+git config --global user.name "Agora Dev"
 git remote add upstream $appUpstreamRepo
 git fetch upstream
 git checkout main
