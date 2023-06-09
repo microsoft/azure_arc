@@ -273,7 +273,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing complete deployment](./ing/contoso_supermarket_complete.png)
 
-  ![Screenshot showing Agora resources in Azure portal](./img/rg_arc.png)
+  ![Screenshot showing Agora resources in Azure portal](./img/rg_complete.png)
 
 ## Next steps
 
