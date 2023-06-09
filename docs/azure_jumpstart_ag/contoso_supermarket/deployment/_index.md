@@ -277,11 +277,11 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ## Next steps
 
-Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases.
+Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases of Contoso Supermarket in Jumpstart Agora.
 
 - [POS](https://placeholder)
 - [Freezer Monitor](https://placeholder)
-- [CICD](https://placeholder)
+- [CI/CD](https://placeholder)
 - [Basic GitOps](https://placeholder)
 - [Analytics](https://analytics)
 - [Troubleshooting](https://troubleshooting)
