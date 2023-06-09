@@ -226,7 +226,7 @@ Jumpstart Agora provides an experimental feature that allows users to deploy wit
 
 - Run the ```azd up``` command to deploy the environment. Azd will prompt you to enter the target subscription, region and all required parameters.
 
-  ![Screenshot showing azd init](./img/azd_up.png)
+  ![Screenshot showing azd up](./img/azd_up.png)
 
 ## Start post-deployment automation
 
