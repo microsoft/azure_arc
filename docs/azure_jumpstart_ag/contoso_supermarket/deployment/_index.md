@@ -59,7 +59,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT6.png)
 
-  - Assign "Read and write" permissions for your fork of the jumpstart-agora-apps repo. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, Workflows.
+  - Assign the "Read and write" permissions for your fork of the _jumpstart-agora-apps_ repo. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, and Workflows.
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT7.png)
 
