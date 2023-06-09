@@ -75,6 +75,8 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT11.png)
 
+    > **NOTE: GitHub fine-grained access tokens are a beta feature of GitHub and may be subject to change in user experience or functionality.**
+
     > **NOTE: The token shown in the above screenshot is a placeholder value for example purposes only and not a working token.**
 
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
@@ -203,7 +205,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
   ![Screenshot showing example parameters](./img/parameters_bicep.png)
 
-- Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/bicep) and run the below command:
+- Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/jumpstart_ag/azure_jumpstart_ag/bicep) and run the below command:
 
   ```shell
   az login
