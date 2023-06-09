@@ -27,7 +27,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 - Fork the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-  - Open the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
+  - Open the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo1.png)
   
