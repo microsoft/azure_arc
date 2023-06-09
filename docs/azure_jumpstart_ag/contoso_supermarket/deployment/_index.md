@@ -10,13 +10,14 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 ![Architecture diagram](./img/architecture_diagram.png)
 
-Deploying Agora consists of the following steps.
-
-    1. Prerequisite - User creates or already has access to an Azure service principal with Owner role scoped to an Azure subscription.
-    2. Prerequisite - User forks the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into their own GitHub account.
-    3. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
-    4. Login to the Agora-VM-Client Azure virtual machine - On first logon to the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run.
-    5. Automation completes - The PowerShell windows automatically close and the Agora desktop background is visible.
+Deploying Agora consists of the following steps (once prerequisites are met).
+  
+  1. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
+  2. Bicep template deploys multiple Azure resources including the Client virtual machine.
+  3. Client VM uses custom script extension to run the Bootstrap PowerShell script which initializes the environment.
+  4. Bootstrap script injects the Logon script to Client VM.
+  5. User logs in to the Agora-VM-Client Azure virtual machine.
+  6. After login the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run.
 
 Once automation is complete, users can immediately start enjoying the Contoso Supermarket experience.
 
