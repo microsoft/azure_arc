@@ -111,16 +111,19 @@ Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundCol
 $retryCount = 0
 $maxRetries = 5
 do {
+    $forkExists = $false
     try {
         $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
         if ($response) {
             write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
+            $forkExists = $true
         }
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed . . . waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
             $retryCount++
+            $forkExists = $false
             start-sleep -Seconds 60
         }
         else {
@@ -128,7 +131,7 @@ do {
             Exit
         }
     }
-} until ($response.full_name -eq "$githubUser/$appsRepo")
+} until ($forkExists -eq $true)
 
 Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
 do {
@@ -164,7 +167,7 @@ do {
     }
     catch {
         if($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme].....waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme] (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
             start-sleep -Seconds 60
@@ -181,18 +184,41 @@ Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
 git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
 Set-Location "$AgAppsRepo\$appsRepo"
 
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-foreach ($branch in $protectedBranches) {
-    $branchName = $branch.name
-    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
-}
+Write-Host "INFO: Verifying 'Administration' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+
+$body = @{
+    required_status_checks        = $null
+    enforce_admins                = $false
+    required_pull_request_reviews = @{
+        required_approving_review_count = 0
+    }
+    dismiss_stale_reviews         = $true
+    restrictions                  = $null
+} | ConvertTo-Json
+
+do {
+    try {
+        $response= Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+    }
+    catch {
+        if($retryCount -lt $maxRetries) {
+            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            $retryCount++
+            start-sleep -Seconds 60
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Administration' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+    }
+} until ($response)
+Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
 
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
-git config --global user.name $githubUser
+git config --global user.name "Agora Dev"
 git remote add upstream $appUpstreamRepo
 git fetch upstream
 git checkout main
@@ -202,8 +228,71 @@ git pull
 git remote remove upstream
 git remote add upstream $appsRepo
 
-write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
+Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
+$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
+$response = Invoke-RestMethod -Uri $githubApiUrl
+$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+$fileUrls | ForEach-Object {
+    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
+    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+}
+git add .
+git commit -m "Pushing GitHub Actions to apps fork"
+git push
+Start-Sleep -Seconds 20
+
+Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh secret set "test" -b "test" 2>&1
+    if ($response -match "error") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 60
+        }
+    }
+} while ($response -match "error" -or $retryCount -ge $maxRetries)
+gh secret delete test
+Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
+
+Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
+$retryCount = 0
+$maxRetries = 5
+do {
+    $response = gh workflow enable update-files.yml 2>&1
+    if ($response -match "failed") {
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Actions' write permissions assigned. Exiting." -ForegroundColor Red
+            Exit
+        }
+        else {
+            $retryCount++
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Start-Sleep -Seconds 60
+        }
+    }
+} while ($response -match "failed" -or $retryCount -ge $maxRetries)
+Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
+
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+foreach ($branch in $protectedBranches) {
+    $branchName = $branch.name
+    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+}
+
+write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
 Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
 Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
 gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
@@ -215,19 +304,6 @@ gh secret set "PAT_GITHUB" -b $githubPat
 gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
 gh secret set "SPN_TENANT_ID" -b $spnTenantId
 
-Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-$response = Invoke-RestMethod -Uri $githubApiUrl
-$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-$fileUrls | ForEach-Object {
-    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-    Invoke-RestMethod -Uri $_ -OutFile $outputFile
-}
-git add .
-git commit -m "Pushing GitHub actions to apps fork"
-git push
-Start-Sleep -Seconds 20
 Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
 gh workflow run update-files.yml
 while ($workflowStatus.status -ne "completed") {
@@ -242,7 +318,7 @@ Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor G
 $branches = $AgConfig.GitBranches
 foreach ($branch in $branches) {
     try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/jumpstart-agora-apps/branches/$branch"
+        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch"
         if ($response) {
             if ($branch -ne "main") {
                 Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
@@ -267,9 +343,18 @@ foreach ($branch in $branches) {
         git push origin $branch
     }
 }
+Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
+$existingBranches = gh api "repos/$githubUser/$appsRepo/branches" | ConvertFrom-Json
+$branches = $AgConfig.GitBranches
+foreach ($branch in $existingBranches) {
+    if($branches -notcontains $branch.name){
+        $branchToDelete = $branch.name
+        git push origin --delete $branchToDelete
+    }
+}
+
 Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
 git checkout main
-
 
 Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
 foreach ($branch in $branches) {
@@ -355,10 +440,10 @@ if (!(Test-Path -Path $storesJsonPath)) {
 }
 
 # Download icon file
-$iconPath = "$AgIconsDir\dashboard.ico"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/dashboard.ico" -OutFile $iconPath
+$iconPath = "$AgIconsDir\emulator.ico"
+Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
 if (!(Test-Path -Path $iconPath)) {
-    Write-Host "Unabled to download dashboard.ico file. Please download manually from GitHub into the icons folder."
+    Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
 }
 
 # Create desktop shortcut
@@ -770,17 +855,6 @@ foreach ($VM in $VMNames) {
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-    # Cleaning up images-cache namespace on all clusters
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Start-Job -Name images-cache-cleanup -ScriptBlock {
-            $cluster = $using:cluster
-            $clusterName = $cluster.Name.ToLower()
-            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-            kubectl delete namespace "images-cache" --context $clusterName
-        }
-    }
-
 #####################################################################
 # Tag Azure Arc resources
 #####################################################################
@@ -882,7 +956,7 @@ foreach ($job in $jobs) {
     $provisioningState = $result.ProvisioningState
 
     if ($provisioningState -ne "Succeeded") {
-        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds..." -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds (attempt $retryCount/$maxRetries)..." -ForegroundColor Gray
         Start-Sleep -Seconds 10
         $retryCount++
     }
@@ -916,7 +990,18 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 12/17)" -ForegroundColor DarkGreen
 
-#  TODO - this looks app-specific so should perhaps be moved to the app loop 
+Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+# Cleaning up images-cache namespace on all clusters
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    Start-Job -Name images-cache-cleanup -ScriptBlock {
+        $cluster = $using:cluster
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+        kubectl delete namespace "images-cache" --context $clusterName
+    }
+}
+
+#  TODO - this looks app-specific so should perhaps be moved to the app loop
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
     Start-Sleep -Seconds 10
@@ -1149,12 +1234,21 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 $env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
 grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-# Get Grafana credentials
-$credentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
-$encodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($credentials))
+# Get Grafana Admin credentials
+$adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
+$adminEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($adminCredentials))
 
-$headers = @{
-    "Authorization" = ("Basic " + $encodedcredentials)
+$adminHeaders = @{
+    "Authorization" = ("Basic " + $adminEncodedcredentials)
+    "Content-Type"  = "application/json"
+}
+
+# Get Contoso User credentials
+$userCredentials = $adminUsername + ':' + $adminPassword
+$userEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($userCredentials))
+
+$userHeaders = @{
+    "Authorization" = ("Basic " + $userEncodedcredentials)
     "Content-Type"  = "application/json"
 }
 
@@ -1169,6 +1263,18 @@ foreach ($dashboard in $observabilityDashboards.'grafana.com') {
 $observabilityDashboardstoImport = @()
 $observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
 $observabilityDashboardstoImport += $observabilityDashboards.'custom'
+
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
+# Add Contoso Operator User
+$grafanaUserBody = @{
+    name     = $AgConfig.Monitoring["User"] # Display Name
+    email    = $AgConfig.Monitoring["Email"]
+    login    = $adminUsername
+    password = $adminPassword
+} | ConvertTo-Json
+
+# Make HTTP request to the API
+Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Deploying Kube Prometheus Stack for stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -1218,7 +1324,21 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         } | ConvertTo-Json
 
         # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $headers -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    }
+
+    # Add Contoso Operator User
+    if (!$_.Value.IsProduction) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
+        $grafanaUserBody = @{
+            name     = $AgConfig.Monitoring["User"] # Display Name
+            email    = $AgConfig.Monitoring["Email"]
+            login    = $adminUsername
+            password = $adminPassword
+        } | ConvertTo-Json
+
+        # Make HTTP request to the API
+        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
@@ -1251,42 +1371,22 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         if ($_.Value.IsProduction) {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
         }
         else {
             # Set Grafana Dashboard endpoint
             $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+            $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
         }
 
         # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $headers -Body $grafanaDBBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-    }
+        $dashboardID=(Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id 
 
-    if (!$_.Value.IsProduction) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
-        $grafanaUserBody = @{
-            name     = $AgConfig.Monitoring["User"] # Display Name
-            email    = $AgConfig.Monitoring["Email"]
-            login    = $adminUsername
-            password = $adminPassword
-        } | ConvertTo-Json
-
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
     }
+
 }
-
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
-# Add Contoso Operator User
-$grafanaUserBody = @{
-    name     = $AgConfig.Monitoring["User"] # Display Name
-    email    = $AgConfig.Monitoring["Email"]
-    login    = $adminUsername
-    password = $adminPassword
-} | ConvertTo-Json
-
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $headers -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
@@ -1326,6 +1426,26 @@ foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
 foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
     Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
 }
+
+# Configure Windows Terminal
+Set-Location $env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
+
+# Launch Windows Terminal for default settings.json to be created
+Start-Process wt.exe -WindowStyle Hidden
+
+# Give process time to initiate and create settings file
+Start-Sleep 2
+
+# Stop Windows Terminal process
+Get-Process WindowsTerminal | Stop-Process
+
+$settings = Get-Content .\settings.json | ConvertFrom-Json
+$settings.profiles.defaults.elevate
+
+# Configure the default profile setting "Run this profile as Administrator" to "true"
+$settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
+
+$settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
 
 # Install Ubuntu
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
@@ -1442,6 +1562,25 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
             Start-Sleep -Seconds 2
         }
+    }
+
+    # Matching url: prometheus
+    $matchingServices = $services.items | Where-Object {
+        $_.spec.ports.port -contains 9090 -and
+        $_.spec.type -eq "LoadBalancer"
+    }
+    $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
+
+    foreach ($prometheusIp in $prometheusIps) {
+        $output = "http://$prometheusIp" + ':9090'
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
     }
 }
 
