@@ -202,7 +202,6 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   - _`githubUser`_ - The name of the user account on GitHub where you have forked the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps)
   - _`githubPAT`_ - The GitHub PAT token that you created as part of the prerequisites.
 
-
   ![Screenshot showing example parameters](./img/parameters_bicep.png)
 
 - Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/jumpstart_ag/azure_jumpstart_ag/bicep) and run the below command:
@@ -272,9 +271,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing Agora-Client-VM](./img/automation.png)
 
-- Deployment is complete! Let's begin exploring the features of Agora!
+- Deployment is complete! Let's begin exploring the features of Contoso Supermarket!
 
-  ![Screenshot showing complete deployment](./ing/contoso_supermarket_complete.png)
+  ![Screenshot showing complete deployment](./img/contoso_supermarket_complete.png)
 
   ![Screenshot showing Agora resources in Azure portal](./img/rg_complete.png)
 
