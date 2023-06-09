@@ -177,13 +177,13 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   ssh-rsa o1djFhyNe5NXyYk7XVF7wOBAAABgQDO/QPJ6IZHujkGRhiI+6s1ngK8V4OK+iBAa15GRQqd7scWgQ1RUSFAAKUxHn2TJPx/Z/IU60aUVmAq/OV9w0RMrZhQkGQz8CHRXc28S156VMPxjk/gRtrVZXfoXMr86W1nRnyZdVwojy2++sqZeP/2c5GoeRbv06NfmHTHYKyXdn0lPALC6i3OLilFEnm46Wo+azmxDuxwi66RNr9iBi6WdIn/zv7tdeE34VAutmsgPMpynt1+vCgChbdZR7uxwi66RNr9iPdMR7gjx3W7dikQEo1djFhyNe5rrejrgjerggjkXyYk7XVF7wOk0t8KYdXvLlIyYyUCk1cOD2P48ArqgfRxPIwepgW78znYuwiEDss6g0qrFKBcl8vtiJE5Vog/EIZP04XpmaVKmAWNCCGFJereRKNFIl7QfSj3ZLT2ZXkXaoLoaMhA71ko6bKBuSq0G5YaMq3stCfyVVSlHs7nzhYsX6aDU6LwM/BTO1c= user@pc
   ```
 
-## Deployment: Bicep deployment via Azure CLI
-
 - Clone the Azure Arc Jumpstart repository
 
   ```shell
   git clone https://github.com/microsoft/azure_arc.git
   ```
+
+## Deployment: Bicep deployment via Azure CLI
 
 - Upgrade to latest Bicep version
 
@@ -213,6 +213,20 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   ```
 
     > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://placeholder).**
+
+## Deployment via Azure Developer CLI (experimental)
+
+Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
+
+- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+
+- Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
+  
+  ![Screenshot showing azd init](./img/azd_init.png)
+
+- Run the ```azd up``` command to deploy the environment. Azd will prompt you to enter the target subscription, region and all required parameters.
+
+  ![Screenshot showing azd init](./img/azd_up.png)
 
 ## Start post-deployment automation
 
@@ -287,4 +301,15 @@ Once deployment is complete its time to start experience Agora capabilities. Use
 - [Basic GitOps](https://placeholder)
 - [Analytics](https://analytics)
 - [Troubleshooting](https://troubleshooting)
-- [Cleanup](https://placeholder)
+
+## Clean up the deployment
+
+To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
+
+```shell
+az group delete -n <name of your resource group>
+```
+
+![Screenshot showing az group delete](./img/placeholder.png)
+
+![Screenshot showing group delete from Azure portal](./img/placeholder.png)
