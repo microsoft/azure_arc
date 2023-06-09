@@ -1387,6 +1387,7 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
     }
 
 }
+Write-Host
 
 #############################################################
 # Install Windows Terminal, WSL2, and Ubuntu
