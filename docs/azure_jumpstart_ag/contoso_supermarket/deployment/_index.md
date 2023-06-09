@@ -215,7 +215,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 ## Start post-deployment automation
 
-Once your deployment is complete, you can open the Azure portal and see the Agora resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
+Once your deployment is complete, you can open the Azure portal and see the Agora scenario resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
 
   ![Screenshot showing all deployed resources in the resource group](./img/deployed_resources.png)
 
