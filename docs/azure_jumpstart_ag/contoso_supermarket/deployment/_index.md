@@ -12,15 +12,15 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 Deploying Agora consists of the following steps.
 
-    - Prerequisite - User creates or already has access to a service principal with Owner role
-    - Prerequisite - User forks the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into their own GitHub account
-    - Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group
-    - Login to the Agora-VM-Client Azure virtual machine - On first logon to the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run as they 
-    - Automation completes - The PowerShell windows automatically close and the Agora desktop background is visible
+    1. Prerequisite - User creates or already has access to an Azure service principal with Owner role scoped to an Azure subscription.
+    2. Prerequisite - User forks the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into their own GitHub account.
+    3. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
+    4. Login to the Agora-VM-Client Azure virtual machine - On first logon to the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run.
+    5. Automation completes - The PowerShell windows automatically close and the Agora desktop background is visible.
+
+Once automation is complete, users can immediately start enjoying the Contoso Supermarket experience.
 
 ![Architecture diagram](./img/deployment_flow.png)
-
-Once automation is complete, users can immediately start enjoying the Agora experience.
 
 ## Prerequisites
 
@@ -216,7 +216,7 @@ Once automation is complete, users can immediately start enjoying the Agora expe
 
 Once your deployment is complete, you can open the Azure portal and see the Agora resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
 
-  ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
+  ![Screenshot showing all deployed resources in the resource group](./img/deployed_resources.png)
 
    > **NOTE: For enhanced Agora security posture, RDP (3389) and SSH (22) ports are not open by default in Agora deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
@@ -233,23 +233,21 @@ By design, Agora does not open port 3389 on the network security group. Therefor
 
 - Open the _Agora-NSG-Prod_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing Agora NSG with blocked RDP](./rdp_nsg_blocked.png)
-
-  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
+  ![Screenshot showing adding a new inbound security rule](./img/nsg_add_rule.png)
 
 - Select My IP address from the dropdown.
 
-  <img src="./nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
+  <img src="./img/nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
 
-  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
+  ![Screenshot showing all inbound security rule](./img/nsg_rdp_all_rules.png)
 
-  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+  ![Screenshot showing connecting to the VM using RDP](./img/rdp_connect.png)
 
 #### Connect using Azure Bastion
 
 - If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
 
-  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
+  ![Screenshot showing connecting to the VM using Bastion](./img/bastion_connect.png)
 
   > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _Agora-Client-VM_ with Azure Bastion.**
 
@@ -259,23 +257,23 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./img/jit_allowing_rdp.png)
 
-  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+  ![Screenshot showing connecting to the VM using RDP](./img/rdp_connect.png)
 
-  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
+  ![Screenshot showing connecting to the VM using JIT](./img/jit_connect_rdp.png)
 
 ### The Logon scripts
 
 - Once you log into the _Agora-Client-VM_, multiple automated scripts will open and start running. These scripts usually take around thirty minutes to finish, and once completed, the script windows will close automatically. At this point, the deployment is complete.
 
-  ![Screenshot showing Agora-Client-VM](./automation.png)
+  ![Screenshot showing Agora-Client-VM](./img/automation.png)
 
 - Deployment is complete! Let's begin exploring the features of Agora!
 
-  ![Screenshot showing complete deployment](./arcbox_complete.png)
+  ![Screenshot showing complete deployment](./ing/contoso_supermarket_complete.png)
 
-  ![Screenshot showing Agora resources in Azure portal](./rg_arc.png)
+  ![Screenshot showing Agora resources in Azure portal](./img/rg_arc.png)
 
 ## Next steps
 
