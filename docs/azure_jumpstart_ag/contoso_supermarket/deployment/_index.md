@@ -218,7 +218,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
 
-- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+- Follow the install guide for the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
 - Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
   
