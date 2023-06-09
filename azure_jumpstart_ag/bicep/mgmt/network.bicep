@@ -171,6 +171,19 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
           destinationAddressPrefix: '*'
           destinationPortRange: '81'
         }
+      }
+      {
+        name: 'allow_prometheus_9090'
+        properties: {
+          priority: 1008
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '9090'
+        }
       }       
     ]
   }
