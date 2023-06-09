@@ -6,7 +6,7 @@ toc_hide: true
 
 ## Jumpstart Agora - Deployment guide
 
-Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Agora environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components. The diagram below details the high-level architecture that is deployed and configured as part of the automation.
+Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Contoso Supermarket scenario environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components. The diagram below details the high-level architecture that is deployed and configured as part of the automation.
 
 ![Architecture diagram](./img/architecture_diagram.png)
 
@@ -25,9 +25,9 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 ## Prerequisites
 
-- Fork the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
+- Fork the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-  - Open the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
+  - Open the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo1.png)
   
@@ -55,11 +55,11 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT5.png)
 
-  - Under "Repository access" select "Only select repositories" and then choose the jumpstart-agora-apps repo that you forked in the previous steps.
+  - Under "Repository access" select "Only select repositories" and then choose the _jumpstart-agora-apps_ repo that you forked in the previous steps.
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT6.png)
 
-  - Assign "Read and write" permissions for your fork of the jumpstart-agora-apps repo. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, Workflows.
+  - Assign the "Read and write" permissions for your fork of the _jumpstart-agora-apps_ repo. The PAT should have read and write permissions for the following operations: Actions, Administration, Contents, Pull Requests, Secrets, and Workflows.
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT7.png)
 
@@ -199,7 +199,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`deployBastion`_ - Option to deploy using Azure Bastion instead of traditional RDP. Set to true or false.
-  - _`githubUser`_ - The name of the user account on GitHub where you have forked the [Jumpstart-Agora-Apps repo](https://github.com/microsoft/jumpstart-agora-apps)
+  - _`githubUser`_ - The name of the user account on GitHub where you have forked the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps)
   - _`githubPAT`_ - The GitHub PAT token that you created as part of the prerequisites.
 
 
@@ -217,7 +217,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 ## Start post-deployment automation
 
-Once your deployment is complete, you can open the Azure portal and see the Agora resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
+Once your deployment is complete, you can open the Azure portal and see the Agora scenario resources inside your resource group. You will be using the _Agora-Client-VM_ Azure virtual machine to explore various capabilities of Agora. You will need to remotely access _Agora-Client-VM_.
 
   ![Screenshot showing all deployed resources in the resource group](./img/deployed_resources.png)
 
