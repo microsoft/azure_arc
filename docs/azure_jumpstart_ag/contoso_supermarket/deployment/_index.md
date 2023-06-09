@@ -304,7 +304,7 @@ Once deployment is complete its time to start experience Agora capabilities. Use
 
 ## Clean up the deployment
 
-To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
+To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal. If you used Azure Developer CLI to deploy then ```azd down``` can be used instead. 
 
 ```shell
 az group delete -n <name of your resource group>
@@ -313,3 +313,5 @@ az group delete -n <name of your resource group>
 ![Screenshot showing az group delete](./img/placeholder.png)
 
 ![Screenshot showing group delete from Azure portal](./img/placeholder.png)
+
+![Screenshot showing azd down](./img/azd_down.png)
