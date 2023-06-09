@@ -55,7 +55,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT5.png)
 
-  - Under "Repository access" select "Only select repositories" and then choose the jumpstart-agora-apps repo that you forked in the previous steps.
+  - Under "Repository access" select "Only select repositories" and then choose the _jumpstart-agora-apps_ repo that you forked in the previous steps.
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT6.png)
 
