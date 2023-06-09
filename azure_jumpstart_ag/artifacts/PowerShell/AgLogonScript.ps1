@@ -1563,6 +1563,25 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             Start-Sleep -Seconds 2
         }
     }
+
+    # Matching url: prometheus
+    $matchingServices = $services.items | Where-Object {
+        $_.spec.ports.port -contains 9090 -and
+        $_.spec.type -eq "LoadBalancer"
+    }
+    $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
+
+    foreach ($prometheusIp in $prometheusIps) {
+        $output = "http://$prometheusIp" + ':9090'
+        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+        # Replace matching value in the Bookmarks file
+        $content = Get-Content -Path $bookmarksFileName
+        $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
+        $newContent | Set-Content -Path $bookmarksFileName
+
+        Start-Sleep -Seconds 2
+    }
 }
 
 # Matching url: Agora apps forked repo
