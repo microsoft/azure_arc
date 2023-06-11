@@ -6,11 +6,17 @@ toc_hide: true
 
 # Infrastructure security with Microsoft Defender for Servers
 
+## Overview
+
+Contoso Supermarket is aware that as they navigate the complex landscape of edge computing, it is essential to protect their servers against threats while maintaining a comprehensive view of their security posture. Microsoft Defender for Cloud emerges as a vital component, playing a pivotal role in protecting servers from threats and providing unparalleled visibility into their security landscape.
+
+Microsoft Defender for Cloud ensures that Contoso Supermarket's Azure Arc-enabled servers remain resilient against a wide range of cyber threats. With advanced threat protection, machine learning algorithms, and real-time security intelligence, Microsoft Defender for Cloud proactively detects and neutralizes potential risks.
+
+On the other hand, maintaining visibility into the security posture of Azure Arc-enabled servers is crucial for Contoso Supermarket. Microsoft Defender for Cloud offers comprehensive insights into the servers' security status, providing a centralized view of threats, vulnerabilities, and security events. By analyzing telemetry data, logs, and behavioral patterns, Contoso Supermarket gains a deep understanding of their security landscape, enabling proactive risk mitigation.
+
+## Instructions
+
 Microsoft Defender for Cloud provides unified security management and threat protection across your hybrid and multi-cloud workloads. To get all of the Microsoft Defender for Servers protections, you will need to enable the Microsoft Defender for Servers plan at subscription level.
-
-CONTOSO SUPERMARKET STORY
-
-## Onboarding
 
 Follow these steps to enable the plan in the case it is not already enabled:
 
@@ -44,7 +50,7 @@ Now that you have successfully enabled Microsoft Defender for Servers, you will 
 
 Microsoft Defender for Servers will collect data from your Arc-enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection.
 
->**NOTE: it may take upto 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
+>**NOTE: it may take up to 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
 
 - Navigate to Microsoft Defender for Cloud. In the "Inventory" section under "VM and Servers", Defender will provide you with an overview of all the discovered security recommendations for your **Azure Arc-enabled servers**.
 
