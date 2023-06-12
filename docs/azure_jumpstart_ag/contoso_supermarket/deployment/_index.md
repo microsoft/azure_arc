@@ -220,6 +220,12 @@ Jumpstart Agora provides an experimental feature that allows users to deploy wit
 
 - Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
+  > **NOTE: PowerShell is required for using azd with Jumpstart Agora. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.**
+
+- Login with azd using ```azd auth login``` which will open a browser for interactive login.
+
+  ![Screenshot showing azd auth login](./img/azd_auth_login.png)
+
 - Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
   
   ![Screenshot showing azd init](./img/azd_init.png)
