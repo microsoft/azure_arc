@@ -216,9 +216,9 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 ## Deployment via Azure Developer CLI (experimental)
 
-Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
+Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
 
-- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
 - Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
   
@@ -304,14 +304,16 @@ Once deployment is complete its time to start experience Agora capabilities. Use
 
 ## Clean up the deployment
 
-To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal. If you used Azure Developer CLI to deploy then ```azd down``` can be used instead. 
+- To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal. 
 
-```shell
-az group delete -n <name of your resource group>
-```
+  ```shell
+  az group delete -n <name of your resource group>
+  ```
 
-![Screenshot showing az group delete](./img/placeholder.png)
+  ![Screenshot showing az group delete](./img/az_group_delete.png)
 
-![Screenshot showing group delete from Azure portal](./img/placeholder.png)
+  ![Screenshot showing group delete from Azure portal](./img/portal_delete.png)
 
-![Screenshot showing azd down](./img/azd_down.png)
+- If you used Azure Developer CLI to deploy then ```azd down``` can be used instead.
+
+  ![Screenshot showing azd down](./img/azd_down.png)
