@@ -30,6 +30,8 @@ Grafana's dashboards in Contoso Supermarket's implementation provide a visually 
 
 - **Node Exporter Full**: The Kubernetes Nodes Dashboard in Grafana provides a detailed view of node-level metrics and resources in your Kubernetes cluster. It enables you to monitor CPU and RAM usage, track pods running on each node, and identify any resource anomalies or performance issues. The dashboard also offers system-level metrics such as system load, context switches, and file descriptors, allowing for troubleshooting and optimization. Additionally, it provides insights into storage capacity, volumes, and I/O operations on the nodes, aiding in effective management of storage resources.
 
+- **Freezer Monitoring**: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide](../freezer_monitor/_index.md)
+
 ## Access the dashboards
 
 As an Operations team member at Contoso Supermarket, you will have access to the Grafana dashboards for infrastructure observability. These dashboards provide a comprehensive view of the health, performance, and metrics of the cloud to edge infrastructure. To access the Grafana dashboards follow the below steps.
@@ -42,7 +44,7 @@ As an Operations team member at Contoso Supermarket, you will have access to the
 
     ![Observability grafana_prod diagram](./img/grafana_prod.png)
 
-- Login using the Contoso Operator username `arcdemo` and the Windows Admin Password you provided when you created your deployment.
+- Login using the Windows Admin Username and Password you provided when you created your deployment.
 
     ![Observability grafana_prod diagram](./img/grafana_prod_login.png)
 
@@ -86,7 +88,7 @@ As an Operations team member at Contoso Supermarket, you will have access to the
 
     ![Observability grafana_prod diagram](./img/grafana_staging.png)
 
-- Login using the Contoso Operator username `arcdemo` and the Windows Admin Password you provided when you created your deployment. Review the available dashboards.
+- Login using the Windows Admin Username and Password you provided when you created your deployment. Review the available dashboards.
 
     ![Observability grafana_prod diagram](./img/grafana_staging_dashboard_home.png)
 
@@ -104,7 +106,7 @@ As an Operations team member at Contoso Supermarket, you will have access to the
 
     ![Observability grafana_prod diagram](./img/grafana_dev.png)
 
-- Login using the Contoso Operator username `arcdemo` and the Windows Admin Password you provided when you created your deployment. Review the available dashboards.
+- Login using the Windows Admin Username and Password you provided when you created your deployment. Review the available dashboards.
 
     ![Observability grafana_prod diagram](./img/grafana_dev_dashboard_home.png)
 
@@ -116,6 +118,16 @@ As an Operations team member at Contoso Supermarket, you will have access to the
 
     ![Observability grafana_prod diagram](./img/grafana_dev_dashboard_node.png)
 
+## Next steps
+
+Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
+
+- [POS](https://placeholder)
+- [Freezer Monitor](https://placeholder)
+- [CI/CD](https://placeholder)
+- [Basic GitOps](https://placeholder)
+- [Analytics](https://analytics)
+- [Troubleshooting](https://troubleshooting)
 
 > **Grafana Dashboard Credits:**                           
 > The Kubernetes dashboards included in this project are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
