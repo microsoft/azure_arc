@@ -54,34 +54,30 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
 
 - Navigate to Microsoft Defender for Cloud. In the "Inventory" section under "VM and Servers", Defender will provide you with an overview of all the discovered security recommendations for your **Azure Arc-enabled servers**.
 
-    ![Screenshot of Microsoft Defender for Cloud Inventory](./img/04.png)
+    ![Screenshot of Microsoft Defender for Cloud Inventory](./img/03.png)
 
 - Select one of the Azure Arc-enabled servers. Microsoft Defender for Cloud will provide security recommendations:
 
-    ![Screenshot of Microsoft Defender for Cloud Recommendations](./img/05.png)
+    ![Screenshot of Microsoft Defender for Cloud Recommendations](./img/04.png)
 
 - Select one of the recommendations. Each recommendation will include:
   - A short description of what is being recommended.
   - Related recommendations.
   - The remediation steps to carry out in order to implement the recommendation. For specific recommendations, you may also get a **_Quick Fix_** that enables you to quickly remediate a recommendation on multiple resources.
 
-    ![Screenshot of Defender recommendation on Azure Arc-enabled server](./img/06.png)
+    ![Screenshot of Defender recommendation on Azure Arc-enabled server](./img/05.png)
 
-- For this Azure Arc-enabled server the recommendation _Machines should have a vulnerability assessment solution_ provides a **_Quick Fix_**. It is using an ARM template to deploy an extension to enable a vulnerability assessment solution on the Azure Arc machine.
+- For this Azure Arc-enabled server the recommendation _Machines should be configured to periodically check for missing system updates_ provides a **_Quick Fix_**. It is using an ARM template to enable a periodic update assessment on the Azure Arc machine.
 
-    ![Screenshot of Defender recommendation Quick Fix ARM template](./img/07.png)
+    ![Screenshot of Defender recommendation Quick Fix ARM template](./img/06.png)
 
 - You can trigger the remediation by clicking on the **_Fix_** button:  
 
-    ![Screenshot of Defender recommendation Fix button](./img/08.png)
-
-- Leave the default vulnerability assessment solution selected and click first on **_Proceed_**, then click on **_Fix 1 resource_**.
-
-    ![Screenshot of Defender recommendation Proceed button](./img/09.png)
+    ![Screenshot of Defender recommendation Fix button](./img/07.png)
 
 - After you apply the recommendation it will be now marked as healthy. Note that It can take several minutes after remediation completes to see the resources in the 'healthy resources' tab
 
-    ![Screenshot showing healthy Azure Arc-enabled server](./10.png)
+    ![Screenshot showing healthy Azure Arc-enabled server](./img/08.png)
 
 ## Cleanup
 
@@ -97,4 +93,4 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
     az security pricing create -n VirtualMachines --tier 'free'
     ```
 
-    ![Disable microsoft defender for servers  at subscription level](./img/03.png)
+    ![Disable microsoft defender for servers  at subscription level](./img/09.png)
