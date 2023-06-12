@@ -295,16 +295,15 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases of Contoso Supermarket in Jumpstart Agora.
 
-- [POS](https://placeholder)
-- [Freezer Monitor](https://placeholder)
-- [CI/CD](https://placeholder)
-- [Basic GitOps](https://placeholder)
-- [Analytics](https://analytics)
-- [Troubleshooting](https://troubleshooting)
+- [Freezer Monitor](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/_index.md)
+- [CI/CD](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/ci_cd/_index.md)
+- [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
+- [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
+- [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
 
 ## Clean up the deployment
 
-- To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal. 
+- To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
 
   ```shell
   az group delete -n <name of your resource group>
@@ -317,3 +316,5 @@ Once deployment is complete its time to start experience Agora capabilities. Use
 - If you used Azure Developer CLI to deploy then ```azd down``` can be used instead.
 
   ![Screenshot showing azd down](./img/azd_down.png)
+
+  > **NOTE: If you have manually configured Defender for Cloud, please refer to the [dedicated page](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md) to clean up Defender for Cloud resources.**
