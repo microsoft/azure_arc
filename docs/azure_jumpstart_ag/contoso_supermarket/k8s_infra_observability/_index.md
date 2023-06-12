@@ -52,7 +52,7 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
     ![Observability grafana_prod diagram](./img/grafana_prod_db_global01.png)
 
-- Review different panels in the dashboard to see the metrics collected from the Kubernetes cluster.
+- Review the different panels in the dashboard to see the metrics collected from the Kubernetes cluster.
 
     ![Observability grafana_prod diagram](./img/grafana_prod_db_global02.png)
 
