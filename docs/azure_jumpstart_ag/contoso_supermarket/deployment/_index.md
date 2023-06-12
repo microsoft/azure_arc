@@ -212,13 +212,13 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
-    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://placeholder).**
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md).**
 
 ## Deployment via Azure Developer CLI (experimental)
 
 Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
 
-- Follow the install guide for the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
 - Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
   
@@ -295,23 +295,26 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases of Contoso Supermarket in Jumpstart Agora.
 
-- [POS](https://placeholder)
-- [Freezer Monitor](https://placeholder)
-- [CI/CD](https://placeholder)
-- [Basic GitOps](https://placeholder)
-- [Analytics](https://analytics)
-- [Troubleshooting](https://troubleshooting)
+- [Freezer Monitor](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/_index.md)
+- [CI/CD](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/ci_cd/_index.md)
+- [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
+- [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
+- [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
 
 ## Clean up the deployment
 
-To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal. If you used Azure Developer CLI to deploy then ```azd down``` can be used instead. 
+- To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
 
-```shell
-az group delete -n <name of your resource group>
-```
+  ```shell
+  az group delete -n <name of your resource group>
+  ```
 
-![Screenshot showing az group delete](./img/placeholder.png)
+  ![Screenshot showing az group delete](./img/az_group_delete.png)
 
-![Screenshot showing group delete from Azure portal](./img/placeholder.png)
+  ![Screenshot showing group delete from Azure portal](./img/portal_delete.png)
 
-![Screenshot showing azd down](./img/azd_down.png)
+- If you used Azure Developer CLI to deploy then ```azd down``` can be used instead.
+
+  ![Screenshot showing azd down](./img/azd_down.png)
+
+  > **NOTE: If you have manually configured Defender for Cloud, please refer to the [dedicated page](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md) to clean up Defender for Cloud resources.**
