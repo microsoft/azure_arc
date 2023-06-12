@@ -118,7 +118,7 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
 
 > **Grafana Dashboard Credits:**                           
-> The Kubernetes dashboards included in this project are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
+> The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
 > The original dashboards can be found at:                            
 > - https://grafana.com/grafana/dashboards/1860-node-exporter-full                              
 > - https://github.com/dotdc/grafana-dashboards-kubernetes
