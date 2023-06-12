@@ -14,7 +14,7 @@ Azure Monitor empowers Contoso Supermarket with the ability to monitor and colle
 
 ## Instructions
 
-Azure Monitor can collect data directly from your hybrid machines into a Log Analytics workspace for detailed analysis and correlation. It requires installing the Azure Monitor agent and Dependency agent VM extension in your Azure Arc-enabled servers, enabling VM insights to collect data from your machines.
+Azure Monitor can collect data directly from your hybrid machines into a Log Analytics workspace for detailed analysis and correlation. It requires installing the Azure Monitor Agent (AMA) and Dependency agent VM extension in your Azure Arc-enabled servers, enabling VM insights to collect data from your machines.
 
 As part of the automated deployment, an Azure Policy monitoring initiative and a Data Collection Rule (DCR) are deployed. They allow collecting monitoring data from your Azure Arc-enabled servers.
 
@@ -24,11 +24,11 @@ Follow these steps to verify that these required Azure Monitor artifacts have be
 
     ![Screenshot of searching Azure Policy](./img/01.png)
 
-- Click on **Assignments**, and you will see the Azure Policy initiative _(Ag) Enable Azure Monitor for Hybrid VMs with AMA_. This initiative enables Azure Monitor for the hybrid virtual machines with AMA. Takes Log Analytics workspace as parameter and asks for an option to enable Processes and Dependencies.
+- Click on **Assignments**. You will see the Azure Policy initiative _(Ag) Enable Azure Monitor for Hybrid VMs with AMA_. This initiative enables Azure Monitor for the hybrid virtual machines with AMA. It takes a Log Analytics workspace as parameter and asks for an option to enable Processes and Dependencies.
 
     ![Screenshot of Azure Monitor initiative assignment Azure Policy](./img/02.png)
 
-- The Azure Policy initiative mentioned above deploys a Data Collection Rule (DCR), which is in charge of collecting monitoring data from the Azure Arc-enabled servers. In the top bar, search for **Data collection rules**
+- The Azure Policy initiative mentioned above deploys a Data Collection Rule (DCR), which is in charge of collecting monitoring data from the Azure Arc-enabled servers. In the top bar, search for **Data collection rules**:
 
     ![Screenshot of searching Data Collection Rules](./img/03.png)
 
@@ -46,11 +46,11 @@ Follow these steps to verify that these required Azure Monitor artifacts have be
 
 Now that we have checked that the required monitoring artifacts have been successfully enabled, it's time to leverage VMInsights. It monitors the performance and health of your Azure Arc-enabled servers by collecting data on their running processes and dependencies on other resources.
 
-- Search for **Azure Arc**, click on **Servers** and click in one of your **Azure Arc-enabled servers**:
+- Search for **Azure Arc**, go to **Servers** and click in one of your **Azure Arc-enabled servers**:
 
     ![Screenshot of searching for an Azure Arc-enabled server](./img/07.png)
 
-- Click on **Insights** and then on **Performance**. You will find a set of performance charts that target several key performance indicators to help you determine how well a virtual machine is performing. The charts show resource utilization over a period of time.
+- Click on **Insights** and then on **Performance**. You will find a set of performance charts that target several key performance indicators to help you determine how well your Azure Arc-enabled server is performing. The charts show resource utilization over a period of time:
 
     ![Screenshot of VMInsights - Performance](./img/08.png)
 
