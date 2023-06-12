@@ -34,7 +34,7 @@ To get started with the "Contoso Supermarket" Jumpstart Agora scenario, we provi
 
 | **Guide**                                                              | **Contoso Supermarket service or platform**    | **Technology stack**                                                                          |
 |------------------------------------------------------------------------|------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| [Contoso Supermarket deployment](./deployment/_index.md)               | Not applicable                                 | Not applicable                                                                                |
+| [Contoso Supermarket deployment](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md)               | Not applicable                                 | Not applicable                                                                                |
 | Data pipeline and reporting across cloud and edge - Store orders       | Point of Sale (PoS)                            | Cosmos DB, Azure Data Explorer, OSS PostgreSQL, AKS Edge Essentials                           |
 | Data pipeline and reporting across cloud and edge - Sensor telemetry   | Freezer Monitoring for Food Safety             | IoT Hub, Azure Data Explorer, Mosquitto MQTT Broker, Prometheus, Grafana, AKS Edge Essentials |
 | Platform Engineering application config rollout with basic GitOps flow | Point of Sale (PoS), Checkout Queue Monitoring | AKS, AKS Edge Essentials, Azure Arc, Flux                                                     |
