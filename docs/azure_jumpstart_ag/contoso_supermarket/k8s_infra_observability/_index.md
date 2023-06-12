@@ -30,7 +30,13 @@ Grafana's dashboards in Contoso's implementation provide a visually appealing an
 
 - **Node Exporter Full**: The Kubernetes Nodes Dashboard in Grafana provides a detailed view of node-level metrics and resources in your Kubernetes cluster. It enables you to monitor CPU and RAM usage, track pods running on each node, and identify any resource anomalies or performance issues. The dashboard also offers system-level metrics such as system load, context switches, and file descriptors, allowing for troubleshooting and optimization. Additionally, it provides insights into storage capacity, volumes, and I/O operations on the nodes, aiding in the effective management of storage resources.
 
-- **Freezer Monitoring**: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide](../freezer_monitor/_index.md)
+- **Freezer Monitoring**: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide.](../freezer_monitor/_index.md)
+
+> **Grafana Dashboard Credits:**                           
+> The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
+> The original dashboards can be found at:                            
+> - https://grafana.com/grafana/dashboards/1860-node-exporter-full                              
+> - https://github.com/dotdc/grafana-dashboards-kubernetes
 
 ## Access the dashboards
 
@@ -128,9 +134,3 @@ Use the following guides to explore different use cases of Contoso Supermarket i
 - [Basic GitOps](https://placeholder)
 - [Analytics](https://analytics)
 - [Troubleshooting](https://troubleshooting)
-
-> **Grafana Dashboard Credits:**                           
-> The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
-> The original dashboards can be found at:                            
-> - https://grafana.com/grafana/dashboards/1860-node-exporter-full                              
-> - https://github.com/dotdc/grafana-dashboards-kubernetes
