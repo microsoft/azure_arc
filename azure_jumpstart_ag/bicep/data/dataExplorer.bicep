@@ -115,7 +115,7 @@ resource cosmosReaderRoleDefinition 'Microsoft.Authorization/roleDefinitions@201
 }
 
 // Assign "Cosmos DB Account Reader Role"
-resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2021-04-01-preview' = {
+resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(adxCluster.id, cosmosDBAccountName, cosmosDBAccountReader)
   properties: {
     roleDefinitionId: cosmosReaderRoleDefinition.id
