@@ -37,7 +37,7 @@
         "Mtu": 0
       },
       "LinuxNode": {
-        "CpuCount": 2,
+        "CpuCount": 4,
         "MemoryInMB": 16384,
         "DataSizeInGB": 80,
         "Ip4Address": "Ip4Address-null",
