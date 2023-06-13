@@ -18,14 +18,14 @@
 .alter table Orders policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
 
 // Create a landing table fo IoT Hub environmentSensor data
-.create table environmentSensor(['iothub-enqueuedtime']:datetime, ['device-id']:string , Humidity:dynamic, Temperature_F:dynamic)
+.create table environmentSensor(['iothub-enqueuedtime']:datetime, ['device-id']:string , ['Humidity']:int, ['Temperature_F']:int)
 .create table environmentSensor ingestion json mapping "EnvironmentSensorMapping"
 ```
 [
-    {"column":"iothub-enqueuedtime","path":"$.iothub-enqueuedtime"},
-    {"column":"device-id","path":"$.iothub-connection-device-id"},
-    {"column":"Humidity","path":"$.Humidity"},
-    {"column":"Temperature_F","path":"$.Temperature_F"},
+    {"column":"iothub-enqueuedtime","path":"$['iothub-enqueuedtime']"},
+    {"column":"device-id","path":"$['iothub-connection-device-id']"},
+    {"column":"Humidity", "Properties":{"Path":"$[\'Humidity(%)\']"}},
+    {"column":"Temperature_F", "Properties":{"Path":"$[\'Temperature(F)\']"}},
 ]
 ```
 
