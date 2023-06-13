@@ -111,7 +111,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
         name: 'allow_k8s_80'
         properties: {
           priority: 1003
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: '*'
@@ -124,7 +124,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
         name: 'allow_k8s_8080'
         properties: {
           priority: 1004
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: '*'
@@ -137,7 +137,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
         name: 'allow_k8s_443'
         properties: {
           priority: 1005
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: '*'
@@ -146,6 +146,45 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
           destinationPortRange: '443'
         }
       }
+      {
+        name: 'allow_pos_5000'
+        properties: {
+          priority: 1006
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '5000'
+        }
+      }
+      {
+        name: 'allow_pos_81'
+        properties: {
+          priority: 1007
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '81'
+        }
+      }
+      {
+        name: 'allow_prometheus_9090'
+        properties: {
+          priority: 1008
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '9090'
+        }
+      }       
     ]
   }
 }
@@ -160,7 +199,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
         name: 'bastion_allow_https_inbound'
         properties: {
           priority: 1010
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: 'Internet'
@@ -173,7 +212,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
         name: 'bastion_allow_gateway_manager_inbound'
         properties: {
           priority: 1011
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: 'GatewayManager'
@@ -186,7 +225,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
         name: 'bastion_allow_load_balancer_inbound'
         properties: {
           priority: 1012
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
           sourceAddressPrefix: 'AzureLoadBalancer'
@@ -231,7 +270,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
           priority: 1015
-          protocol: 'Tcp'
+          protocol: 'TCP'
           access: 'Allow'
           direction: 'Outbound'
           sourceAddressPrefix: '*'
