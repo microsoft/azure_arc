@@ -4,9 +4,9 @@ weight: 100
 toc_hide: true
 ---
 
-# Contoso Supermarket Freezer Monitor Overview
+## Contoso Supermarket Freezer Monitor Overview
 
-## Overview + Diagram (if applicable)
+### Overview + Diagram (if applicable)
 
 ![Applications and technology stack architecture diagram](./img/placeholder.png)
 
@@ -23,30 +23,31 @@ toc_hide: true
 The manager of the Chicago store has reported that food in one of the freezers has not been staying frozen. She has moved the food to the second freezer and called for service, but the technician reported that the freezer seems to be operating within parameters. Your job as the data analyst is to determine if the temperature sensor in the freezer has observed the issue, and provide the data to the store manager.
 
 #### Prerequisites
+
 - If you have not already imported the Azure Data Explorer dashboard, follow the instructions in the [TODO-Venkata - where are the instructions?] [Azure Data Explorer](../azure_data_explorer/README.md) section to import the dashboard.
 
 #### Confirm the issue in Azure Data Explorer
 
-    1. From your own computer (not the Client VM) open the dashboard named "Freezer Monitoring" in Azure Data Explorer: https://dataexplorer.azure.com/dashboards
+   1. From your own computer (not the Client VM) open the dashboard named "Freezer Monitoring" in Azure Data Explorer: https://dataexplorer.azure.com/dashboards
     ![Dashboard showing all freezers](./img/placeholder.png)
 
-    2. The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
+   2. The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
         ![Dashboard showing Chicago freezers only](./img/placeholder.png)
 
-    3. The store manager didn't tell you which freezer was having problems, but it's obvious that Freezer-2 is regularly exceeding the safe threshold of 20°F. You can send information to the store manager via a screenshot, or you can explain to the manager how she can use Grafana in the store to see the same data.
+   3. The store manager didn't tell you which freezer was having problems, but it's obvious that Freezer-2 is regularly exceeding the safe threshold of 20°F. You can send information to the store manager via a screenshot, or you can explain to the manager how she can use Grafana in the store to see the same data.
 
-    4. While you're in the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to the store manager.
+   4. While you're in the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to the store manager.
 
 #### View the data in Grafana at the store
 
-    1. Connect to the Client VM `Ag-VM-Client` using the instructions in the ![TODO - Deployment Guide](../deployment_guide/README.md)
-    2. Open the Edge browser, expand Grafana in the Favorites Bar and select Grafana Prod
-    3. Login using the username `admin` and the Windows Admin Password you provided when you created your deployment
-    4. Click the Hamburger menu > then Dashboards
-    5. Click General to see the dashboards
-    6. Click "Chicago - Freezer Monitoring" to see the dashboard
-    7. Notice that freezer2 is showing significant variability and frequently exceeding the safe threshold of 15°F.
-    8. The manager can use this dashboard directly when talking to the technician about the freezer.
+   1. Connect to the Client VM `Ag-VM-Client` using the instructions in the ![TODO - Deployment Guide](../deployment_guide/README.md)
+   2. Open the Edge browser, expand Grafana in the Favorites Bar and select Grafana Prod
+   3. Login using the username `admin` and the Windows Admin Password you provided when you created your deployment
+   4. Click the Hamburger menu > then Dashboards
+   5. Click General to see the dashboards
+   6. Click "Chicago - Freezer Monitoring" to see the dashboard
+   7. Notice that freezer2 is showing significant variability and frequently exceeding the safe threshold of 15°F.
+   8. The manager can use this dashboard directly when talking to the technician about the freezer.
 
 - TODO - fix series names to just show "Freezer-1-Chicago"
 
@@ -150,7 +151,6 @@ Azure Data Explorer (ADX) is a cloud service that ingests, stores, and analyzes 
 
 #### Grafana
 
-
 ### Additional Scenarios
 
 - "fix the freezer"
@@ -167,4 +167,3 @@ Azure Data Explorer (ADX) is a cloud service that ingests, stores, and analyzes 
 - grafana view
 
 ## Next steps
-
