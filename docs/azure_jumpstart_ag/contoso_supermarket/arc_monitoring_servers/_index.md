@@ -24,7 +24,7 @@ Follow these steps to verify that these required Azure Monitor artifacts have be
 
     ![Screenshot of searching Azure Policy](./img/01.png)
 
-- Click on **Assignments**. You will see the Azure Policy initiative _(Ag) Enable Azure Monitor for Hybrid VMs with AMA_. This initiative enables Azure Monitor for the hybrid virtual machines with AMA. It takes a Log Analytics workspace as parameter and asks for an option to enable Processes and Dependencies.
+- Click on **Assignments**. You will see the Azure Policy initiative "_(Ag) Enable Azure Monitor for Hybrid VMs with AMA_". This initiative enables Azure Monitor for the hybrid virtual machines with AMA. It takes a Log Analytics workspace as a parameter and asks for an option to enable Processes and Dependencies.
 
     ![Screenshot of Azure Monitor initiative assignment Azure Policy](./img/02.png)
 
