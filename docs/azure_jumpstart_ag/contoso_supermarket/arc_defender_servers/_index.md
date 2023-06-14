@@ -28,7 +28,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
     az security pricing show -n VirtualMachines
     ```
 
-    ![Screenshot of checking microsoft defender for servers enabled at subscription level](./img/01.png)
+![Screenshot of checking Microsoft Defender for Servers enabled at subscription level](./img/01.png)
 
     > **NOTE: Proceed with the next step if the value you have got for _pricingTier_ is equals to _Free_. If the value was _Standard_, Microsoft Defender for Servers is already enabled and no additional action is required.**
 
