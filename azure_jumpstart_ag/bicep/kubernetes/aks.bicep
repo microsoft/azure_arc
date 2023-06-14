@@ -76,7 +76,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-03-02-previ
     type: 'SystemAssigned'
   }
   sku: {
-    name: 'Basic'
+    name: 'Base'
     tier: tier
   }
   properties: {
