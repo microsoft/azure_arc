@@ -95,4 +95,4 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
     az security pricing create -n VirtualMachines --tier 'free'
     ```
 
-    ![Disable microsoft defender for servers  at subscription level](./img/disable_defender_for_servers.png)
+    ![Disable Microsoft Defender for Servers at the subscription level](./img/disable_defender_for_servers.png)
