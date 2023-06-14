@@ -36,7 +36,7 @@ Follow these steps to verify that these required Azure Monitor artifacts have be
 
     ![Screenshot of the Data Collection Rules](./img/04.png)
 
-- Click on the DCR. You will see the data sources collected ant the Azure Arc-enabled servers associated to this DCR:
+- Click on the DCR. You will see the data sources collected ant the Azure Arc-enabled servers associated with this DCR:
 
     ![Screenshot of the DCR - Data sources](./img/05.png)
 
