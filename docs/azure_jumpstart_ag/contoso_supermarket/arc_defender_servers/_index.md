@@ -73,7 +73,7 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
 
     ![Screenshot of Defender recommendation Fix button](./img/07.png)
 
-- After you apply the recommendation, it will be now marked as healthy. Note that It can take several minutes after remediation completes to see the resources in the 'healthy resources' tab
+- After you apply the recommendation, it will be now marked as healthy. Note that it can take several minutes after remediation completes to see the resources in the 'healthy resources' tab
 
     ![Screenshot showing healthy Azure Arc-enabled server](./img/08.png)
 
