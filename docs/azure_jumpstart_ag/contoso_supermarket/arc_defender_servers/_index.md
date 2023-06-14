@@ -40,7 +40,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
 
 ![Screenshot of enabling Microsoft Defender for Servers at subscription level](./img/02.png)
 
-    > **NOTE: Remember to follow the steps provided in the Cleanup section to disable Microsoft Defender for Servers.**
+    > **NOTE: Remember to follow the steps provided in the Cleanup section to disable Microsoft Defender for Servers, otherwise you may incur additional charges in your subscription.**
 
 ## Azure Arc-enabled servers and Microsoft Defender for Servers Integration
 
