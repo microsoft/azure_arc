@@ -8,7 +8,7 @@ toc_hide: true
 
 ## Overview
 
-Contoso Supermarket is aware that as they navigate the complex landscape of edge computing, it is essential to protect their servers against threats while maintaining a comprehensive view of their security posture. Microsoft Defender for Servers emerges as a vital component, playing a pivotal role in protecting servers from threats and providing unparalleled visibility into their security landscape.
+Contoso Supermarket are aware that as they navigate the complex landscape of edge computing, it is essential to protect their servers against threats while maintaining a comprehensive view of their security posture. Microsoft Defender for Servers emerges as a vital component, playing a pivotal role in protecting servers from threats and providing unparalleled visibility into their security landscape.
 
 Microsoft Defender for Servers ensures that Contoso Supermarket's Azure Arc-enabled servers remain resilient against a wide range of cyber threats. With advanced threat protection, machine learning algorithms, and real-time security intelligence, Microsoft Defender for Servers proactively detects and neutralizes potential risks.
 
