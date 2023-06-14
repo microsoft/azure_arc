@@ -8,9 +8,9 @@ toc_hide: true
 
 ## Overview
 
-Infrastructure observability is key for Contoso Supermarket to understand the performance and the health of their Azure Arc-enabled servers. This is where Azure Monitor steps in, playing a crucial role in providing visibility into every aspect of their Azure Arc-enabled servers ecosystem.
+Infrastructure observability is key for Contoso Supermarket to understand the performance and the health of their Azure Arc-enabled servers. This is where [Azure Monitor](https://learn.microsoft.com/azure/cloud-adoption-framework/scenarios/hybrid/arc-enabled-servers/eslz-management-and-monitoring-arc-server) steps in, playing a crucial role in providing visibility into every aspect of their Azure Arc-enabled servers ecosystem.
 
-Azure Monitor empowers Contoso Supermarket with the ability to monitor and collect telemetry data from their Azure Arc-enabled servers. It acts as a central hub, delivering near real-time insights into server performance, health, and resource utilization. Azure Monitor provides a holistic view of the entire infrastructure, ensuring proactive identification and resolution of potential issues.
+Azure Monitor empowers Contoso with the ability to monitor and collect telemetry data from their Azure Arc-enabled servers. It acts as a central hub, delivering near real-time insights into server performance, health, and resource utilization. Azure Monitor provides a holistic view of the entire infrastructure, ensuring proactive identification and resolution of potential issues.
 
 ## Enable and configure Azure Monitor
 
