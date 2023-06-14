@@ -46,7 +46,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
 
 Now that you have successfully enabled Microsoft Defender for Servers, you will start getting recommendations to help you protect your resources, including your Azure Arc-enabled servers.
 
-Microsoft Defender for Servers will collect data from your Arc-enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection.
+Microsoft Defender for Servers will collect data from your Arc-enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health, and threat protection.
 
 - Navigate to Microsoft Defender for Cloud. In the **Inventory** section under **VM and Servers**, Defender will provide you with an overview of all the discovered security recommendations for your **Azure Arc-enabled servers**.
 
