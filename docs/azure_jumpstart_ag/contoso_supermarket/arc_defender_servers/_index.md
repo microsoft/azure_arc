@@ -14,7 +14,7 @@ Microsoft Defender for Servers ensures that Contoso Supermarket's Azure Arc-enab
 
 On the other hand, maintaining visibility into the security posture of Azure Arc-enabled servers is crucial for Contoso Supermarket. Microsoft Defender for Servers offers comprehensive insights into the servers' security status, providing a centralized view of threats, vulnerabilities, and security events. By analyzing telemetry data, logs, and behavioral patterns, Contoso Supermarket gains a deep understanding of their security landscape, enabling proactive risk mitigation.
 
-## Instructions
+## Enable Microsoft Defender for Servers
 
 To get all of the Microsoft Defender for Servers protections, you will need to enable the Microsoft Defender for Servers plan at subscription level. Follow these steps to enable the plan in the case it is not already enabled:
 
