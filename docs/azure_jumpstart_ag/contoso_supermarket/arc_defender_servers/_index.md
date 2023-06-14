@@ -16,7 +16,7 @@ On the other hand, maintaining visibility into the security posture of Azure Arc
 
 ## Enable Microsoft Defender for Servers
 
-To protect workloads with Microsoft Defender for Servers, you will need to enable its Servers plan at subscription level. Follow these steps, if it is not already enabled:
+To protect workloads with Microsoft Defender for Servers, you will need to enable its "Servers" plan at the Azure subscription level. Follow these steps, if it is not already enabled:
 
 - Login to AZ CLI using the ```az login``` command.
 
