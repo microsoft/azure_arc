@@ -68,7 +68,7 @@ var serviceCidr_staging = '10.21.64.0/19'
 var dnsServiceIP_staging = '10.21.64.10'
 var dockerBridgeCidr_staging = '172.18.0.1/16'
 
-resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-03-02-preview' = {
   location: location
   name: aksStagingClusterName
   tags: resourceTags
@@ -76,7 +76,7 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2022-07-02-previ
     type: 'SystemAssigned'
   }
   sku: {
-    name: 'Basic'
+    name: 'Base'
     tier: tier
   }
   properties: {
