@@ -20,7 +20,7 @@ As part of the automated deployment, an Azure Policy monitoring initiative and a
 
 Follow these steps to verify that these required Azure Monitor artifacts have been successfully deployed:
 
-- In the top bar of the Azure Portal, search for **policy** and click on **Policy**:
+- In the top bar of the Azure portal, search for **policy** and click on **Policy**:
 
     ![Screenshot of searching Azure Policy](./img/01.png)
 
