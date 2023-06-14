@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-# Infrastructure observability – Azure Arc-enabled servers
+# Infrastructure observability for Azure Arc-enabled servers using Azure Monitor
 
 ## Overview
 
