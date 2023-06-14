@@ -12,7 +12,7 @@ Infrastructure observability is key for Contoso Supermarket to understand the pe
 
 Azure Monitor empowers Contoso Supermarket with the ability to monitor and collect telemetry data from their Azure Arc-enabled servers. It acts as a central hub, delivering near real-time insights into server performance, health, and resource utilization. Azure Monitor provides a holistic view of the entire infrastructure, ensuring proactive identification and resolution of potential issues.
 
-## Instructions
+## Enable and configure Azure Monitor
 
 Azure Monitor can collect data directly from your hybrid machines into a Log Analytics workspace for detailed analysis and correlation. It requires installing the Azure Monitor Agent (AMA) and Dependency agent VM extension in your Azure Arc-enabled servers, enabling VM insights to collect data from your machines.
 
