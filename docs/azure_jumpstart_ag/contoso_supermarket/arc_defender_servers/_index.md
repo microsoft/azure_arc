@@ -30,7 +30,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
 
     ![Screenshot of checking Microsoft Defender for Servers enabled at subscription level](./img/01.png)
 
-    > **NOTE: Proceed with the next step if the value you have got for _pricingTier_ is equals to _Free_. If the value was _Standard_, Microsoft Defender for Servers is already enabled and no additional action is required.**
+    > **NOTE: Proceed with the next step if the value you have got for _pricingTier_ is equal to _Free_. If the value was _Standard_, Microsoft Defender for Servers is already enabled and no additional action is required.**
 
 - Run the following command to enable Microsoft Defender for Servers in your subscription:
 
