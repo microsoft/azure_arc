@@ -10,7 +10,7 @@ toc_hide: true
 
 Occasionally deployments of the Agora Contoso Supermarket experience may fail at various stages. Common reasons for failed deployments include:
 
-- Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
+- Invalid Azure service principal id, service principal secret, or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
 - Invalid SSH public key provided in _azuredeploy.parameters.json_ file.
   - An example SSH public key is shown here. Note that the public key includes "ssh-rsa" at the beginning. The entire value should be included in your _main.parameters.json_ file.
 
