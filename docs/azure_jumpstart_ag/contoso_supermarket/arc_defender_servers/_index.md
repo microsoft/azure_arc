@@ -28,7 +28,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
     az security pricing show -n VirtualMachines
     ```
 
-![Screenshot of checking Microsoft Defender for Servers enabled at subscription level](./img/01.png)
+    ![Screenshot of checking Microsoft Defender for Servers enabled at subscription level](./img/01.png)
 
     > **NOTE: Proceed with the next step if the value you have got for _pricingTier_ is equals to _Free_. If the value was _Standard_, Microsoft Defender for Servers is already enabled and no additional action is required.**
 
@@ -38,7 +38,7 @@ To protect workloads with Microsoft Defender for Servers, you will need to enabl
     az security pricing create -n VirtualMachines --tier 'standard'
     ```
 
-![Screenshot of enabling Microsoft Defender for Servers at subscription level](./img/02.png)
+    ![Screenshot of enabling Microsoft Defender for Servers at subscription level](./img/02.png)
 
     > **NOTE: Remember to follow the steps provided in the Cleanup section to disable Microsoft Defender for Servers, otherwise you may incur additional charges in your subscription.**
 
@@ -48,11 +48,11 @@ Now that you have successfully enabled Microsoft Defender for Servers, you will 
 
 Microsoft Defender for Servers will collect data from your Arc-enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection.
 
->**NOTE: it may take up to 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
-
 - Navigate to Microsoft Defender for Cloud. In the **Inventory** section under **VM and Servers**, Defender will provide you with an overview of all the discovered security recommendations for your **Azure Arc-enabled servers**.
 
     ![Screenshot of Microsoft Defender for Cloud Inventory](./img/03.png)
+
+    > **NOTE: it may take up to 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
 
 - Select one of the Azure Arc-enabled servers. Microsoft Defender for Cloud will show the security recommendations:
 
