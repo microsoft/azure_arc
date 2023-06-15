@@ -146,3 +146,17 @@ The development process will start from the local _dev_ cluster, where as a deve
 - A GitHub action is automatically triggered to build new Docker image of the Pos application and deploy this new image to the Staging cluster
 
   ![Screenshot showing the staging GitHub Action](./img/github_github_actions_dev.png)
+
+- On the Client VM, open Windows Terminal, switch to the _Staging_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux V2 extension picks up the changes you made on the _Dev_ environment and deploys it to the _Staging_ cluster
+
+  ![Screenshot showing the pos application pods](./img/repo_staging_pods_gitops.png)
+
+- Open Edge, and navigate to the _POS Staging - Customer_ bookmark
+
+  ![Screenshot showing the staging customer bookmark in edge](./img/edge_staging_customer_portal.png)
+
+- The new checkout feature is now deployed and visible on the _Staging_ environment
+
+  ![Screenshot showing the new checkout feature in the staging environment](./img/pos_after_checkout_feature.png)
+
+
