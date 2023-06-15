@@ -10,13 +10,13 @@ toc_hide: true
 
 Occasionally deployments of the Agora Contoso Supermarket experience may fail at various stages. Common reasons for failed deployments include:
 
-- Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
+- Invalid Azure service principal id, service principal secret, or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
 - Invalid SSH public key provided in _azuredeploy.parameters.json_ file.
   - An example SSH public key is shown here. Note that the public key includes "ssh-rsa" at the beginning. The entire value should be included in your _main.parameters.json_ file.
 
     ![Screenshot showing SSH public key example](./img/ssh_example.png)
 
-- User has not forked the [Jumpstart-agora-apps repository](https://github.com/microsoft/jumpstart-agora-apps). To simulate the developer experience, you must first fork the sample apps repo so that you have your own version of the underlying source code to work with. Instructions on how to fork this repo are included in the [deployment guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md).
+- User has not forked the [jumpstart-agora-apps GitHub repository](https://github.com/microsoft/jumpstart-agora-apps). To simulate the developer experience, you must first fork the sample apps repo so that you have your own version of the underlying source code to work with. Instructions on how to fork this repo are included in the [deployment guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md).
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 40 available vCPU.
   - You can use the command ```az vm list-usage --location <your location> --output table``` to check your available vCPU quota.
 
