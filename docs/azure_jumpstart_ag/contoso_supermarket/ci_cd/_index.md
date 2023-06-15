@@ -62,6 +62,8 @@ Contoso Supermarket has implemented a CI/CD workflow to make it easier for devel
 
 As a Contoso Supermarket developer, you are assigned a new task to implement a new feature to the Point of Sale (PoS) application where customers have provided feedback that the checkout process is not optimal. As they are adding products to their cart, there is no way for them to see how many items are in the cart and how much is the total cost at this time of their buying process.
 
+The development process will start from the local _dev_ cluster, where as a developer, you will write some code to add this new functionality using VSCode's dev containers feature.
+
   ![Screenshot showing the pos application before the checkout feature](./img/pos_before_checkout_feature.png)
 
 - Connect to the Client VM `Ag-VM-Client` using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
@@ -69,5 +71,58 @@ As a Contoso Supermarket developer, you are assigned a new task to implement a n
 - Open VSCode from the desktop shortcut
 
   ![Screenshot showing the the VSCode icon on the desktop](./img/open_vscode.png)
+
+- Bring up the VSCode command palette
+
+  ![Screenshot showing the opening the command palette in VSCode](./img/vscode_command_palette.png)
+
+- Select the option to open a folder in a dev container from the command palette
+
+  ![Screenshot showing opening a folder in a dev container](./img/vscode_dev_container.png)
+
+- Browse to the cloned repository on the Client VM located at _C:\Ag\AppsRepo\jumpstart-agora-apps_
+
+  ![Screenshot showing the cloned repository on the client VM](./img/vscode_dev_container_open_folder.png)
+
+- Select the _Ubuntu_ operating system for your dev container
+
+  ![Screenshot showing the operating system for the dev container](./img/vscode_dev_container_os.png)
+
+  ![Screenshot showing the operating system creation for the dev container](./img/vscode_dev_container_os_create.png)
+
+- No need for any additional features to install, so click _Ok_
+
+  ![Screenshot showing the additional operating system features to install](./img/vscode_dev_container_os_options.png)
+
+- Click on _Trust folder and continue_, now you can see the cloned repository opened in VSCode, in te _Ubuntu_ dev container
+
+  ![Screenshot showing the trust folder prompt in VSCode](./img/vscode_dev_container_pos_app.png)
+
+  ![Screenshot showing the cloned repository opened in the dev container](./img/vscode_dev_container_trust_folder.png)
+
+- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to whitelist it
+
+  ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
+
+- To add this new checkout functionality, you will have to create a new feature branch and edit the _navbar.html_ file in the _pos_ application.
+- Create a new branch from VSCode called _feature-checkout-cart_
+
+  ![Screenshot showing creating a new branch](./img/vscode_dev_new_feature_branch.png)
+
+- Navigate to the file _contoso_supermarket/developer/pos/src/templates/navbar.html_
+
+  ![Screenshot showing the navbar.html file](./img/vscode_dev_navbar_file.png)
+
+- To simulate adding this new functionality, uncomment the commented section in the _navbar.html_ file and save your changes
+
+  ![Screenshot showing the commented section of the navbar.html file](./img/vscode_dev_navbar_file_uncommented.png)
+
+- You should see a new change visible in the GitHub pane (if you don't see any changes, click refresh)
+
+  ![Screenshot showing the added changes in the repository](./img/vscode_dev_add_changes.png)
+
+- Add a commit message and click Commit, for example: "Adding checkout functionality"
+
+  ![Screenshot showing the added a commit message](./img/vscode_dev_commit_message.png)
 
 
