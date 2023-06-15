@@ -18,7 +18,7 @@ Below is an architecture diagram that shows how the data flows from the PoS appl
 
 Contoso supports dashboard reports for the PoS application and Internet of Things (IoT) environment sensor analytics and monitoring. These reports are created in ADX to allow users to view dashboards reports. These reports are generated based on live data received from the PoS application and IoT environment sensors into the ADX database using data integration.
 
-## Import dashboards
+## Manually import dashboards
 
 > **Note:** If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the deployment.
 
