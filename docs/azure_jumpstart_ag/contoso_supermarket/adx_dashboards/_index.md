@@ -30,7 +30,7 @@ Follow the below steps In order to view the PoS Orders dashboard reports you wil
 
 - Copy these ADX dashboards report JSON files on your computer in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM. Your Azure AD tenant may have conditional access policies enabled and might prevent login to ADX Dashboards from the Client VM as this VM is not managed by your organization.
 
-- On your computer or Client VM open Edge browser and login to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use same account will prevent access to the ADX Orders database to generate reports.
+- On your computer or Client VM open Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate reports.
 
 - Once you login to ADX dashboards, click on Dashboards in the left navigation and review existing reports. You may or may not have existing reports.
 
