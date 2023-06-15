@@ -28,13 +28,46 @@ Contoso Supermarket has three environments for their development process (Dev, S
 
 ### CI/CD workflow
 
+Contoso Supermarket has implemented a CI/CD workflow to make it easier for developers to focus on code and streamline all the code build, test and deployment activities. Before starting to code this new feature, its useful to take take a look on how the Contoso Supermarket's GitHub repository is structured and how CI/CD workflow is configured.
+
+  ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
+
+- The GitHub repository for Contoso Supermarket has a branch per environment as follows:
+  - Main branch targets the local _Dev_ environment/cluster
+  - Staging branch targets the _Staging_ environment/cluster
+  - Canary branch targets the _Chicago_ environment/cluster
+  - Production branch targets the _Seattle_ environment/cluster
+
+  ![Screenshot showing the GitHub repository branches](./img/repo_branches.png)
+
+- The repository has two main folders to seperate the development team applications' code (developer) and the DevOps team operations GitOps configurations (operations)
+
+  ![Screenshot showing the GitHub repository main folder structure](./img/repo_folder_structure.png)
+
+- Within the _developer_ folder, there is a folder for each application's source code. This is where Contoso Supermarket's developers develop new features
+
+  ![Screenshot showing the developer folder structure](./img/repo_developer_structure.png)
+
+- Within the _operations_ folder, there is also folder for each application's GitOps configuration. This is where Contoso Supermarket's DevOps team manage how the applications are deployed to the different environments
+
+  ![Screenshot showing the operations folder structure](./img/repo_operations_structure.png)
+
+- Each application has folder for _charts_ where the Kubernetes mainfests for each application is located and a folder for _releases_ where the helm releases for each application and each environment is located. This way the DevOps team can control the promotion of each version of the applications across the CI/CD workflow on different environments and also enable/disable features created by the developers as needed
+
+  ![Screenshot showing the helm folder structure](./img/repo_operations_helm_structure.png)
+
+  ![Screenshot showing the helm releases folder structure](./img/repo_operations_helmreleases_structure.png)
+
+## Developer experience
+
 As a Contoso Supermarket developer, you are assigned a new task to implement a new feature to the Point of Sale (PoS) application where customers have provided feedback that the checkout process is not optimal. As they are adding products to their cart, there is no way for them to see how many items are in the cart and how much is the total cost at this time of their buying process.
 
   ![Screenshot showing the pos application before the checkout feature](./img/pos_before_checkout_feature.png)
 
-Contoso Supermarket has implemented a CI/CD workflow to make it easier for developers to focus on code and streamline all the code build, test and deployment activities. Before starting to code this new feature, its useful to take take a look on how the Contoso Supermarket's GitHub repository is structured and how CI/CD workflow is configured.
+- Connect to the Client VM `Ag-VM-Client` using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
 
+- Open VSCode from the desktop shortcut
 
+  ![Screenshot showing the the VSCode icon on the desktop](./img/open_vscode.png)
 
-  ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
 
