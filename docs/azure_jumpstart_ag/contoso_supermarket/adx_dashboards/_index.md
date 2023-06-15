@@ -22,7 +22,7 @@ Contoso supports dashboard reports for the PoS application and Internet of Thing
 
 > **Note:** If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the deployment.
 
-In order to view PoS Order dashboard reports you need to import these dashboards into ADX. You should have completed deployment of Jumptstart Agora in your environment and logon script is completed after you first login to Client VM _Ag-VM-Client_. Follow the step below to import dashboards once all the pre-requisites are completed.
+Follow the below steps In order to view the PoS Orders dashboard reports you will need to import these into ADX. 
 
 - On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard report JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with ADX name and URI updated when the logon script is completed.
 
