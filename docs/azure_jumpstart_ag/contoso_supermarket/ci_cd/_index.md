@@ -58,6 +58,13 @@ Contoso Supermarket has implemented a CI/CD workflow to make it easier for devel
 
   ![Screenshot showing the helm releases folder structure](./img/repo_operations_helmreleases_structure.png)
 
+- The repository has the following GitHub actions that build the Contoso Supermarket's CI/CD workflow
+  - **Promte-to-staging:** This workflow is triggered once a pull request targeting the code of the Pos application is merged. It will build the new images based on code changes, increment the image tag, run unit tests and update the Pos application on the _Staging_ environment
+  - **Promte-to-canary:** This workflow is triggered once the staging cluster has a healthy deployment of the Pos application via a Flux V2 alert. It will build the new canary image, run integration tests and submits a PR to update the image tag on the _canary_ Helm release
+  - **Promte-to-production:** This workflow is triggered once the canary cluster has a healthy deployment of the Pos application via a Flux V2 alert. It will build the new production image, run final tests and submits a PR to update the image tag on the _production_ Helm release
+p
+  ![Screenshot showing all the GitHub actions](./img/github_actions_list.png)
+
 ## Developer experience
 
 As a Contoso Supermarket developer, you are assigned a new task to implement a new feature to the Point of Sale (PoS) application where customers have provided feedback that the checkout process is not optimal. As they are adding products to their cart, there is no way for them to see how many items are in the cart and how much is the total cost at this time of their buying process.
@@ -129,7 +136,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
   ![Screenshot showing the added pushing code to remote](./img/vscode_dev_push_changes.png)
 
-- After the code has been pushed, navigate to your GitHub fork of the _jumpstart-agora-apps_, you will see a notification about changes in the _feature-checkout-cart_branch. Click _Compare & Pull request_
+- After the code has been pushed, navigate to your GitHub fork of the _jumpstart-agora-apps_, you will see a notification about changes in the _feature-checkout-cart_branch. Click_Compare & Pull request_
 
   ![Screenshot showing new changes message](./img/github_create_pr_dev.png)
 
@@ -145,9 +152,13 @@ The development process will start from the local _dev_ cluster, where as a deve
 
 - A GitHub action is automatically triggered to build new Docker image of the Pos application and deploy this new image to the Staging cluster
 
-  ![Screenshot showing the staging GitHub Action](./img/github_github_actions_dev.png)
+  ![Screenshot showing the staging GitHub Action](./img/github_actions_dev.png)
 
 - On the Client VM, open Windows Terminal, switch to the _Staging_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux V2 extension picks up the changes you made on the _Dev_ environment and deploys it to the _Staging_ cluster
+
+  ```azurecli
+  kubectx staging
+  ```
 
   ![Screenshot showing the pos application pods](./img/repo_staging_pods_gitops.png)
 
@@ -159,4 +170,50 @@ The development process will start from the local _dev_ cluster, where as a deve
 
   ![Screenshot showing the new checkout feature in the staging environment](./img/pos_after_checkout_feature.png)
 
+- Once the Pos application is healthy on the _Staging_ cluster, a pull request is created automatically to update the _Canary_ environment with the new Pos application image
 
+  ![Screenshot showing the canary Pull request](./img/github_canary_pr.png)
+
+- Merge the new pull request to deploy this new checkout feature to the _Canary_ environment (Chicago store) and delete the branch
+
+  ![Screenshot showing merging canary Pull request](./img/github_canary_pr_merge.png)
+
+  ![Screenshot showing deleting the canary Pull request branch](./img/github_canary_pr_delete_branch.png)
+
+- Once the merge is complete, GitOps configuration will pick up the new changes and deploy the new image to the _Canary_ cluster
+
+  ![Screenshot showing canary customer view before update](./img/edge_canary_before_update.png)
+
+- On the Client VM, open Windows Terminal, switch to the _Chicago_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux V2 extension picks up the changes you made on the _Staging_ environment and deploys it to the _Canary_ cluster
+
+  ```azurecli
+  kubectx chicago
+  ```
+
+  ![Screenshot showing canary customer view before update](./img/repo_canary_pods_gitops.png)
+
+  ![Screenshot showing canary customer view after update](./img/edge_canary_after_update.png)
+
+- Once the Pos application is healthy on the _Canary_ cluster, a pull request is created automatically to update the _Production_ environment with the new Pos application image
+
+  ![Screenshot showing the production Pull request](./img/github_production_pr.png)
+
+- Merge the new pull request to deploy this new checkout feature to the _Production_ environment (Seattle store) and delete the branch
+
+  ![Screenshot showing merging production Pull request](./img/github_production_pr_merge.png)
+
+  ![Screenshot showing deleting the production Pull request branch](./img/github_production_pr_delete_branch.png)
+
+- Once the merge is complete, GitOps configuration will pick up the new changes and deploy the new image to the _Production_ cluster
+
+  ![Screenshot showing production customer view before update](./img/edge_production_before_update.png)
+
+- On the Client VM, open Windows Terminal, switch to the _Seattle_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux V2 extension picks up the changes you made on the _Staging_ environment and deploys it to the _Canary_ cluster
+
+  ```azurecli
+  kubectx seattle
+  ```
+
+  ![Screenshot showing production customer view before update](./img/repo_production_pods_gitops.png)
+
+  ![Screenshot showing production customer view after update](./img/edge_production_after_update.png)
