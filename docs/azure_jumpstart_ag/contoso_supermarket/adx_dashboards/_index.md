@@ -10,7 +10,7 @@ If you are on this page, by now you may have the familiarity of Contoso Supermar
 
 ## Architecture
 
-Below is an architecture diagram that shows how the data flows from PoS application and all the way into Azure Data Explorer (ADX) database to generate near realtime reports of orders received and processed across various store locations. This architecture includes a local PostgreSQL database running at the edge location of the Contoso store, Cosmos DB and ADX cluster in Azure cloud, and a Cloud sync service that moves orders data from edge location to Cosmos DB in the cloud. Please refer to steps 1 through 6 in the architecture diagram below to understand how the orders data flows to ADX database.
+Below is an architecture diagram that shows how the data flows from the PoS application and into the ADX database to generate near real-time reports of orders received and processed across various supermarket store locations. This architecture includes a local PostgreSQL database running at the edge in the store, [Azure Cosmos DB](https://learn.microsoft.com/azure/cosmos-db/introduction) and ADX cluster in Azure cloud, and a Cloud Sync service that moves orders data from edge location to Cosmos DB in the cloud.
 
 ![Data pipeline architecture diagram](./img/contoso_supermarket_pos_service_architecture.png)
 
