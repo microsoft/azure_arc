@@ -58,6 +58,10 @@ Contoso Supermarket has implemented a CI/CD workflow to make it easier for devel
 
     ![Screenshot showing the helm releases folder structure](./img/repo_operations_helmreleases_structure.png)
 
+- Helm releases control the promotion of the Pos application images from one environment to the other using the image tag as a Helm value
+
+    ![Screenshot showing the helm release values](./img/github_helm_release_example.png)
+
 - The repository has the following GitHub actions that build the Contoso Supermarket's CI/CD workflow
   - **Promte-to-staging:** This workflow is triggered once a pull request targeting the code of the Pos application is merged. It will build the new images based on code changes, increment the image tag, run unit tests and update the Pos application on the _Staging_ environment
   - **Promte-to-canary:** This workflow is triggered once the staging cluster has a healthy deployment of the Pos application via a Flux V2 alert. It will build the new canary image, run integration tests and submits a PR to update the image tag on the _canary_ Helm release
