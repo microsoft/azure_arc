@@ -30,7 +30,7 @@ Contoso Supermarket has three environments for their development process (Dev, S
 
 Contoso Supermarket has implemented a CI/CD workflow to make it easier for developers to focus on code and streamline all the code build, test and deployment activities. Before starting to code this new feature, its useful to take take a look on how the Contoso Supermarket's GitHub repository is structured and how CI/CD workflow is configured.
 
-  ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
+   ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
 
 - The GitHub repository for Contoso Supermarket has a branch per environment as follows:
   - Main branch targets the local _Dev_ environment/cluster
@@ -62,7 +62,7 @@ Contoso Supermarket has implemented a CI/CD workflow to make it easier for devel
   - **Promte-to-staging:** This workflow is triggered once a pull request targeting the code of the Pos application is merged. It will build the new images based on code changes, increment the image tag, run unit tests and update the Pos application on the _Staging_ environment
   - **Promte-to-canary:** This workflow is triggered once the staging cluster has a healthy deployment of the Pos application via a Flux V2 alert. It will build the new canary image, run integration tests and submits a PR to update the image tag on the _canary_ Helm release
   - **Promte-to-production:** This workflow is triggered once the canary cluster has a healthy deployment of the Pos application via a Flux V2 alert. It will build the new production image, run final tests and submits a PR to update the image tag on the _production_ Helm release
-p
+
     ![Screenshot showing all the GitHub actions](./img/github_actions_list.png)
 
 ## Developer experience
@@ -71,7 +71,7 @@ As a Contoso Supermarket developer, you are assigned a new task to implement a n
 
 The development process will start from the local _dev_ cluster, where as a developer, you will write some code to add this new functionality using VSCode's dev containers feature.
 
-    ![Screenshot showing the pos application before the checkout feature](./img/pos_before_checkout_feature.png)
+   ![Screenshot showing the pos application before the checkout feature](./img/pos_before_checkout_feature.png)
 
 - Connect to the Client VM `Ag-VM-Client` using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
 
@@ -158,6 +158,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
   ```azurecli
   kubectx staging
+  kubectl get pods -n contoso-supermarket
   ```
 
     ![Screenshot showing the pos application pods](./img/repo_staging_pods_gitops.png)
@@ -188,6 +189,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
   ```azurecli
   kubectx chicago
+  kubectl get pods -n contoso-supermarket
   ```
 
     ![Screenshot showing canary customer view before update](./img/repo_canary_pods_gitops.png)
@@ -212,6 +214,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
      ```azurecli
      kubectx seattle
+     kubectl get pods -n contoso-supermarket
      ```
 
     ![Screenshot showing production customer view before update](./img/repo_production_pods_gitops.png)
