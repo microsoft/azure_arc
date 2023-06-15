@@ -21,7 +21,7 @@ Currently, Agora offers the [Contoso Supermarket](./contoso_supermarket/_index.m
 
 ### What is required to deploy Agora?
 
-Agora deployment requires an Azure service principal with Contributor or Owner role-based access control (RBAC) on an Azure subscription and resource group. You can deploy Agora using the Azure Bicep. The service principal is required to run the automation scripts that deploy and configure Agora features. You can view how the service principal is used by exploring the Agora code on our [public GitHub repository](https://github.com/microsoft/azure_arc).
+Agora deployment requires an Azure service principal with Contributor or Owner role-based access control (RBAC) on an Azure subscription and resource group. You can deploy Agora using Azure Bicep or the [Azure Developer CLI](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview). The service principal is required to run the automation scripts that deploy and configure Agora features. You can view how the service principal is used by exploring the Agora code on our [public GitHub repository](https://github.com/microsoft/azure_arc).
 
 ### What Azure regions can Agora be deployed to?
 
