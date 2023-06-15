@@ -30,7 +30,7 @@ Contoso Supermarket has three environments for their development process (Dev, S
 
 Contoso Supermarket has implemented a CI/CD workflow to make it easier for developers to focus on code and streamline all the code build, test and deployment activities. Before starting to code this new feature, its useful to take take a look on how the Contoso Supermarket's GitHub repository is structured and how CI/CD workflow is configured.
 
-    ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
+  ![Screenshot showing the CI/CD workflow](./img/ci_cd_workflow.png)
 
 - The GitHub repository for Contoso Supermarket has a branch per environment as follows:
   - Main branch targets the local _Dev_ environment/cluster
