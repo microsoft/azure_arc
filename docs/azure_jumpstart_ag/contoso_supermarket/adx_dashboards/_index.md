@@ -24,7 +24,7 @@ Contoso supports dashboard reports for the PoS application and Internet of Thing
 
 Follow the below steps In order to view the PoS Orders dashboard reports you will need to import these into ADX. 
 
-- On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard report JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with ADX name and URI updated when the logon script is completed.
+- On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard report JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
 
   ![Locate dashboard report template files](./img/adx_dashboard_report_files.png)
 
