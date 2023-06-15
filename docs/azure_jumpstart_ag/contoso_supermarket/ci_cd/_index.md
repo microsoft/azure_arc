@@ -220,3 +220,14 @@ The development process will start from the local _dev_ cluster, where as a deve
     ![Screenshot showing production customer view before update](./img/repo_production_pods_gitops.png)
 
     ![Screenshot showing production customer view after update](./img/edge_production_after_update.png)
+
+## Next steps
+
+Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
+
+- [POS](https://placeholder)
+- [Freezer Monitor](https://placeholder)
+- [observability](https://placeholder)
+- [Basic GitOps](https://placeholder)
+- [Analytics](https://analytics)
+- [Troubleshooting](https://troubleshooting)
