@@ -105,9 +105,11 @@ The development process will start from the local _dev_ cluster, where as a deve
   ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
 
 - To add this new checkout functionality, you will have to create a new feature branch and edit the _navbar.html_ file in the _pos_ application.
-- Create a new branch from VSCode called _feature-checkout-cart_
+- Create a new branch from VSCode called _feature-checkout-cart_ and publish this branch to the remote repository
 
   ![Screenshot showing creating a new branch](./img/vscode_dev_new_feature_branch.png)
+
+  ![Screenshot showing publishing the new branch](./img/vscode_dev_publish_branch.png)
 
 - Navigate to the file _contoso_supermarket/developer/pos/src/templates/navbar.html_
 
@@ -121,8 +123,26 @@ The development process will start from the local _dev_ cluster, where as a deve
 
   ![Screenshot showing the added changes in the repository](./img/vscode_dev_add_changes.png)
 
-- Add a commit message and click Commit, for example: "Adding checkout functionality"
+- Add a commit message and click Commit, for example: "Adding checkout functionality" and push your code
 
   ![Screenshot showing the added a commit message](./img/vscode_dev_commit_message.png)
 
+  ![Screenshot showing the added pushing code to remote](./img/vscode_dev_push_changes.png)
 
+- After the code has been pushed, navigate to your GitHub fork of the _jumpstart-agora-apps_, you will see a notification about changes in the _feature-checkout-cart_branch. Click _Compare & Pull request_
+
+  ![Screenshot showing new changes message](./img/github_create_pr_dev.png)
+
+- Change the base repository to your fork, create the pull request, merge the pull request and delete the feature branch after the merge
+
+  ![Screenshot showing changing base branch and submitting the pull request](./img/github_change_remote.png)
+
+  ![Screenshot showing changing base branch and submitting the pull request](./img/github_change_remote_updated.png)
+
+  ![Screenshot showing merging the pull request](./img/github_merge_dev.png)
+
+  ![Screenshot showing deleting the feature](./img/github_delete_branch_dev.png)
+
+- A GitHub action is automatically triggered to build new Docker image of the Pos application and deploy this new image to the Staging cluster
+
+  ![Screenshot showing the staging GitHub Action](./img/github_github_actions_dev.png)
