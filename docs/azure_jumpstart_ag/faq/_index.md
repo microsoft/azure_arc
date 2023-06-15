@@ -48,6 +48,6 @@ Agora incurs normal Azure consumption charges for various Azure resources such a
 
 ### Where can I go if I have trouble deploying or using ArcBox?
 
-Agora has a [dedicated page for troubleshooting](https://aka.ms/AgoraTroubleshooting) that you can review for common issues:
+Agora has a [dedicated page for troubleshooting](https://aka.ms/AgoraTroubleshooting) that you can review for common issues.
 
 If you're still stuck, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on our GitHub repository and the Jumpstart team will try to assist you.
