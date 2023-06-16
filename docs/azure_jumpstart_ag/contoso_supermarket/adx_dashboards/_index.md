@@ -6,7 +6,9 @@ toc_hide: true
 
 # Contoso Supermarket data pipeline and reporting across cloud and edge - Store orders
 
-If you are on this page, by now you may have the familiarity of Contoso Supermarket, its objectives, and goals. As part of the series of various technology stack demonstration scenarios, this scenario covers the data pipeline and reporting across various Contoso Supermarket stores and services to showcase how the Point of Sale (PoS) order data flows to Azure Data Explorer (ADX) database and generate near realtime reports. Contoso management can leverage these reports to adjust their inventory and supply chain based on the product demand from customer orders across stores, day, week, month, and year. This helps optimize Contoso resources, store capacity, and saves significant cost and at the same time improves customer satisfaction and trust.
+One of Contoso's biggest objectives is how to use the data coming from their stores and visualize it for business intelligence by leveraging the power of the cloud.
+
+In this scenario, Contoso wants to use their data pipeline so customer orders placed in the Point of Sale (PoS) application on the various supermarket stores, flow to [Azure Data Explorer (ADX)](https://learn.microsoft.com/azure/data-explorer/data-explorer-overview) database and generate near real-time reports. By doing so, Contoso management can leverage these reports to adjust their inventory and supply chain based on the product demand from customer orders across multiple filters - stores, day, week, month, and year. This helps optimize Contoso resources, stores supplies, saves significant costs and at the same time improves customer satisfaction and trust.
 
 ## Architecture
 
@@ -16,35 +18,37 @@ Below is an architecture diagram that shows how the data flows from the PoS appl
 
 ## PoS dashboard reports
 
-Contoso supports dashboard reports for the PoS application and Internet of Things (IoT) environment sensor analytics and monitoring. These reports are created in ADX to allow users to view dashboards reports. These reports are generated based on live data received from the PoS application and IoT environment sensors into the ADX database using data integration.
+Contoso supports dashboard reports for the PoS application analytics and monitoring. These reports are created in ADX to allow users to view dashboards reports. These reports are generated based on live data received from the PoS application into the ADX database using data integration.
 
 ## Manually import dashboards
 
 > **Note:** If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the deployment.
 
-Follow the below steps In order to view the PoS Orders dashboard reports you will need to import these into ADX. 
+Follow the below steps in order to view the PoS Orders dashboard reports you will need to import these into ADX.
 
 - On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard report JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
 
   ![Locate dashboard report template files](./img/adx_dashboard_report_files.png)
 
-- Copy these ADX dashboards report JSON files on your computer in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM. Your Azure AD tenant may have conditional access policies enabled and might prevent login to ADX Dashboards from the Client VM as this VM is not managed by your organization.
+- Copy these ADX dashboards report JSON files on your computer in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
 
-- On your computer or Client VM open Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate reports.
+  > **Note:** Depending the account being used to log in to ADX portal, Azure AD tenant of that account may have conditional access policies enabled and might prevent log in to ADX Dashboards from the Client VM as this VM is not managed by your organization.
 
-- Once you login to ADX dashboards, click on Dashboards in the left navigation and review existing reports. You may or may not have existing reports.
+- On your computer open browser of your choice or on the Client VM open Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate reports.
+
+- Once you log in to ADX dashboards, click on Dashboards in the left navigation to import PoS Orders dashboard report.
 
   ![Navigate to ADX dashboard reports](./img/adx_view_dashboards.png)
 
-- Click import dashboard file to select previously copied file from the Client VM or _C:\Ag\adx_dashboards_ folder on the Client VM.
+- Select _Import dashboard from file_ to select previously copied file from the Client VM or _C:\Ag\adx_dashboards_ folder on the Client VM.
 
-  ![Click import dashboard file](./img/adx_import_dashboard_file.png)
+  ![Select import dashboard file](./img/adx_import_dashboard_file.png)
 
 - Choose _adx-dashboard-orders-payload.json_ file to import.
 
   ![Choose dashboard report JSON file to import](./img/adx_select_dashboard_file.png)
 
-- Confirm dashboard report name, accept the suggested name or chose your own name and click Create.
+- Confirm dashboard report name, accept the suggested name or chose your own name and click _Create_.
 
   ![Confirm dashboard report name](./img/adx_confirm_dashboard_report_name.png)
 
@@ -52,21 +56,17 @@ Follow the below steps In order to view the PoS Orders dashboard reports you wil
 
   ![Empty data in orders dashboard report](./img/adx_orders_report_empty_data.png)
 
-- Repeat above steps to import Freezer Monitoring dashboard report using _adx-dashboard-iotsensor-payload.json_ template file.
-
-  ![Save dashboard report](./img/adx_iot_report_withdata.png)
-
-- Freezer monitoring IoT sensors continuously send data to ADX database after the deployment is completed and will see data in the Freezer Monitoring dashboard report.
-
 ## Generate sample data using Data Emulator
 
 By default there is no data available in Cosmos DB database after the deployment is complete. There are two ways you can generate Orders data. One method is using PoS application and place orders. Another option is by using Data Emulator tool available on the Agora client VM. Use instructions below to generate sample data using the Data Emulator tool.
 
-- On the Client VM **Ag-VM-Client**, locate Data Emulator icon on the desktop.
+- On the Client VM, locate Data Emulator icon on the desktop.
 
   ![Locate Data Emulator on the desktop](./img/locate_data_emulator_desktop.png)
 
-- Double click on the Data Emulator desktop icon to launch executable and generate sample data. Confirm by entering **Yes** or **Y** to start generating data, entering No or N will exit the tool. This tool generates data for the last 30 days. Say No or N to prevent regenerating sample data if it is generated earlier. You can still generate additional sample data. Please note, there might be duplicate key errors and might fail to generate data in subsequent attempts.
+- Double click on the Data Emulator desktop icon to launch executable and generate sample data. Confirm by entering **Yes** or **Y** to start generating data, entering No or N will exit the tool. This tool generates data for the last 30 days. Say No or N to prevent regenerating sample data if it is generated earlier.
+
+  > **Note**: You can still generate additional sample data by running this tool multiple times, but there might be duplicate key errors and fails to generate data in subsequent attempts.
 
   ![Confirm sample data generation](./img/confirm_sample_data_generation.png)
 
@@ -84,7 +84,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
 ## Generate orders from Contoso Supermarket store applications
 
-- On the Agora client VM **Ag-VM-Client**, open Edge browser. From the favorites bar review bookmarks created for PoS applications for different stores and environments.
+- On the Agora client VM, open Edge browser. From the favorites bar review bookmarks created for PoS applications for different stores and environments.
 
   ![PoS app bookmarks](./img/pos_app_edge_bookmarks.png)
 
@@ -102,7 +102,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
 - Place multiple orders by adding random items to the cart.
 
-- Go to ADX Portal, under Dashboards open PoS Orders report and chose time range for last 30 minutes. Some times it takes time to flow orders to Azure Data Explore wait for few minutes and refresh report to see data.
+- Go to ADX portal, under Dashboards open PoS Orders report and chose time range for last 30 minutes. Some times it takes time to flow orders to Azure Data Explore wait for few minutes and refresh report to see data.
 
   ![PoS Chicago dashboard report](./img/pos_chicago_customer_report.png)
 
