@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-## Clean up the deployment
+# Cleanup deployment
 
 - To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
 

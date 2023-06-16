@@ -4,13 +4,13 @@ weight: 100
 toc_hide: true
 ---
 
-# Infrastructure observability for Kubernetes and Arc-enabled Kubernetes 
+# Infrastructure observability for Kubernetes and Arc-enabled Kubernetes
 
 ## Overview
 
 Infrastructure observability plays a crucial role in the success of Contoso Supermarket's cloud to edge strategy. By implementing infrastructure observability, Contoso gains comprehensive monitoring and visualization capabilities for their Kubernetes and Arc-enabled Kubernetes environments. This empowers them to proactively monitor the health and performance of their infrastructure, identify potential issues, and make data-driven decisions to optimize their operations. With infrastructure observability, Contoso can ensure that their cloud and edge infrastructure remain reliable, efficient, and resilient, enabling them to deliver exceptional customer experiences.
 
-[Prometheus](https://prometheus.io/) is a highly efficient open-source monitoring system that collects and stores metrics from various sources in real-time. It provides a flexible query language for analyzing the collected metrics and offers robust alerting capabilities. On the other hand, [Grafana](https://grafana.com/) is a powerful open-source data visualization and analytics platform. It allows users to create interactive and customizable dashboards to visualize the collected metrics in real-time. 
+[Prometheus](https://prometheus.io/) is a highly efficient open-source monitoring system that collects and stores metrics from various sources in real-time. It provides a flexible query language for analyzing the collected metrics and offers robust alerting capabilities. On the other hand, [Grafana](https://grafana.com/) is a powerful open-source data visualization and analytics platform. It allows users to create interactive and customizable dashboards to visualize the collected metrics in real-time.
 
 By leveraging Prometheus and Grafana for infrastructure observability, Contoso enjoys several advantages. Firstly, Prometheus's efficient data collection ensures that Contoso can monitor crucial performance indicators and resource utilization in real-time. Secondly, Grafana provides a user-friendly interface for visualizing the collected metrics, enabling Contoso to create interactive and customizable dashboards. These dashboards allow them to gain valuable insights into their infrastructure's health and performance, identify trends, and make informed decisions. Lastly, the combination of Prometheus and Grafana supports troubleshooting and root cause analysis.
 
@@ -26,17 +26,17 @@ The Dev and Staging environments are configured with individual Prometheus and G
 
 Grafana's dashboards in Contoso's implementation provide a visually appealing and customizable interface for monitoring their infrastructure. With Grafana, they can create intuitive and interactive dashboards that display key metrics and insights, empowering them to make data-driven decisions and quickly identify any issues or trends within their cloud to edge infrastructure. The following Grafana dashboards are automatically deployed as part of advanced automation to the Dev, Staging, and Prod environments:
 
-- **Kubernetes / Views / Global**: The Kubernetes Global Dashboard in Grafana offers a concise overview of your Kubernetes cluster, allowing you to quickly assess its overall health and performance. The dashboard includes panels that highlight key metrics, such as total cluster CPU, RAM, and network utilization, as well as resource usage across namespaces and nodes. Additionally, it tracks the number of resource types used in the cluster and helps detect misconfigured application resources by comparing real usage with requested and limited resources.
+- __Kubernetes / Views / Global__: The Kubernetes Global Dashboard in Grafana offers a concise overview of your Kubernetes cluster, allowing you to quickly assess its overall health and performance. The dashboard includes panels that highlight key metrics, such as total cluster CPU, RAM, and network utilization, as well as resource usage across namespaces and nodes. Additionally, it tracks the number of resource types used in the cluster and helps detect misconfigured application resources by comparing real usage with requested and limited resources.
 
-- **Node Exporter Full**: The Kubernetes Nodes Dashboard in Grafana provides a detailed view of node-level metrics and resources in your Kubernetes cluster. It enables you to monitor CPU and RAM usage, track pods running on each node, and identify any resource anomalies or performance issues. The dashboard also offers system-level metrics such as system load, context switches, and file descriptors, allowing for troubleshooting and optimization. Additionally, it provides insights into storage capacity, volumes, and I/O operations on the nodes, aiding in the effective management of storage resources.
+- __Node Exporter Full__: The Kubernetes Nodes Dashboard in Grafana provides a detailed view of node-level metrics and resources in your Kubernetes cluster. It enables you to monitor CPU and RAM usage, track pods running on each node, and identify any resource anomalies or performance issues. The dashboard also offers system-level metrics such as system load, context switches, and file descriptors, allowing for troubleshooting and optimization. Additionally, it provides insights into storage capacity, volumes, and I/O operations on the nodes, aiding in the effective management of storage resources.
 
-- **Freezer Monitoring**: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide.](../freezer_monitor/_index.md)
+- __Freezer Monitoring__: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide.](../freezer_monitor/_index.md)
 
-> **Grafana Dashboard Credits:**                           
-> The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes. 
-> The original dashboards can be found at:                            
-> - https://grafana.com/grafana/dashboards/1860-node-exporter-full                              
-> - https://github.com/dotdc/grafana-dashboards-kubernetes
+> __Grafana Dashboard Credits:__
+> The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes.
+> The original dashboards can be found at:
+> - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full)
+> - [Grafana Dashboards Kubernetes](https://github.com/dotdc/grafana-dashboards-kubernetes)
 
 ## Access the dashboards
 
