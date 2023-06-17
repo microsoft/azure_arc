@@ -30,7 +30,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
   ![Locate dashboard report template files](./img/adx_dashboard_report_files.png)
 
-- Copy these ADX dashboards report JSON files on your computer in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
+- Copy these ADX dashboards report JSON files on your local machine in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
 
   > **Note:** Depending the account being used to log in to ADX portal, Azure AD tenant of that account may have conditional access policies enabled and might prevent log in to ADX Dashboards from the Client VM as this VM is not managed by your organization.
 
