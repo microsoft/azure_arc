@@ -40,7 +40,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
   ![Navigate to ADX dashboard reports](./img/adx_view_dashboards.png)
 
-- Select _Import dashboard from file_ to select previously copied file from the Client VM or _C:\Ag\adx_dashboards_ folder on the Client VM.
+- Select _Import dashboard from file_ to select previously copied file from the Client VM to your local machine or the _C:\Ag\adx_dashboards_ folder on the Client VM.
 
   ![Select import dashboard file](./img/adx_import_dashboard_file.png)
 
