@@ -102,9 +102,9 @@ By default there is no data available in Cosmos DB database after the deployment
 
 - Place additional orders from the same store by repeating the above steps. Try adding random items to each order to simulate orders from different customers of the store.
 
-- To view the orders placed form the Contoso Chicago store, go to ADX portal, under Dashboards open PoS Orders report and chose time range as _"Last 30 minutes"_.
+- In the ADX Portal, under Dashboards, open the PoS Orders report and set the time range for "_Last 30 minutes_", and refresh the report to see data.
 
-  > **Note:** Some times it takes time to flow orders data in to the ADX database. Wait for few minutes and refresh report to see orders data.
+> **NOTE:** As the Cloud Sync service performs the sync in the backend, it might take a few minutes for orders to show up in ADX.
 
   ![PoS Chicago dashboard report](./img/pos_chicago_customer_report.png)
 
