@@ -72,11 +72,11 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![Generating sample data](./img/sample_data_generation.png)
 
-- From ADX open PoS Orders report to see newly simulated orders data. Allow some time to propagate data into the ADX database using an integrated data pipeline.
+- From ADX open PoS Orders report to view simulated orders data. Allow some time to propagate data into the ADX database using an integrated data pipeline.
 
   ![PoS Orders with simulated data](./img/adx_posorders_with_simulated_data.png)
 
-- By default report displays for the last one hour data. To change report time range, chose time range as last 30 days from the report to refresh and display for the selected time range.
+- PoS Orders dashboard report is configured to display data from the _"Last 1 hour"_ by default. To view all the simulated orders data, change report time range to _"Last 30 days"_ as shown in the picture below. Dashboard report will refresh data and display reports for the selected time range.
 
   ![PoS Orders select time range](./img/adx_orders_report_select_timerange.png)
 
@@ -100,7 +100,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![Select PoS Chicago application](./img/pos_chicago_customer_place_order.png)
 
-- Place multiple orders by adding random items to the cart.
+- Place additional orders from the same store by repeating the above steps. Try adding random items to each order to simulate orders from different customers of the store.
 
 - Go to ADX portal, under Dashboards open PoS Orders report and chose time range for last 30 minutes. Some times it takes time to flow orders to Azure Data Explore wait for few minutes and refresh report to see data.
 
