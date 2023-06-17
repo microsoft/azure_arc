@@ -48,7 +48,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
   ![Choose dashboard report JSON file to import](./img/adx_select_dashboard_file.png)
 
-- Confirm dashboard report name, accept the suggested name or chose your own name and click _Create_.
+- Confirm the dashboard report name, accept the suggested name (or choose your own), and click Create.
 
   ![Confirm dashboard report name](./img/adx_confirm_dashboard_report_name.png)
 
