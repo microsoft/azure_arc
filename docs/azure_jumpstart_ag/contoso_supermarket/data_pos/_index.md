@@ -22,7 +22,7 @@ Contoso supports dashboard reports for the PoS application analytics and monitor
 
 ## Manually import dashboards
 
-> **Note:** If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the deployment.
+> __NOTE: If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the automated deployment.__
 
 Follow the below steps in order to view the PoS Orders dashboard reports you will need to import these into ADX.
 
@@ -32,7 +32,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
 - Copy these ADX dashboards report JSON files on your local machine in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
 
-  > **Note:** Depending the account being used to log in to ADX portal, Azure AD tenant of that account may have conditional access policies enabled and might prevent log in to ADX Dashboards from the Client VM as this VM is not managed by your organization.
+  > __NOTE: Depending the account being used to log in to ADX portal, Azure AD tenant of that account may have conditional access policies enabled and might prevent log in to ADX Dashboards from the Client VM as this VM is not managed by your organization.__
 
 - On your local machine open the browser of your choice OR on the Client VM open the Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate reports.
 
@@ -64,9 +64,9 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![Locate Data Emulator on the desktop](./img/locate_data_emulator_desktop.png)
 
-- Double click on the Data Emulator desktop icon to launch executable and generate sample data. Confirm by entering **Yes** or **Y** to start generating data, entering No or N will exit the tool. This tool generates data for the last 30 days. Say No or N to prevent regenerating sample data if it is generated earlier.
+- Double click on the Data Emulator desktop icon to launch executable and generate sample data. Confirm by entering __Yes__ or __Y__ to start generating data, entering No or N will exit the tool. This tool generates data for the last 30 days. Say No or N to prevent regenerating sample data if it is generated earlier.
 
-  > **Note**: You can still generate additional sample data by running this tool multiple times, but there might be duplicate key errors and fails to generate data in subsequent attempts.
+  > __NOTE: You can still generate additional sample data by running this tool multiple times, but there might be duplicate key errors and fails to generate data in subsequent attempts.__
 
   ![Confirm sample data generation](./img/confirm_sample_data_generation.png)
 
@@ -90,7 +90,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
 - From the bookmarks expand POS -> Chicago and select "POS Chicago - Customer".
 
-  ![Select POS Chicago application](./img/pos_app_edge_select_pos_chicago_customer.png)
+  ![Select PoS Chicago application](./img/pos_app_edge_select_pos_chicago_customer.png)
 
 - Randomly add a few items to the cart.
 
@@ -104,7 +104,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
 - In the ADX Portal, under Dashboards, open the PoS Orders report and set the time range for "_Last 30 minutes_", and refresh the report to see data.
 
-> **NOTE:** As the Cloud Sync service performs the sync in the backend, it might take a few minutes for orders to show up in ADX.
+> __NOTE: As the Cloud Sync service performs the sync in the backend, it might take a few minutes for orders to show up in ADX.__
 
   ![PoS Chicago dashboard report](./img/pos_chicago_customer_report.png)
 
