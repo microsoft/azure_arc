@@ -36,7 +36,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
 - On your local machine open the browser of your choice OR on the Client VM open the Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate reports.
 
-- Once you log in to ADX dashboards, click on Dashboards in the left navigation to import PoS Orders dashboard report.
+- Once you are logged in to ADX dashboards, click on Dashboards in the left navigation to import the PoS Orders dashboard report.
 
   ![Navigate to ADX dashboard reports](./img/adx_view_dashboards.png)
 
