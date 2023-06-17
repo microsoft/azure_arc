@@ -44,7 +44,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
   ![Select import dashboard file](./img/adx_import_dashboard_file.png)
 
-- Choose _adx-dashboard-orders-payload.json_ file to import.
+- Choose to import the _adx-dashboard-orders-payload.json_ file.
 
   ![Choose dashboard report JSON file to import](./img/adx_select_dashboard_file.png)
 
