@@ -52,7 +52,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
   ![Confirm dashboard report name](./img/adx_confirm_dashboard_report_name.png)
 
-- By default there is no data available in the ADX Orders database to display report after deployment. Click Save to save dashboard report in ADX.
+- By default, there is no data available in the ADX Orders database to display in the report after deployment. Click Save to save the dashboard report in ADX.
 
   ![Empty data in orders dashboard report](./img/adx_orders_report_empty_data.png)
 
