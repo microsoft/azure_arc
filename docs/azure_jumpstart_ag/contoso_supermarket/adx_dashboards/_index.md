@@ -72,7 +72,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![Generating sample data](./img/sample_data_generation.png)
 
-- From ADX open PoS Orders report to see newly simulated orders data. Allow some time to propagate data into ADX database using integrated data pipeline.
+- From ADX open PoS Orders report to see newly simulated orders data. Allow some time to propagate data into the ADX database using an integrated data pipeline.
 
   ![PoS Orders with simulated data](./img/adx_posorders_with_simulated_data.png)
 
@@ -82,21 +82,21 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![PoS Orders with simulated data for selected time range](./img/adx_posorders_with_simulated_data_selected_timerange.png)
 
-## Generate orders from Contoso Supermarket store applications
+### Generate orders from Contoso Supermarket store applications
 
 - On the Agora client VM, open Edge browser. From the favorites bar review bookmarks created for PoS applications for different stores and environments.
 
   ![PoS app bookmarks](./img/pos_app_edge_bookmarks.png)
 
-- From the bookmarks expand POS -> Chicago and select POS Chicago - Customer application.
+- From the bookmarks expand POS -> Chicago and select "POS Chicago - Customer".
 
   ![Select POS Chicago application](./img/pos_app_edge_select_pos_chicago_customer.png)
 
-- Randomly add few items to the cart.
+- Randomly add a few items to the cart.
 
   ![Select PoS Chicago application](./img/chicago_pos_app_customer.png)
 
-- Click on Cart, review items in the cart, and click Place Order.
+- Click on Cart, review items, and click Place Order.
 
   ![Select PoS Chicago application](./img/pos_chicago_customer_place_order.png)
 
@@ -106,7 +106,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
   ![PoS Chicago dashboard report](./img/pos_chicago_customer_report.png)
 
-- From Edge browser bookmarks, open PoS application for other stores and repeat the order processing and see PoS Orders dashboard for multiple stores and environments.
+- From Edge browser bookmarks, open the PoS application for other stores and repeat the order processing and see the PoS Orders dashboard for multiple stores and environments.
 
   ![PoS Orders multiple stores dashboard report](./img/pos_orders_multiplestores_report.png)
 
