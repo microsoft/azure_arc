@@ -12,7 +12,7 @@ In today's fast-paced software development industry having a robust and efficien
 
 GitHub Actions allows Contoso Supermarket's developers to define workflows to build, test, and deploy their applications directly from their GitHub repositories. With its wide range of pre-built actions and integrations, GitHub Actions makes it easy for developers to implement CI/CD pipelines for Contoso Supermarket's critical applications and services and to ship more features without compromising quality, security, and speed.
 
-Contoso Supermarket's DevOps team has adopted GitOps methodologies which allows them to use Git as the single source of truth for managing infrastructure and application deployments. It involves declarative definitions of infrastructure and application configurations, which are stored in Git repositories. The GitOps pipeline automatically detects any changes made to the repositories and triggers the necessary actions to deploy the changes to the target environments. 
+Contoso Supermarket's DevOps team has adopted GitOps methodologies which allows them to use Git as the single source of truth for managing infrastructure and application deployments. It involves declarative definitions of infrastructure and application configurations, which are stored in Git repositories. The GitOps pipeline automatically detects any changes made to the repositories and triggers the necessary actions to deploy the changes to the target environments.
 
 One of the main benefits of GitOps is its ability to provide a consistent and auditable deployment process. All changes to the infrastructure and application configurations are tracked and versioned in Git, making it easy to roll back to a previous state if necessary. The declarative nature of GitOps also enables the automation of the deployment process, which reduces the risk of human error and streamlines the entire process.
 
@@ -111,7 +111,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the additional operating system features to install](./img/vscode_dev_container_os_options.png)
 
-- Click on _Trust folder and continue_, now you can see the cloned repository opened in VSCode, in te _Ubuntu_ dev container.
+- Click on _Trust folder and continue_, now you can see the cloned repository opened in VSCode, in the _Ubuntu_ dev container.
 
     ![Screenshot showing the trust folder prompt in VSCode](./img/vscode_dev_container_pos_app.png)
 
