@@ -173,7 +173,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the PoS application pods](./img/repo_staging_pods_gitops.png)
 
-- Open Edge, and navigate to the _POS Staging - Customer_ bookmark.
+- Open the Microsoft Edge browser, and navigate to the _POS Staging - Customer_ bookmark.
 
     ![Screenshot showing the staging customer bookmark in edge](./img/edge_staging_customer_portal.png)
 
