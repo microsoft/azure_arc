@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-## Jumpstart Agora - Deployment guide
+# Jumpstart Agora - Contoso Supermarket deployment guide
 
 Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Contoso Supermarket scenario environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components. The diagram below details the high-level architecture that is deployed and configured as part of the automation.
 
@@ -35,7 +35,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo2.png)
 
-- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify *only* the Jumpstart Agora Apps repo that you forked.
+- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify __only__ the Jumpstart Agora Apps repo that you forked.
 
   - In the top right of the GitHub website, click on the dropdown on your user icon and then click "Settings".
 
@@ -75,9 +75,8 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT11.png)
 
-    > **NOTE: GitHub fine-grained access tokens are a beta feature of GitHub and may be subject to change in user experience or functionality.**
-
-    > **NOTE: The token shown in the above screenshot is a placeholder value for example purposes only and not a working token.**
+    > __NOTE: GitHub fine-grained access tokens are a beta feature of GitHub and may be subject to change in user experience or functionality.__
+    > __NOTE: The token shown in the above screenshot is a placeholder value for example purposes only and not a working token.__
 
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
@@ -89,7 +88,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 - Ensure that you have selected the correct subscription you want to deploy Agora to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
 
-- Agora must be deployed to one of the following regions. **Deploying Agora outside of these regions may result in unexpected results or deployment errors.**
+- Agora must be deployed to one of the following regions. __Deploying Agora outside of these regions may result in unexpected results or deployment errors.__
 
   - East US
   - East US 2
@@ -98,7 +97,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   - North Europe
   - West Europe
 
-- **Agora requires XXX XXX-series and XXX XXX-series vCPUs**. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy Agora. You can use the below Az CLI command to check your vCPU utilization.
+- __Agora requires XXX XXX-series and XXX XXX-series vCPUs__. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy Agora. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -157,9 +156,8 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing creating an SPN with PowerShell](./img/create_spn_powershell.png)
 
-    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.**
-
-    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
+    > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.__
+    > __NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
 
 - [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
@@ -212,7 +210,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
-    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md).**
+    > __NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md).__
 
 ## Deployment via Azure Developer CLI (experimental)
 
@@ -220,7 +218,7 @@ Jumpstart Agora provides an experimental feature that allows users to deploy wit
 
 - Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
-  > **NOTE: PowerShell is required for using azd with Jumpstart Agora. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.**
+  > __NOTE: PowerShell is required for using azd with Jumpstart Agora. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.__
 
 - Login with azd using ```azd auth login``` which will open a browser for interactive login.
 
@@ -240,7 +238,7 @@ Once your deployment is complete, you can open the Azure portal and see the Agor
 
   ![Screenshot showing all deployed resources in the resource group](./img/deployed_resources.png)
 
-   > **NOTE: For enhanced Agora security posture, RDP (3389) and SSH (22) ports are not open by default in Agora deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
+   > __NOTE: For enhanced Agora security posture, RDP (3389) and SSH (22) ports are not open by default in Agora deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.__
 
 ### Connecting to the Agora Client virtual machine
 
@@ -271,7 +269,7 @@ By design, Agora does not open port 3389 on the network security group. Therefor
 
   ![Screenshot showing connecting to the VM using Bastion](./img/bastion_connect.png)
 
-  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _Agora-Client-VM_ with Azure Bastion.**
+  > __NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _Agora-Client-VM_ with Azure Bastion.__
 
 #### Connect using just-in-time access (JIT)
 
@@ -306,21 +304,3 @@ Once deployment is complete its time to start experience Agora capabilities. Use
 - [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
 - [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
 - [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
-
-## Clean up the deployment
-
-- To clean up your deployment, simply delete the resource group using Azure CLI or Azure portal.
-
-  ```shell
-  az group delete -n <name of your resource group>
-  ```
-
-  ![Screenshot showing az group delete](./img/az_group_delete.png)
-
-  ![Screenshot showing group delete from Azure portal](./img/portal_delete.png)
-
-- If you used Azure Developer CLI to deploy then ```azd down``` can be used instead.
-
-  ![Screenshot showing azd down](./img/azd_down.png)
-
-  > **NOTE: If you have manually configured Defender for Cloud, please refer to the [dedicated page](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md) to clean up Defender for Cloud resources.**
