@@ -164,7 +164,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the staging GitHub Action](./img/github_actions_dev.png)
 
-- On the Client VM, open Windows Terminal, switch to the _Staging_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux v2 extension picks up the changes you made on the _Dev_ environment and deploys it to the _Staging_ cluster.
+- On the Client VM, open Windows Terminal, switch to the _Staging_ Kubernetes cluster and monitor the _contosopos_ pods. You should see the pods are recreated as the Flux v2 extension picks up the changes you made on the _Dev_ environment and deploys it to the _Staging_ cluster.
 
   ```azurecli
   kubectx staging
