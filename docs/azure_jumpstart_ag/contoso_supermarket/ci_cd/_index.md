@@ -195,7 +195,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing canary customer view before update](./img/edge_canary_before_update.png)
 
-- On the Client VM, open Windows Terminal, switch to the _Chicago_ Kubernetes cluster and monitor the contosopos pods. You should see the pods are recreated as the Flux v2 extension picks up the changes you made on the _Staging_ environment and deploys it to the _Canary_ cluster.
+- On the Client VM, open Windows Terminal, switch to the _Chicago_ Kubernetes cluster and monitor the _contosopos_ pods. You should see the pods are recreated as the Flux v2 extension picks up the changes you made on the _Staging_ environment and deploys it to the _Canary_ cluster.
 
   ```azurecli
   kubectx chicago
