@@ -160,7 +160,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing deleting the feature](./img/github_delete_branch_dev.png)
 
-- A GitHub action is automatically triggered to build new Docker image of the PoS application and deploy this new image to the Staging cluster.
+- A GitHub action is automatically triggered to build a new Docker image of the PoS application and deploy this new image to the Staging cluster.
 
     ![Screenshot showing the staging GitHub Action](./img/github_actions_dev.png)
 
