@@ -20,15 +20,15 @@ As part of the automated deployment, an Azure Policy monitoring initiative and a
 
 Follow these steps to verify that these required Azure Monitor artifacts have been successfully deployed:
 
-- In the top bar of the Azure portal, search for **policy** and click on **Policy**:
+- In the top bar of the Azure portal, search for __policy__ and click on __Policy__:
 
     ![Screenshot of searching Azure Policy](./img/search_policy.png)
 
-- Click on **Assignments**. You will see the Azure Policy initiative "_(Ag) Enable Azure Monitor for Hybrid VMs with AMA_". This initiative enables Azure Monitor for the hybrid virtual machines with AMA. It takes a Log Analytics workspace as a parameter and asks for an option to enable Processes and Dependencies.
+- Click on __Assignments__. You will see the Azure Policy initiative "_(Ag) Enable Azure Monitor for Hybrid VMs with AMA_". This initiative enables Azure Monitor for the hybrid virtual machines with AMA. It takes a Log Analytics workspace as a parameter and asks for an option to enable Processes and Dependencies.
 
     ![Screenshot of Azure Monitor initiative assignment Azure Policy](./img/azure_monitor_initiative.png)
 
-- The Azure Policy initiative mentioned above deploys a Data Collection Rule (DCR), which is in charge of collecting monitoring data from the Azure Arc-enabled servers. In the top bar, search for **Data collection rules**:
+- The Azure Policy initiative mentioned above deploys a Data Collection Rule (DCR), which is in charge of collecting monitoring data from the Azure Arc-enabled servers. In the top bar, search for __Data collection rules__:
 
     ![Screenshot of searching Data Collection Rules](./img/search_dcr.png)
 
@@ -46,14 +46,14 @@ Follow these steps to verify that these required Azure Monitor artifacts have be
 
 Now that we have checked that the required monitoring artifacts have been successfully enabled, it's time to leverage VMInsights. It monitors the performance and health of your Azure Arc-enabled servers by collecting data on their running processes and dependencies on other resources.
 
-- Search for **Azure Arc**, go to **Servers** and click in one of your **Azure Arc-enabled servers**:
+- Search for __Azure Arc__, go to __Servers__ and click in one of your __Azure Arc-enabled servers__:
 
     ![Screenshot of searching for an Azure Arc-enabled server](./img/search_arc_server.png)
 
-- Click on **Insights** and then on **Performance**. You will find a set of performance charts that target several key performance indicators to help you determine how well your Azure Arc-enabled server is performing. The charts show resource utilization over a period of time:
+- Click on __Insights__ and then on __Performance__. You will find a set of performance charts that target several key performance indicators to help you determine how well your Azure Arc-enabled server is performing. The charts show resource utilization over a period of time:
 
     ![Screenshot of VMInsights - Performance](./img/vminsights_performance.png)
 
-- After you have explored all the available performance charts, click on **Map**. You will see the processes running in your Azure Arc-enabled servers, their connections and dependencies:
+- After you have explored all the available performance charts, click on __Map__. You will see the processes running in your Azure Arc-enabled servers, their connections and dependencies:
 
     ![Screenshot of VMInsights - Map](./img/vminsights_map.png)
