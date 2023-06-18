@@ -69,9 +69,9 @@ Contoso has implemented a CI/CD workflow to make it easier for their developers 
     ![Screenshot showing the helm release values](./img/github_helm_release_example.png)
 
 - The repository has the following GitHub actions that build the Contoso Supermarket's CI/CD workflow
-  - **Promote-to-staging:** This workflow is triggered once a pull request targeting the code of the PoS application is merged. It will build the new images based on code changes, increment the image tag, run unit tests and update the PoS application on the _Staging_ environment.
-  - **Promote-to-canary:** This workflow is triggered once the staging cluster has a healthy deployment of the PoS application, this is done once the Flux v2 operator captures the new commit in staging branch and generates an notification that the deployment is ready. It will build the new canary image, run integration tests and submits a PR to update the image tag on the _canary_ Helm release.
-  - **Promote-to-production:** This workflow is triggered once the canary cluster has a healthy deployment of the PoS application, this is done once the Flux v2 operator captures the new commit in canary branch and generates an notification that the deployment is ready. It will build the new production image, run final tests and submits a PR to update the image tag on the _production_ Helm release.
+  - __Promote-to-staging:__ This workflow is triggered once a pull request targeting the code of the PoS application is merged. It will build the new images based on code changes, increment the image tag, run unit tests, and update the PoS application on the _Staging_ environment.
+  - __Promote-to-canary:__ This workflow is triggered once the staging cluster has a healthy deployment of the PoS application, this is done once the Flux v2 operator captures the new commit in the staging branch and generates a notification that the deployment is ready. It will build the new canary image, run integration tests, and submits a PR to update the image tag on the _canary_ Helm release.
+  - __Promote-to-production:__ This workflow is triggered once the canary cluster has a healthy deployment of the PoS application, this is done once the Flux v2 operator captures the new commit in the canary branch and generates a notification that the deployment is ready. It will build the new production image, run final tests, and submits a PR to update the image tag on the _production_ Helm release.
 
     ![Screenshot showing all the GitHub actions](./img/github_actions_list.png)
 
