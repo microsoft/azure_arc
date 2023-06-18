@@ -216,6 +216,16 @@ do {
 } until ($response)
 Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
 
+
+Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
+$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
+foreach ($branch in $protectedBranches) {
+    $branchName = $branch.name
+    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
+    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
+    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
+}
+
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
 git config --global user.name "Agora Dev"
@@ -281,16 +291,6 @@ do {
     }
 } while ($response -match "failed" -or $retryCount -ge $maxRetries)
 Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
-
-
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-foreach ($branch in $protectedBranches) {
-    $branchName = $branch.name
-    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
-}
 
 write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
 Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
