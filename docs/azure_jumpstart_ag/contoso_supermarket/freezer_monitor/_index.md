@@ -6,25 +6,77 @@ toc_hide: true
 
 ## Contoso Supermarket Freezer Monitor Overview
 
-### Overview + Diagram (if applicable)
+### Overview
 
-![Applications and technology stack architecture diagram](./img/placeholder.png)
+Contoso Supermarket is obsessed with achieving the highest levels of food safety. To support this obsession Contoso has invested in technology to let it know when any food in a store's freezers is potentially unsafe due to the freezer reaching temperatures that would allow the food to thaw and pathogens to grow.
 
-### Data flow
+Contoso has installed IoT sensors in each freezer in each store to detect both temperature and humidity. The IoT sensors send current measurements via Message Queuing Telemetry Transport (MQTT) to a broker service in each store. The broker forwards the data to [Azure IoT Hub](https://azure.microsoft.com/products/iot-hub/) and along to [Azure Data Explorer (ADX)](https://azure.microsoft.com/products/data-explorer/) for aggregation with data from all stores and analysis. In addition, the sensor data is also sent to a dashboard in each store for visualizing sensor history and to enable early warning notifications to the store manager when a safety issue is imminent.
 
-![Data flow diagram](./img/placeholder.png)
-(not sure if separate dfd is needed with the Diagram above...
-)
+Contoso Supermarket is researching a number of additional health and safety systems that will leverage the same IoT infrastructure. These include:
 
-## Instructions
+- Air quality sensors to detect the presence of smoke or other contaminants
+- Water quality sensors to detect the presence of contaminants in the water supply
+- Motion and presence sensors to lights should be turned on for personal safety
+
+The local collection and visualization of sensor data uses the same infrastructure as the [Infrastructure Observability](..\k8s_infra_observability\_index.md) stack, namely Prometheus and Grafana. This provides the store manager with a single pane of glass for monitoring both the infrastructure and the sensors, and minimizes the number of new technologies that the manager needs to learn and that Contoso must to support.
+
+[Prometheus](https://prometheus.io/) is a highly efficient open-source monitoring system that collects and stores metrics from various sources in real-time. It provides a flexible query language for analyzing the collected metrics and offers robust alerting capabilities. On the other hand, [Grafana](https://grafana.com/) is a powerful open-source data visualization and analytics platform. It allows users to create interactive and customizable dashboards to visualize the collected metrics in real-time and also offers its own alerting capabilities.
+
+### Architecture
+
+![Applications and technology stack architecture diagram](./img/architecture.png)
+
+As mentioned above, the environmental observability architecture for Staging, Dev, and Prod environments leverages the the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in our scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus (MQTT2PROM).
+
+Mosquitto MQTT was chosen because it is a popular, open-source MQTT broker that is lightweight and efficient, making it a good fit for the IoT sensors. Azure IoT Hub is a fully managed service that enables reliable and secure bi-directional communications between millions of IoT devices and a solution back end. It also provides a device registry that stores information about the devices and their capabilities.
+
+The Dev and Staging environments are configured with individual Prometheus and Grafana instances, while the Prod environment is configured with a central Grafana instance. This architecture allows for more granular monitoring and troubleshooting in the Dev and Staging environments, while still providing a centralized view of the infrastructure's health and performance in the Prod environment.
+
+## Freezer Monitoring dashboard
+
+Contoso has an ADX dashboard for Freezer Monitoring analytics and monitoring. The dashboard is generated from live data sent from the IoT devices through the MQTT broker and IoT Hub to the ADX database using data integration.
+
+## Manually import dashboard
+
+> __NOTE: If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as the dashboard is automatically imported for you during the automated deployment.__
+
+To view the Freezer Monitoring dashboard you will first need to import it into ADX.
+
+- On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
+
+  ![Locate dashboard template files](./img/adx_dashboard_report_files.png)
+
+- Copy these ADX dashboard JSON files on your local machine in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
+
+  > __NOTE: Depending on the account being used to log in to ADX portal, the Azure AD tenant of that account may have conditional access policies enabled and might prevent log in to ADX Dashboards from the Client VM as this VM is not managed by your organization.__
+
+- On your local machine open the browser of your choice OR on the Client VM open the Edge browser and log in to [ADX Dashboards](https://dataexplorer.azure.com/). Use the same user account that you deployed Jumpstart Agora in your subscription. Failure to use the same account will prevent access to the ADX Orders database to generate dashboards.
+
+- Once you are logged in to ADX dashboards, click on Dashboards in the left navigation to import the Freezer Monitoring dashboard.
+
+  ![Navigate to ADX dashboard](./img/adx_view_dashboards.png)
+
+- Select _Import dashboard from file_ to select previously copied file from the Client VM to your local machine or the _C:\Ag\adx_dashboards_ folder on the Client VM.
+
+  ![Select import dashboard file](./img/adx_import_dashboard_file.png)
+
+- Choose to import the _adx-dashboard-iotsensor-payload.json_ file.
+
+  ![Choose dashboard JSON file to import](./img/adx_select_dashboard_file.png)
+
+- Confirm the dashboard name, accept the suggested name (or choose your own), and click Create.
+
+  ![Confirm dashboard name](./img/adx_confirm_dashboard_report_name.png)
+
+- By default, the simulated IoT sensors are sending data to ADX so you will see at least a few minutes of data in the dashboard. Click Save to save the dashboard in ADX.
+
+  ![Default freezer dashboard](./img/adx_freezer_dashboard_default.png)
+
+## Scenarios
 
 ### Scenario 1: Identifying the broken freezer
 
 The manager of the Chicago store has reported that food in one of the freezers has not been staying frozen. She has moved the food to the second freezer and called for service, but the technician reported that the freezer seems to be operating within parameters. Your job as the data analyst is to determine if the temperature sensor in the freezer has observed the issue, and provide the data to the store manager.
-
-#### Prerequisites
-
-- If you have not already imported the Azure Data Explorer dashboard, follow the instructions in the [TODO-Venkata - where are the instructions?] [Azure Data Explorer](../azure_data_explorer/README.md) section to import the dashboard.
 
 #### Confirm the issue in Azure Data Explorer
 
@@ -71,7 +123,7 @@ As the manager of the Chicago store, you can use the Grafana dashboard to see th
       1. Enter 'Freezer too warm - food at risk' as the Rule name
    4. Section 2
       1. Select 'Chicago' as the data source in query 'A'
-      2. Select 'Temperature' as the Metric in auery 'A'
+      2. Select 'Temperature' as the Metric in query 'A'
       3. Enter '15' as the Threshold in expression 'C'
       4. Click the 'Preview' button
       5. It's difficult to determine which series is which, so let's fix the series names
