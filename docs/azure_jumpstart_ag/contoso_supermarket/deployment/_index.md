@@ -92,7 +92,6 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
   - East US
   - East US 2
-  - Central US
   - West US 2
   - North Europe
   - West Europe
