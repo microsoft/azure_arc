@@ -12,7 +12,7 @@ To achieve this goal, Contoso leverages their existing CCTV cameras by seamlessl
 
 The "Managers Control Center" serves as the central hub of this experience. From this interface, Store Managers can easily monitor the number of people in each lane. The home page consists of two main areas
 
-- Heatmap. Using the heatmap, the Store Manager can open or close checkout lanes to distribute the traffic of the store, using the Toggles above each lane.
+- __Heatmap:__ Using the heatmap, the Store Manager can open or close checkout lanes to distribute the traffic of the store, using the Toggles above each lane.
   
     ![Store Manager Screenshot Heatmap focus](./img/checkout-heatmap.png)
 
