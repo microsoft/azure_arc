@@ -45,6 +45,7 @@ az provider register --namespace Microsoft.AzureArcData --wait
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
+az extension add --name connectedk8s --version "1.3.17" --system
 az extension add --name arcdata --system
 az -v
 
@@ -190,7 +191,7 @@ foreach ($cluster in $clusters) {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.18.0 `
+            --version 1.19.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
         Write-Host "`n"
@@ -344,8 +345,10 @@ if (-not $ArcServersLogonScript) {
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
-Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+if ($null -ne (Get-ScheduledTask -TaskName "DataOpsLogonScript" -ErrorAction SilentlyContinue)) {
+    Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
+}
+
 Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window

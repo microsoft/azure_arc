@@ -32,7 +32,7 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '10s/^/export deployBastion=/' vars.sh
 sed -i '11s/^/export templateBaseUrl=/' vars.sh
 
-export K3S_VERSION="1.26.3+k3s1"
+export K3S_VERSION="1.27.1+k3s1" # Do not change!
 
 chmod +x vars.sh
 . ./vars.sh

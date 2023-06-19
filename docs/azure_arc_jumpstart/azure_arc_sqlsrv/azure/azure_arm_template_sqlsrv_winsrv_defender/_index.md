@@ -255,7 +255,12 @@ Please note it may take some time to show this status in the Azure portal, but s
 
   ![Screenshot showing Defender for SQL test scripts](./defender-sql-testing-script.png)
 
-- Please note once in a while these test execution may fails randomly. If you don't find these alerts, login to nested SQL VM in Hyper-V and execute test script manually as show below.
+- Please note once in a while these test execution may fails randomly. If you don't find these alerts, login to nested SQL VM in Hyper-V and execute test script manually as show below. Following are the credentials to login to nested SQL Server VM.
+
+  ```text
+  Username: Administrator
+  Password: ArcDemo123!!
+  ```
 
   ![Screenshot showing manual execution of the test scripts](./manual-brute-force-test.png)
 
