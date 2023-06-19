@@ -16,7 +16,7 @@ The "Managers Control Center" serves as the central hub of this experience. From
   
     ![Store Manager Screenshot Heatmap focus](./img/checkout-heatmap.png)
 
-- Reporting. Contoso is interested in improving their store experience by measuring 2 key metrics: Total people in the store, and Shopper Wait Time. This metrics are shown in the Store Manager Control Center as shown below
+- __Reporting:__ Contoso is interested in improving their store experience by measuring 2 key metrics: Total people in the store, and Shopper Wait Time. This metrics are shown in the Store Manager Control Center as shown below
 
     ![Store Manager Reporting Pane](./img/reporting.png)
 
