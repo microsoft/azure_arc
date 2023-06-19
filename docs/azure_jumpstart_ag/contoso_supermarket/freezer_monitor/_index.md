@@ -26,11 +26,11 @@ The local collection and visualization of sensor data uses the same infrastructu
 
 ![Applications and technology stack architecture diagram](./img/architecture.png)
 
-As mentioned above, the environmental observability architecture for Staging, Dev, and Prod environments leverages the the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in our scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus (MQTT2PROM).
+As mentioned above, the environmental observability architecture for _Staging_, _Dev_, and _Prod_ environments leverages the the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in our scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus (MQTT2PROM).
 
 Mosquitto MQTT was chosen because it is a popular, open-source MQTT broker that is lightweight and efficient, making it a good fit for the IoT sensors. Azure IoT Hub is a fully managed service that enables reliable and secure bi-directional communications between millions of IoT devices and a solution back end. It also provides a device registry that stores information about the devices and their capabilities.
 
-The Dev and Staging environments are configured with individual Prometheus and Grafana instances, while the Prod environment is configured with a central Grafana instance. This architecture allows for more granular monitoring and troubleshooting in the Dev and Staging environments, while still providing a centralized view of the infrastructure's health and performance in the Prod environment.
+The _Dev_ and _Staging_ environments are configured with individual Prometheus and Grafana instances, while the _Prod_ environment is configured with a central Grafana instance. This architecture allows for more granular monitoring and troubleshooting in the _Dev_ and _Staging_ environments, while still providing a centralized view of the infrastructure's health and performance in the _Prod_ environment.
 
 ## Freezer Monitoring dashboard
 
@@ -74,16 +74,18 @@ To view the Freezer Monitoring dashboard you will first need to import it into A
 
 ## Scenarios
 
+Here are a few scenarios that Contoso Supermarket might encounter, and how they can be addressed using the data collected by the IoT sensors.
+
 ### Scenario 1: Identifying the broken freezer
 
 The manager of the Chicago store has reported that food in one of the freezers has not been staying frozen. She has moved the food to the second freezer and called for service, but the technician reported that the freezer seems to be operating within parameters. Your job as the data analyst is to determine if the temperature sensor in the freezer has observed the issue, and provide the data to the store manager.
 
 #### Confirm the issue in Azure Data Explorer
 
-   1. From your own computer (not the Client VM) open the dashboard named "Freezer Monitoring" in Azure Data Explorer: https://dataexplorer.azure.com/dashboards
+- Open the _Freezer Monitoring_ dashboard named "Freezer Monitoring" in Azure Data Explorer: https://dataexplorer.azure.com/dashboards
     ![Dashboard showing all freezers](./img/placeholder.png)
 
-   2. The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
+- The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
         ![Dashboard showing Chicago freezers only](./img/placeholder.png)
 
    3. The store manager didn't tell you which freezer was having problems, but it's obvious that Freezer-2 is regularly exceeding the safe threshold of 20°F. You can send information to the store manager via a screenshot, or you can explain to the manager how she can use Grafana in the store to see the same data.
@@ -107,7 +109,7 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 As the manager of the Chicago store, you can use the Grafana dashboard to see the current temperature, but you're a busy person so you want to be notified when the temperature exceeds the safe threshold of 15°F so you can take action immediately.
 
-(*Note - this won't really send you email because the server is not configured to send smtp messages. However, it will help you understand the potential options available to a store manager.*)
+__NOTE: This won't really send you email because the server is not configured to send smtp messages. However, it will help you understand the potential options available to a store manager.__
 
 1. In the Grafana dashboard, click the Hamburger menu > then Alerting
 2. Add a Contact point
