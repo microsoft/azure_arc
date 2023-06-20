@@ -57,7 +57,6 @@ To view the Freezer Monitoring dashboard you will first need to import it into A
   ![Navigate to ADX dashboard](./img/adx_view_dashboards.png)
 
 - Select _Import dashboard from file_ to select previously copied file from the Client VM to your local machine or the _C:\Ag\adx_dashboards_ folder on the Client VM.
-
   ![Select import dashboard file](./img/adx_import_dashboard_file.png)
 
 - Choose to import the _adx-dashboard-iotsensor-payload.json_ file.
@@ -82,14 +81,17 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 #### Confirm the issue in Azure Data Explorer
 
-- Open the _Freezer Monitoring_ dashboard in ADX: https://dataexplorer.azure.com/dashboards
-   ![Dashboard showing all freezers](./img/adx_freezer_dashboard_default.png)
+- Open the __Freezer Monitoring__ dashboard in ADX: https://dataexplorer.azure.com/dashboards
 
-- The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
-   ![Dashboard showing filtering for Chicago](./img/adx_freezer_dashboard_select_chicago.png)
+  ![Dashboard showing all freezers](./img/adx_freezer_dashboard_default.png)
 
-- The store manager didn't tell you which freezer was having problems, but if you look at the dashboard below it's obvious that Freezer-2 (aka device-id:Freezer-2-Chicago:Temperature_F) is regularly exceeding the safe threshold of 20°F as indicated by the green dashed line. You can send this information to the store manager via a screenshot, or you can show the manager how she can use the Grafana dashboard to see see the same data.
-   ![Dashboard showing only Chicago freezers](./img/adx_freezer_dashboard_show_chicago.png)
+- The charts are quite busy so let's make it easier to see the problem in Chicago by filtering the dashboard to show only data for the __Chicago__ store.
+
+  ![Dashboard showing filtering for Chicago](./img/adx_freezer_dashboard_select_chicago.png)
+
+- The store manager didn't tell you which freezer was having problems, but if you look at the dashboard below it's obvious that Freezer-2 (aka _device-id:Freezer-2-Chicago:Temperature_F_) is regularly exceeding the safe threshold of 20°F as indicated by the green dashed line. You can send this information to the store manager via a screenshot, or you can show the manager how she can use the Grafana dashboard to see see the same data.
+
+  ![Dashboard showing only Chicago freezers](./img/adx_freezer_dashboard_show_chicago.png)
 
 - While you're viewing the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to that store manager.
 
@@ -97,14 +99,17 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 From the Client VM:
 
-- Open the Edge browser, expand Grafana in the Favorites Bar, and select Grafana Prod
-- Login with the username `admin` and the Windows Admin Password you provided when you created your deployment
-- Click the Hamburger menu next to "Home" then click Dashboards
+- Open the Edge browser, expand Grafana in the Favorites Bar, and select __Grafana Prod__
+- Login with the username _admin_ and the Windows Admin Password you provided when you created your deployment
+- Click the hamburger menu next to __Home__ then click __Dashboards__
+
   ![Grafana showing the Dashboards menu](./img/grafana_click_dashboards.png)
-- Click General to see the list of dashboards then click "Chicago - Freezer Monitoring" to open the dashboard for Chicago
+- Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago
+
   ![Grafana showing list of Dashboards](./img/grafana_click_chicago.png)
-  - Notice that freezer2 is showing significant variability and frequently exceeding the safe threshold of 20°F.
-  ![Grafana showing the Chicago dashboard](./img/grafana_chicago_dashboard.png)
+  - Notice that __freezer2__ is showing significant variability and frequently exceeding the safe threshold of 20°F.
+
+    ![Grafana showing the Chicago dashboard](./img/grafana_chicago_dashboard.png)
 - The manager can use this dashboard directly when talking to the technician about the freezer.
 
 ### Scenario 2: Send alert when freezer is too warm
@@ -113,36 +118,61 @@ As the manager of the Chicago store, you can use the Grafana dashboard to see th
 
 __NOTE: This won't really send you email because the server is not configured to send smtp messages. However, it will help you understand the potential options available to a store manager.__
 
-- In the Grafana dashboard, click the Hamburger menu > then Alerting
+- In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__
+
+  ![Grafana showing the Alerting menu](./img/grafana_click_alerting.png)
 - Add a Contact point
-  - Click 'Contact points' in the navigation menu on the left
-  - Click the 'Add contact point' button
-  - Enter 'Chicago Store Manager' as the Name and 'chicago@contoso.com' in the Address field
-  - Click 'Save contact point'
+  - Click __Contact points__ in the navigation menu on the left
+
+    ![Grafana showing the Contact points menu](./img/grafana_click_contact_points.png)
+  - Click the __Add contact point__ button
+
+    ![Grafana showing the Add contact point button](./img/grafana_click_add_contact_point.png)
+  - Enter _Chicago Store Manager_ as the __Name__ and _chicago@contoso.com_ in the __Addresses__ field then click __Save contact point__
+
+    ![Grafana showing the Add contact point form](./img/grafana_add_contact_point.png)
 - Add an Alert rule
-  ![Add alert rule](./img/placeholder.png)
-  - Click 'Alert rules' in the navigation menu
-  - Click the 'Create alert rule' button
+  - Click __Alert rules__ in the navigation menu
+
+    ![Grafana showing the Alert rules menu](./img/grafana_click_alert_rules.png)
+  - Click __Create alert rule__
+
+    ![Grafana showing the Create alert rule button](./img/grafana_click_create_alert_rule.png)
   - Section 1
-    - Enter 'Freezer too warm - food at risk' as the Rule name
+    - Enter _Freezer too warm - food at risk_ as the __Rule name__
+
+      ![Grafana showing the Add alert rule form](./img/grafana_add_alert_rule_name.png)
   - Section 2
-    - Select 'Chicago' as the data source in query 'A'
-    - Select 'Temperature' as the Metric in query 'A'
-    - Enter '15' as the Threshold in expression 'C'
-    - Click the 'Preview' button
-    - It's difficult to determine which series is which, so let's fix the series names
-      - Click options under 'Legend'
-      - Select 'Custom'  enter '{{sensor}}'
+    - Select __chicago__ as the data source in query __A__
+    - Select __temperature__ as the Metric in query __A__
+    - Enter _15_ as the Threshold in expression __C__
+    - Click __Preview__
+
+      ![Grafana showing the Add alert rule form](./img/grafana_add_alert_rule_config.png)
+    - View the preview
+
+      ![Grafana showing the Add alert preview](./img/grafana_add_alert_rule_preview.png)
+    - Since it's difficult to determine which series is which, let's fix the series names
+      - Click __Options__
+      - Under __Legend__ select __Custom__ then enter _{{sensor_type}}_
       - Click away from the 'Legend' box, then back into it for the series names to update
+
+        ![Grafana showing preview legend options](./img/grafana_add_alert_rule_preview_legend.png)
     - Notice in the chart the times where freezer2 exceeds the threshold and would trigger an alert
   - Section 3
-    - Under 'Folder' type 'Alerts' and press 'Enter'
-    - Under 'Evaluation group' type 'Alert Group' and press 'Enter'
-  - Scroll to the top of the page and click the 'Save and exit' button
+    - Under __Folder__ type _Alerts_ and press __Enter__
+    - Under __Evaluation group__ type _Alert Group_ and press __Enter__
+
+      ![Grafana showing the Folder selection](./img/grafana_add_alert_rule_folder.png)
+  - Scroll to the top of the page and click __Save and exit__
+
+    ![Grafana showing the Save and exit button](./img/grafana_add_alert_rule_save.png)
 - View your alert
-  - Back on the 'Alert rules' page, type 'freezer' in the 'Search box' and press 'Enter'
-  - Expand the 'Alerts > Alert Group' folder to see your 'Freezer too warm - food at risk' alert
-  - Expand the alert to view Silence it, view the state history, or quickly edit or delete the alert
+  - Back on the __Alert rules__ page, type _freezer_ in the __Search__ box and press __Enter__
+  - Expand the __Alerts > Alert Group__ folder to see your __Freezer too warm - food at risk__ alert
+  - Expand the alert to view to __Silence__ it, __Show state history__, or quickly __edit__ or __delete__ the alert
+
+    ![Grafana showing the new alert rule](./img/grafana_new_alert_rule.png)
 
 ### Scenario 3: Follow the data from the freezer to the dashboards
 
