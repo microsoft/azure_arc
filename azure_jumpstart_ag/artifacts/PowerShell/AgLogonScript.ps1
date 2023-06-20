@@ -865,7 +865,7 @@ $Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
 foreach ($arcResourceType in $arcResourceTypes) {
     $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
     foreach ($arcResource in $arcResources) {
-        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Merge | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
     }
 }
 
@@ -1146,35 +1146,39 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        $retryCount++
-                        Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        az k8s-configuration flux delete `
-                        --resource-group $resourceGroup `
-                        --cluster-name $clusterName `
-                        --cluster-type $type `
-                        --name $configName `
-                        --force `
-                        --yes `
-                        --only-show-errors `
+                        Start-Sleep -Seconds 20
+                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
+                        if($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries){
+                            $retryCount++
+                            Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            az k8s-configuration flux delete `
+                            --resource-group $resourceGroup `
+                            --cluster-name $clusterName `
+                            --cluster-type $type `
+                            --name $configName `
+                            --force `
+                            --yes `
+                            --only-show-errors `
+                            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                            Start-Sleep -Seconds 10
+                            Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                            az k8s-configuration flux create `
+                            --cluster-name $clusterName `
+                            --resource-group $resourceGroup `
+                            --name $configName `
+                            --cluster-type $type `
+                            --url $appClonedRepo `
+                            --branch $branch `
+                            --sync-interval 5s `
+                            --kustomization name=$appName path=$appPath/$store prune=true `
+                            --timeout 30m `
+                            --namespace $namespace `
+                            --only-show-errors `
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                        Start-Sleep -Seconds 10
-                        Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                        az k8s-configuration flux create `
-                        --cluster-name $clusterName `
-                        --resource-group $resourceGroup `
-                        --name $configName `
-                        --cluster-type $type `
-                        --url $appClonedRepo `
-                        --branch $branch `
-                        --sync-interval 5s `
-                        --kustomization name=$appName path=$appPath/$store prune=true `
-                        --timeout 30m `
-                        --namespace $namespace `
-                        --only-show-errors `
-                    | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        }
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries){
                         Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
