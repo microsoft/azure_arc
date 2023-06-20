@@ -197,10 +197,11 @@ From the Client VM:
 
   ![Visual Studio Code showing the Use Namespace menu](./img/vscode_use_namespace.png)
 - Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
-  ![Visual Studio Code showing the Logs menu](./img/vscode_simulator_logs.png)
+
+  ![Visual Studio Code showing the Logs menu](./img/vscode_simulator_logs_menu.png)
 - In the Logs view click __Run__ to see the logs
 
-  ![Visual Studio Code showing the Logs window](./img/vscode_simulator_logs_window.png)
+  ![Visual Studio Code showing the Logs window](./img/vscode_simulator_logs_run.png)
 - This won't show you the values being produced, but it will show you that data is being published to the MQTT Broker
 
   ![Visual Studio Code showing the Simulator logs](./img/vscode_simulator_logs.png)
@@ -210,17 +211,18 @@ From the Client VM:
 The MQTT Broker is a container running Mosquitto in each AKS Edge Essentials cluster like the simulator. It receives the data from the simulator and sends it to the Azure IoT Hub. It also makes the data available for a third service, MQTT2Prometheus, which we'll discuss in a moment.
 
 To see data being received by the MQTT Broker
-(you can skip steps 1-6 if you just finished inspecting the Simulator logs.)
 
-- Connect to the Client VM
-- Open Visual Studio Code
-- Click the Kubernetes icon in the Activity Bar on the left
-- Right-click on the 'chicago' cluster and select 'Set as Current Cluster'
-- Expand Chicago > Namespaces, right-click on 'sensor-monitor' and select 'Use Namespace'
-- Expand Chicago > Workloads > Pods
-- Right-click on the 'sensor-monitor-broker-xxx' pod and select 'Logs'
-- In the Logs window that appears, select 'mqtt-broker' from the Container dropdown, then click the 'Run' button
-- This won't show you the values being produced, but it will show you the connections from the 2 simulated freezer devices to the broker, as well as the connections from the broker to Azure IoT Hub for each freezer device. Finally, shows the connection from 'sensor-monitor-mqtt2prom' which subscribes to the freezer data on the broker and makes it available to Prometheus, but more on that a bit later.
+Assuming you have completed the steps to view the MQTT Simulator logs above:
+
+- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
+
+  ![Visual Studio Code showing the Logs menu](./img/vscode_broker_logs_menu.png)
+- In the Logs view click __Run__ to see the logs
+
+  ![Visual Studio Code showing the Logs window](./img/vscode_broker_logs_run.png)
+- This won't show you the values being received or forwarded, but it will show you the connections from the 2 simulated freezer devices to the broker, as well as the connections from the broker to Azure IoT Hub for each freezer device. Finally, it shows the connection from __sensor-monitor-mqtt2prom__ which subscribes to the freezer data on the broker and makes it available to Prometheus, but more on that a bit later.
+
+  ![Visual Studio Code showing the Simulator logs](./img/vscode_broker_logs.png)
 
 #### Azure IoT Hub
 
