@@ -82,28 +82,30 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 #### Confirm the issue in Azure Data Explorer
 
-- Open the _Freezer Monitoring_ dashboard named "Freezer Monitoring" in Azure Data Explorer: https://dataexplorer.azure.com/dashboards
-    ![Dashboard showing all freezers](./img/placeholder.png)
+- Open the _Freezer Monitoring_ dashboard in ADX: https://dataexplorer.azure.com/dashboards
+   ![Dashboard showing all freezers](./img/adx_freezer_dashboard_default.png)
 
 - The charts are quite busy so let's make it easier to see if there is a problem in Chicago by filtering the dashboard to show only data for the Chicago store.
-        ![Dashboard showing Chicago freezers only](./img/placeholder.png)
+   ![Dashboard showing filtering for Chicago](./img/adx_freezer_dashboard_select_chicago.png)
 
-- The store manager didn't tell you which freezer was having problems, but it's obvious that Freezer-2 is regularly exceeding the safe threshold of 20°F. You can send information to the store manager via a screenshot, or you can explain to the manager how she can use Grafana in the store to see the same data.
+- The store manager didn't tell you which freezer was having problems, but if you look at the dashboard below it's obvious that Freezer-2 (aka device-id:Freezer-2-Chicago:Temperature_F) is regularly exceeding the safe threshold of 20°F as indicated by the green dashed line. You can send this information to the store manager via a screenshot, or you can show the manager how she can use the Grafana dashboard to see see the same data.
+   ![Dashboard showing only Chicago freezers](./img/adx_freezer_dashboard_show_chicago.png)
 
-- While you're in the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to the store manager.
+- While you're viewing the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to that store manager.
 
 #### View the data in Grafana at the store
 
-- Connect to the Client VM `Ag-VM-Client` using the instructions in the ![TODO - Deployment Guide](../deployment_guide/README.md)
-- Open the Edge browser, expand Grafana in the Favorites Bar and select Grafana Prod
-- Login using the username `admin` and the Windows Admin Password you provided when you created your deployment
-- Click the Hamburger menu > then Dashboards
-- Click General to see the dashboards
-- Click "Chicago - Freezer Monitoring" to see the dashboard
-- Notice that freezer2 is showing significant variability and frequently exceeding the safe threshold of 15°F.
-- The manager can use this dashboard directly when talking to the technician about the freezer.
+From the Client VM:
 
-- TODO - fix series names to just show "Freezer-1-Chicago"
+- Open the Edge browser, expand Grafana in the Favorites Bar, and select Grafana Prod
+- Login with the username `admin` and the Windows Admin Password you provided when you created your deployment
+- Click the Hamburger menu next to "Home" then click Dashboards
+  ![Grafana showing the Dashboards menu](./img/grafana_click_dashboards.png)
+- Click General to see the list of dashboards then click "Chicago - Freezer Monitoring" to open the dashboard for Chicago
+  ![Grafana showing list of Dashboards](./img/grafana_click_chicago.png)
+  - Notice that freezer2 is showing significant variability and frequently exceeding the safe threshold of 20°F.
+  ![Grafana showing the Chicago dashboard](./img/grafana_chicago_dashboard.png)
+- The manager can use this dashboard directly when talking to the technician about the freezer.
 
 ### Scenario 2: Send alert when freezer is too warm
 
