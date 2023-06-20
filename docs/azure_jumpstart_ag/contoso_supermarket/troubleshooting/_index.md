@@ -26,24 +26,24 @@ Occasionally deployments of the Jumpstart Agora Contoso Supermarket scenario may
 
 - Target Azure region does not support all required Azure services - ensure you are running Agora in one of the supported regions listed in the [deployment guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md).
 
-### Exploring logs from the _Agora-Client-VM_ virtual machine
+### Exploring logs from the _Ag-VM-Client_ virtual machine
 
-Occasionally, you may need to review log output from scripts that run on the _Agora-Client-VM_ virtual machine in case of deployment failures. To make troubleshooting easier, the Agora deployment scripts collect all relevant logs in the _C:\Agora\Logs_ folder on _Agora-Client-VM_. A short description of the logs and their purpose can be seen in the list below:
+Occasionally, you may need to review log output from scripts that run on the _Ag-VM-Client_ virtual machine in case of deployment failures. To make troubleshooting easier, the Agora deployment scripts collect all relevant logs in the _C:\Ag\Logs_ folder on _Ag-VM-Client_. A short description of the logs and their purpose can be seen in the list below:
 
 | Log file | Description |
 | ------- | ----------- |
-| _C:\Agora\Logs\AgLogonScript.log_ | Output from the primary PowerShell script that drives most of the automation tasks. |
-| _C:\Agora\Logs\ArcConnectivity.log_ | Output from the tasks that onboard servers and Kubernetes clusters to Azure Arc. |
-| _C:\Agora\Logs\AzCLI.log_ | Output from Az CLI login. |
-| _C:\Agora\Logs\AzPowerShell.log_ | Output from the installation of PowerShell modules. |
-| _C:\Agora\Logs\Bookmarks.log_ | Output from the configuration of Microsoft Edge bookmarks. |
-| _C:\Agora\Logs\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _Agora-Client-VM_. |
-| _C:\Agora\Logs\ClusterSecrets.log_ | Output of secret creation on Kubernetes clusters. |
-| _C:\Agora\Logs\GitOps-Ag-*.log_ | Output of scripts that collect GitOps logs on the remote Kubernetes clusters. |
-| _C:\Agora\Logs\IoT.log_ | Output of automation tasks that configure Azure IoT services. |
-| _C:\Agora\Logs\L1AKSInfra.log_ | Output of scripts that configure AKS Edge Essentials clusters on the nested virtual machines. |
-| _C:\Agora\Logs\Nginx.log_ | Output from the script that configures Nginx load balancing on the Kubernetes clusters. |
-| _C:\ArcBox\Logs\Observability.log_ | Output from the script that configures observability components of the solution. |
-| _C:\ArcBox\Logs\Tools.log_ | Output from the tasks that set up developer tools on _Agora-Client-VM_. |
+| _C:\Ag\Logs\AgLogonScript.log_ | Output from the primary PowerShell script that drives most of the automation tasks. |
+| _C:\Ag\Logs\ArcConnectivity.log_ | Output from the tasks that onboard servers and Kubernetes clusters to Azure Arc. |
+| _C:\Ag\Logs\AzCLI.log_ | Output from Az CLI login. |
+| _C:\Ag\Logs\AzPowerShell.log_ | Output from the installation of PowerShell modules. |
+| _C:\Ag\Logs\Bookmarks.log_ | Output from the configuration of Microsoft Edge bookmarks. |
+| _C:\Ag\Logs\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _Ag-VM-Client_. |
+| _C:\Ag\Logs\ClusterSecrets.log_ | Output of secret creation on Kubernetes clusters. |
+| _C:\Ag\Logs\GitOps-Ag-*.log_ | Output of scripts that collect GitOps logs on the remote Kubernetes clusters. |
+| _C:\Ag\Logs\IoT.log_ | Output of automation tasks that configure Azure IoT services. |
+| _C:\Ag\Logs\L1AKSInfra.log_ | Output of scripts that configure AKS Edge Essentials clusters on the nested virtual machines. |
+| _C:\Ag\Logs\Nginx.log_ | Output from the script that configures Nginx load balancing on the Kubernetes clusters. |
+| _C:\Ag\Logs\Observability.log_ | Output from the script that configures observability components of the solution. |
+| _C:\Ag\Logs\Tools.log_ | Output from the tasks that set up developer tools on _Ag-VM-Client_. |
 
-  ![Screenshot showing Agora logs folder on ArcBox-Client](./PLACEHOLDER.png)
+  ![Screenshot showing Agora logs folder on ArcBox-Client](./logs_folder.png)

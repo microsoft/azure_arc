@@ -27,7 +27,6 @@ Agora can be deployed to the following regions:
 
 - East US
 - East US 2
-- Central US
 - West US 2
 - North Europe
 - West Europe

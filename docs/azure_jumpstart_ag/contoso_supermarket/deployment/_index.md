@@ -94,7 +94,6 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
   - East US
   - East US 2
-  - Central US
   - West US 2
   - North Europe
   - West Europe
@@ -279,11 +278,11 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./img/jit_allowing_rdp.png)
+  ![Screenshot showing how to enable JIT](./img/enable_jit.png)
 
-  ![Screenshot showing connecting to the VM using RDP](./img/rdp_connect.png)
+  ![Screenshot showing how to enable JIT](./img/enable_jit2.png)
 
-  ![Screenshot showing connecting to the VM using JIT](./img/jit_connect_rdp.png)
+  ![Screenshot showing connecting to the VM using RDP](./img/connect_jit.png)
 
 ### The Logon scripts
 
