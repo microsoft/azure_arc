@@ -129,13 +129,13 @@ if ($env:kubernetesDistribution -eq "k8s") {
 
 # Random guid
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$ArcName = "$env:resourceGroup-$guid"
+$arcResourceName = "$env:resourceGroup-$guid"
 
 # AKS EE configuration
 $SiteConfig = @{
     Node1 = @{
         Networkplugin = "$networkplugin"
-        ArcClusterName = "$ArcName"
+        ArcClusterName = "$arcResourceName"
         NetIPAddress = "172.20.1.2"
         DefaultGateway = "172.20.1.1"
         PrefixLength = "24"
