@@ -696,6 +696,11 @@ $elapsedTime = Measure-Command {
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
         $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
+        $file = Get-Item $destinationPath
+        if ($file.Length -eq 0) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Kubeconfig on $VMName is corrupt. This error is unrecoverable. Exiting." -ForegroundColor White -BackgroundColor Red
+            Exit 1
+        }
     }
 }
 
