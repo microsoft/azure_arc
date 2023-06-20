@@ -329,7 +329,6 @@ foreach ($branch in $branches) {
                 git pull origin main
                 git checkout -b $branch main
                 git pull origin main
-                #git push origin $branch
                 git push --set-upstream origin $branch
             }
         }
@@ -341,7 +340,7 @@ foreach ($branch in $branches) {
         git pull origin main
         git checkout -b $branch main
         git pull origin main
-        git push origin $branch
+        git push --set-upstream origin $branch
     }
 }
 Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
