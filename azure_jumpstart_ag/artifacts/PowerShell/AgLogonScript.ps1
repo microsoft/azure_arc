@@ -1277,8 +1277,22 @@ $grafanaUserBody = @{
     password = $adminPassword
 } | ConvertTo-Json
 
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+# Make HTTP request to the API to create user
+$retryCount = 5
+$retryDelay = 60
+do {
+    try {
+        Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        $retryCount = 0
+    }
+    catch {
+        $retryCount--
+        if ($retryCount -gt 0) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+            Start-Sleep -Seconds $retryDelay
+        }
+    }
+} while ($retryCount -gt 0)
 
 # Deploying Kube Prometheus Stack for stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -1341,8 +1355,23 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
             password = $adminPassword
         } | ConvertTo-Json
 
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        # Make HTTP request to the API to create user
+        $retryCount = 5
+        $retryDelay = 60
+
+        do {
+            try {
+                Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+                $retryCount = 0
+            }
+            catch {
+                $retryCount--
+                if ($retryCount -gt 0) {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                    Start-Sleep -Seconds $retryDelay
+                }
+            }
+        } while ($retryCount -gt 0)
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
