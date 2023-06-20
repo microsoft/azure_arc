@@ -38,7 +38,7 @@
       },
       "LinuxNode": {
         "CpuCount": 4,
-        "MemoryInMB": 16384,
+        "MemoryInMB": 24576,
         "DataSizeInGB": 80,
         "Ip4Address": "Ip4Address-null",
         "TimeoutSeconds": 300,
