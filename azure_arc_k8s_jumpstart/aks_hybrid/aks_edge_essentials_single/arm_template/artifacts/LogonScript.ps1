@@ -230,7 +230,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
-$guid = toLower(substring(newGuid(), 0, 5))
+$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
 az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
