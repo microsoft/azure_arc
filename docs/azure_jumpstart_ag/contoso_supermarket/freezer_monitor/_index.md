@@ -226,35 +226,32 @@ Assuming you have completed the steps to view the MQTT Simulator logs above:
 
 #### Azure IoT Hub
 
-From the MQTT Broker the data is sent to Azure IoT Hub. IoT Hub is a managed service, hosted in the cloud, that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. You can use IoT Hub to build IoT solutions with reliable and secure communications between millions of IoT devices and a cloud-hosted solution backend. You can connect virtually any device to IoT Hub.
+From the MQTT Broker the data is sent to Azure IoT Hub, which is a managed service, hosted in the cloud, that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. You can use IoT Hub to build IoT solutions with reliable and secure communications between millions of IoT devices and a cloud-hosted solution backend. You can connect virtually any device to IoT Hub.
 
 To see whether data is being received by Azure IoT Hub for your devices
 
-- Open the Azure Portal - https://portal.azure.com
-- Click the 'Resource groups' icon in the left navigation menu (expand the menu at the top if necessary)
-- Click the new resource group that was created for you when you created the environment
-- Click 'Ag-IotHub-xxxxx' to open the IoT Hub
-- Click 'Queries' in the left navigation menu
-- Click the 'Run query' button
-- Scroll down to where you see "deviceId": "Freezer-1-Chicago"
-- Review the "connectionState" and "lastActivityTime" values to see if the device is connected and sending data
-- Repeat the last 2 steps above for "Freezer-2-Chicago"
+From your local machine:
+
+- Open Resource Groups in the Azure Portal - [https://portal.azure.com](https://ms.portal.azure.com/#browse/resourcegroups)
+- Click the new resource group you created for __Jumpstart Agora__
+- Click __Ag-IotHub-xxxxx__ to open the IoT Hub
+
+  ![Azure Portal showing the IoT Hub](./img/azure_portal_iot_hub.png)
+- Click __Queries__ in the left navigation menu
+
+  ![Azure Portal showing the IoT Hub Queries](./img/azure_portal_iot_hub_queries.png)
+- Click __Run query__
+
+  ![Azure Portal showing the IoT Hub Run query button](./img/azure_portal_iot_hub_queries_run.png)
+  
+- Scroll down to where you see __"deviceId": "Freezer-1-Chicago"__
+- Review the __"connectionState"__ and __"lastActivityTime"__ values to see if the device is connected and sending data
+
+  ![Azure Portal showing the IoT Hub Run query results](./img/azure_portal_iot_hub_queries_results.png)
+- Repeat the last 2 steps above for __"Freezer-2-Chicago"__
 
 #### Azure Data Explorer (ADX)
 
 Azure Data Explorer (ADX) is a cloud service that ingests, stores, and analyzes diverse data from any data source. It is a fast, fully managed data analytics service for real-time analysis on large volumes of data streaming (i.e. log and telemetry data) from applications, websites, IoT devices, and more. ADX is a great choice for analyzing data from IoT devices because it can ingest data from a variety of sources, including IoT Hub, which is how we're getting the data from the MQTT Broker.
-
-### Additional Scenarios
-
-- "fix the freezer"
-
-## Troubleshooting (if applicable)
-
-- what if data is not flowing
-- logs for simulator
-- logs for broker
-- metrics for broker
-- prometheus view
-- grafana view
 
 ## Next steps
