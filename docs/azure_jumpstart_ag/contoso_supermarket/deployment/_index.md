@@ -6,6 +6,8 @@ toc_hide: true
 
 # Jumpstart Agora - Contoso Supermarket deployment guide
 
+## Overview
+
 Jumpstart Agora provides a simple deployment process using Azure Bicep and PowerShell that minimizes user interaction. This automation automatically configures the Contoso Supermarket scenario environment, including the infrastructure, the Contoso-Supermarket applications, CI/CD artifacts, and observability components. The diagram below details the high-level architecture that is deployed and configured as part of the automation.
 
 ![Architecture diagram](./img/architecture_diagram.png)
