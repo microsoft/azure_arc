@@ -236,7 +236,7 @@ git reset --hard upstream/main
 git push origin main -f
 git pull
 git remote remove upstream
-git remote add upstream "https://github.com/$githubUser/$appsRepo.git"
+git remote add upstream $appClonedRepo
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
