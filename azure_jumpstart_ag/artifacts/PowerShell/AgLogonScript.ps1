@@ -1146,7 +1146,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        Start-Sleep -Seconds 30
+                        Start-Sleep -Seconds 20
                         $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
                         if($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries){
                             $retryCount++
@@ -1161,10 +1161,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                             --yes `
                             --only-show-errors `
                             | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-    
+
                             Start-Sleep -Seconds 10
                             Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-    
+
                             az k8s-configuration flux create `
                             --cluster-name $clusterName `
                             --resource-group $resourceGroup `
