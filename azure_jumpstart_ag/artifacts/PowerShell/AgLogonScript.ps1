@@ -229,14 +229,14 @@ foreach ($branch in $protectedBranches) {
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
 git config --global user.name "Agora Dev"
-git remote add upstream $appUpstreamRepo
+git remote add upstream "$appUpstreamRepo.git"
 git fetch upstream
 git checkout main
 git reset --hard upstream/main
 git push origin main -f
 git pull
 git remote remove upstream
-git remote add upstream $appClonedRepo
+git remote add upstream "$appClonedRepo.git"
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
