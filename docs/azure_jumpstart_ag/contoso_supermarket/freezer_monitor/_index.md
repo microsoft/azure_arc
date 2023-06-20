@@ -176,23 +176,34 @@ __NOTE: This won't really send you email because the server is not configured to
 
 ### Scenario 3: Follow the data from the freezer to the dashboards
 
-There are a lot of moving parts so lets take a look at how the data flows from from a simulated freezer to the dashboards in Azure Data Explorer and Grafana.
+In order to troubleshoot problems with the IoT data flow, it's important to understand the components involved so let's take a look at how the data flows from from a simulated freezer to the dashboards in Azure Data Explorer and Grafana.
 
 #### MQTT Simulator
 
-The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is a python script that runs in each AKS Edge Essentials cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
+The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is a Python script that runs in each AKS Edge Essentials cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
 
 To see data being produced by the MQTT Simulator
 
-- Connect to the Client VM
-- Open Visual Studio Code
-- Click on the Kubernetes icon in the Activity Bar on the left
-- Right-click on the 'chicago' cluster and select 'Set as Current Cluster'
-- Expand Seattle > Namespaces, right-click on 'sensor-monitor' and select 'Use Namespace'
-- Expand Seattle > Workloads > Pods
-- Right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
-- In the Logs window that appears, select 'mqtt-simulator' from the Container dropdown, then click the 'Run' button
+From the Client VM:
+
+- Open __Visual Studio Code__
+- Click on the __Kubernetes__ icon in the Activity Bar on the left
+
+  ![Visual Studio Code showing the Kubernetes icon](./img/vscode_kubernetes_icon.png)
+- Right-click on the __Chicago__ cluster and select __Set as Current Cluster__
+
+  ![Visual Studio Code showing the Set as Current Cluster menu](./img/vscode_set_as_current_cluster.png)
+- Expand __Chicago__ > __Namespaces__, right-click on __sensor-monitor__ and select __Use Namespace__
+
+  ![Visual Studio Code showing the Use Namespace menu](./img/vscode_use_namespace.png)
+- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
+  ![Visual Studio Code showing the Logs menu](./img/vscode_simulator_logs.png)
+- In the Logs view click __Run__ to see the logs
+
+  ![Visual Studio Code showing the Logs window](./img/vscode_simulator_logs_window.png)
 - This won't show you the values being produced, but it will show you that data is being published to the MQTT Broker
+
+  ![Visual Studio Code showing the Simulator logs](./img/vscode_simulator_logs.png)
 
 #### MQTT Broker
 
@@ -205,8 +216,8 @@ To see data being received by the MQTT Broker
 - Open Visual Studio Code
 - Click the Kubernetes icon in the Activity Bar on the left
 - Right-click on the 'chicago' cluster and select 'Set as Current Cluster'
-- Expand Seattle > Namespaces, right-click on 'sensor-monitor' and select 'Use Namespace'
-- Expand Seattle > Workloads > Pods
+- Expand Chicago > Namespaces, right-click on 'sensor-monitor' and select 'Use Namespace'
+- Expand Chicago > Workloads > Pods
 - Right-click on the 'sensor-monitor-broker-xxx' pod and select 'Logs'
 - In the Logs window that appears, select 'mqtt-broker' from the Container dropdown, then click the 'Run' button
 - This won't show you the values being produced, but it will show you the connections from the 2 simulated freezer devices to the broker, as well as the connections from the broker to Azure IoT Hub for each freezer device. Finally, shows the connection from 'sensor-monitor-mqtt2prom' which subscribes to the freezer data on the broker and makes it available to Prometheus, but more on that a bit later.
