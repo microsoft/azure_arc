@@ -16,7 +16,7 @@ In each cluster, a queue monitoring frontend service is deployed to allow store 
 
    ![Screenshot showing the Contoso Supermarket's queue monitoring service](./img/ai_diagram.png)
 
-Contoso Supermarket's DevOps team has adopted GitOps methodologies which allows them to use Git as the single source of truth for managing infrastructure and application deployments. It involves declarative definitions of infrastructure and application configurations, which are stored in Git repositories. The GitOps pipeline automatically detects any changes made to the repositories and triggers the necessary actions to deploy the changes to the target environments.
+Contoso's DevOps team has adopted GitOps methodologies which allows them to use Git as the single source of truth for managing infrastructure and application deployments. It involves declarative definitions of infrastructure and application configurations, which are stored in Git repositories. The GitOps pipeline automatically detects any changes made to the repositories and triggers the necessary actions to deploy the changes to the target environments.
 
 One of the main benefits of GitOps is its ability to provide a consistent and auditable deployment process. All changes to the infrastructure and application configurations are tracked and versioned in Git, making it easy to roll back to a previous state if necessary. The declarative nature of GitOps also enables the automation of the deployment process, which reduces the risk of human error and streamlines the entire process.
 
