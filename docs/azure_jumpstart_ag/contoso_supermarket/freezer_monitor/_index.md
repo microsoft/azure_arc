@@ -116,7 +116,7 @@ From the Client VM:
 
 As the manager of the Chicago store, you can use the Grafana dashboard to see the current temperature. While taking care of other store activities, you want to be notified when the temperature exceeds the safe threshold of 15°F so you can take action immediately.
 
-__NOTE: This won't really send you email because the server is not configured to send smtp messages. However, it will help you understand the potential options available to a store manager.__
+__NOTE: This won't really send you email because the server is not configured to send Simple Mail Transfer Protocol (SMTP) messages. However, it will help you understand the potential options available to a store manager.__
 
 - In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__
 
