@@ -24,7 +24,7 @@ One of the main benefits of GitOps is its ability to provide a consistent and au
 
 Contoso aims to maximize the usage of their existing Closed-circuit television (CCTV) cameras installed across their stores. After careful evaluation, Contoso has opted to utilize Intel's OpenVino Technology for their solution. By leveraging OpenVino, Contoso can perform inference on the CPU of their edge devices, eliminating the need for expensive discrete GPUs. Intel also provides a set of pre-trained models that align with Contoso's requirements.
 
-In this specific use case, Contoso has chosen the person-detection-retail-0013 pretrained model. This model boasts an impressive Average Precision of 88.62% and accepts high-definition videos (1024x768) as input. For more detailed information about OpenVino, please refer to this [link](https://docs.openvino.ai/2022.3/omz_models_model_person_detection_retail_0013.html).
+In this specific use case, Contoso has chosen the [person-detection-retail-0013 pre-trained model](https://docs.openvino.ai/2022.3/omz_models_model_person_detection_retail_0013.html). This model boasts an impressive Average Precision of 88.62% and accepts high-definition videos (1024x768) as input.
 
 The developed application showcases the live video feed with bounding boxes encompassing identified individuals. Additionally, a heatmap is superimposed on the video to provide a visual representation of people density in different areas of the frame.
 
