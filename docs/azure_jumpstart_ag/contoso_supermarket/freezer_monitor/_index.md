@@ -4,9 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-## Contoso Supermarket Freezer Monitor Overview
-
-### Overview
+## Overview
 
 Contoso Supermarket is obsessed with achieving the highest levels of food safety. To support this obsession Contoso has invested in technology to let it know when any food in a store's freezers is potentially unsafe due to the freezer reaching temperatures that would allow the food to thaw and pathogens to grow.
 
@@ -26,7 +24,7 @@ The local collection and visualization of sensor data uses the same infrastructu
 
 ![Applications and technology stack architecture diagram](./img/architecture.png)
 
-As mentioned above, the environmental observability architecture for _Dev_, _Staging_, and _Prod_ environments leverage the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in the scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus (MQTT2PROM).
+As mentioned above, the environmental observability architecture for _Dev_, _Staging_, and _Prod_ environments leverage the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in the scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus ([MQTT2Prometheus](https://github.com/hikhvar/mqtt2prometheus)).
 
 Mosquitto open-source MQTT broker was chosen due to its popularity, lightweight implementation, and efficiency, making it a good fit for handling the sensors' messaging flow. Azure IoT Hub is a fully managed service that enables reliable and secure bi-directional communications between millions of IoT devices and a solution backend. It also provides a device registry that stores information about the devices and their capabilities.
 
@@ -36,7 +34,7 @@ The _Dev_ and _Staging_ environments are configured with individual Prometheus a
 
 Contoso has an ADX dashboard report for Freezer Monitoring analytics and monitoring. The dashboard is generated from live data sent from the IoT devices through the MQTT broker and IoT Hub to the ADX database using data integration.
 
-## Manually import dashboard
+### Manually import dashboard
 
 > __NOTE: If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as the dashboard is automatically imported for you during the automated deployment.__
 
@@ -180,7 +178,7 @@ In order to troubleshoot problems with the IoT data flow, it's important to unde
 
 #### MQTT Simulator
 
-The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is a Python script that runs in each AKS Edge Essentials cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
+The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is a Python script that runs in each AKS Edge Essentials cluster and the AKS cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
 
 To see data being produced by the MQTT Simulator
 
@@ -207,7 +205,7 @@ From the Client VM:
 
 #### MQTT Broker
 
-The MQTT Broker is a container running Mosquitto in each AKS Edge Essentials cluster like the simulator. It receives the data from the simulator and sends it to the Azure IoT Hub. It also makes the data available for a third service, MQTT2Prometheus, and is explained below.
+The MQTT Broker is a container running Mosquitto in each AKS Edge Essentials cluster and the AKS cluster, like the simulator. It receives the data from the simulator and sends it to the Azure IoT Hub. It also makes the data available for a third service, MQTT2Prometheus, and is explained below.
 
 Assuming you have completed the steps to view the MQTT Simulator logs above:
 
@@ -223,7 +221,7 @@ Assuming you have completed the steps to view the MQTT Simulator logs above:
 
 #### Azure IoT Hub
 
-From the MQTT Broker, the data is sent to Azure IoT Hub, which is a managed service, hosted in the cloud, that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. You can use IoT Hub to build IoT solutions with reliable and secure communications between millions of IoT devices and a cloud-hosted solution backend. You can connect virtually any device to the IoT Hub.
+From the MQTT Broker, the data is sent to Azure IoT Hub, which is a managed service hosted in the cloud that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. You can use IoT Hub to build IoT solutions with reliable and secure communications between millions of IoT devices and a cloud-hosted solution backend. You can connect virtually any device to the IoT Hub.
 
 To see whether data is being received by Azure IoT Hub for your devices, from your local machine:
 
