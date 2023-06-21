@@ -1,9 +1,8 @@
-
 {
   "$schema": "https://dataexplorer.azure.com/static/d/schema/35/dashboard.json",
   "id": "2db2cda4-1563-4cba-9bbd-92e6a81c3e27",
   "eTag": "LUKrHaq9L9ACGqMC5zRS6Q==",
-  "schema_version": "35",
+  "schema_version": "37",
   "title": "Freezer Monitoring",
   "autoRefresh": {
     "enabled": false
@@ -19,7 +18,7 @@
         "x": 0,
         "y": 0,
         "width": 19,
-        "height": 7
+        "height": 10
       },
       "query": {
         "kind": "inline",
@@ -27,11 +26,14 @@
           "kind": "inline",
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
-        "usedVariables": [],
-        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F"
+        "usedVariables": [
+          "_endTime",
+          "_startTime",
+          "site"
+        ],
+        "text": "environmentSensor\n//| where ['iothub-enqueuedtime'] > now(-1h)\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| where ['device-id'] has ['site']\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F"
       },
       "visualOptions": {
-        "hideTileTitle": false,
         "multipleYAxes": {
           "base": {
             "id": "-1",
@@ -40,7 +42,12 @@
             "yAxisMaximumValue": null,
             "yAxisMinimumValue": null,
             "yAxisScale": "linear",
-            "horizontalLines": []
+            "horizontalLines": [
+              {
+                "id": "85904966-6ba4-4c22-8e2c-a47933cc1bb1",
+                "value": 20
+              }
+            ]
           },
           "additional": [],
           "showMultiplePanels": false
@@ -77,9 +84,9 @@
       "pageId": "cbfb4c28-bf08-4da5-9ee5-1a9d3bf52d5d",
       "layout": {
         "x": 0,
-        "y": 7,
+        "y": 10,
         "width": 19,
-        "height": 7
+        "height": 10
       },
       "query": {
         "kind": "inline",
@@ -87,11 +94,14 @@
           "kind": "inline",
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
-        "usedVariables": [],
-        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
+        "usedVariables": [
+          "_endTime",
+          "_startTime",
+          "site"
+        ],
+        "text": "environmentSensor\n//| where ['iothub-enqueuedtime'] > now(-1h)\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| where ['device-id'] has ['site']\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
       },
       "visualOptions": {
-        "hideTileTitle": false,
         "multipleYAxes": {
           "base": {
             "id": "-1",
@@ -142,6 +152,35 @@
         "kind": "dynamic",
         "count": 1,
         "unit": "hours"
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    },
+    {
+      "kind": "string",
+      "id": "e60de914-f88f-44f3-9314-81ae01a0cc4e",
+      "displayName": "Site",
+      "variableName": "site",
+      "selectionType": "scalar",
+      "includeAllOption": true,
+      "defaultValue": {
+        "kind": "all"
+      },
+      "dataSource": {
+        "kind": "query",
+        "query": {
+          "kind": "inline",
+          "dataSource": {
+            "kind": "inline",
+            "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
+          },
+          "usedVariables": [],
+          "text": "environmentSensor\n| project site = tostring(split(['device-id'],\"-\")[2])\n| distinct site\n"
+        },
+        "columns": {
+          "value": "site"
+        }
       },
       "showOnPages": {
         "kind": "all"

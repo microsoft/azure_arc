@@ -69,22 +69,17 @@ echo ""
 # Installing snap
 sudo apt install snapd
 
-# Installing Docker
-sudo snap install docker
-sudo groupadd docker
-sudo usermod -aG docker $adminUsername
-
 # Installing kustomize
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export KUBECTL_VERSION="1.24/stable" # Do not change!
-export CLUSTERCTL_VERSION="1.3.6" # Do not change!
+export KUBECTL_VERSION="1.27/stable" # Do not change!
+export CLUSTERCTL_VERSION="1.4.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.7.4" # Do not change!
-export KUBERNETES_VERSION="1.25.8" # Do not change!
+export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
+export KUBERNETES_VERSION="1.27.1" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.26.3" # Do not change!
-export K3S_VERSION="1.25.8+k3s1" # Do not change!
+export K3S_VERSION="1.27.1+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -204,13 +199,14 @@ until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do
 echo ""
 sudo kubectl get kubeadmcontrolplane --all-namespaces
 clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+sleep 120
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
 
 echo ""
 CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
 export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
