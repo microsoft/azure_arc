@@ -60,7 +60,7 @@ The "Managers Control Center" serves as the central hub of this experience. From
 
 To access the "Managers Control Center", select the POS [_env_] Manager option from the _POS_ Bookmarks folder. Each environment will have it's own "Managers Control Center" instance with a different IP.
 
-![POS Bookmar](./img/control-center-menu.png)
+![Screenshot showing the POS Bookmark](./img/control-center-menu.png)
 
 - __Heatmap:__ Using the heatmap, the Store Manager can open or close checkout lanes to distribute the traffic of the store, using the Toggles above each lane.
 
