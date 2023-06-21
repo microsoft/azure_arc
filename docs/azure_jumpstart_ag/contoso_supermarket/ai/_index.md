@@ -136,7 +136,7 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the navbar.html file](./img/vscode_canary_live_view_enabled.png)
 
-- After a couple of seconds, Flux v2 should detect this new change and you should start seeing pod recreation activity on the _Chicago_ Kubernetes clusters
+- After a couple of seconds, the Flux operator should detect the change and you should start seeing pod recreation activity on the _Chicago_ Kubernetes cluster.
 
     ![Screenshot showing pods terminating in the canary cluster](./img/live_view_containers.png)
 
