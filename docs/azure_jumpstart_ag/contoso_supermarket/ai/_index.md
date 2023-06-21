@@ -64,11 +64,11 @@ To access the "Managers Control Center", select the POS [_env_] Manager option f
 
 - __Heatmap:__ Using the heatmap, the Store Manager can open or close checkout lanes to distribute the traffic of the store, using the Toggles above each lane.
 
-    ![Store Manager Screenshot Heatmap focus](./img/checkout-heatmap.png)
+    ![Screen shot showing the Store Manager Screenshot Heatmap focus](./img/checkout-heatmap.png)
 
 - __Reporting:__ Contoso is interested in improving their store experience by measuring two key metrics: Total people in the store, and Shopper Wait Time. These metrics are shown in the Store Manager Control Center as shown below.
 
-    ![Store Manager Reporting Pane](./img/reporting.png)
+    ![Screen shot showing the Store Manager Reporting Pane](./img/reporting.png)
 
 ## Live View
 
