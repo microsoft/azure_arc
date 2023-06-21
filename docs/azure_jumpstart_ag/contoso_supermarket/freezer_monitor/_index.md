@@ -73,7 +73,7 @@ To view the Freezer Monitoring dashboard you will first need to import it into A
 
 ## Scenarios
 
-Here are a few scenarios that Contoso Supermarket might encounter, and how they can be addressed using the data collected by the IoT sensors.
+Below are a few scenarios that Contoso Supermarket might encounter, and how they can be addressed using the data collected by the IoT sensors.
 
 ### Scenario 1: Identifying the broken freezer
 
