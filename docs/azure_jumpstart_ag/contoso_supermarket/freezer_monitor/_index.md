@@ -225,9 +225,7 @@ Assuming you have completed the steps to view the MQTT Simulator logs above:
 
 From the MQTT Broker the data is sent to Azure IoT Hub, which is a managed service, hosted in the cloud, that acts as a central message hub for bi-directional communication between your IoT application and the devices it manages. You can use IoT Hub to build IoT solutions with reliable and secure communications between millions of IoT devices and a cloud-hosted solution backend. You can connect virtually any device to the IoT Hub.
 
-To see whether data is being received by Azure IoT Hub for your devices
-
-From your local machine:
+To see whether data is being received by Azure IoT Hub for your devices, from your local machine:
 
 - Open Resource Groups in the Azure Portal - [https://portal.azure.com](https://ms.portal.azure.com/#browse/resourcegroups)
 - Click the new resource group you created for __Jumpstart Agora__
