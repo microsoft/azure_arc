@@ -144,67 +144,67 @@ __NOTE: This won't really send you an email because the server is not configured
 
 - Add an Alert rule
 
-  - Click __Alert rules__ in the navigation menu
+  - Click __Alert rules__ in the navigation menu.
 
     ![Screenshot showing tge Grafana Alert rules menu](./img/grafana_click_alert_rules.png)
 
-  - Click __Create alert rule__
+  - Click __Create alert rule__.
 
     ![Screenshot showing the Grafana Create alert rule button](./img/grafana_click_create_alert_rule.png)
 
   - Section 1
 
-    - Enter _Freezer too warm - food at risk_ as the __Rule name__
+    - Enter _Freezer too warm - food at risk_ as the __Rule name__.
 
       ![Screenshot showing the Grafana Add alert rule form](./img/grafana_add_alert_rule_name.png)
 
   - Section 2
 
-    - Select __chicago__ as the data source in query __A__
+    - Select __chicago__ as the data source in query __A__.
 
-    - Select __temperature__ as the Metric in query __A__
+    - Select __temperature__ as the Metric in query __A__.
 
-    - Enter _15_ as the Threshold in expression __C__
+    - Enter _15_ as the Threshold in expression __C__.
 
-    - Click __Preview__
+    - Click __Preview__.
 
       ![Screenshot showing the Grafana Add alert rule form](./img/grafana_add_alert_rule_config.png)
 
-    - View the preview
+    - View the preview.
 
       ![Screenshot showing the Grafana Add alert preview](./img/grafana_add_alert_rule_preview.png)
 
-    - Since it is difficult to determine which series is which, let's fix the series names
+    - Since it is difficult to determine which series is which, let's fix the series names.
 
-      - Click __Options__
+      - Click __Options__.
 
-      - Under __Legend__ select __Custom__ then enter _{{sensor_type}}_
+      - Under __Legend__ select __Custom__ then enter _{{sensor_type}}_.
 
-      - Click away from the 'Legend' box, then back into it for the series names to update
+      - Click away from the 'Legend' box, then back into it for the series names to update.
 
         ![Screenshot showing the Grafana preview legend options](./img/grafana_add_alert_rule_preview_legend.png)
 
-    - Notice in the chart the times where freezer2 exceeds the threshold and would trigger an alert
+    - Notice in the chart the times where freezer2 exceeds the threshold and would trigger an alert.
 
   - Section 3
 
-    - Under __Folder__ type _Alerts_ and press __Enter__
+    - Under __Folder__ type _Alerts_ and press __Enter__.
 
-    - Under __Evaluation group__ type _Alert Group_ and press __Enter__
+    - Under __Evaluation group__ type _Alert Group_ and press __Enter__.
 
       ![Screenshot showing the Grafana Folder selection](./img/grafana_add_alert_rule_folder.png)
 
-  - Scroll to the top of the page and click __Save and exit__
+  - Scroll to the top of the page and click __Save and exit__.
 
     ![Screenshot showing the Grafana Save and exit button](./img/grafana_add_alert_rule_save.png)
 
 - View your alert
 
-  - Back on the __Alert rules__ page, type _freezer_ in the __Search__ box and press __Enter__
+  - Back on the __Alert rules__ page, type _freezer_ in the __Search__ box and press __Enter__.
 
-  - Expand the __Alerts > Alert Group__ folder to see your __Freezer too warm - food at risk__ alert
+  - Expand the __Alerts > Alert Group__ folder to see your __Freezer too warm - food at risk__ alert.
 
-  - Expand the alert to view to __Silence__ it, __Show state history__, or quickly __edit__ or __delete__ the alert
+  - Expand the alert to view to __Silence__ it, __Show state history__, or quickly __edit__ or __delete__ the alert.
 
     ![Screenshot showing the Grafana new alert rule](./img/grafana_new_alert_rule.png)
 
@@ -222,23 +222,23 @@ To see data being produced by the MQTT Simulator, from the Client VM:
 
   ![Screenshot showing the Visual Studio Code Kubernetes icon](./img/vscode_kubernetes_icon.png)
 
-- Right-click on the __Chicago__ cluster and select __Set as Current Cluster__
+- Right-click on the __Chicago__ cluster and select __Set as Current Cluster__.
 
   ![Screenshot showing the Visual Studio Code Set as Current Cluster menu](./img/vscode_set_as_current_cluster.png)
 
-- Expand __Chicago__ > __Namespaces__, right-click on __sensor-monitor__ and select __Use Namespace__
+- Expand __Chicago__ > __Namespaces__, right-click on __sensor-monitor__ and select __Use Namespace__.
 
   ![Screenshot showing the Visual Studio Code Use Namespace menu](./img/vscode_use_namespace.png)
 
-- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
+- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'.
 
   ![Screenshot showing the Visual Studio Code Logs menu](./img/vscode_simulator_logs_menu.png)
 
-- In the Logs view click __Run__ to see the logs
+- In the Logs view click __Run__ to see the logs.
 
   ![Screenshot showing the Visual Studio Code Logs window](./img/vscode_simulator_logs_run.png)
 
-- This won't show you the values being produced, but it will show you that data is being published to the MQTT Broker
+- This won't show you the values being produced, but it will show you that data is being published to the MQTT Broker.
 
   ![Screenshot showing the Visual Studio Code Simulator logs](./img/vscode_simulator_logs.png)
 
@@ -248,11 +248,11 @@ The MQTT Broker is a container running Mosquitto in each AKS Edge Essentials clu
 
 Assuming you have completed the steps to view the MQTT Simulator logs above:
 
-- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
+- Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'.
 
   ![Screenshot showing the Visual Studio Code Logs menu](./img/vscode_broker_logs_menu.png)
 
-- In the Logs view click __Run__ to see the logs
+- In the Logs view click __Run__ to see the logs.
 
   ![Screenshot showing the Visual Studio Code Logs window](./img/vscode_broker_logs_run.png)
 
@@ -268,23 +268,23 @@ To see whether data is being received by Azure IoT Hub for your devices, from yo
 
 - Open Resource Groups in the Azure Portal - [https://portal.azure.com](https://ms.portal.azure.com/#browse/resourcegroups)
 
-- Click the new resource group you created for __Jumpstart Agora__
+- Click the new resource group you created for __Jumpstart Agora__.
 
-- Click __Ag-IotHub-xxxxx__ to open the IoT Hub
+- Click __Ag-IotHub-xxxxx__ to open the IoT Hub.
 
   ![Screenshot showing the Azure Portal IoT Hub](./img/azure_portal_iot_hub.png)
 
-- Click __Queries__ in the left navigation menu
+- Click __Queries__ in the left navigation menu.
 
   ![Screenshot showing the Azure Portal IoT Hub Queries](./img/azure_portal_iot_hub_queries.png)
 
-- Click __Run query__
+- Click __Run query__.
 
   ![Screenshot showing the Azure Portal IoT Hub Run query button](./img/azure_portal_iot_hub_queries_run.png)
 
-- Scroll down to where you see __"deviceId": "Freezer-1-Chicago"__
+- Scroll down to where you see __"deviceId": "Freezer-1-Chicago"__.
 
-- Review the __"connectionState"__ and __"lastActivityTime"__ values to see if the device is connected and sending data
+- Review the __"connectionState"__ and __"lastActivityTime"__ values to see if the device is connected and sending data.
 
   ![Screenshot showing the Azure Portal IoT Hub Run query results](./img/azure_portal_iot_hub_queries_results.png)
 
