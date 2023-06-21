@@ -103,7 +103,7 @@
 
     # L1 virtual machine configuration
     HostVMDrive             = "V"                                   # This value controls the drive letter where the nested virtual
-    L1VMMemory              = 24GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
+    L1VMMemory              = 32GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
     L1VMNumVCPU             = 8                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
     InternalSwitch          = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
     L1Username              = "Administrator"                       # This value controls the Admin credential username for the L1 Hyper-V virtual machines that run on the Agora-Client.

@@ -1,5 +1,5 @@
 {
-  "SchemaVersion": "1.6",
+  "SchemaVersion": "1.8",
   "Version": "1.0",
   "DeploymentType": "ScalableCluster",
   "Init": {
@@ -38,7 +38,7 @@
       },
       "LinuxNode": {
         "CpuCount": 4,
-        "MemoryInMB": 16384,
+        "MemoryInMB": 24576,
         "DataSizeInGB": 80,
         "Ip4Address": "Ip4Address-null",
         "TimeoutSeconds": 300,

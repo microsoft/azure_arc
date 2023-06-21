@@ -229,14 +229,14 @@ foreach ($branch in $protectedBranches) {
 Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
 git config --global user.email "dev@agora.com"
 git config --global user.name "Agora Dev"
-git remote add upstream $appUpstreamRepo
+git remote add upstream "$appUpstreamRepo.git"
 git fetch upstream
 git checkout main
 git reset --hard upstream/main
 git push origin main -f
 git pull
 git remote remove upstream
-git remote add upstream $appsRepo
+git remote add upstream "$appClonedRepo.git"
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
@@ -329,7 +329,7 @@ foreach ($branch in $branches) {
                 git pull origin main
                 git checkout -b $branch main
                 git pull origin main
-                git push origin $branch
+                git push --set-upstream origin $branch
             }
         }
     }
@@ -340,7 +340,7 @@ foreach ($branch in $branches) {
         git pull origin main
         git checkout -b $branch main
         git pull origin main
-        git push origin $branch
+        git push --set-upstream origin $branch
     }
 }
 Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
@@ -696,6 +696,11 @@ $elapsedTime = Measure-Command {
         $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
         $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
+        $file = Get-Item $destinationPath
+        if ($file.Length -eq 0) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Kubeconfig on $VMName is corrupt. This error is unrecoverable. Exiting." -ForegroundColor White -BackgroundColor Red
+            Exit 1
+        }
     }
 }
 
@@ -865,7 +870,7 @@ $Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
 foreach ($arcResourceType in $arcResourceTypes) {
     $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
     foreach ($arcResource in $arcResources) {
-        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Replace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+        Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Merge | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
     }
 }
 
@@ -1146,35 +1151,39 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        $retryCount++
-                        Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        az k8s-configuration flux delete `
-                        --resource-group $resourceGroup `
-                        --cluster-name $clusterName `
-                        --cluster-type $type `
-                        --name $configName `
-                        --force `
-                        --yes `
-                        --only-show-errors `
+                        Start-Sleep -Seconds 20
+                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
+                        if($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries){
+                            $retryCount++
+                            Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            az k8s-configuration flux delete `
+                            --resource-group $resourceGroup `
+                            --cluster-name $clusterName `
+                            --cluster-type $type `
+                            --name $configName `
+                            --force `
+                            --yes `
+                            --only-show-errors `
+                            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                            Start-Sleep -Seconds 10
+                            Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                            az k8s-configuration flux create `
+                            --cluster-name $clusterName `
+                            --resource-group $resourceGroup `
+                            --name $configName `
+                            --cluster-type $type `
+                            --url $appClonedRepo `
+                            --branch $branch `
+                            --sync-interval 5s `
+                            --kustomization name=$appName path=$appPath/$store prune=true `
+                            --timeout 30m `
+                            --namespace $namespace `
+                            --only-show-errors `
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                        Start-Sleep -Seconds 10
-                        Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                        az k8s-configuration flux create `
-                        --cluster-name $clusterName `
-                        --resource-group $resourceGroup `
-                        --name $configName `
-                        --cluster-type $type `
-                        --url $appClonedRepo `
-                        --branch $branch `
-                        --sync-interval 5s `
-                        --kustomization name=$appName path=$appPath/$store prune=true `
-                        --timeout 30m `
-                        --namespace $namespace `
-                        --only-show-errors `
-                    | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                        }
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries){
                         Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -1273,8 +1282,22 @@ $grafanaUserBody = @{
     password = $adminPassword
 } | ConvertTo-Json
 
-# Make HTTP request to the API
-Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+# Make HTTP request to the API to create user
+$retryCount = 10
+$retryDelay = 30
+do {
+    try {
+        Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        $retryCount = 0
+    }
+    catch {
+        $retryCount--
+        if ($retryCount -gt 0) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+            Start-Sleep -Seconds $retryDelay
+        }
+    }
+} while ($retryCount -gt 0)
 
 # Deploying Kube Prometheus Stack for stores
 $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
@@ -1337,8 +1360,23 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
             password = $adminPassword
         } | ConvertTo-Json
 
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        # Make HTTP request to the API to create user
+        $retryCount = 10
+        $retryDelay = 30
+
+        do {
+            try {
+                Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+                $retryCount = 0
+            }
+            catch {
+                $retryCount--
+                if ($retryCount -gt 0) {
+                    Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                    Start-Sleep -Seconds $retryDelay
+                }
+            }
+        } while ($retryCount -gt 0)
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
