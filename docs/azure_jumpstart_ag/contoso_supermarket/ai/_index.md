@@ -84,7 +84,7 @@ Live View will be disabled by default in Seattle and Chicago environments as sho
 
 ## DevOps team experience
 
-The Contoso Supermarket's DevOps team has received a request from the _Chicago_ store managers that they need the live view feature enabled in their store as their queues are getting longer throughout peak hours through the day.
+Contoso's DevOps team has received a request from the _Chicago_ store managers that they need the "Live View" feature enabled in their store as their queues are getting longer throughout peak hours throughout the day.
 
 - Connect to the Client VM `Ag-VM-Client` using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
 
