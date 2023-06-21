@@ -14,9 +14,9 @@ Contoso has installed temperature and humidity sensors in each freezer in each s
 
 Contoso Supermarket is researching a number of additional health and safety systems that will leverage the same IoT infrastructure. These include:
 
-- Air quality sensors to detect the presence of smoke or other contaminants
-- Water quality sensors to detect the presence of contaminants in the water supply
-- Motion and presence sensors to lights should be turned on for personal safety
+- Air quality sensors to detect the presence of smoke or other contaminants.
+- Water quality sensors to detect the presence of contaminants in the water supply.
+- Motion and presence sensors to lights should be turned on for personal safety.
 
 The local collection and visualization of sensor data uses the same infrastructure as the [Infrastructure Observability](..\k8s_infra_observability\_index.md) stack, namely Prometheus and Grafana. This provides the store manager with a single pane of glass for monitoring both the infrastructure and the sensors, and minimizes the number of new technologies that the manager needs to learn and that Contoso must support.
 
