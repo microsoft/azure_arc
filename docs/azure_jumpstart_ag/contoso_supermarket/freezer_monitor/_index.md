@@ -104,12 +104,14 @@ From the Client VM:
 - Click the hamburger menu next to __Home__ then click __Dashboards__.
 
   ![Grafana showing the Dashboards menu](./img/grafana_click_dashboards.png)
-- Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago
+- Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago.
 
   ![Grafana showing list of Dashboards](./img/grafana_click_chicago.png)
+  
   - Notice that __freezer2__ is showing significant variability and frequently exceeding the safe threshold of 20°F.
 
     ![Grafana showing the Chicago dashboard](./img/grafana_chicago_dashboard.png)
+    
 - The manager can use this dashboard directly when talking to the technician about the freezer.
 
 ### Scenario 2: Send alert when freezer is too warm
