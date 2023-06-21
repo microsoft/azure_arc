@@ -210,8 +210,6 @@ From the Client VM:
 
 The MQTT Broker is a container running Mosquitto in each AKS Edge Essentials cluster like the simulator. It receives the data from the simulator and sends it to the Azure IoT Hub. It also makes the data available for a third service, MQTT2Prometheus, and is explained below.
 
-To see data being received by the MQTT Broker
-
 Assuming you have completed the steps to view the MQTT Simulator logs above:
 
 - Expand __Chicago__ > __Workloads__ > __Pods__ then right-click on the 'sensor-monitor-simulator-xxx' pod and select 'Logs'
@@ -248,7 +246,6 @@ From your local machine:
 - Review the __"connectionState"__ and __"lastActivityTime"__ values to see if the device is connected and sending data
 
   ![Azure Portal showing the IoT Hub Run query results](./img/azure_portal_iot_hub_queries_results.png)
-- Repeat the last 2 steps above for __"Freezer-2-Chicago"__
 
 #### Azure Data Explorer (ADX)
 
