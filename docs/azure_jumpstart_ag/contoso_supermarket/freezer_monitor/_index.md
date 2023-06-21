@@ -95,7 +95,7 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 - While you're viewing the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to that store manager.
 
-#### View the data in Grafana at the store
+#### View the store data in Grafana
 
 From the Client VM:
 
