@@ -34,7 +34,7 @@ The _Dev_ and _Staging_ environments are configured with individual Prometheus a
 
 ## Freezer Monitoring dashboard
 
-Contoso has an ADX dashboard for Freezer Monitoring analytics and monitoring. The dashboard is generated from live data sent from the IoT devices through the MQTT broker and IoT Hub to the ADX database using data integration.
+Contoso has an ADX dashboard report for Freezer Monitoring analytics and monitoring. The dashboard is generated from live data sent from the IoT devices through the MQTT broker and IoT Hub to the ADX database using data integration.
 
 ## Manually import dashboard
 
