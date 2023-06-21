@@ -252,7 +252,7 @@ From your local machine:
 
 #### Azure Data Explorer (ADX)
 
-Azure Data Explorer (ADX) is a cloud service that ingests, stores, and analyzes diverse data from any data source. It is a fast, fully managed data analytics service for real-time analysis on large volumes of data streaming (i.e. log and telemetry data) from applications, websites, IoT devices, and more. ADX is a great choice for analyzing data from IoT devices because it can ingest data from a variety of sources, including IoT Hub, which is how we're getting the data from the MQTT Broker.
+ADX is a cloud service that ingests, stores, and analyzes diverse data from any data source. It is a fast, fully managed data analytics service for real-time analysis on large volumes of data streaming (i.e. log and telemetry data) from applications, websites, IoT devices, and more. ADX is a great choice for analyzing data from IoT devices because it can ingest data from a variety of sources, including the IoT Hub, which is how we're getting the data from the MQTT Broker.
 
 To see the ADX dashboard, review the steps from -[Scenario 1: View the data in Azure Data Explorer](#scenario-1-identifying-the-broken-freezer).
 
