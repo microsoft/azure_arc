@@ -184,9 +184,7 @@ In order to troubleshoot problems with the IoT data flow, it's important to unde
 
 The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is based on a Python script that runs in each AKS Edge Essentials cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
 
-To see data being produced by the MQTT Simulator
-
-From the Client VM:
+To see data being produced by the MQTT Simulator, from the Client VM:
 
 - Open __Visual Studio Code__ and click on the __Kubernetes__ icon in the Activity Bar on the left.
 
