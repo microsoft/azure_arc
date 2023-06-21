@@ -220,7 +220,7 @@ Assuming you have completed the steps to view the MQTT Simulator logs above:
 - In the Logs view click __Run__ to see the logs
 
   ![Visual Studio Code showing the Logs window](./img/vscode_broker_logs_run.png)
-- This won't show you the values being received or forwarded, but it will show you the connections from the 2 simulated freezer devices to the broker, as well as the connections from the broker to Azure IoT Hub for each freezer device. Finally, it shows the connection from __sensor-monitor-mqtt2prom__ which subscribes to the freezer data on the broker and makes it available to Prometheus, but more on that a bit later.
+- This won't show you the values being received or forwarded, but it will show you the connections from the 2 simulated freezer devices to the MQTT broker, as well as the connections from the MQTT broker to Azure IoT Hub for each freezer device. Finally, it shows the connection from __sensor-monitor-mqtt2prom__ which subscribes to the freezer data on the MQTT broker and makes it available to Prometheus and is explained in the sections below.
 
   ![Visual Studio Code showing the Simulator logs](./img/vscode_broker_logs.png)
 
