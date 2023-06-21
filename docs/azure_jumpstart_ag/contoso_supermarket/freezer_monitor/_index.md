@@ -90,7 +90,7 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
   ![Screenshot showing filtering for Chicago](./img/adx_freezer_dashboard_select_chicago.png)
 
-- The store manager didn't tell you which freezer was having problems, but if you look at the dashboard below it's obvious that Freezer-2 (aka _device-id:Freezer-2-Chicago:Temperature_F_) is regularly exceeding the safe threshold of 20°F as indicated by the green dashed line. You can send this information to the store manager via a screenshot, or you can show the manager how she can use the Grafana dashboard to see see the same data.
+- The store manager didn't tell you which freezer was having problems, but if you look at the dashboard below it is obvious that Freezer-2 (aka _device-id:Freezer-2-Chicago:Temperature_F_) is regularly exceeding the safe threshold of 20°F as indicated by the green dashed line. You can send this information to the store manager via a screenshot, or you can show the manager how she can use the Grafana dashboard to see see the same data.
 
   ![Screenshot showing only Chicago freezers](./img/adx_freezer_dashboard_show_chicago.png)
 
@@ -174,7 +174,7 @@ __NOTE: This won't really send you an email because the server is not configured
 
       ![Screenshot showing the Grafana Add alert preview](./img/grafana_add_alert_rule_preview.png)
 
-    - Since it's difficult to determine which series is which, let's fix the series names
+    - Since it is difficult to determine which series is which, let's fix the series names
 
       - Click __Options__
 
@@ -210,7 +210,7 @@ __NOTE: This won't really send you an email because the server is not configured
 
 ### Scenario 3: Follow the data from the freezer to the dashboards
 
-In order to troubleshoot problems with the IoT data flow, it's important to understand the components involved. Take a look at how the data flows from a simulated freezer to the dashboards in ADX and Grafana.
+In order to troubleshoot problems with the IoT data flow, it is important to understand the components involved. Take a look at how the data flows from a simulated freezer to the dashboards in ADX and Grafana.
 
 #### MQTT Simulator
 
