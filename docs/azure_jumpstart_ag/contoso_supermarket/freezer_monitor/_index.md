@@ -12,9 +12,9 @@ Contoso has installed temperature and humidity sensors in each freezer in each s
 
 Contoso Supermarket is researching a number of additional health and safety systems that will leverage the same IoT infrastructure. These include:
 
-- Air quality sensors to detect the presence of smoke or other contaminants
-- Water quality sensors to detect the presence of contaminants in the water supply
-- Motion and presence sensors to lights should be turned on for personal safety
+- Air quality sensors to detect the presence of smoke or other contaminants.
+- Water quality sensors to detect the presence of contaminants in the water supply.
+- Motion and presence sensors to lights should be turned on for personal safety.
 
 The local collection and visualization of sensor data uses the same infrastructure as the [Infrastructure Observability](..\k8s_infra_observability\_index.md) stack, namely Prometheus and Grafana. This provides the store manager with a single pane of glass for monitoring both the infrastructure and the sensors, and minimizes the number of new technologies that the manager needs to learn and that Contoso must support.
 
@@ -24,7 +24,7 @@ The local collection and visualization of sensor data uses the same infrastructu
 
 ![Applications and technology stack architecture diagram](./img/architecture.png)
 
-As mentioned above, the environmental observability architecture for _Dev_, _Staging_, and _Prod_ environments leverage the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in the scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus ([MQTT2Prometheus](https://github.com/hikhvar/mqtt2prometheus)).
+The environmental observability architecture for _Dev_, _Staging_, and _Prod_ environments leverage the same Kube Prometheus Stack as Infrastructure Observability, which includes Kubernetes manifests, Grafana dashboards, and Prometheus rules. Added to that are the IoT sensors (simulated in the scenario), [Mosquitto MQTT broker](https://mosquitto.org/), Azure IoT Hub, ADX, and a service that exposes IoT data to be scraped by Prometheus called [MQTT2PROM](https://github.com/hikhvar/mqtt2prometheus).
 
 Mosquitto open-source MQTT broker was chosen due to its popularity, lightweight implementation, and efficiency, making it a good fit for handling the sensors' messaging flow. Azure IoT Hub is a fully managed service that enables reliable and secure bi-directional communications between millions of IoT devices and a solution backend. It also provides a device registry that stores information about the devices and their capabilities.
 
@@ -93,37 +93,39 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 - While you're viewing the dashboard, take a look at the Seattle store to see if there are any issues that should be reported to that store manager.
 
-#### View the data in Grafana at the store
+#### View the store data in Grafana
 
 From the Client VM:
 
-- Open the Edge browser, expand Grafana in the Favorites Bar, and select __Grafana Prod__
-- Login with the username _admin_ and the Windows Administrator password provided when you created the deployment
-- Click the hamburger menu next to __Home__ then click __Dashboards__
+- Open the Edge browser, expand Grafana in the Favorites Bar, and select __Grafana Prod__.
+- Login with the username _admin_ and the Windows Administrator password provided when you created the deployment.
+- Click the hamburger menu next to __Home__ then click __Dashboards__.
 
   ![Grafana showing the Dashboards menu](./img/grafana_click_dashboards.png)
-- Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago
+- Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago.
 
   ![Grafana showing list of Dashboards](./img/grafana_click_chicago.png)
+  
   - Notice that __freezer2__ is showing significant variability and frequently exceeding the safe threshold of 20°F.
 
     ![Grafana showing the Chicago dashboard](./img/grafana_chicago_dashboard.png)
+    
 - The manager can use this dashboard directly when talking to the technician about the freezer.
 
 ### Scenario 2: Send alert when freezer is too warm
 
 As the manager of the Chicago store, you can use the Grafana dashboard to see the current temperature. While taking care of other store activities, you want to be notified when the temperature exceeds the safe threshold of 15°F so you can take action immediately.
 
-__NOTE: This won't really send you email because the server is not configured to send Simple Mail Transfer Protocol (SMTP) messages. However, it will help you understand the potential options available to a store manager.__
+__NOTE: This won't really send you an email because the server is not configured to send Simple Mail Transfer Protocol (SMTP) messages. However, it will help you understand the potential options available to a store manager.__
 
-- In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__
+- In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__.
 
   ![Grafana showing the Alerting menu](./img/grafana_click_alerting.png)
 - Add a Contact point
-  - Click __Contact points__ in the navigation menu on the left
+  - Click __Contact points__ in the navigation menu on the left.
 
     ![Grafana showing the Contact points menu](./img/grafana_click_contact_points.png)
-  - Click the __Add contact point__ button
+  - Click the __Add contact point__ button.
 
     ![Grafana showing the Add contact point button](./img/grafana_click_add_contact_point.png)
   - Enter _Chicago Store Manager_ as the __Name__ and _chicago@contoso.com_ in the __Addresses__ field then click __Save contact point__
@@ -178,11 +180,9 @@ In order to troubleshoot problems with the IoT data flow, it's important to unde
 
 #### MQTT Simulator
 
-The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is a Python script that runs in each AKS Edge Essentials cluster and the AKS cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
+The first component, which generates the data for both dashboards is the MQTT Simulator. The simulator is based on a Python script that runs in each AKS Edge Essentials cluster and the AKS cluster. It generates simulated temperature and humidity data for two freezers in each environment and sends the data via the MQTT protocol to the MQTT Broker.
 
-To see data being produced by the MQTT Simulator
-
-From the Client VM:
+To see data being produced by the MQTT Simulator, from the Client VM:
 
 - Open __Visual Studio Code__ and click on the __Kubernetes__ icon in the Activity Bar on the left.
 
@@ -215,7 +215,7 @@ Assuming you have completed the steps to view the MQTT Simulator logs above:
 - In the Logs view click __Run__ to see the logs
 
   ![Visual Studio Code showing the Logs window](./img/vscode_broker_logs_run.png)
-- This won't show you the values being received or forwarded, but it will show you the connections from the 2 simulated freezer devices to the MQTT broker, as well as the connections from the MQTT broker to Azure IoT Hub for each freezer device. Finally, it shows the connection from __sensor-monitor-mqtt2prom__ which subscribes to the freezer data on the MQTT broker and makes it available to Prometheus and is explained in the sections below.
+- This won't show you the values being received or forwarded, but it will show you the connections from the two simulated freezer devices to the MQTT broker, as well as the connections from the MQTT broker to Azure IoT Hub for each freezer device. Finally, it shows the connection from __sensor-monitor-mqtt2prom__ which subscribes to the freezer data on the MQTT broker and makes it available to Prometheus and is explained in the sections below.
 
   ![Visual Studio Code showing the Simulator logs](./img/vscode_broker_logs.png)
 
@@ -244,9 +244,9 @@ To see whether data is being received by Azure IoT Hub for your devices, from yo
 
 #### Azure Data Explorer (ADX)
 
-ADX is a cloud service that ingests, stores, and analyzes diverse data from any data source. It is a fast, fully managed data analytics service for real-time analysis on large volumes of data streaming (i.e. log and telemetry data) from applications, websites, IoT devices, and more. ADX is a great choice for analyzing data from IoT devices because it can ingest data from a variety of sources, including the IoT Hub, which is how we're getting the data from the MQTT Broker.
+ADX is a cloud service that ingests, stores, and analyzes diverse data from any data source. It is a fast, fully managed data analytics service for real-time analysis of large volumes of data streaming (i.e. log and telemetry data) from applications, websites, IoT devices, and more. ADX is a great choice for analyzing data from IoT devices because it can ingest data from a variety of sources, including the IoT Hub, which is how we're getting the data from the MQTT Broker.
 
-To see the ADX dashboard, review the steps from -[Scenario 1: View the data in Azure Data Explorer](#scenario-1-identifying-the-broken-freezer).
+To see the ADX dashboard, review the steps from ["Scenario 1: View the data in Azure Data Explorer"](#scenario-1-identifying-the-broken-freezer).
 
 ## Next steps
 
