@@ -120,14 +120,14 @@ As the manager of the Chicago store, you can use the Grafana dashboard to see th
 
 __NOTE: This won't really send you an email because the server is not configured to send Simple Mail Transfer Protocol (SMTP) messages. However, it will help you understand the potential options available to a store manager.__
 
-- In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__
+- In the Grafana dashboard, click the hamburger menu next to __Home__ then __Alerting__.
 
   ![Grafana showing the Alerting menu](./img/grafana_click_alerting.png)
 - Add a Contact point
-  - Click __Contact points__ in the navigation menu on the left
+  - Click __Contact points__ in the navigation menu on the left.
 
     ![Grafana showing the Contact points menu](./img/grafana_click_contact_points.png)
-  - Click the __Add contact point__ button
+  - Click the __Add contact point__ button.
 
     ![Grafana showing the Add contact point button](./img/grafana_click_add_contact_point.png)
   - Enter _Chicago Store Manager_ as the __Name__ and _chicago@contoso.com_ in the __Addresses__ field then click __Save contact point__
