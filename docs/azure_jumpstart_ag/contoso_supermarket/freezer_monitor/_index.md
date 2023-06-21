@@ -77,7 +77,7 @@ Here are a few scenarios that Contoso Supermarket might encounter, and how they 
 
 ### Scenario 1: Identifying the broken freezer
 
-The manager of the Chicago store has reported that food in one of the freezers has not been staying frozen. She has moved the food to the second freezer and called for service, but the technician reported that the freezer seems to be operating within parameters. Your job as the data analyst is to determine if the temperature sensor in the freezer has observed the issue, and provide the data to the store manager.
+The manager of the Chicago store has reported that food in one of the freezers has not been staying frozen. She moved the food to the second freezer and called for service, but the technician reported that the freezer seems to be operating within parameters. Your job as the data analyst is to determine if the temperature sensor in the freezer has observed the issue and provide the data to the store manager.
 
 #### Confirm the issue in Azure Data Explorer
 
