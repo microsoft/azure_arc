@@ -4,7 +4,9 @@ linkTitle: "Jumpstart Agora"
 weight: 3
 ---
 
-## Jumpstart Agora - Overview
+## Jumpstart Agora
+
+### Overview
 
 Jumpstart Agora is a marketplace of various “cloud to edge” industry scenarios, designed to provide an end-to-end user experience. The word "Agora" comes from the ancient Greek term for a public gathering place or assembly, and it has come to be used more broadly to refer to any place or forum where people come together for discussion or exchange.
 
@@ -20,7 +22,7 @@ Our mission is to create a rich marketplace of applications that can leverage Hy
 - Demo environment for customer presentations or events.
 - Rapid integration testing platform.
 
-### Jumpstart Agora scenarios and getting started
+### Jumpstart Agora scenarios and get started
 
 Each Agora scenario is a full-stack deployment, from the infrastructure layer all the way to the line of business applications. To get started with Jumpstart Agora, each scenario has a dedicated set of guides that will walk you through the deployment process. The guides are designed to be as simple as possible but also keep the detailed-oriented spirit of the Jumpstart.
 
