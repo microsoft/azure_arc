@@ -22,7 +22,7 @@ One of the main benefits of GitOps is its ability to provide a consistent and au
 
 ### GitOps workflow
 
-Contoso has deployed GitOps configurations for all of their services to make it easier for their developers to focus on code and streamline all the code build, test, and deployment activities. Flux v2 is the main driver for Contoso's Supermarket GitOps workflow by monitoring the Git repository holding all the clusters' configurations and applications code for changes and automatically updates the deployed resources accordingly. This makes it easy for teams to manage their infrastructure as code, using Git as the single source of truth.
+Contoso has deployed GitOps configurations for all of their services to make it easier for their developers to focus on code and streamline all the code build, test, and deployment activities. Flux v2 is the main driver for Contoso's GitOps workflow by monitoring the Git repository holding all the clusters' configurations and applications code for changes and automatically updating the deployed resources accordingly. This makes it easy for teams to manage their infrastructure as code, using Git as the single source of truth.
 
 Before starting to code this new feature, it is useful to take a look at how Contoso's GitHub repository is structured.
 
