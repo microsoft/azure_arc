@@ -40,7 +40,7 @@ Contoso has an ADX dashboard report for Freezer Monitoring analytics and monitor
 
 To view the Freezer Monitoring dashboard you will first need to import it into ADX.
 
-- On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
+- On the Client VM, open Windows Explorer and navigate to the _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
 
   ![Screenshot showing locating the dashboard template files](./img/adx_dashboard_report_files.png)
 
