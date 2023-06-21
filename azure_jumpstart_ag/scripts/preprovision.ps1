@@ -178,6 +178,9 @@ catch {
     If ($error[0].ToString() -match "Forbidden"){
         Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
     }
+    elseif ($error[0].ToString() -match "credentials") {
+        Throw "Please run Connect-AzAccount to sign and run 'azd up' again."
+    }
     else {
         Throw "An error occurred creating the service principal. Please try again."
     }
