@@ -4,7 +4,7 @@
 
 Contoso prides itself on being technology innovators. In the current market, Contoso's leadership recognizes that maintaining their position as leaders in the retail space requires innovation in every aspect of their operations.
 
-To this end, Contoso has developed an AI mechanism that empowers them to enhance the customer experience in their stores. The objective is to accurately detect the number of people waiting at different checkout lanes and enable proactive actions based on this data.
+To this end, Contoso Supermarket has developed an artificial intelligence (AI) mechanism that empowers them to enhance the customer experience in their stores. By implementing such a mechanism, their objective is to accurately detect the number of people waiting at different checkout lanes and enable proactive actions based on this data.
 
 ## Architecture
 
