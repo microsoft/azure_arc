@@ -66,7 +66,7 @@ To access the "Managers Control Center", select the POS [_env_] Manager option f
 
     ![Store Manager Screenshot Heatmap focus](./img/checkout-heatmap.png)
 
-- __Reporting:__ Contoso is interested in improving their store experience by measuring 2 key metrics: Total people in the store, and Shopper Wait Time. This metrics are shown in the Store Manager Control Center as shown below
+- __Reporting:__ Contoso is interested in improving their store experience by measuring two key metrics: Total people in the store, and Shopper Wait Time. These metrics are shown in the Store Manager Control Center as shown below.
 
     ![Store Manager Reporting Pane](./img/reporting.png)
 
