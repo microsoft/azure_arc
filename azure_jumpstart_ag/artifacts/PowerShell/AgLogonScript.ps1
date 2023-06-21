@@ -1283,8 +1283,8 @@ $grafanaUserBody = @{
 } | ConvertTo-Json
 
 # Make HTTP request to the API to create user
-$retryCount = 5
-$retryDelay = 60
+$retryCount = 10
+$retryDelay = 30
 do {
     try {
         Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
@@ -1361,8 +1361,8 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         } | ConvertTo-Json
 
         # Make HTTP request to the API to create user
-        $retryCount = 5
-        $retryDelay = 60
+        $retryCount = 10
+        $retryDelay = 30
 
         do {
             try {
