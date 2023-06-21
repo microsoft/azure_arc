@@ -36,6 +36,8 @@ The _Dev_ and _Staging_ environments are configured with individual Prometheus a
 
 Contoso has an ADX dashboard report for Freezer Monitoring analytics and monitoring. The dashboard is generated from live data sent from the IoT devices through the MQTT broker and IoT Hub to the ADX database using data integration.
 
+![Screenshot showing the default freezer dashboard](./img/adx_freezer_dashboard_default.png)
+
 ### Manually import dashboard
 
 > __NOTE: If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as the dashboard is automatically imported for you during the automated deployment.__
@@ -298,12 +300,11 @@ To see the ADX dashboard, review the steps from ["Scenario 1: View the data in A
 
 Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
 
-- [PoS](https://placeholder)
+- [CI/CD](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/ci_cd/_index.md)
 
-- [CI/CD](https://placeholder)
+- [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
 
-- [Basic GitOps](https://placeholder)
+- [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
 
-- [Analytics](https://analytics)
+- [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
 
-- [Troubleshooting](https://troubleshooting)
