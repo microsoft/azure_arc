@@ -100,7 +100,7 @@ The manager of the Chicago store has reported that food in one of the freezers h
 From the Client VM:
 
 - Open the Edge browser, expand Grafana in the Favorites Bar, and select __Grafana Prod__
-- Login with the username _admin_ and the Windows Admin Password you provided when you created your deployment
+- Login with the username _admin_ and the Windows Administrator password provided when you created the deployment
 - Click the hamburger menu next to __Home__ then click __Dashboards__
 
   ![Grafana showing the Dashboards menu](./img/grafana_click_dashboards.png)
