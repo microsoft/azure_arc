@@ -186,8 +186,7 @@ To see data being produced by the MQTT Simulator
 
 From the Client VM:
 
-- Open __Visual Studio Code__
-- Click on the __Kubernetes__ icon in the Activity Bar on the left
+- Open __Visual Studio Code__ and click on the __Kubernetes__ icon in the Activity Bar on the left.
 
   ![Visual Studio Code showing the Kubernetes icon](./img/vscode_kubernetes_icon.png)
 - Right-click on the __Chicago__ cluster and select __Set as Current Cluster__
