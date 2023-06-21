@@ -140,7 +140,7 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing pods terminating in the canary cluster](./img/live_view_containers.png)
 
-- After refreshing the store manager view, we can see that the "Live View" feature is enabled and the "Live View" button is not greyed out anymore.
+- Upon refreshing the store manager view, you can see that the "Live View" feature is enabled and the "Live View" button is not greyed out anymore.
 
     ![Screenshot showing the live view feature enabled on the browser](./img/edge_live_view_enabled.png)
 
