@@ -120,11 +120,11 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the cloned repository opened in the dev container](./img/vscode_dev_container_trust_folder.png)
 
-- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to whitelist it.
+- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_, and select the _jumpstart-agora-apps_ repository to whitelist it.
 
     ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
 
-- Switch to the _canary_ branch to enable the "Live View"feature on the _Chicago_ Kubernetes cluster
+- Switch to the _canary_ branch to enable the "Live View" feature on the _Chicago_ Kubernetes cluster
 
     ![Screenshot showing switching to the canary branch](./img/vscode_canary_branch.png)
 
