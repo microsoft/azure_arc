@@ -13,7 +13,9 @@ Contoso has installed temperature and humidity sensors in each freezer in each s
 Contoso Supermarket is researching a number of additional health and safety systems that will leverage the same IoT infrastructure. These include:
 
 - Air quality sensors to detect the presence of smoke or other contaminants.
+
 - Water quality sensors to detect the presence of contaminants in the water supply.
+
 - Motion and presence sensors to lights should be turned on for personal safety.
 
 The local collection and visualization of sensor data uses the same infrastructure as the [Infrastructure Observability](..\k8s_infra_observability\_index.md) stack, namely Prometheus and Grafana. This provides the store manager with a single pane of glass for monitoring both the infrastructure and the sensors, and minimizes the number of new technologies that the manager needs to learn and that Contoso must support.
@@ -99,7 +101,9 @@ The manager of the Chicago store has reported that food in one of the freezers h
 From the Client VM:
 
 - Open the Edge browser, expand Grafana in the Favorites Bar, and select __Grafana Prod__.
+
 - Login with the username _admin_ and the Windows Administrator password provided when you created the deployment.
+
 - Click the hamburger menu next to __Home__ then click __Dashboards__.
 
   ![Screenshot showing the Grafana Dashboards menu](./img/grafana_click_dashboards.png)
@@ -107,11 +111,11 @@ From the Client VM:
 - Click __General__ to see the list of dashboards then click __Chicago - Freezer Monitoring__ to open the dashboard for Chicago.
 
   ![Screenshot showing the list Grafana of Dashboards](./img/grafana_click_chicago.png)
-  
+
   - Notice that __freezer2__ is showing significant variability and frequently exceeding the safe threshold of 20°F.
 
     ![Screenshot showing Grafana with the Chicago dashboard](./img/grafana_chicago_dashboard.png)
-    
+
 - The manager can use this dashboard directly when talking to the technician about the freezer.
 
 ### Scenario 2: Send alert when freezer is too warm
@@ -125,6 +129,7 @@ __NOTE: This won't really send you an email because the server is not configured
   ![Screenshot showing the Grafana Alerting menu](./img/grafana_click_alerting.png)
 
 - Add a Contact point
+
   - Click __Contact points__ in the navigation menu on the left.
 
     ![Screenshot showing the Grafana Contact points menu](./img/grafana_click_contact_points.png)
@@ -138,6 +143,7 @@ __NOTE: This won't really send you an email because the server is not configured
     ![Screenshot showing the Grafana Add contact point form](./img/grafana_add_contact_point.png)
 
 - Add an Alert rule
+
   - Click __Alert rules__ in the navigation menu
 
     ![Screenshot showing tge Grafana Alert rules menu](./img/grafana_click_alert_rules.png)
@@ -147,14 +153,19 @@ __NOTE: This won't really send you an email because the server is not configured
     ![Screenshot showing the Grafana Create alert rule button](./img/grafana_click_create_alert_rule.png)
 
   - Section 1
+
     - Enter _Freezer too warm - food at risk_ as the __Rule name__
 
       ![Screenshot showing the Grafana Add alert rule form](./img/grafana_add_alert_rule_name.png)
 
   - Section 2
+
     - Select __chicago__ as the data source in query __A__
+
     - Select __temperature__ as the Metric in query __A__
+
     - Enter _15_ as the Threshold in expression __C__
+
     - Click __Preview__
 
       ![Screenshot showing the Grafana Add alert rule form](./img/grafana_add_alert_rule_config.png)
@@ -164,15 +175,21 @@ __NOTE: This won't really send you an email because the server is not configured
       ![Screenshot showing the Grafana Add alert preview](./img/grafana_add_alert_rule_preview.png)
 
     - Since it's difficult to determine which series is which, let's fix the series names
+
       - Click __Options__
+
       - Under __Legend__ select __Custom__ then enter _{{sensor_type}}_
+
       - Click away from the 'Legend' box, then back into it for the series names to update
 
         ![Screenshot showing the Grafana preview legend options](./img/grafana_add_alert_rule_preview_legend.png)
 
     - Notice in the chart the times where freezer2 exceeds the threshold and would trigger an alert
+
   - Section 3
+
     - Under __Folder__ type _Alerts_ and press __Enter__
+
     - Under __Evaluation group__ type _Alert Group_ and press __Enter__
 
       ![Screenshot showing the Grafana Folder selection](./img/grafana_add_alert_rule_folder.png)
@@ -182,8 +199,11 @@ __NOTE: This won't really send you an email because the server is not configured
     ![Screenshot showing the Grafana Save and exit button](./img/grafana_add_alert_rule_save.png)
 
 - View your alert
+
   - Back on the __Alert rules__ page, type _freezer_ in the __Search__ box and press __Enter__
+
   - Expand the __Alerts > Alert Group__ folder to see your __Freezer too warm - food at risk__ alert
+
   - Expand the alert to view to __Silence__ it, __Show state history__, or quickly __edit__ or __delete__ the alert
 
     ![Screenshot showing the Grafana new alert rule](./img/grafana_new_alert_rule.png)
@@ -247,7 +267,9 @@ From the MQTT Broker, the data is sent to Azure IoT Hub, which is a managed serv
 To see whether data is being received by Azure IoT Hub for your devices, from your local machine:
 
 - Open Resource Groups in the Azure Portal - [https://portal.azure.com](https://ms.portal.azure.com/#browse/resourcegroups)
+
 - Click the new resource group you created for __Jumpstart Agora__
+
 - Click __Ag-IotHub-xxxxx__ to open the IoT Hub
 
   ![Screenshot showing the Azure Portal IoT Hub](./img/azure_portal_iot_hub.png)
@@ -259,8 +281,9 @@ To see whether data is being received by Azure IoT Hub for your devices, from yo
 - Click __Run query__
 
   ![Screenshot showing the Azure Portal IoT Hub Run query button](./img/azure_portal_iot_hub_queries_run.png)
-  
+
 - Scroll down to where you see __"deviceId": "Freezer-1-Chicago"__
+
 - Review the __"connectionState"__ and __"lastActivityTime"__ values to see if the device is connected and sending data
 
   ![Screenshot showing the Azure Portal IoT Hub Run query results](./img/azure_portal_iot_hub_queries_results.png)
@@ -276,7 +299,11 @@ To see the ADX dashboard, review the steps from ["Scenario 1: View the data in A
 Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
 
 - [PoS](https://placeholder)
+
 - [CI/CD](https://placeholder)
+
 - [Basic GitOps](https://placeholder)
+
 - [Analytics](https://analytics)
+
 - [Troubleshooting](https://troubleshooting)
