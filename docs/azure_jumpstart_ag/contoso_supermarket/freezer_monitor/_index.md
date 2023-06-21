@@ -114,7 +114,7 @@ From the Client VM:
 
 ### Scenario 2: Send alert when freezer is too warm
 
-As the manager of the Chicago store, you can use the Grafana dashboard to see the current temperature, but you're a busy person so you want to be notified when the temperature exceeds the safe threshold of 15°F so you can take action immediately.
+As the manager of the Chicago store, you can use the Grafana dashboard to see the current temperature. While taking care of other store activities, you want to be notified when the temperature exceeds the safe threshold of 15°F so you can take action immediately.
 
 __NOTE: This won't really send you email because the server is not configured to send smtp messages. However, it will help you understand the potential options available to a store manager.__
 
