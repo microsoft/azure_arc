@@ -176,7 +176,7 @@ __NOTE: This won't really send you email because the server is not configured to
 
 ### Scenario 3: Follow the data from the freezer to the dashboards
 
-In order to troubleshoot problems with the IoT data flow, it's important to understand the components involved so let's take a look at how the data flows from from a simulated freezer to the dashboards in Azure Data Explorer and Grafana.
+In order to troubleshoot problems with the IoT data flow, it's important to understand the components involved. Take a look at how the data flows from a simulated freezer to the dashboards in ADX and Grafana.
 
 #### MQTT Simulator
 
