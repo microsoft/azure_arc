@@ -1,3 +1,29 @@
+########################################################################
+# Connect to Azure
+########################################################################
+
+Write-Host "Connecting to Azure..."
+
+# Install Azure module if not already installed
+if (-not (Get-Command -Name Get-AzContext)) {
+    Write-Host "Installing Azure module..."
+    Install-Module -Name Az -AllowClobber -Scope CurrentUser -ErrorAction Stop
+}
+
+# If not signed in, run the Connect-AzAccount cmdlet
+if (-not (Get-AzContext)) {
+    Write-Host "Logging in to Azure..."
+    If (-not (Connect-AzAccount -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop)){
+        Throw "Unable to login to Azure. Please check your credentials and try again."
+    }
+}
+
+# Write-Host "Setting Azure context..."
+$context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop
+
+# Write-Host "Setting az subscription..."
+$azLogin = az account set --subscription $env:AZURE_SUBSCRIPTION_ID
+
 
 ########################################################################
 # Check for available capacity in region
@@ -117,7 +143,10 @@ azd env set JS_RDP_PORT $JS_RDP_PORT
 ########################################################################
 $JS_GITHUB_USER = $env:JS_GITHUB_USER
 
-if ($promptOutput = Read-Host "Enter your GitHub user name [$JS_GITHUB_USER]") { $JS_GITHUB_USER = $promptOutput }
+$defaultGhUser = ""
+If ($JS_GITHUB_USER) { $defaultGhUser = " [$JS_GITHUB_USER]"}
+
+if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS_GITHUB_USER = $promptOutput }
 
 # set the env variable
 azd env set JS_GITHUB_USER $JS_GITHUB_USER
@@ -128,7 +157,10 @@ azd env set JS_GITHUB_USER $JS_GITHUB_USER
 ########################################################################
 $JS_GITHUB_PAT = $env:JS_GITHUB_PAT
 
-if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT) [$JS_GITHUB_PAT]") { $JS_GITHUB_PAT = $promptOutput }
+$defaultPAT = ""
+If ($JS_GITHUB_PAT) { $defaultPAT = " [$JS_GITHUB_PAT]"}
+
+if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$defaultPAT") { $JS_GITHUB_PAT = $promptOutput }
 
 # set the env variable
 azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
@@ -158,18 +190,8 @@ azd env set JS_SSH_RSA_PUBLIC_KEY $JS_SSH_RSA_PUBLIC_KEY
 # Create Azure Service Principal
 ########################################################################
 Write-Host "Creating Azure Service Principal..."
-# Install Azure module if not already installed
-if (-not (Get-Command -Name Get-AzContext)) {
-    Write-Host "Installing Azure module..."
-    Install-Module -Name Az -AllowClobber -Scope CurrentUser
-}
 
-# If not signed in, run the Connect-AzAccount cmdlet
-if (-not (Get-AzContext)) {
-    Connect-AzAccount
-}
-
-$user = (get-azcontext).Account.Id.split("@")[0]
+$user = $context.Account.Id.split("@")[0]
 $uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
 try {
     $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
