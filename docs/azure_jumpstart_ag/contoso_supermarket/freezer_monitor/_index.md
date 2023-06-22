@@ -4,6 +4,8 @@ weight: 100
 toc_hide: true
 ---
 
+# Data pipeline and reporting across cloud and edge - Sensor telemetry
+
 ## Overview
 
 Contoso Supermarket is obsessed with achieving the highest levels of food safety. To support this obsession Contoso has invested in technology to let it know when any food in a store's freezers is potentially unsafe due to the freezer reaching temperatures that would allow the food to thaw and pathogens to grow.
@@ -84,7 +86,7 @@ The manager of the Chicago store has reported that food in one of the freezers h
 
 #### Confirm the issue in Azure Data Explorer
 
-- Open the __Freezer Monitoring__ dashboard in ADX: https://dataexplorer.azure.com/dashboards
+- Open the __Freezer Monitoring__ dashboard in [ADX](https://dataexplorer.azure.com/dashboards).
 
   ![Screenshot showing the dashboard with all freezers](./img/adx_freezer_dashboard_default.png)
 
@@ -307,4 +309,3 @@ Use the following guides to explore different use cases of Contoso Supermarket i
 - [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
 
 - [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
-
