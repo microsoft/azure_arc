@@ -120,12 +120,7 @@ $JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
-azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
-
-# The user will be prompted for this by azd so we can maintain the security of the password.
-# $JS_WINDOWS_ADMIN_PASSWORD = Read-Host "Enter the Windows Admin Password (hint: ArcPassword123!! - 12 character minimum)" -AsSecureString
-
-# azd env set JS_WINDOWS_ADMIN_PASSWORD $JS_WINDOWS_ADMIN_PASSWORD
+azd env set JS_WINDOWS_ADMIN_USERNAME -- $JS_WINDOWS_ADMIN_USERNAME
 
 
 ########################################################################
@@ -152,7 +147,7 @@ If ($JS_GITHUB_USER) { $defaultGhUser = " [$JS_GITHUB_USER]"}
 if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS_GITHUB_USER = $promptOutput }
 
 # set the env variable
-azd env set JS_GITHUB_USER $JS_GITHUB_USER
+azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
 
 
 ########################################################################
@@ -166,7 +161,7 @@ If ($JS_GITHUB_PAT) { $defaultPAT = " [$JS_GITHUB_PAT]"}
 if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$defaultPAT") { $JS_GITHUB_PAT = $promptOutput }
 
 # set the env variable
-azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
+azd env set JS_GITHUB_PAT -- $JS_GITHUB_PAT
 
 
 ########################################################################
@@ -186,7 +181,7 @@ $JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
 $JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
 
 # set the env variable
-azd env set JS_SSH_RSA_PUBLIC_KEY $JS_SSH_RSA_PUBLIC_KEY
+azd env set JS_SSH_RSA_PUBLIC_KEY -- $JS_SSH_RSA_PUBLIC_KEY
 
 
 ########################################################################
@@ -216,7 +211,7 @@ $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
 $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
 
 # Set environment variables
-azd env set SPN_CLIENT_ID $SPN_CLIENT_ID
-azd env set SPN_CLIENT_SECRET $SPN_CLIENT_SECRET
-azd env set SPN_TENANT_ID $SPN_TENANT_ID
+azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
+azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
+azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
 
