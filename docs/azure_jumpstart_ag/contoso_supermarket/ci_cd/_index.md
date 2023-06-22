@@ -117,7 +117,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the cloned repository opened in the dev container](./img/vscode_dev_container_trust_folder.png)
 
-- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to whitelist it.
+- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to add it to the allow list.
 
     ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
 
