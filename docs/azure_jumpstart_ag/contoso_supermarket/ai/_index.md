@@ -190,7 +190,7 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
 - You should see a new change visible in the GitHub pane (if you don't see any changes, click refresh).
 
-    ![Screenshot showing the added changes in the repository](./img/vscode_production_add_committ_message.png)
+    ![Screenshot showing the added changes in the repository](./img/vscode_production_view_changes.png)
 
 - Add a commit message and click Commit, for example: "Adding Live View feature" and push your code.
 
