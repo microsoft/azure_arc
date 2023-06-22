@@ -180,7 +180,7 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
     ![Screenshot showing switching to the production branch](./img/vscode_production_branch.png)
 
-- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml_. You can see that "Holiday Banner" feature is disabled
+- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml_. You can see that the "Holiday Banner" feature is disabled
 
     ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_disabled.png)
 
