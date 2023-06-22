@@ -170,9 +170,9 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the live view feature showing the video feed](./img/edge_canary_pos_manage_live_view.png)
 
-Contoso's DevOps team has also received a request from the _Seattle_ store managers that they would like to add some holiday greetings on the PoS application's naivgation bar that was created by the development team.
+Contoso's DevOps team has also received a request from the _Seattle_ store managers that they would like to add a "Holiday Banner" feature on the customer view of the PoS application that was created by the development team.
 
-- Navigate to the customer view in the PoS application, you can see that there is no Holidays banner in the navigation bar
+- Navigate to the customer view in the PoS application, you can see that there is no "Holidays Banner" feature in the navigation bar
 
     ![Screenshot showing customer view with no holidat banner](./img/edge_seattle_pos_no_banner.png)
 
@@ -190,7 +190,7 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
 - You should see a new change visible in the GitHub pane (if you don't see any changes, click refresh).
 
-    ![Screenshot showing the added changes in the repository](./img/vscode_add_changes.png)
+    ![Screenshot showing the added changes in the repository](./img/vscode_production_add_committ_message.png)
 
 - Add a commit message and click Commit, for example: "Adding Live View feature" and push your code.
 
