@@ -202,7 +202,7 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
     ![Screenshot showing pods terminating in the production cluster](./img/live_view_containers_production.png)
 
-- Upon refreshing the customer view, you can see that the "Holiday Banner" feature is enabled and the "Holiday Banner" is visible on the navigation bar.
+- Upon refreshing the customer view, you can see that the "Holiday Banner" feature is enabled and the holiday banner is visible on the customer view of the PoS application.
 
     ![Screenshot showing the Holiday banner feature enabled on the browser](./img/edge_production_pos_holiday_banner.png)
 
