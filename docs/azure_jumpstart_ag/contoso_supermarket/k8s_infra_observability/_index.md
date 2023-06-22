@@ -20,7 +20,7 @@ The observability infrastructure stack architecture for Staging, Dev, and Prod e
 
 The Dev and Staging environments are configured with individual Prometheus and Grafana instances, while the Prod environment is configured with a central Grafana instance. This architecture allows for more granular monitoring and troubleshooting in the Dev and Staging environments, while still providing a centralized view of the infrastructure's health and performance in the Prod environment.
 
-![Observability infrastructure stack architecture diagram](./img/technology_stack.png)
+![Screenshot showing Observability infrastructure stack architecture](./img/technology_stack.png)
 
 ## Grafana dashboards
 
@@ -48,81 +48,81 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
 - Open the Edge browser, expand Grafana in the Favorites Bar and select `Grafana Prod`.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod.png)
+    ![Screenshot showing accessing Grafana Prod](./img/grafana_prod.png)
 
 - Login using the Windows Admin Username and Password you provided when you created your deployment.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_login.png)
+    ![Screenshot showing Login for Grafana Prod](./img/grafana_prod_login.png)
 
 - Click `Chicago - Kubernetes / Views / Global` dashboard to review the overall health of the cluster.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_dashboard_global.png)
+    ![Screenshot showing Grafana Prod dashboards](./img/grafana_prod_dashboard_global.png)
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_global01.png)
+    ![Screenshot showing Grafana Prod Cluster dashboard](./img/grafana_prod_db_global01.png)
 
 - Review the different panels in the dashboard to see the metrics collected from the Kubernetes cluster.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_global02.png)
+    ![Screenshot showing Grafana Prod Cluster dasboard panels CPU](./img/grafana_prod_db_global02.png)
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_global03.png)
+    ![Screenshot showing Grafana Prod Cluster dasboard panels Network](./img/grafana_prod_db_global03.png)
 
 - Click `Home` to go back to the home page and review the other dashboards available.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_dashboard_home.png)
+    ![Screenshot showing Grafana Prod Home page](./img/grafana_prod_dashboard_home.png)
 
 - Click `Chicago - Node Exporter Full` dashboard to review the Chicago store node metrics.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_dashboard_node.png)
+    ![Screenshot showing Grafana Prod Node Exporter dashboard](./img/grafana_prod_dashboard_node.png)
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_node01.png)
+    ![Screenshot showing Grafana Prod Node Exporter dashboard overview](./img/grafana_prod_db_node01.png)
 
 - Review the different panels in the dashboard to see the metrics collected from the Kubernetes cluster.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_node02.png)
+    ![Screenshot showing Grafana Prod Node Exporter dashboard panels CPU](./img/grafana_prod_db_node02.png)
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_node03.png)
+    ![Screenshot showing Grafana Prod Node Exporter dashboard panels Memory](./img/grafana_prod_db_node03.png)
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_db_node04.png)
+    ![Screenshot showing Grafana Prod Node Exporter dashboard panels Storage](./img/grafana_prod_db_node04.png)
 
 - Repeat the same steps to access the `Seattle Store` dashboards and review the cluster and node metrics.
 
-    ![Observability grafana_prod diagram](./img/grafana_prod_dashboard_seattle.png)
+    ![Screenshot showing Grafana Prod Seattle Store Dashboards](./img/grafana_prod_dashboard_seattle.png)
 
 ### Staging Store
 
 - Open the Edge browser, expand Grafana in the Favorites Bar and select `Grafana Staging`.
 
-    ![Observability grafana_prod diagram](./img/grafana_staging.png)
+    ![Screenshot showing accessing Grafana Staging](./img/grafana_staging.png)
 
 - Login using the Windows Admin Username and Password you provided when you created your deployment. Review the available dashboards.
 
-    ![Observability grafana_prod diagram](./img/grafana_staging_dashboard_home.png)
+    ![Screenshot showing Login Grafana Staging](./img/grafana_staging_dashboard_home.png)
 
 - Review `Staging - Kubernetes / Views / Global` dashboard to check the overall health of the cluster.
 
-    ![Observability grafana_prod diagram](./img/grafana_staging_dashboard_global.png)
+    ![Screenshot showing Grafana Staging Cluster dashboard](./img/grafana_staging_dashboard_global.png)
 
 - Review `Staging - Node Exporter Full` dashboard to check the Chicago store node metrics.
 
-    ![Observability grafana_prod diagram](./img/grafana_staging_dashboard_node.png)
+    ![Screenshot showing Grafana Staging Node Exporter dashboard](./img/grafana_staging_dashboard_node.png)
 
 ### Dev Store
 
 - Open the Edge browser, expand Grafana in the Favorites Bar and select `Grafana Dev`.
 
-    ![Observability grafana_prod diagram](./img/grafana_dev.png)
+    ![Screenshot showing accessing Grafana Dev](./img/grafana_dev.png)
 
 - Login using the Windows Admin Username and Password you provided when you created your deployment. Review the available dashboards.
 
-    ![Observability grafana_prod diagram](./img/grafana_dev_dashboard_home.png)
+    ![Screenshot showing Login Grafana Dev](./img/grafana_dev_dashboard_home.png)
 
 - Review `Dev - Kubernetes / Views / Global` dashboard to check the overall health of the cluster.
 
-    ![Observability grafana_prod diagram](./img/grafana_dev_dashboard_global.png)
+    ![Screenshot showing Grafana Dev Cluster dashboard](./img/grafana_dev_dashboard_global.png)
 
 - Review `Dev - Node Exporter Full` dashboard to check the Dev store node metrics.
 
-    ![Observability grafana_prod diagram](./img/grafana_dev_dashboard_node.png)
+    ![Screenshot showing Grafana Dev Node Exporter dashboard](./img/grafana_dev_dashboard_node.png)
 
 ## Next steps
 
