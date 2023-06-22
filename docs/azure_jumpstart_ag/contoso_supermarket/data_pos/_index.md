@@ -16,7 +16,7 @@ In this scenario, Contoso wants to use their data pipeline so customer orders pl
 
 Below is an architecture diagram that shows how the data flows from the PoS application and into the ADX database to generate near real-time reports of orders received and processed across various supermarket store locations. This architecture includes a local PostgreSQL database running at the edge in the store, [Azure Cosmos DB](https://learn.microsoft.com/azure/cosmos-db/introduction) and ADX cluster in Azure cloud, and a Cloud Sync service that moves orders data from edge location to Cosmos DB in the cloud.
 
-![Screenshot showing the data pipeline architecture diagram](./img/contoso_supermarket_pos_service_architecture.png)
+![Data pipeline architecture diagram](./img/contoso_supermarket_pos_service_architecture.png)
 
 ## PoS dashboard reports
 
@@ -30,7 +30,7 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
 - On the Client VM, open Windows Explorer and navigate to folder _C:\Ag\adx_dashboards_ folder. This folder contains two ADX dashboard report JSON files (_adx-dashboard-iotsensor-payload.json_ and _adx-dashboard-orders-payload.json_) with the ADX name and URI updated when the deployment PowerShell logon script is completed.
 
-  ![Screenshot showing the dashboard report template files location](./img/adx_dashboard_report_files.png)
+  ![Locate dashboard report template files](./img/adx_dashboard_report_files.png)
 
 - Copy these ADX dashboards report JSON files on your local machine in a temporary folder to import into ADX dashboards. Alternatively, you can log in to ADX Dashboards directly on the Client VM.
 
@@ -40,15 +40,15 @@ Follow the below steps in order to view the PoS Orders dashboard reports you wil
 
 - Once you are logged in to ADX dashboards, click on Dashboards in the left navigation to import the PoS Orders dashboard report.
 
-  ![Screenshot showing the navigate to ADX dashboard reports](./img/adx_view_dashboards.png)
+  ![Navigate to ADX dashboard reports](./img/adx_view_dashboards.png)
 
 - Select _Import dashboard from file_ to select previously copied file from the Client VM to your local machine or the _C:\Ag\adx_dashboards_ folder on the Client VM.
 
-  ![Screenshot showing the import dashboard file](./img/adx_import_dashboard_file.png)
+  ![Select import dashboard file](./img/adx_import_dashboard_file.png)
 
 - Choose to import the _adx-dashboard-orders-payload.json_ file.
 
-  ![Screenshot showing the dashboard report JSON file to import](./img/adx_select_dashboard_file.png)
+  ![Choose dashboard report JSON file to import](./img/adx_select_dashboard_file.png)
 
 - Confirm the dashboard report name, accept the suggested name (or choose your own), and click Create.
 

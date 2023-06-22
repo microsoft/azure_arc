@@ -23,7 +23,7 @@ Deploying Agora consists of the following steps (once prerequisites are met).
 
 Once automation is complete, users can immediately start enjoying the Contoso Supermarket experience.
 
-![Architecture diagram](./img/deployment_flow.png)
+![Deployment flow architecture diagram](./img/deployment_flow.png)
 
 ## Prerequisites
 
