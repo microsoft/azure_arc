@@ -18,8 +18,11 @@ if (-not (Get-AzContext)) {
     }
 }
 
+# Write-Host "Getting Azure Tenant Id..."
+$tenantId = (Get-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID).TenantId
+
 # Write-Host "Setting Azure context..."
-$context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop
+$context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -Tenant $tenantId -ErrorAction Stop
 
 # Write-Host "Setting az subscription..."
 $azLogin = az account set --subscription $env:AZURE_SUBSCRIPTION_ID
