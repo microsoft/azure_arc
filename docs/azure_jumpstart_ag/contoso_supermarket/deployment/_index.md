@@ -98,7 +98,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   - North Europe
   - West Europe
 
-- __Agora requires XXX XXX-series and XXX XXX-series vCPUs__. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy Agora. You can use the below Az CLI command to check your vCPU utilization.
+- __Agora requires 40 Ds-series vCPUs__. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy Agora. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
