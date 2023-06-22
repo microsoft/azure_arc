@@ -6,6 +6,8 @@ Contoso prides itself on being technology innovators. In the current market, Con
 
 To this end, Contoso Supermarket has developed an artificial intelligence (AI) mechanism that empowers them to enhance the customer experience in their stores. By implementing such a mechanism, their objective is to accurately detect the number of people waiting at different checkout lanes and enable proactive actions based on this data.
 
+Contoso has also adopted GitOps methodologies so they can enable their DevOps teams to centrally and gradually rollout new features developed by the development team to their stores in a controlled manner.
+
 ## Architecture
 
 Contoso has four Kubernetes environments for their application rollout process (Dev, Staging, Canary, and Production), each environment is represented in their GitHub repository as a separate branch to allow developers to develop, test, and ship features and fixes in a controlled manner across each environment.
@@ -148,6 +150,16 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the navbar.html file](./img/vscode_canary_live_view_enabled.png)
 
+- You should see a new change visible in the GitHub pane (if you don't see any changes, click refresh).
+
+    ![Screenshot showing the added changes in the repository](./img/vscode_add_changes.png)
+
+- Add a commit message and click Commit, for example: "Adding Live View feature" and push your code.
+
+    ![Screenshot showing the added a commit message](./img/vscode_add_committ_message.png)
+
+    ![Screenshot showing the added pushing code to remote](./img/vscode_push_changes.png)
+
 - After a couple of seconds, the Flux operator should detect the change and you should start seeing pod recreation activity on the _Chicago_ Kubernetes cluster.
 
     ![Screenshot showing pods terminating in the canary cluster](./img/live_view_containers.png)
@@ -157,6 +169,42 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
     ![Screenshot showing the live view feature enabled on the browser](./img/edge_live_view_enabled.png)
 
     ![Screenshot showing the live view feature showing the video feed](./img/edge_canary_pos_manage_live_view.png)
+
+Contoso's DevOps team has also received a request from the _Seattle_ store managers that they would like to add some holiday greetings on the PoS application's naivgation bar that was created by the development team.
+
+- Navigate to the customer view in the PoS application, you can see that there is no Holidays banner in the navigation bar
+
+    ![Screenshot showing customer view with no holidat banner](./img/edge_seattle_pos_no_banner.png)
+
+- Switch to the _production_ branch to enable the "Holiday Banner" feature on the _Seattle_ Kubernetes cluster
+
+    ![Screenshot showing switching to the production branch](./img/vscode_production_branch.png)
+
+- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml_. You can see that "Holiday Banner" feature is disabled
+
+    ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_disabled.png)
+
+- Change the value to _True_ to enable the "Holiday Banner" feature
+
+    ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_enabled.png)
+
+- You should see a new change visible in the GitHub pane (if you don't see any changes, click refresh).
+
+    ![Screenshot showing the added changes in the repository](./img/vscode_add_changes.png)
+
+- Add a commit message and click Commit, for example: "Adding Live View feature" and push your code.
+
+    ![Screenshot showing the added a commit message](./img/vscode_production_add_committ_message.png)
+
+    ![Screenshot showing the added pushing code to remote](./img/vscode_production_push_changes.png)
+
+- After a couple of seconds, the Flux operator should detect the change and you should start seeing pod recreation activity on the _Seattle_ Kubernetes cluster.
+
+    ![Screenshot showing pods terminating in the production cluster](./img/live_view_containers_production.png)
+
+- Upon refreshing the customer view, you can see that the "Holiday Banner" feature is enabled and the "Holiday Banner" is visible on the navigation bar.
+
+    ![Screenshot showing the Holiday banner feature enabled on the browser](./img/edge_production_pos_holiday_banner.png)
 
 ## Next Steps
 
