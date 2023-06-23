@@ -22,10 +22,10 @@ Contoso Supermarket's commitment to digital transformation, along with their clo
 
 To support their digital transformation aspirations, Contoso Supermarket stores has a robust technology stack, services, and processes. To demonstrate the various use cases mentioned below, a set of reference applications is included:
 
-- Point of Sale (PoS) - Streamlining sales transactions and customer interactions through a user-friendly and efficient point-of-sale system, simplifying the purchasing process and enhancing overall customer satisfaction.
-- Managers Control Center - Enabling managers to monitor and manage store operations in real-time, ensuring optimal performance and customer satisfaction.
-- Checkout Queue Monitoring - Enhancing customer experience by monitoring and managing checkout queues in real-time to minimize waiting times and improve operational efficiency.
-- Freezer Monitoring for Food Safety - Ensuring food safety by monitoring and maintaining optimal conditions in freezers to prevent spoilage and maintain product quality.
+- __Point of Sale (PoS)__ - Streamlining sales transactions and customer interactions through a user-friendly and efficient point-of-sale system, simplifying the purchasing process and enhancing overall customer satisfaction.
+- __Managers Control Center__ - Enabling managers to monitor and manage store operations in real-time, ensuring optimal performance and customer satisfaction.
+- __Checkout Queue Monitoring__ - Enhancing customer experience by monitoring and managing checkout queues in real-time to minimize waiting times and improve operational efficiency.
+- __Freezer Monitoring for Food Safety__ - Ensuring food safety by monitoring and maintaining optimal conditions in freezers to prevent spoilage and maintain product quality.
 
 ![Applications and technology stack architecture diagram](./img/technology_stack.png)
 
