@@ -26,7 +26,7 @@ One of the main benefits of GitOps is its ability to provide a consistent and au
 
 Contoso aims to maximize the usage of their existing Closed-circuit television (CCTV) cameras installed across their stores. After careful evaluation, Contoso has opted to utilize Intel's OpenVino Technology for their solution. By leveraging OpenVino, Contoso can perform inference on the CPU of their edge devices, eliminating the need for expensive discrete GPUs. Intel also provides a set of pre-trained models that align with Contoso's requirements.
 
-In this specific use case, Contoso has chosen the [person-detection-retail-0013 pre-trained model](https://docs.openvino.ai/2022.3/omz_models_model_person_detection_retail_0013.html). This model boasts an impressive Average Precision of 88.62% and accepts high-definition videos (1024x768) as input.
+In this specific use case, Contoso has chosen the [_"person-detection-retail-0013 pre-trained model"_](https://docs.openvino.ai/2022.3/omz_models_model_person_detection_retail_0013.html). This model boasts an impressive Average Precision of 88.62% and accepts high-definition videos (1024x768) as input.
 
 The developed application showcases the live video feed with bounding boxes encompassing identified individuals. Additionally, a heatmap is superimposed on the video to provide a visual representation of people density in different areas of the frame.
 
@@ -138,15 +138,15 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
 
-- Switch to the _canary_ branch to enable the "Live View" feature on the _Chicago_ Kubernetes cluster
+- Switch to the _canary_ branch to enable the "Live View" feature on the _Chicago_ Kubernetes cluster.
 
     ![Screenshot showing switching to the canary branch](./img/vscode_canary_branch.png)
 
-- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend/canary/chicago.yaml_. You can see that "Live View" is disabled
+- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/queue-monitoring-frontend/canary/chicago.yaml_. You can see that "Live View" is disabled.
 
     ![Screenshot showing the navbar.html file](./img/vscode_canary_live_view_disabled.png)
 
-- Change the value to _True_ to enable the "Live View" feature
+- Change the value to _True_ to enable the "Live View" feature.
 
     ![Screenshot showing the navbar.html file](./img/vscode_canary_live_view_enabled.png)
 
@@ -172,19 +172,19 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
 Contoso's DevOps team has also received a request from the _Seattle_ store managers that they would like to add a "Holiday Banner" feature on the customer view of the PoS application that was created by the development team.
 
-- Navigate to the customer view in the PoS application, you can see that there is no "Holidays Banner" feature in the navigation bar
+- Navigate to the customer view in the PoS application, you can see that there is no "Holidays Banner" feature in the navigation bar.
 
-    ![Screenshot showing customer view with no holidat banner](./img/edge_seattle_pos_no_banner.png)
+    ![Screenshot showing customer view with no holiday banner](./img/edge_seattle_pos_no_banner.png)
 
-- Switch to the _production_ branch to enable the "Holiday Banner" feature on the _Seattle_ Kubernetes cluster
+- Switch to the _production_ branch to enable the "Holiday Banner" feature on the _Seattle_ Kubernetes cluster.
 
     ![Screenshot showing switching to the production branch](./img/vscode_production_branch.png)
 
-- Navigate to the file _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml_. You can see that the "Holiday Banner" feature is disabled
+- Navigate to the _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml file. You can see that the "Holiday Banner" feature is disabled.
 
     ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_disabled.png)
 
-- Change the value to _True_ to enable the "Holiday Banner" feature
+- Change the value to _True_ to enable the "Holiday Banner" feature.
 
     ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_enabled.png)
 
