@@ -22,10 +22,10 @@ Contoso Supermarket's commitment to digital transformation, along with their clo
 
 To support their digital transformation aspirations, Contoso Supermarket stores has a robust technology stack, services, and processes. To demonstrate the various use cases mentioned below, a set of reference applications is included:
 
-- Point of Sale (PoS) - Streamlining sales transactions and customer interactions through a user-friendly and efficient point-of-sale system, simplifying the purchasing process and enhancing overall customer satisfaction.
-- Managers Control Center - Enabling managers to monitor and manage store operations in real-time, ensuring optimal performance and customer satisfaction.
-- Checkout Queue Monitoring - Enhancing customer experience by monitoring and managing checkout queues in real-time to minimize waiting times and improve operational efficiency.
-- Freezer Monitoring for Food Safety - Ensuring food safety by monitoring and maintaining optimal conditions in freezers to prevent spoilage and maintain product quality.
+- __Point of Sale (PoS)__ - Streamlining sales transactions and customer interactions through a user-friendly and efficient point-of-sale system, simplifying the purchasing process and enhancing overall customer satisfaction.
+- __Managers Control Center__ - Enabling managers to monitor and manage store operations in real-time, ensuring optimal performance and customer satisfaction.
+- __Checkout Queue Monitoring__ - Enhancing customer experience by monitoring and managing checkout queues in real-time to minimize waiting times and improve operational efficiency.
+- __Freezer Monitoring for Food Safety__ - Ensuring food safety by monitoring and maintaining optimal conditions in freezers to prevent spoilage and maintain product quality.
 
 ![Applications and technology stack architecture diagram](./img/technology_stack.png)
 
@@ -38,8 +38,7 @@ To get started with the "Contoso Supermarket" Jumpstart Agora scenario, we provi
 | [Contoso Supermarket deployment guide](./deployment/_index.md)                                                                         | Not applicable                                              | Not applicable                                                                                     |
 | [Data pipeline and reporting across cloud and edge - Store orders](./data_pos/_index.md)                                               | Point of Sale (PoS)                                         | Cosmos DB, Azure Data Explorer, OSS PostgreSQL, AKS Edge Essentials                                |
 | [Data pipeline and reporting across cloud and edge - Sensor telemetry](./freezer_monitor/_index.md)                                    | Freezer Monitoring for Food Safety                          | IoT Hub, Azure Data Explorer, Mosquitto MQTT Broker, Prometheus, Grafana, AKS Edge Essentials      |
-| Platform Engineering application config rollout with basic GitOps flow                                                                 | Point of Sale (PoS)                                         | AKS, AKS Edge Essentials, Azure Arc, Flux, Azure Container Registry                                |
-| [Enabling AI at the Edge](./ai/_index.md)                                                                                              | Managers Control Center                                     | AKS Edge Essentials, GitOps (Flux) OSS PostgreSQL, Intel OpenVino Inference Engine                 |
+| [Enabling AI at the Edge & Software configurations rollout with basic GitOps flow](./ai/_index.md)                                     | Managers Control Center                                     | AKS Edge Essentials, GitOps (Flux) OSS PostgreSQL, Intel OpenVino Inference Engine                 |
 | [Streamlining the Software Delivery Process using CI/CD](./ci_cd/_index.md)                                                            | Point of Sale (PoS)                                         | AKS, AKS Edge Essentials, Azure Arc, Flux, GitHub Actions, Azure Container Registry                |
 | [Infrastructure observability for Kubernetes and Arc-enabled Kubernetes](./k8s_infra_observability/_index.md)                          | Infrastructure                                              | AKS, AKS Edge Essentials, Prometheus, Grafana                                                      |
 | [Infrastructure observability for Azure Arc-enabled servers using Azure Monitor](./arc_monitoring_servers/_index.md)                   | Infrastructure                                              | Azure Arc-enabled servers, Azure Monitor                                                           |

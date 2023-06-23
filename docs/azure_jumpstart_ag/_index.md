@@ -26,10 +26,10 @@ Our mission is to create a rich marketplace of applications that can leverage Hy
 
 Each Agora scenario is a full-stack deployment, from the infrastructure layer all the way to the line of business applications. To get started with Jumpstart Agora, each scenario has a dedicated set of guides that will walk you through the deployment process. The guides are designed to be as simple as possible but also keep the detailed-oriented spirit of the Jumpstart.
 
-| __Scenario__                                                               | __Industry__ | __Version__ |
-|----------------------------------------------------------------------------|--------------|-------------|
-| [Contoso Supermarket](../azure_jumpstart_ag/contoso_supermarket/_index.md) | Retail       |1.0          |
-| Future Jumpstart Agora scenarios                                           |              |             |
+| __Scenario__                                                               | __Industry__ | __Version__           |
+|----------------------------------------------------------------------------|--------------|-----------------------|
+| [Contoso Supermarket](../azure_jumpstart_ag/contoso_supermarket/_index.md) | Retail       | 0.1 (Private Preview) |
+| Future Jumpstart Agora scenarios                                           |              |                       |
 
 ### Jumpstart Agora use cases
 
