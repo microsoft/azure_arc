@@ -229,13 +229,18 @@ if ($Env:flavor -ne "DevOps") {
         # Get workspace information
         $workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
         $workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
+
+        Write-Host "Deploying Microsoft Monitoring Agent to test Defender for SQL."
         az connectedmachine extension create --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring" --no-wait
+        Write-Host "Microsoft Monitoring Agent deployment completed."
     }
 
     # Install Azure Monitor Agent extension to support SQL BPA
     $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
     if ($amaExtension.Count -le 0) {
+        Write-Host "Deploying Azure Monitoring Agent extension to enabled SQL BPA."
         az connectedmachine extension create --machine-name $SQLvmName --name "AzureMonitorWindowsAgent" --resource-group $resourceGroup --type "AzureMonitorWindowsAgent" --publisher "Microsoft.Azure.Monitor" --no-wait
+        Write-Host "Azure Monitoring Agent extenstion deployment initiated."
     }
     
     # Wait until extension status is Succeded
@@ -244,10 +249,13 @@ if ($Env:flavor -ne "DevOps") {
         Start-Sleep(60)
         $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
         if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
+            Write-Host "Azure Monitoring Agent extension installation to complete."
             break
         }
 
         $retryCount = $retryCount + 1
+        Write-Host "Waiting for Azure Monitoring Agent extension installation to complete ... Retry count: $retryCount"
+
         if ($retryCount -ge 5) {
             Write-Host "WARNING: Azure Monitor Agent extenstion is taking longger than expected. Enable SQL BPA later through Azure portal."
         }
