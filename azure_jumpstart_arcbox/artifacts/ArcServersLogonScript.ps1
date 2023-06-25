@@ -232,7 +232,7 @@ if ($Env:flavor -ne "DevOps") {
 
         Write-Host "Deploying Microsoft Monitoring Agent to test Defender for SQL."
         az connectedmachine extension create --machine-name $SQLvmName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring" --no-wait
-        Write-Host "Microsoft Monitoring Agent deployment completed."
+        Write-Host "Microsoft Monitoring Agent deployment initiated."
     }
 
     # Install Azure Monitor Agent extension to support SQL BPA
