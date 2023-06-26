@@ -12,26 +12,26 @@ $AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
 $configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
 $websiteUrls        = $AgConfig.URLs
-$githubAccount      = $env:githubAccount
-$githubBranch       = $env:githubBranch
-$githubUser         = $env:githubUser
-$githubPat          = $env:GITHUB_TOKEN
-$resourceGroup      = $env:resourceGroup
-$azureLocation      = $env:azureLocation
-$spnClientId        = $env:spnClientId
-$spnClientSecret    = $env:spnClientSecret
-$spnTenantId        = $env:spnTenantId
-$adminUsername      = $env:adminUsername
+$githubAccount      = $Env:githubAccount
+$githubBranch       = $Env:githubBranch
+$githubUser         = $Env:githubUser
+$githubPat          = $Env:GITHUB_TOKEN
+$resourceGroup      = $Env:resourceGroup
+$azureLocation      = $Env:azureLocation
+$spnClientId        = $Env:spnClientId
+$spnClientSecret    = $Env:spnClientSecret
+$spnTenantId        = $Env:spnTenantId
+$adminUsername      = $Env:adminUsername
 $acrName            = $Env:acrName.ToLower()
 $cosmosDBName       = $Env:cosmosDBName
 $cosmosDBEndpoint   = $Env:cosmosDBEndpoint
-$templateBaseUrl    = $env:templateBaseUrl
+$templateBaseUrl    = $Env:templateBaseUrl
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
-$adxClusterName     = $env:adxClusterName
-$namingGuid         = $env:namingGuid
+$adxClusterName     = $Env:adxClusterName
+$namingGuid         = $Env:namingGuid
 $appsRepo           = "jumpstart-agora-apps"
-$adminPassword      = $env:adminPassword
+$adminPassword      = $Env:adminPassword
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $workflowStatus     = ""
 
@@ -120,7 +120,7 @@ do {
         }
     }
     catch {
-        if($retryCount -lt $maxRetries) {
+        if ($retryCount -lt $maxRetries) {
             Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
             $retryCount++
             $forkExists = $false
@@ -128,7 +128,7 @@ do {
         }
         else {
             Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist. Exiting." -ForegroundColor Red
-            Exit
+            exit
         }
     }
 } until ($forkExists -eq $true)
@@ -148,7 +148,7 @@ do {
 )
 
 Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
-$env:GITHUB_TOKEN=$githubPAT.Trim()
+$Env:GITHUB_TOKEN = $githubPAT.Trim()
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT.Trim(), [System.EnvironmentVariableTarget]::Machine)
 
 Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
@@ -166,7 +166,7 @@ do {
         $PatAssigned = $true
     }
     catch {
-        if($retryCount -lt $maxRetries) {
+        if ($retryCount -lt $maxRetries) {
             Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme] (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
@@ -174,7 +174,7 @@ do {
         }
         else{
             Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo. Exiting." -ForegroundColor Red
-            Exit
+            exit
         }
     }
 } until ($PatAssigned -eq $true)
@@ -200,17 +200,17 @@ $body = @{
 
 do {
     try {
-        $response= Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
+        $response = Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
     }
     catch {
-        if($retryCount -lt $maxRetries) {
+        if ($retryCount -lt $maxRetries) {
             Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
             $retryCount++
             start-sleep -Seconds 60
         }
         else {
             Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Administration' write permissions assigned. Exiting." -ForegroundColor Red
-            Exit
+            exit
         }
     }
 } until ($response)
@@ -261,7 +261,7 @@ do {
     if ($response -match "error") {
         if ($retryCount -eq $maxRetries) {
             Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
-            Exit
+            exit
         }
         else {
             $retryCount++
@@ -281,7 +281,7 @@ do {
     if ($response -match "failed") {
         if ($retryCount -eq $maxRetries) {
             Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Actions' write permissions assigned. Exiting." -ForegroundColor Red
-            Exit
+            exit
         }
         else {
             $retryCount++
@@ -347,7 +347,7 @@ Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
 $existingBranches = gh api "repos/$githubUser/$appsRepo/branches" | ConvertFrom-Json
 $branches = $AgConfig.GitBranches
 foreach ($branch in $existingBranches) {
-    if($branches -notcontains $branch.name){
+    if ($branches -notcontains $branch.name){
         $branchToDelete = $branch.name
         git push origin --delete $branchToDelete
     }
@@ -383,12 +383,12 @@ Write-Host
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 4/17)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
-    $iotHubHostName = $env:iotHubHostName
+    $iotHubHostName = $Env:iotHubHostName
     $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
     $sites = $AgConfig.SiteConfig.Values
     Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
     foreach ($site in $sites) {
-        foreach ($device in $site.IoTDevices){
+        foreach ($device in $site.IoTDevices) {
             $deviceId = "$device-$($site.FriendlyName)"
             Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
         }
@@ -451,7 +451,7 @@ $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
-$shortcut.IconLocation="$iconPath, 0"
+$shortcut.IconLocation = "$iconPath, 0"
 $shortcut.WindowStyle = 7
 $shortcut.Save()
 
@@ -463,9 +463,9 @@ $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
 # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
-$kubeFolder = "$env:USERPROFILE\.kube"
+$kubeFolder = "$Env:USERPROFILE\.kube"
 New-Item -ItemType Directory $kubeFolder -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-New-SmbShare -Name "kube" -Path "$env:USERPROFILE\.kube" -FullAccess "Everyone" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+New-SmbShare -Name "kube" -Path "$Env:USERPROFILE\.kube" -FullAccess "Everyone" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
 # Enable Enhanced Session Mode on Host
 Write-Host "[$(Get-Date -Format t)] INFO: Enabling Enhanced Session Mode on Hyper-V host" -ForegroundColor Gray
@@ -558,7 +558,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     Write-Host "[$(Get-Date -Format t)] INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
     $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
     $logsFolder = "$deploymentFolder\Logs"
-    $kubeFolder = "$env:USERPROFILE\.kube"
+    $kubeFolder = "$Env:USERPROFILE\.kube"
 
     # Set up an array of folders
     $folders = @($logsFolder, $kubeFolder)
@@ -587,10 +587,10 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $logsFolder = "$deploymentFolder\Logs"
 
     # Assigning network adapter IP address
-    $NetIPAddress = $AgConfig.SiteConfig[$env:COMPUTERNAME].NetIPAddress
-    $DefaultGateway = $AgConfig.SiteConfig[$env:COMPUTERNAME].DefaultGateway
-    $PrefixLength = $AgConfig.SiteConfig[$env:COMPUTERNAME].PrefixLength
-    $DNSClientServerAddress = $AgConfig.SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
+    $NetIPAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].NetIPAddress
+    $DefaultGateway = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
+    $PrefixLength = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
+    $DNSClientServerAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring networking interface on $hostname with IP address $NetIPAddress." -ForegroundColor Gray
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
@@ -630,16 +630,16 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $namingGuid = $using:namingGuid
-    $arcClusterName = $AgConfig.SiteConfig[$env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
+    $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
     $replacementParams = @{
-        "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
-        "1000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
-        "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$env:COMPUTERNAME].ControlPlaneEndpointIp
-        "Ip4GatewayAddress-null"      = $AgConfig.SiteConfig[$env:COMPUTERNAME].DefaultGateway
-        "2000"                        = $AgConfig.SiteConfig[$env:COMPUTERNAME].PrefixLength
-        "DnsServer-null"              = $AgConfig.SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
+        "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeStart
+        "1000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeSize
+        "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ControlPlaneEndpointIp
+        "Ip4GatewayAddress-null"      = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
+        "2000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
+        "DnsServer-null"              = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
         "Ethernet-Null"               = $AdapterName
-        "Ip4Address-null"             = $AgConfig.SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
+        "Ip4Address-null"             = $AgConfig.SiteConfig[$Env:COMPUTERNAME].LinuxNodeIp4Address
         "ClusterName-null"            = $arcClusterName
         "Location-null"               = $using:azureLocation
         "ResourceGroupName-null"      = $using:resourceGroup
@@ -668,7 +668,7 @@ foreach ($VMName in $VMNames) {
     Invoke-Command -Session $Session -ScriptBlock {
         $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\Deployment\AKSEEBootstrap.ps1"
         $Trigger = New-ScheduledTaskTrigger -AtStartup
-        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $env:USERNAME -Password 'Agora123!!' -RunLevel Highest | Out-Null
+        Register-ScheduledTask -TaskName "Startup Scan" -Action $Action -Trigger $Trigger -User $Env:USERNAME -Password 'Agora123!!' -RunLevel Highest | Out-Null
         Restart-Computer -Force -Confirm:$false
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
     Remove-PSSession $Session | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
@@ -693,13 +693,13 @@ $elapsedTime = Measure-Command {
         }
 
         Write-Host "[$(Get-Date -Format t)] INFO: $VMName's kubeconfig is ready - copying over config-$VMName" -ForegroundColor DarkGreen
-        $destinationPath = $env:USERPROFILE + "\.kube\config-" + $VMName
+        $destinationPath = $Env:USERPROFILE + "\.kube\config-" + $VMName
         $s = New-PSSession -VMName $VMName -Credential $credential
         Copy-Item -FromSession $s -Path $path -Destination $destinationPath
         $file = Get-Item $destinationPath
         if ($file.Length -eq 0) {
             Write-Host "[$(Get-Date -Format t)] ERROR: Kubeconfig on $VMName is corrupt. This error is unrecoverable. Exiting." -ForegroundColor White -BackgroundColor Red
-            Exit 1
+            exit 1
         }
     }
 }
@@ -713,13 +713,13 @@ Write-Host "[$(Get-Date -Format t)] INFO: Waiting on kubeconfig files took $($el
 Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
 $kubeconfigpath = ""
 foreach ($VMName in $VMNames) {
-    $kubeconfigpath = $kubeconfigpath + "$env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
+    $kubeconfigpath = $kubeconfigpath + "$Env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
 }
-$env:KUBECONFIG = $kubeconfigpath
-kubectl config view --merge --flatten > "$env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
-kubectl config get-clusters --kubeconfig="$env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
-Rename-Item -Path "$env:USERPROFILE\.kube\config-raw" -NewName "$env:USERPROFILE\.kube\config"
-$env:KUBECONFIG = "$env:USERPROFILE\.kube\config"
+$Env:KUBECONFIG = $kubeconfigpath
+kubectl config view --merge --flatten > "$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
+kubectl config get-clusters --kubeconfig="$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
+Rename-Item -Path "$Env:USERPROFILE\.kube\config-raw" -NewName "$Env:USERPROFILE\.kube\config"
+$Env:KUBECONFIG = "$Env:USERPROFILE\.kube\config"
 
 # Print a message indicating that the merge is complete
 Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files merged successfully." -ForegroundColor Gray
@@ -763,14 +763,14 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     foreach ($namespace in $AgConfig.Namespaces) {
-        if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
+        if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
             Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
             kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret docker-registry acr-secret `
                 --namespace $namespace `
                 --docker-server="$acrName.azurecr.io" `
-                --docker-username="$env:spnClientId" `
-                --docker-password="$env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                --docker-username="$Env:spnClientId" `
+                --docker-password="$Env:spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }
     }
 }
@@ -784,7 +784,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
     foreach ($namespace in $AgConfig.Namespaces) {
-        if($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
+        if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
             kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
             kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -811,10 +811,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $imageTag = "v1.0"
     $imagePullSecret = "acr-secret"
     $namespace = "images-cache"
-    if($branch -eq "chicago"){
+    if ($branch -eq "chicago") {
         $branch = "canary"
     }
-    if($branch -eq "seattle"){
+    if ($branch -eq "seattle") {
         $branch = "production"
     }
     Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
@@ -823,16 +823,47 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
     Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
+
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 9/17)" -ForegroundColor DarkGreen
+
+# Running pre-checks to ensure that the aksedge ConfigMap is present on all clusters
+$maxRetries = 5
+$retryInterval = 30 # seconds
+$retryCount = 0
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    if ($clusterName -ne "staging") {
+        while ($retryCount -lt $maxRetries) {
+            kubectx $clusterName
+            $configMap = kubectl get configmap -n aksedge aksedge
+            if ($null -eq $configMap) {
+                $retryCount++
+                Write-Host "Retry ${retryCount}/${maxRetries}: aksedge ConfigMap not found on $clusterName. Retrying in $retryInterval seconds..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+                Start-Sleep -Seconds $retryInterval
+            }
+            else {
+                # ConfigMap found, continue with the rest of the script
+                Write-Host "aksedge ConfigMap found on $clusterName. Continuing with the script..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")     
+                break # Exit the loop
+            }
+        }
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: aksedge ConfigMap not found on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+            exit 1 # Exit the script
+        }
+    }
+}
+
 foreach ($VM in $VMNames) {
     $secret = $Env:spnClientSecret
     $clientId = $Env:spnClientId
     $tenantId = $Env:spnTenantId
     $location = $Env:azureLocation
-    $resourceGroup = $env:resourceGroup
+    $resourceGroup = $Env:resourceGroup
 
     Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
         # Install prerequisites
@@ -855,6 +886,8 @@ foreach ($VM in $VMNames) {
         # Connect clusters to Arc
         $deploymentPath = "C:\Deployment\config.json"
         Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+
+
         kubectl get svc
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
     } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
@@ -868,7 +901,7 @@ $Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
 
 # Iterate over the Arc resources and tag it
 foreach ($arcResourceType in $arcResourceTypes) {
-    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $env:resourceGroup
+    $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $Env:resourceGroup
     foreach ($arcResource in $arcResources) {
         Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Merge | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
     }
@@ -885,7 +918,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters 
 $retryCount = 0
 $maxRetries = 3
 $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
-$resources = Get-AzResource -ResourceGroupName $env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+$resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
 $jobs = @()
 
@@ -900,12 +933,12 @@ foreach ($resource in $resources) {
                 --extension-type Microsoft.flux `
                 --scope cluster `
                 --cluster-name $resourceName `
-                --resource-group $env:resourceGroup `
+                --resource-group $Env:resourceGroup `
                 --cluster-type connectedClusters `
                 --auto-upgrade false
 
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
-                --resource-group $env:resourceGroup `
+                --resource-group $Env:resourceGroup `
                 --cluster-type connectedClusters `
                 --name flux `
                 --query provisioningState `
@@ -928,12 +961,12 @@ foreach ($resource in $resources) {
                 --extension-type Microsoft.flux `
                 --scope cluster `
                 --cluster-name $resourceName `
-                --resource-group $env:resourceGroup `
+                --resource-group $Env:resourceGroup `
                 --cluster-type managedClusters `
                 --auto-upgrade false
 
             $provisioningState = az k8s-extension show --cluster-name $resourceName `
-                --resource-group $env:resourceGroup `
+                --resource-group $Env:resourceGroup `
                 --cluster-type managedClusters `
                 --name flux `
                 --query provisioningState `
@@ -1092,9 +1125,9 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
                     $repoPath     = $configMap.value.RepoPath
                     $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
-                    $iotHubName   = $env:iotHubHostName.replace(".azure-devices.net", "")
-                    $gitHubUser   = $env:gitHubUser
-                    $githubBranch = $env:githubBranch
+                    $iotHubName   = $Env:iotHubHostName.replace(".azure-devices.net", "")
+                    $gitHubUser   = $Env:gitHubUser
+                    $githubBranch = $Env:githubBranch
                     
                     New-Item -Path $configPath -ItemType Directory -Force | Out-Null
                     
@@ -1147,13 +1180,13 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
                 else {
-                    if($configStatus.ComplianceState -ne "Non-compliant"){
+                    if ($configStatus.ComplianceState -ne "Non-compliant") {
                         Start-Sleep -Seconds 20
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         Start-Sleep -Seconds 20
                         $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
-                        if($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries){
+                        if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                             $retryCount++
                             Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                             Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -1185,7 +1218,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                         | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         }
                     }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries){
+                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
                         Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         break
                     }
@@ -1240,7 +1273,7 @@ Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Re
 }
 
 # Reset Grafana Password
-$env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
+$Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
 grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
 # Get Grafana Admin credentials
@@ -1467,7 +1500,7 @@ foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
 }
 
 # Configure Windows Terminal
-Set-Location $env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
+Set-Location $Env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
 
 # Launch Windows Terminal for default settings.json to be created
 Start-Process wt.exe -WindowStyle Hidden
@@ -1501,7 +1534,7 @@ Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -Fil
 # Create Windows Terminal shortcut
 $WshShell = New-Object -comObject WScript.Shell
 $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\Windows Terminal.lnk")
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
 $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
@@ -1522,8 +1555,8 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -Foregroun
 # Download and Install Docker Desktop
 $arguments = 'install --quiet --accept-license'
 Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
-Get-ChildItem "$env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Copy-Item "$AgToolsDir\settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
@@ -1539,7 +1572,7 @@ Write-Host
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
 $bookmarksFileName = "$AgToolsDir\Bookmarks"
-$edgeBookmarksPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+$edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
