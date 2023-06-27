@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-# Data pipeline and reporting across cloud and edge - Sensor telemetry
+# Data pipeline and reporting across cloud and edge for sensor telemetry
 
 ## Overview
 
@@ -300,12 +300,4 @@ To see the ADX dashboard, review the steps from ["Scenario 1: View the data in A
 
 ## Next steps
 
-Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
-
-- [CI/CD](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/ci_cd/_index.md)
-
-- [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
-
-- [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
-
-- [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
+Now that you have seen how the data flows in the various Contoso Supermarket scenarios, you can now explore how to [enable AI at the edge and experiment with software configurations rollout using basic GitOps flow](../ai/_index.md).

@@ -57,3 +57,7 @@ Now that we have checked that the required monitoring artifacts have been succes
 - After you have explored all the available performance charts, click on __Map__. You will see the processes running in your Azure Arc-enabled servers, their connections and dependencies:
 
     ![Screenshot of VMInsights - Map](./img/vminsights_map.png)
+
+## Next steps
+
+Now that you have successfully learned how the integration of Azure Monitor for Azure Arc-enabled servers works, continue to the next step to learn how to [secure your Azure Arc-enabled servers with Microsoft Defender for Servers](../arc_defender_servers/_index.md).

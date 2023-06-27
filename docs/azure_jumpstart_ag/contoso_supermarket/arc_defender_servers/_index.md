@@ -96,3 +96,7 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
     ```
 
     ![Screenshot showing Disable Microsoft Defender for Servers at the subscription level](./img/disable_defender_for_servers.png)
+
+## Next steps
+
+Now that you have successfully completed all of the Contoso Supermarket scenarios, continue to the next step to learn how to [cleanup the deployment](../cleanup/_index.md).
