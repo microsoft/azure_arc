@@ -42,7 +42,7 @@ Grafana's dashboards in Contoso's implementation provide a visually appealing an
 
 As an Operations team member at Contoso, you will have access to the Grafana dashboards for infrastructure observability. These dashboards provide a comprehensive view of the health, performance, and metrics of the cloud to edge infrastructure. To access the Grafana dashboards follow the below steps.
 
-- Connect to the Client VM `Ag-VM-Client` using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
+- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
 
 ### Prod Stores
 
@@ -62,9 +62,9 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
 - Review the different panels in the dashboard to see the metrics collected from the Kubernetes cluster.
 
-    ![Screenshot showing Grafana Prod Cluster dasboard panels CPU](./img/grafana_prod_db_global02.png)
+    ![Screenshot showing Grafana Prod Cluster dashboard panels CPU](./img/grafana_prod_db_global02.png)
 
-    ![Screenshot showing Grafana Prod Cluster dasboard panels Network](./img/grafana_prod_db_global03.png)
+    ![Screenshot showing Grafana Prod Cluster dashboard panels Network](./img/grafana_prod_db_global03.png)
 
 - Click `Home` to go back to the home page and review the other dashboards available.
 
@@ -126,11 +126,4 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
 ## Next steps
 
-Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
-
-- [POS](https://placeholder)
-- [Freezer Monitor](https://placeholder)
-- [CI/CD](https://placeholder)
-- [Basic GitOps](https://placeholder)
-- [Analytics](https://analytics)
-- [Troubleshooting](https://troubleshooting)
+Continuing with the next Contoso Supermarket scenario, you can now proceed to the next guide to learn about [infrastructure observability for Azure Arc-enabled servers using Azure Monitor](../arc_monitoring_servers/_index.md).

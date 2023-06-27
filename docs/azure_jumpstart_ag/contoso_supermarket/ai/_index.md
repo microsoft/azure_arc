@@ -1,4 +1,4 @@
-# Running AI at the Edge
+# Enabling AI at the Edge & Software configurations rollout with basic GitOps flow
 
 ## Overview
 
@@ -180,7 +180,7 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
     ![Screenshot showing switching to the production branch](./img/vscode_production_branch.png)
 
-- Navigate to the _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml file. You can see that the "Holiday Banner" feature is disabled.
+- Navigate to the _contoso_supermarket/operations/contoso_supermarket/releases/contosopos/production/seattle.yaml_ file. You can see that the "Holiday Banner" feature is disabled.
 
     ![Screenshot showing the navbar.html file](./img/vscode_production_holiday_banner_disabled.png)
 
@@ -208,11 +208,4 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
 ## Next Steps
 
-Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
-
-- [PoS](https://placeholder)
-- [Freezer Monitor](https://placeholder)
-- [CI/CD](https://placeholder)
-- [Basic GitOps](https://placeholder)
-- [Analytics](https://analytics)
-- [Troubleshooting](https://troubleshooting)
+In the next scenario, learn how Contoso Supermarket are streamlining the [Software Delivery Process using CI/CD](../ci_cd/_index.md).

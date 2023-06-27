@@ -4,7 +4,7 @@ weight: 100
 toc_hide: true
 ---
 
-# Contoso Supermarket data pipeline and reporting across cloud and edge - Store orders
+# Data pipeline and reporting across cloud and edge for store orders
 
 ## Overview
 
@@ -116,11 +116,4 @@ By default there is no data available in Cosmos DB database after the deployment
 
 ## Next steps
 
-Use the following guides to explore different use cases of Contoso Supermarket in Jumpstart Agora.
-
-- [PoS](https://placeholder)
-- [Freezer Monitor](https://placeholder)
-- [CI/CD](https://placeholder)
-- [Basic GitOps](https://placeholder)
-- [Analytics](https://analytics)
-- [Troubleshooting](https://troubleshooting)
+Now that you have completed the first data pipeline scenario, it's time to continue to the next scenario, [Data pipeline and reporting across cloud and edge for sensor telemetry](../freezer_monitor/_index.md).

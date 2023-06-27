@@ -298,10 +298,4 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ## Next steps
 
-Once deployment is complete its time to start experience Agora capabilities. Use the following guides to explore the use cases of Contoso Supermarket in Jumpstart Agora.
-
-- [Freezer Monitor](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/_index.md)
-- [CI/CD](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/ci_cd/_index.md)
-- [Observability](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/k8s_infra_observability/_index.md)
-- [Arc-enabled servers](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/arc_servers/_index.md)
-- [Troubleshooting](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md)
+Once deployment is complete its time to start experimenting with the various scenarios under the “Contoso Supermarket” experience, starting with the [“Data pipeline and reporting across cloud and edge for store orders”](../data_pos/_index.md).
