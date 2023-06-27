@@ -28,7 +28,7 @@ Each Agora scenario is a full-stack deployment, from the infrastructure layer al
 
 | __Scenario__                                                               | __Industry__ | __Version__           |
 |----------------------------------------------------------------------------|--------------|-----------------------|
-| [Contoso Supermarket](../azure_jumpstart_ag/contoso_supermarket/_index.md) | Retail       | 0.1 (Private Preview) |
+| [Contoso Supermarket](../azure_jumpstart_ag/contoso_supermarket/_index.md) | Retail       | 1.0                   |
 | Future Jumpstart Agora scenarios                                           |              |                       |
 
 ### Jumpstart Agora use cases
