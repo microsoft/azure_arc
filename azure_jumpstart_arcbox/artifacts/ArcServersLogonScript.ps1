@@ -249,7 +249,7 @@ if ($Env:flavor -ne "DevOps") {
         Start-Sleep(60)
         $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
         if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
-            Write-Host "Azure Monitoring Agent extension installation to complete."
+            Write-Host "Azure Monitoring Agent extension installation complete."
             break
         }
 
