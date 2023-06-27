@@ -235,15 +235,7 @@ if ($Env:flavor -ne "DevOps") {
         Write-Host "Microsoft Monitoring Agent deployment initiated."
     }
 
-    <# Install Azure Monitor Agent extension to support SQL BPA
-    $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
-    if ($amaExtension.Count -le 0) {
-        Write-Host "Deploying Azure Monitoring Agent extension to enabled SQL BPA."
-        az connectedmachine extension create --machine-name $SQLvmName --name "AzureMonitorWindowsAgent" --resource-group $resourceGroup --type "AzureMonitorWindowsAgent" --publisher "Microsoft.Azure.Monitor" --no-wait
-        Write-Host "Azure Monitoring Agent extenstion deployment initiated."
-    }#>
-    
-    # Wait until extension status is Succeded
+    # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
     $retryCount = 0
     do {
         Start-Sleep(60)
