@@ -69,6 +69,9 @@ echo ""
 # Installing snap
 sudo apt install snapd
 
+# Installing jq
+sudo apt install jq -y
+
 # Installing kustomize
 sudo snap install kustomize
 
