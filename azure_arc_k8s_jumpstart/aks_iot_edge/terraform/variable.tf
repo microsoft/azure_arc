@@ -396,7 +396,7 @@ variable "sta-disk-vm" {
 
 variable "image-publisher-vm" {
   description = "(Required) Image Publisher SO of Virtual Machine"
-  default="Canonical"
+  default="canonical"
 }
 
 variable "image-offer-vm" {
