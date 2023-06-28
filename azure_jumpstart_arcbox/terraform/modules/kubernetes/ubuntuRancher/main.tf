@@ -18,11 +18,11 @@ variable "vm_size" {
 variable "os_sku" {
   type        = string
   description = "The Linux version for the Rancher VM."
-  default     = "20_04-lts-gen2"
+  default     = "22_04-lts-gen2"
 
   validation {
-    condition     = contains(["20_04-lts-gen2"], var.os_sku)
-    error_message = "Valid options for OS Sku: '20_04-lts-gen2'."
+    condition     = contains(["22_04-lts-gen2"], var.os_sku)
+    error_message = "Valid options for OS Sku: '22_04-lts-gen2'."
   }
 }
 
@@ -128,8 +128,8 @@ resource "azurerm_virtual_machine" "client" {
   vm_size               = var.vm_size
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
+    publisher = "canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
     sku       = var.os_sku
     version   = "latest"
   }
