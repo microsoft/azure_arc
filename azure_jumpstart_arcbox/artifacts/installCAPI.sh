@@ -69,16 +69,19 @@ echo ""
 # Installing snap
 sudo apt install snapd
 
+# Installing jq
+sudo apt install jq -y
+
 # Installing kustomize
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
 export KUBECTL_VERSION="1.27/stable" # Do not change!
-export CLUSTERCTL_VERSION="1.4.2" # Do not change!
+export CLUSTERCTL_VERSION="1.4.4" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
 export KUBERNETES_VERSION="1.27.1" # Do not change!
-export AZURE_DISK_CSI_DRIVER_VERSION="1.26.3" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.28.0" # Do not change!
 export K3S_VERSION="1.27.1+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
@@ -172,7 +175,7 @@ clusterctl generate yaml --from jumpstart.yaml > template.yaml
 echo ""
 echo "Creating Microsoft Defender for Cloud audit secret"
 echo ""
-curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+curl -o audit.yaml https://raw.githubusercontent.com/Azure/Microsoft-Defender-for-Cloud/main/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -201,12 +204,39 @@ sudo kubectl get kubeadmcontrolplane --all-namespaces
 clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
 sleep 120
 echo ""
-sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+# sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+helm repo add projectcalico https://docs.tigera.io/calico/charts --kubeconfig=./$CLUSTER_NAME.kubeconfig && \
+helm install calico projectcalico/tigera-operator --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
 
 echo ""
-CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
-export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done
+while true; do
+  # Retrieve the list of nodes
+  nodes=$(kubectl get nodes --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.items[].metadata.name')
+
+  # Flag to keep track of readiness status
+  all_ready=true
+
+  # Iterate over each node and check its status
+  for node in $nodes; do
+    ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
+    
+    if [[ $ready != "True" ]]; then
+      echo "Node $node is not ready."
+      all_ready=false
+    fi
+  done
+
+  # Check if all nodes are ready
+  if [[ $all_ready == true ]]; then
+    echo "All nodes are ready."
+    break
+  else
+    echo "Waiting for 30 seconds..."
+    sleep 30
+  fi
+done
+
+
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
@@ -234,7 +264,7 @@ sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions
 echo ""
-sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create --name "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
