@@ -209,7 +209,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Output "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 
-    Write-Header "Onboarding Arc-enabled Servers"
+    Write-Header "Onboarding Arc-enabled servers"
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
@@ -436,7 +436,7 @@ if ($Env:flavor -ne "DevOps") {
         Set-SCPItem -ComputerName $Ubuntu01VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
         Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 
-        Write-Header "Onboarding Arc-enabled Servers"
+        Write-Header "Onboarding Arc-enabled servers"
 
         # Onboarding the nested VMs as Azure Arc-enabled servers
         Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
