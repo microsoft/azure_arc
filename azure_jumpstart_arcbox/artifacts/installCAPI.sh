@@ -76,7 +76,7 @@ sudo apt install jq -y
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export KUBECTL_VERSION="1.27/stable" # Do not change!
+export KUBECTL_VERSION="1.26/stable" # Do not change!
 export CLUSTERCTL_VERSION="1.4.4" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
