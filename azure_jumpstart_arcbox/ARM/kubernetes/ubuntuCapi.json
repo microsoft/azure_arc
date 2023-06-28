@@ -217,7 +217,7 @@
                     },
                     "imageReference": {
                         "publisher": "canonical",
-                        "offer": "0001-com-ubuntu-server-jammyl",
+                        "offer": "0001-com-ubuntu-server-jammy",
                         "sku": "[parameters('ubuntuOSVersion')]",
                         "version": "latest"
                     }
