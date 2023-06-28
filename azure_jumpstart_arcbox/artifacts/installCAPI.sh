@@ -204,9 +204,38 @@ echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
 
 echo ""
-CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
-export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done
+# CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
+# export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
+# until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done
+
+while true; do
+  # Retrieve the list of nodes
+  nodes=$(kubectl get nodes --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.items[].metadata.name')
+
+  # Flag to keep track of readiness status
+  all_ready=true
+
+  # Iterate over each node and check its status
+  for node in $nodes; do
+    ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
+    
+    if [[ $ready != "True" ]]; then
+      echo "Node $node is not ready."
+      all_ready=false
+    fi
+  done
+
+  # Check if all nodes are ready
+  if [[ $all_ready == true ]]; then
+    echo "All nodes are ready."
+    break
+  else
+    echo "Waiting for 30 seconds..."
+    sleep 30
+  fi
+done
+
+
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
