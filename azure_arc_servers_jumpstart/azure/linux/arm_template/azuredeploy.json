@@ -276,7 +276,7 @@
             }
           },
           "imageReference": {
-            "publisher": "Canonical",
+            "publisher": "canonical",
             "offer": "UbuntuServer",
             "sku": "[parameters('ubuntuOSVersion')]",
             "version": "latest"
