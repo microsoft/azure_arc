@@ -102,6 +102,125 @@ if ($AgConfig.AzureProviders.Count -ne 0) {
 Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
 
+#############################################################
+# Install Windows Terminal, WSL2, and Ubuntu
+#############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/17)" -ForegroundColor DarkGreen
+
+$step14job = Invoke-Command -ScriptBlock {
+
+$AgConfig = $using:AgConfig
+$websiteUrls = $using:websiteUrls
+
+If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+$downloadDir = "C:\WinTerminal"
+$frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+$WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
+$windowsTerminalPath = "$downloadDir\WindowsTerminal"
+$filenamePattern = "*PreinstallKit.zip"
+$terminalDownloadUri = ((Invoke-RestMethod -Method GET -Uri $websiteUrls["windowsTerminal"]).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
+
+# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
+Invoke-WebRequest -Uri $websiteUrls["vcLibs"] -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+Invoke-WebRequest -Uri $terminalDownloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Extract Windows Terminal PreinstallKit
+Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
+Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Install WSL latest kernel update
+Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
+msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Install the Windows Terminal prereqs
+foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
+    Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+}
+
+# Install Windows Terminal
+foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
+    Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+}
+
+# Configure Windows Terminal
+Set-Location $Env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
+
+# Launch Windows Terminal for default settings.json to be created
+Start-Process wt.exe -WindowStyle Hidden
+
+# Give process time to initiate and create settings file
+Start-Sleep 2
+
+# Stop Windows Terminal process
+Get-Process WindowsTerminal | Stop-Process
+
+$settings = Get-Content .\settings.json | ConvertFrom-Json
+$settings.profiles.defaults.elevate
+
+# Configure the default profile setting "Run this profile as Administrator" to "true"
+$settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
+
+$settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
+
+# Install Ubuntu
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
+Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Setting WSL environment variables
+$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+# Initializing the wsl ubuntu app without requiring user input
+$ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+# Create Windows Terminal shortcut
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+# Install VSCode extensions
+foreach ($extension in $AgConfig.VSCodeExtensions) {
+    code --install-extension $extension | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+}
+
+#############################################################
+# Install Docker Desktop
+#############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
+# Download and Install Docker Desktop
+$arguments = 'install --quiet --accept-license'
+Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
+Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+Start-Sleep -Seconds 10
+Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
+Start-Sleep -Seconds 5
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+# Cleanup
+Remove-Item $downloadDir -Recurse -Force
+
+} -JobName step14 -ThrottleLimit 16 -AsJob
+
+Write-Host "[$(Get-Date -Format t)] INFO: Tools setup initiated in background job." -ForegroundColor Green
+
+$step14job
+
+Write-Host
+
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
@@ -846,7 +965,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             }
             else {
                 # ConfigMap found, continue with the rest of the script
-                Write-Host "aksedge ConfigMap found on $clusterName. Continuing with the script..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")     
+                Write-Host "aksedge ConfigMap found on $clusterName. Continuing with the script..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
                 break # Exit the loop
             }
         }
@@ -1048,11 +1167,11 @@ while ($workflowStatus.status -ne "completed") {
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Job -Name gitops -ScriptBlock {
-        
+
         Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
             # Force TLS 1.2 for connections to prevent TLS/SSL errors
             [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            
+
             $response = Invoke-RestMethod -Uri $githubApiUrl
             $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
             $fileUrls | ForEach-Object {
@@ -1060,7 +1179,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 $outputFile = Join-Path $folderPath $fileName
                 Invoke-RestMethod -Uri $_ -OutFile $outputFile
             }
-        
+
             If (-not $excludeFolders) {
                 $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
                     $folderName = $_.name
@@ -1070,7 +1189,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 }
             }
         }
-        
+
         $AgConfig       = $using:AgConfig
         $cluster        = $using:cluster
         $site           = $cluster.Value
@@ -1079,7 +1198,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $resourceGroup  = $using:resourceGroup
         $appClonedRepo  = $using:appClonedRepo
         $appsRepo       = $using:appsRepo
-        
+
         $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
             $app         = $_
             $store       = $cluster.value.Branch.ToLower()
@@ -1128,29 +1247,29 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     $iotHubName   = $Env:iotHubHostName.replace(".azure-devices.net", "")
                     $gitHubUser   = $Env:gitHubUser
                     $githubBranch = $Env:githubBranch
-                    
+
                     New-Item -Path $configPath -ItemType Directory -Force | Out-Null
-                    
+
                     $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
                     Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
-                    
+
                     # replace the IoT Hub name and the SAS Tokens with the deployment specific values
                     # this is a one-off for the broker, but needs to be generalized if/when another app needs it
                     If ($configMap.Name -eq "mqtt-broker-config"){
                         $configFile = "$configPath\mosquitto.conf"
-                        $update     = (Get-Content $configFile -Raw) 
+                        $update     = (Get-Content $configFile -Raw)
                         $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
-                        
+
                         foreach ($device in $site.IoTDevices) {
                             $deviceId = "$device-$($site.FriendlyName)"
                             $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
                             $update = $update -replace "Chicago", $site.FriendlyName
                             $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
                         }
-                        
+
                         $update | Set-Content $configFile
                     }
-                    
+
                     # create the namespace if needed
                     If (-not (kubectl get namespace $namespace --context $siteName)){
                         kubectl create namespace $namespace --context $siteName
@@ -1159,7 +1278,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
                 }
             }
-            
+
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
                 --resource-group $resourceGroup `
@@ -1451,120 +1570,13 @@ $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         }
 
         # Make HTTP request to the API
-        $dashboardID=(Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id 
+        $dashboardID=(Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
 
         Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
     }
 
 }
-Write-Host
-
-#############################################################
-# Install Windows Terminal, WSL2, and Ubuntu
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 14/17)" -ForegroundColor DarkGreen
-If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
-$downloadDir = "C:\WinTerminal"
-$frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-$WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
-$windowsTerminalPath = "$downloadDir\WindowsTerminal"
-$filenamePattern = "*PreinstallKit.zip"
-$terminalDownloadUri = ((Invoke-RestMethod -Method GET -Uri $websiteUrls["windowsTerminal"]).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
-
-# Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
-Invoke-WebRequest -Uri $websiteUrls["vcLibs"] -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-Invoke-WebRequest -Uri $terminalDownloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Extract Windows Terminal PreinstallKit
-Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
-Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Install WSL latest kernel update
-Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
-msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
-Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Install the Windows Terminal prereqs
-foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
-    Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-}
-
-# Install Windows Terminal
-foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
-    Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-}
-
-# Configure Windows Terminal
-Set-Location $Env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
-
-# Launch Windows Terminal for default settings.json to be created
-Start-Process wt.exe -WindowStyle Hidden
-
-# Give process time to initiate and create settings file
-Start-Sleep 2
-
-# Stop Windows Terminal process
-Get-Process WindowsTerminal | Stop-Process
-
-$settings = Get-Content .\settings.json | ConvertFrom-Json
-$settings.profiles.defaults.elevate
-
-# Configure the default profile setting "Run this profile as Administrator" to "true"
-$settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
-
-$settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
-
-# Install Ubuntu
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
-Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Setting WSL environment variables
-$userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
-[System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
-
-# Initializing the wsl ubuntu app without requiring user input
-$ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
-Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-# Create Windows Terminal shortcut
-$WshShell = New-Object -comObject WScript.Shell
-$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-$Shortcut.TargetPath = $WinTerminalPath
-$shortcut.WindowStyle = 3
-$shortcut.Save()
-
-#############################################################
-# Install VSCode extensions
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-# Install VSCode extensions
-foreach ($extension in $AgConfig.VSCodeExtensions) {
-    code --install-extension $extension | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-}
-
-#############################################################
-# Install Docker Desktop
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
-# Download and Install Docker Desktop
-$arguments = 'install --quiet --accept-license'
-Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
-Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-Start-Sleep -Seconds 10
-Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Start-Sleep -Seconds 5
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-# Cleanup
-Remove-Item $downloadDir -Recurse -Force
-Write-Host "[$(Get-Date -Format t)] INFO: Tools setup complete." -ForegroundColor Green
 Write-Host
 
 ##############################################################
@@ -1730,6 +1742,11 @@ namespace Win32{
 '@
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+Write-Host "[$(Get-Date -Format t)] INFO: Tools setup background job:" -ForegroundColor Green
+
+$step14job
+$step14job | Receive-Job -Wait
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
