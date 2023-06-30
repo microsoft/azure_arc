@@ -1757,8 +1757,8 @@ Add-Type $code
 
 Write-Host "[$(Get-Date -Format t)] INFO: Tools setup background job:" -ForegroundColor Green
 
-$step14job
-$step14job | Receive-Job -Wait
+$step3job
+$step3job | Wait-Job | Receive-Job | Tee-Object -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ToolsSetup.log") -Append
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
