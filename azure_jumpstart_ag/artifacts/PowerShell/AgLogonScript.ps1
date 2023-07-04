@@ -107,7 +107,7 @@ Write-Host
 #############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 3/17)" -ForegroundColor DarkGreen
 
-$step3job = Invoke-Command -ScriptBlock {
+$DevToolsInstallationJob = Invoke-Command -ScriptBlock {
 
 $AgConfig = $using:AgConfig
 $websiteUrls = $using:websiteUrls
@@ -220,16 +220,14 @@ Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roa
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 Start-Sleep -Seconds 10
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-Start-Sleep -Seconds 5
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force
 
 } -JobName step3 -ThrottleLimit 16 -AsJob -ComputerName .
 
-Write-Host "[$(Get-Date -Format t)] INFO: Tools setup initiated in background job." -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools installation initiated in background job." -ForegroundColor Green
 
-$step3job
+$DevToolsInstallationJob
 
 Write-Host
 
@@ -1755,10 +1753,13 @@ namespace Win32{
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-Write-Host "[$(Get-Date -Format t)] INFO: Tools setup background job:" -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools Installation background job:" -ForegroundColor Green
 
-$step3job
-$step3job | Wait-Job | Receive-Job | Tee-Object -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ToolsSetup.log") -Append
+$DevToolsInstallationJob
+$DevToolsInstallationJob | Wait-Job | Receive-Job | Tee-Object -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ToolsSetup.log") -Append
+
+Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop after Dev Tools Installation background job completed." -ForegroundColor Green
+Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
