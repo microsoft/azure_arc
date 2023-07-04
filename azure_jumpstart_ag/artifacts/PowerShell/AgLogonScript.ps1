@@ -512,7 +512,7 @@ Write-Host
 #####################################################################
 # Azure IoT Hub resources preparation
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 6/17)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
 if ($githubUser -ne "microsoft") {
     $iotHubHostName = $Env:iotHubHostName
     $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
