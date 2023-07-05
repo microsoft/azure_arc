@@ -43,7 +43,7 @@ spec:
       jsonPath: ".metadata.creationTimestamp"
   - name: v2
     served: true
-    storage: true
+    storage: false
     schema:
       openAPIV3Schema:
         type: object
@@ -57,6 +57,800 @@ spec:
     - name: Age
       type: date
       jsonPath: ".metadata.creationTimestamp"
+  - name: v3
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              metrics:
+                type: object
+                properties:
+                  database:
+                    type: object
+                    properties:
+                      influxdb:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                      opensearch:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                  userInterface:
+                    type: object
+                    properties:
+                      grafana:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          services:
+                            type: object
+                            properties:
+                              primary:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                  port:
+                                    type: integer
+                                  dnsName:
+                                    type: string
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                      opensearchDashboards:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          services:
+                            type: object
+                            properties:
+                              primary:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                  port:
+                                    type: integer
+                                  dnsName:
+                                    type: string
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                  settings:
+                    x-kubernetes-preserve-unknown-fields: true
+              logs:
+                type: object
+                properties:
+                  database:
+                    type: object
+                    properties:
+                      influxdb:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                      opensearch:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                  userInterface:
+                    type: object
+                    properties:
+                      grafana:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          services:
+                            type: object
+                            properties:
+                              primary:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                  port:
+                                    type: integer
+                                  dnsName:
+                                    type: string
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                      opensearchDashboards:
+                        type: object
+                        properties:
+                          enable:
+                            type: boolean
+                          services:
+                            type: object
+                            properties:
+                              primary:
+                                type: object
+                                properties:
+                                  type:
+                                    type: string
+                                  port:
+                                    type: integer
+                                  dnsName:
+                                    type: string
+                          scheduling:
+                            type: object
+                            properties:
+                              default:
+                                type: object
+                                properties:
+                                  resources:
+                                    type: object
+                                    properties:
+                                      limits:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                                      requests:
+                                        type: object
+                                        additionalProperties:
+                                          type: object
+                          storage:
+                            type: object
+                            properties:
+                              data:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                              logs:
+                                type: object
+                                properties:
+                                  volumes:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        className:
+                                          type: string
+                                        labels:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        annotations:
+                                          type: object
+                                          additionalProperties:
+                                            type: string
+                                        accessMode:
+                                          type: string
+                                        size:
+                                          type: string
+                                        claimName:
+                                          type: string
+                          settings:
+                            x-kubernetes-preserve-unknown-fields: true
+                  settings:
+                    x-kubernetes-preserve-unknown-fields: true
+              security:
+                type: object
+                properties:
+                  opensearchDashboards:
+                    type: object
+                    properties:
+                      AdminLoginSecret:
+                        type: string
+                      ServiceCertificateSecret:
+                        type: string
+                  grafana:
+                    type: object
+                    properties:
+                      AdminLoginSecret:
+                        type: string
+                      ServiceCertificateSecret:
+                        type: string
+                  allowDumps:
+                    type: boolean
+                    default: true
+                  allowNodeMetricsCollection:
+                    type: boolean
+                    default: true
+                  allowPodMetricsCollection:
+                    type: boolean
+                    default: true
+              update:
+                type: object
+                properties:
+                  desiredVersion:
+                    type: string
+          status:
+            type: object
+            properties:
+              metricsDbReadyReplicas:
+                type: string
+              logsDbReadyReplicas:
+                type: string
+              metricsUiReadyReplicas:
+                type: string
+              logsUiReadyReplicas:
+                type: string
+              logSearchDashboard:
+                type: string
+              metricsDashboard:
+                type: string
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+          apiVersion:
+            type: string
+          kind:
+            type: string
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
   conversion:
     strategy: None
   names:
