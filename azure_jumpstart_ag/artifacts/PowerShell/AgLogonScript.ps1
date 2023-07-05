@@ -1044,97 +1044,78 @@ Write-Host
 # Installing flux extension on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
-$retryCount = 0
-$maxRetries = 3
+
 $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
 $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
 $jobs = @()
 
 foreach ($resource in $resources) {
+
     $resourceName = $resource.Name
     $resourceType = $resource.Type
+
     Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
-    if ($resourceType -eq $AgConfig.ArcK8sResourceType) {
+
         $job = Start-Job -ScriptBlock {
             param($resourceName, $resourceType)
-            az k8s-extension create --name flux `
-                --extension-type Microsoft.flux `
-                --scope cluster `
-                --cluster-name $resourceName `
-                --resource-group $Env:resourceGroup `
-                --cluster-type connectedClusters `
-                --auto-upgrade false
 
-            $provisioningState = az k8s-extension show --cluster-name $resourceName `
-                --resource-group $Env:resourceGroup `
-                --cluster-type connectedClusters `
-                --name flux `
-                --query provisioningState `
-                --output tsv
+            switch ($resourceType)
+            {
+                'Microsoft.Kubernetes/connectedClusters' {$ClusterType = 'ConnectedClusters'}
+                'Microsoft.ContainerService/managedClusters' {$ClusterType = 'ManagedClusters'}
+            }
+
+            $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
+
+            if (-not ($extension)) {
+
+            $retryCount = 3
+            $retryDelaySeconds = 30
+
+            for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
+
+                try {
+                    New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
+
+                    $ProvisioningState = $extension.ProvisioningState
+
+                    break # Command succeeded, exit the loop
+                }
+
+                catch {
+                    Write-Warning "An error occurred: $($_.Exception.Message)"
+
+                    if ($attempt -lt $retryCount) {
+                        Write-Host "Retrying in $retryDelaySeconds seconds..."
+                        Start-Sleep -Seconds $retryDelaySeconds
+                    }
+                    else {
+                        Write-Error "Failed to execute the command after $retryCount attempts."
+                        $ProvisioningState = $($_.Exception.Message)
+                        break # Max retry attempts reached, exit the loop
+                    }
+
+                 }
+
+              }
+
+            }
+
 
             [PSCustomObject]@{
                 ResourceName = $resourceName
                 ResourceType = $resourceType
-                ProvisioningState = $provisioningState
+                ProvisioningState = $ProvisioningState
             }
+
         } -ArgumentList $resourceName, $resourceType
 
         $jobs += $job
-    }
-    else {
-        $job = Start-Job -ScriptBlock {
-            param($resourceName, $resourceType)
-
-            az k8s-extension create --name flux `
-                --extension-type Microsoft.flux `
-                --scope cluster `
-                --cluster-name $resourceName `
-                --resource-group $Env:resourceGroup `
-                --cluster-type managedClusters `
-                --auto-upgrade false
-
-            $provisioningState = az k8s-extension show --cluster-name $resourceName `
-                --resource-group $Env:resourceGroup `
-                --cluster-type managedClusters `
-                --name flux `
-                --query provisioningState `
-                --output tsv
-
-            [PSCustomObject]@{
-                ResourceName = $resourceName
-                ResourceType = $resourceType
-                ProvisioningState = $provisioningState
-            }
-        } -ArgumentList $resourceName, $resourceType
-
-        $jobs += $job
-    }
 }
 
 # Wait for all jobs to complete
-$null = $jobs | Wait-Job
-
-# Check provisioning states for each resource
-foreach ($job in $jobs) {
-    $result = Receive-Job -Job $job
-    $resourceName = $result.ResourceName
-    $resourceType = $result.ResourceType
-    $provisioningState = $result.ProvisioningState
-
-    if ($provisioningState -ne "Succeeded") {
-        Write-Host "[$(Get-Date -Format t)] INFO: flux extension is not ready yet for $resourceName. Retrying in 10 seconds (attempt $retryCount/$maxRetries)..." -ForegroundColor Gray
-        Start-Sleep -Seconds 10
-        $retryCount++
-    }
-    else {
-        Write-Host "[$(Get-Date -Format t)] INFO: flux extension installed successfully on $resourceName" -ForegroundColor Gray
-    }
-}
-
-if ($retryCount -eq $maxRetries) {
-    Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached. Exiting..." -ForegroundColor White -BackgroundColor Red
-}
+$jobs | Wait-Job | Receive-Job
 
 # Clean up jobs
 $jobs | Remove-Job
