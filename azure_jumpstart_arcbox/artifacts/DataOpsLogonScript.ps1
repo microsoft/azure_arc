@@ -45,7 +45,8 @@ az provider register --namespace Microsoft.AzureArcData --wait
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
-az extension add --name connectedk8s --version "1.3.17" --system
+# az extension add --name connectedk8s --version "1.3.20" --system // Keeping for fast pindown version test
+az extension add --name connectedk8s --system
 az extension add --name arcdata --system
 az -v
 
@@ -191,7 +192,7 @@ foreach ($cluster in $clusters) {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.19.0 `
+            --version 1.20.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
         Write-Host "`n"
