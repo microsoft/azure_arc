@@ -11,6 +11,42 @@ weight: 5
 
 ## 2023
 
+### June 2023
+
+#### Release highlights
+
+- Scenarios enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled Kubernetes
+  - Azure Arc-enabled data services
+- ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Jumpstart ArcBox
+
+- [Versioning: June versions bump #1972](https://github.com/microsoft/azure_arc/issues/1972)
+- [Bug fix: DataOps deployment failing when using --use-k8s in CAPI #1881](https://github.com/microsoft/azure_arc/issues/1881)
+- [Bug fix: Failed to remove ArcBox deployment logon script scheduled tasks #1882](https://github.com/microsoft/azure_arc/issues/1882)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: Arc-enabled SQL Managed Instance script - AutoUpgradeMinorVersion cannot be set to true #1884](https://github.com/microsoft/azure_arc/issues/1884)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: SQL Managed Instance ARM Template #1971](https://github.com/microsoft/azure_arc/issues/1971)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Versioning: https://github.com/microsoft/azure_arc/issues/1964](https://github.com/microsoft/azure_arc/issues/1964)
+- [Bug fix: Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster #1923](https://github.com/microsoft/azure_arc/issues/1923)
+- [Bug fix: AKS edge essential unique name for Arc-enabled resource #1928](https://github.com/microsoft/azure_arc/issues/1928)
+- [Bug fix: AKS EE essential random guid fails #1943](https://github.com/microsoft/azure_arc/issues/1943)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - June release #1898](https://github.com/microsoft/azure_arc/issues/1898)
+
 ### May 2023
 
 #### Release highlights
