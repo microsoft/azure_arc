@@ -1117,6 +1117,8 @@ foreach ($resource in $resources) {
 # Wait for all jobs to complete
 $jobs | Wait-Job | Receive-Job
 
+$jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
+
 # Clean up jobs
 $jobs | Remove-Job
 
