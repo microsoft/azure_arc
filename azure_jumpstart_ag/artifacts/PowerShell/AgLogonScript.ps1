@@ -1057,7 +1057,7 @@ foreach ($resource in $resources) {
 
     Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
 
-        $job = Start-Job -ScriptBlock {
+        $job = Start-Job -Name $resourceName -ScriptBlock {
             param($resourceName, $resourceType)
 
             switch ($resourceType)
@@ -1077,7 +1077,7 @@ foreach ($resource in $resources) {
 
                 try {
 
-                    Remove-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name $extension.Name -ResourceGroupName $Env:resourceGroup -ForceDelete
+                    Remove-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ForceDelete
 
                     New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
 
