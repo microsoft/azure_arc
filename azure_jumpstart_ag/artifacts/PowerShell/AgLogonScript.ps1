@@ -1068,7 +1068,7 @@ foreach ($resource in $resources) {
 
             $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
 
-            if (-not ($extension)) {
+            if (-not ($extension.ProvisioningState -eq 'Succeeded')) {
 
             $retryCount = 3
             $retryDelaySeconds = 30
@@ -1076,9 +1076,10 @@ foreach ($resource in $resources) {
             for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
                 try {
-                    New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
 
-                    $ProvisioningState = $extension.ProvisioningState
+                    Remove-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name $extension.Name -ResourceGroupName $Env:resourceGroup -ForceDelete
+
+                    New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
 
                     break # Command succeeded, exit the loop
                 }
@@ -1102,6 +1103,7 @@ foreach ($resource in $resources) {
 
             }
 
+            $ProvisioningState = $extension.ProvisioningState
 
             [PSCustomObject]@{
                 ResourceName = $resourceName
