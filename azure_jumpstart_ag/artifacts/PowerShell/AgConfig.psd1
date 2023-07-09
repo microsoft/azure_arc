@@ -52,6 +52,7 @@
     # PowerShell modules
     PowerShellModules       = @(
         'Az.ConnectedKubernetes'
+        'Az.KubernetesConfiguration'
         'Az.Kusto'
     )
 
