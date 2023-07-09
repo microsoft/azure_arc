@@ -1105,7 +1105,7 @@ foreach ($resource in $resources) {
 
             $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
 
-            if ($extension.ProvisioningState -ne 'Succeeded' -and $ConnectivityStatus -eq 'Connected') {
+            if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
 
             $retryCount = 3
             $retryDelaySeconds = 30
