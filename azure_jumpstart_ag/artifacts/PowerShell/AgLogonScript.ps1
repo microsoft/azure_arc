@@ -1066,42 +1066,42 @@ foreach ($resource in $resources) {
                 'Microsoft.ContainerService/managedClusters' {$ClusterType = 'ManagedClusters'}
             }
 
-            # Check if cluster is connected to Azure Arc control plane
-            $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-
-            if (-not ($ConnectivityStatus -eq 'Connected')) {
-
-            $retryCount = 5
-            $retryDelaySeconds = 60
-
-            for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-
-
+            if($clusterType == 'ConnectedClusters'){
+                # Check if cluster is connected to Azure Arc control plane
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
-                # Check the condition
-                if ($ConnectivityStatus -eq 'Connected') {
-                    # Condition is true, break out of the loop
-                    break
+                if (-not ($ConnectivityStatus -eq 'Connected')) {
+
+                $retryCount = 5
+                $retryDelaySeconds = 60
+
+                for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
+
+
+                    $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
+
+                    # Check the condition
+                    if ($ConnectivityStatus -eq 'Connected') {
+                        # Condition is true, break out of the loop
+                        break
+                    }
+
+                    # Wait for a specific duration before re-evaluating the condition
+                    Start-Sleep -Seconds $retryDelaySecond
+
+
+                        if ($attempt -lt $retryCount) {
+                            Write-Host "Retrying in $retryDelaySeconds seconds..."
+                            Start-Sleep -Seconds $retryDelaySeconds
+                        }
+                        else {
+                        $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
+                            break # Max retry attempts reached, exit the loop
+                        }
+
+                    }
                 }
-
-                # Wait for a specific duration before re-evaluating the condition
-                Start-Sleep -Seconds $retryDelaySecond
-
-
-                    if ($attempt -lt $retryCount) {
-                        Write-Host "Retrying in $retryDelaySeconds seconds..."
-                        Start-Sleep -Seconds $retryDelaySeconds
-                    }
-                    else {
-                    $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
-                        break # Max retry attempts reached, exit the loop
-                    }
-
-                 }
-
-              }
-
+            }
 
             $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
 
