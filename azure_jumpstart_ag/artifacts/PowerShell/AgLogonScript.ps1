@@ -1066,7 +1066,7 @@ foreach ($resource in $resources) {
                 'Microsoft.ContainerService/managedClusters' {$ClusterType = 'ManagedClusters'}
             }
 
-            if($clusterType == 'ConnectedClusters'){
+            if($clusterType -eq 'ConnectedClusters'){
                 # Check if cluster is connected to Azure Arc control plane
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
