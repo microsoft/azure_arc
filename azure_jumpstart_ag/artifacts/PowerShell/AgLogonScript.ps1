@@ -267,7 +267,7 @@ do {
     $response = gh auth status 2>&1
     if ($response -match "authentication failed") {
         write-host "ERROR: The GitHub Personal access token is not valid" -ForegroundColor Red
-        Write-Host "INFO: Please try to re-generate the personal access token and provide it here [Placeholder for readme]: "
+        Write-Host "INFO: Please try to re-generate the personal access token and provide it here (https://aka.ms/AgoraPreReqs): "
         do {
             $githubPAT = Read-Host "GitHub personal access token"
         } while ($githubPAT -eq "")
@@ -296,7 +296,7 @@ do {
     }
     catch {
         if ($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork [Placeholder to readme] (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
             $PatAssigned = $false
             $retryCount++
             start-sleep -Seconds 60
@@ -333,7 +333,7 @@ do {
     }
     catch {
         if ($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
             $retryCount++
             start-sleep -Seconds 60
         }
@@ -394,7 +394,7 @@ do {
         }
         else {
             $retryCount++
-            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
             Start-Sleep -Seconds 60
         }
     }
@@ -414,7 +414,7 @@ do {
         }
         else {
             $retryCount++
-            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions [Placeholder for docs] (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
+            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
             Start-Sleep -Seconds 60
         }
     }
