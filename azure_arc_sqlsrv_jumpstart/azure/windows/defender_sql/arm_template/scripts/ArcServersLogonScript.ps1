@@ -79,14 +79,14 @@ Write-Header "Enabling Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 Write-Header "Fetching Nested VMs"
-$sourceFolder = "https://jumpstart.blob.core.windows.net/jumpstartvhds"
-$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
+$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 $Env:AZCOPY_BUFFER_GB=4
 
 # Other ArcJS flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 $JSWinSQLVHDFileName = "JS-Win-SQL-01.vhdx"
-azcopy cp "$sourceFolder/$JSWinSQLVHDFileName$sas" "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" --recursive=true --check-length=false --log-level=ERROR
 
 # Create the nested VMs
 Write-Header "Create Hyper-V VMs"
@@ -119,6 +119,15 @@ Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
+
+# Rename hostname from ArcBox-SQL to JS-Win-SQL-01
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { 
+                    $ComputerInfo = Get-WmiObject -Class Win32_ComputerSystem
+                    $ComputerInfo.Rename($JSWinSQLVMName) 
+                } -Credential $winCreds
+
+# Restart VM after rename
+Restart-VM -VMName $JSWinSQLVMName
 
 # Configure the Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
 Write-Header "Blocking IMDS"
