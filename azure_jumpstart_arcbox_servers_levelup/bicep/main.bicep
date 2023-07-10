@@ -25,16 +25,22 @@ param windowsAdminPassword string
 param logAnalyticsWorkspaceName string
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'arc_Servers_level_up'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string = 'microsoft'
+
+@description('Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM.')
+param rdpPort string = '3389'
+
+@description('Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM.')
+param sshPort string = '22'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -55,6 +61,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubUser: githubUser
     location: location
+    rdpPort: rdpPort
+    sshPort: sshPort
   }
 }
 
