@@ -28,7 +28,7 @@ param logAnalyticsWorkspaceName string
 param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'arc_Servers_level_up'
+param githubBranch string = 'arc_servers_level_up'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -42,7 +42,7 @@ param rdpPort string = '3389'
 @description('Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM.')
 param sshPort string = '22'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox_servers_levelup/'
 
 var location = resourceGroup().location
 
