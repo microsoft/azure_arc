@@ -46,17 +46,16 @@ az extension add --name connectedmachine --yes --only-show-errors
 # Enable defender for cloud
 Write-Header "Enabling defender for cloud for SQL Server"
 $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
-    if ($currentsqlplan.pricingTier -eq "Free") {
+if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
     # Set defender for cloud log analytics workspace
     Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
     az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
-
 }
 else {
-        Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
-    }
+    Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+}
 
 
 #Install SQLAdvancedThreatProtection solution
@@ -149,15 +148,6 @@ if ((Get-VM -Name $JSWinSQLVMName -ErrorAction SilentlyContinue).State -ne "Runn
     # Start the VM
     Write-Header "Starting VM"
     Start-VM -Name $JSWinSQLVMName
-
-    # Rename hostname from ArcBox-SQL to JS-Win-SQL-01
-    Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { 
-        $ComputerInfo = Get-WmiObject -Class Win32_ComputerSystem
-        $ComputerInfo.Rename($Using:JSWinSQLVMName) 
-    } -Credential $winCreds
-
-    # Restart VM after rename
-    Restart-VM -VMName $JSWinSQLVMName -Force -Wait
 }
 
 # Restarting Windows VM Network Adapters
@@ -165,6 +155,15 @@ Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
+
+# Rename hostname from ArcBox-SQL to JS-Win-SQL-01
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { 
+    $ComputerInfo = Get-WmiObject -Class Win32_ComputerSystem
+    $ComputerInfo.Rename($Using:JSWinSQLVMName) 
+} -Credential $winCreds
+
+# Restart VM after rename
+Restart-VM -VMName $JSWinSQLVMName -Force -Wait
 
 # Configure the Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
 Write-Header "Blocking IMDS"
