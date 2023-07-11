@@ -6,7 +6,17 @@ $agentScript = "$Env:ArcJSDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
-Start-Transcript -Path "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
+# VHD storage details
+$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+$sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+
+$logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
+if ([System.IO.File]::Exists($logFilePath)) {
+    $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
+    Rename-Item -Path $logFilePath -NewName $archivefile -Force
+}
+
+Start-Transcript -Path $logFilePath
 
 $cliDir = New-Item -Path "$Env:ArcJSDir\.cli\" -Name ".servers" -ItemType Directory
 
@@ -35,11 +45,19 @@ az extension add --name connectedmachine --yes --only-show-errors
 
 # Enable defender for cloud
 Write-Header "Enabling defender for cloud for SQL Server"
-az security pricing create -n SqlServerVirtualMachines --tier 'standard'
+$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
+    if ($currentsqlplan.pricingTier -eq "Free") {
+    az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
-# Set defender for cloud log analytics workspace
-Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+    # Set defender for cloud log analytics workspace
+    Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+    az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+
+}
+else {
+        Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+    }
+
 
 #Install SQLAdvancedThreatProtection solution
 az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
@@ -47,66 +65,54 @@ az monitor log-analytics solution create --resource-group $env:resourceGroup --s
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
-Add-DhcpServerv4Scope -Name "ArcJS" `
-                      -StartRange 10.10.1.100 `
-                      -EndRange 10.10.1.200 `
-                      -SubnetMask 255.255.255.0 `
-                      -LeaseDuration 1.00:00:00 `
-                      -State Active
-Set-DhcpServerv4OptionValue -ComputerName localhost `
+$dhcpScope = Get-DhcpServerv4Scope
+if ($dhcpScope.Name -ne "ArcJS") {
+    Add-DhcpServerv4Scope -Name "ArcJS" `
+                        -StartRange 10.10.1.100 `
+                        -EndRange 10.10.1.200 `
+                        -SubnetMask 255.255.255.0 `
+                        -LeaseDuration 1.00:00:00 `
+                        -State Active
+}
+
+$dhcpOptions = Get-DhcpServerv4OptionValue                      
+if ($dhcpOptions.Count -lt 3) {
+    Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
                             -DnsServer 168.63.129.16 `
                             -Router 10.10.1.1
-Restart-Service dhcpserver
+    Restart-Service dhcpserver
+}
 
 # Create the NAT network
 Write-Header "Creating Internal NAT"
 $natName = "InternalNat"
-New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
+$netNat = Get-NetNat
+if ($netNat.Name -ne $natName) {
+    New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
+}
 
 # Create an internal switch with NAT
 Write-Header "Creating Internal vSwitch"
 $switchName = 'InternalNATSwitch'
-New-VMSwitch -Name $switchName -SwitchType Internal
-$adapter = Get-NetAdapter | Where-Object { $_.Name -like "*"+$switchName+"*" }
 
-# Create an internal network (gateway first)
-Write-Header "Creating Gateway"
-New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
+# Verify if internal switch is already created, if not create a new switch
+$inernalSwitch = Get-VMSwitch
+if ($inernalSwitch.Name -ne $switchName) {
+    New-VMSwitch -Name $switchName -SwitchType Internal
+    $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*"+$switchName+"*" }
 
-# Enable Enhanced Session Mode on Host
-Write-Header "Enabling Enhanced Session Mode"
-Set-VMHost -EnableEnhancedSessionMode $true
+        # Create an internal network (gateway first)
+    Write-Header "Creating Gateway"
+    New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
 
-Write-Header "Fetching Nested VMs"
-$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
-$Env:AZCOPY_BUFFER_GB=4
-
-# Other ArcJS flavors does not have an azcopy network throughput capping
-Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$JSWinSQLVHDFileName = "JS-Win-SQL-01.vhdx"
-azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" --recursive=true --check-length=false --log-level=ERROR
-
-# Create the nested VMs
-Write-Header "Create Hyper-V VMs"
-$JSWinSQLVMName = "JS-Win-SQL-01"
-New-VM -Name $JSWinSQLVMName -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$Env:ArcJSVMDir\$JSWinSQLVHDFileName" -Path $Env:ArcJSVMDir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName $JSWinSQLVMName -Count 2
-
-# We always want the VMs to start with the host and shut down cleanly with the host
-Write-Header "Set VM Auto Start/Stop"
-Set-VM -Name $JSWinSQLVMName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-
-Write-Header "Enabling Guest Integration Service"
-Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
-
-# Start all the VMs
-Write-Header "Starting VMs"
-Start-VM -Name $JSWinSQLVMName
+    # Enable Enhanced Session Mode on Host
+    Write-Header "Enabling Enhanced Session Mode"
+    Set-VMHost -EnableEnhancedSessionMode $true
+}
 
 Write-Header "Creating VM Credentials"
-# Hard-coded username and password for the nested VMs
+# Hard-coded username and password for the nested VM
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
 
@@ -114,27 +120,61 @@ $nestedWindowsPassword = "ArcDemo123!!"
 $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
 $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
 
+Write-Header "Fetching Nested VMs"
+$Env:AZCOPY_BUFFER_GB=4
+
+# Other ArcJS flavors does not have an azcopy network throughput capping
+Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+$SQLvmvhdPath = "$Env:ArcJSVMDir\JS-Win-SQL-01.vhdx"
+if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
+    azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
+}
+
+# Create the nested VMs
+Write-Header "Create Hyper-V VMs"
+$JSWinSQLVMName = "JS-Win-SQL-01"
+if ((Get-VM -Name $JSWinSQLVMName -ErrorAction SilentlyContinue).State -ne "Running") {
+
+    Remove-VM -Name $JSWinSQLVMName -Force -ErrorAction SilentlyContinue
+    New-VM -Name $JSWinSQLVMName -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcJSVMDir -Generation 2 -Switch $switchName
+    Set-VMProcessor -VMName $JSWinSQLVMName -Count 2
+
+    # We always want the VMs to start with the host and shut down cleanly with the host
+    Write-Header "Set VM Auto Start/Stop"
+    Set-VM -Name $JSWinSQLVMName -AutomaticStartAction Start -AutomaticStopAction ShutDown
+
+    Write-Header "Enabling Guest Integration Service"
+    Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
+
+    # Start the VM
+    Write-Header "Starting VM"
+    Start-VM -Name $JSWinSQLVMName
+
+    # Rename hostname from ArcBox-SQL to JS-Win-SQL-01
+    Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { 
+        $ComputerInfo = Get-WmiObject -Class Win32_ComputerSystem
+        $ComputerInfo.Rename($Using:JSWinSQLVMName) 
+    } -Credential $winCreds
+
+    # Restart VM after rename
+    Restart-VM -VMName $JSWinSQLVMName -Force -Wait
+}
+
 # Restarting Windows VM Network Adapters
 Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
 
-# Rename hostname from ArcBox-SQL to JS-Win-SQL-01
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { 
-                    $ComputerInfo = Get-WmiObject -Class Win32_ComputerSystem
-                    $ComputerInfo.Rename($JSWinSQLVMName) 
-                } -Credential $winCreds
-
-# Restart VM after rename
-Restart-VM -VMName $JSWinSQLVMName
-
 # Configure the Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
 Write-Header "Blocking IMDS"
 Write-Output "Configure the ArcJS VM to allow the nested VMs onboard as Azure Arc-enabled servers"
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
-New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
+
+if (!(Get-NetFirewallRule -Name BlockAzureIMDS -ErrorAction SilentlyContinue).Enabled) {
+    New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
+}
 
 # Copying the Azure Arc Connected Agent to nested VMs
 # Onboarding the nested VMs as Azure Arc-enabled servers
@@ -189,7 +229,9 @@ add-type $code
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+if ($null -ne (Get-ScheduledTask -TaskName "ArcServersLogonScript" -ErrorAction SilentlyContinue)) {
+    Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+}
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
