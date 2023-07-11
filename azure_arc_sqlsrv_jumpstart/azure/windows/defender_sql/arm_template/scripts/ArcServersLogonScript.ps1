@@ -18,7 +18,9 @@ if ([System.IO.File]::Exists($logFilePath)) {
 
 Start-Transcript -Path $logFilePath
 
-$cliDir = New-Item -Path "$Env:ArcJSDir\.cli\" -Name ".servers" -ItemType Directory
+if ([System.IO.Directory]::Exists("$Env:ArcJSDir\.cli\.servers")) {
+    $cliDir = New-Item -Path "$Env:ArcJSDir\.cli\" -Name ".servers" -ItemType Directory
+}
 
 if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
@@ -133,7 +135,6 @@ if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
 Write-Header "Create Hyper-V VMs"
 $JSWinSQLVMName = "JS-Win-SQL-01"
 if ((Get-VM -Name $JSWinSQLVMName -ErrorAction SilentlyContinue).State -ne "Running") {
-
     Remove-VM -Name $JSWinSQLVMName -Force -ErrorAction SilentlyContinue
     New-VM -Name $JSWinSQLVMName -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcJSVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $JSWinSQLVMName -Count 2
