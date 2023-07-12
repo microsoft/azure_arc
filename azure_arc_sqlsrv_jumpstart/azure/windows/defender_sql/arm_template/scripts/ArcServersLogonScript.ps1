@@ -12,14 +12,18 @@ $sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0a
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
-    $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
+    $archivefile = "$Env:ArcJSLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
     Rename-Item -Path $logFilePath -NewName $archivefile -Force
 }
 
 Start-Transcript -Path $logFilePath
 
-if ([System.IO.Directory]::Exists("$Env:ArcJSDir\.cli\.servers")) {
+$cliDirPath = "$Env:ArcJSDir\.cli\.servers"
+if (![System.IO.Directory]::Exists($cliDirPath)) {
     $cliDir = New-Item -Path "$Env:ArcJSDir\.cli\" -Name ".servers" -ItemType Directory
+}
+else {
+    $cliDir = Get-Item -Path $cliDirPath
 }
 
 if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -243,3 +247,5 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcJSLogsDir\LogsBundle-"$RandomString".zip $Env:ArcJSLogsDir\*.log
 }'
+
+Stop-Transcript
