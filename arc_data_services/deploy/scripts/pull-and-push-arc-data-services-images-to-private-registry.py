@@ -54,9 +54,9 @@ else:
 if os.getenv("SOURCE_DOCKER_TAG") is None:
     SOURCE_DOCKER_TAG = (
         input(
-            "Provide container image tag for the images at the source - press ENTER for using 'v1.20.0_2023-06-13': "
+            "Provide container image tag for the images at the source - press ENTER for using 'v1.21.0_2023-07-11': "
         )
-        or "v1.20.0_2023-06-13"
+        or "v1.21.0_2023-07-11"
     )
 else:
     SOURCE_DOCKER_TAG = os.environ["SOURCE_DOCKER_TAG"]
