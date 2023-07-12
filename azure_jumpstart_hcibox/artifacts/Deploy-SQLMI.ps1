@@ -139,7 +139,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         --resource-group $using:rg `
         --auto-upgrade false `
         --scope cluster `
-        --version 1.20.0 `
+        --version 1.21.0 `
         --release-namespace arc `
         --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper `
         --only-show-errors
