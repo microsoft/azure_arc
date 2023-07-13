@@ -142,7 +142,7 @@ foreach ($app in $appsToInstall) {
     
 }
 
-choco install azure-cli --version=2.49.0
+choco install azure-cli --version=2.49.0 -y
 
 Write-Header "Fetching GitHub Artifacts"
 
