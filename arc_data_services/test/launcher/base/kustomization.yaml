@@ -10,4 +10,4 @@ secretGenerator:
 images:
 - name: arc-ci-launcher
   newName: mcr.microsoft.com/arcdata/arc-ci-launcher
-  newTag: v1.18.0_2023-04-11
+  newTag: v1.20.0_2023-06-13

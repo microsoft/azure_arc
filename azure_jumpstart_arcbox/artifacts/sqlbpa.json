@@ -126,17 +126,6 @@
                     "contentVersion": "1.0.0.0",
                     "resources": [
                         {
-                            "type": "Microsoft.HybridCompute/machines/extensions",
-                            "apiVersion": "2021-12-10-preview",
-                            "name": "[format('{0}/AzureMonitorWindowsAgent', parameters('vmName'))]",
-                            "location": "[variables('location')]",
-                            "properties": {
-                                "publisher": "Microsoft.Azure.Monitor",
-                                "type": "AzureMonitorWindowsAgent",
-                                "autoUpgradeMinorVersion": true
-                            }
-                        },
-                        {
                             "type": "Microsoft.Insights/dataCollectionRuleAssociations",
                             "apiVersion": "2021-09-01-preview",
                             "scope": "[format('Microsoft.HybridCompute/machines/{0}', parameters('vmName'))]",
