@@ -124,7 +124,7 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                            choco install azure-cli --version=2.49.0
+                            choco install azure-cli -y --version=2.49.0
                         }
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "${tempDir}\azuredatastudio.zip"
