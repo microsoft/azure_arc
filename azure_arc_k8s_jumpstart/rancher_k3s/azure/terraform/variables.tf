@@ -36,7 +36,7 @@ variable "tenant_id" {
 variable "ubuntuOSVersion" {
   type        = string
   description = "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
-  default     = "20_04-lts-gen2"
+  default     = "22_04-lts-gen2"
 }
 
 variable "location" {
