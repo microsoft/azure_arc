@@ -150,6 +150,7 @@ foreach ($cluster in $clusters) {
         Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
+        az extension add --name connectedk8s --upgrade
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
@@ -183,22 +184,8 @@ foreach ($cluster in $clusters) {
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
-        try {
-            az k8s-extension create --name arc-data-services `
-            --extension-type microsoft.arcdataservices `
-            --cluster-type connectedClusters `
-            --cluster-name $cluster.clusterName `
-            --resource-group $Env:resourceGroup `
-            --auto-upgrade false `
-            --scope cluster `
-            --release-namespace arc `
-            --version 1.18.0 `
-            --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper > /dev/null
-        }
-        catch {
-            Write-Host "Error detected....retrying"
-            az extension add --name connectedk8s
-            az k8s-extension create --name arc-data-services `
+        
+        az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
             --cluster-name $cluster.clusterName `
@@ -208,7 +195,6 @@ foreach ($cluster in $clusters) {
             --release-namespace arc `
             --version 1.18.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
-        }
 
         Write-Host "`n"
 
