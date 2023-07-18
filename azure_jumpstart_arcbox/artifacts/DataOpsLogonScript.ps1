@@ -45,7 +45,6 @@ az provider register --namespace Microsoft.AzureArcData --wait
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
-az extension add --name connectedk8s
 az extension add --name arcdata
 az -v
 
