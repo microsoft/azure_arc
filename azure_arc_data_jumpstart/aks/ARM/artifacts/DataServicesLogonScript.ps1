@@ -15,6 +15,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
 az extension add --name arcdata
+az extension add --name connectedk8s
 az extension add --name k8s-extension
 Write-Host "`n"
 az -v
@@ -85,6 +86,7 @@ $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Start-Sleep -Seconds 10
 
+az extension remove --name connectedk8s
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $Env:resourceGroup `
