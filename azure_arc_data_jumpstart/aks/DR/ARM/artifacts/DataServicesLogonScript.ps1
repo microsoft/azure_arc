@@ -21,7 +21,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
 az extension add --name arcdata
-az extension add --name connectedk8s
+az extension add --name connectedk8s --version 1.3.17
 az extension add --name k8s-extension
 az extension add --name customlocation
 Write-Host "`n"
@@ -135,7 +135,7 @@ az k8s-extension create --name arc-data-services `
                         --resource-group $Env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
-                        --version 1.20.0 `
+                        --version 1.18.0 `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
