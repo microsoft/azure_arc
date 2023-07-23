@@ -239,8 +239,6 @@ Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/hom
 Write-Host "Installing VSCode extensions"
 # Install VSCode extensions
 $VSCodeExtensions = @(
-    'ms-vscode-remote.remote-containers',
-    'ms-vscode-remote.remote-wsl',
     'ms-vscode.powershell',
     'esbenp.prettier-vscode',
     'ms-dotnettools.dotnet-interactive-vscode'
@@ -254,10 +252,11 @@ foreach ($extension in $VSCodeExtensions) {
 Write-Header "Onboarding Arc-enabled servers"
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
-<#
+
+$Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+#Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
@@ -270,13 +269,13 @@ $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
 # Configure SSH on the nested Windows VMs
-Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
+<#Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
 Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
     # Allow SSH via Azure Arc agent
     azcmagent config set incomingconnections.ports 22
 } -Credential $winCreds
-
 #>
+
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
