@@ -150,10 +150,6 @@ foreach ($cluster in $clusters) {
         Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        Write-Host "Getting version of connectredk8s extension"
-        az extension list -o table
-        Start-Sleep -Seconds 15
-        az extension add --name connectedk8s --upgrade
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
