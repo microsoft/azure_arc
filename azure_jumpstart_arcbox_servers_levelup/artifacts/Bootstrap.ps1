@@ -81,7 +81,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,putty.install,zoomit,openssl.light'
+$chocolateyAppList = 'azure-cli,az.powershell,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,putty.install,zoomit,openssl.light,dotnet-7.0-sdk'
 
 try {
     choco config get cacheLocation

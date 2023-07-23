@@ -232,6 +232,25 @@ Write-Output "Transferring installation script to nested Linux VMs..."
 Set-SCPItem -ComputerName $Ubuntu01VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Host "Installing VSCode extensions"
+# Install VSCode extensions
+$VSCodeExtensions = @(
+    'ms-vscode-remote.remote-containers',
+    'ms-vscode-remote.remote-wsl',
+    'ms-vscode.powershell',
+    'esbenp.prettier-vscode',
+    'ms-dotnettools.dotnet-interactive-vscode'
+)
+
+foreach ($extension in $VSCodeExtensions) {
+    code --install-extension $extension
+}
+
+
 Write-Header "Onboarding Arc-enabled servers"
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
