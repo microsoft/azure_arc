@@ -276,6 +276,17 @@ Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
 } -Credential $winCreds
 #>
 
+# Creating notebook desktop shortcut
+Write-Host "Creating Notebook Shortcut"
+Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+$SourceFilePath = "$Env:ArcBoxDir\AzureArcLevelupNotebook.dib"
+$ShortcutPath = "C:\Users\All Users\Desktop\AzureArcLevelUpInstructions.lnk"
+$WScriptObj = New-Object -ComObject ("WScript.Shell")
+$shortcut = $WscriptObj.CreateShortcut($ShortcutPath)
+$shortcut.TargetPath = $SourceFilePath
+$shortcut.WindowStyle = 1
+$shortcut.Save()
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
