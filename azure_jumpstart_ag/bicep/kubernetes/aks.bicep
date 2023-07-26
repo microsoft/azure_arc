@@ -107,7 +107,6 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-05-02-previ
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_staging
       dnsServiceIP: dnsServiceIP_staging
-      dockerBridgeCidr: dockerBridgeCidr_staging
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
