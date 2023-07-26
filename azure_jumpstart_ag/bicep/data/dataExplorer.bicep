@@ -120,7 +120,6 @@ resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssign
   properties: {
     roleDefinitionId: cosmosReaderRoleDefinition.id
     principalId: adxCluster.identity.principalId
-    scope: resourceGroup().id
   }
 }
 
