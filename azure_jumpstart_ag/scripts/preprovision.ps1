@@ -87,7 +87,7 @@ If ($available.usableLocation -contains $false) {
 ########################################################################
 # Get Windows Admin Username and Password
 ########################################################################
-$JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
+$JS_WINDOWS_ADMIN_USERNAME = 'agora'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
