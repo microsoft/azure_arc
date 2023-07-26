@@ -119,7 +119,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
       }
       imageReference: {
         publisher: 'canonical'
-        offer: '0001-com-ubuntu-server-focal'
+        offer: '0001-com-ubuntu-server-jammy'
         sku: ubuntuOSVersion
         version: 'latest'
       }
