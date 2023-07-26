@@ -110,6 +110,7 @@ resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sql
 }
 
 resource cosmosReaderRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
   name: cosmosDBAccountReader
 }
 
@@ -119,6 +120,7 @@ resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssign
   properties: {
     roleDefinitionId: cosmosReaderRoleDefinition.id
     principalId: adxCluster.identity.principalId
+    scope: resourceGroup().id
   }
 }
 
