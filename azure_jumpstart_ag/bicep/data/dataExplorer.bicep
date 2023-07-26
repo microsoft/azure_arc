@@ -36,11 +36,11 @@ param skuCapacity int = 1
 var cosmosDataReader = '00000000-0000-0000-0000-000000000001'
 var cosmosDBAccountReader = 'fbdf93bf-df7d-467e-a4d2-9458aa1360c8'
 
-resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' existing = {
+resource cosmosDBAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' existing = {
   name: cosmosDBAccountName
 }
 
-resource adxCluster 'Microsoft.Kusto/clusters@2022-12-29' = {
+resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   name: adxClusterName
   location: location
   tags: resourceTags
@@ -61,7 +61,7 @@ resource adxCluster 'Microsoft.Kusto/clusters@2022-12-29' = {
   ]
 }
 
-resource ordersScript 'Microsoft.Kusto/clusters/databases/scripts@2022-12-29' = {
+resource ordersScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'ordersScrit'
   parent: posOrdersDB
   properties: {
@@ -71,14 +71,14 @@ resource ordersScript 'Microsoft.Kusto/clusters/databases/scripts@2022-12-29' = 
   }
 }
 
-resource posOrdersDB 'Microsoft.Kusto/clusters/databases@2022-12-29' = {
+resource posOrdersDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
   name: posOrdersDBName
   location: location
   kind: 'ReadWrite'
 }
 
-resource adxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
+resource adxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-02-01' = {
   name: 'iotHubConnection'
   location: location
   kind: 'IotHub'
@@ -99,7 +99,7 @@ resource adxdatabaseIotConnection 'Microsoft.Kusto/clusters/databases/dataConnec
 }
 
 //  We need to authorize the cluster to read Cosmos DB's change feed by assigning the role
-resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2023-03-01-preview' = {
+resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2023-04-15' = {
   name: guid(adxCluster.id, cosmosDBAccountName)
   parent: cosmosDBAccount
   properties: {
@@ -109,7 +109,7 @@ resource clusterCosmosDbAuthorization 'Microsoft.DocumentDB/databaseAccounts/sql
   }
 }
 
-resource cosmosReaderRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+resource cosmosReaderRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   scope: subscription()
   name: cosmosDBAccountReader
 }
@@ -124,7 +124,7 @@ resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssign
   }
 }
 
-resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-12-29' = {
+resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-02-01' = {
   location: location
   name: 'OrdersConnection'
   parent: posOrdersDB
