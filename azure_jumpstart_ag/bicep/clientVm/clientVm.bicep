@@ -93,7 +93,7 @@ var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2023-02-01' = {
   name: networkInterfaceName
   location: location
   tags: resourceTags
@@ -113,7 +113,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2023-02-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
   tags: resourceTags
@@ -127,7 +127,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: vmName
   location: location
   tags: resourceTags
@@ -182,7 +182,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
 }
 
-resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
