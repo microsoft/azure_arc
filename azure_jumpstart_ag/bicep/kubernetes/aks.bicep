@@ -66,7 +66,6 @@ param kubernetesVersion string = '1.25.6'
 
 var serviceCidr_staging = '10.21.64.0/19'
 var dnsServiceIP_staging = '10.21.64.10'
-var dockerBridgeCidr_staging = '172.18.0.1/16'
 
 resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-05-02-preview' = {
   location: location
