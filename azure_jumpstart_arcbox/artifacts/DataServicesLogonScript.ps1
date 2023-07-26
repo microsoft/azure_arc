@@ -28,6 +28,7 @@ az login --service-principal --username $Env:spnClientID --password $Env:spnClie
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
+az extension add --name connectedk8s --version 1.3.17
 az extension add --name arcdata --system
 az -v
 
