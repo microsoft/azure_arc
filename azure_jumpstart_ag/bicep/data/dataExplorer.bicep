@@ -123,7 +123,7 @@ resource cosmosDBAccountReaderRoleAssignment 'Microsoft.Authorization/roleAssign
   }
 }
 
-resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2022-02-01' = {
+resource ordersConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-05-02' = {
   location: location
   name: 'OrdersConnection'
   parent: posOrdersDB
