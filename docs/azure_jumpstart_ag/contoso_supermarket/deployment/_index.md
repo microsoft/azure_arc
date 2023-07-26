@@ -39,7 +39,9 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 - Configure a GitHub fine-grained personal access token (PAT) with permissions to modify __only__ the Jumpstart Agora Apps repo that you forked.
 
-  - In the top right of the GitHub website, click on the dropdown on your user icon and then click "Settings".
+  - In the top right of the GitHub website, click on your user icon and then click "Settings".
+
+    ![Screenshot showing how to create the GitHub PAT](./img/github_PAT0.png)
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT1.png)
 
@@ -77,6 +79,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     ![Screenshot showing how to create the GitHub PAT](./img/github_PAT11.png)
 
+    > __NOTE: The GitHub PAT token only needs to be created once and can be reused on subsequent deployments for as long as the token is valid.__
     > __NOTE: GitHub fine-grained access tokens are a beta feature of GitHub and may be subject to change in user experience or functionality.__
     > __NOTE: The token shown in the above screenshot is a placeholder value for example purposes only and not a working token.__
 
