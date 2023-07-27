@@ -117,6 +117,10 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-05-02-previ
         ]
       }
     }
+    servicePrincipalProfile: {
+      clientId: spnClientId
+      secret: spnClientSecret
+    }
   }
 }
 
