@@ -1045,6 +1045,10 @@ Write-Host
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
 
+## Convert AKS cluster to MSI based
+
+az aks update -g $Env:resourceGroup -n $Env:aksStagingClusterName --enable-managed-identity
+
 $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
 $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
