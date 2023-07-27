@@ -45,7 +45,7 @@ az provider register --namespace Microsoft.AzureArcData --wait
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
-az extension add --name connectedk8s
+az extension add --name connectedk8s --version 1.3.17
 az extension add --name arcdata
 az -v
 
@@ -150,10 +150,6 @@ foreach ($cluster in $clusters) {
         Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        Write-Host "Getting version of connectredk8s extension"
-        az extension list -o table
-        Start-Sleep -Seconds 15
-        az extension add --name connectedk8s --upgrade
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
