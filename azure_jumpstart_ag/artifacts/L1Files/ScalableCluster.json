@@ -41,7 +41,7 @@
         "MemoryInMB": 24576,
         "DataSizeInGB": 80,
         "Ip4Address": "Ip4Address-null",
-        "TimeoutSeconds": 300,
+        "TimeoutSeconds": 600,
         "TpmPassthrough": false
       }
     }
