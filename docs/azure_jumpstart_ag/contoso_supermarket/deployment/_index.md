@@ -146,6 +146,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
     $spn = New-AzADServicePrincipal -DisplayName "<Unique SPN name>" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
+    echo "SPN tenant: $($account.Context.Tenant.Id)"
     ```
 
     For example:
