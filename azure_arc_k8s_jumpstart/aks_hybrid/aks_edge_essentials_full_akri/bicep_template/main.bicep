@@ -24,7 +24,7 @@ param windowsAdminPassword string
 param githubAccount string = 'lanicolas'
 
 @description('Target GitHub branch')
-param githubBranch string = 'akrii'
+param githubBranch string = 'akri_video'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -42,7 +42,7 @@ param subnetNameCloud string = 'AKS-EE-Full-Subnet'
 @description('AKS Edge Essentials Kubernetes distribution')
 param kubernetesDistribution string
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full_akri/bicep_template/'
 
 module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
