@@ -48,7 +48,7 @@ param deployBastion bool = false
 param githubAccount string = 'lanicolas'
 
 @description('Target GitHub branch')
-param githubBranch string = 'akrii'
+param githubBranch string = 'akri_video'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'AKS-EE-Full-Bastion'
