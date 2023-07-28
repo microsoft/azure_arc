@@ -291,7 +291,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "Fetching GitHub artifacts"
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/artifacts/L1Files?ref=$using:githubBranch"
+    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full_akri/bicep_template/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
