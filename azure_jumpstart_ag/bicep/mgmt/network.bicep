@@ -87,7 +87,7 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = if (deployBastion == true) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2023-02-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
   location: location
   tags: resourceTags
@@ -101,7 +101,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-07-01' = if (
   }
 }
 
-resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022-07-01' = {
+resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023-02-01' = {
   name: networkSecurityGroupNameCloud
   location: location
   tags: resourceTags
@@ -189,7 +189,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2022
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-07-01' = if (deployBastion == true) {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-02-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
   tags: resourceTags
@@ -315,7 +315,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBastion == true) {
   name: bastionName
   location: location
   tags: resourceTags
