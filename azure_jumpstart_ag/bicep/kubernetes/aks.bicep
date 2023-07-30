@@ -25,12 +25,6 @@ param agentCount int = 2
 @description('The size of the Virtual Machine')
 param agentVMSize string = 'Standard_D4s_v4'
 
-@description('User name for the Linux Virtual Machines')
-param linuxAdminUsername string = 'arcdemo'
-
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
 @description('Client ID (used by cloudprovider)')
 @secure()
 param spnClientId string
@@ -106,16 +100,6 @@ resource aksStaging 'Microsoft.ContainerService/managedClusters@2023-05-02-previ
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_staging
       dnsServiceIP: dnsServiceIP_staging
-    }
-    linuxProfile: {
-      adminUsername: linuxAdminUsername
-      ssh: {
-        publicKeys: [
-          {
-            keyData: sshRSAPublicKey
-          }
-        ]
-      }
     }
     servicePrincipalProfile: {
       clientId: spnClientId
