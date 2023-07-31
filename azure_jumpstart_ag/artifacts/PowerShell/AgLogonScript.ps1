@@ -1060,6 +1060,9 @@ foreach ($resource in $resources) {
         $job = Start-Job -Name $resourceName -ScriptBlock {
             param($resourceName, $resourceType)
 
+            $retryCount = 10
+            $retryDelaySeconds = 60
+
             switch ($resourceType)
             {
                 'Microsoft.Kubernetes/connectedClusters' {$ClusterType = 'ConnectedClusters'}
@@ -1071,9 +1074,6 @@ foreach ($resource in $resources) {
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
-
-                $retryCount = 5
-                $retryDelaySeconds = 60
 
                 for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
@@ -1106,9 +1106,6 @@ foreach ($resource in $resources) {
             $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
 
             if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
-
-            $retryCount = 3
-            $retryDelaySeconds = 30
 
             for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
@@ -1154,12 +1151,19 @@ foreach ($resource in $resources) {
 }
 
 # Wait for all jobs to complete
-$jobs | Wait-Job | Receive-Job
+$FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
 
-$jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
+$FluxExtensionJobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
 
 # Clean up jobs
 $jobs | Remove-Job
+
+# Abort if Flux-extension fails on any cluster
+if ($FluxExtensionJobs | Where-Object $PSItem.ProvisioningState -ne 'Succeeded') {
+
+    throw "One or more Flux-extension deployments failed - aborting"
+
+}
 
 #####################################################################
 # Deploying nginx on AKS cluster
