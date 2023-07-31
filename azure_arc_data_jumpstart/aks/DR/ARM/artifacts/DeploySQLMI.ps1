@@ -182,20 +182,16 @@ Write-Host "Configuring the primary cluster DAG"
 New-Item -Path "$Env:TempDir/sqlcerts" -ItemType Directory
 Write-Host "`n"
 kubectx primary
-$primaryMirroringEndpoint = $(az sql mi-arc show -n $primarySqlMIInstance --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
 az sql mi-arc get-mirroring-cert --name $primarySqlMIInstance --cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 
 Write-Host "Configuring the secondary cluster DAG"
 Write-Host "`n"
 kubectx secondary
-$secondaryMirroringEndpoint = $(az sql mi-arc show -n $secondarySqlMIInstance --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
 az sql mi-arc get-mirroring-cert --name $secondarySqlMIInstance --cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 
 Write-Host "`n"
 kubectx primary
-az sql instance-failover-group-arc create --shared-name jumpstartDag --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDag --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --resource-group $env:resourceGroup --partner-resource-group $env:resourceGroup
 Write-Host "`n"
-kubectx secondary
-az sql instance-failover-group-arc create --shared-name jumpstartDag --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s

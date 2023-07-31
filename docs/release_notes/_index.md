@@ -11,6 +11,112 @@ weight: 5
 
 ## 2023
 
+### June 2023
+
+#### Release highlights
+
+- Scenarios enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled Kubernetes
+  - Azure Arc-enabled data services
+- ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Jumpstart ArcBox
+
+- [Versioning: June versions bump #1972](https://github.com/microsoft/azure_arc/issues/1972)
+- [Bug fix: DataOps deployment failing when using --use-k8s in CAPI #1881](https://github.com/microsoft/azure_arc/issues/1881)
+- [Bug fix: Failed to remove ArcBox deployment logon script scheduled tasks #1882](https://github.com/microsoft/azure_arc/issues/1882)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: Arc-enabled SQL Managed Instance script - AutoUpgradeMinorVersion cannot be set to true #1884](https://github.com/microsoft/azure_arc/issues/1884)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: SQL Managed Instance ARM Template #1971](https://github.com/microsoft/azure_arc/issues/1971)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Versioning: https://github.com/microsoft/azure_arc/issues/1964](https://github.com/microsoft/azure_arc/issues/1964)
+- [Bug fix: Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster #1923](https://github.com/microsoft/azure_arc/issues/1923)
+- [Bug fix: AKS edge essential unique name for Arc-enabled resource #1928](https://github.com/microsoft/azure_arc/issues/1928)
+- [Bug fix: AKS EE essential random guid fails #1943](https://github.com/microsoft/azure_arc/issues/1943)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - June release #1898](https://github.com/microsoft/azure_arc/issues/1898)
+
+### May 2023
+
+#### Release highlights
+
+- New Azure Arc-enabled Kubernetes scenario
+- Scenarios enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled data services
+- ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Jumpstart ArcBox
+
+- [Bug fix: azuredeploy.parameters.json file has incorrect names that do not correlate with the azuredeploy.json file #1827](https://github.com/microsoft/azure_arc/issues/1827)
+- [Bug fix: patchesstrategicmerge is deprecated in kustomize #1840](https://github.com/microsoft/azure_arc/issues/1840)
+- [Bug fix: ArcBox deployment fails #1861](https://github.com/microsoft/azure_arc/issues/1861)
+- [Feature: Move ArcBox VHDs to new Jumpstart blob storage #1839](https://github.com/microsoft/azure_arc/issues/1839)
+- [Docs update: Add Nested VMs credentials to guide #1829](https://github.com/microsoft/azure_arc/issues/1829)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: Invalid parameter in register HCI #1877](https://github.com/microsoft/azure_arc/issues/1877)
+
+#### Azure Arc-enabled Kubernetes
+
+- [New scenario: AKS Edge Essentials multi-node deployment with Azure Arc using Azure Bicep](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_full/)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: azuredeploy.parameters.json file has incorrect names that do not correlate with the azuredeploy.json file #1827](https://github.com/microsoft/azure_arc/issues/1827)
+- [Docs update: Add Nested VMs credentials to guide #1829](https://github.com/microsoft/azure_arc/issues/1829)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - May release #1807](https://github.com/microsoft/azure_arc/issues/1807)
+
+### April 2023
+
+#### Release highlights
+
+- New Azure Arc-enabled servers scenarios
+- Scenarios enhancements and bug fixes:
+  - Azure Arc-enabled SQL Server
+  - Azure Arc-enabled data services
+- ArcBox and HCIBox enhancements and bug fixes
+- Monthly ArcBox Kubernetes-related versions bump
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Create Automanage Machine Configuration custom configurations for Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows/)
+- [New scenario: Create Automanage Machine Configuration custom configurations for Linux](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_linux/)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: Arc-enabled SQL Server best practices assessment failing with error #1783](https://github.com/microsoft/azure_arc/issues/1783)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - April release #1762](https://github.com/microsoft/azure_arc/issues/1762)
+- [Bug fix: Arc data services extension creation requires a --version argument #1780](https://github.com/microsoft/azure_arc/issues/1780)
+- [Bug fix: Azure Arc-enabled SQL Managed Instance for AKS fails to deploy #1810](https://github.com/microsoft/azure_arc/issues/1810)
+
+#### Jumpstart ArcBox
+
+- [Feature: April Kubernetes-related version bump #1815](https://github.com/microsoft/azure_arc/issues/1815)
+
+#### Jumpstart HCIBox
+
+- [Bug fix: HCIBox Microsoft.OperationalInsights #1805](https://github.com/microsoft/azure_arc/issues/1805)
+
 ### March 2023
 
 #### Release highlights
@@ -34,7 +140,7 @@ weight: 5
 
 #### Azure Arc-enabled Kubernetes
 
-- [Bug fix: Missing two parameters to use Azure Arc with ARO in azure. #1716](https://github.com/microsoft/azure_arc/issues/1716)
+- [Bug fix: Missing two parameters to use Azure Arc with ARO in Azure #1716](https://github.com/microsoft/azure_arc/issues/1716)
 
 #### Azure Arc-enabled data services
 

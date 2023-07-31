@@ -16,11 +16,11 @@ echo ""
 
   # Set deployment environment variables
   export GUID=$(echo $RANDOM | md5sum | head -c 4; echo;) # Do not change!
-  export CLUSTERCTL_VERSION="1.3.6" # Do not change!
+  export CLUSTERCTL_VERSION="1.4.4" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
-  export CAPI_PROVIDER_VERSION="1.7.4" # Do not change!
-  export KUBERNETES_VERSION="1.25.8" # Do not change!
-  export K3S_VERSION="1.26.3+k3s1" # Do not change!
+  export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
+  export KUBERNETES_VERSION="1.27.1" # Do not change!
+  export K3S_VERSION="1.27.1+k3s1" # Do not change!
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
   export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
