@@ -29,6 +29,9 @@ param windowsAdminUsername string
 @secure()
 param windowsAdminPassword string
 
+@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
+param sshRSAPublicKey string
+
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
@@ -131,6 +134,7 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
     spnClientSecret: spnClientSecret
     location: location
     acrName: acrName
+    sshRSAPublicKey: sshRSAPublicKey
   }
 }
 
