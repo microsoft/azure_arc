@@ -20,9 +20,6 @@
     "windowsAdminUsername": {
       "value": "${JS_WINDOWS_ADMIN_USERNAME}"
     },
-    "sshRSAPublicKey": {
-      "value": "${JS_SSH_RSA_PUBLIC_KEY}"
-    },
     "deployBastion": {
       "value": false
     },
