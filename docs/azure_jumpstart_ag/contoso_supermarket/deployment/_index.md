@@ -218,13 +218,13 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
     > __NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/troubleshooting/_index.md).__
 
-## Deployment via Azure Developer CLI (experimental)
+## Deployment via Azure Developer CLI
 
-Jumpstart Agora provides an experimental feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview). Follow these steps to try this experimental feature in your subscription.
+Jumpstart Agora provides a feature that allows users to deploy with the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview). Follow these steps to try this feature in your subscription.
 
 - Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
-  > __NOTE: PowerShell is required for using azd with Jumpstart Agora. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.__
+  > __NOTE: PowerShell is required for using azd with Jumpstart Agora. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.__
 
 - Login with azd using ```azd auth login``` which will open a browser for interactive login.
 
