@@ -1775,12 +1775,7 @@ namespace Win32{
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools Installation background job:" -ForegroundColor Green
-
-$DevToolsInstallationJob
-$DevToolsInstallationJob | Wait-Job | Receive-Job | Tee-Object -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ToolsSetup.log") -Append
-
-Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop after Dev Tools Installation background job completed." -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 $endTime = Get-Date
