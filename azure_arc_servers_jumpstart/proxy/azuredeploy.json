@@ -59,7 +59,7 @@
       },
       "ubuntuOSVersion": {
         "type": "string",
-        "defaultValue": "20_04-lts-gen2",
+        "defaultValue": "22_04-lts-gen2",
         "metadata": {
           "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
         }

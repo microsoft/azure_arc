@@ -100,8 +100,8 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
+    publisher = "canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
     sku       = var.ubuntuOSVersion
     version   = "latest"
   }

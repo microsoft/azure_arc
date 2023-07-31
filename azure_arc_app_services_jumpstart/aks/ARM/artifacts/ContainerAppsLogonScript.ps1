@@ -102,8 +102,8 @@ az k8s-extension create `
     --configuration-settings "appsextensionNamespace=${namespace}" `
     --configuration-settings "CLUSTER_NAME=$Env:connectedClusterName" `
     --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
-    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
-    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
+    --config-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
+    --config-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appplat-ns; Start-Sleep -Seconds 5; Clear-Host }}
 
