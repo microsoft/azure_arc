@@ -26,6 +26,11 @@ Occasionally deployments of the Jumpstart Agora Contoso Supermarket scenario may
 
 - Target Azure region does not support all required Azure services - ensure you are running Agora in one of the supported regions listed in the [deployment guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md).
 
+- Not enough Azure Active Directory quota to create additional service principals. You may receive a message stating "The directory object quota limit for the Principal has been exceeded. Please ask your administrator to increase the quota limit or delete objects to reduce the used quota."
+  - If this occurs, you must delete some of your unused service principals and try the deployment again.
+
+![Screenshot showing not enough AAD quota for new service principals](./img/aad_quota_exceeded.png)
+
 ### Exploring logs from the _Ag-VM-Client_ virtual machine
 
 Occasionally, you may need to review log output from scripts that run on the _Ag-VM-Client_ virtual machine in case of deployment failures. To make troubleshooting easier, the Agora deployment scripts collect all relevant logs in the _C:\Ag\Logs_ folder on _Ag-VM-Client_. A short description of the logs and their purpose can be seen in the list below:
