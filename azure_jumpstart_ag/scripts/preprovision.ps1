@@ -87,7 +87,7 @@ If ($available.usableLocation -contains $false) {
 ########################################################################
 # Get Windows Admin Username and Password
 ########################################################################
-$JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
+$JS_WINDOWS_ADMIN_USERNAME = 'agora'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
@@ -133,21 +133,20 @@ if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT) [$J
 # set the env variable
 azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
 
-
 ########################################################################
 # Create SSH RSA Public Key
 ########################################################################
 Write-Host "Creating SSH RSA Public Key..."
 $file = "js_rsa"
-remove-item $file, "$file.pub" -Force -ea 0 
+remove-item $file, "$file.pub" -Force -ea 0
 
 # Generate the SSH key pair
-ssh-keygen -q -t rsa -b 4096 -f $file -N '""' 
+ssh-keygen -q -t rsa -b 4096 -f $file -N '""'
 
 # Get the public key
 $JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
 
-# Escape the backslashes 
+# Escape the backslashes
 $JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
 
 # set the env variable
