@@ -29,7 +29,7 @@ Occasionally deployments of the Jumpstart Agora Contoso Supermarket scenario may
 - Not enough Azure Active Directory quota to create additional service principals. You may receive a message stating "The directory object quota limit for the Principal has been exceeded. Please ask your administrator to increase the quota limit or delete objects to reduce the used quota."
   - If this occurs, you must delete some of your unused service principals and try the deployment again.
 
-![Screenshot showing not enough AAD quota for new service principals](./img/aad_quota_exceeded.png)
+    ![Screenshot showing not enough AAD quota for new service principals](./img/aad_quota_exceeded.png)
 
 ### Exploring logs from the _Ag-VM-Client_ virtual machine
 
