@@ -197,7 +197,7 @@ az account set --subscription $Env:subscriptionId
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
-az extension add --name connectedk8s
+az extension add --name connectedk8s --version 1.3.17
 az extension add --name k8s-extension
 Write-Host "`n"
 
@@ -230,8 +230,8 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
-$suffix = -join ((97..122) | Get-Random -Count 4 | ForEach-Object { [char]$_ })
-$Env:arcClusterName = "$Env:ComputerName-$suffix"
+$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
+$Env:arcClusterName = "$Env:resourceGroup-$guid"
 az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
     --location $env:location `
