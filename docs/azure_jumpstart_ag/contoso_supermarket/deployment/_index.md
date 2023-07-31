@@ -191,6 +191,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   ```
 
 - Edit the [main.parameters.json](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/azure_jumpstart_ag/bicep/main.parameters.json) template parameters file and supply some values for your environment.
+  - _`sshRSAPublicKey`_ - Your SSH public key
   - _`spnClientId`_ - Your Azure service principal id
   - _`spnClientSecret`_ - Your Azure service principal secret
   - _`spnTenantId`_ - Your Azure tenant id
