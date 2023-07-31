@@ -17,9 +17,6 @@
     "windowsAdminPassword": {
       "value": ""
     },
-    "sshRSAPublicKey": {
-      "value": ""
-    },
     "deployBastion": {
       "value": false
     },
