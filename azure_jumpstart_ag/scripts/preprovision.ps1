@@ -134,6 +134,26 @@ if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT) [$J
 azd env set JS_GITHUB_PAT $JS_GITHUB_PAT
 
 ########################################################################
+# Create SSH RSA Public Key
+########################################################################
+Write-Host "Creating SSH RSA Public Key..."
+$file = "js_rsa"
+remove-item $file, "$file.pub" -Force -ea 0
+
+# Generate the SSH key pair
+ssh-keygen -q -t rsa -b 4096 -f $file -N '""'
+
+# Get the public key
+$JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
+
+# Escape the backslashes
+$JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
+
+# set the env variable
+azd env set JS_SSH_RSA_PUBLIC_KEY $JS_SSH_RSA_PUBLIC_KEY
+
+
+########################################################################
 # Create Azure Service Principal
 ########################################################################
 Write-Host "Creating Azure Service Principal..."
