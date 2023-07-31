@@ -133,8 +133,8 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
-    sshRSAPublicKey: sshRSAPublicKey
     acrName: acrName
+    sshRSAPublicKey: sshRSAPublicKey
   }
 }
 
