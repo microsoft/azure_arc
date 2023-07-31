@@ -13,7 +13,7 @@ param resourceTags object = {
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string
 
-resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-03-01-preview' = {
+resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: accountName
   kind: 'GlobalDocumentDB'
   location: location
