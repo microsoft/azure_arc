@@ -1060,6 +1060,9 @@ foreach ($resource in $resources) {
         $job = Start-Job -Name $resourceName -ScriptBlock {
             param($resourceName, $resourceType)
 
+            $retryCount = 10
+            $retryDelaySeconds = 60
+
             switch ($resourceType)
             {
                 'Microsoft.Kubernetes/connectedClusters' {$ClusterType = 'ConnectedClusters'}
@@ -1071,9 +1074,6 @@ foreach ($resource in $resources) {
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
-
-                $retryCount = 5
-                $retryDelaySeconds = 60
 
                 for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
@@ -1103,20 +1103,22 @@ foreach ($resource in $resources) {
                 }
             }
 
-            $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
+            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+            $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
             if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
-
-            $retryCount = 3
-            $retryDelaySeconds = 30
 
             for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
                 try {
 
-                    Remove-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ForceDelete
+                    if ($extension) {
 
-                    New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
+                        az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
+
+                     }
+
+                    az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
 
                     break # Command succeeded, exit the loop
                 }
@@ -1154,12 +1156,19 @@ foreach ($resource in $resources) {
 }
 
 # Wait for all jobs to complete
-$jobs | Wait-Job | Receive-Job
+$FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
 
 $jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
 
 # Clean up jobs
 $jobs | Remove-Job
+
+# Abort if Flux-extension fails on any cluster
+if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
+
+    throw "One or more Flux-extension deployments failed - aborting"
+
+}
 
 #####################################################################
 # Deploying nginx on AKS cluster
@@ -1775,12 +1784,7 @@ namespace Win32{
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools Installation background job:" -ForegroundColor Green
-
-$DevToolsInstallationJob
-$DevToolsInstallationJob | Wait-Job | Receive-Job | Tee-Object -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ToolsSetup.log") -Append
-
-Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop after Dev Tools Installation background job completed." -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 $endTime = Get-Date
