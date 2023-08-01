@@ -1,6 +1,5 @@
 ---
 type: docs
-title: "Agora FAQ"
 linkTitle: "Agora FAQ"
 weight: 2
 ---
