@@ -1103,7 +1103,8 @@ foreach ($resource in $resources) {
                 }
             }
 
-            $extension = Get-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -ResourceGroupName $Env:resourceGroup | Where-Object ExtensionType -eq 'microsoft.flux'
+            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+            $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
             if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
 
@@ -1111,9 +1112,9 @@ foreach ($resource in $resources) {
 
                 try {
 
-                    Remove-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ForceDelete
+                    az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force
 
-                    New-AzKubernetesExtension -ClusterName $resourceName -ClusterType $ClusterType -Name flux -ResourceGroupName $Env:resourceGroup -ExtensionType microsoft.flux -IdentityType 'SystemAssigned' -ErrorAction Stop -OutVariable extension | Out-Null
+                    az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
 
                     break # Command succeeded, exit the loop
                 }
@@ -1137,7 +1138,7 @@ foreach ($resource in $resources) {
 
             }
 
-            $ProvisioningState = $extension.ProvisioningState.ToString()
+            $ProvisioningState = $extension.ProvisioningState
 
             [PSCustomObject]@{
                 ResourceName = $resourceName
