@@ -181,6 +181,8 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the new checkout feature in the staging environment](./img/pos_after_checkout_feature.png)
 
+    > __NOTE: In some cases you may need to force a refresh of your browser's cache to see the updated feature. This can be done by pressing Ctrl-F5 to force the cache to clear and reload the page.__
+
 - Once the PoS application is healthy on the _Staging_ cluster, a pull request is created automatically to update the _Canary_ environment with the new PoS application image.
 
     ![Screenshot showing the canary Pull request](./img/github_canary_pr.png)
