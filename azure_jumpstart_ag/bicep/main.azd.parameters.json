@@ -27,13 +27,13 @@
       "value": false
     },
     "rdpPort": {
-      "value": "${JS_RDP_PORT}"
+      "value": "8888"
     },
     "githubUser": {
-      "value": "${JS_GITHUB_USER}"
+      "value": "brauliomsft"
     },
     "githubPAT": {
-      "value": "${JS_GITHUB_PAT}"
+      "value": "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"
     }
   }
 }
