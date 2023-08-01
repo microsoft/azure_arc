@@ -13,7 +13,7 @@ The Jumpstart provides step-by-step guides for independent Azure Arc scenarios t
 
 Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
 
-<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
+<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="270"></p>
 
 ## Our philosophy and core design principals
 
@@ -33,7 +33,7 @@ Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jum
 
 [Jumpstart Agora](https://aka.ms/JumpstartAgora) is a marketplace of various “cloud to edge” industry scenarios, designed to provide an automated end-to-end user experience. It provides a rich and comprehensive experience while getting started with a full-stack deployment, from the infrastructure layer all the way to the line of business applications and the operational and development process around them.
 
-<p align="center"><a href="https://aka.ms/JumpstartAgora" target="_blank"><img src="/img/agora_logo.png" alt="jumpstart-agora-logo" width="250"></a></p>
+<p align="center"><a href="https://aka.ms/JumpstartAgora" target="_blank"><img src="/img/agora_logo.png" alt="jumpstart-agora-logo" width="270"></a></p>
 
 ## Jumpstart ArcBox
 
@@ -41,7 +41,7 @@ Have you ever wanted to have a complete Azure Arc environment with just one clic
 
 [ArcBox](https://aka.ms/JumpstartArcBox) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc-enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<p align="center"><a href="https://aka.ms/JumpstartArcBox" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></a></p>
+<p align="center"><a href="https://aka.ms/JumpstartArcBox" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="270"></a></p>
 
 ## Jumpstart HCIBox
 
@@ -49,7 +49,7 @@ Are you eager to try out Azure Stack HCI but you don't have access to physical h
 
 [HCIBox](https://aka.ms/JumpstartHCIBox) is a dedicated Azure Stack HCI sandbox environment, and like ArcBox you only need an Azure subscription to get started. With a one-click deployment, you get a full Azure Stack HCI lab packed with technology including Azure Arc integration, Azure Kubernetes Service, Windows Admin Center and much more. Check out HCIBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<p align="center"><a href="https://aka.ms/JumpstartHCIBox" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="250"></a></p> 
+<p align="center"><a href="https://aka.ms/JumpstartHCIBox" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="270"></a></p>
 
 ## Jumpstart YouTube Channel
 
@@ -57,7 +57,7 @@ We know you are busy and sometimes all you need is just a good, short, solid rec
 
 All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemos) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
-<p align="center"><a href="https://www.youtube.com/channel/UCoIJw-P_9Jp6Jo_0Ca9avcA" target="_blank"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="250"></a></p>
+<p align="center"><a href="https://www.youtube.com/channel/UCoIJw-P_9Jp6Jo_0Ca9avcA" target="_blank"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="270"></a></p>
 
 Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
 
@@ -67,7 +67,7 @@ Enjoy!
 
 Jumpstart Lightning is the show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories. Who knows?! You might find yourself on our YouTube channel!
 
-<p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="250"></a></p>
+<p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="270"></a></p>
 
 * Are you an awesome Azure Arc customer or a Microsoft partner that has an awesome story you would like to talk about?!
 * Ever contributed to the Jumpstart project and want to share it with the world?!
