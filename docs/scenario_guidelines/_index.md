@@ -2,7 +2,7 @@
 type: docs
 title: "Scenario Write-up Guidelines"
 linkTitle: "Scenario Write-up Guidelines"
-weight: 7
+weight: 6
 ---
 
 # Jumpstart Scenario Write-up Guidelines

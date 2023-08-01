@@ -8,7 +8,7 @@ description: >
 
 ## Enable SSH access to Azure Arc-enabled servers
 
-The following Jumpstart scenario will guide you on how to enable [SSH access to Azure Arc-enabled servers](https://docs.microsoft.com/azure/azure-arc/servers/ssh-arc-overview), this feature allows you to connect over SSH to your Arc-enabled servers both Linux and Windows without requiring a public IP address or additional open ports.
+The following Jumpstart scenario will guide you on how to enable [SSH access to Azure Arc-enabled servers](https://docs.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview), this feature allows you to connect over SSH to your Arc-enabled servers both Linux and Windows without requiring a public IP address or additional open ports.
 
 > **NOTE: SSH for Arc-enabled servers is currently in Preview**
 
