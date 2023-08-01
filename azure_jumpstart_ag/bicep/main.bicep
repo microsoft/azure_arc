@@ -78,7 +78,7 @@ param posOrdersDBName string = 'Orders'
 param acrName string = 'agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
-param rdpPort string = '3389'
+param rdpPort string = '8888'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
