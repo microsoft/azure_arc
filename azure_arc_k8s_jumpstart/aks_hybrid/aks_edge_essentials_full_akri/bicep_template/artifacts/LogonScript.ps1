@@ -588,7 +588,8 @@ Invoke-Command -VMName Node1 -Credential $Credentials -ArgumentList $templateBas
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
     Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
     Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
-    Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "sudo /home/aksedge-user/akri.sh"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "chmod +x /home/aksedge-user/akri.sh"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "./akri.sh"
 }
 
 Invoke-Command -VMName Node2 -Credential $Credentials -ArgumentList $templateBaseUrl -ScriptBlock {
@@ -602,7 +603,8 @@ Invoke-Command -VMName Node2 -Credential $Credentials -ArgumentList $templateBas
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
     Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
     Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
-    Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "sudo /home/aksedge-user/akri.sh"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "chmod +x /home/aksedge-user/akri.sh"
+    Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "./akri.sh"
     kubectl apply -f $videoDir\akri-video-streaming-app.yaml
     kubectl apply -f $videoDir\video-streaming.yaml  
 }
