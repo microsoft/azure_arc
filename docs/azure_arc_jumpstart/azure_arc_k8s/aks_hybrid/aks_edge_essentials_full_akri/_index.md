@@ -239,7 +239,7 @@ Now you need to get the Linux node IP and the port of your web app service. Firs
 
 To get the IP address open Hyper-V manager and access the console of one of the Windows nodes.
 
-  ![Login Windows VMs](./31.png)
+  ![Access Console](./31.png)
 
 Once there, authenticate with:
 
@@ -252,11 +252,11 @@ Within the VM open a PowerShell window and run:
     Get-AksEdgeNodeAddr
   ```
 
-  ![Login Windows VMs](./31.png)
+  ![Get AKS edge node](./32.png)
 
 Also from the Windows HyperV VM open Edge browser and navigate to the service, you should see the video streaming
 
-  ![Video Streaming](./32.png)
+  ![Video Streaming](./33.png)
 
 ### Exploring logs from the Azure Windows Server VM
 
@@ -268,10 +268,10 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS Edge Essentials cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Hyper-V VMs. |
 |
 
-![Screenshot showing the Temp folder with deployment logs](./33.png)
+![Screenshot showing the Temp folder with deployment logs](./34.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-  ![Screenshot showing Azure resource group deletion](./34.png)
+  ![Screenshot showing Azure resource group deletion](./35.png)
