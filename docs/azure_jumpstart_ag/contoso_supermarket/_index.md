@@ -1,6 +1,5 @@
 ---
 type: docs
-title: "Contoso Supermarket"
 linkTitle: "Contoso Supermarket"
 weight: 1
 ---
