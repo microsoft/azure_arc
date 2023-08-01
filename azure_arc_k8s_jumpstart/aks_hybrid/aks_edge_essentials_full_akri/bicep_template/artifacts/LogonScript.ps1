@@ -580,11 +580,10 @@ Invoke-Command -VMName Node1 -Credential $Credentials -ArgumentList $templateBas
     --set onvif.configuration.brokerPod.image.repository='ghcr.io/project-akri/akri/onvif-video-broker' `
     --set onvif.configuration.brokerPod.image.tag='latest'
      # Copy video scripts
+     Write-Host "Downloading video artifacts"
      $videoDir = ".\video"
     New-Item -Path $videoDir -ItemType directory -Force
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video.mp4") -OutFile $videoDir\video.mp4
-    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
-    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
     Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
     Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
@@ -594,20 +593,24 @@ Invoke-Command -VMName Node1 -Credential $Credentials -ArgumentList $templateBas
 
 Invoke-Command -VMName Node2 -Credential $Credentials -ArgumentList $templateBaseUrl -ScriptBlock {
      # Copy video scripts
-     # Copy video scripts
+     Write-Host "Downloading video artifacts"
     $videoDir = ".\video"
     New-Item -Path $videoDir -ItemType directory -Force
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video.mp4") -OutFile $videoDir\video.mp4
-    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
-    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
     Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
     Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
     Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "chmod +x /home/aksedge-user/akri.sh"
     Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "./akri.sh"
-    kubectl apply -f $videoDir\akri-video-streaming-app.yaml
-    kubectl apply -f $videoDir\video-streaming.yaml  
+
 }
+
+$videoDir = ".\video"
+New-Item -Path $videoDir -ItemType directory -Force
+Invoke-WebRequest ($templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
+kubectl apply -f $videoDir\akri-video-streaming-app.yaml
+kubectl apply -f $videoDir\video-streaming.yaml  
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
