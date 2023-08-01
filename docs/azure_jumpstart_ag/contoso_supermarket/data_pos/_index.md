@@ -24,7 +24,7 @@ Contoso supports dashboard reports for the PoS application analytics and monitor
 
 ## Manually import dashboards
 
-> __NOTE: If you used the [Azure Developer CLI (azd) method](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the automated deployment.__
+> __NOTE: If you used the [Azure Developer CLI (azd) method](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#deployment-via-azure-developer-cli) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the automated deployment.__
 
 Follow the below steps in order to view the PoS Orders dashboard reports you will need to import these into ADX.
 
@@ -106,7 +106,7 @@ By default there is no data available in Cosmos DB database after the deployment
 
 - In the ADX Portal, under Dashboards, open the PoS Orders report and set the time range for "_Last 30 minutes_", and refresh the report to see data.
 
-> __NOTE: As the Cloud Sync service performs the sync in the backend, it might take a few minutes for orders to show up in ADX.__
+  > __NOTE: As the Cloud Sync service performs the sync in the backend, it might take a few minutes for orders to show up in ADX.__
 
   ![Screenshot showing the PoS Chicago dashboard report](./img/pos_chicago_customer_report.png)
 

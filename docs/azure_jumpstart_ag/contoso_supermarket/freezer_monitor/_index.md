@@ -42,7 +42,7 @@ Contoso has an ADX dashboard report for Freezer Monitoring analytics and monitor
 
 ### Manually import dashboard
 
-> __NOTE: If you used the [Azure Developer CLI (azd) method](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as the dashboard is automatically imported for you during the automated deployment.__
+> __NOTE: If you used the [Azure Developer CLI (azd) method](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#deployment-via-azure-developer-cli) to deploy the Contoso Supermarket scenario, you may skip this section as the dashboard is automatically imported for you during the automated deployment.__
 
 To view the Freezer Monitoring dashboard you will first need to import it into ADX.
 
@@ -270,7 +270,7 @@ From the MQTT Broker, the data is sent to Azure IoT Hub, which is a managed serv
 
 To see whether data is being received by Azure IoT Hub for your devices, from your local machine:
 
-- Open Resource Groups in the Azure Portal - [https://portal.azure.com](https://ms.portal.azure.com/#browse/resourcegroups)
+- Open Resource Groups in the [Azure Portal](https://ms.portal.azure.com/#browse/resourcegroups).
 
 - Click the new resource group you created for __Jumpstart Agora__.
 
