@@ -20,7 +20,7 @@ toc_hide: true
 
   ![Screenshot showing azd down](./img/azd_down.png)
 
-  > __NOTE: If you have manually configured Defender for Cloud, please refer to the [dedicated page](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/arc_servers/) to clean up Defender for Cloud resources.__
+  > __NOTE: If you have manually configured Defender for Cloud, please refer to the [dedicated page](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/arc_defender_servers/#cleanup) to clean up Defender for Cloud resources.__
 
 ## Next steps
 
