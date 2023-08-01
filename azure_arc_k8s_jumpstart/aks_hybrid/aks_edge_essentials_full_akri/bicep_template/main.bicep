@@ -21,10 +21,10 @@ param windowsAdminUsername string
 param windowsAdminPassword string
 
 @description('Target GitHub account')
-param githubAccount string = 'lanicolas'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'akri_video'
+param githubBranch string = 'main'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
