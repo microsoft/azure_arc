@@ -15,6 +15,12 @@ Our goal is for you to have a working Azure Arc environment spun-up in no time s
 
 <p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
 
+## Our philosophy and core design principals
+
+In the Jumpstart, we believe a document or a guide is not just that. It should represent an experience that is simply more than just a set of instructions. It should be a journey that is easy to follow, fun to do, and most importantly, it should be a journey that you can relate to and see yourself in it.
+
+![design principals](/img/design_principals.png)
+
 ## Jumpstart Scenarios
 
 Ready to get going?! This website offers you detailed guides, automation, code samples, screenshots and everything you really need to get going with Azure Arc!

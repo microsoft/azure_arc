@@ -1,7 +1,7 @@
 ---
 type: docs
 linkTitle: "Jumpstart HCIBox"
-weight: 4
+weight: 5
 ---
 
 ## Jumpstart HCIBox - Overview

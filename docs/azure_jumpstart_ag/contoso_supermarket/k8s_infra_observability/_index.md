@@ -30,7 +30,7 @@ Grafana's dashboards in Contoso's implementation provide a visually appealing an
 
 - __Node Exporter Full__: The Kubernetes Nodes Dashboard in Grafana provides a detailed view of node-level metrics and resources in your Kubernetes cluster. It enables you to monitor CPU and RAM usage, track pods running on each node, and identify any resource anomalies or performance issues. The dashboard also offers system-level metrics such as system load, context switches, and file descriptors, allowing for troubleshooting and optimization. Additionally, it provides insights into storage capacity, volumes, and I/O operations on the nodes, aiding in the effective management of storage resources.
 
-- __Freezer Monitoring__: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide.](../freezer_monitor/_index.md)
+- __Freezer Monitoring__: The Freezer Monitoring dashboard in Grafana provides the current temperature of the freezers and the temperature history for the last 24 hours. You can also set up alerts to notify you when the temperature exceeds a certain threshold. This allows you to proactively monitor the freezer's health and performance and take corrective actions to prevent any issues. This would be covered in more detail in the [Freezer Monitor guide.](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/)
 
 > __Grafana Dashboard Credits:__
 > The Kubernetes dashboards included in this guide are based on the work of publicly available dashboards. We would like to express our appreciation for Author's efforts in creating this insightful dashboard that enhances our monitoring capabilities for Kubernetes.
@@ -42,7 +42,7 @@ Grafana's dashboards in Contoso's implementation provide a visually appealing an
 
 As an Operations team member at Contoso, you will have access to the Grafana dashboards for infrastructure observability. These dashboards provide a comprehensive view of the health, performance, and metrics of the cloud to edge infrastructure. To access the Grafana dashboards follow the below steps.
 
-- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
+- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
 
 ### Prod Stores
 
@@ -126,4 +126,4 @@ As an Operations team member at Contoso, you will have access to the Grafana das
 
 ## Next steps
 
-Continuing with the next Contoso Supermarket scenario, you can now proceed to the next guide to learn about [infrastructure observability for Azure Arc-enabled servers using Azure Monitor](../arc_monitoring_servers/_index.md).
+Continuing with the next Contoso Supermarket scenario, you can now proceed to the next guide to learn about [infrastructure observability for Azure Arc-enabled servers using Azure Monitor](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/arc_monitoring_servers/).

@@ -99,4 +99,4 @@ Microsoft Defender for Servers will collect data from your Arc-enabled servers t
 
 ## Next steps
 
-Now that you have successfully completed all of the Contoso Supermarket scenarios, continue to the next step to learn how to [cleanup the deployment](../cleanup/_index.md).
+Now that you have successfully completed all of the Contoso Supermarket scenarios, continue to the next step to learn how to [cleanup the deployment](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/cleanup/).

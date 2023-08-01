@@ -60,4 +60,4 @@ Now that we have checked that the required monitoring artifacts have been succes
 
 ## Next steps
 
-Now that you have successfully learned how the integration of Azure Monitor for Azure Arc-enabled servers works, continue to the next step to learn how to [secure your Azure Arc-enabled servers with Microsoft Defender for Servers](../arc_defender_servers/_index.md).
+Now that you have successfully learned how the integration of Azure Monitor for Azure Arc-enabled servers works, continue to the next step to learn how to [secure your Azure Arc-enabled servers with Microsoft Defender for Servers](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/arc_defender_servers/).
