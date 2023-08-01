@@ -585,13 +585,25 @@ Invoke-Command -VMName Node1 -Credential $Credentials -ArgumentList $templateBas
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video.mp4") -OutFile $videoDir\video.mp4
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
     Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
+    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
     Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p udp --sport 3702 -j ACCEPT"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p udp -m udp --sport 3702 -j ACCEPT' /etc/systemd/scripts/ip4save"
+    Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
+    Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "sudo /home/aksedge-user/akri.sh"
+}
+
+Invoke-Command -VMName Node2 -Credential $Credentials -ArgumentList $templateBaseUrl -ScriptBlock {
+     # Copy video scripts
+     # Copy video scripts
+    $videoDir = ".\video"
+    New-Item -Path $videoDir -ItemType directory -Force
+    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video.mp4") -OutFile $videoDir\video.mp4
+    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/video-streaming.yaml") -OutFile $videoDir\video-streaming.yaml
+    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri-video-streaming-app.yaml") -OutFile $videoDir\akri-video-streaming-app.yaml
+    Invoke-WebRequest ($Using:templateBaseUrl + "artifacts/video/akri.sh") -OutFile $videoDir\akri.sh
+    Copy-AksEdgeNodeFile -FromFile $videoDir\video.mp4 -toFile /home/aksedge-user/sample.mp4 -PushFile
+    Copy-AksEdgeNodeFile -FromFile $videoDir\akri.sh -toFile /home/aksedge-user/akri.sh -PushFile
+    Invoke-AksEdgeNodeCommand -NodeType "Linux"-command "sudo /home/aksedge-user/akri.sh"
     kubectl apply -f $videoDir\akri-video-streaming-app.yaml
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo ip route add 239.255.255.250/32 dev cni0"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p udp --dport 3702 -j ACCEPT"
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | sudo tee /etc/systemd/scripts/ip4save > /dev/null"  
     kubectl apply -f $videoDir\video-streaming.yaml  
 }
 
