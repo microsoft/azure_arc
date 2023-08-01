@@ -105,7 +105,19 @@ To get familiar with the automation and deployment flow read the following expla
 
     2. Set local OS environment variables
 
-## Deployment
+## Deployment Option 1: Azure portal
+
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_sqlsrv_jumpstart%2Fazure%2Fwindows%2Fdefender_sql%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+
+  ![Screenshot showing Azure portal deployment of Jumpstart scenario](./portaldeploy.png)
+
+  ![Screenshot showing Azure portal deployment creation of Jumpstart scenario](./portaldeploy-create.png)
+
+  ![Screenshot showing Azure portal deployment progress of Jumpstart scenario](./portaldeployinprogress.png)
+
+  ![Screenshot showing Azure portal deployment completion of Jumpstart scenario](./portaldeploymentcomplete.png)
+
+## Deployment Option 2: ARM template with Azure CLI
 
 As mentioned, this deployment will use an ARM Template. You will deploy a single template that creates all the Azure resources in a single resource group as well as onboarding the nested Hyper-V guest SQL Server VM to Azure Arc.
 

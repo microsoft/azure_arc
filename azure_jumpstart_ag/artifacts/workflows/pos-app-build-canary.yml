@@ -1,0 +1,102 @@
+name: Promote-to-canary
+on:
+  repository_dispatch:
+    types:
+      - Kustomization/config-supermarket-pos-contosopos.contoso-supermarket
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote-to-canary:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.client_payload.metadata.summary == 'env=staging' && github.event.client_payload.severity == 'info' && contains(github.event.client_payload.message,'Health check passed')
+
+    steps:
+    - name: 'Checkout repository'
+      uses: actions/checkout@v3
+
+    - name: 'Login to ACR'
+      uses: azure/docker-login@v1
+      with:
+        login-server: "${{ secrets.ACR_NAME }}.azurecr.io"
+        username: ${{ secrets.SPN_CLIENT_ID }}
+        password: ${{ secrets.SPN_CLIENT_SECRET }}
+
+    - name: Get latest Staging Image Tag
+      id: latestImageTag
+      env:
+        ACR_NAME: ${{ secrets.ACR_NAME }}
+        namespace: "staging"
+      run: |
+        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+        LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
+        echo $LATEST_TAG
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+    - name: Get latest Canary Image Tag
+      id: canaryLatestImageTag
+      env:
+        ACR_NAME: ${{ secrets.ACR_NAME }}
+        namespace: "canary"
+      run: |
+        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+        CANARY_LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
+        echo $CANARY_LATEST_TAG
+        echo "latest_tag=$CANARY_LATEST_TAG" >> $GITHUB_OUTPUT
+
+    - name: Run integration tests
+      uses: mscoutermarsh/ascii-art-action@master
+      env:
+        latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
+      with:
+        text: 'Integration tests complete!'
+
+    - name: 'Build and push new images'
+      env:
+        latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+        namespace: "canary"
+      if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
+      run: |
+        if [ "$latest_tag" != "v1.0" ]; then
+          docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag"
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
+        fi
+
+    - name: 'Checkout canary branch'
+      uses: actions/checkout@v3
+      env:
+        latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+      if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
+      with:
+        ref: 'canary'
+
+    - name: 'Update Image tag on canary branch and submit PR'
+      env:
+        latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ env.latest_tag != 'v1.0' && env.canary_latest_tag != env.latest_tag}}
+      run: |
+        FILE_PATH=$(find . -name "chicago.yaml")
+        newLine="    image_tag: $latest_tag"
+        if [ ! -z "$FILE_PATH" ]; then
+          sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+        else
+          echo "chicago.yaml not found"
+        fi
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        newBranch="update-canary-image-tag-${latest_tag}"
+        git checkout -b $newBranch canary
+        git config pull.rebase false
+        git add --all
+        git commit -m "Update Image Tag on Canary to $latest_tag"
+        git push --set-upstream origin $newBranch
+        gh pr create --title "Update Canary Image Tag to $latest_tag" --body "Update Canary Image Tag to $latest_tag" --base canary
