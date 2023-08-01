@@ -1137,7 +1137,7 @@ foreach ($resource in $resources) {
 
             }
 
-            $ProvisioningState = $extension.ProvisioningState
+            $ProvisioningState = $extension.ProvisioningState.ToString()
 
             [PSCustomObject]@{
                 ResourceName = $resourceName
@@ -1153,7 +1153,7 @@ foreach ($resource in $resources) {
 # Wait for all jobs to complete
 $FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
 
-$FluxExtensionJobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
+$jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
 
 # Clean up jobs
 $jobs | Remove-Job
@@ -1789,5 +1789,3 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment tim
 Write-Host
 
 Stop-Transcript
-
-Wait-Debugger
