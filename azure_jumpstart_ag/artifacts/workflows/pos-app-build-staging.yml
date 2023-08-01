@@ -1,0 +1,127 @@
+name: Promote-to-staging
+
+on:
+  pull_request:
+        branches:
+            - main
+        types:
+            - closed
+        paths:
+        - 'contoso_supermarket/developer/pos/**'
+
+  workflow_dispatch: {}
+
+permissions:
+    contents: write
+    pull-requests: write
+    id-token: write
+
+jobs:
+  promote-to-staging:
+      if: github.repository != 'microsoft/jumpstart-agora-apps' && github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+      steps:
+      # checkout the repo
+      - name: 'Checkout repository'
+        uses: actions/checkout@v3
+
+      - name: 'Login to ACR'
+        uses: azure/docker-login@v1
+        with:
+          login-server: "${{ secrets.ACR_NAME }}.azurecr.io"
+          username: ${{ secrets.SPN_CLIENT_ID }}
+          password: ${{ secrets.SPN_CLIENT_SECRET }}
+
+      - name: Increment Image Tag
+        id: latestImageTag
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          namespace: "dev"
+        run: |
+          az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+          LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
+          NEW_VERSION=$(echo $LATEST_TAG | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
+          echo $NEW_VERSION
+          echo "latest_tag=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Run unit tests
+        uses: mscoutermarsh/ascii-art-action@master
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          canary_latest_tag: ${{ steps.canaryLatestImageTag.outputs.latest_tag }}
+        with:
+          text: 'Unit Tests complete!'
+
+      - name: 'Build and push new images'
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        run: |
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/dev/contoso-supermarket/pos:$latest_tag
+              docker build ./contoso_supermarket/developer/pos/src -t "${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag"
+              docker push ${{ secrets.ACR_NAME }}.azurecr.io/staging/contoso-supermarket/pos:$latest_tag
+
+      - name: 'Update Image tag on main branch'
+        env:
+            latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        run: |
+          FILE_PATH=$(find . -name "dev.yaml")
+          newLine="    image_tag: $latest_tag"
+          if [ ! -z "$FILE_PATH" ]; then
+            sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+          else
+            echo "dev.yaml not found"
+          fi
+
+      - name: Commit and push changes to main branch
+        continue-on-error: true
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            git config --global user.name "GitHub Action"
+            git config --global user.email "action@github.com"
+            newBranch="update-dev-image-tag-${latest_tag}"
+            git checkout -b $newBranch main
+            git config pull.rebase false
+            git add --all
+            git commit -m "Update Image Tag on dev to $latest_tag"
+            git push --set-upstream origin $newBranch
+            pr=$(gh pr create --title "Update dev Image Tag to $latest_tag" --body "Update dev Image Tag to $latest_tag")
+            pr_number=$(echo "${url}" | awk -F'/' '{print $NF}')
+            gh pr merge $pr_number --merge --delete-branch
+
+      - name: 'Checkout staging branch'
+        uses: actions/checkout@v3
+        with:
+          ref: 'staging'
+
+      - name: 'Update Image tag on staging branch'
+        env:
+            latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+        run: |
+          FILE_PATH=$(find . -name "staging.yaml")
+          newLine="    image_tag: $latest_tag"
+          if [ ! -z "$FILE_PATH" ]; then
+            sed -i "s/.*image_tag.*/$newLine/" $FILE_PATH
+          else
+            echo "staging.yaml not found"
+          fi
+
+      - name: Commit and push changes to staging branch
+        continue-on-error: true
+        env:
+          latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            git config --global user.name "GitHub Action"
+            git config --global user.email "action@github.com"
+            newBranch="update-staging-image-tag-${latest_tag}"
+            git checkout -b $newBranch staging
+            git config pull.rebase false
+            git add --all
+            git commit -m "Update Image Tag on Staging to $latest_tag"
+            git push --set-upstream origin $newBranch
+            pr=$(gh pr create --title "Update Staging Image Tag to $latest_tag" --body "Update Staging Image Tag to $latest_tag" --base staging)
+            pr_number=$(echo "${url}" | awk -F'/' '{print $NF}')
+            gh pr merge $pr_number --merge --delete-branch
