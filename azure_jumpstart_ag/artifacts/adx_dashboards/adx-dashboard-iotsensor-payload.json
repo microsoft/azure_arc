@@ -1,0 +1,168 @@
+
+{
+  "$schema": "https://dataexplorer.azure.com/static/d/schema/35/dashboard.json",
+  "id": "2db2cda4-1563-4cba-9bbd-92e6a81c3e27",
+  "eTag": "LUKrHaq9L9ACGqMC5zRS6Q==",
+  "schema_version": "35",
+  "title": "Freezer Monitoring",
+  "autoRefresh": {
+    "enabled": false
+  },
+  "sharedQueries": [],
+  "tiles": [
+    {
+      "id": "d6282c73-3902-4b76-8a39-f9cdb080706e",
+      "title": "Temperature",
+      "visualType": "line",
+      "pageId": "cbfb4c28-bf08-4da5-9ee5-1a9d3bf52d5d",
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 19,
+        "height": 7
+      },
+      "query": {
+        "kind": "inline",
+        "dataSource": {
+          "kind": "inline",
+          "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
+        },
+        "usedVariables": [],
+        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F"
+      },
+      "visualOptions": {
+        "hideTileTitle": false,
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": false,
+        "xColumnTitle": "",
+        "xColumn": {
+          "type": "infer"
+        },
+        "yColumns": {
+          "type": "infer"
+        },
+        "seriesColumns": {
+          "type": "infer"
+        },
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": true,
+        "drillthroughDisabled": false,
+        "crossFilter": [
+          {
+            "interaction": "column",
+            "property": "device-id",
+            "disabled": false
+          }
+        ],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "0869e97f-f3e0-45da-be16-b42b079166b7",
+      "title": "Humidity",
+      "visualType": "line",
+      "pageId": "cbfb4c28-bf08-4da5-9ee5-1a9d3bf52d5d",
+      "layout": {
+        "x": 0,
+        "y": 7,
+        "width": 19,
+        "height": 7
+      },
+      "query": {
+        "kind": "inline",
+        "dataSource": {
+          "kind": "inline",
+          "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
+        },
+        "usedVariables": [],
+        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
+      },
+      "visualOptions": {
+        "hideTileTitle": false,
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": false,
+        "xColumnTitle": "",
+        "xColumn": {
+          "type": "infer"
+        },
+        "yColumns": {
+          "type": "infer"
+        },
+        "seriesColumns": {
+          "type": "infer"
+        },
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": true,
+        "drillthroughDisabled": false,
+        "crossFilter": [
+          {
+            "interaction": "column",
+            "property": "device-id",
+            "disabled": false
+          }
+        ],
+        "drillthrough": []
+      }
+    }
+  ],
+  "parameters": [
+    {
+      "kind": "duration",
+      "id": "34db77f9-4127-466e-9ad0-640760523df5",
+      "displayName": "Time range",
+      "beginVariableName": "_startTime",
+      "endVariableName": "_endTime",
+      "defaultValue": {
+        "kind": "dynamic",
+        "count": 1,
+        "unit": "hours"
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    }
+  ],
+  "dataSources": [
+    {
+      "id": "a047cfcb-722a-49e0-af1c-b57f30309d6b",
+      "name": "{{ADX_CLUSTER_NAME}}",
+      "clusterUri": "{{ADX_CLUSTER_URI}}",
+      "database": "Orders",
+      "queryResultsCacheMaxAge": 1800000,
+      "kind": "manual-kusto",
+      "scopeId": "kusto"
+    }
+  ],
+  "pages": [
+    {
+      "name": "Page 1",
+      "id": "cbfb4c28-bf08-4da5-9ee5-1a9d3bf52d5d"
+    }
+  ]
+}
