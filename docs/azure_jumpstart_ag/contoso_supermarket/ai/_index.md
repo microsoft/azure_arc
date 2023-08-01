@@ -1,3 +1,9 @@
+---
+type: docs
+weight: 100
+toc_hide: true
+---
+
 # Enabling AI at the Edge & Software configurations rollout with basic GitOps flow
 
 ## Overview
