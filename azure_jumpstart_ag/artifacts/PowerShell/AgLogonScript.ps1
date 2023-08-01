@@ -1159,7 +1159,7 @@ $FluxExtensionJobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
 $jobs | Remove-Job
 
 # Abort if Flux-extension fails on any cluster
-if ($FluxExtensionJobs | Where-Object $PSItem.ProvisioningState -ne 'Succeeded') {
+if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
 
     throw "One or more Flux-extension deployments failed - aborting"
 
@@ -1789,3 +1789,5 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment tim
 Write-Host
 
 Stop-Transcript
+
+Wait-Debugger
