@@ -1,7 +1,8 @@
 ---
 type: docs
-weight: 100
-toc_hide: true
+title: "Contoso Supermarket"
+linkTitle: "Contoso Supermarket"
+weight: 1
 ---
 
 # Contoso Supermarket overview
