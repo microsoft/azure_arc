@@ -2,7 +2,7 @@
 type: docs
 title: "Security"
 linkTitle: "Security"
-weight: 12
+weight: 11
 ---
 
 <!-- BEGIN MICROSOFT SECURITY.MD V0.0.5 BLOCK -->

@@ -2,7 +2,7 @@
 type: docs
 title: "Jumpstart FAQ"
 linkTitle: "Jumpstart FAQ"
-weight: 8
+weight: 7
 ---
 
 # Jumpstart Frequently Asked Questions (FAQ)
