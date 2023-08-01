@@ -103,7 +103,7 @@ These practices and techniques are already well established for Azure-based work
 
 With Azure Arc, Contoso is able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and can extend cloud-native operations and governance beyond Azure.
 
-<p align="center"><img src="/img/architecture_dark.jpg" alt="architecture" width="1280"></p>
+![architecture](/img/architecture_dark.jpg)
 
 ## Want to be an Azure Arc "Jumpstarter"?
 
