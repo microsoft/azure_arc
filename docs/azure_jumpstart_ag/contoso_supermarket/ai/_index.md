@@ -122,7 +122,7 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
     ![Screenshot showing the operating system for the dev container](./img/vscode_dev_container_os.png)
 
-    ![Screenshot showing the operating system creation for the dev container](./img/vscode_dev_container_os_create.png)
+    ![Screenshot showing the jammy ubuntu flavor for the dev container](./img/vscode_dev_container_ubuntu_flavor.png)
 
 - No need for any additional features to install, so click _Ok_.
 
@@ -130,9 +130,9 @@ Contoso's DevOps team has received a request from the _Chicago_ store managers t
 
 - Click on _Trust folder and continue_, now you can see the cloned repository opened in VSCode, in the _Ubuntu_ dev container.
 
-    ![Screenshot showing the trust folder prompt in VSCode](./img/vscode_dev_container_pos_app.png)
-
     ![Screenshot showing the cloned repository opened in the dev container](./img/vscode_dev_container_trust_folder.png)
+
+    ![Screenshot showing the trust folder prompt in VSCode](./img/vscode_dev_container_pos_app.png)
 
 - Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_, and select the _jumpstart-agora-apps_ repository to include the repository to the allow list.
 
