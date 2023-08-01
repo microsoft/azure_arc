@@ -19,11 +19,7 @@ Our goal is for you to have a working Azure Arc environment spun-up in no time s
 
 In the Jumpstart, we believe a document or a guide is not just that. It should represent an experience that is simply more than just a set of instructions. It should be a journey that is easy to follow, fun to do, and most importantly, it should be a journey that you can relate to and see yourself in it.
 
-<!-- ![design principals](/img/design_principals.png) -->
-
 <p align="center"><img src="/img/design_principals.png" alt="design-principals" width="1280"></p>
-
-<p align="center"><img src="/img/design_principals.png" alt="design-principals" width="1280" height="720"></p>
 
 ## Jumpstart Scenarios
 
@@ -107,7 +103,7 @@ These practices and techniques are already well established for Azure-based work
 
 With Azure Arc, Contoso is able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and can extend cloud-native operations and governance beyond Azure.
 
-![architecture](/img/architecture_white.jpg)
+<p align="center"><img src="/img/architecture_dark.jpg" alt="architecture" width="1280"></p>
 
 ## Want to be an Azure Arc "Jumpstarter"?
 
