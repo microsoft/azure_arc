@@ -100,7 +100,7 @@ Before starting to code this new feature, it is useful to take a look at how Con
 
 Contoso's DevOps team has received a request from the _Chicago_ store managers that they need the "Live View" feature enabled in their store as their queues are getting longer throughout peak hours throughout the day.
 
-- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#connecting-to-the-agora-client-virtual-machine).
+- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
 
 - Open VSCode from the desktop shortcut.
 
@@ -208,4 +208,4 @@ Contoso's DevOps team has also received a request from the _Seattle_ store manag
 
 ## Next Steps
 
-In the next scenario, learn how Contoso Supermarket are streamlining the [Software Delivery Process using CI/CD](../ci_cd/_index.md).
+In the next scenario, learn how Contoso Supermarket are streamlining the [Software Delivery Process using CI/CD](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/ci_cd/).

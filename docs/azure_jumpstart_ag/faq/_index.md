@@ -1,8 +1,8 @@
 ---
 type: docs
-title: "Jumpstart Agora FAQ"
-linkTitle: "Jumpstart Agora FAQ"
-weight: 7
+title: "Agora FAQ"
+linkTitle: "Agora FAQ"
+weight: 2
 ---
 
 # Jumpstart Agora Frequently Asked Questions (FAQ)
@@ -15,7 +15,7 @@ Jumpstart Agora is a marketplace of various “cloud to edge” industry scenari
 
 ## What industry scenarios are available in Jumpstart Agora?
 
-Currently, Agora offers the [Contoso Supermarket](../contoso_supermarket/_index.md) retail industry experience. Contoso Supermarket includes everything needed to deploy, configure and use a realistic sample point-of-sale application including CI/CD, observability, security, and more.
+Currently, Agora offers the [Contoso Supermarket](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/) retail industry experience. Contoso Supermarket includes everything needed to deploy, configure and use a realistic sample point-of-sale application including CI/CD, observability, security, and more.
 
 ## What is required to deploy Agora?
 

@@ -24,7 +24,7 @@ Contoso supports dashboard reports for the PoS application analytics and monitor
 
 ## Manually import dashboards
 
-> __NOTE: If you used the [Azure Developer CLI (azd) method](https://github.com/microsoft/azure_arc/blob/jumpstart_ag/docs/azure_jumpstart_ag/contoso_supermarket/deployment/_index.md#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the automated deployment.__
+> __NOTE: If you used the [Azure Developer CLI (azd) method](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#deployment-via-azure-developer-cli-experimental) to deploy the Contoso Supermarket scenario, you may skip this section as these reports are automatically imported for you during the automated deployment.__
 
 Follow the below steps in order to view the PoS Orders dashboard reports you will need to import these into ADX.
 
@@ -116,4 +116,4 @@ By default there is no data available in Cosmos DB database after the deployment
 
 ## Next steps
 
-Now that you have completed the first data pipeline scenario, it's time to continue to the next scenario, [Data pipeline and reporting across cloud and edge for sensor telemetry](../freezer_monitor/_index.md).
+Now that you have completed the first data pipeline scenario, it's time to continue to the next scenario, [Data pipeline and reporting across cloud and edge for sensor telemetry](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/).
