@@ -120,7 +120,7 @@ $JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
-azd env set JS_WINDOWS_ADMIN_USERNAME -- $JS_WINDOWS_ADMIN_USERNAME
+azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 
 
 ########################################################################
