@@ -178,7 +178,7 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
   $folderPath = <Specify a folder path to clone the repo>
 
   Set-Location -Path $folderPath
-  git clone https://github.com/microsoft/azure_arc.git
+  git clone -b arc_servers_level_up https://github.com/microsoft/azure_arc.git
   Set-Location -Path "azure_arc\azure_jumpstart_arcbox_servers_levelup\bicep"
   ```
 
