@@ -49,6 +49,8 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
   az --version
   ```
 
+    ![Screenshot showing azure cli version](./azcli_version.png)
+
 - Login to AZ CLI using the ```az login``` command.
 
 - Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
@@ -91,16 +93,22 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Owner" --scopes /subscriptions/$subscriptionId
+    subscriptionId="<Your Subscription Id>"
+    servicePrincipalName="<Unique Service principal name>"
+
+    az account set -s $subscriptionId
+    az ad sp create-for-rbac -n $servicePrincipalName --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
     az login
-    subscriptionId=$(az account show --query id --output tsv)
-    az ad sp create-for-rbac -n "JumpstartArcBoxSPN" --role "Owner" --scopes /subscriptions/$subscriptionId
+    subscriptionId="98471a83-9151-489e-uub1-463447bed604"
+    servicePrincipalName="JumpstartArcBoxSPN"
+
+    az account set -s $subscriptionId
+    az ad sp create-for-rbac -n $servicePrincipalName --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look similar to this:
@@ -108,7 +116,7 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "JumpstartArcBox",
+    "displayName": "JumpstartArcBoxSPN",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
@@ -118,7 +126,11 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
     ```PowerShell
     $account = Connect-AzAccount
-    $spn = New-AzADServicePrincipal -DisplayName "<Unique SPN name>" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
+    $subscriptionId = "<Your Subscription Id>"
+    $servicePrincipalName = "<Unique Service principal name>"
+
+    Set-AzContext -SubscriptionId $subscriptionId
+    $spn = New-AzADServicePrincipal -DisplayName $servicePrincipalName -Role "Owner" -Scope "/subscriptions/$subscriptionId"
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
     ```
@@ -127,7 +139,11 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
     ```PowerShell
     $account = Connect-AzAccount
-    $spn = New-AzADServicePrincipal -DisplayName "JumpstartArcBoxSPN" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
+    $subscriptionId = "98471a83-9151-489e-uub1-463447bed604"
+    $servicePrincipalName = "JumpstartArcBoxSPN"
+
+    Set-AzContext -SubscriptionId $subscriptionId
+    $spn = New-AzADServicePrincipal -DisplayName $servicePrincipalName -Role "Owner" -Scope "/subscriptions/$subscriptionId"
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
     ```
@@ -154,6 +170,43 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
     > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#basic-troubleshooting).**
 
+### Deployment Option 3: Bicep deployment via Azure CLI
+
+- Clone the Azure Arc Jumpstart repository
+
+  ```shell
+  $folderPath = <Specify a folder path to clone the repo>
+
+  Set-Location -Path $folderPath
+  git clone https://github.com/microsoft/azure_arc.git
+  Set-Location -Path "azure_arc\azure_jumpstart_arcbox_servers_levelup\bicep"
+  ```
+
+- Upgrade to latest Bicep version
+
+  ```shell
+  az bicep upgrade
+  ```
+
+- Edit the [main.parameters.json](https://github.com/sebassem/azure_arc/blob/arc_servers_level_up/azure_jumpstart_arcbox_servers_levelup/bicep/main.parameters.json) template parameters file and supply some values for your environment.
+  - _`spnClientId`_ - Your Azure service principal id
+  - _`spnClientSecret`_ - Your Azure service principal secret
+  - _`spnTenantId`_ - Your Azure tenant id
+  - _`windowsAdminUsername`_ - Client Windows VM Administrator name
+  - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
+
+  ![Screenshot showing example parameters](./parameters_bicep.png)
+
+- Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the below command:
+
+  ```shell
+  az login
+  az group create --name "<resource-group-name>" --location "<preferred-location>"
+  az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
+  ```
+
+    > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#basic-troubleshooting).**
 
 ## Modules
 
