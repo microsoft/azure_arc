@@ -8,7 +8,9 @@ description: >
 
 ## Discover ONVIF cameras with Akri on AKS Edge Essentials multi-node deployment
 
-The following Jumpstart scenario will show how to create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview). Once Edge Essentials is deployed Akri is installed as a Kubernetes resource interface that exposes an IP mock camera as resources in the Edge Essentials cluster.
+The following Jumpstart scenario will show how to create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview). Once Edge Essentials is deployed [Akri](https://docs.akri.sh/) is installed as a Kubernetes resource interface that exposes an IP mock camera as resources in the Edge Essentials cluster.
+
+Akri is an opensource project for a Kubernetes resource interface that lets you expose heterogenous leaf devices as resources in a Kubernetes cluster. It currently supports OPC UA, ONVIF and udev protocols, but you can also implement custom protocol handlers provided by the template. In this scenario Akri is used for handling the dynamic appearance and disappearance of an [ONVIF](https://en.wikipedia.org/wiki/ONVIF) mock camera as the Discovery Handler.
 
 > **NOTE: It is not expected to use a nested virtualization in a production environment, let alone using an Azure VM to do so. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
@@ -219,7 +221,7 @@ To view these cluster extensions, click on the Azure Arc-enabled Kubernetes reso
 
 ## Akri deployment
 
-This scenario deploys Akri and it is used to discover ONVIF cameras that are connected to the same network as your AKS Edge Essentials cluster, in this instance a mock ONVIF camera is deployed as a container. These steps helps you get started using Akri to discover IP cameras through the ONVIF protocol and use them via a video broker that enables you to consume the footage from the camera and display it in a web application.
+This scenario deploys Akri and it is used to discover ONVIF cameras that are connected to the same network as your AKS Edge Essentials cluster, in this instance a mock ONVIF camera is deployed as a container. These steps help you get started using Akri to discover IP cameras through the ONVIF protocol and use them via a video broker that enables you to consume the footage from the camera and display it in a web application.
 
 First, verify that Akri can discover the camera, it should be seen as one Akri instance that represents the ONVIF camera:
 
@@ -229,7 +231,7 @@ First, verify that Akri can discover the camera, it should be seen as one Akri i
 
   ![Camera as Akri instance](./29.png)
 
-Now you need to get the Linux node IP and the port of your web app service. First get the port of the web app service by running:
+Next, you will need to receive the Linux node IP and the port of your web app service. First, get the port of the web app service by running:
 
   ```shell
     kubectl get svc
@@ -243,10 +245,12 @@ To get the IP address open Hyper-V manager and access the console of one of the 
 
 Once there, authenticate with:
 
-- Username: Administrator
-- Password: JS123!!
+  ```text
+    - Username: Administrator
+    - Password: JS123!!
+  ```
 
-Within the VM open a PowerShell window and run:
+Within the VM, open a PowerShell window and run:
 
   ```powershell
     Get-AksEdgeNodeAddr
@@ -254,7 +258,7 @@ Within the VM open a PowerShell window and run:
 
   ![Get AKS edge node](./32.png)
 
-Also from the Windows HyperV VM open Edge browser and navigate to the service, you should see the video streaming
+Also from the Windows Hyper-V VM, open the Edge browser and navigate to the service, you should see the video streaming
 
   ![Video Streaming](./33.png)
 
