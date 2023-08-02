@@ -1,3 +1,9 @@
+---
+type: docs
+weight: 100
+toc_hide: true
+---
+
 # Enabling AI at the Edge & Software configurations rollout with basic GitOps flow
 
 ## Overview
@@ -12,11 +18,11 @@ Contoso has also adopted GitOps methodologies so they can enable their DevOps te
 
 Contoso has four Kubernetes environments for their application rollout process (Dev, Staging, Canary, and Production), each environment is represented in their GitHub repository as a separate branch to allow developers to develop, test, and ship features and fixes in a controlled manner across each environment.
 
-   ![Screenshot showing the Contoso Supermarket's virtualization stack](./img/ag_aks_clusters.png)
+  ![Screenshot showing the Contoso Supermarket's virtualization stack](./img/ag_aks_clusters.png)
 
 In each cluster, a queue monitoring frontend service is deployed to allow store managers to monitor the checkout queues and leverages the power of AI to detect the number of users in a certain queue so they can take immediate action to enhance the customers' checkout experience.
 
-   ![Screenshot showing the Contoso Supermarket's queue monitoring service](./img/ai_diagram.png)
+  ![Screenshot showing the Contoso Supermarket's queue monitoring service](./img/ai_diagram.png)
 
 Contoso's DevOps team has adopted GitOps methodologies which allows them to use Git as the single source of truth for managing infrastructure and application deployments. It involves declarative definitions of infrastructure and application configurations, which are stored in Git repositories. The GitOps pipeline automatically detects any changes made to the repositories and triggers the necessary actions to deploy the changes to the target environments.
 
@@ -100,7 +106,7 @@ Before starting to code this new feature, it is useful to take a look at how Con
 
 Contoso's DevOps team has received a request from the _Chicago_ store managers that they need the "Live View" feature enabled in their store as their queues are getting longer throughout peak hours throughout the day.
 
-- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
+- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [deployment guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
 
 - Open VSCode from the desktop shortcut.
 

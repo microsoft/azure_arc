@@ -12,7 +12,7 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 ![Architecture diagram](./img/architecture_diagram.png)
 
-Deploying Agora consists of the following steps (once prerequisites are met).
+Deploying the "Contoso Supermarket" scenario consists of the following steps (once prerequisites are met).
   
   1. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
   2. Bicep template deploys multiple Azure resources including the Client virtual machine.
@@ -27,9 +27,9 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 ## Prerequisites
 
-- Fork the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
+- Fork the [_jumpstart-agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-  - Open the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
+  - Open the [_jumpstart-Agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo1.png)
   
@@ -203,7 +203,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`deployBastion`_ - Option to deploy using Azure Bastion instead of traditional RDP. Set to true or false.
-  - _`githubUser`_ - The name of the user account on GitHub where you have forked the [_Jumpstart-Agora-Apps_ repo](https://github.com/microsoft/jumpstart-agora-apps)
+  - _`githubUser`_ - The name of the user account on GitHub where you have forked the [_jumpstart-agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps)
   - _`githubPAT`_ - The GitHub PAT token that you created as part of the prerequisites.
 
   ![Screenshot showing example parameters](./img/parameters_bicep.png)
@@ -264,7 +264,9 @@ By design, Agora does not open port 3389 on the network security group. Therefor
 - Select My IP address from the dropdown.
 
   <img src="./img/nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
-
+  
+  <br/>
+  
   ![Screenshot showing all inbound security rule](./img/nsg_rdp_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./img/rdp_connect.png)

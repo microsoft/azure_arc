@@ -17,7 +17,7 @@ Occasionally deployments of the Jumpstart Agora Contoso Supermarket scenario may
 
     ![Screenshot showing SSH public key example](./img/ssh_example.png)
 
-- User has not forked the [jumpstart-agora-apps GitHub repository](https://github.com/microsoft/jumpstart-agora-apps). To simulate the developer experience, you must first fork the sample apps repo so that you have your own version of the underlying source code to work with. Instructions on how to fork this repo are included in the [deployment guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/).
+- User has not forked the [_jumpstart-agora-apps_ GitHub repository](https://github.com/microsoft/jumpstart-agora-apps). To simulate the developer experience, you must first fork the sample apps repo so that you have your own version of the underlying source code to work with. Instructions on how to fork this repo are included in the [deployment guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/).
 
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 40 available vCPU.
   - You can use the command ```az vm list-usage --location <your location> --output table``` to check your available vCPU quota.
@@ -51,4 +51,4 @@ Occasionally, you may need to review log output from scripts that run on the _Ag
 | _C:\Ag\Logs\Observability.log_ | Output from the script that configures observability components of the solution. |
 | _C:\Ag\Logs\Tools.log_ | Output from the tasks that set up developer tools on _Ag-VM-Client_. |
 
-  ![Screenshot showing Agora logs folder on ArcBox-Client](./img/logs_folder.png)
+  ![Screenshot showing Agora logs folder on AG-Client](./img/logs_folder.png)
