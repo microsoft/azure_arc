@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will show how to create an AKS Edge Essentials full deployment with two VMs in Hyper-V nested virtualization in an Azure Windows Server VM, and connect the Hyper-V VMs and AKS Edge Essentials cluster to Azure Arc using [Azure Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview). Once Edge Essentials is deployed [Akri](https://docs.akri.sh/) is installed as a Kubernetes resource interface that exposes an IP mock camera as resources in the Edge Essentials cluster.
 
-Akri is an opensource project for a Kubernetes resource interface that lets you expose heterogenous leaf devices as resources in a Kubernetes cluster. It currently supports OPC UA, ONVIF and udev protocols, but you can also implement custom protocol handlers provided by the template. In this scenario Akri is used for handling the dynamic appearance and disappearance of an [ONVIF](https://en.wikipedia.org/wiki/ONVIF) mock camera as the Discovery Handler.
+Akri is an open-source project for a Kubernetes resource interface that lets you expose heterogenous leaf devices as resources in a Kubernetes cluster. It currently supports OPC UA, ONVIF, and udev protocols, but you can also implement custom protocol handlers provided by the template. In this scenario, Akri is used for handling the dynamic appearance and disappearance of an [ONVIF](https://wikipedia.org/wiki/ONVIF) mock camera as the Discovery Handler.
 
 > **NOTE: It is not expected to use a nested virtualization in a production environment, let alone using an Azure VM to do so. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
