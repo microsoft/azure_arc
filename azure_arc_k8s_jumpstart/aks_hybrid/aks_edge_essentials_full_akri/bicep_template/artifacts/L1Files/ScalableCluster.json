@@ -1,0 +1,49 @@
+{
+  "SchemaVersion": "1.8",
+  "Version": "1.0",
+  "DeploymentType": "ScalableCluster",
+  "Init": {
+    "ServiceIPRangeStart": "ServiceIPRangeStart-null",
+    "ServiceIPRangeSize": 1000
+  },
+  "Arc": {
+    "ClusterName": "ClusterName-null",
+    "Location": "Location-null",
+    "ResourceGroupName": "ResourceGroupName-null",
+    "SubscriptionId": "SubscriptionId-null",
+    "TenantId": "TenantId-null",
+    "ClientId": "ClientId-null",
+    "ClientSecret": "ClientSecret-null"
+  },
+  "Network": {
+    "NetworkPlugin": "NetworkPlugin-null",
+    "ControlPlaneEndpointIp": "ControlPlaneEndpointIp-null",
+    "Ip4GatewayAddress": "Ip4GatewayAddress-null",
+    "Ip4PrefixLength": 2000,
+    "DnsServers": [
+        "DnsServer-null"
+    ],
+    "InternetDisabled": false,
+    "SkipAddressFreeCheck": false
+  },
+  "User": {
+    "AcceptEula": true,
+    "AcceptOptionalTelemetry": true
+  },
+  "Machines": [
+    {
+      "NetworkConnection": {
+        "AdapterName": "Ethernet-Null",
+        "Mtu": 0
+      },
+      "LinuxNode": {
+        "CpuCount": 4,
+        "MemoryInMB": 4096,
+        "DataSizeInGB": 20,
+        "Ip4Address": "Ip4Address-null",
+        "TimeoutSeconds": 300,
+        "TpmPassthrough": false
+      }
+    }
+  ]
+}
