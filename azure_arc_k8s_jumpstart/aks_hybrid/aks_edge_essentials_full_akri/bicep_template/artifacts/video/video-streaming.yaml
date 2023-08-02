@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onvif-camera-mocking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onvif-camera-mocking
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5    
+  template:
+    metadata:
+      labels:
+        app: onvif-camera-mocking
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: azure-vote-front
+        image: winiotsaleskit.azurecr.io/onvif-camera-mocking:latest
+        ports:
+        - containerPort: 8554
+        - containerPort: 1000
+        - containerPort: 3702
+        env:
+        - name: INTERFACE
+          value: "eth0"
+        - name: DIRECTORY
+          value: "/onvif-camera-mock"
+        - name: MP4FILE
+          value: /mnt/sample.mp4
+        volumeMounts:
+        - name: sample-volume
+          mountPath: /mnt
+      volumes:
+      - name: sample-volume
+        hostPath:
+          path: /home/aksedge-user
+          type: Directory
