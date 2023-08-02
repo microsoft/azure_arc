@@ -29,12 +29,6 @@ Agora can be deployed to the following regions:
 - West US 2
 - North Europe
 - West Europe
-- France Central
-- UK South
-- Australia East
-- Japan East
-- Korea Central
-- Southeast Asia
 
 ## What are the costs for using Agora?
 
@@ -42,7 +36,7 @@ Agora incurs normal Azure consumption charges for various Azure resources such a
 
 - [Agora Contoso Supermarket cost estimate](https://aka.ms/AgoraContosoSupermarketCostEstimate)
 
-## Where can I go if I have trouble deploying or using ArcBox?
+## Where can I go if I have trouble deploying or using Agora?
 
 Agora has a [dedicated page for troubleshooting](https://aka.ms/AgoraTroubleshooting) that you can review for common issues.
 

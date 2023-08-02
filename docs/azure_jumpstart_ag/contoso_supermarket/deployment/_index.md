@@ -12,7 +12,7 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 ![Architecture diagram](./img/architecture_diagram.png)
 
-Deploying Agora consists of the following steps (once prerequisites are met).
+Deploying the "Contoso Supermarket" scenario consists of the following steps (once prerequisites are met).
   
   1. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
   2. Bicep template deploys multiple Azure resources including the Client virtual machine.
