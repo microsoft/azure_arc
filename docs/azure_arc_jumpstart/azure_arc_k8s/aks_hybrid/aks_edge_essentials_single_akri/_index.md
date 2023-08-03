@@ -1,14 +1,16 @@
 ---
 type: docs
-title: "Akri on AKS Edge Essentials single node deployment"
-linkTitle: "Akri AKS Edge Essentials single node deployment"
+title: "Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment"
+linkTitle: "Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment"
 weight: 1
 description: >
 ---
 
-## Akri AKS Edge Essentials single node deployment with Azure Arc using ARM Template
+## Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment 
 
-The following Jumpstart scenario will show how to deploy Akri and a mock ONVIF camera on an AKS Edge Essentials cluster in Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation, Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster) and Akri deployment) on the Azure VM.
+The following Jumpstart scenario will show how to create an AKS Edge Essentials single node deployment in an Azure Windows Server VM and connect the Azure VM and AKS Edge Essentials cluster to Azure Arc. The provided ARM template is responsible for creating the Azure resources as well as executing the LogonScript (AKS Edge Essentials cluster creation, Azure Arc onboarding (Azure VM and AKS Edge Essentials cluster) and Akri deployment) on the Azure VM. Once Edge Essentials is deployed [Akri](https://docs.akri.sh/) is installed as a Kubernetes resource interface that exposes an IP mock camera as resources in the Edge Essentials cluster.
+
+Akri is an open-source project for a Kubernetes resource interface that lets you expose heterogenous leaf devices as resources in a Kubernetes cluster. It currently supports OPC UA, ONVIF, and udev protocols, but you can also implement custom protocol handlers provided by the template. In this scenario, Akri is used for handling the dynamic appearance and disappearance of an [ONVIF](https://wikipedia.org/wiki/ONVIF) mock camera as the Discovery Handler.
 
 Azure VMs leverage the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/azure/virtual-machines/windows/instance-metadata-service) by default to provide information about the VMs, and to manage and configure the VMs. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow the Azure Arc server resources to be represented as one resource when the IMDS is being used. Instead, the Azure Arc server will still "act" as a native Azure VM.
 
@@ -228,6 +230,36 @@ To view these cluster extensions, click on the Azure Arc-enabled Kubernetes reso
 
   ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./25.png)
 
+## Akri deployment
+
+This scenario deploys Akri and it is used to discover ONVIF cameras that are connected to the same network as your AKS Edge Essentials cluster, in this instance a mock ONVIF camera is deployed as a container. These steps help you get started using Akri to discover IP cameras through the ONVIF protocol and use them via a video broker that enables you to consume the footage from the camera and display it in a web application.
+
+First, verify that Akri can discover the camera, it should be seen as one Akri instance that represents the ONVIF camera:
+
+  ```shell
+    kubectl get akrii
+  ```
+
+  ![Camera as Akri instance](./26.png)
+
+Next, you will need to receive the Linux node IP and the port of your web app service. First, get the port of the web app service by running:
+
+  ```shell
+    kubectl get svc
+  ```
+
+  ![Web App service Port](./27.png)
+
+  ```powershell
+    Get-AksEdgeNodeAddr
+  ```
+
+  ![Get AKS edge node](./28.png)
+
+Open the Edge browser and navigate to the service, you should see the video streaming
+
+  ![Video Streaming](./29.png)
+
 ### Exploring logs from the Client VM
 
 Occasionally, you may need to review log output from scripts that run on the _AKS-EE-Demo_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on _AKS-EE-Demo_ Azure VM. A short description of the logs and their purpose can be seen in the list below:
@@ -238,10 +270,10 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 | _C:\Temp\LogonScript.log_ | Output of _LogonScript.ps1_ which creates the AKS Edge Essentials cluster, onboard it with Azure Arc creating the needed extensions as well as onboard the Azure VM. |
 |
 
-![Screenshot showing the Temp folder with deployment logs](./26.png)
+![Screenshot showing the Temp folder with deployment logs](./30.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./27.png)
+    ![Screenshot showing Azure resource group deletion](./31.png)
