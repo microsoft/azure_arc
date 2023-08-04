@@ -1790,7 +1790,7 @@ Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 Write-Host
-Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Please enjoy the Agora experience!" -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Enjoy the Agora experience!" -ForegroundColor Green
 Write-Host
 
 Stop-Transcript
