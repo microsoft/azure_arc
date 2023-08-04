@@ -115,8 +115,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _azuredeploy.parameters.json_ file**
-
     For example:
 
     ```shell

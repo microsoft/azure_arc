@@ -94,7 +94,7 @@ As mentioned, this deployment will leverage Azure Bicep templates. You will depl
   - _`windowsAdminPassword`_ - Azure Windows Server VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the Azure Windows Server VM.
 
-- To deploy the Azure Bicep template, navigate to the local cloned [deployment folder](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/main.parameters.json) and run the below command:
+- To deploy the Azure Bicep template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template) and run the below command:
 
     ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region>
