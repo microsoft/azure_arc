@@ -2,7 +2,7 @@
 type: docs
 title: "Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment"
 linkTitle: "Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment"
-weight: 1
+weight: 3
 description: >
 ---
 

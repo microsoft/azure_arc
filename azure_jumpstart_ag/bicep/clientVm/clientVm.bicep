@@ -72,7 +72,7 @@ param rdpPort string = '3389'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'jumpstart_ag'
+param githubBranch string = 'main'
 
 @description('GitHub Personal access token for the user account')
 @secure()

@@ -51,4 +51,4 @@ Occasionally, you may need to review log output from scripts that run on the _Ag
 | _C:\Ag\Logs\Observability.log_ | Output from the script that configures observability components of the solution. |
 | _C:\Ag\Logs\Tools.log_ | Output from the tasks that set up developer tools on _Ag-VM-Client_. |
 
-  ![Screenshot showing Agora logs folder on ArcBox-Client](./img/logs_folder.png)
+  ![Screenshot showing Agora logs folder on AG-Client](./img/logs_folder.png)
