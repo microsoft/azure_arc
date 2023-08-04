@@ -13,67 +13,67 @@
       "type": "string"
     },
     "dataControllerId": {
-      "type": "String"
+      "type": "string"
     },
     "customLocation": {
-      "type": "String"
+      "type": "string"
     },
     "subscriptionId": {
-      "type": "String"
+      "type": "string"
     },
     "admin": {
-      "type": "String"
+      "type": "string"
     },
     "password": {
-      "type": "SecureString"
+      "type": "securestring"
     },
     "namespace": {
-      "type": "String"
+      "type": "string"
     },
     "serviceType": {
-      "type": "String"
+      "type": "string"
     },
     "coordinatorCoresRequest": {
-      "type": "String"
+      "type": "string"
     },
     "coordinatorCoresLimit": {
-      "type": "String"
+      "type": "string"
     },
     "coordinatorMemoryRequest": {
-      "type": "String"
+      "type": "string"
     },
     "coordinatorMemoryLimit": {
-      "type": "String"
+      "type": "string"
     },
     "postgresEngineVersion": {
-      "type": "Int"
+      "type": "int"
     },
     "dataStorageSize": {
-      "type": "String"
+      "type": "string"
     },
     "dataStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "logsStorageSize": {
-      "type": "String"
+      "type": "string"
     },
     "logStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "backupsStorageSize": {
-      "type": "String"
+      "type": "string"
     },
     "backupsStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "resourceTags": {
-      "type": "Object"
+      "type": "object"
     },
     "numWorkers": {
-      "type": "Int"
+      "type": "int"
     },
     "apiVersion": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {},
