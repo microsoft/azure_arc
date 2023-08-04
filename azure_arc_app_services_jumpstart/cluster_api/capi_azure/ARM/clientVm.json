@@ -3,28 +3,28 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-App-Client",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
     },
     "capiArcAppClusterName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-AppSvc-CAPI",
       "metadata": {
         "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
       }
     },
     "windowsAdminUsername": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "arcdemo",
       "metadata": {
         "description": "Username for the Virtual Machine"
       }
     },
     "windowsAdminPassword": {
-      "type": "SecureString",
+      "type": "securestring",
       "minLength": 12,
       "maxLength": 123,
       "defaultValue": "ArcPassword123!!",
@@ -33,79 +33,79 @@
       }
     },
     "windowsOSVersion": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "2022-datacenter-g2",
       "metadata": {
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
       }
     },
     "location": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "vmSize": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Standard_D8s_v4",
       "metadata": {
         "description": "The size of the VM"
       }
     },
     "virtualNetworkName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-App-CAPI-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-App-CAPI-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "networkSecurityGroupName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-App-Client-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
     },
     "resourceTags": {
-      "type": "Object",
+      "type": "object",
       "defaultValue": {
         "Project": "jumpstart_azure_arc_app_services"
       }
     },
     "spnClientId": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Client id of the service principal"
       }
     },
     "spnClientSecret": {
-      "type": "SecureString",
+      "type": "securestring",
       "metadata": {
         "description": "Client secret of the service principal"
       }
     },
     "spnTenantId": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Tenant id of the service principal"
       }
     },
     "stagingStorageAccountName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
       }
     },
     "workspaceName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name of the Log Analytics workspace used with cluster extensions"
       }
@@ -139,19 +139,19 @@
       }
     },
     "templateBaseUrl": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
     },
     "adminEmail": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Email address to which all notifications from the deployment will be sent"
       }
     },
     "bastionSubnetRef": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet reference"
       }
@@ -164,14 +164,14 @@
       "defaultValue": false
     },
     "bastionHostName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arc-App-Demo-Bastion",
       "metadata": {
         "description": "Azure Bastion host name"
       }
     },
     "bastionSubnetPrefix": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
       }
@@ -356,11 +356,11 @@
 
   "outputs": {
     "adminUsername": {
-      "type": "String",
+      "type": "string",
       "value": "[parameters('windowsAdminUsername')]"
     },
     "publicIP": {
-      "type": "String",
+      "type": "string",
       "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
     }
   }

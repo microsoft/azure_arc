@@ -22,7 +22,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
 
 * Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
 
-* [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

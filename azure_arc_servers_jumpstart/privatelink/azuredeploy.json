@@ -25,14 +25,14 @@
         },
         "privateLinkScopes_name": {
             "defaultValue": "Arc-PL-demo",
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name for Azure Arc private Link Scope"
             }
         },
         "privateEndpoints_name": {
             "defaultValue": "Arc-PE-demo",
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name for Azure Arc private Link Endpoint"
             }
