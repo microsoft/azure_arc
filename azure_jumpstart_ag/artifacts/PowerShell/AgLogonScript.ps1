@@ -1087,7 +1087,7 @@ foreach ($resource in $resources) {
                     }
 
                     # Wait for a specific duration before re-evaluating the condition
-                    Start-Sleep -Seconds $retryDelaySecond
+                    Start-Sleep -Seconds $retryDelaySeconds
 
 
                         if ($attempt -lt $retryCount) {
