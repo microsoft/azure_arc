@@ -3,30 +3,30 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "connectorName": {
-      "type": "String"
+      "type": "string"
     },
     "domainController": {
-      "type": "String"
+      "type": "string"
     },
     "netbiosDomainName": {
-      "type": "String"
+      "type": "string"
     },
     "realm": {
-      "type": "String"
+      "type": "string"
     },
     "serviceAccountProvisioning": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "manual"
     },
     "domainName": {
-      "type": "String"
+      "type": "string"
     },
     "nameserverIPAddresses": {
       "type": "array",
       "defaultValue": [ "10.16.2.100" ]
     },
     "replicas": {
-      "type": "Int",
+      "type": "int",
       "defaultValue": 2
     },
     "preferK8sDnsForPtrLookups": {
@@ -34,7 +34,7 @@
       "defaultValue": false
     },
     "apiVersion": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {},

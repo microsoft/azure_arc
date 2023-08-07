@@ -3,83 +3,83 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources"
       }
     },
     "resourceGroup": {
-      "type": "String"
+      "type": "string"
     },
     "namespace": {
-      "type": "String"
+      "type": "string"
     },
     "connectionMode": {
-      "type": "String"
+      "type": "string"
     },
     "controllerName": {
-      "type": "String"
+      "type": "string"
     },
     "azdataUsername": {
-      "type": "String"
+      "type": "string"
     },
     "azdataPassword": {
-      "type": "SecureString"
+      "type": "securestring"
     },
     "customLocation": {
-      "type": "String"
+      "type": "string"
     },
     "subscriptionId": {
-      "type": "String"
+      "type": "string"
     },
     "spnClientId": {
-      "type": "String"
+      "type": "string"
     },
     "spnTenantId": {
-      "type": "String"
+      "type": "string"
     },
     "spnClientSecret": {
-      "type": "SecureString"
+      "type": "securestring"
     },
     "spnAuthority": {
-      "type": "String"
+      "type": "string"
     },
     "logAnalyticsWorkspaceId": {
-      "type": "String"
+      "type": "string"
     },
     "logAnalyticsPrimaryKey": {
-      "type": "String"
+      "type": "string"
     },
     "resourceTags": {
-      "type": "Object"
+      "type": "object"
     },
     "dockerRegistryCredential": {
-      "type": "String"
+      "type": "string"
     },
     "dataStorageClass": {
-      "type": "String"
+      "type": "string"
     },
     "dataStorageSize": {
-      "type": "String"
+      "type": "string"
     },
     "logsStorageClass": {
-      "type": "String"
+      "type": "string"
     },
     "logsStorageSize": {
-      "type": "String"
+      "type": "string"
     },
     "serviceType": {
-      "type": "String"
+      "type": "string"
     },
     "controllerPort": {
-      "type": "Int"
+      "type": "int"
     },
     "apiVersion": {
-      "type": "String"
+      "type": "string"
     },
     "infrastructure": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {},
