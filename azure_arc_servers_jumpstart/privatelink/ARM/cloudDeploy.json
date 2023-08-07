@@ -46,11 +46,11 @@
         },
         "privateLinkScopes_name": {
             "defaultValue": "Arc-PL-demo",
-            "type": "String"
+            "type": "string"
         },
         "privateEndpoints_name": {
             "defaultValue": "Arc-PE-demo",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {

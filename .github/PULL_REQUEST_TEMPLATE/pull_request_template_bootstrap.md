@@ -3,11 +3,11 @@
 ## Description
 <!--- Describe your changes in detail -->
 
-
 ## How Has This Been Tested?
-* Please describe in detail how you tested your changes
-* Include details of your testing environment, and the tests you ran to
-* see how your change affects other areas of the code, etc.
+
+- Please describe in detail how you tested your changes
+- Include details of your testing environment, and the tests you ran to
+- see how your change affects other areas of the code, etc.
 
 ## Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
@@ -15,7 +15,7 @@
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 
-## Checklist:
+## Checklist
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 - [ ] My code follows the code style of this project.
@@ -23,4 +23,3 @@
 - [ ] I have updated the documentation and/or images accordingly.
 <!-- - [ ] I've read the [CONTRIBUTION](https://github.com/openfaas/faas/blob/master/CONTRIBUTING.md) guide -->
 <!-- - [ ] I have signed-off my commits with `git commit -s` -->
-

@@ -3,25 +3,25 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "virtualNetworkName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "addressPrefix": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "VNET CIDR"
       }
     },
     "subnetAddressPrefix": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Subnet CIDR"
       }
@@ -34,7 +34,7 @@
       "defaultValue" : false
     },
     "bastionSubnetPrefix": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Bastion subnet prefix"
       }
