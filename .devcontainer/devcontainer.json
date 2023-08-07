@@ -2,8 +2,9 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/powershell
 {
 	"name": "azure-arc",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/powershell:7.3-ubuntu-22.04",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": "true",
@@ -18,9 +19,6 @@
 		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 
-	// Set PowerShell as default login shell
-	"postCreateCommand": "sudo chsh vscode -s \"$(which pwsh)\"",
-
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -32,7 +30,7 @@
 
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
-				"ms-vscode.powershell","ms-vscode.azure-account","ms-azuretools.vscode-bicep","hashicorp.terraform","ms-azuretools.azure-dev","ms-kubernetes-tools.vscode-kubernetes-tools","ms-kubernetes-tools.vscode-aks-tools"
+				"ms-vscode.powershell","ms-vscode.azure-account","ms-azuretools.vscode-bicep","ms-dotnettools.dotnet-interactive-vscode","hashicorp.terraform","ms-azuretools.azure-dev","ms-kubernetes-tools.vscode-kubernetes-tools","ms-kubernetes-tools.vscode-aks-tools"
 			]
 		}
 	}
