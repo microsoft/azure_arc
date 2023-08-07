@@ -22,7 +22,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: azure-vote-front
-        image: winiotsaleskit.azurecr.io/onvif-camera-mocking:latest
+        image: jumpstartprod.azurecr.io/onvif-camera-mocking
         ports:
         - containerPort: 8554
         - containerPort: 1000
