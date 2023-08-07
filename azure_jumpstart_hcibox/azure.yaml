@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: azure_jumpstart_hcibox
+metadata:
+    template: azure_jumpstart_hcibox@0.0.1-beta
+infra:
+  provider: "bicep"
+  path: "bicep"
+  module: "main.azd"
+hooks:
+  preprovision:
+    shell: pwsh
+    run: ./scripts/preprovision.ps1
+    continueOnError: false
+    interactive: true
+  postprovision:
+    shell: pwsh
+    run: ./scripts/postprovision.ps1
+    continueOnError: false
+    interactive: true
