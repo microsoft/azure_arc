@@ -3,37 +3,37 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "type": "SecureString",
+      "type": "securestring",
       "metadata": {
         "description": "RSA public key used for securing SSH access to ArcBox resources"
       }
     },
     "spnClientId": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Azure service principal client id"
       }
     },
     "spnClientSecret": {
-      "type": "SecureString",
+      "type": "securestring",
       "metadata": {
         "description": "Azure service principal client secret"
       }
     },
     "spnTenantId": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Azure AD tenant id for your service principal"
       }
     },
     "windowsAdminUsername": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Username for Windows account"
       }
     },
     "windowsAdminPassword": {
-      "type": "SecureString",
+      "type": "securestring",
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
@@ -41,13 +41,13 @@
       }
     },
     "logAnalyticsWorkspaceName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
     },
     "flavor": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps', 'DataOps'"
       },
@@ -60,14 +60,14 @@
       "defaultValue": "Full"
     },
     "githubAccount": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Target GitHub account"
       },
       "defaultValue": "microsoft"
     },
     "githubBranch": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Target GitHub branch"
       },
@@ -81,21 +81,21 @@
       "defaultValue": false
     },
     "githubUser": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "microsoft"
     },
     "addsDomainName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Active directory domain services domain name"
       },
       "defaultValue": "jumpstart.local"
     },
     "guid":{
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Random GUID for cluster names"
       },
@@ -449,7 +449,7 @@
   "outputs": {
     "clientVmLogonUserName": {
       "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "type": "String",
+      "type": "string",
       "value": "[concat(parameters('windowsAdminUsername'),'@',parameters('addsDomainName'))]"
     }
   }
