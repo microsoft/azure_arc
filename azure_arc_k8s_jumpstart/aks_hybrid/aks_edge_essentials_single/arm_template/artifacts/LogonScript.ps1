@@ -3,9 +3,9 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1000"
+$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.5"
+$schemaVersionAksEdgeConfig = "1.8"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 
