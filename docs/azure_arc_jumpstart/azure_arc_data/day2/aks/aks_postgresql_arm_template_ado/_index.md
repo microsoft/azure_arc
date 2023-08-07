@@ -22,7 +22,7 @@ By the end of this scenario, you will have an Azure DevOps Release pipeline to d
   - (Optional) [Create new Azure DevOps organization](https://docs.microsoft.com/azure/devops/organizations/accounts/create-organization?view=azure-devops).
   - (Optional) [Create new Azure DevOps project](https://docs.microsoft.com/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page).
 
-- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

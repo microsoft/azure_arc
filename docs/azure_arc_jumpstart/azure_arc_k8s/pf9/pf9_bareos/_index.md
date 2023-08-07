@@ -31,7 +31,7 @@ The following Jumpstart scenario will guide on how to deploy a Kubernetes cluste
 
   > **NOTE: The *kubectl* package is installed from the Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository. Note: All PMK cluster nodes would have kubectl installed once the cluster is deployed.**
 
-- [Install or update Azure CLI (az) to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest).
+- [Install or update Azure CLI (az) to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest).
 
   Use the below command to check your current installed version.
 

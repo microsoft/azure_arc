@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureLocation": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Location of your Azure resources"
             }
         },
         "logAnalyticsWorkspace": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name of your log analytics workspace"
             }
         },
         "flavor": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
             }

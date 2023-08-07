@@ -2,28 +2,28 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workbookDisplayName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "Arcbox Workbook",
       "metadata": {
         "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
       }
     },
     "workbookType": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "workbook",
       "metadata": {
         "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
       }
     },
     "workbookResourceId": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "workbookresourceid-stage",
       "metadata": {
         "description": "The id of resource instance to which the workbook will be associated"
       }
     },
     "workbookId": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "[newGuid()]",
       "metadata": {
         "description": "The unique guid for this workbook instance"
@@ -2914,7 +2914,7 @@
   ],
   "outputs": {
     "workbookId": {
-      "type": "String",
+      "type": "string",
       "value": "[resourceId( 'microsoft.insights/workbooks', parameters('workbookId'))]"
     }
   },
