@@ -3,34 +3,34 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-App-CAPI-MGMT",
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
         },
         "capiArcAppClusterName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-AppSvc-CAPI",
             "metadata": {
                 "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
             }
         },
         "adminUsername": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine."
             }
         },
         "sshRSAPublicKey": {
-            "type": "SecureString",
+            "type": "securestring",
             "metadata": {
                 "description": "SSH Key for the Virtual Machine. SSH key is recommended over password."
             }
         },
         "ubuntuOSVersion": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "22_04-lts-gen2",
             "allowedValues": [
                 "22_04-lts-gen2"
@@ -40,90 +40,90 @@
             }
         },
         "azureLocation": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
             }
         },
         "vmSize": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Standard_D4s_v4",
             "metadata": {
                 "description": "The size of the VM"
             }
         },
         "virtualNetworkName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-App-CAPI-VNet",
             "metadata": {
                 "description": "Name of the VNet"
             }
         },
         "subnetName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-App-CAPI-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "networkSecurityGroupName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-App-CAPI-MGMT-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
         },
         "resourceTags": {
-            "type": "Object",
+            "type": "object",
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_app_services"
             }
         },
         "spnClientId": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure service principal client id"
             }
         },
         "spnClientSecret": {
-            "type": "SecureString",
+            "type": "securestring",
             "metadata": {
                 "description": "Azure service principal client secret"
             }
         },
         "spnTenantId": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure AD tenant id for your service principal"
             }
         },
         "stagingStorageAccountName": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
         "logAnalyticsWorkspaceName": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },
         "templateBaseUrl": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Base URL for ARM template"
             }
         },
         "subnetAddressPrefix": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Subnet CIDR"
             }
         },
         "bastionSubnetRef": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure Bastion subnet reference"
             }
@@ -136,14 +136,14 @@
             "defaultValue": false
         },
         "bastionHostName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-App-Demo-Bastion",
             "metadata": {
                 "description": "Azure Bastion host name"
             }
         },
         "bastionSubnetPrefix": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure Bastion subnet IP prefix"
             }
