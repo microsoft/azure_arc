@@ -1,3 +1,8 @@
+@minLength(1)
+@maxLength(77)
+@description('Prefix for resource group, i.e. {name}-rg')
+param envName string
+
 @description('Azure service principal client id')
 param spnClientId string
 
@@ -49,8 +54,16 @@ param rdpPort string = '3389'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
+targetScope = 'subscription'
+
+resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+  name: '${envName}-rg'
+  location: location
+}
+
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
+  scope: rg
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
@@ -59,6 +72,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
 
 module networkDeployment 'network/network.bicep' = {
   name: 'networkDeployment'
+  scope: rg
   params: {
     deployBastion: deployBastion
     location: location
@@ -67,6 +81,7 @@ module networkDeployment 'network/network.bicep' = {
 
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
+  scope: rg
   params: {
     location: location
   }
@@ -74,6 +89,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 
 module hostDeployment 'host/host.bicep' = {
   name: 'hostVmDeployment'
+  scope: rg
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
