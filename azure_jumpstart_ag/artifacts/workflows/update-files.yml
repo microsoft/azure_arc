@@ -1,0 +1,158 @@
+name: Update-helm-values
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  replace-text:
+    if: ${{ github.repository != 'microsoft/jumpstart-agora-apps' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Replace the correct ACR name
+      continue-on-error: true
+      env:
+        ACR_NAME: ${{ secrets.ACR_NAME }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    acr_name: $ACR_NAME"
+            if grep -q "acr_name" "$FILE_PATH"; then
+              sed -i "s/.*acr_name.*/$newLine/" "$FILE_PATH"
+            else
+              echo "acr_name not found in $FILE_PATH"
+            fi
+          done
+        done
+
+        # Push changes
+        git add .
+        git commit -m "Update ACR name"
+        git push
+
+    - name: Replace the correct image tag
+      continue-on-error: true
+      env:
+        IMAGE_TAG: "v1.0"
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    image_tag: $IMAGE_TAG"
+            if grep -q "image_tag" "$FILE_PATH"; then
+              sed -i "s/.*image_tag.*/$newLine/" "$FILE_PATH"
+            else
+              echo "image_tag not found in $FILE_PATH"
+            fi
+          done
+        done
+
+        # Push changes
+        git add .
+        git commit -m "Update ACR name"
+        git push
+
+    - name: Replace the correct Cosmos DB endpoint
+      continue-on-error: true
+      env:
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="      endpoint: $COSMOS_ENDPOINT"
+            if grep -q "endpoint" "$FILE_PATH"; then
+              sed -i "s#.*endpoint.*#$newLine#" "$FILE_PATH"
+            else
+              echo "endpoint not found in $FILE_PATH"
+            fi
+          done
+        done
+
+        # Push changes
+        git add .
+        git commit -m "Update Cosmos DB endpoint"
+        git push
+
+    - name: Replace the correct GitHub account
+      continue-on-error: true
+      env:
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        for branch in "${branches[@]}"; do
+          FILE_PATHS=($(find . -name $branch))
+          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
+            echo "No files found for $branch"
+            continue
+          fi
+          for FILE_PATH in "${FILE_PATHS[@]}"; do
+            newLine="    github_User: $GITHUB_REPOSITORY_OWNER"
+            if grep -q "github_User" "$FILE_PATH"; then
+              sed -i "s#.*github_User.*#$newLine#" "$FILE_PATH"
+            else
+              echo "github_User not found in $FILE_PATH"
+            fi
+          done
+        done
+
+        # Push changes
+        git add .
+        git commit -m "Update GitHub account"
+        git push
+
+    - name: Replace the correct GitHub account in Chart.yaml files
+      continue-on-error: true
+      env:
+        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git pull
+        find . -type f -name "Chart.yaml" -print0 | xargs -0 sed -i "s/__github_account__/$GITHUB_REPOSITORY_OWNER/g"
+        # Push changes
+        git add .
+        git commit -m "Update GitHub account"
+        git push

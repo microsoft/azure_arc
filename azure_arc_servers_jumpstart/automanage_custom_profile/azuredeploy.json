@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "machineName": {
-            "type": "String"
+            "type": "string"
         },
         "customProfileName": {
-            "type": "String"
+            "type": "string"
         },
         "subscriptionId": {
-            "type": "String"
+            "type": "string"
         },
         "azureSecurityBaselineAssignmentType": {
             "type": "string",
@@ -20,7 +20,7 @@
             ]
         },
         "logAnalyticsWorkspace": {
-                "type": "String"
+                "type": "string"
         }
     },
     "variables": {

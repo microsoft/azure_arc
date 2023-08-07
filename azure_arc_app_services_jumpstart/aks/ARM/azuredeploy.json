@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "windowsAdminUsername": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Username for Windows account"
             }
         },
         "windowsAdminPassword": {
-            "type": "SecureString",
+            "type": "securestring",
             "minLength": 12,
             "maxLength": 123,
             "metadata": {
@@ -17,51 +17,51 @@
             }
         },
         "sshRSAPublicKey": {
-            "type": "SecureString",
+            "type": "securestring",
             "metadata": {
                 "description": "RSA public key used for securing SSH access to Azure resources"
             }
         },
         "spnClientId": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure service principal client id"
             }
         },
         "spnClientSecret": {
-            "type": "SecureString",
+            "type": "securestring",
             "metadata": {
                 "description": "Azure service principal client secret"
             }
         },
         "spnTenantId": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Azure AD tenant id for your service principal"
             }
         },
         "logAnalyticsWorkspaceName": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name for your Azure Log Analytics workspace"
             }
         },
         "kubernetesVersion": {
             "defaultValue": "1.25.6",
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes"
             }
         },
         "clusterName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-AppSvc-AKS",
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource"
             }
         },
         "dnsPrefix": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "arcappsvc",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
@@ -103,20 +103,20 @@
             }
         },
         "adminEmail": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Email address used on the Azure API Management deployment to receive all system notifications"
             }
         },
         "githubAccount": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Target GitHub account"
             },
             "defaultValue": "microsoft"
         },
         "githubBranch": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
@@ -130,28 +130,28 @@
             "defaultValue": false
         },
         "bastionHostName": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "Arc-Data-Demo-Bastion",
             "metadata": {
                 "description": "the Azure Bastion host name"
             }
         },
         "productsImage": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "arcjumpstart.azurecr.io/products:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Products API Image"
             }
         },
         "inventoryImage": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "arcjumpstart.azurecr.io/inventory:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Inventory API Image"
             }
         },
         "storeImage": {
-            "type": "String",
+            "type": "string",
             "defaultValue": "arcjumpstart.azurecr.io/store:e24e4fc06c771bf110b2cc714c71ec8a18b5c03b",
             "metadata": {
                 "description": "Store API Image"

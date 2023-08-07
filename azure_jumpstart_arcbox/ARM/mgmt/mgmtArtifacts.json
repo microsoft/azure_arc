@@ -3,75 +3,75 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "virtualNetworkName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-VNet",
       "metadata": {
         "description": "Name of the VNet"
       }
     },
     "subnetName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "aksSubnetName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-AKS-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "dcSubnetName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-DC-Subnet",
       "metadata": {
         "description": "Name of the Domain Controller subnet in the virtual network"
       }
     },
     "drVirtualNetworkName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-DR-VNet",
       "metadata": {
         "description": "Name of the DR VNet"
       }
     },
     "drSubnetName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-DR-Subnet",
       "metadata": {
         "description": "Name of the DR subnet in the DR virtual network"
       }
     },
     "workspaceName": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
     },
     "location": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Azure Region to deploy the Log Analytics Workspace"
       }
     },
     "sku": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "pergb2018",
       "metadata": {
         "description": "SKU, leave default pergb2018"
       }
     },
     "templateBaseUrl": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
     },
     "flavor": {
-      "type": "String",
+      "type": "string",
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       }
@@ -84,14 +84,14 @@
       "defaultValue": false
     },
     "networkSecurityGroupName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
     },
     "bastionNetworkSecurityGroupName": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "ArcBox-Bastion-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
