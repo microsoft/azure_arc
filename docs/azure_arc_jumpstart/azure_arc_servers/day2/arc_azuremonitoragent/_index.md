@@ -37,7 +37,7 @@ Please review the [Azure Monitor Agent (AMA) supported OS documentation](https:/
 
     ![Screenshot Windows Azure Arc-enabled server connected status](./03.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.42.0 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.49.0 or later. Use ```az --version``` to check your current installed version.
 
 - To complete this scenario, the user or service principal running the automation need these minimum Role-based access control (RBAC) permissions: *Azure Connected Machine Resource Administrator* on your Azure Arc-enabled servers. *Monitoring Contributor* and *Microsoft.Resources/deployments/** on the resource group where you will deploy this scenario.
 

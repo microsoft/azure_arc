@@ -44,7 +44,7 @@ By the end of this scenario, you will have an Azure Arc-enabled server with Azur
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server detail](./02.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.42.0 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.49.0 or later. Use ```az --version``` to check your current installed version.
 
 - Create Azure service principal (SP)
 

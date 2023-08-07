@@ -28,7 +28,7 @@ Dapr is a portable, event-driven runtime that makes it easy for any developer to
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
