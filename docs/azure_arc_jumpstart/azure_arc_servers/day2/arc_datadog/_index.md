@@ -125,7 +125,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 Complete the following steps to clean up your environment.
 
-- Remove the virtual machines from each environment by following the teardown instructions from each guide.
+Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
 - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
 - **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
