@@ -27,8 +27,12 @@
           "kind": "inline",
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
-        "usedVariables": [],
-        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F"
+                "usedVariables": [
+                    "_endTime",
+                    "_site",
+                    "_startTime"
+                ],
+                "text": "environmentSensor\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| extend site = tostring(split(['device-id'],'-')[2])\n| where isempty(_site) or _site contains site\n| project ['iothub-enqueuedtime'], ['device-id'], Temperature_F\n"
       },
       "visualOptions": {
         "hideTileTitle": false,
@@ -87,8 +91,12 @@
           "kind": "inline",
           "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
         },
-        "usedVariables": [],
-        "text": "// Please enter your KQL query (Example):\n// <table name>\n// | where <datetime column> between (['_startTime'] .. ['_endTime']) // Time range filtering\n// | take 100\n\nenvironmentSensor\n| where ['iothub-enqueuedtime'] > now(-1h)\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
+                "usedVariables": [
+                    "_endTime",
+                    "_site",
+                    "_startTime"
+                ],
+                "text": "environmentSensor\n| where ['iothub-enqueuedtime'] between (['_startTime'] .. ['_endTime'])\n| extend site = tostring(split(['device-id'],'-')[2])\n| where isempty(_site) or _site contains site\n| project ['iothub-enqueuedtime'], ['device-id'], Humidity"
       },
       "visualOptions": {
         "hideTileTitle": false,
@@ -146,7 +154,40 @@
       "showOnPages": {
         "kind": "all"
       }
-    }
+        },
+        {
+            "kind": "string",
+            "id": "a820c90f-55a1-4141-9b27-3161c747e933",
+            "displayName": "Site",
+            "variableName": "_site",
+            "selectionType": "array",
+            "includeAllOption": false,
+            "defaultValue": {
+                "kind": "values",
+                "values": [
+                    "Chicago"
+                ]
+            },
+            "dataSource": {
+                "kind": "query",
+                "query": {
+                    "kind": "inline",
+                    "dataSource": {
+                        "kind": "inline",
+                        "dataSourceId": "a047cfcb-722a-49e0-af1c-b57f30309d6b"
+                    },
+                    "usedVariables": [],
+                    "text": "environmentSensor\n| distinct tostring(['device-id'])\n| project site = split(['device-id'],'-')[2]\n| distinct tostring(site)\n"
+                },
+                "columns": {
+                    "value": "site",
+                    "label": "site"
+                }
+            },
+            "showOnPages": {
+                "kind": "all"
+            }
+        }
   ],
   "dataSources": [
     {
