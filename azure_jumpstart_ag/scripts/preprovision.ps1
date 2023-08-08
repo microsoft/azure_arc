@@ -130,7 +130,7 @@ $JS_RDP_PORT = '3389'
 If ($env:JS_RDP_PORT) {
     $JS_RDP_PORT = $env:JS_RDP_PORT
 }
-if ($promptOutput = Read-Host "Enter the RDP Port for remote connection [$JS_RDP_PORT]") { $JS_RDP_PORT = $promptOutput }
+if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection [$JS_RDP_PORT]") { $JS_RDP_PORT = $promptOutput }
 
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
