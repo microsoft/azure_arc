@@ -110,3 +110,7 @@ module hostDeployment 'host/host.bicep' = {
     rdpPort: rdpPort
   }
 }
+
+output AZURE_RESOURCE_GROUP string = rg.name
+output RDP_PORT string = rdpPort
+output AZURE_TENANT_ID string = tenant().tenantId
