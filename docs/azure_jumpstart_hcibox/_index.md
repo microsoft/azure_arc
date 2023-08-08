@@ -89,7 +89,13 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
 
 The following prerequisites must be completed in order to deploy HCIBox using the manual Bicep template option. If you elect to use Azure Developer CLI instead, then many of these prerequisites are configured for you as part of the AZD experience and can be skipped.
 
-### Required for both manual and Azure Devleoper CLI deployment
+### Required for both manual and Azure Developer CLI deployment
+
+- Clone the Azure Arc Jumpstart repository
+
+  ```shell
+  git clone https://github.com/microsoft/azure_arc.git
+  ```
 
 - [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
@@ -189,16 +195,30 @@ The following prerequisites must be completed in order to deploy HCIBox using th
     ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
     > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.__
-    
+
     > __NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
 
+## Azure Developer CLI deployment
+
+- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+
+  > __NOTE: PowerShell is required for using azd with HCIBox. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.__
+
+- Login with azd using ```azd auth login``` which will open a browser for interactive login.
+
+  ![Screenshot showing azd auth login](./azd_auth_login.png)
+
+- Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
+  
+  ![Screenshot showing azd init](./azd_init.png)
+
+- Run the ```azd up``` command to deploy the environment. Azd will prompt you to enter the target subscription, region and all required parameters.
+
+  ![Screenshot showing azd up](./azd_up.png)
+
+- Once complete, continue on in the section [Start post-deployment automation](https://azurearcjumpstart.io/azure_jumpstart_hcibox/#start-post-deployment-automation)
+
 ## Bicep deployment via Azure CLI
-
-- Clone the Azure Arc Jumpstart repository
-
-  ```shell
-  git clone https://github.com/microsoft/azure_arc.git
-  ```
 
 - Upgrade to latest Bicep version
 
@@ -247,6 +267,8 @@ Various options are available to connect to _HCIBox-Client_ VM, depending on the
 #### Connecting directly with RDP
 
 By design, HCIBox does not open port 3389 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+  > __NOTE: If you deployed with Azure Developer CLI then this step is automatically done for you as part of the automation.__
 
 - Open the _HCIBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
@@ -392,14 +414,24 @@ HCIBox is a sandbox that can be used for a large variety of use cases, such as a
 
 ## Clean up the deployment
 
-To clean up your deployment, simply delete the resource groups using Azure CLI or Azure portal. Be sure to delete the ArcServers resource group first as seen in the example below.
+To clean up your deployment, simply delete the resource groups using Azure CLI, Azure Developer CLI, or Azure portal. Be sure to delete the ArcServers resource group first as seen in the example below.
 
-```shell
-az group delete -n <name of your resource group>-ArcServers
-az group delete -n <name of your resource group>
-```
+- Clean up Using Azure CLI
 
-![Screenshot showing az group delete](./az_delete.png)
+  ```shell
+  az group delete -n <name of your resource group>-ArcServers
+  az group delete -n <name of your resource group>
+  ```
+
+  ![Screenshot showing az group delete](./az_delete.png)
+
+- Clean up using Azure Developer CLI
+
+  ```shell
+  azd down
+  ```
+
+  ![Screenshot showing azd down](./azd_down.png)
 
 ## Basic Troubleshooting
 
