@@ -20,6 +20,9 @@
         "windowsAdminUsername": {
             "value": "${JS_WINDOWS_ADMIN_USERNAME}"
         },
+        "rdpPort": {
+            "value": "${JS_RDP_PORT}"
+        },
         "deployBastion": {
             "value": false
         },
