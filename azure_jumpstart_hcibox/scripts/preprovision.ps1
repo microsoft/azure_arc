@@ -25,7 +25,20 @@ $tenantId = (Get-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID).Tena
 $context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -Tenant $tenantId -ErrorAction Stop
 
 # Write-Host "Setting az subscription..."
-$azLogin = az account set --subscription $env:AZURE_SUBSCRIPTION_ID
+az account set --subscription $env:AZURE_SUBSCRIPTION_ID
+
+# Register providers
+Write-Host "Registering Azure providers..."
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace Microsoft.OperationsManagement --wait
+az provider register --namespace Microsoft.AzureStackHCI --wait
+az provider register --namespace Microsoft.ResourceConnector --wait
+az provider register --namespace Microsoft.OperationalInsights --wait
 
 
 ########################################################################
