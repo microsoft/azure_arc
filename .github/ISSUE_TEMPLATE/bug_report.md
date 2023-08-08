@@ -2,7 +2,7 @@
 name: "\U0001F41BBug report"
 about: Create a report to help us improve
 title: ''
-labels: 'bug,triage'
+labels: 'triage'
 assignees: ''
 
 ---
@@ -13,8 +13,8 @@ assignees: ''
 **Is your issue related to a Jumpstart scenario, ArcBox, HCIBox, or Agora?**
 <!--- A link to the Jumpstart scenario you are working on. --->
 
-**Describe the bug**
-<!--- A clear and concise description of what the bug is. --->
+**Describe the issue or the bug**
+<!--- A clear and concise description of what the issue or the bug is. --->
 
 **To Reproduce**
 <!--- Steps to reproduce the behavior:
