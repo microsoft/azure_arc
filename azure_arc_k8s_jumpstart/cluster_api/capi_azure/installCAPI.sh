@@ -25,7 +25,7 @@ echo ""
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
   export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
-  export AZURE_LOCATION="Azure region" # Name of the Azure datacenter location. For example: "eastus2"
+  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus2"
   export AZURE_RESOURCE_GROUP="<Azure resource group name>" # Name of the Azure resource group name. For example: "Arc-CAPI-Demo"
   export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal. A GUID suffix will be added automatically.
   export AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the Azure Arc-enabled Kubernetes cluster resource name. Do not change!
