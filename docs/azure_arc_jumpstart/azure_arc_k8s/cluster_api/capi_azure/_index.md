@@ -22,7 +22,7 @@ in this scenario, a [Rancher K3s](https://rancher.com/docs/k3s/latest/en/), sing
 
 - The automation for this scenario is designed with the assumption that an existing (brownfield) Ubuntu server is already deployed. This can achieved in multiple ways but we recommend using either an [Ubuntu Azure virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal) or Ubuntu deployed [using Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/install).
 
-- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

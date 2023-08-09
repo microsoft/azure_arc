@@ -20,7 +20,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -114,8 +114,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_single/arm_template/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
-
-    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _azuredeploy.parameters.json_ file**
 
     For example:
 
