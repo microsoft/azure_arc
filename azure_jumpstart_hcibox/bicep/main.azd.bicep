@@ -50,7 +50,7 @@ param deployBastion bool = false
 @allowed(['eastus', 'eastus2', 'westus2', 'northeurope'])
 param location string
 
-@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
+@description('Override default RDP port using this parameter. Default is 3389.')
 param rdpPort string
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
