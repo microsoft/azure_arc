@@ -22,12 +22,6 @@ in this scenario, a [Rancher K3s](https://rancher.com/docs/k3s/latest/en/), sing
 
 - The automation for this scenario is designed with the assumption that an existing (brownfield) Ubuntu server is already deployed. This can achieved in multiple ways but we recommend using either an [Ubuntu Azure virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal) or Ubuntu deployed [using Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/install).
 
-- Clone the Azure Arc Jumpstart repository
-
-    ```shell
-    git clone https://github.com/microsoft/azure_arc.git
-    ```
-  
 - [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -144,11 +138,23 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     ![Screenshot showing the script runtime](./08.png)
 
+    ![Screenshot showing the script runtime](./09.png)
+
+    ![Screenshot showing the script runtime](./10.png)
+
+    ![Screenshot showing the script runtime](./11.png)
+
+    ![Screenshot showing the script runtime](./12.png)
+
+    ![Screenshot showing the script runtime](./13.png)
+
+    ![Screenshot showing the script runtime](./14.png)
+
 - Upon completion, you will have a new Cluster API Kubernetes cluster deployed on top of Azure virtual machines that are already onboarded as an Azure Arc-enabled Kubernetes cluster.
 
-  ![Screenshot showing the Azure resource group](./09.png)
+  ![Screenshot showing the Azure resource group](./15.png)
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster resource](./10.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster resource](./16.png)
 
 ## Logging
 
@@ -158,10 +164,10 @@ For ease of troubleshooting and tracking, a deployment log will be created autom
 cat /home/<USER>/jumpstart_logs/installCAPI.log
 ```
 
-![Screenshot showing the installCAPI log file](./11.png)
+![Screenshot showing the installCAPI log file](./17.png)
 
 ## Cleanup
 
 To cleanup the deployment, simply delete the Azure resource group.
 
-![Screenshot showing the deletion of the Azure resource group](./12.png)
+![Screenshot showing the deletion of the Azure resource group](./18.png)

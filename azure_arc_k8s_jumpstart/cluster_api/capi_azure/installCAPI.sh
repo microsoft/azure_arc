@@ -15,6 +15,7 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
+  export KUBECTL_VERSION="1.27/stable" # Do not change!
   export GUID=$(echo $RANDOM | md5sum | head -c 4; echo;) # Do not change!
   export CLUSTERCTL_VERSION="1.4.4" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
@@ -24,7 +25,7 @@ echo ""
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
   export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
-  export AZURE_LOCATION="Azure region" # Name of the Azure datacenter location. For example: "eastus2"
+  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus2"
   export AZURE_RESOURCE_GROUP="<Azure resource group name>" # Name of the Azure resource group name. For example: "Arc-CAPI-Demo"
   export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal. A GUID suffix will be added automatically.
   export AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the Azure Arc-enabled Kubernetes cluster resource name. Do not change!
@@ -77,76 +78,15 @@ echo ""
   sudo apt install snapd
   echo ""
 
-  # Making sure Docker plumping is ready
-  GROUP=docker
-  if [ -x "$(command -v docker)" ]; then
-    tput setaf 6;echo "Docker is already installed. Moving on..."
-    tput sgr0
-    echo ""
-
-  if [ $(getent group $GROUP) ]; then
-    tput setaf 6;echo "Group `tput sitm`$GROUP`tput ritm` already exists."
-    tput sgr0
-    echo ""
-  else
-    tput setaf 1;echo "Group `tput sitm`$GROUP`tput ritm` does not exist. Creating..."
-    tput sgr0
-    sudo groupadd $GROUP
-    getent group $GROUP
-    echo ""
-    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
-    tput sgr0
-    sudo usermod -aG $GROUP $USER
-    echo ""
-  fi
-
-  if id -nGz "$USER" | grep -qzxF "$GROUP"
-  then
-    tput setaf 6;echo "User `tput sitm`$USER`tput ritm` already belongs to group `tput sitm`$GROUP`tput ritm`"
-    tput sgr0
-    echo ""
-  else
-    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
-    tput sgr0
-    sudo usermod -aG $GROUP $USER
-    echo ""
-  fi
-
-  else
-    tput setaf 1;echo "Docker is not installed. Installing..."
-    tput sgr0
-    echo ""
-    sudo snap install docker
-    tput setaf 1;echo "Group `tput sitm`$GROUP`tput ritm` does not exist. Creating..."
-    tput sgr0
-    sudo groupadd $GROUP
-    getent group $GROUP
-    echo ""
-    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
-    tput sgr0
-    sudo usermod -aG $GROUP $USER
-    echo ""
-    echo "Starting docker"
-    sleep 5
-    sudo snap start docker
-    sleep 5
-    echo ""
-    while (! sudo docker stats --no-stream > /dev/null 2>&1); do
-      # Docker takes a few seconds to initialize
-      echo "Waiting for Docker to initialize..."
-      sleep 1
-    done
-  fi
+  # Installing jq
+  echo ""
+  echo "Installing jq" 
+  sudo apt install jq -y
+  echo ""
 
   # Installing kubectl
   echo ""
-  echo "Installing kubectl"
-  sudo apt-get install -y apt-transport-https
-  sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-  echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-  sudo apt-get update
-  sudo apt-get install -y kubectl
-  kubectl version --client
+  sudo snap install kubectl --channel=$KUBECTL_VERSION --classic
   echo ""
 
   # Installing kustomize
@@ -233,7 +173,7 @@ echo ""
   echo ""
   echo "Creating Microsoft Defender for Cloud audit secret"
   echo ""
-  curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+  curl -o audit.yaml https://raw.githubusercontent.com/Azure/Microsoft-Defender-for-Cloud/main/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -260,14 +200,41 @@ EOF
   echo ""
   kubectl get kubeadmcontrolplane --all-namespaces
   clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+  sleep 120
   echo ""
-  kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+  # kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+  helm repo add projectcalico https://docs.tigera.io/calico/charts --kubeconfig=./$CLUSTER_NAME.kubeconfig && \
+  helm install calico projectcalico/tigera-operator --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
   echo ""
 
   echo ""
-  CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
-  export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-  until [[ $(kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+  while true; do
+    # Retrieve the list of nodes
+    nodes=$(kubectl get nodes --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.items[].metadata.name')
+
+    # Flag to keep track of readiness status
+    all_ready=true
+
+    # Iterate over each node and check its status
+    for node in $nodes; do
+      ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
+      
+      if [[ $ready != "True" ]]; then
+        echo "Node $node is not ready."
+        all_ready=false
+      fi
+    done
+
+    # Check if all nodes are ready
+    if [[ $all_ready == true ]]; then
+      echo "All nodes are ready."
+      break
+    else
+      echo "Waiting for 30 seconds..."
+      sleep 30
+    fi
+  done
+
   echo ""
   kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
   echo ""
