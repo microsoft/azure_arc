@@ -43,11 +43,140 @@ spec:
       jsonPath: ".metadata.creationTimestamp"
   - name: v1
     served: true
-    storage: true
+    storage: false
     schema:
       openAPIV3Schema:
         type: object
         x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: ".status.state"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  - name: v2
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              activeDirectory:
+                type: object
+                properties:
+                  serviceAccountProvisioning:
+                    type: string
+                  realm:
+                    type: string
+                  netbiosDomainName:
+                    type: string
+                  ouDistinguishedName:
+                    type: string
+                  domainServiceAccountSecret:
+                    type: string
+                  domainControllers:
+                    type: object
+                    properties:
+                      primaryDomainController:
+                        type: object
+                        properties:
+                          hostname:
+                            type: string
+                      secondaryDomainControllers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            hostname:
+                              type: string
+              dns:
+                type: object
+                properties:
+                  domainName:
+                    type: string
+                  nameserverIPAddresses:
+                    type: array
+                    items:
+                      type: string
+                  replicas:
+                    type: integer
+                  preferK8sDnsForPtrLookups:
+                    type: boolean
+              fileOverrideConfigMap:
+                type: string
+              update:
+                type: object
+                properties:
+                  desiredVersion:
+                    type: string
+          status:
+            type: object
+            properties:
+              observedGeneration:
+                type: integer
+              runningVersion:
+                type: string
+              registryVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              releasedVersions:
+                type: object
+                properties:
+                  next:
+                    type: string
+                  previous:
+                    type: string
+                  current:
+                    type: string
+                  latest:
+                    type: string
+                  behind:
+                    type: integer
+                  available:
+                    type: array
+                    items:
+                      type: string
+              arcDataServicesK8sExtensionLatestVersion:
+                type: string
+              endpoints:
+                type: object
+                additionalProperties:
+                  type: string
+              state:
+                type: string
+              healthState:
+                type: string
+              reason:
+                type: string
+              message:
+                type: string
+              lastUpdateTime:
+                type: string
+                format: date-time
+          apiVersion:
+            type: string
+          kind:
+            type: string
     subresources:
       status: {}
     additionalPrinterColumns:
