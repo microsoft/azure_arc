@@ -1019,7 +1019,7 @@ foreach ($VM in $VMNames) {
 
         kubectl get svc
         Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
-    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+    } 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 
 #####################################################################
@@ -1087,7 +1087,7 @@ foreach ($resource in $resources) {
                     }
 
                     # Wait for a specific duration before re-evaluating the condition
-                    Start-Sleep -Seconds $retryDelaySecond
+                    Start-Sleep -Seconds $retryDelaySeconds
 
 
                         if ($attempt -lt $retryCount) {
@@ -1332,10 +1332,10 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 --timeout 10m `
                 --namespace $namespace `
                 --only-show-errors `
-            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
             do {
-                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
+                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
                 if ($configStatus.ComplianceState -eq "Compliant") {
                     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                 }
@@ -1345,7 +1345,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                         Start-Sleep -Seconds 20
-                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json) | convertFrom-JSON
+                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
                         if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
                             $retryCount++
                             Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -1358,7 +1358,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                             --force `
                             --yes `
                             --only-show-errors `
-                            | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
 
                             Start-Sleep -Seconds 10
                             Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
@@ -1375,7 +1375,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                             --timeout 30m `
                             --namespace $namespace `
                             --only-show-errors `
-                        | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
                         }
                     }
                     elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
