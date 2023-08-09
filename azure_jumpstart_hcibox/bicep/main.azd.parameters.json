@@ -34,12 +34,6 @@
         },
         "deployAKSHCI": {
             "value": true
-        },
-        "githubAccount": {
-            "value": "dkirby-ms"
-        },
-        "githubBranch": {
-            "value": "azd_hcibox"
         }
     }
 }
