@@ -268,6 +268,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing complete deployment](./arcbox_complete.png)
 
+  ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
+
 ## Modules
 
 ### Module 1: On-boarding to Azure Arc-enabled servers

@@ -232,22 +232,6 @@ Write-Output "Transferring installation script to nested Linux VMs..."
 Set-SCPItem -ComputerName $Ubuntu01VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 
-
-#############################################################
-# Install VSCode extensions
-#############################################################
-Write-Host "Installing VSCode extensions"
-# Install VSCode extensions
-$VSCodeExtensions = @(
-    'ms-vscode.powershell',
-    'esbenp.prettier-vscode'
-)
-
-foreach ($extension in $VSCodeExtensions) {
-    code --install-extension $extension
-}
-
-
 Write-Header "Onboarding Arc-enabled servers"
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
@@ -274,6 +258,30 @@ Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
     azcmagent config set incomingconnections.ports 22
 } -Credential $winCreds
 #>
+
+# Test Defender for SQL
+Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+$remoteScriptFileFile = "$agentScript\testDefenderForServers.ps1"
+Copy-VMFile $Win2k19vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
+Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
+
+Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
+Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Host "Installing VSCode extensions"
+# Install VSCode extensions
+$VSCodeExtensions = @(
+    'ms-vscode.powershell',
+    'esbenp.prettier-vscode'
+)
+
+foreach ($extension in $VSCodeExtensions) {
+    code --install-extension $extension
+}
+
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
