@@ -1,7 +1,7 @@
 ---
 type: docs
 linkTitle: "Jumpstart ArcBox"
-weight: 3
+weight: 4
 ---
 
 ## Jumpstart ArcBox - Overview

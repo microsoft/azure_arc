@@ -13,7 +13,13 @@ The Jumpstart provides step-by-step guides for independent Azure Arc scenarios t
 
 Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
 
-<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
+<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="270"></p>
+
+## Our philosophy and core design principals
+
+In the Jumpstart, we believe a document or a guide is not just that. It should represent an experience that is simply more than just a set of instructions. It should be a journey that is easy to follow, fun to do, and most importantly, it should be a journey that you can relate to and see yourself in it.
+
+<p align="center"><img src="/img/design_principals.png" alt="design-principals" width="1280"></p>
 
 ## Jumpstart Scenarios
 
@@ -23,21 +29,27 @@ Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jum
 
 > **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code.**
 
+## Jumpstart Agora
+
+[Jumpstart Agora](https://aka.ms/JumpstartAgora) is a marketplace of various “cloud to edge” industry scenarios, designed to provide an automated end-to-end user experience. It provides a rich and comprehensive experience while getting started with a full-stack deployment, from the infrastructure layer all the way to the line of business applications and the operational and development process around them.
+
+<p align="center"><a href="https://aka.ms/JumpstartAgora" target="_blank"><img src="/img/agora_logo.png" alt="jumpstart-agora-logo" width="270"></a></p>
+
 ## Jumpstart ArcBox
 
 Have you ever wanted to have a complete Azure Arc environment with just one click? We've got you covered with ArcBox!
 
-[ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc-enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
+[ArcBox](https://aka.ms/JumpstartArcBox) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc-enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_arcbox/" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></a></p>
+<p align="center"><a href="https://aka.ms/JumpstartArcBox" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="270"></a></p>
 
 ## Jumpstart HCIBox
 
 Are you eager to try out Azure Stack HCI but you don't have access to physical hardware? If so then HCIBox is the tool for you.
 
-[HCIBox](https://azurearcjumpstart.io/azure_jumpstart_hcibox/) is a dedicated Azure Stack HCI sandbox environment, and like ArcBox you only need an Azure subscription to get started. With a one-click deployment, you get a full Azure Stack HCI lab packed with technology including Azure Arc integration, Azure Kubernetes Service, Windows Admin Center and much more. Check out HCIBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
+[HCIBox](https://aka.ms/JumpstartHCIBox) is a dedicated Azure Stack HCI sandbox environment, and like ArcBox you only need an Azure subscription to get started. With a one-click deployment, you get a full Azure Stack HCI lab packed with technology including Azure Arc integration, Azure Kubernetes Service, Windows Admin Center and much more. Check out HCIBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_hcibox/" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="250"></a></p> 
+<p align="center"><a href="https://aka.ms/JumpstartHCIBox" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="270"></a></p>
 
 ## Jumpstart YouTube Channel
 
@@ -45,7 +57,7 @@ We know you are busy and sometimes all you need is just a good, short, solid rec
 
 All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemos) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
-<p align="center"><a href="https://www.youtube.com/channel/UCoIJw-P_9Jp6Jo_0Ca9avcA" target="_blank"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="250"></a></p>
+<p align="center"><a href="https://www.youtube.com/channel/UCoIJw-P_9Jp6Jo_0Ca9avcA" target="_blank"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="270"></a></p>
 
 Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
 
@@ -55,7 +67,7 @@ Enjoy!
 
 Jumpstart Lightning is the show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories. Who knows?! You might find yourself on our YouTube channel!
 
-<p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="250"></a></p>
+<p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="270"></a></p>
 
 * Are you an awesome Azure Arc customer or a Microsoft partner that has an awesome story you would like to talk about?!
 * Ever contributed to the Jumpstart project and want to share it with the world?!
@@ -81,17 +93,17 @@ For customers who want to simplify complex and distributed environments across o
 
 ## Azure Arc Story Time
 
-Fabrikam Global Manufacturing runs workloads on different hardware, across on-premises datacenters, and multiple public clouds, with Microsoft Azure being the primary cloud. They also support IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platform-as-a-Service (PaaS) services, and container-based applications.
+Contoso Global Manufacturing runs workloads on different hardware, across on-premises datacenters, and multiple public clouds, with Microsoft Azure being the primary cloud. They also support IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platform-as-a-Service (PaaS) services, and container-based applications.
 
-As mentioned, Fabrikam’s R&D teams are well-invested in containerized workloads for their modernized applications. As a result, they are using Kubernetes as their container orchestration platform. Kubernetes is deployed both as self-managed Kubernetes clusters in their on-premises environments and managed Kubernetes deployments in the cloud.
+As mentioned, Contoso’s R&D teams are well-invested in containerized workloads for their modernized applications. As a result, they are using Kubernetes as their container orchestration platform. Kubernetes is deployed both as self-managed Kubernetes clusters in their on-premises environments and managed Kubernetes deployments in the cloud.
 
-As part of their cloud-native practices with Azure being the main hyper-scale cloud, Fabrikam’s operations teams are standardized and taking advantage of Azure Resource Manager (ARM) capabilities such as (but not limited to) tagging, Azure Monitoring for VMs and containers, logging and telemetry, policy and governance, Desired State Configuration (DSC), Update Management, Change Tracking, Inventory management, etc.
+As part of their cloud-native practices with Azure being the main hyper-scale cloud, Contoso’s operations teams are standardized and taking advantage of Azure Resource Manager (ARM) capabilities such as (but not limited to) tagging, Azure Monitoring for VMs and containers, logging and telemetry, policy and governance, Desired State Configuration (DSC), Update Management, Change Tracking, Inventory management, etc.
 
-These practices and techniques are already well established for Azure-based workloads in use such as Azure VMs, Azure Kubernetes Service (AKS), Azure SQL, and many more. In order to take advantage of these well-established practices, Fabrikam is using Azure Arc to extend the ARM APIs to project and manage their workloads deployed outside of Azure. Once onboarded, Azure Arc projects resources as first-class citizens in Azure which can then take advantage of the ARM capabilities mentioned above. In addition, they are able to guarantee Kubernetes deployments and app consistency through GitOps-based configuration for their Kubernetes clusters in Azure, other clouds and on-premises.
+These practices and techniques are already well established for Azure-based workloads in use such as Azure VMs, Azure Kubernetes Service (AKS), Azure SQL, and many more. In order to take advantage of these well-established practices, Contoso is using Azure Arc to extend the ARM APIs to project and manage their workloads deployed outside of Azure. Once onboarded, Azure Arc projects resources as first-class citizens in Azure which can then take advantage of the ARM capabilities mentioned above. In addition, they are able to guarantee Kubernetes deployments and app consistency through GitOps-based configuration for their Kubernetes clusters in Azure, other clouds and on-premises.
 
-With Azure Arc, Fabrikam is able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and can extend cloud-native operations and governance beyond Azure.
+With Azure Arc, Contoso is able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and can extend cloud-native operations and governance beyond Azure.
 
-![architecture](/img/architecture_white.jpg)
+![architecture](/img/architecture_dark.jpg)
 
 ## Want to be an Azure Arc "Jumpstarter"?
 
@@ -99,4 +111,4 @@ We would love to have you! We are always looking for community support so if you
 
 ## Jumpstart Roadmap
 
-Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
+Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/orgs/microsoft/projects/162).

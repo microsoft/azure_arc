@@ -18,7 +18,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.42.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.49.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

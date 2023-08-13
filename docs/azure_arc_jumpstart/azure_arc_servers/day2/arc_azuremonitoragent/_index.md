@@ -37,7 +37,7 @@ Please review the [Azure Monitor Agent (AMA) supported OS documentation](https:/
 
     ![Screenshot Windows Azure Arc-enabled server connected status](./03.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.42.0 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.49.0 or later. Use ```az --version``` to check your current installed version.
 
 - To complete this scenario, the user or service principal running the automation need these minimum Role-based access control (RBAC) permissions: *Azure Connected Machine Resource Administrator* on your Azure Arc-enabled servers. *Monitoring Contributor* and *Microsoft.Resources/deployments/** on the resource group where you will deploy this scenario.
 
@@ -182,4 +182,4 @@ Complete the following steps to clean up your environment:
 - [Remove Data Collection Rule Association](https://docs.microsoft.com/powershell/module/az.monitor/remove-azdatacollectionruleassociation?view=azps-8.1.0)
 - [Remove Data Collection Rule](https://docs.microsoft.com/powershell/module/az.monitor/remove-azdatacollectionrule?view=azps-8.1.0)
 - [Uninstall Azure Monitor Agent (AMA)](https://docs.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-manage?tabs=ARMAgentPowerShell%2CPowerShellWindows%2CPowerShellWindowsArc%2CCLIWindows%2CCLIWindowsArc#uninstall-on-azure-arc-enabled-servers)
-- [Delete the Log Analytics workspace](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/delete-workspace#powershell)
+- [Delete the Log Analytics workspace](https://docs.microsoft.com/azure/azure-monitor/logs/delete-workspace#powershell)
