@@ -23,8 +23,8 @@ After completion of this workshop, you will be able to:
 | LevelUp Module | Duration | Facilitator |
 |---------------|---------------|---------------|
 | **1. Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Owner |
-|**2. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
-|**3. Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Owner |
+|**2. Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Owner |
+|**3. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
 |**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
 |**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
 |**6. Keep your Azure Arc-enabled servers patched using Update Management Center** | x minutes | Owner |
@@ -43,7 +43,7 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
 ### Prerequisites
 
-- [Install or update Azure CLI to version 2.40.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.51.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -52,6 +52,10 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
     ![Screenshot showing azure cli version](./azcli_version.png)
 
 - Login to AZ CLI using the ```az login``` command.
+
+```shell
+az login
+```
 
 - Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
 
@@ -92,7 +96,6 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
   - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
 
     ```shell
-    az login
     subscriptionId="<Your Subscription Id>"
     servicePrincipalName="<Unique Service principal name>"
 
@@ -103,7 +106,6 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
     For example:
 
     ```shell
-    az login
     subscriptionId="98471a83-9151-489e-uub1-463447bed604"
     servicePrincipalName="JumpstartArcBoxSPN"
 
@@ -168,9 +170,11 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploymentcomplete.png)
 
+    > **NOTE: The deployment takes around 20 minutes to complete.**
+
     > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#basic-troubleshooting).**
 
-### Deployment Option 3: Bicep deployment via Azure CLI
+### Deployment Option 2: Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -201,12 +205,96 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 - Now you will deploy the Bicep file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the below command:
 
   ```shell
-  az login
   az group create --name "<resource-group-name>" --location "<preferred-location>"
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
     > **NOTE: If you see any failure in the deployment, please check the [troubleshooting guide](https://azurearcjumpstart.io/azure_jumpstart_arcbox/itpro/#basic-troubleshooting).**
+
+    > **NOTE: The deployment takes around 20 minutes to complete.**
+
+### Connecting to the ArcBox Client virtual machine
+
+Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
+
+- [RDP](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro/#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+
+#### Connecting directly with RDP
+
+By design, ArcBox does not open port 3389 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _ArcBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
+
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  <img src="./nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
+
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+#### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+
+#### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
+
+#### The Logon scripts
+
+- Once you log into the _ArcBox-Client_ VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish, and once completed, the script windows will close automatically. At this point, the deployment is complete.
+
+  ![Screenshot showing ArcBox-Client](./automation.png)
+
+- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servers with ArcBox for IT Pros!
+
+  ![Screenshot showing complete deployment](./arcbox_complete.png)
+
+  ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_icon.png)
+
+- A pop-up box will walk you through the target SQL Server which will be onboarded to Azure Arc, as well as provide details around the flow of the onboarding automation and how to complete the Azure authentication process when prompted.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_start.png)
+
+- The automation uses the PowerShell SDK to onboard the Azure Arc-enabled SQL Server on your behalf. To accomplish this, it will login to Azure with the _-UseDeviceAuthentication_ flag. The device code will be copied to the clipboard on your behalf, so you can simply paste the value into box when prompted.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_code.png)
+
+- You'll then need to provide your Azure credentials to complete the authentication process. The user you login as will need _'Microsoft.Authorization/roleAssignments/write'_ permissions on the ArcBox resource group to complete the onboarding process.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_login.png)
+
+- The output of each step of the onboarding process will be displayed in the PowerShell script window, so you'll be able to see where the script currently is in the process at all times.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_output.png)
+
+- Once complete, you'll receive a pop-up notification informing you that the onboarding process is complete, and to check the Azure Arc blade in the Azure portal in the next few minutes.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_complete.png)
+
+- From the Azure portal, the SQL Server should now be visible as an Azure Arc-enabled SQL Server.
+
+  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_portal.png)
 
 ## Modules
 
@@ -218,7 +306,7 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
 #### Task 2
 
-### Module 2: Secure your Azure Arc-enabled servers using Microsoft Defender for servers
+### Module 2: Monitor your Azure Arc-enabled servers using Azure Monitor
 
 #### Module overview
 
@@ -226,7 +314,7 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
 #### Task 2
 
-### Module 3: Monitor your Azure Arc-enabled servers using Azure Monitor
+### Module 3: Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 
 #### Module overview
 
