@@ -264,37 +264,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing ArcBox-Client](./automation.png)
 
-- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servers with ArcBox for IT Pros!
+- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servers with the Level-up modules.
 
   ![Screenshot showing complete deployment](./arcbox_complete.png)
-
-  ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_icon.png)
-
-- A pop-up box will walk you through the target SQL Server which will be onboarded to Azure Arc, as well as provide details around the flow of the onboarding automation and how to complete the Azure authentication process when prompted.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_start.png)
-
-- The automation uses the PowerShell SDK to onboard the Azure Arc-enabled SQL Server on your behalf. To accomplish this, it will login to Azure with the _-UseDeviceAuthentication_ flag. The device code will be copied to the clipboard on your behalf, so you can simply paste the value into box when prompted.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_code.png)
-
-- You'll then need to provide your Azure credentials to complete the authentication process. The user you login as will need _'Microsoft.Authorization/roleAssignments/write'_ permissions on the ArcBox resource group to complete the onboarding process.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_login.png)
-
-- The output of each step of the onboarding process will be displayed in the PowerShell script window, so you'll be able to see where the script currently is in the process at all times.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_output.png)
-
-- Once complete, you'll receive a pop-up notification informing you that the onboarding process is complete, and to check the Azure Arc blade in the Azure portal in the next few minutes.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_complete.png)
-
-- From the Azure portal, the SQL Server should now be visible as an Azure Arc-enabled SQL Server.
-
-  ![Screenshot showing ArcBox-Client](./sql_manual_onboard_portal.png)
 
 ## Modules
 
