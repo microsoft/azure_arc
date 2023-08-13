@@ -3,28 +3,28 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "The datacenter to use for the deployment."
             }
         },
         "logicAppSystemAssignedIdentityTenantId": {
-            "type": "String"
+            "type": "string"
         },
         "logicAppSystemAssignedIdentityObjectId": {
-            "type": "String"
+            "type": "string"
         },
         "sa_name": {
             "defaultValue": "storage name",
-            "type": "String"
+            "type": "string"
         },
         "connections_azureblob_name": {
             "defaultValue": "azureblob",
-            "type": "String"
+            "type": "string"
         },
         "connections_azurequeue_name": {
             "defaultValue": "azurequeue",
-            "type": "String"
+            "type": "string"
         }
     },
     "resources": [
@@ -165,7 +165,7 @@
     ],
     "outputs": {
         "blobendpointurl": {
-            "type": "String",
+            "type": "string",
             "value": "[reference(resourceId('Microsoft.Web/connections', parameters('connections_azureblob_name')),'2016-06-01', 'full').properties.connectionRuntimeUrl]"
         }
     }
