@@ -292,10 +292,62 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 #### Module overview
 
-#### Task 1
+In this module, you will learn how to enable and leverage Microsoft Defender for Servers to secure your Azure Arc-enabled servers using capabilities like Defender for Endpoint, vulnerability assessment and threat detection via alerts.
 
-#### Task 2
+#### Task 1: Pre-requisites
 
+> **NOTE: In the previous module, you should have already deployed the Azure Monitor agent (AMA) to you Arc-enabled servers. If you have not deployed it, follow the following steps in module 2 to deploy it otherwise skip to task 2**
+
+#### Task 2: Enable the Defender for Servers plan
+
+- From the Azure home page, search for defender and select Microsoft Defender for Cloud.
+
+    ![Screenshot showing searching for Defender for Cloud in the Azure Portal](./defenderForCloud_portal_search.png)
+
+- If you already have Defender plans setup at your subscription level, you may find that Defender is already turned on for your Arc-enabled servers. However, if Defender is not enabled, select _Environment settings_ from the Management section on the left blade.
+
+    ![Screenshot showing selecting the right subscription to enableDefender for Cloud in the Azure Portal](./defenderForCloud_portal_env_settings.png)
+
+- Expand the Tenant Root Group, and then select your subscription.
+
+- Enable the plan for servers, you can select either _Plan 1_ or _Plan 2_ for this exercise
+
+    ![Screenshot showing enabling Defender for servers plan in the Azure Portal](./defenderForCloud_portal_servers_enable.png)
+
+- Click on the settings option in the _Monitoring coverage_ and enable the following capabilities:
+  - Vulnerability assessment for machines
+  - Endpoint protection
+
+    ![Screenshot showing configuring Defender for servers plan 1 in the Azure Portal](./defenderForCloud_portal_servers_settings.png)
+
+- Click Save.
+
+    ![Screenshot showing configuring Defender for servers plan 1 in the Azure Portal](./defenderForCloud_portal_servers_save.png)
+
+#### Task 3: Detect threats on your servers using alerts
+
+- To simulate a malicious activity, rdp into the _ArcBox-Client_ VM
+- Go to Start and type cmd.
+- Right-select Command Prompt and select Run as administrator
+
+    ![Screenshot showing opening cmd as administator](./command-prompt.png)
+
+- Run the following command:
+
+```shell
+$remoteScriptFile = "$agentScript\testDefenderForServers.ps1"
+$Win2k22vmName = "ArcBox-Win2K22"
+$nestedWindowsUsername = "Administrator"
+$nestedWindowsPassword = "ArcDemo123!!"
+$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+$cmdExePath = "C:\Windows\System32\cmd.exe"
+$cmdArguments = "/C `"$remoteScriptFile`""
+
+Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Using:cmdExePath -ArgumentList $cmdArguments } -Credential $winCreds
+```
+
+- The Command Prompt window closes automatically. If successful, a new alert should appear in Defender for Cloud Alerts blade in 10 minutes.
 
 ### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
