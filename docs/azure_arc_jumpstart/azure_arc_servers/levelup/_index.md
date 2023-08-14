@@ -349,7 +349,7 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
 - The Command Prompt window closes automatically. If successful, a new alert should appear in Defender for Cloud Alerts blade in 10 minutes.
 
-  > **NOTE: You should already see an alert for the Win2k22 Arc-enabled server**
+  > **NOTE: You should already see an alert for the Win2k19 Arc-enabled server**
 
 ### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
