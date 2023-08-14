@@ -262,13 +262,13 @@ Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
 # Test Defender for Servers
 Write-Header "Simulating threats to generate alerts from Defender for Cloud"
 $remoteScriptFileFile = "$agentScript\testDefenderForServers.ps1"
-Copy-VMFile $Win2k19vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
-Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
+Copy-VMFile $Win2k19vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFile -CreateFullPath -FileSource Host -Force
+Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFile -CreateFullPath -FileSource Host -Force
 
 $cmdExePath = "C:\Windows\System32\cmd.exe"
 $cmdArguments = "/C `"$remoteScriptFile`""
 
-Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Start-Process -FilePath $Using:cmdExePath -ArgumentList $cmdArguments } -Credential $winCreds
+Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Start-Process -FilePath $Using:cmdExePath -ArgumentList $Using:cmdArguments } -Credential $winCreds
 
 #############################################################
 # Install VSCode extensions
