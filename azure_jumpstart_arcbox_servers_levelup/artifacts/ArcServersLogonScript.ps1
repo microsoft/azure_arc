@@ -261,7 +261,7 @@ Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
 
 # Test Defender for Servers
 Write-Header "Simulating threats to generate alerts from Defender for Cloud"
-$remoteScriptFileFile = "$agentScript\testDefenderForServers.ps1"
+$remoteScriptFile = "$agentScript\testDefenderForServers.ps1"
 Copy-VMFile $Win2k19vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFile -CreateFullPath -FileSource Host -Force
 Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\testDefenderForServers.cmd" -DestinationPath $remoteScriptFile -CreateFullPath -FileSource Host -Force
 
