@@ -322,11 +322,11 @@ In this module, you will learn how to enable and leverage Microsoft Defender for
 
 - Click Save.
 
-    ![Screenshot showing configuring Defender for servers plan 1 in the Azure Portal](./defenderForCloud_portal_servers_save.png)
+    ![Screenshot showing configuring Defender for servers plan 1 in the Azure Portal](./defenderForCloud_portal_save.png)
 
 #### Task 3: Detect threats on your servers using alerts
 
-- To simulate a malicious activity on the _Win2k19_ servers, rdp into the _ArcBox-Client_ VM
+- To simulate a malicious activity on the _Win2k22_ servers, rdp into the _ArcBox-Client_ VM
 - Go to Start and type cmd.
 - Right-select Command Prompt and select Run as administrator
 
@@ -348,6 +348,10 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 ```
 
 - The Command Prompt window closes automatically. If successful, a new alert should appear in Defender for Cloud Alerts blade in 10 minutes.
+
+- Navigate to the Security tab of the _Win2k19_ Arc-enabled server in the portal
+
+    ![Screenshot showing the generated alert](./defenderForCloud_portal_alert.png)
 
   > **NOTE: You should already see an alert for the Win2k19 Arc-enabled server**
 
