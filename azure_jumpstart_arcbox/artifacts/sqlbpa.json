@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "Name of the Log Analytics workspace to use."
             }
         },
         "vmName": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "The name of the virtual machine."
             }
         },
         "arcSubscriptionId": {
-            "type": "String",
+            "type": "string",
             "metadata": {
                 "description": "The name of the virtual machine."
             }
@@ -144,11 +144,11 @@
     ],
     "outputs": {
         "dataCollectionEndpointId": {
-            "type": "String",
+            "type": "string",
             "value": "[resourceId('Microsoft.Insights/dataCollectionEndpoints', variables('dataCollectionEndpointName'))]"
         },
         "dataCollectionRuleId": {
-            "type": "String",
+            "type": "string",
             "value": "[resourceId('Microsoft.Insights/dataCollectionRules', variables('dataCollectionRuleName'))]"
         }
     }
