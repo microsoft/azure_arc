@@ -25,7 +25,20 @@ $tenantId = (Get-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID).Tena
 $context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -Tenant $tenantId -ErrorAction Stop
 
 # Write-Host "Setting az subscription..."
-$azLogin = az account set --subscription $env:AZURE_SUBSCRIPTION_ID
+az account set --subscription $env:AZURE_SUBSCRIPTION_ID
+
+# Register providers
+Write-Host "Registering Azure providers..."
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace Microsoft.OperationsManagement --wait
+az provider register --namespace Microsoft.AzureStackHCI --wait
+az provider register --namespace Microsoft.ResourceConnector --wait
+az provider register --namespace Microsoft.OperationalInsights --wait
 
 
 ########################################################################
@@ -86,7 +99,7 @@ Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) 
 #endregion Functions
 
 $location = $env:AZURE_LOCATION
-$minCores = 32
+$minCores = 32 # 32 vCPUs required for standard deployment with E32s v5
 $skuFriendlyNames = "Standard DSv5 Family vCPUs|Total Regional vCPUs"
 
 Write-Host "`nChecking for available capacity in $location region..."
@@ -116,7 +129,7 @@ If ($available.usableLocation -contains $false) {
 ########################################################################
 # Get Windows Admin Username and Password
 ########################################################################
-$JS_WINDOWS_ADMIN_USERNAME = 'agora'
+$JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
@@ -134,54 +147,6 @@ if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection 
 
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
-
-
-########################################################################
-# GitHub User
-########################################################################
-$JS_GITHUB_USER = $env:JS_GITHUB_USER
-
-$defaultGhUser = ""
-If ($JS_GITHUB_USER) { $defaultGhUser = " [$JS_GITHUB_USER]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS_GITHUB_USER = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
-
-
-########################################################################
-# GitHub Personal Access Token
-########################################################################
-$JS_GITHUB_PAT = $env:JS_GITHUB_PAT
-
-$defaultPAT = ""
-If ($JS_GITHUB_PAT) { $defaultPAT = " [$JS_GITHUB_PAT]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$defaultPAT") { $JS_GITHUB_PAT = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_PAT -- $JS_GITHUB_PAT
-
-
-########################################################################
-# Create SSH RSA Public Key
-########################################################################
-Write-Host "Creating SSH RSA Public Key..."
-$file = "js_rsa"
-remove-item $file, "$file.pub" -Force -ea 0 
-
-# Generate the SSH key pair
-ssh-keygen -q -t rsa -b 4096 -f $file -N '""' 
-
-# Get the public key
-$JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
-
-# Escape the backslashes 
-$JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
-
-# set the env variable
-azd env set JS_SSH_RSA_PUBLIC_KEY -- $JS_SSH_RSA_PUBLIC_KEY
 
 
 ########################################################################
