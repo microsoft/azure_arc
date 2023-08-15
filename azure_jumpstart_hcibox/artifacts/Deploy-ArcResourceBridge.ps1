@@ -79,7 +79,7 @@ if ($env:deployAKSHCI -eq $false) {
 }
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -vnetName $using:SDNConfig.AKSvSwitchName -vswitchName $using:SDNConfig.AKSvSwitchName -ipaddressprefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -vlanID $using:SDNConfig.AKSVlanID
+    New-ArcHciConfigFiles -subscriptionID $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -vnetName $using:SDNConfig.AKSvSwitchName -vswitchName $using:SDNConfig.AKSvSwitchName -ipaddressprefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -controlPlaneIP $using:SDNConfig.rbCpip -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp2 -vlanID $using:SDNConfig.AKSVlanID
 }
 
 $ErrorActionPreference = "Continue"
