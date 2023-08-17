@@ -55,7 +55,7 @@ Occasionally, you may need to review log output from scripts that run on the _Ag
 
 ### Accessing the Kubernetes resources on the clusters
 
-After deploying Agora, if you try to access the Kubernetes resources on the clusters you will see the following error message. This is expected as you must have access/permissions to the cluster, the Kubernetes API, and the Kubernetes objects. You must grant yourself an appropriate RBAC permission to be able to view those resources.
+After deploying Agora, if you try to access the Kubernetes resources on the clusters, you will see the following error message. This is expected as you must have access/permissions to the cluster, the Kubernetes API, and the Kubernetes objects. You must grant yourself the appropriate RBAC permission to view those resources.
 
   ![Screenshot showing an error message when accessing Kubernetes resources on the AKS cluster](./img/aks_resources_access.png)
 
