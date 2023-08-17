@@ -591,8 +591,8 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
     Expand-Archive -Path C:\VHDs\SqlQueryStress.zip -DestinationPath C:\VHDs\SqlQueryStress
 
     # Create SQLQueryStress desktop shortcut
-    Write-Host "Installing dotnetcore sdk"
-    choco install dotnetcore-3.1-sdk -y -r --no-progress
+    Write-Host "Installing dotnet sdk"
+    choco install dotnet-sdk -y -r --no-progress
     Write-Host "`n"
     Write-Host "Creating SQLQueryStress Desktop shortcut"
     Write-Host "`n"
