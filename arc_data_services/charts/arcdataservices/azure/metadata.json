@@ -5,7 +5,7 @@
             "ResourceType": "datacontrollers/activeDirectoryConnectors",
             "ProviderName": "Microsoft.AzureArcData",
             "ResourceMapping": {
-                "Version": "v1",
+                "Version": "v2",
                 "Group": "arcdata.microsoft.com",
                 "Kind": "ActiveDirectoryConnector",
                 "Name": "activedirectoryconnectors",
