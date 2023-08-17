@@ -22,7 +22,7 @@ After completion of this workshop, you will be able to:
 
 | LevelUp Module | Duration | Facilitator |
 |---------------|---------------|---------------|
-| **1. Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Owner |
+|**1. Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Owner |
 |**2. Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Owner |
 |**3. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
 |**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
@@ -34,6 +34,8 @@ After completion of this workshop, you will be able to:
 |**10. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
 |**11. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
 |**12. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
+|**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
+|**14. Run command (TBD)** | x minutes | Owner |
 
 ## LevelUp Lab Environment
 
