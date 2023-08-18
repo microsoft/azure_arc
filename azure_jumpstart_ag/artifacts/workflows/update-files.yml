@@ -25,7 +25,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml" "physical_ag.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATHS=($(find . -name $branch))
           if [ ${#FILE_PATHS[@]} -eq 0 ]; then
@@ -56,7 +56,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml" "physical_ag.yaml")
 
         for branch in "${branches[@]}"; do
           FILE_PATHS=($(find . -name $branch))
@@ -89,7 +89,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml" "physical_ag.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATHS=($(find . -name $branch))
           if [ ${#FILE_PATHS[@]} -eq 0 ]; then
@@ -121,7 +121,7 @@ jobs:
         git config --global user.email "action@github.com"
         git pull
 
-        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
+        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml" "physical_ag.yaml")
         for branch in "${branches[@]}"; do
           FILE_PATHS=($(find . -name $branch))
           if [ ${#FILE_PATHS[@]} -eq 0 ]; then

@@ -92,9 +92,6 @@
 
     # Git branches
     GitBranches             = @(
-        'production',
-        'staging',
-        'canary' ,
         'main'
     )
 

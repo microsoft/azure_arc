@@ -1,0 +1,30 @@
+name: Push to Azure Container Registry
+on:
+  push:
+    branches:
+      - physical_ag
+
+jobs:
+  build:
+    name: Build container image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+               
+      - name: Log into registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.ACR_ENDPOINT }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src
+          push: true
+          build-args: |
+            version=0.0.1
+          tags: ${{ secrets.ACR_ENDPOINT }}/contosoapp:latest
+          

@@ -32,7 +32,7 @@ jobs:
           retry_on: error
           max_attempts: 3
           command: |
-            branches=("production" "staging" "canary" "main")
+            branches=("production" "staging" "canary" "main" "physical_ag")
             # Build pos image for each branch
             for branch in "${branches[@]}"; do
               if [ $branch == "main" ]; then
@@ -52,7 +52,7 @@ jobs:
           max_attempts: 3
           command: |
             # Build cloudSync image for each branch
-            branches=("production" "staging" "canary" "main")
+            branches=("production" "staging" "canary" "main" "physical_ag")
             for branch in "${branches[@]}"; do
               if [ $branch == "main" ]; then
                 branch="dev"
@@ -71,7 +71,7 @@ jobs:
           max_attempts: 3
           command: |
             # Build contosoAi image for each branch
-            branches=("production" "staging" "canary" "main")
+            branches=("production" "staging" "canary" "main" "physical_ag")
             for branch in "${branches[@]}"; do
               if [ $branch == "main" ]; then
                 branch="dev"
@@ -90,7 +90,7 @@ jobs:
           max_attempts: 3
           command: |
             # Build queue monitoring backend image for each branch
-            branches=("production" "staging" "canary" "main")
+            branches=("production" "staging" "canary" "main" "physical_ag")
             for branch in "${branches[@]}"; do
               if [ $branch == "main" ]; then
                 branch="dev"
@@ -109,7 +109,7 @@ jobs:
           max_attempts: 3
           command: |
             # Build queue monitoring frontend image for each branch
-            branches=("production" "staging" "canary" "main")
+            branches=("production" "staging" "canary" "main" "physical_ag")
             for branch in "${branches[@]}"; do
               if [ $branch == "main" ]; then
                 branch="dev"
