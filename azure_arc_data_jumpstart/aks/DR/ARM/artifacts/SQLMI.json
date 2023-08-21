@@ -13,80 +13,80 @@
       "type": "string"
     },
     "dataControllerId": {
-      "type": "String"
+      "type": "string"
     },
     "customLocation": {
-      "type": "String"
+      "type": "string"
     },
     "subscriptionId": {
-      "type": "String"
+      "type": "string"
     },
     "admin": {
-      "type": "String"
+      "type": "string"
     },
     "password": {
-      "type": "SecureString"
+      "type": "securestring"
     },
     "namespace": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "arc"
     },
     "serviceType": {
-      "type": "String"
+      "type": "string"
     },
     "readableSecondaries": {
-      "type": "String"
+      "type": "string"
     },    
     "vCoresRequest": {
-      "type": "String"
+      "type": "string"
     },
     "memoryRequest": {
-        "type": "String"
+        "type": "string"
     },
     "vCoresLimit": {
-        "type": "String"
+        "type": "string"
     },
     "memoryLimit": {
-        "type": "String"
+        "type": "string"
     },
     "dataStorageSize": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "5"
     },
     "dataStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "logsStorageSize": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "5"
     },
     "logsStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "dataLogsStorageSize": {
-      "type": "String",
+      "type": "string",
       "defaultValue": "5"
     },
     "dataLogsStorageClassName": {
-      "type": "String"
+      "type": "string"
     },
     "replicas": {
-      "type": "Int"
+      "type": "int"
     },
     "resourceTags": {
-      "type": "Object"
+      "type": "object"
     },
     "apiVersion": {
-      "type": "String"
+      "type": "string"
     },
     "pricingTier": {
-      "type": "String"
+      "type": "string"
     },
     "licenseType": {
-      "type": "String"
+      "type": "string"
     },
     "sqlMIName": {
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {},

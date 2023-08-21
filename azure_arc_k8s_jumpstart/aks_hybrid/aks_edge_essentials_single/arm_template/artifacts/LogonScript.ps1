@@ -3,9 +3,9 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1000"
+$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.5"
+$schemaVersionAksEdgeConfig = "1.8"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 
@@ -209,6 +209,7 @@ az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.HybridConnectivity --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
 
 az provider show --namespace Microsoft.Kubernetes -o table
 Write-Host "`n"
@@ -219,6 +220,8 @@ Write-Host "`n"
 az provider show --namespace Microsoft.GuestConfiguration -o table
 Write-Host "`n"
 az provider show --namespace Microsoft.HybridConnectivity -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.ExtendedLocation -o table
 Write-Host "`n"
 
 # Onboarding the cluster to Azure Arc

@@ -2,7 +2,7 @@
 name: "\U0001F41BBug report"
 about: Create a report to help us improve
 title: ''
-labels: 'bug,triage'
+labels: 'triage'
 assignees: ''
 
 ---
@@ -10,11 +10,11 @@ assignees: ''
 
 <!---  Disclaimer: The intent of this "Bug report" template is to address issues related to the Azure Arc Jumpstart scenarios, ArcBox, HCIBox and all other project ares. The Azure Arc Jumpstart team does not handle Azure Arc core product issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com). --->
 
-**Is your issue related to a Jumpstart scenario, ArcBox, or HCIBox?**
+**Is your issue related to a Jumpstart scenario, ArcBox, HCIBox, or Agora?**
 <!--- A link to the Jumpstart scenario you are working on. --->
 
-**Describe the bug**
-<!--- A clear and concise description of what the bug is. --->
+**Describe the issue or the bug**
+<!--- A clear and concise description of what the issue or the bug is. --->
 
 **To Reproduce**
 <!--- Steps to reproduce the behavior:
@@ -36,6 +36,7 @@ assignees: ''
 - [Jumpstart ArcBox for DevOps troubleshooting](https://azurearcjumpstart.io/azure_jumpstart_arcbox/devops/#basic-troubleshooting)
 - [Jumpstart ArcBox for DataOps troubleshooting](https://azurearcjumpstart.io/azure_jumpstart_arcbox/dataops/)
 - [HCIBox troubleshooting](https://azurearcjumpstart.io/azure_jumpstart_hcibox/#basic-troubleshooting)
+- [Agora - Contoso Supermarket troubleshooting](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/troubleshooting/)
 --->
 
 **Screenshots**

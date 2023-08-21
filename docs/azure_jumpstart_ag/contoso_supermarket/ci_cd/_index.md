@@ -83,7 +83,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
    ![Screenshot showing the PoS application before the checkout feature](./img/pos_before_checkout_feature.png)
 
-- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [Deployment Guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
+- Connect to the Client VM _Ag-VM-Client_ using the instructions in the [deployment guide](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/deployment/#connecting-to-the-agora-client-virtual-machine).
 
 - Open VSCode from the desktop shortcut.
 
@@ -117,7 +117,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the cloned repository opened in the dev container](./img/vscode_dev_container_pos_app.png)
 
-- Click on the GitHub icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to add it to the allow list.
+- Click on the _Source Control_ icon in the VSCode toolbar, click on _Manage Unsafe Repositories_ and select the _jumpstart-agora-apps_ repository to add it to the allow list.
 
     ![Screenshot showing the trust repository prompt in VSCode](./img/vscode_dev_container_trust_repository.png)
 
@@ -146,7 +146,7 @@ The development process will start from the local _dev_ cluster, where as a deve
 
     ![Screenshot showing the added pushing code to remote](./img/vscode_dev_push_changes.png)
 
-- After the code has been pushed, navigate to your GitHub fork of the _jumpstart-agora-apps_, you will see a notification about changes in the _feature-checkout-cart_branch. Click_Compare & Pull request_.
+- After the code has been pushed, navigate to your GitHub fork of the _jumpstart-agora-apps_, you will see a notification about changes in the _feature-checkout-cart_branch_. Click _Compare & Pull request_.
 
     ![Screenshot showing new changes message](./img/github_create_pr_dev.png)
 
