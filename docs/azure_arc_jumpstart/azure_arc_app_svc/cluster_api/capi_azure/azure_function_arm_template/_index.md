@@ -157,6 +157,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
+    > **NOTE: If you receive an error message stating that the requested VM size is not available in the desired location (as an example: 'Standard_D8s_v3'), it means that there is currently a capacity restriction for that specific VM size in that particular region. Capacity restrictions can occur due to various reasons, such as high demand or maintenance activities. Microsoft Azure periodically adjusts the available capacity in each region based on usage patterns and resource availability. To continue deploying this scenario, please try to re-run the deployment using another region.**
+
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal. Included in this part of the automation, is also the onboarding of the cluster as an Azure Arc-enabled Kubernetes resource. Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations) which will be deployed later, in the next phase of the scenario automation.
 
     ![Screenshot showing the ARM template deployment completed](./01.png)
