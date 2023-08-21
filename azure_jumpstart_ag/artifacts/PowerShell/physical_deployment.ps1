@@ -11,47 +11,44 @@ $AgConfig           = Import-PowerShellDataFile -Path "./physical_agora_params.p
 #####################################################################
 # Initialize the environment
 #####################################################################
-$AgConfig           = Import-PowerShellDataFile -Path $Env:AgConfigPath
+
 $AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
 $configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
 $websiteUrls        = $AgConfig.URLs
 $appsRepo           = "jumpstart-agora-apps"
-$adminPassword      = $Env:adminPassword
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $workflowStatus     = ""
 
 
 # GitHub Account Info
-$githubAccount      = "brauliomsft"
+$githubAccount      = "agoraedge"
 $githubBranch       = "physical_ag"
-$gitHubUser         = "brauliomsft"
-$githubPat          = "PAT"
+$gitHubUser         = "agoraedge"
+$githubPat          = "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"
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
 
 
 
 # Azure Account Info
+$uniqueGuid         = [Guid]::NewGuid().ToString("N").Substring(0, 5)
 $deploymentName     = "agoraphysical"
 $resourceGroup      = $deploymentName + "-" + $uniqueGuid + "-" + "RG"
-$uniqueGuid = [Guid]::NewGuid().ToString("N")
-$azureLocation      = "eastus2"
-$spnClientId        = $Env:spnClientId
-$spnClientSecret    = $Env:spnClientSecret
-$spnTenantId        = $Env:spnTenantId
-$acrName            = $deploymentName + "-" + $uniqueGuid
-$cosmosDBName       = $deploymentName + "-" + $uniqueGuid
-$cosmosDBEndpoint   = "Orders"
+$azureLocation      = "westus2"
+$location           = $azureLocation
+$acrName            = $deploymentName + $uniqueGuid
+$cosmosDBName       = $deploymentName + $uniqueGuid
+$database           = "Orders"
+$container          = "Orders"
 $templateBaseUrl    = $Env:templateBaseUrl
-$namingGuid         = $Env:namingGuid
-$adxClusterName     = $deploymentName + "-" + $uniqueGuid
+$adxClusterName     = $deploymentName + $uniqueGuid
 $iotHubHostName     = "iothostname"
 
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
-Write-Header "Executing Jumpstart Agora automation scripts"
+#Write-Header "Executing Jumpstart Agora automation scripts"
 $startTime = Get-Date
 
 # Disable Windows firewall
@@ -59,6 +56,7 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 # Force TLS 1.2 for connections to prevent TLS/SSL errors
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 
 #####################################################################
 # Install Azure CLI 
@@ -74,6 +72,10 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 #Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 #az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Github CLI..." -ForegroundColor DarkGreen
+winget install --id GitHub.cli
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI..." -ForegroundColor Gray
 az login
@@ -128,17 +130,18 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure Resources... (Step 3/17)" -ForegroundColor DarkGreen
 
 # Resource Group
-az group create --name $resourceGroup --location eastus
+az group create --name $resourceGroup --location $location
 Write-Host "[$(Get-Date -Format t)] INFO: Resource Group $resourceGroup Created" -ForegroundColor DarkGreen
 
 # Azure Container Registry
-az acr create --resource-group $resourceGroup --name mycontainerregistry --sku Basic
+az acr create --resource-group $resourceGroup --name $acrName --sku Basic
 Write-Host "[$(Get-Date -Format t)] INFO: Container Registry $acrName Created" -ForegroundColor DarkGreen
 
 # CosmosDB
-az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --default-consistency-level Eventual --locations regionName="$location" failoverPriority=0 isZoneRedundant=False --locations regionName="$failoverLocation" failoverPriority=1 isZoneRedundant=False
-az cosmosdb sql database create --account-name $cosmosDBName --resource-group $resourceGroup --name $database
-az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name $database --name $container --partition-key-path $partitionKey --throughput 400 --idx @idxpolicy-$randomIdentifier.json
+#az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --default-consistency-level Eventual --locations regionName="$location" failoverPriority=0 isZoneRedundant=False --locations regionName="$failoverLocation" failoverPriority=1 isZoneRedundant=False
+az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --kind GlobalDocumentDB --server-version 3.6 --default-consistency-level Eventual --locations $location --capabilities EnableServerless
+az cosmosdb sql database create --account-name $cosmosDBName --resource-group $resourceGroup --name $cosmosDBName
+az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name $cosmosDBName --name $container
 Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB $cosmosDBName Created" -ForegroundColor DarkGreen
 
 
@@ -151,8 +154,9 @@ $url = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/tools/scripts/AksE
 Invoke-WebRequest -Uri $url -OutFile .\AksEdgeQuickStart.ps1
 Unblock-File .\AksEdgeQuickStart.ps1
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-
-.\AksEdgeQuickStart.ps1 -SubscriptionId "<subscription-id>" -TenantId "<tenant-id>" -Location "<location>"
+$subscriptionId = (Get-AzSubscription).Id
+$TenantId = (Get-AzSubscription).TenantId
+.\AksEdgeQuickStart.ps1 -SubscriptionId $subscriptionId -TenantId $TenantId -Location $location
 Write-Host "[$(Get-Date -Format t)] INFO: Sleeping for three (3) minutes to allow for AKS EE installs to complete." -ForegroundColor Gray
 Start-Sleep -Seconds 180 # Give some time for the AKS EE installs to complete. This will take a few minutes.
 
