@@ -38,7 +38,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubernetes-helm'
             #Run commands in parallel.
             Parallel 
                 {
