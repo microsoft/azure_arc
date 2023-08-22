@@ -44,8 +44,8 @@ choco install azcopy10
 # Download of Windows VM VHDX file 
 New-Item -Path $nodepath -Name "ArcJumpstart" -ItemType "directory"
 Write-Verbose "Downloading Windows Server VHDX file. Hold tight, this might take a few minutes..." -Verbose
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/jumpstartvhds/ArcVM-HCIJS-win.vhdx'
-$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
+$sourceFolder = 'https://jsvhds.blob.core.windows.net/scenarios/prod/ArcVM-HCIJS-win.vhdx'
+$sas = "?sp=r&st=2023-08-10T19:01:34Z&se=2033-08-11T03:01:34Z&spr=https&sv=2022-11-02&sr=b&sig=ieWak5x0UZMrPBjJJ4BMR5RzXbhjUiGDofN0R3cRtZ0%3D"
 azcopy cp $sourceFolder/*$sas $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx
 
 # Enable CredSSP

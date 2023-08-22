@@ -208,7 +208,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
 
   ![Screenshot showing azd auth login](./azd_auth_login.png)
 
-- Run the ```azd init``` command from your cloned repo _*azure_jumpstart_ag*_ folder.
+- Run the ```azd init``` command from your cloned repo _*azure_jumpstart_hcibox*_ folder.
   
   ![Screenshot showing azd init](./azd_init.png)
 
