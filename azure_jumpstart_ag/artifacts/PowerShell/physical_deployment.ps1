@@ -53,6 +53,10 @@ $spnClientID        = "848d84a7-6480-41e0-b3f1-00a58b0912cf"
 $cosmosDBEndpoint   = "https://" + $deploymentName + $uniqueGuid + ".documents.azure.com:443"
 $clusterName        = "agorak3s" + $uniqueGuid
 
+if (Test-Path -Path $AgConfig.AgDirectories["AgLogsDir"]) {
+    Remove-Item -Path $AgConfig.AgDirectories["AgLogsDir"] -Recurse -Force
+}
+
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 #Write-Header "Executing Jumpstart Agora automation scripts"
 $startTime = Get-Date
