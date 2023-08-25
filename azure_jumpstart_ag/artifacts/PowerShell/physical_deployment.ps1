@@ -17,39 +17,47 @@ $AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
 $configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
 $websiteUrls        = $AgConfig.URLs
-$appsRepo           = "jumpstart-agora-apps"
+$appsRepo           = $AgConfig.GitHub["appsRepo"]
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $workflowStatus     = ""
 $namespace          = "contoso-supermarket"
 
 
 # GitHub Account Info
+$githubAccount      = $AgConfig.GitHub["githubAccount"]
+$githubBranch       = $AgConfig.GitHub["githubBranch"]
+$gitHubUser         = $AgConfig.GitHub["gitHubUser"]
+$githubPat          = $AgConfig.GitHub["githubPat"]
+$appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+
+
+<#
 $githubAccount      = "agoraedge"
 $githubBranch       = "physical_ag"
 $gitHubUser         = "agoraedge"
 $githubPat          = "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"
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+#>
 
-
+#Deployment Info
+$deploymentName     = $AgConfig.AzureDeployment["deploymentName"]
+$azureLocation      = $AgConfig.AzureDeployment["azureLocation"]
+$database           = $AgConfig.AzureDeployment["database"]
+$container          = $AgConfig.AzureDeployment["container"]
+$appId              = $AgConfig.AzureDeployment["appId"]
+$spnClientSecret    = $AgConfig.AzureDeployment["spnClientSecret"]
+$spnTenantId        = $AgConfig.AzureDeployment["spnTenantId"]
+$spnClientID        = $AgConfig.AzureDeployment["spnClientID"]
 
 # Azure Account Info
 $uniqueGuid         = [Guid]::NewGuid().ToString("N").Substring(0, 5)
-$deploymentName     = "agoraphysical"
 $resourceGroup      = $deploymentName + "-" + $uniqueGuid + "-" + "RG"
-$azureLocation      = "westus2"
 $location           = $azureLocation
 $acrName            = $deploymentName + $uniqueGuid
 $cosmosDBName       = $deploymentName + $uniqueGuid
-$database           = "Orders"
-$container          = "Orders"
-$templateBaseUrl    = $Env:templateBaseUrl
 $adxClusterName     = $deploymentName + $uniqueGuid
-$iotHubHostName     = "iothostname"
-$appId              = "848d84a7-6480-41e0-b3f1-00a58b0912cf"
-$spnClientSecret    = "oXi8Q~C-w~u6cj6tIjwJdLDjh1pGJvrj8GDpja4g"
-$spnTenantId        = "563ba6b9-0d93-41be-a390-246d9b406654"
-$spnClientID        = "848d84a7-6480-41e0-b3f1-00a58b0912cf"
 $cosmosDBEndpoint   = "https://" + $deploymentName + $uniqueGuid + ".documents.azure.com:443"
 $clusterName        = "agorak3s" + $uniqueGuid
 
@@ -79,6 +87,7 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
     $folder.Attributes += [System.IO.FileAttributes]::Hidden
 }
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
@@ -110,16 +119,11 @@ Write-Host
 #####################################################################
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
-$azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-$subscriptionId = (Get-AzSubscription).Id
-
 # Install PowerShell modules
 if ($AgConfig.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
     foreach ($module in $AgConfig.PowerShellModules) {
-        Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+        Install-Module -Name $module -Force -AllowClobber | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     }
 }
 
@@ -132,6 +136,12 @@ if ($AgConfig.AzureProviders.Count -ne 0) {
 }
 Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
+
+
+$azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+$subscriptionId = (Get-AzSubscription).Id
 
 #####################################################################
 # Configure Azure Resources

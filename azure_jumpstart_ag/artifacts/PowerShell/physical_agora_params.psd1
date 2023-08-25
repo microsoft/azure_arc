@@ -19,7 +19,27 @@
         AgMonitoringDir   = "C:\Ag\Monitoring"
     }
 
+    GitHub                 = @{
+        githubAccount      = "agoraedge"
+        githubBranch       = "physical_ag"
+        gitHubUser         = "agoraedge"
+        githubPat          = ""
+        appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+        appsRepo           = "jumpstart-agora-apps"
+    }
     # Required URLs
+
+    AzureDeployment             =@{
+        deploymentName     = ""
+        azureLocation      = "westus2"
+        database           = "Orders"
+        container          = "Orders"
+        appId              = ""
+        spnClientSecret    = ""
+        spnTenantId        = ""
+        spnClientID        = ""
+    }
+
     URLs                    = @{
         chocoInstallScript = 'https://chocolatey.org/install.ps1'
         wslUbuntu          = 'https://aka.ms/wslubuntu'
@@ -51,31 +71,14 @@
 
     # PowerShell modules
     PowerShellModules       = @(
+        'Az'
+        'Az.Accounts'
+        'Az.Resources'
         'Az.ConnectedKubernetes'
         'Az.KubernetesConfiguration'
         'Az.Kusto'
     )
 
-    # Chocolatey packages list
-    ChocolateyPackagesList  = @(
-        'azure-cli',
-        'az.powershell',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnetcore-3.1-sdk',
-        'zoomit',
-        'openssl.light',
-        'mqtt-explorer',
-        'gh'
-    )
 
     # VSCode extensions
     VSCodeExtensions        = @(
@@ -94,28 +97,6 @@
     GitBranches             = @(
         'main'
     )
-
-    # VHDX blob url
-    ProdVHDBlobURL          = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11/AGBase.vhdx?sp=r&st=2023-05-06T14:38:41Z&se=2033-05-06T22:38:41Z&spr=https&sv=2022-11-02&sr=b&sig=DTDZOvPlzwrjg3gppwVo1TdDZRgPt5AYBfe9YeKEobo%3D'
-    PreProdVHDBlobURL       = 'https://jsvhds.blob.core.windows.net/agora/contoso-supermarket-w11-preprod/*?si=Agora-RL&spr=https&sv=2021-12-02&sr=c&sig=Afl5LPMp5EsQWrFU1bh7ktTsxhtk0QcurW0NVU%2FD76k%3D'
-
-    # L1 virtual machine configuration
-    HostVMDrive             = "V"                                   # This value controls the drive letter where the nested virtual
-    L1VMMemory              = 32GB                                  # This value controls the amount of RAM for each AKS Edge Essentials host virtual machine
-    L1VMNumVCPU             = 8                                     # This value controls the number of vCPUs to assign to each AKS Edge Essentials host virtual machine.
-    InternalSwitch          = "InternalSwitch"                      # This value controls the Hyper-V internal switch name used by L0 Azure virtual machine.
-    L1Username              = "Administrator"                       # This value controls the Admin credential username for the L1 Hyper-V virtual machines that run on the Agora-Client.
-    L1Password              = 'Agora123!!'                          # This value controls the Admin credential password for the L1 Hyper-V virtual machines that run on the Agora-Client.
-    L1DefaultGateway        = "172.20.1.1"                          # This value controls the default gateway IP address used by each L1 Hyper-V virtual machines that run on the Agora-Client.
-    L1SwitchName            = "AKS-Int"                             # This value controls the Hyper-V internal switch name used by each L1 Hyper-V virtual machines that run on the Agora-Client.
-    L1NatSubnetPrefix       = "172.20.1.0/24"                       # This value controls the network subnet used by each L1 Hyper-V virtual machines that run on the Agora-Client.
-
-    # NAT Configuration
-    natHostSubnet           = "192.168.128.0/24"
-    natHostVMSwitchName     = "InternalNAT"
-    natConfigure            = $true
-    natSubnet               = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
-    natDNS                  = "%staging-natDNS%"                     # Do not change - can be configured by passing the optional natDNS parameter to the ARM deployment.
 
     # AKS Edge Essentials variables
     SiteConfig              = @{
@@ -149,28 +130,6 @@
     ArcServerResourceType   = 'Microsoft.HybridCompute/machines'
     ArcK8sResourceType      = 'Microsoft.Kubernetes/connectedClusters'
     AksResourceType         = 'Microsoft.ContainerService/managedClusters'
-
-    # nginx variables
-    nginx                   = @{
-        RepoName    = "ingress-nginx"
-        RepoURL     = "https://kubernetes.github.io/ingress-nginx"
-        ReleaseName = "ingress-nginx"
-        ChartName   = "ingress-nginx/ingress-nginx"
-        Namespace   = "ingress-nginx"
-    }
-
-    # Observability variables
-    Monitoring              = @{
-        AdminUser  = "admin"
-        User       = "Contoso Operator"
-        Email      = "operator@contoso.com"
-        Namespace  = "observability"
-        ProdURL    = "http://localhost:3000"
-        Dashboards = @{
-            "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
-            "custom"      = @('freezer-monitoring','node-exporter-full','cluster-global') # Dashboards from https://github.com/microsoft/azure_arc/tree/jumpstart_ag/azure_jumpstart_ag/artifacts/monitoring
-        }
-    }
 
     # Microsoft Edge startup settings variables
     EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
