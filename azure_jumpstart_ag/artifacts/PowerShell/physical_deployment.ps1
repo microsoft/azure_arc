@@ -1,4 +1,4 @@
-
+#Requires -RunAsAdministrator
 $ProgressPreference = "SilentlyContinue"
 Set-PSDebug -Strict
 
@@ -20,13 +20,14 @@ $websiteUrls        = $AgConfig.URLs
 $appsRepo           = "jumpstart-agora-apps"
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $workflowStatus     = ""
+$namespace          = "contoso-supermarket"
 
 
 # GitHub Account Info
 $githubAccount      = "agoraedge"
 $githubBranch       = "physical_ag"
 $gitHubUser         = "agoraedge"
-$githubPat          = "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"
+$githubPat          = "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"
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
 
@@ -45,7 +46,12 @@ $container          = "Orders"
 $templateBaseUrl    = $Env:templateBaseUrl
 $adxClusterName     = $deploymentName + $uniqueGuid
 $iotHubHostName     = "iothostname"
-
+$appId              = "848d84a7-6480-41e0-b3f1-00a58b0912cf"
+$spnClientSecret    = "oXi8Q~C-w~u6cj6tIjwJdLDjh1pGJvrj8GDpja4g"
+$spnTenantId        = "563ba6b9-0d93-41be-a390-246d9b406654"
+$spnClientID        = "848d84a7-6480-41e0-b3f1-00a58b0912cf"
+$cosmosDBEndpoint   = "https://" + $deploymentName + $uniqueGuid + ".documents.azure.com:443"
+$clusterName        = "agorak3s" + $uniqueGuid
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 #Write-Header "Executing Jumpstart Agora automation scripts"
@@ -70,15 +76,15 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 }
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-#Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
-#az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
+az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Github CLI..." -ForegroundColor DarkGreen
 winget install --id GitHub.cli
 
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI..." -ForegroundColor Gray
-az login
+
 
 
 # Making extension install dynamic
@@ -100,10 +106,9 @@ Write-Host
 #####################################################################
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
-#$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-#$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-#Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-Connect-AzAccount | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+$azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
 $subscriptionId = (Get-AzSubscription).Id
 
 # Install PowerShell modules
@@ -138,28 +143,60 @@ az acr create --resource-group $resourceGroup --name $acrName --sku Basic
 Write-Host "[$(Get-Date -Format t)] INFO: Container Registry $acrName Created" -ForegroundColor DarkGreen
 
 # CosmosDB
-#az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --default-consistency-level Eventual --locations regionName="$location" failoverPriority=0 isZoneRedundant=False --locations regionName="$failoverLocation" failoverPriority=1 isZoneRedundant=False
-az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --kind GlobalDocumentDB --server-version 3.6 --default-consistency-level Eventual --locations $location --capabilities EnableServerless
+az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --kind GlobalDocumentDB --capabilities EnableServerless
+Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Account Created" -ForegroundColor Gray
+
 az cosmosdb sql database create --account-name $cosmosDBName --resource-group $resourceGroup --name $cosmosDBName
-az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name $cosmosDBName --name $container
-Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB $cosmosDBName Created" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB DB Created" -ForegroundColor Gray
+
+az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name $cosmosDBName --name $container --partition-key-path '/OrderId'
+Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Container Created" -ForegroundColor DarkGreen
 
 
 
 #####################################################################
 # Install AKSEE on Host and Configure Single Cluster with Internal vSwitch
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring AKSEE as Single Machine Cluster (Step 4/17)" -ForegroundColor DarkGreen
-$url = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/tools/scripts/AksEdgeQuickStart/AksEdgeQuickStart.ps1"
-Invoke-WebRequest -Uri $url -OutFile .\AksEdgeQuickStart.ps1
-Unblock-File .\AksEdgeQuickStart.ps1
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-$subscriptionId = (Get-AzSubscription).Id
-$TenantId = (Get-AzSubscription).TenantId
-.\AksEdgeQuickStart.ps1 -SubscriptionId $subscriptionId -TenantId $TenantId -Location $location
-Write-Host "[$(Get-Date -Format t)] INFO: Sleeping for three (3) minutes to allow for AKS EE installs to complete." -ForegroundColor Gray
-Start-Sleep -Seconds 180 # Give some time for the AKS EE installs to complete. This will take a few minutes.
 
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring AKSEE as Single Machine Cluster (Step 4/17)" -ForegroundColor DarkGreen
+$msiurl = "https://aka.ms/aks-edge/k3s-msi"
+Invoke-WebRequest -Uri $msiurl -OutFile aksee-k3s-msi.msi
+$msiFilePath = "aksee-k3s-msi.msi"
+$msiInstallLog = "aksedgelog.txt"
+Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log `"$msiInstallLog`"" -Wait
+Import-Module AksEdge.psm1 -Force
+Install-AksEdgeHostFeatures -Force
+
+$jsonObj = New-AksEdgeConfig -DeploymentType SingleMachineCluster
+$jsonObj.User.AcceptEula = $true
+$jsonObj.User.AcceptOptionalTelemetry = $true
+$jsonObj.Init.ServiceIpRangeSize = 10
+$jsonObj.Arc.ClusterName = $clusterName
+$jsonObj.Arc.Location = $location
+$jsonObj.Arc.ResourceGroupName = $resourceGroup
+$jsonObj.Arc.SubscriptionId = $subscriptionId
+$jsonObj.Arc.TenantId = $spnTenantId
+$jsonObj.Arc.ClientId = $spnClientID
+$jsonObj.Arc.ClientSecret = $spnClientSecret
+$machine = $jsonObj.Machines[0]
+$machine.LinuxNode.CpuCount = 4
+$machine.LinuxNode.MemoryInMB = 4096
+$machine.LinuxNode.DataSizeInGB = 80
+
+New-AksEdgeDeployment -JsonConfigString ($jsonObj | ConvertTo-Json -Depth 4)
+
+Write-Host "[$(Get-Date -Format t)] INFO: AKSEE Succesfully Installed. Connecting to Azure..." -ForegroundColor DarkGreen
+Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop  
+Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop 
+Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
+
+# Connect Arc-enabled kubernetes
+Connect-AksEdgeArc -JsonConfigString (($jsonObj | ConvertTo-Json -Depth 4))
+
+#Connect Server to Arc
+Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
+Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "Ag-$hostname-Host" -Location $location 
 
 
 #####################################################################
@@ -350,8 +387,8 @@ do {
         }
     }
 } while ($response -match "failed" -or $retryCount -ge $maxRetries)
-Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
 
+Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
 write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
 Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
 Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
@@ -374,19 +411,13 @@ while ($workflowStatus.status -ne "completed") {
 Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
 gh workflow run pos-app-initial-images-build.yml
 
-#Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
-#$branches = $AgConfig.GitBranches
-
-
 Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
 git checkout main
 
 Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
 
-#####################################################################
-# Configure GitOps in Cluster
-#####################################################################
+
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
@@ -394,15 +425,10 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 6)" -Foregrou
 
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
 # Cleaning up images-cache namespace on all clusters
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name images-cache-cleanup -ScriptBlock {
-        $cluster = $using:cluster
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-        kubectl delete namespace "images-cache" --context $clusterName
-    }
-}
+# kubectl delete namespace "images-cache"
 
+kubectl create ns $namespace
+kubectl create namespace "images-cache"
 #  TODO - this looks app-specific so should perhaps be moved to the app loop
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
@@ -410,8 +436,34 @@ while ($workflowStatus.status -ne "completed") {
     $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
 }
 
+
+#####################################################################
+# Setup Azure Container registry pull secret on clusters
+#####################################################################
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
+kubectl create secret docker-registry acr-secret `
+                --namespace $namespace `
+                --docker-server="$acrName.azurecr.io" `
+                --docker-username="$spnClientId" `
+                --docker-password="$spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+#####################################################################
+# Create secrets for GitHub actions
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
+az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+
+kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
+Write-Host
+
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name gitops -ScriptBlock {
+    
 
         Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
             # Force TLS 1.2 for connections to prevent TLS/SSL errors
@@ -435,94 +487,34 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             }
         }
 
-        $AgConfig       = $using:AgConfig
-        $cluster        = $using:cluster
+        
+
         $site           = $cluster.Value
         $siteName       = $site.FriendlyName.ToLower()
-        $namingGuid     = $using:namingGuid
-        $resourceGroup  = $using:resourceGroup
-        $appClonedRepo  = $using:appClonedRepo
-        $appsRepo       = $using:appsRepo
-
+       
+       
+        az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
         $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
             $app         = $_
-            $store       = $cluster.value.Branch.ToLower()
-            $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-            $branch      = $cluster.value.Branch.ToLower()
+            $store       = "dev"
+            $branch      = "main"
             $configName  = $app.value.GitOpsConfigName.ToLower()
-            $clusterType = $cluster.value.Type
+            $clusterType = "$cluster.value.Type"            
             $namespace   = $app.value.Namespace
             $appName     = $app.Value.KustomizationName
             $appPath     = $app.Value.KustomizationPath
             $retryCount  = 0
             $maxRetries  = 2
 
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-            if ($clusterType -eq "AKS") {
-                $type = "managedClusters"
-                $clusterName = $cluster.value.ArcClusterName
-            }
-            else {
-                $type = "connectedClusters"
-            }
-            if ($branch -eq "main") {
-                $store = "dev"
-            }
-
+            #Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $clustername" -ForegroundColor Gray
+            $type = "connectedClusters"
+            
             # Wait for Kubernetes API server to become available
-            $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
+            $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
             $apiServerAddress = $apiServer -replace '.*https://| .*$'
             $apiServerFqdn    = ($apiServerAddress -split ":")[0]
             $apiServerPort    = ($apiServerAddress -split ":")[1]
-
-            do {
-                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-                if ($result.TcpTestSucceeded) {
-                    break
-                }
-                else {
-                    Start-Sleep -Seconds 5
-                }
-            } while ($true)
-            If ($app.Value.ConfigMaps){
-                # download the config files
-                foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
-                    $repoPath     = $configMap.value.RepoPath
-                    $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
-                    $iotHubName   = $iotHubHostName.replace(".azure-devices.net", "")
-                    $gitHubUser   = $gitHubUser
-                    $githubBranch = $githubBranch
-
-                    New-Item -Path $configPath -ItemType Directory -Force | Out-Null
-
-                    $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
-                    Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
-
-                    # replace the IoT Hub name and the SAS Tokens with the deployment specific values
-                    # this is a one-off for the broker, but needs to be generalized if/when another app needs it
-                    If ($configMap.Name -eq "mqtt-broker-config"){
-                        $configFile = "$configPath\mosquitto.conf"
-                        $update     = (Get-Content $configFile -Raw)
-                        $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
-
-                        foreach ($device in $site.IoTDevices) {
-                            $deviceId = "$device-$($site.FriendlyName)"
-                            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-                            $update = $update -replace "Chicago", $site.FriendlyName
-                            $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
-                        }
-
-                        $update | Set-Content $configFile
-                    }
-
-                    # create the namespace if needed
-                    If (-not (kubectl get namespace $namespace --context $siteName)){
-                        kubectl create namespace $namespace --context $siteName
-                    }
-                    # create the configmap
-                    kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
-                }
-            }
 
             az k8s-configuration flux create `
                 --cluster-name $clusterName `
@@ -589,15 +581,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
                 }
             } until ($configStatus.ComplianceState -eq "Compliant")
         }
-    }
+    
 }
 
-while ($(Get-Job -Name gitops).State -eq 'Running') {
-    #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-    Receive-Job -Name gitops -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 60
-}
-
-Get-Job -name gitops | Remove-Job
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
