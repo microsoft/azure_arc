@@ -222,6 +222,7 @@ resource sentinel 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' 
     name: 'SecurityInsights${workspaceName}'
     publisher: 'Microsoft'
     product: 'OMSGallery/SecurityInsights'
+    promotionCode: ''
   }
 }
 
