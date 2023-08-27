@@ -14,8 +14,12 @@ $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+#$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+#$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+
+# Change to use the level-up CDN for VHDs
+$vhdSourceFolder = "https://arcLevelupCDN-ehfhbeehgrc5bjah.z01.azurefd.net/arcbox"
+$sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
 
 # Archive exising log file and crate new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -144,16 +148,9 @@ $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))) {
     <# Action when all if and elseif conditions are false #>
     $Env:AZCOPY_BUFFER_GB = 4
-    if ($Env:flavor -eq "Full") {
-        # The "Full" ArcBox flavor has an azcopy network throughput capping
-        Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
-    }
-    else {
-        # Other ArcBox flavors does not have an azcopy network throughput capping
-        Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
-    }
+    # Other ArcBox flavors does not have an azcopy network throughput capping
+    Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+    azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --from-to BlobLocal
 }
 
 # Create the nested VMs if not already created
