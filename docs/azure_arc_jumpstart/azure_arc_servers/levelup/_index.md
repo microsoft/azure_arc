@@ -91,6 +91,7 @@ az login
   az provider register --namespace Microsoft.GuestConfiguration --wait
   az provider register --namespace Microsoft.AzureArcData --wait
   az provider register --namespace Microsoft.OperationsManagement --wait
+  az provider register --namespace Microsoft.SecurityInsights --wait
   ```
 
 - Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
