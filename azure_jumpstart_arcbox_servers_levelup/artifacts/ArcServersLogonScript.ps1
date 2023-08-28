@@ -284,7 +284,7 @@ Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
 #############################################################
 # Install VSCode extensions
 #############################################################
-Write-Host "Installing VSCode extensions"
+Write-Header "Installing VSCode extensions"
 # Install VSCode extensions
 $VSCodeExtensions = @(
     'ms-vscode.powershell',
@@ -294,6 +294,13 @@ $VSCodeExtensions = @(
 foreach ($extension in $VSCodeExtensions) {
     code --install-extension $extension
 }
+
+#############################################################
+# Install PowerShell 7
+#############################################################
+Write-Header "Installing PowerShell 7"
+Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
+Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
 
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
