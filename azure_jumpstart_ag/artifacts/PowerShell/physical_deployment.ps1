@@ -100,6 +100,8 @@ winget install --id GitHub.cli
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI..." -ForegroundColor Gray
 New-Item -Path ($AgConfig.AgDirectories["AgAppsRepo"]) -ItemType Directory
 
+
+
 #####################################################################
 # Install Git
 #####################################################################
@@ -174,7 +176,6 @@ az cosmosdb sql container create --account-name $cosmosDBName --resource-group $
 Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Container Created" -ForegroundColor DarkGreen
 
 
-
 #####################################################################
 # Install AKSEE on Host and Configure Single Cluster with Internal vSwitch
 #####################################################################
@@ -204,6 +205,8 @@ $machine.LinuxNode.CpuCount = 4
 $machine.LinuxNode.MemoryInMB = 4096
 $machine.LinuxNode.DataSizeInGB = 80
 
+#$scriptPath = "./installaksee.ps1"
+#Start-Process -FilePath "powershell.exe" -ArgumentList "-File" $scriptPath -Verb RunAs
 New-AksEdgeDeployment -JsonConfigString ($jsonObj | ConvertTo-Json -Depth 4)
 
 Write-Host "[$(Get-Date -Format t)] INFO: AKSEE Succesfully Installed. Connecting to Azure..." -ForegroundColor DarkGreen
@@ -213,12 +216,26 @@ Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber
 Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
 # Connect Arc-enabled kubernetes
+#TODO Uncomment line to connect host to Azure
 Connect-AksEdgeArc -JsonConfigString (($jsonObj | ConvertTo-Json -Depth 4))
 
 #Connect Server to Arc
 Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
+
+#TODO Uncomment line to connect host to Azure
 #Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "$hostname" -Location $location 
-Start-Sleep -Seconds 60
+#Start-Sleep -Seconds 60
+
+#Add C:\Program Files\AksEdge\kubectl to PATH
+$kubePath = "C:\Program Files\AksEdge\kubectl"
+Copy-Item "C:\Program Files\AksEdge\kubectl\kubectl.exe" -Destination "kubectl.exe"
+Copy-Item "C:\Program Files\AksEdge\kubectl\kubectl.exe" -Destination "C:\Windows\System32\kubectl.exe"
+$env:Path += ";$newPath"
+
+Write-Host "INFO: Kubectl added to Path" -ForegroundColor DarkGreen
+kubectl create ns testagora
+
+
 
 #####################################################################
 # Configure Jumpstart Agora Apps repository
@@ -449,8 +466,13 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 6)" -Foregrou
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
 # Cleaning up images-cache namespace on all clusters
 
+Copy-Item "C:\Program Files\AksEdge\kubectl\kubectl.exe" -Destination "kubectl.exe"
+#TODO testing for kubectl not found error
 kubectl create ns $namespace
 kubectl create namespace "images-cache"
+
+
+
 #  TODO - this looks app-specific so should perhaps be moved to the app loop
 while ($workflowStatus.status -ne "completed") {
     Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
@@ -465,6 +487,7 @@ while ($workflowStatus.status -ne "completed") {
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
 
+
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
 kubectl create secret docker-registry acr-secret `
@@ -472,6 +495,7 @@ kubectl create secret docker-registry acr-secret `
                 --docker-server="$acrName.azurecr.io" `
                 --docker-username="$spnClientId" `
                 --docker-password="$spnClientSecret" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
 
 #####################################################################
 # Create secrets for GitHub actions
@@ -481,8 +505,14 @@ az login --service-principal --username $spnClientID --password $spnClientSecret
 $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
 
 kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+
 kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+
 kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+
 Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
 Write-Host
 
@@ -536,6 +566,8 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
             
             # Wait for Kubernetes API server to become available
             $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+            
+
             $apiServerAddress = $apiServer -replace '.*https://| .*$'
             $apiServerFqdn    = ($apiServerAddress -split ":")[0]
             $apiServerPort    = ($apiServerAddress -split ":")[1]
