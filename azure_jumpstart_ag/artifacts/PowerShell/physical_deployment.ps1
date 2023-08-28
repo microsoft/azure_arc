@@ -222,8 +222,8 @@ Connect-AksEdgeArc -JsonConfigString (($jsonObj | ConvertTo-Json -Depth 4))
 Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
 
 #TODO Uncomment line to connect host to Azure
-#Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "$hostname" -Location $location 
-#Start-Sleep -Seconds 60
+Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "$hostname" -Location $location 
+Start-Sleep -Seconds 60
 
 #Add C:\Program Files\AksEdge\kubectl to PATH
 $kubePath = "C:\Program Files\AksEdge\kubectl"
