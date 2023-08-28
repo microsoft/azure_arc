@@ -60,6 +60,7 @@ $cosmosDBName       = $deploymentName + $uniqueGuid
 $adxClusterName     = $deploymentName + $uniqueGuid
 $cosmosDBEndpoint   = "https://" + $deploymentName + $uniqueGuid + ".documents.azure.com:443"
 $clusterName        = "agorak3s" + $uniqueGuid
+$hostname           = hostname
 
 if (Test-Path -Path $AgConfig.AgDirectories["AgLogsDir"]) {
     Remove-Item -Path $AgConfig.AgDirectories["AgLogsDir"] -Recurse -Force
@@ -97,7 +98,13 @@ winget install --id GitHub.cli
 
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI..." -ForegroundColor Gray
+New-Item -Path ($AgConfig.AgDirectories["AgAppsRepo"]) -ItemType Directory
 
+#####################################################################
+# Install Git
+#####################################################################
+
+winget install --id Git.Git -e --source winget
 
 
 # Making extension install dynamic
@@ -210,8 +217,8 @@ Connect-AksEdgeArc -JsonConfigString (($jsonObj | ConvertTo-Json -Depth 4))
 
 #Connect Server to Arc
 Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
-Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "Ag-$hostname-Host" -Location $location 
-
+#Connect-AzConnectedMachine -ResourceGroupName $resourceGroup -Name "$hostname" -Location $location 
+Start-Sleep -Seconds 60
 
 #####################################################################
 # Configure Jumpstart Agora Apps repository
@@ -411,6 +418,8 @@ gh repo set-default "$githubUser/$appsRepo"
 gh secret set "SPN_CLIENT_ID" -b $spnClientID
 gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
 gh secret set "ACR_NAME" -b $acrName
+gh secret set "ACR_USERNAME" -b $spnClientId
+gh secret set "ACR_PASSWORD" -b $spnClientSecret
 gh secret set "PAT_GITHUB" -b $githubPat
 gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
 gh secret set "SPN_TENANT_ID" -b $spnTenantId
@@ -435,11 +444,10 @@ Write-Host
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 6)" -ForegroundColor DarkGreen
 
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 6)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
 # Cleaning up images-cache namespace on all clusters
-# kubectl delete namespace "images-cache"
 
 kubectl create ns $namespace
 kubectl create namespace "images-cache"
@@ -449,6 +457,8 @@ while ($workflowStatus.status -ne "completed") {
     Start-Sleep -Seconds 10
     $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
 }
+
+
 
 
 #####################################################################
