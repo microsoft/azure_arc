@@ -330,10 +330,10 @@ In this module, you will learn how to enable and leverage Microsoft Defender for
 #### Task 3: Detect threats on your servers using alerts
 
 - To simulate a malicious activity on the _Win2k22_ servers, rdp into the _ArcBox-Client_ VM
-- Go to Start and type cmd.
-- Right-select Command Prompt and select Run as administrator
+- Go to Start and type _PowerShell ISE_.
+- Right-select and select Run as administrator.
 
-    ![Screenshot showing opening cmd as administator](./command-prompt.png)
+    ![Screenshot showing opening cmd as administator](./powershellISE_runas.png)
 
 - Run the following command:
 
@@ -347,16 +347,24 @@ $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindows
 $cmdExePath = "C:\Windows\System32\cmd.exe"
 $cmdArguments = "/C `"$remoteScriptFile`""
 
-Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Using:cmdExePath -ArgumentList $cmdArguments } -Credential $winCreds
+Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Using:cmdExePath -ArgumentList $Using:cmdArguments } -Credential $winCreds
 ```
 
-- The Command Prompt window closes automatically. If successful, a new alert should appear in Defender for Cloud Alerts blade in 10 minutes.
+  ![Screenshot showing running the Defender alert trigger script in ISE](./run_defender_alert_trigger.png)
 
 - Navigate to the Security tab of the _Win2k19_ Arc-enabled server in the portal
 
     ![Screenshot showing the generated alert](./defenderForCloud_portal_alert.png)
 
   > **NOTE: You should already see an alert for the Win2k19 Arc-enabled server**
+
+- You can also see the alerts from the _Defender for Cloud_ portal, in the _Security alerts_ pane.
+
+    ![Screenshot showing the generated alert](./defenderForCloud_portal_alert_mdfc.png)
+
+  > **NOTE: If you don't see the alerts, make sure to select the Information severity in the filters**
+
+    ![Screenshot showing the generated alert filters](./defenderForCloud_portal_alert_filter.png)
 
 ### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
