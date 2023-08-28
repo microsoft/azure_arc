@@ -252,7 +252,7 @@ Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Start-Process -FilePath $Us
 # Onboarding to Vulnerability assessment solution
 Write-Header "Onboarding to Vulnerability assessment solution"
 $resourceId=$(az resource show --name $Win2k19vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
-$Uri = "https://management.azure.com${resourceId}providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
+$Uri = "https://management.azure.com${resourceId}/providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
 az rest --uri $Uri --method PUT
 
 
@@ -266,7 +266,7 @@ $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -W
 # Onboarding to Vulnerability assessment solution
 Write-Header "Onboarding to Vulnerability assessment solution"
 $resourceId=$(az resource show --name $Ubuntu01vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
-$Uri = "https://management.azure.com${resourceId}providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
+$Uri = "https://management.azure.com${resourceId}/providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
 az rest --uri $Uri --method PUT
 
 #$ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
