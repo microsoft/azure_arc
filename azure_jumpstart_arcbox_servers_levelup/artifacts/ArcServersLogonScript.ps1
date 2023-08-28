@@ -288,7 +288,8 @@ Write-Header "Installing VSCode extensions"
 # Install VSCode extensions
 $VSCodeExtensions = @(
     'ms-vscode.powershell',
-    'esbenp.prettier-vscode'
+    'esbenp.prettier-vscode',
+    'ms-vscode-remote.remote-ssh'
 )
 
 foreach ($extension in $VSCodeExtensions) {
@@ -298,9 +299,19 @@ foreach ($extension in $VSCodeExtensions) {
 #############################################################
 # Install PowerShell 7
 #############################################################
-Write-Header "Installing PowerShell 7"
+Write-Header "Installing PowerShell 7 on the client VM"
 Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
 Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
+
+Write-Header "Installing PowerShell 7 on the nested ArcBox-Ubuntu-01 VM"
+$ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
+$Command = "wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb;sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb"
+$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+
+Write-Host "Configuring pwsh on the Linux VM"
+$ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
+$Command = "sudo pwsh;Install-Module -Force -PassThru -Name PSWSMan;Install-WSMan"
+$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
