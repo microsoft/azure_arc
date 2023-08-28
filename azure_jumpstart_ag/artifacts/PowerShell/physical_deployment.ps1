@@ -31,16 +31,6 @@ $githubPat          = $AgConfig.GitHub["githubPat"]
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
 
-
-<#
-$githubAccount      = "agoraedge"
-$githubBranch       = "physical_ag"
-$gitHubUser         = "agoraedge"
-$githubPat          = "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"
-$appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
-$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
-#>
-
 #Deployment Info
 $deploymentName     = $AgConfig.AzureDeployment["deploymentName"]
 $azureLocation      = $AgConfig.AzureDeployment["azureLocation"]
@@ -78,9 +68,18 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 
 #####################################################################
+# TODO / Check for Requirements 
+#####################################################################
+# 1. Check if Hyper-V is installed
+# 2. Check if Azure CLI is installed
+# 3. Check if Git is installed
+# 4. Check CPU/Mem
+
+
+#####################################################################
 # Install Azure CLI 
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Ag Folders in C: (Step 1/17)" -ForegroundColor DarkGreen
 $cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
