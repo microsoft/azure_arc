@@ -28,7 +28,7 @@ After completion of this workshop, you will be able to:
 |**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
 |**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
 |**6. Keep your Azure Arc-enabled servers patched using Update Management Center** | x minutes | Owner |
-|**7. Sentinel (TBD)** | x minutes | Owner |
+|**7. Sentinel(TBD)** | x minutes | Owner |
 |**8. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
 |**9. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
 |**10. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
