@@ -14,10 +14,10 @@ Jumpstart Agora provides a simple deployment process using Azure Bicep and Power
 
 Deploying the "Contoso Supermarket" scenario consists of the following steps (once prerequisites are met).
   
-  1. Deploy infrastructure - User deploys a Bicep file that creates the infrastructure in an Azure resource group.
+  1. Deploy infrastructure - The user deploys a Bicep file that creates the infrastructure in an Azure resource group.
   2. Bicep template deploys multiple Azure resources including the Client virtual machine.
-  3. Client VM uses custom script extension to run the Bootstrap PowerShell script which initializes the environment.
-  4. Bootstrap script injects the Logon script to Client VM.
+  3. Client VM uses a custom script extension to run the Bootstrap PowerShell script which initializes the environment.
+  4. Bootstrap script injects the Logon script to the Client VM.
   5. User logs in to the Agora-VM-Client Azure virtual machine.
   6. After login the Agora-VM-Client PowerShell scripts automatically run that configure the applications and CI/CD. These scripts will take some time to run.
 
@@ -29,15 +29,15 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
 - Fork the [_jumpstart-agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) into your own GitHub account. If you do not have a GitHub account, visit [this link](https://github.com/join) to create one.
 
-  - Open the [_jumpstart-Agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed into your GitHub account and click the "Fork" button in the upper-right corner.
+  - Open the [_jumpstart-Agora-apps_ repo](https://github.com/microsoft/jumpstart-agora-apps) while signed in to your GitHub account and click the "Fork" button in the upper-right corner.
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo1.png)
   
-  - Use the default settings to create your fork. Ensure that your user is selected in the dropdown and then click the "Create Fork" button.
+  - Use the default settings to create your fork. Ensure your user is selected in the dropdown and then click the "Create Fork" button.
 
     ![Screenshot showing how to fork the Jumpstart Agora Apps repo](./img/fork_repo2.png)
 
-- Configure a GitHub fine-grained personal access token (PAT) with permissions to modify __only__ the Jumpstart Agora Apps repo that you forked.
+- Configure a GitHub fine-grained personal access token (PAT) with permission to modify __only__ the Jumpstart Agora Apps repo that you forked.
 
   > __NOTE: The PAT token only needs to be created once as part of the prerequisites. Your token can be reused on subsequent deployments for as long as the token is valid. Therefore you should only need to complete these steps before your first deployment. If your token expires, simply follow the steps to create another.__
 
@@ -163,7 +163,7 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
     ![Screenshot showing creating an SPN with PowerShell](./img/create_spn_powershell.png)
 
     > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.__
-    > __NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
+    > __NOTE: The Jumpstart scenarios are designed with as much ease of use in mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
 
 - [Generate a new SSH key pair](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) or use an existing one (Windows 10 and above now comes with a built-in ssh client). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
