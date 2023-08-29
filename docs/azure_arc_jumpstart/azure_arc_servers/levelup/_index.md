@@ -686,8 +686,22 @@ Look at the update options
 Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
 ![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
 
+#### Reporting
+Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Update Management Center.
+There are a few views in there that show the total number of machines connected, history of runs, and the status.
+
+View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
+![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
+
+View of manual vs periodic assessments and manual vs automatically updated.
+![Screenshot showing overall machine Status](./updatemgmt-reporting2.png)
+
+View of updates by classification
+![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
+
 #### Ending session
 In this session, you have setup Update Management and learnt how to enable it to efficiently manage all updates for your machines, regardless of where they are.
+You have also seen some of the default reports, and since they use workbooks, you can easily create your own customized reports.
 
 ### Module 7: Run scripts on your Azure Arc-enabled servers using Custom script extensions
 
