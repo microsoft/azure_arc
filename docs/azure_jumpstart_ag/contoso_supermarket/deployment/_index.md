@@ -110,6 +110,8 @@ Once automation is complete, users can immediately start enjoying the Contoso Su
 
   ![Screenshot showing az vm list-usage](./img/az_vm_list_usage.png)
 
+- __Agora requires 3 Public IP addresses__. Ensure you have sufficient Public IP addresses available in your Azure subscription and the region where you plan to deploy Agora.
+
 - Create Azure service principal (SP). An Azure service principal assigned with the _Owner_ Role-based access control (RBAC) role is required. You can use Azure Cloud Shell (or other Bash shell), or PowerShell to create the service principal.
 
   - (Option 1) Create service principal using [Azure Cloud Shell](https://shell.azure.com/) or Bash shell with Azure CLI:
