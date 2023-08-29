@@ -137,14 +137,10 @@ If ($available.usableLocation -contains $false) {
 
 Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
 
-Write-Host "PIP1"
-$minPublicIP
-$availableIP
-Write-Host "PIP2"
+Write-Host "PIP1 $minPublicIP"
+Write-Host "PIP2 $availableIP"
 If ($availableIP -le $minPublicIP) {
-    $availableIP
     $requiredIp = $minPublicIP - $availableIP
-    $requiredIp
     Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
 } else {
     Write-Host "`n`u{2705} There is enough Public IP in the $location region to deploy the Jumpstart environment.`n"
