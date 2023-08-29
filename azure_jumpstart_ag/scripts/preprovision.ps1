@@ -137,6 +137,9 @@ If ($available.usableLocation -contains $false) {
     If ($availableIP -le $minPublicIP) {
         $requiredIp = $minPublicIP - $availableIP
         Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
+
+        $message = "Not enough capacity in $location region."
+        Throw $message
     } else {
         Write-Host "`n`u{2705} There is enough VM and Public IP capacity in the $location region to deploy the Jumpstart environment.`n"
     }
