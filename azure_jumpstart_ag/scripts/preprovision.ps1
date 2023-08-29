@@ -137,8 +137,10 @@ If ($available.usableLocation -contains $false) {
 
 Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
 
+Write-Host "PIP1"
 $minPublicIP
 $availableIP
+Write-Host "PIP2"
 If ($availableIP -le $minPublicIP) {
     $availableIP
     $requiredIp = $minPublicIP - $availableIP
