@@ -106,8 +106,6 @@ Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicI
     }
 }
 
-Get-AzAvailablePublicIpAddress -location eastus -subscriptionId 06e3cad0-b918-4596-aefa-a7b4bc649276 -minPublicIP 1500
-
 #endregion Functions
 
 $location = $env:AZURE_LOCATION
