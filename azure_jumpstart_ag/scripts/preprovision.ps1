@@ -98,9 +98,9 @@ Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicI
 
     $limit = ($response.value | where-object { $_.name.value -eq "PublicIPAddresses"}).limit
 
-    $availableIp = $limit - $publicIpCount
+    $availableIP = $limit - $publicIpCount
 
-    $availableIp
+    $availableIP
 
 }
 
@@ -137,9 +137,11 @@ If ($available.usableLocation -contains $false) {
 
 Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
 
-If ($availableIp -le $minPublicIP) {
-    $availableIp
-    $requiredIp = $minPublicIP - $availableIp
+$minPublicIP
+$availableIP
+If ($availableIP -le $minPublicIP) {
+    $availableIP
+    $requiredIp = $minPublicIP - $availableIP
     $requiredIp
     Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
 } else {
