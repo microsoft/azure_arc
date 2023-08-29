@@ -100,6 +100,8 @@ Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicI
 
     $availableIp = $limit - $publicIpCount
 
+    $availableIp
+
 }
 
 #endregion Functions
