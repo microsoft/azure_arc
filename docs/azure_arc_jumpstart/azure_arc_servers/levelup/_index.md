@@ -694,7 +694,7 @@ View of currently connected machines, split by Azure and Azure Arc VMs, and Wind
 ![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
 
 View of manual vs periodic assessments and manual vs automatically updated.
-![Screenshot showing overall machine Status](./updatemgmt-reporting2.png)
+![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
 
 View of updates by classification
 ![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
