@@ -132,16 +132,14 @@ If ($available.usableLocation -contains $false) {
     Throw $message
 
 } else {
-    Write-Host "`n`u{2705} There is enough VM capacity in the $location region to deploy the Jumpstart environment.`n"
-}
+    $availableIP = Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
 
-$availableIP = Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
-
-If ($availableIP -le $minPublicIP) {
-    $requiredIp = $minPublicIP - $availableIP
-    Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
-} else {
-    Write-Host "`n`u{2705} There is enough Public IP in the $location region to deploy the Jumpstart environment.`n"
+    If ($availableIP -le $minPublicIP) {
+        $requiredIp = $minPublicIP - $availableIP
+        Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
+    } else {
+        Write-Host "`n`u{2705} There is enough VM and Public IP capacity in the $location region to deploy the Jumpstart environment.`n"
+    }
 }
 
 ########################################################################
