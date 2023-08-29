@@ -592,7 +592,7 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 
     # Create SQLQueryStress desktop shortcut
     Write-Host "Installing dotnetcore sdk"
-    choco install dotnetcore-3.1-sdk -y -r --no-progress
+    choco install dotnet-sdk -y -r --no-progress
     Write-Host "`n"
     Write-Host "Creating SQLQueryStress Desktop shortcut"
     Write-Host "`n"
