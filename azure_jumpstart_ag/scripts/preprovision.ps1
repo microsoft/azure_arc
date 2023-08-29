@@ -83,10 +83,33 @@ Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) 
 
     $usableLocations
 }
+
+Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicIP = 0) {
+    
+    $accessToken = az account get-access-token --query accessToken -o tsv
+    $headers = @{
+        "Authorization" = "Bearer $accessToken"
+    }
+
+    $uri = "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.Network/locations/$location/usages?api-version=2023-02-01"
+
+    $publicIpCount = (Get-AzPublicIpAddress | where-object {$_.location -eq $location} | measure-object).count
+    $response = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
+
+    $limit = ($response.value | where-object { $_.name.value -eq "PublicIPAddresses"}).limit
+
+    $availableIP = $limit - $publicIpCount
+
+    $availableIP
+
+}
+
 #endregion Functions
 
 $location = $env:AZURE_LOCATION
+$subscriptionId = $env:AZURE_SUBSCRIPTION_ID
 $minCores = 32
+$minPublicIP = 3
 $skuFriendlyNames = "Standard DSv5 Family vCPUs|Total Regional vCPUs"
 
 Write-Host "`nChecking for available capacity in $location region..."
@@ -109,9 +132,18 @@ If ($available.usableLocation -contains $false) {
     Throw $message
 
 } else {
-    Write-Host "`n`u{2705} There is enough VM capacity in the $location region to deploy the Jumpstart environment.`n"
-}
+    $availableIP = Get-AzAvailablePublicIpAddress -location $location -subscriptionId $subscriptionId -minPublicIP $minPublicIP
 
+    If ($availableIP -le $minPublicIP) {
+        $requiredIp = $minPublicIP - $availableIP
+        Write-Host "`n`u{274C} There is not enough Public IP in the $location region to deploy the Jumpstart environment. Need addtional $requiredIp Public IP." -ForegroundColor Red
+
+        $message = "Not enough capacity in $location region."
+        Throw $message
+    } else {
+        Write-Host "`n`u{2705} There is enough VM and Public IP capacity in the $location region to deploy the Jumpstart environment.`n"
+    }
+}
 
 ########################################################################
 # Get Windows Admin Username and Password
