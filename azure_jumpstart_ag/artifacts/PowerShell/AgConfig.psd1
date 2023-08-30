@@ -70,7 +70,7 @@
         'kubectx',
         'putty.install',
         'kubernetes-helm',
-        'dotnetcore-3.1-sdk',
+        'dotnet-sdk',
         'zoomit',
         'openssl.light',
         'mqtt-explorer',
