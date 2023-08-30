@@ -109,7 +109,7 @@ Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicI
 $location = $env:AZURE_LOCATION
 $subscriptionId = $env:AZURE_SUBSCRIPTION_ID
 $minCores = 32
-$minPublicIP = 3
+$minPublicIP = 10
 $skuFriendlyNames = "Standard DSv5 Family vCPUs|Total Regional vCPUs"
 
 Write-Host "`nChecking for available capacity in $location region..."
