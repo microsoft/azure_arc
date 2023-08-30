@@ -8,8 +8,8 @@ description: >
 
 ## Deploy a full Azure Video Indexer enabled by Arc envoiroment with Video Indexer extension running on physical hardware
 
-Azure Video Indexer enabled by Arc is aimed at running Video and Audio Analysis on Edge Devices in a connected fashion, only control plane data is passed to the cloud, while data plane data is stored only on the edge device.
-The solution is designed to run on Azure Stack Edge Profile, a heavy edge device, and supports three video formats, including MP4 and four additional common formats. During the public preview, the solution supports eigth Azure languages: English (US), Spanish, German, French, Italian, Portuguese, Chinese (Simplified) and Arabic in all basic audio-related models.
+[Azure Video Indexer](https://learn.microsoft.com/azure/azure-video-indexer/video-indexer-overview) enabled by Arc is aimed at running Video and Audio Analysis on Edge Devices in a connected fashion, only control plane data is passed to the cloud, while data plane data is stored only on the edge device.
+The solution is designed to run on [Azure Stack Edge](https://azure.microsoft.com/products/azure-stack/edge/) Profile, a heavy edge device, and supports three video formats, including MP4 and four additional common formats. During the public preview, the solution supports eigth Azure languages: English (US), Spanish, German, French, Italian, Portuguese, Chinese (Simplified) and Arabic in all basic audio-related models.
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Video Indexer enabled by Arc](https://azure.microsoft.com/products/ai-video-indexer) deployed on a Kubernetes cluster.
 
@@ -19,7 +19,7 @@ By the end of this scenario, you will have an AKS cluster deployed with an App S
 
 ## Prerequisites
 
->NOTE: In order to succesfully deploy the VI Extension it is **mandatory** that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register).
+**NOTE: In order to succesfully deploy the VI Extension it is _mandatory_ that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register).**
 
 - Azure subscription with permissions to create Azure resources
 - Azure Video Indexer Account. The quickest way is using the Azure Portal using this tutorial [Create Video Indexer account](https://learn.microsoft.com/azure/azure-video-indexer/create-account-portal#use-the-azure-portal-to-create-an-azure-video-indexer-account).
@@ -54,9 +54,6 @@ The following is the minumum and recommended requirements if the extension conta
 | Operating System | Ubuntu 20.04 LTS or any Linux Compatible OS |
 | Kubernetes | 1.24 |
 | Azure CLI | 2.4.0 |
-
- 
-## Manual deployment
 
 Follow these steps to deploy the Video Indexer Arc Extension to your Azure Arc-enabled Kubernetes cluster.
 
@@ -141,22 +138,22 @@ The following parameters will be used as input to the extension creation command
 | frontend.endpointUri |  | Video Indexer DNS Name to be used as the Portal endpoint |
 
 ```shell
-                        az k8s-extension create --name videoindexer \
-                            --extension-type Microsoft.videoindexer \
-                            --scope cluster \
-                            --release-namespace ${namespace} \
-                            --cluster-name ${connectedClusterName} \
-                            --resource-group ${connectedClusterRg} \
-                            --cluster-type connectedClusters \
-                            --release-train preview  \
-                            --version ${version} \
-                            --auto-upgrade-minor-version false \
-                            --config-protected-settings "speech.endpointUri=${speechUri}" \
-                            --config-protected-settings "speech.secret=${speechSecret}" \
-                            --config-protected-settings "translate.endpointUri=${translateUri}" \
-                            --config-protected-settings "translate.secret=${translateSecret}" \
-                            --config "videoIndexer.accountId=${viAccountId}" \
-                            --config "frontend.endpointUri=${dnsName}" 
+az k8s-extension create --name videoindexer \
+    --extension-type Microsoft.videoindexer \
+    --scope cluster \
+    --release-namespace ${namespace} \
+    --cluster-name ${connectedClusterName} \
+    --resource-group ${connectedClusterRg} \
+    --cluster-type connectedClusters \
+    --release-train preview  \
+    --version ${version} \
+    --auto-upgrade-minor-version false \
+    --config-protected-settings "speech.endpointUri=${speechUri}" \
+    --config-protected-settings "speech.secret=${speechSecret}" \
+    --config-protected-settings "translate.endpointUri=${translateUri}" \
+    --config-protected-settings "translate.secret=${translateSecret}" \
+    --config "videoIndexer.accountId=${viAccountId}" \
+    --config "frontend.endpointUri=${dnsName}" 
 
 ```
 
@@ -181,23 +178,20 @@ There are some additional Parameters that can be used in order to have a fine gr
 | storage.storageClass | "" | The storage class to be used |
 | storage.useExternalPvc | false | determines whether an external PVC is used. if true, the VideoIndexer PVC will not be installed |
 
-example deploy script :
+Example deploy script :
 
 ```shell
-                        az k8s-extension create --name videoindexer \
-                            --extension-type Microsoft.videoindexer \
-                            .......
-                            
-                            --config AI.nodeSelector."beta\\.kubernetes\\.io/os"=linux
-                            --config "speech.resource.requests.cpu=500m" \
-                            --config "speech.resource.requests.mem=2Gi" \
-                            --config "speech.resource.limits.cpu=1" \
-                            --config "speech.resource.limits.mem=4Gi" \
-                            --config "videoIndexer.webapi.resources.requests.mem=4Gi"\
-                            --config "videoIndexer.webapi.resources.limits.mem=8Gi"\
-                            --config "videoIndexer.webapi.resources.limits.cpu=1"\
-                            --config "storage.storageClass=azurefile-csi" 
-
+    az k8s-extension create --name videoindexer \
+        --extension-type Microsoft.videoindexer \
+        --config AI.nodeSelector."beta\\.kubernetes\\.io/os"=linux \
+        --config "speech.resource.requests.cpu=500m" \
+        --config "speech.resource.requests.mem=2Gi" \
+        --config "speech.resource.limits.cpu=1" \
+        --config "speech.resource.limits.mem=4Gi" \
+        --config "videoIndexer.webapi.resources.requests.mem=4Gi"\
+        --config "videoIndexer.webapi.resources.limits.mem=8Gi"\
+        --config "videoIndexer.webapi.resources.limits.cpu=1"\
+        --config "storage.storageClass=azurefile-csi" 
 ```
 
 ### Step 4 - Verify Deployment
@@ -211,15 +205,13 @@ kubectl get pods -n video-indexer
 In case updates are required to the extension, the following command can be used to update the extension with either another version or with different configuration parameters
 
 ```shell
-           az k8s-extension update --name videoindexer \
-                            --cluster-name ${connectedClusterName} \
-                            --resource-group ${connectedClusterRg} \
-                            --cluster-type connectedClusters \
-                            --release-train ${releaseTrain}  \
-                            --version ${version} \
-                            --config "speech.resource.requests.cpu=500m"
-
-                            
+    az k8s-extension update --name videoindexer \
+        --cluster-name ${connectedClusterName} \
+        --resource-group ${connectedClusterRg} \
+        --cluster-type connectedClusters \
+        --release-train ${releaseTrain}  \
+        --version ${version} \
+        --config "speech.resource.requests.cpu=500m"
 ```
 
 > **NOTE:** You must specify the cluster name and resurce group name in order to update the extension.
