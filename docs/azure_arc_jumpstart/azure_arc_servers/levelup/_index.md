@@ -659,10 +659,46 @@ if ($roleDefinitionIds.Count -gt 0)
 ### Module 10: Manage your Azure Arc-enabled servers using Admin Center (Preview)
 
 #### Module overview
+In this module you will learn how to use the Windows Admin Center in the Azure portal to manage the Windows Server operating system of your Arc-enabled servers, known as hybrid machines. You can securely manage hybrid machines from anywhere without needing a VPN, public IP address, or other inbound connectivity to your machine.
 
-#### Task 1
+#### Task 1: Pre-requisites
 
-#### Task 2
+Pre-requisite 1: Check the status of the resource provider _Microsoft.HybridConnectivity_ and register if needed
+- In the Azure Portal, go to Subscriptions and select your subscription.
+- Select "Resource providers" from the "Settings" menue and search for _Microsoft.HybridConnectivity_.
+- If the status is NotRegistered, select Microsoft.HybridConnectivity, and then select Register.
+ ![Screenshot for HybridConnectivity RP](./Admin_centre_resource_provider_1.png)
+
+Pre-requisite 2: Azure permissions
+- To install the Windows Admin Center extension for an Arc-enabled server resource, your account must be granted the Owner, Contributor, or Windows Admin Center Administrator Login role in Azure. **You should have this already on your internal subscription.**
+
+- Connecting to Windows Admin center requires you to have Reader and Windows Admin Center Administrator Login permissions at the Arc-enabled server resource.
+    - Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
+![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+
+    - Click on any of your Azure Arc-enabled **Windows** servers.
+![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
+
+    - From the selected Windows machine click "Access control (IAM)" then add the role "Admin Center Administrator Login" to your access.
+![Screenshot of required role for Admin Center](./Admin_centre_Add_Role_1.png)
+
+#### Task 2: Deploy the Windows Admin Center VM extension
+- Open the Azure portal and navigate to your Arc-enabled server.
+- Under the Settings group, select Windows Admin Center, then click "Set up".
+- Specify the port on which you wish to install Windows Admin Center, and then select Install.
+
+![Screenshot deploy Admin Centre Extension](./Admin_center_install.png)
+
+- If you get the following message after the installatin is complete then you need to go back to the previous step and set up the permissions as explained in Pre-requisite-2
+
+![Screenshot permissions missing for Admin Centre](./Admin_Centre_install_message_1.png)
+#### Task 3: Connect and explore Windows Admin Center (preview)
+
+- Once the installation is complete then you can connect to the Admin Center 
+![Screenshot connecting to Admin Center](./Admin_Center_Connect.png)
+
+- Start exploring the capabilities it offers to manage your Arc-enabled Windows machine.
+![Screenshot Admin Center overview](./Admin_Centre_Overview.png)
 
 ### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
