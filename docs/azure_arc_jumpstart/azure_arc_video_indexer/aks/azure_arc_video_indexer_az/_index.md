@@ -19,7 +19,7 @@ By the end of this scenario, you will have an AKS cluster deployed with an App S
 
 ## Prerequisites
 
-**NOTE: In order to succesfully deploy the VI Extension it is _mandatory_ that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register).**
+>NOTE: In order to succesfully deploy the VI Extension it is **mandatory** that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register).
 
 - Azure subscription with permissions to create Azure resources
 - Azure Video Indexer Account. The quickest way is using the Azure Portal using this tutorial [Create Video Indexer account](https://learn.microsoft.com/azure/azure-video-indexer/create-account-portal#use-the-azure-portal-to-create-an-azure-video-indexer-account).
