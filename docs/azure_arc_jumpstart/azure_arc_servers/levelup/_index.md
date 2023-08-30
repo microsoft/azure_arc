@@ -663,13 +663,7 @@ In this module you will learn how to use the Windows Admin Center in the Azure p
 
 #### Task 1: Pre-requisites
 
-Pre-requisite 1: Check the status of the resource provider _Microsoft.HybridConnectivity_ and register it if not registered.
-- In the Azure Portal, go to Subscriptions and select your subscription.
-- Select "Resource providers" from the "Settings" menu and search for _Microsoft.HybridConnectivity_.
-- If the status is NotRegistered, select Microsoft.HybridConnectivity, and then select Register.
- ![Screenshot for HybridConnectivity RP](./Admin_centre_resource_provider_1.png)
-
-Pre-requisite 2: Azure permissions
+Pre-requisite: Azure permissions
 - To install the Windows Admin Center extension for an Arc-enabled server resource, your account must be granted the Owner, Contributor, or Windows Admin Center Administrator Login role in Azure. **You should have this already on your internal subscription.**
 
 - Connecting to Windows Admin Center requires you to have Reader and Windows Admin Center Administrator Login permissions at the Arc-enabled server resource.
@@ -691,7 +685,7 @@ Pre-requisite 2: Azure permissions
 
 ![Screenshot deploy Admin Centre Extension](./Admin_center_install.png)
 
-- If you get the following message after the installation is complete then you need to go back to the previous step and set up the permissions as explained in Pre-requisite 2.
+- If you get the following message after the installation is complete then you need to go back to the previous step and set up the permissions as explained in Pre-requisite.
 
 ![Screenshot permissions missing for Admin Centre](./Admin_Centre_install_message_1.png)
 #### Task 3: Connect and explore Windows Admin Center (preview)
