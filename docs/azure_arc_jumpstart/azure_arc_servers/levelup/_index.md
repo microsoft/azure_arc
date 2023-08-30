@@ -696,6 +696,14 @@ Pre-requisite: Azure permissions
 - Start exploring the capabilities offered by the Windows Admin Center to manage your Arc-enabled Windows machine.
 ![Screenshot Admin Center overview](./Admin_Centre_Overview.png)
 
+- Let us use the Windows Admin Center to add a local user, a new group and assign the new user to the new group.
+    - From the left menu select "Local users & groups". Then from the "Users" tab click "New user". Enter the user details and click on "Submit". Verify that the user has been added.
+![Screenshot adding local user](./Admin_center_local_users_1.png)
+    - Now select the "Groups" tab and click on "New Group". Enter the group details and click on "Submit". Verify that the group has been added.
+![Screenshot adding local group](./Admin_center_local_groups_1.png)
+    - Back to the "Users" tab, select the new user you have added, then click "Manage membership". Add the selected user to the new group and save.
+![Screenshot Group membership](./Admin_centre_group_membership_1.png)
+
 ### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
 #### Module overview
