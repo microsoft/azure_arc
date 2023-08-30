@@ -667,10 +667,119 @@ if ($roleDefinitionIds.Count -gt 0)
 ### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
 #### Module overview
+In this module, you will learn how to use the Azure Resource queries both in the Azure Graph Explorer and Powershell to demonstrate inventory management of your Azure Arc connected servers. Note that the results you get by running the graph queries in this module might be different from the sample screenshots as your environment might be different e.g. as a result of working with the other modules. 
 
-#### Task 1
+#### Task 1: Apply resource tags to Azure Arc-enabled servers
 
-#### Task 2
+In this first step, you will assign Azure resource tags to some of your Azure Arc-enabled servers. This gives you the ability to easily organize and manage server inventory.
+
+- Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
+
+![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+
+- Click on any of your Azure Arc-enabled servers.
+
+![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
+
+- Click on "Tags". Add a new tag with Name="Scenario” and Value="azure_arc_servers_inventory”. Click Apply when ready.
+
+![Screenshot showing adding tag to a server](./tagging_servers.png)
+
+- Repeat the same process in other Azure Arc-enabled servers if you wish. This new tag will be used later when working with Resource Graph Explorer queries.
+
+#### Task 2: The Azure Resource Graph Explorer
+
+- Now we will explore our hybrid server inventory using a number of Azure Graph Queries. Enter "Resource Graph Explorer" in the top search bar in the Azure portal and select it.
+
+![Screenshot of Graph Explorer in portal](./search_graph_explorer.png)
+
+- The scope of the Resource Graph Explorer can be set as seen below
+
+![Screenshot of Graph Explorer Scope](./Scope_of_Graph_Query.png)
+
+#### Task 3: Run a query to show all Azure Arc-enabled servers in your subscription
+
+- In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/equals-operator).
+
+Resources \
+| where type =~ 'Microsoft.HybridCompute/machines'
+
+![Screenshot of query to list arc servers](./query_arc_machines.png)
+
+- Scroll to the right on the results pane and click "See Details" to see all the Azure Arc-enabled server metadata. Note for example the list of detected properties, we will be using these in the next task.
+
+- You can also run the same query using PowerShell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module).
+To install the PowerShell module, run the following command 
+
+```powershell
+Install-Module -Name Az.ResourceGraph
+```
+Then run the query in PowerShell
+
+```powershell
+ Search-AzGraph -Query "Resources | where type =~ 'Microsoft.HybridCompute/machines'"
+```
+
+#### Task 4: Query your server inventory using the available metadata.
+
+- Use PowerShell and the Resource Graph Explorer to summarize the server count by "logical cores" which is one of the detected propeties referred to in the previous task. Remember to only use the query string, which is enclosed in double quotes, in the portal.
+
+```powershell
+Search-AzGraph -Query  “Resources
+| where type =~ 'Microsoft.HybridCompute/machines'
+| extend logicalCores = tostring(properties.detectedProperties.logicalCoreCount)
+| summarize serversCount = count() by logicalCores”
+```
+- The Graph Explorer allows you to get a graphical view of your results by selecting the "charts" option.
+
+![Screenshot of the logicalCores server summary](./chart_for_vcpu_summay.png)
+
+#### Task 5: Use the resource tags in your Graph Query.
+
+- Let’s now build a query that uses the tag we assigned earlier to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the Scenario tag. Feel free to use the portal of PowerShell. Check that the results match the servers that you set tags for earlier.
+
+```powershell
+Search-AzGraph -Query  “Resources
+| where type =~ 'Microsoft.HybridCompute/machines' and isnotempty(tags['Scenario'])
+| extend Scenario = tags['Scenario']
+| project name, tags"
+```
+#### Task 6: List the extensions installed on the Azure Arc-enabled servers.
+
+- Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in PowerShell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language#escape-characters)
+
+```powershell
+Search-AzGraph -Query “Resources
+| where type == 'microsoft.hybridcompute/machines'
+| project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)
+| join kind=leftouter(
+    Resources
+    | where type == 'microsoft.hybridcompute/machines/extensions'
+    | project MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))), ExtensionName = name
+) on `$left.JoinID == `$right.MachineId
+| summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName
+| order by tolower(OSName) desc”
+```
+- If you have used the portal to run the query then you should see something like the following 
+
+- ![Screenshot of extensions query](./Extensions_query.png)
+
+#### Task 7: Query other properties
+
+- Azure Arc provides additional properties on the Azure Arc-enabled server resource that we can query with Resource Graph Explorer. In the following example, we list some of these key properties, like the Azure Arc Agent version installed on your Azure Arc-enabled servers
+
+```powershell
+Search-AzGraph -Query  “Resources
+| where type =~ 'Microsoft.HybridCompute/machines'
+| extend arcAgentVersion = tostring(properties.['agentVersion']), osName = tostring(properties.['osName']), osVersion = tostring(properties.['osVersion']), osSku = tostring(properties.['osSku']),
+lastStatusChange = tostring(properties.['lastStatusChange'])
+| project name, arcAgentVersion, osName, osVersion, osSku, lastStatusChange"
+```
+
+- Running the same query in the portal should reslut in something like the following
+
+- ![Screenshot of extra properties](./extra_properties.png)
+
 
 ### Module 12: Enforce governance across your Azure Arc-enabled servers using Azure Policy
 
