@@ -712,7 +712,7 @@ Resources \
 To install the PowerShell module, run the following command 
 
 ```powershell
-Install-Module -Name Az.ResourceGrpah
+Install-Module -Name Az.ResourceGraph
 ```
 Then run the query in PowerShell
 
