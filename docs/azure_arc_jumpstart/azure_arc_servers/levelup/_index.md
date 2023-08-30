@@ -641,8 +641,8 @@ This new service is currently in preview and has no powershell scripting option 
 Ensure that you already have your Jumpbox with VMs onboarded via Azure Arc.
 
 #### Onboarding the VMs
-Note that all Azure VMs and Arc Server VMs are automatically enrolled in this Azure Update Management service.
-Desktop VMs are not supported (use Intune)
+Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Management service.
+Desktop VMs are visible but not supported for updates (use Intune)
 
 View the support matrix here:
 https://learn.microsoft.com/en-us/azure/update-center/support-matrix
