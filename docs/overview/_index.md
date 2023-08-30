@@ -27,7 +27,7 @@ Ready to get going?! This website offers you detailed guides, automation, code s
 
 Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/) section and enjoy the ride.
 
-> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code.**
+> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code. Jumpstart scenarios, ArcBox, HCIBox, and Agora are all intended for evaluation, training and demo purposes only and are not supported for production use cases.**
 
 ## Jumpstart Agora
 
