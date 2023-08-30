@@ -708,7 +708,13 @@ Resources \
 
 - Scroll to the right on the results pane and click "See Details" to see all the Azure Arc-enabled server metadata. Note for example the list of detected properties, we will be using these in the next task.
 
-- You can also run the same query using Powershell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module)
+- You can also run the same query using PowerShell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module).
+To install the PowerShell module, run the following command 
+
+```powershell
+Install-Module -Name Az.ResourceGrpah
+```
+Then run the query in PowerShell
 
 ```powershell
  Search-AzGraph -Query "Resources | where type =~ 'Microsoft.HybridCompute/machines'"
@@ -716,7 +722,7 @@ Resources \
 
 #### Task 4: Query your server inventory using the available metadata.
 
-- Use powershell and the Resource Graph Explorer to summarize the server count by "logical cores" which is one of the detected propeties referred to in the previous task. Remember to only use the query string, which is enclosed in double quotes, in the portal.
+- Use PowerShell and the Resource Graph Explorer to summarize the server count by "logical cores" which is one of the detected propeties referred to in the previous task. Remember to only use the query string, which is enclosed in double quotes, in the portal.
 
 ```powershell
 Search-AzGraph -Query  “Resources
@@ -730,7 +736,7 @@ Search-AzGraph -Query  “Resources
 
 #### Task 5: Use the resource tags in your Graph Query.
 
-- Let’s now build a query that uses the tag we assigned earlier to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the Scenario tag. Feel free to use the portal of powershell. Check that the results match the servers that you set tags for earlier.
+- Let’s now build a query that uses the tag we assigned earlier to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the Scenario tag. Feel free to use the portal of PowerShell. Check that the results match the servers that you set tags for earlier.
 
 ```powershell
 Search-AzGraph -Query  “Resources
@@ -740,7 +746,7 @@ Search-AzGraph -Query  “Resources
 ```
 #### Task 6: List the extensions installed on the Azure Arc-enabled servers.
 
-- Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in powershell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language#escape-characters)
+- Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in PowerShell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language#escape-characters)
 
 ```powershell
 Search-AzGraph -Query “Resources
