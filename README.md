@@ -6,6 +6,8 @@ https://azurearcjumpstart.io
 
 This repository contains the markdown files which generate the above website. See below for guidance on running with a local environment to contribute to the docs.
 
+> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code. Jumpstart scenarios, ArcBox, HCIBox, and Agora are all intended for evaluation, training and demo purposes only and are not supported for production use cases.**
+
 ## Want to help and contribute?
 
 Before making your first contribution, make sure to review the [contributing](https://azurearcjumpstart.io/contributing/) section in the docs.
