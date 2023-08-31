@@ -23,7 +23,7 @@ By the end of this scenario, you will have an AKS cluster deployed with an App S
 
 - Azure subscription with permissions to create Azure resources
 - Azure Video Indexer Account. The quickest way to create one is by using the Azure Portal using this tutorial [Create Video Indexer account](https://learn.microsoft.com/azure/azure-video-indexer/create-account-portal#use-the-azure-portal-to-create-an-azure-video-indexer-account).
-- For the manual deployment, you will need a working Azure Arc Kubernetes environmnet you can follow one of the guides [here](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/).
+- For the manual deployment, you will need a working Azure Arc-enabled Kubernetes environment. To create one you can follow one of the guides [here](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/).
 - The latest version of [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli). You can skip if you're using cloud shell.
 - The latest version of connected Kubernetes Azure CLI extension, installed by running the following command. **You can skip if you're using the Cloud Shell** option:
 
