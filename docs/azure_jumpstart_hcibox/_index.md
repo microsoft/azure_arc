@@ -382,7 +382,7 @@ HCIBox includes a deployment of a Windows Admin Center (WAC) gateway server. Win
 
 ![Screenshot showing Windows Admin Center](./wac_portal.png)
 
-  > __NOTE: [Registering Windows Admin Center with Azure](https://learn.microsoft.com/en-us/azure-stack/hci/manage/register-windows-admin-center) is not supported in HCIBox.__
+  > __NOTE: [Registering Windows Admin Center with Azure](https://learn.microsoft.com/azure-stack/hci/manage/register-windows-admin-center) is not supported in HCIBox.__
 
 ### Azure Kubernetes Service
 
