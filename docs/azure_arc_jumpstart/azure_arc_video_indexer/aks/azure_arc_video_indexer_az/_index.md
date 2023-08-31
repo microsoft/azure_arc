@@ -19,13 +19,13 @@ By the end of this scenario, you will have an AKS cluster deployed with an App S
 
 ## Prerequisites
 
->NOTE: In order to succesfully deploy the VI Extension it is **mandatory** that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register).
+>**NOTE: In order to succesfully deploy the VI Extension it is _mandatory_ that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register)**.
 
 - Azure subscription with permissions to create Azure resources
 - Azure Video Indexer Account. The quickest way to create one is by using the Azure Portal using this tutorial [Create Video Indexer account](https://learn.microsoft.com/azure/azure-video-indexer/create-account-portal#use-the-azure-portal-to-create-an-azure-video-indexer-account).
-- For the manual deployment, you will need a working Azure Arc Kubernetes environmnet you can follow one of the guides [here](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/).
-- The latest version of [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli). You can skip if you're using cloud shell.
-- The latest version of connected Kubernetes Azure CLI extension, installed by running the following command. **You can skip if you're using the Cloud Shell** option:
+- For the manual deployment, you will need a working Azure Arc-enabled Kubernetes environment. To create one you can follow one of the guides [here](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/).
+- The latest version of [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli). You can skip if you're using Cloud Shell.
+- The latest version of connected Kubernetes Azure CLI extension, installed by running the following command. **You can skip if you're using the Cloud Shell option:
 
 ```shell
 az extension add --name connectedk8s
@@ -33,8 +33,9 @@ az extension add --name connectedk8s
 
 ### Minumum Hardware Requirements
 
-The following is the minumum and recommended requirements if the extension contains single Languge support.
-> **NOTE:** If you install multiple Speech and Translation containers with several languages, ensure to increase the hardware requirements accordingly.
+The following is the minimum and recommended requirements if the extension contains single Languge support.
+
+> **NOTE: If you install multiple Speech and Translation containers with several languages, ensure to increase the hardware requirements accordingly**.
 
 | Component | Minimum Requirements | Recommended Requirements |
 | --- | --- | --- |
@@ -43,9 +44,8 @@ The following is the minumum and recommended requirements if the extension conta
 | RAM (Per Cluster)| 32 GB | 64 GB |
 | Storage | 30 GB | 50 GB |
 
-> **NOTE:** at least 2-node cluster is recommended for high availability and scalability. The Recommended Settings refer to cluster wide settings, so for example, if you have 2 nodes, each node should have 16 cores and 32 GB of RAM.
-
-> **TIP:** We recommend creating a dedicate node-pool / auto-scaling groups to host the VI Solution
+> **NOTE: We recommend creating a dedicate node-pool / auto-scaling groups to host the VI Solution.  
+ At least 2-node cluster is recommended for high availability and scalability. The Recommended Settings refer to cluster wide settings, so for example, if you have 2 nodes, each node should have 16 cores and 32 GB of RAM**.
 
 ### Minimum Software Requirements
 
@@ -55,9 +55,9 @@ The following is the minumum and recommended requirements if the extension conta
 | Kubernetes | 1.24 |
 | Azure CLI | 2.4.0 |
 
-Follow these steps to deploy the Video Indexer Arc Extension to your Azure Arc-enabled Kubernetes cluster.
-
 ## Installation Steps
+
+Follow these steps to deploy the Video Indexer Arc Extension to your Azure Arc-enabled Kubernetes cluster.
 
 ### Step 1 - Create Azure Arc Kubernetes Cluster and connect it to your cluster
 
@@ -70,15 +70,15 @@ Run the following command to connect your cluster. This command deploys the Azur
 az connectedk8s connect --name myAKSCluster --resource-group myResourceGroup
 ```
 
-> **TIP:** Follow the article [how to connect your cluster to Azure Arc][4] on Azure Docs
-> for a complete walkthrough on this process
+> **TIP: Follow the article [how to connect your cluster to Azure Arc][4] on Azure Docs
+> for a complete walkthrough on this process**
 
 [4]: https://learn.microsoft.com/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli
 
 ### Step 2 - Generate Cognitive Services Resources for the extension
 
->**NOTE:**
-> The resources are created once per each subscription, and used by all the extenions under that subscription.
+>**NOTE:
+> The resources are created once per each subscription, and used by all the extenions under that subscription**.
 
 One of the prerequisites to installing a Video Indexer Arc extension are speech and translator resources. Once the resources are created, their key and endpoint need to be provided in the installation process.
 The resources are created once per subscription.
@@ -214,4 +214,4 @@ In case updates are required to the extension, the following command can be used
         --config "speech.resource.requests.cpu=500m"
 ```
 
-> **NOTE:** You must specify the cluster name and resurce group name in order to update the extension.
+> **NOTE: You must specify the cluster name and resurce group name in order to update the extension**.
