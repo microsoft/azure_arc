@@ -627,10 +627,81 @@ if ($roleDefinitionIds.Count -gt 0)
 ### Module 6: Keep your Azure Arc-enabled servers patched using Update Management Center
 
 #### Module overview
+Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
+This service is NOT dependent on Log analytics agent. (The older Azure Automation Update service relies on Log Analytics agent)
 
-#### Task 1
+Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc). 
+These modules will take a while to run, up to 15 minutes for each VM, due to processing required at the various VMs, although it is all running simultaneously.
 
-#### Task 2
+This information is taken from the link: https://azure.microsoft.com/en-us/products/azure-update-management-center
+
+This new service is currently in preview and has no powershell scripting option (as of Aug 2023)
+
+#### Prerequisites:
+Ensure that you already have your Jumpbox with VMs onboarded via Azure Arc.
+
+#### Onboarding the VMs
+Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Management service.
+Desktop VMs are visible but not supported for updates (use Intune)
+
+View the support matrix here:
+https://learn.microsoft.com/en-us/azure/update-center/support-matrix
+Currently, Azure VMs that are migrated from on-premises are not supported for Update Management Center.
+
+![Screenshot showing initial view of all VMs](./updatemgmt-allvms.png)
+
+#### Refresh the VMs:
+Once the VMs have been onboarded, clicking on the refresh button will refresh the current status of selected VMs.
+This can also be set as an automatic recurring task for at scale refresh - once every 24 hours. This automatic refresh interval cannot be changed.
+![Screenshot showing automatic refresh configuration](./updatemgmt-updatesettings.png)
+
+#### Setup Maintenance Configuration
+Setup a list of maintenance configurations for each specific group of VMs in your environment. For countries in Asia and Europe, it is a good idea to use second Tuesday + 1 day to coincode with Patch Tuesday. Do not use "Second Wednesday of the month".
+![Screenshot showing how to add a maintenance config](./updatemgmt-maintenanceconfig.png)
+
+Then choose how machines are added to this maintenance configuration (by OS, location, resource group)
+![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
+
+Or choose machines specifically instead of dynamically
+![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
+
+Then choose what type of updates will be installed by this config
+![Screenshot showing which updates are going to be installed](./updatemgmt-specificupdates.png)
+
+
+#### Forcing one-time updates
+Instead of using maintenance configs with specific recurring cycles, you can also setup one-time updates (immediately!)
+Start by forcing an immediate refresh:
+![Screenshot showing onetime refresh](./updatemgmt-onetimerefresh.png)
+
+Then specify which machines
+![Screenshot showing what updates for each machines](./updatemgmt-installonetimeupdates.png)
+
+Choose which types of updates
+![Screenshot showing which types of updates to install](./updatemgmt-showwhichupdates.png)
+
+Look at the update options
+![Screenshot showing changes to be made in the onboard script](./updatemgmt-installoptions.png)
+
+Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
+![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
+
+#### Reporting
+Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Update Management Center.
+There are a few views in there that show the total number of machines connected, history of runs, and the status.
+
+View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
+![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
+
+View of manual vs periodic assessments and manual vs automatically updated.
+![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
+
+View of updates by classification
+![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
+
+#### Ending session
+In this session, you have setup Update Management and learnt how to enable it to efficiently manage all updates for your machines, regardless of where they are.
+You have also seen some of the default reports, and since they use workbooks, you can easily create your own customized reports.
 
 ### Module 7: Run scripts on your Azure Arc-enabled servers using Custom script extensions
 
