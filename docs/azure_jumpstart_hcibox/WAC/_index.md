@@ -38,7 +38,7 @@ Windows Admin Center can be used directly from the Azure portal. To set this up 
 
 HCIBox also includes a dedicated Windows Admin Center (WAC) gateway server. The WAC gateway server can be accessed by connecting to it from RDP. A shortcut is available on the _HCIBox-Client_ desktop.
 
-  > __NOTE: [Registering Windows Admin Center with Azure](https://learn.microsoft.com/en-us/azure-stack/hci/manage/register-windows-admin-center) is not supported in HCIBox.__
+  > __NOTE: [Registering Windows Admin Center with Azure](https://learn.microsoft.com/azure-stack/hci/manage/register-windows-admin-center) is not supported in HCIBox.__
 
 - Open this shortcut and use the domain credential (username_supplied_at_deployment@jumpstart.local) to start an RDP session to the Windows Admin Center VM.
 
