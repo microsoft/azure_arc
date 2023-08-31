@@ -2,7 +2,7 @@
 
 ## Goals
 
-The purpose of this workshop is to train Microsoft employees who are working in the filed with the Azure Arc-enabled server concepts, features, value proposition, and do hands on training to help customers deploy Azure Arc-enabled servers.
+The purpose of this workshop is to train Microsoft employees who are working in the field with the Azure Arc-enabled server concepts, features, value proposition, and do hands on training to help customers deploy Azure Arc-enabled servers.
 
 After completion of this workshop, you will be able to:
 
@@ -29,13 +29,13 @@ After completion of this workshop, you will be able to:
 |**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
 |**6. Keep your Azure Arc-enabled servers patched using Update Management Center** | x minutes | Owner |
 |**7. Sentinel(TBD)** | x minutes | Owner |
-|**8. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
-|**9. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
+|**8. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Jan Egil Ring |
+|**9. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Jan Egil Ring |
 |**10. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
 |**11. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
 |**12. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
 |**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
-|**14. Run command (TBD)** | x minutes | Owner |
+|**14. Run command** | x minutes | Jan Egil Ring |
 
 ## LevelUp Lab Environment
 
@@ -630,7 +630,7 @@ if ($roleDefinitionIds.Count -gt 0)
 Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
 This service is NOT dependent on Log analytics agent. (The older Azure Automation Update service relies on Log Analytics agent)
 
-Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc). 
+Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc).
 These modules will take a while to run, up to 15 minutes for each VM, due to processing required at the various VMs, although it is all running simultaneously.
 
 This information is taken from the link: https://azure.microsoft.com/en-us/products/azure-update-management-center
@@ -715,6 +715,8 @@ You have also seen some of the default reports, and since they use workbooks, yo
 
 #### Module overview
 
+In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook workers in Azure Automation. We will then create and start runbooks on the hybrid runbook workers to see how this feature can be leveraged.
+
 #### Task 1
 
 #### Task 2
@@ -761,7 +763,7 @@ Pre-requisite: Azure permissions
 ![Screenshot permissions missing for Admin Centre](./Admin_Centre_install_message_1.png)
 #### Task 3: Connect and explore Windows Admin Center (preview)
 
-- Once the installation is complete then you can connect to the Windows Admin Center 
+- Once the installation is complete then you can connect to the Windows Admin Center
 ![Screenshot connecting to Admin Center](./Admin_Center_Connect.png)
 
 - Start exploring the capabilities offered by the Windows Admin Center to manage your Arc-enabled Windows machine.
@@ -778,7 +780,7 @@ Pre-requisite: Azure permissions
 ### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
 #### Module overview
-In this module, you will learn how to use the Azure Resource queries both in the Azure Graph Explorer and Powershell to demonstrate inventory management of your Azure Arc connected servers. Note that the results you get by running the graph queries in this module might be different from the sample screenshots as your environment might be different e.g. as a result of working with the other modules. 
+In this module, you will learn how to use the Azure Resource queries both in the Azure Graph Explorer and Powershell to demonstrate inventory management of your Azure Arc connected servers. Note that the results you get by running the graph queries in this module might be different from the sample screenshots as your environment might be different e.g. as a result of working with the other modules.
 
 #### Task 1: Apply resource tags to Azure Arc-enabled servers
 
@@ -820,7 +822,7 @@ Resources \
 - Scroll to the right on the results pane and click "See Details" to see all the Azure Arc-enabled server metadata. Note for example the list of detected properties, we will be using these in the next task.
 
 - You can also run the same query using PowerShell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module).
-To install the PowerShell module, run the following command 
+To install the PowerShell module, run the following command
 
 ```powershell
 Install-Module -Name Az.ResourceGraph
@@ -871,7 +873,7 @@ Search-AzGraph -Query “Resources
 | summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName
 | order by tolower(OSName) desc”
 ```
-- If you have used the portal to run the query then you should see something like the following 
+- If you have used the portal to run the query then you should see something like the following
 
 - ![Screenshot of extensions query](./Extensions_query.png)
 
