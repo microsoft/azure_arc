@@ -15,11 +15,11 @@ weight: 6
 
 #### Release highlights
 
-New scenarios: 3
-New features: 3
-Enhancements: 5
-Bug fixes: 12
-Documentation updates: 3
+- New scenarios: 3
+- New features: 3
+- Enhancements: 5
+- Bug fixes: 12
+- Documentation updates: 3
 
 #### Jumpstart Agora
 
