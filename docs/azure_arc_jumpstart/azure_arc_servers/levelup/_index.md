@@ -12,7 +12,7 @@ After completion of this workshop, you will be able to:
 - Monitor your Azure Arc-enabled servers using Azure Monitor
 - Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 - Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
-- Keep your Azure Arc-enabled servers patched using Update Management Center
+- Keep your Azure Arc-enabled servers patched using Azure Update Manager
 - Sentinel (TBD)
 - Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
 - SSH into your Azure Arc-enabled servers using SSH access
@@ -624,7 +624,7 @@ if ($roleDefinitionIds.Count -gt 0)
 
 #### Task 2
 
-### Module 6: Keep your Azure Arc-enabled servers patched using Update Management Center
+### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
 #### Module overview
 Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
