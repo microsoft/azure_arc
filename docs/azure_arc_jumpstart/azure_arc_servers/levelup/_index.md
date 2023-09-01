@@ -725,9 +725,183 @@ In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook w
 
 #### Module overview
 
-#### Task 1
+SSH for Arc-enabled servers enables SSH based connections to Arc-enabled servers without requiring a public IP address or additional open ports.
+In this module, you will learn how to enable and configure this functionality. At the end, you will interactively explore how to access to Arc-enabled Windows and Linux machines.
 
-#### Task 2
+#### Task 1 - Install prerequisites on client machine
+
+It is possible to leverage both Azure CLI and Azure PowerShell to connect to Arc-enabled servers, you may choose which one to use based on your own preferences.
+
+- RDP into the _ArcBox-Client_ VM
+- Open PowerShell and install either the Azure CLI extension or the Azure PowerShell modules based on your preference of tooling
+
+#### Azure CLI
+
+```cmd
+az extension add --name ssh
+```
+
+or
+
+#### Azure PowerShell
+
+```powershell
+Install-Module -Name Az.Ssh -Scope CurrentUser -Repository PSGallery
+Install-Module -Name Az.Ssh.ArcProxy -Scope CurrentUser -Repository PSGallery
+```
+
+  > NOTE: We recommend that you install the tools on the ArcBox Client virtual machine, but you may also choose to use your local machine if you want to verify that the Arc-enabled servers is reachable from any internet-connected machine after performing the tasks in this module.
+
+#### Task 2 - Enable SSH service on Arc-enabled servers
+
+We will use two Arc-enabled servers running in ArcBox for this module:
+
+- _ArcBox-Win2K22_
+- _ArcBox-Ubuntu-01_
+
+Perform the following steps in order to enable and verify SSH configuration on both machines:
+
+- RDP into the _ArcBox-Client_ VM
+- Open Hyper-V Manager
+- Right click _ArcBox-Win2K22_ and select Connect twice
+- Login to the operating system using username Administrator and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
+- Follow [these instructions](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=powershell#install-openssh-for-windows) to install OpenSSH for Windows
+- Close the connection to _ArcBox-Win2K22_
+- Right click _ArcBox-Ubuntu-01_ in Hyper-V Manager and select Connect
+- Login to the operating system using username arcbox and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
+- Run the command `systemctl status sshd` to verify that the SSH service is active and running
+- Close the connection to _ArcBox-Ubuntu-01_
+
+
+#### Task 3 - Connect to Arc-enabled servers
+
+From the _ArcBox-Client_ VM, open a PowerShell session and use the below commands to connect to **ArcBox-Ubuntu-01** using SSH:
+
+#### Azure CLI
+```powershell
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+```
+
+or
+
+#### Azure PowerShell
+```powershell
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
+```
+
+The first time you connect to an Arc-enabled server using SSH, you will retrieve the following question:
+> Port 22 is not allowed for SSH connections in this resource. Would you like to update the current Service Configuration in the endpoint to allow connections to port 22? If you would like to update the Service Configuration to allow connections to a different port, please provide the -Port parameter or manually set up the Service Configuration. (y/n)
+
+It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
+
+For this exercise, select `y` and press Enter to proceed.
+
+ ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
+
+ ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+
+Following the previous method, connect to _ArcBox-Win2K22_ via SSH.
+
+#### Azure CLI
+```powershell
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+```
+
+or
+#### Azure PowerShell
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
+```
+
+![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+
+![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+
+In addition to SSH, you can also connect to the Azure Arc-enabled servers, Windows Server virtual machines using **Remote Desktop** tunneled via SSH.
+
+#### Azure CLI
+  ```powershell
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
+  ```
+
+or
+#### Azure PowerShell
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
+```
+
+  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
+
+#### Task 4 - Optional: Azure AD/Entra ID based SSH Login
+
+
+The `Azure AD based SSH Login – Azure Arc` VM extension can be added from the extensions menu of the Arc server in the Azure portal. The Azure AD login extension can also be installed locally via a package manager via: `apt-get install aadsshlogin` or the following command:
+
+```
+$serverName = "ArcBox-Ubuntu-01"
+
+az connectedmachine extension create --machine-name $serverName --resource-group $Env:resourceGroup --publisher Microsoft.Azure.ActiveDirectory --name AADSSHLogin --type AADSSHLoginForLinux --location $env:azureLocation
+```
+
+- Configure role assignments for the Arc-enabled server _ArcBox-Ubuntu-01_ using the Azure portal.  Two Azure roles are used to authorize VM login:
+   - **Virtual Machine Administrator Login**: Users who have this role assigned can log in to an Azure virtual machine with administrator privileges.
+   - **Virtual Machine User Login**: Users who have this role assigned can log in to an Azure virtual machine with regular user privileges.
+
+After assigning one of the two roles for your personal Azure AD/Entra ID user account, run the following command to connect to _ArcBox-Ubuntu-01_ using SSH and AAD/Entra ID-based authentication:
+
+#### Azure CLI
+```powershell
+# Log out from the Service Principcal context
+az logout
+
+# Log in using your personal account
+az login
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName
+```
+
+or
+
+#### Azure PowerShell
+```powershell
+# Log out from the Service Principcal context
+Disconnect-AzAccount
+
+# Log in using your personal account
+Connect-AzAccount
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName
+```
+
+You should now be connected and authenticated using your Azure AD/Entra ID account.
+
 
 ### Module 10: Manage your Azure Arc-enabled servers using Admin Center (Preview)
 
