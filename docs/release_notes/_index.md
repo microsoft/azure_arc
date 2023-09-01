@@ -11,6 +11,60 @@ weight: 6
 
 ## 2023
 
+### August 2023
+
+#### Release highlights
+
+New scenarios: 3
+New features: 3
+Enhancements: 5
+Bug fixes: 12
+Documentation updates: 3
+
+#### Jumpstart Agora
+
+- [Feature: Agora deployment stuck at stage 14/17 - prometheus-grafana #2052](https://github.com/microsoft/azure_arc/issues/2052)
+- [Enhancement: Agora is using a version of .NET Core which has reached end of support #2062](https://github.com/microsoft/azure_arc/issues/2062)
+- [Bug: UserWarning: You are using cryptography on a 32-bit Python on a 64-bit Windows Operating System #2032](https://github.com/microsoft/azure_arc/issues/2032)
+- [Bug: New-NetNat : You were not connected because a duplicate name exists on the network #2033](https://github.com/microsoft/azure_arc/issues/2033)
+- [Bug: Site filter missing from Freezer Monitoring dashboard in ADX #2038](https://github.com/microsoft/azure_arc/issues/2038)
+- [Documentation: Unable to view Ag-AKS-Staging resources in Azure portal #2053](https://github.com/microsoft/azure_arc/issues/2053)
+
+#### Jumpstart ArcBox
+
+- [Enhancement: ArcBox is using a version of .NET Core which has reached end of support #2060](https://github.com/microsoft/azure_arc/issues/2060)
+- [Enhancement: Update storage account in Azure Arc Jumpstart scenarios and ArcBox #2069](https://github.com/microsoft/azure_arc/issues/2069)
+- [Bug: Adventureworks2019 sample database has the wrong name #2083](https://github.com/microsoft/azure_arc/issues/2083)
+
+#### Jumpstart HCIBox
+
+- [Feature: Add Azure Developer CLI support for HCIBox #2044](https://github.com/microsoft/azure_arc/issues/2044)
+- [Bug: HCIBox Resource bridge fails to deploy due to changes in requirements for nodepool size #2050](https://github.com/microsoft/azure_arc/issues/2050)
+- [Bug: HCIBox doc points to wrong folder #2066](https://github.com/microsoft/azure_arc/issues/2066)
+- [Bug: HCIBox SQL MI sample database is not restoring properly #2081](https://github.com/microsoft/azure_arc/issues/2081)
+- [Documentation: Error while registering HCI-Box Windows Admin Center with Azure #2088](https://github.com/microsoft/azure_arc/issues/2088)
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Monitoring Azure Arc-enabled servers with Datadog](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_datadog/)
+
+#### Azure Arc-enabled Kubernetes
+
+- [New scenario: Discover ONVIF cameras with Akri on AKS Edge Essentials single node deployment](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_single_akri/)
+- [New scenario: Discover ONVIF cameras with Akri on AKS Edge Essentials multi-node deployment](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_hybrid/aks_edge_essentials_full_akri/)
+- [Enhancement: ARO scenario should use securestring for SPN credential secret #2058](https://github.com/microsoft/azure_arc/issues/2058)
+- [Bug: update link to deployment folder in AKS Edge Essentials multi-node deployment tutorial #2030](https://github.com/microsoft/azure_arc/issues/2030)
+- [Bug: CAPI Vanilla scenario failing #2041](https://github.com/microsoft/azure_arc/issues/2041)
+- [Bug: AKS Edge Essentials single node deployment failure on Helm and Arc Agent installation #2059](https://github.com/microsoft/azure_arc/issues/2059)
+- [Documentation: Issue with VM Size in supported regions #2065](https://github.com/microsoft/azure_arc/issues/2065)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - August release #1997](https://github.com/microsoft/azure_arc/issues/1997)
+- [Enhancement: Update storage account in Azure Arc Jumpstart scenarios and ArcBox #2069](https://github.com/microsoft/azure_arc/issues/2069)
+- [Bug: HCIBox SQL MI sample database is not restoring properly #2081](https://github.com/microsoft/azure_arc/issues/2081)
+- [Bug: Adventureworks2019 sample database has the wrong name #2083](https://github.com/microsoft/azure_arc/issues/2083)
+
 ### July 2023
 
 #### Release highlights
