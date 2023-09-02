@@ -18,7 +18,7 @@ weight: 6
 - New scenarios: 3
 - New features: 3
 - Enhancements: 5
-- Bug fixes: 12
+- Bug fixes: 11
 - Documentation updates: 3
 
 #### Jumpstart Agora
@@ -62,7 +62,6 @@ weight: 6
 
 - [Feature: Azure Arc-enabled data services - August release #1997](https://github.com/microsoft/azure_arc/issues/1997)
 - [Enhancement: Update storage account in Azure Arc Jumpstart scenarios and ArcBox #2069](https://github.com/microsoft/azure_arc/issues/2069)
-- [Bug: HCIBox SQL MI sample database is not restoring properly #2081](https://github.com/microsoft/azure_arc/issues/2081)
 - [Bug: Adventureworks2019 sample database has the wrong name #2083](https://github.com/microsoft/azure_arc/issues/2083)
 
 ### July 2023
