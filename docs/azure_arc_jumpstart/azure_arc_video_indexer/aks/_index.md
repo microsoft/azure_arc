@@ -213,6 +213,10 @@ az k8s-extension create --name videoindexer \
 - The script usually takes 10-20 minutes to complete. once it is completed you can see the logs verifying the extension creation.
     ![Screenshot log completion](./05.png)
 
+- During the installation of Pods into your cluster you may see several pods that are in pending state, or that are being restarted.Allow the screen to run to its full completion before you start troubleshooting.
+
+    ![Screenshot log completion](./05a.png)
+
 ### Step 3 - Optional Configuration Parameters
 
 There are some additional optional parameters that can be used in order to have a fine grain control on the extension creation
