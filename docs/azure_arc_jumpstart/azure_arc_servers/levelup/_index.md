@@ -894,8 +894,63 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
 ### Module 12: Enforce governance across your Azure Arc-enabled servers using Azure Policy
 
-#### Module overview
+#### Module overview: In this module you will use Azure Policy to Audit Arc-enabled Linux servers that have a certain application installed. 
 
-#### Task 1
+#### Task 1: Assign a built in Azure Policy to the Arc resource group
+- Azure policy can be assigned at Management Group, Subscription or Resource Group scope. In this scenario we will use the Resource Group scope.
+- In the Azure Portal search for the "Policy" resource and navigate to it.
+- Click on "Compliance" in the left mene then click "Assign policy".
 
-#### Task 2
+![Screenshot Navigate to policy assignment](./navigate_to_Policy_initiatives.png)
+
+- Set the scope of the policy assignment to the subscription and the resource group as shown below
+
+
+![Screenshot set Scope of policy](./choose_sub_RG.png)
+
+- Click on the ellipsis next to "Policy definition". This opens the "Available Definitions" panel, where you can start searching for "Audit Linux machines that have the specific applications installed" policy which belongs to the "Guest Configuration" category. Select this policy as shown below.
+
+![Screen shot select audit policy](./find_Linux_policy.png)
+
+- Modify the "Assignment name" so that it would be easy to identify our policy in the compliance list later as shown below, then click "Next" twice to reach the "Parameters" tab.
+
+![Screenshot change assignment name](./change_assignment_name.png)
+
+-On the "Parameters" Screen, set the "Include Arc connected servers" to "true" and then set the name/s of the applications you want to audit the Linux servers for. If you have more than one application then include them in a semicolon separated list enclosed in single quotes e.g. 'App1; App2; App3'.
+
+![Screenshot Arc_Nano](./Arc_Nano.png)
+
+- Move to the "Non-compliance message" tab to add a message of your choice.
+
+![Screenshot non-compliance message](./Non_compliance_message.png)
+
+- Next move to the "Review + create" tab and click "Create" to assign the policy.
+
+
+#### Task 2: Examine the policy compliance
+
+- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list to until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that is faster to show the compliance indication**.
+
+![Screenshot of policies and their compliances with the new policy](./Compliance_dashboard.png)
+
+- Click on the policy from the name column and this will take you a more detailed view of the specific policy compliance as shown below. You can then click on "details" which will open another panel on the right hand side. **If the "details" link is not ready yet then you will need to wait for it, or try task 3 for another way of looking at the compliance of specific servers, which is faster to populate.**
+
+![Screenshot detailed compliance](./detailed_compliance.png)
+
+- Click on the link below "Last evaluated resource ...". This will open the "Guest Assignment" screen showing exactly why that specific server is not compliant with the policy.
+
+![Screenshot Guest Assignment from details](./Guest_assignment_from_details.png)
+
+- The steps above helps you identify non-compliant resources and then you can act on resolving the non-compliance reasons.
+
+#### Task 3: Using the "Guest Assignments" views directly
+
+- As mentioned in Task 2, the policy compliance dashboard can sometimes take a long time before it is updated with the accurate compliance details. We can use a direct route to view the "Guest Assignments" for each resource by searching for "Guest Assignments" from the Azure portal and selecting it.
+
+![Screenshot search for guest assignments](./search_for_guest_assignments.png)
+
+- You can now look at the compliance of the individual resources and identify the ones that are affected by our policy assignment.
+
+![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
+
+- Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
