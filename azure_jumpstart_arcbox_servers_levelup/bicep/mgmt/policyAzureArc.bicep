@@ -56,7 +56,7 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = 
   }
 }]
 
-resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+/*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
     roleDefinitionId: policies[0].roleDefinition[0]
@@ -73,7 +73,7 @@ resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2020-10-01-p
     principalType: 'ServicePrincipal'
   }
 }
-
+*/
 resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
   properties: {

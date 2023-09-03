@@ -123,6 +123,8 @@ az extension add --name connectedmachine --yes --only-show-errors
 Write-Header "Az CLI Login"
 az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
+az account set -s $subscriptionId
+
 # Register Azure providers
 Write-Header "Registering Providers"
 az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
@@ -238,7 +240,7 @@ Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 #Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
-Write-Output "Installing the Azure Monitor Agent"
+Write-Header "Installing the Azure Monitor Agent on the Windows Arc-enabled server"
 az connectedmachine extension create --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --machine-name $Win2k19vmName --resource-group $resourceGroup --location $azureLocation --enable-auto-upgrade true
 
 # Test Defender for Servers
@@ -266,7 +268,7 @@ $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -W
 $command = "curl -o /home/$nestedLinuxUsername/eicar.com.txt"
 $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-Write-Output "Installing the Azure Monitor Agent"
+Write-Header "Installing the Azure Monitor Agent on the Linux Arc-enabled server"
 az connectedmachine extension create --name AzureMonitorLinuxAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorLinuxAgent --machine-name $Ubuntu01vmName --resource-group $resourceGroup --location $azureLocation --enable-auto-upgrade true
 
 # Onboarding to Vulnerability assessment solution
