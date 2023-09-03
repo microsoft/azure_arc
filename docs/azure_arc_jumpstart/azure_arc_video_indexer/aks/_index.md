@@ -99,7 +99,7 @@ To create a new Cluster extension instance, we will use the _k8s-extension creat
 - Download [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) using below command
 
     ```shell
-    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh -o ~/az_k8sconfig_aks.sh
+    curl -L https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh -o ~/vi-deployment-script.sh
 
 - In the screenshot below, notice how currently there are no extensions installed yet in your Arc-enabled Kubernetes cluster.
 
