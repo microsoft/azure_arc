@@ -366,6 +366,24 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
     ![Screenshot showing the generated alert filters](./defenderForCloud_portal_alert_filter.png)
 
+#### Task 4: Enable vulnerability assessment
+
+- After waiting for 30-45 minutes, you should start seeing recommendations for the Arc-enabled machines in the "Security" blade.
+
+    ![Screenshot showing defender recommendations](./defenderForCloud_portal_recommendations.png)
+
+- Click on the "Machines should have a vulnerability assessment solution" recommendation and click "fix"
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_enable_vulnrability.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix_resource.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix_success.png)
+
+> **NOTE: The same steps can be applied to the Linux Arc-enabled machines**
+
 ### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
 #### Module overview
