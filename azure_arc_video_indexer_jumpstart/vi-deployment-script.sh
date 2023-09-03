@@ -20,7 +20,7 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 
 export subscriptionId="<your subscription Id>"
-export resourceGroup="<your resource group name>"
+export resourceGroup="<your video indexer resource group name>"
 export videoIndexerAccountName="<your video Indexer Account name>"
 export videoIndexerAccountId="<your video Indexer Account Id>"
 export connectedClusterName="<your Kubernetes Arc Connected Cluster name>"
