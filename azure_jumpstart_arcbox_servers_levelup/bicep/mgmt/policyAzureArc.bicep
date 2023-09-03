@@ -73,7 +73,7 @@ resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2020-10-01-p
     principalType: 'ServicePrincipal'
   }
 }
-*/
+
 resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
   properties: {
@@ -82,6 +82,7 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
     principalType: 'ServicePrincipal'
   }
 }
+*/
 
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
