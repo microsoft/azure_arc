@@ -765,7 +765,25 @@ Perform the following steps in order to enable and verify SSH configuration on b
 - Open Hyper-V Manager
 - Right click _ArcBox-Win2K22_ and select Connect twice
 - Login to the operating system using username Administrator and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
-- Follow [these instructions](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=powershell#install-openssh-for-windows) to install OpenSSH for Windows
+- Open Windows PowerShell and install OpenSSH for Windows by running the following:
+```powershell
+# Install the OpenSSH Server
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0`
+
+# Start the sshd service
+Start-Service sshd
+
+# Configure the service to start automatically
+Set-Service -Name sshd -StartupType 'Automatic'
+
+# Confirm the Windows Firewall is configured to allow SSH. The rule should be created automatically by setup. Run the following to verify:
+if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
+    Write-Output "Firewall Rule 'OpenSSH-Server-In-TCP' does not exist, creating it..."
+    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+} else {
+    Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
+}
+```
 - Close the connection to _ArcBox-Win2K22_
 - Right click _ArcBox-Ubuntu-01_ in Hyper-V Manager and select Connect
 - Login to the operating system using username arcbox and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
