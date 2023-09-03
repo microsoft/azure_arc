@@ -163,7 +163,7 @@ The installation script already contains the neccessary code to create the resou
 
 - Once the resources are created, their credentials  are automatically injected into the _k8s-extension create_ command. 
 
-- type  _`. ./vi_deployment.sh`_ into your shell ( including the leading .) and hit enter to run the script.
+- type  _`./vi_deployment.sh`_ into your shell ( including the leading .) and hit enter to run the script.
 
    The script will:
 
