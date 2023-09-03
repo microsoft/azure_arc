@@ -13,7 +13,7 @@ After completion of this workshop, you will be able to:
 - Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 - Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
 - Keep your Azure Arc-enabled servers patched using Azure Update Manager
-- Sentinel (TBD)
+- Gain security insights from your Arc-enabled servers using Microsoft Sentinel
 - Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
 - SSH into your Azure Arc-enabled servers using SSH access
 - Manage your Azure Arc-enabled servers using Admin Center (Preview)
@@ -33,9 +33,9 @@ After completion of this workshop, you will be able to:
 |**9. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
 |**10. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
 |**11. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
-|**12. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
-|**13. Run command (TBD)** | x minutes | Owner |
-|**14. Sentinel(TBD)** | x minutes | Owner |
+|**12. Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | x minutes | Owner |
+|**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
+|**14. Run command (TBD)** | x minutes | Owner |
 
 ## LevelUp Lab Environment
 
@@ -352,7 +352,7 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
   ![Screenshot showing running the Defender alert trigger script in ISE](./run_defender_alert_trigger.png)
 
-- Navigate to the Security tab of the _Win2k19_ Arc-enabled server in the portal
+- Navigate to the Security tab of the _Win2k22_ Arc-enabled server in the portal
 
     ![Screenshot showing the generated alert](./defenderForCloud_portal_alert.png)
 
@@ -976,3 +976,68 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
     ![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
 
 - Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
+
+### Module 12 : Gain security insights from your Arc-enabled servers using Microsoft Sentinel
+
+#### Module overview
+
+In this module you will configure Windows security events collection using Sentinel to inspect failed logins on your Windows Arc-enabled machine
+
+#### Task 1: Configure data collection on Sentinel
+
+- In the Azure Portal, search for _Sentinel_
+
+    ![Screenshot showing searching for Sentinel on the Azure Portal](./portal_search_sentinel.png)
+
+- Click on "Content Hub" and search for "Windows Security Events" and install it.
+
+    ![Screenshot showing searching for windows security events](./sentinel_content_hub.png)
+
+- After installation, click on "Manage" to configure the collector.
+
+    ![Screenshot managing the data collection](./sentinel_manage_data_collector.png)
+
+- Select the data connector and make sure you've selected the _Windows Security Events via AMA_ and click "open connector page".
+
+    ![Screenshot selecting the AMA data collection](./sentinel_data_collector_ama.png)
+
+- Create a new data collection rule.
+
+    ![Screenshot showing creating a new data collection rule](./sentinel_create_new_dcr.png)
+
+- Provide a name for the data collection rule and select the same resource group where you've deployed this level-up lab.
+
+    ![Screenshot selecting the data collection rule name](./sentinel_dcr_creation.png)
+
+- Select one or multiple Windows Arc-enabled machines.
+
+    ![Screenshot selecting the arc machines](./sentinel_dcr_select_server.png)
+
+- Select the "Common" event type and create the data collection rule.
+
+    ![Screenshot selecting the common event type](./sentinel_security_events_common.png)
+
+    ![Screenshot selecting the AMA data collection created](./sentinel_security_events_created.png)
+
+
+#### Task 2: Simulating and viewing security events
+
+- After configuring Sentinel, now we need to simulate some failed login attempts on one or more Windows Arc-enabled machines.
+
+- Connect to _ArcBox-Client_ VM, and open the _Hyper-v manager_.
+
+- Right-click one of the Windows machines and connect to it.
+
+    ![Screenshot showing connecting to the nested vm on hyper-v](./hyperv_connect_vm.png)
+
+- Simulate some failed login attempts by trying to login multiple times using an incorrect password.
+
+    ![Screenshot showing failed login attemps on the nested vm](./hyperv_failed_login.png)
+
+- After waiting for about 10-15 minutes for data to start getting ingested into the log analytics workspace, navigate to "Workbooks" and select the "Identity & Access" workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_open_workbook.png)
+
+- Once data is being ingested, you will start seeing the failed login attempts in the workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_failed_login.png)
