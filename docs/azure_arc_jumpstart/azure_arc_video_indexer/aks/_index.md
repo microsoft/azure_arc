@@ -139,7 +139,7 @@ To create a new Cluster extension instance, we will use the _k8s-extension creat
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 
-- Edit the environment variables in the [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file to match your parameters and run it using the _`. ./vi-deployment-script.sh`_ command.
+- Edit the environment variables in the [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file to match your parameters and run it using the _`./vi-deployment-script.sh`_ command.
 
 - The deployment is using the following parameters that you will need to edit in the [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file. 
 
