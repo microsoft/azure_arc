@@ -28,14 +28,14 @@ After completion of this workshop, you will be able to:
 |**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
 |**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
 |**6. Keep your Azure Arc-enabled servers patched using Azure Update Manager** | x minutes | Owner |
-|**7. Sentinel(TBD)** | x minutes | Owner |
-|**8. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
-|**9. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
-|**10. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
-|**11. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
-|**12. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
-|**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
-|**14. Run command (TBD)** | x minutes | Owner |
+|**7. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
+|**8. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
+|**9. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
+|**10. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
+|**11. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
+|**12. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
+|**13. Run command (TBD)** | x minutes | Owner |
+|**14. Sentinel(TBD)** | x minutes | Owner |
 
 ## LevelUp Lab Environment
 
@@ -939,7 +939,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
     ![Screenshot change assignment name](./change_assignment_name.png)
 
--On the "Parameters" Screen, set the "Include Arc connected servers" to "true" and then set the name/s of the applications you want to audit the Linux servers for. If you have more than one application then include them in a semicolon separated list enclosed in single quotes e.g. 'App1; App2; App3'.
+- On the "Parameters" Screen, set the "Include Arc connected servers" to "true" and then set the name/s of the applications you want to audit the Linux servers for. If you have more than one application then include them in a semicolon separated list enclosed in single quotes e.g. 'App1; App2; App3'.
 
     ![Screenshot Arc_Nano](./Arc_Nano.png)
 
