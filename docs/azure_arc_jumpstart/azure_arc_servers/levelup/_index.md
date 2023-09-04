@@ -13,7 +13,7 @@ After completion of this workshop, you will be able to:
 - Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 - Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
 - Keep your Azure Arc-enabled servers patched using Azure Update Manager
-- Sentinel (TBD)
+- Gain security insights from your Arc-enabled servers using Microsoft Sentinel
 - Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
 - SSH into your Azure Arc-enabled servers using SSH access
 - Manage your Azure Arc-enabled servers using Admin Center (Preview)
@@ -27,13 +27,13 @@ After completion of this workshop, you will be able to:
 |**3. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
 |**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
 |**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
-|**6. Keep your Azure Arc-enabled servers patched using Update Management Center** | x minutes | Owner |
-|**7. Sentinel(TBD)** | x minutes | Owner |
-|**8. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Jan Egil Ring |
-|**9. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Jan Egil Ring |
-|**10. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
-|**11. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
-|**12. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
+|**6. Keep your Azure Arc-enabled servers patched using Azure Update Manager** | x minutes | Owner |
+|**7. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
+|**8. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
+|**9. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
+|**10. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
+|**11. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
+|**12. Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | x minutes | Owner |
 |**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
 |**14. Run command** | x minutes | Jan Egil Ring |
 
@@ -352,7 +352,7 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
   ![Screenshot showing running the Defender alert trigger script in ISE](./run_defender_alert_trigger.png)
 
-- Navigate to the Security tab of the _Win2k19_ Arc-enabled server in the portal
+- Navigate to the Security tab of the _Win2k22_ Arc-enabled server in the portal
 
     ![Screenshot showing the generated alert](./defenderForCloud_portal_alert.png)
 
@@ -365,6 +365,24 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
   > **NOTE: If you don't see the alerts, make sure to select the Information severity in the filters**
 
     ![Screenshot showing the generated alert filters](./defenderForCloud_portal_alert_filter.png)
+
+#### Task 4: Enable vulnerability assessment
+
+- After waiting for 30-45 minutes, you should start seeing recommendations for the Arc-enabled machines in the "Security" blade.
+
+    ![Screenshot showing defender recommendations](./defenderForCloud_portal_recommendations.png)
+
+- Click on the "Machines should have a vulnerability assessment solution" recommendation and click "fix"
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_enable_vulnrability.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix_resource.png)
+
+    ![Screenshot showing fixing the recommendation](./defenderForCloud_portal_recommendation_fix_success.png)
+
+> **NOTE: The same steps can be applied to the Linux Arc-enabled machines**
 
 ### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
@@ -627,91 +645,90 @@ if ($roleDefinitionIds.Count -gt 0)
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
 #### Module overview
+
 Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
 This service is NOT dependent on Log analytics agent. (The older Azure Automation Update service relies on Log Analytics agent)
 
 Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc).
 These modules will take a while to run, up to 15 minutes for each VM, due to processing required at the various VMs, although it is all running simultaneously.
 
-This information is taken from the link: https://azure.microsoft.com/en-us/products/azure-update-management-center
-
 This new service is currently in preview and has no powershell scripting option (as of Aug 2023)
 
-#### Prerequisites:
-Ensure that you already have your Jumpbox with VMs onboarded via Azure Arc.
+#### Onboarding the Arc-enabled servers
 
-#### Onboarding the VMs
-Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Management service.
-Desktop VMs are visible but not supported for updates (use Intune)
+Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Manager service.
 
-View the support matrix here:
-https://learn.microsoft.com/en-us/azure/update-center/support-matrix
-Currently, Azure VMs that are migrated from on-premises are not supported for Update Management Center.
+   ![Screenshot showing initial view of all VMs](./updatemgmt-allvms.png)
 
-![Screenshot showing initial view of all VMs](./updatemgmt-allvms.png)
+#### Refresh the VMs
 
-#### Refresh the VMs:
-Once the VMs have been onboarded, clicking on the refresh button will refresh the current status of selected VMs.
+- Once the VMs have been onboarded, clicking on the refresh button will refresh the current status of selected VMs.
 This can also be set as an automatic recurring task for at scale refresh - once every 24 hours. This automatic refresh interval cannot be changed.
-![Screenshot showing automatic refresh configuration](./updatemgmt-updatesettings.png)
+
+   ![Screenshot showing automatic refresh configuration](./updatemgmt-updatesettings.png)
 
 #### Setup Maintenance Configuration
-Setup a list of maintenance configurations for each specific group of VMs in your environment. For countries in Asia and Europe, it is a good idea to use second Tuesday + 1 day to coincode with Patch Tuesday. Do not use "Second Wednesday of the month".
-![Screenshot showing how to add a maintenance config](./updatemgmt-maintenanceconfig.png)
 
-Then choose how machines are added to this maintenance configuration (by OS, location, resource group)
-![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
+- Setup a list of maintenance configurations for each specific group of VMs in your environment. For countries in Asia and Europe, it is a good idea to use second Tuesday + 1 day to coincode with Patch Tuesday. Do not use "Second Wednesday of the month".
 
-Or choose machines specifically instead of dynamically
-![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
+   ![Screenshot showing how to add a maintenance config](./updatemgmt-maintenanceconfig.png)
 
-Then choose what type of updates will be installed by this config
-![Screenshot showing which updates are going to be installed](./updatemgmt-specificupdates.png)
+- Then choose how machines are added to this maintenance configuration (by OS, location, resource group)
 
+   ![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
+
+- Or choose machines specifically instead of dynamically
+
+   ![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
+
+- Then choose what type of updates will be installed by this config
+
+   ![Screenshot showing which updates are going to be installed](./updatemgmt-specificupdates.png)
 
 #### Forcing one-time updates
-Instead of using maintenance configs with specific recurring cycles, you can also setup one-time updates (immediately!)
-Start by forcing an immediate refresh:
-![Screenshot showing onetime refresh](./updatemgmt-onetimerefresh.png)
 
-Then specify which machines
-![Screenshot showing what updates for each machines](./updatemgmt-installonetimeupdates.png)
+- Instead of using maintenance configs with specific recurring cycles, you can also setup one-time updates (immediately!). Start by forcing an immediate refresh.
 
-Choose which types of updates
-![Screenshot showing which types of updates to install](./updatemgmt-showwhichupdates.png)
+   ![Screenshot showing onetime refresh](./updatemgmt-onetimerefresh.png)
 
-Look at the update options
-![Screenshot showing changes to be made in the onboard script](./updatemgmt-installoptions.png)
+- Then specify which machines
 
-Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
-![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
+   ![Screenshot showing what updates for each machines](./updatemgmt-installonetimeupdates.png)
+
+- Choose which types of updates
+
+   ![Screenshot showing which types of updates to install](./updatemgmt-showwhichupdates.png)
+
+- Look at the update options
+
+   ![Screenshot showing changes to be made in the onboard script](./updatemgmt-installoptions.png)
+
+- Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
+
+   ![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
 
 #### Reporting
-Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Update Management Center.
-There are a few views in there that show the total number of machines connected, history of runs, and the status.
 
-View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
-![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
+Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Azure Update Manager. There are a few views in there that show the total number of machines connected, history of runs, and the status.
 
-View of manual vs periodic assessments and manual vs automatically updated.
-![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
+- View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
 
-View of updates by classification
-![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
+   ![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
 
-#### Ending session
+- View of manual vs periodic assessments and manual vs automatically updated.
+
+   ![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
+
+- View of updates by classification
+
+   ![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
+
+#### Module recap
+
 In this session, you have setup Update Management and learnt how to enable it to efficiently manage all updates for your machines, regardless of where they are.
 You have also seen some of the default reports, and since they use workbooks, you can easily create your own customized reports.
 
-### Module 7: Run scripts on your Azure Arc-enabled servers using Custom script extensions
-
-#### Module overview
-
-#### Task 1
-
-#### Task 2
-
-### Module 8: Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
+### Module 7: Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
 
 #### Module overview
 
@@ -721,7 +738,7 @@ In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook w
 
 #### Task 2
 
-### Module 9: SSH into your Azure Arc-enabled servers using SSH access
+### Module 8: SSH into your Azure Arc-enabled servers using SSH access
 
 #### Module overview
 
@@ -921,57 +938,74 @@ Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName
 You should now be connected and authenticated using your Azure AD/Entra ID account.
 
 
-### Module 10: Manage your Azure Arc-enabled servers using Admin Center (Preview)
+### Module 9: Manage your Azure Arc-enabled servers using Admin Center (Preview)
 
 #### Module overview
+
+
 In this module you will learn how to use the Windows Admin Center in the Azure portal to manage the Windows operating system of your Arc-enabled servers, known as hybrid machines. You can securely manage hybrid machines from anywhere without needing a VPN, public IP address, or other inbound connectivity to your machine.
 
 #### Task 1: Pre-requisites
 
 Pre-requisite: Azure permissions
+
 - To install the Windows Admin Center extension for an Arc-enabled server resource, your account must be granted the Owner, Contributor, or Windows Admin Center Administrator Login role in Azure. **You should have this already on your internal subscription.**
 
 - Connecting to Windows Admin Center requires you to have Reader and Windows Admin Center Administrator Login permissions at the Arc-enabled server resource.
+
     - Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
-![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+
+        ![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
 
     - Click on your Azure Arc-enabled **Windows** servers.
-![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
+
+        ![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
 
     - From the selected Windows machine click "Access control (IAM)" then add the role "Admin Center Administrator Login" to your access.
-![Screenshot of required role for Admin Center](./Admin_centre_Add_Role_1.png)
+
+        ![Screenshot of required role for Admin Center](./Admin_centre_Add_Role_1.png)
 
     - Follow similar steps to assign yourself Reader permissions at the Arc-enabled server resource.
 
 #### Task 2: Deploy the Windows Admin Center VM extension
+
 - Open the Azure portal and navigate to your Arc-enabled server.
 - Under the Settings group, select Windows Admin Center, then click "Set up".
 - Specify the port on which you wish to install Windows Admin Center, and then select Install.
 
-![Screenshot deploy Admin Centre Extension](./Admin_center_install.png)
+    ![Screenshot deploy Admin Centre Extension](./Admin_center_install.png)
 
 - If you get the following message after the installation is complete then you need to go back to the previous step and set up the permissions as explained in Pre-requisite.
 
-![Screenshot permissions missing for Admin Centre](./Admin_Centre_install_message_1.png)
+    ![Screenshot permissions missing for Admin Centre](./Admin_Centre_install_message_1.png)
+
 #### Task 3: Connect and explore Windows Admin Center (preview)
 
-- Once the installation is complete then you can connect to the Windows Admin Center
-![Screenshot connecting to Admin Center](./Admin_Center_Connect.png)
+- Once the installation is complete then you can connect to the Windows Admin Center.
+
+    ![Screenshot connecting to Admin Center](./Admin_Center_Connect.png)
 
 - Start exploring the capabilities offered by the Windows Admin Center to manage your Arc-enabled Windows machine.
-![Screenshot Admin Center overview](./Admin_Centre_Overview.png)
+
+    ![Screenshot Admin Center overview](./Admin_Centre_Overview.png)
 
 - Let us use the Windows Admin Center to add a local user, a new group and assign the new user to the new group.
     - From the left menu select "Local users & groups". Then from the "Users" tab click "New user". Enter the user details and click on "Submit". Verify that the user has been added.
-![Screenshot adding local user](./Admin_center_local_users_1.png)
-    - Now select the "Groups" tab and click on "New Group". Enter the group details and click on "Submit". Verify that the group has been added.
-![Screenshot adding local group](./Admin_center_local_groups_1.png)
-    - Back to the "Users" tab, select the new user you have added, then click "Manage membership". Add the selected user to the new group and save.
-![Screenshot Group membership](./Admin_centre_group_membership_1.png)
 
-### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
+        ![Screenshot adding local user](./Admin_center_local_users_1.png)
+
+    - Now select the "Groups" tab and click on "New Group". Enter the group details and click on "Submit". Verify that the group has been added.
+
+        ![Screenshot adding local group](./Admin_center_local_groups_1.png)
+
+    - Back to the "Users" tab, select the new user you have added, then click "Manage membership". Add the selected user to the new group and save.
+
+        ![Screenshot Group membership](./Admin_centre_group_membership_1.png)
+
+### Module 10: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
 #### Module overview
+
 In this module, you will learn how to use the Azure Resource queries both in the Azure Graph Explorer and Powershell to demonstrate inventory management of your Azure Arc connected servers. Note that the results you get by running the graph queries in this module might be different from the sample screenshots as your environment might be different e.g. as a result of working with the other modules.
 
 #### Task 1: Apply resource tags to Azure Arc-enabled servers
@@ -980,15 +1014,15 @@ In this first step, you will assign Azure resource tags to some of your Azure Ar
 
 - Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
 
-![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+    ![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
 
 - Click on any of your Azure Arc-enabled servers.
 
-![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
+    ![Screenshot showing existing Arc connected servers](./click_on_any_arc_enabled_server.png)
 
 - Click on "Tags". Add a new tag with Name="Scenario” and Value="azure_arc_servers_inventory”. Click Apply when ready.
 
-![Screenshot showing adding tag to a server](./tagging_servers.png)
+    ![Screenshot showing adding tag to a server](./tagging_servers.png)
 
 - Repeat the same process in other Azure Arc-enabled servers if you wish. This new tag will be used later when working with Resource Graph Explorer queries.
 
@@ -996,36 +1030,40 @@ In this first step, you will assign Azure resource tags to some of your Azure Ar
 
 - Now we will explore our hybrid server inventory using a number of Azure Graph Queries. Enter "Resource Graph Explorer" in the top search bar in the Azure portal and select it.
 
-![Screenshot of Graph Explorer in portal](./search_graph_explorer.png)
+    ![Screenshot of Graph Explorer in portal](./search_graph_explorer.png)
 
 - The scope of the Resource Graph Explorer can be set as seen below
 
-![Screenshot of Graph Explorer Scope](./Scope_of_Graph_Query.png)
+    ![Screenshot of Graph Explorer Scope](./Scope_of_Graph_Query.png)
 
 #### Task 3: Run a query to show all Azure Arc-enabled servers in your subscription
 
 - In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/equals-operator).
 
+```shell
 Resources \
 | where type =~ 'Microsoft.HybridCompute/machines'
+```
 
-![Screenshot of query to list arc servers](./query_arc_machines.png)
+  ![Screenshot of query to list arc servers](./query_arc_machines.png)
 
 - Scroll to the right on the results pane and click "See Details" to see all the Azure Arc-enabled server metadata. Note for example the list of detected properties, we will be using these in the next task.
 
-- You can also run the same query using PowerShell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module).
+- You can also run the same query using PowerShell (e.g. using Azure Cloud Shell) providing that you have added the required module "Az.ResourceGraph" as explained in [Run your first Resource Graph query using Azure PowerShell](https://learn.microsoft.com/azure/governance/resource-graph/first-query-powershell#add-the-resource-graph-module).
+
 To install the PowerShell module, run the following command
 
 ```powershell
 Install-Module -Name Az.ResourceGraph
 ```
+
 Then run the query in PowerShell
 
 ```powershell
  Search-AzGraph -Query "Resources | where type =~ 'Microsoft.HybridCompute/machines'"
 ```
 
-#### Task 4: Query your server inventory using the available metadata.
+#### Task 4: Query your server inventory using the available metadata
 
 - Use PowerShell and the Resource Graph Explorer to summarize the server count by "logical cores" which is one of the detected properties referred to in the previous task. Remember to only use the query string, which is enclosed in double quotes, in the portal.
 
@@ -1035,9 +1073,10 @@ Search-AzGraph -Query  “Resources
 | extend logicalCores = tostring(properties.detectedProperties.logicalCoreCount)
 | summarize serversCount = count() by logicalCores”
 ```
+
 - The Graph Explorer allows you to get a graphical view of your results by selecting the "charts" option.
 
-![Screenshot of the logicalCores server summary](./chart_for_vcpu_summay.png)
+    ![Screenshot of the logicalCores server summary](./chart_for_vcpu_summay.png)
 
 #### Task 5: Use the resource tags in your Graph Query.
 
@@ -1049,9 +1088,10 @@ Search-AzGraph -Query  “Resources
 | extend Scenario = tags['Scenario']
 | project name, tags"
 ```
+
 #### Task 6: List the extensions installed on the Azure Arc-enabled servers.
 
-- Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in PowerShell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/en-us/azure/governance/resource-graph/concepts/query-language#escape-characters)
+- Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in PowerShell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/azure/governance/resource-graph/concepts/query-language#escape-characters)
 
 ```powershell
 Search-AzGraph -Query “Resources
@@ -1065,9 +1105,10 @@ Search-AzGraph -Query “Resources
 | summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName
 | order by tolower(OSName) desc”
 ```
+
 - If you have used the portal to run the query then you should see something like the following
 
-- ![Screenshot of extensions query](./Extensions_query.png)
+    ![Screenshot of extensions query](./Extensions_query.png)
 
 #### Task 7: Query other properties
 
@@ -1083,13 +1124,133 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
 - Running the same query in the portal should result in something like the following
 
-- ![Screenshot of extra properties](./extra_properties.png)
+    ![Screenshot of extra properties](./extra_properties.png)
 
-
-### Module 12: Enforce governance across your Azure Arc-enabled servers using Azure Policy
+### Module 11: Enforce governance across your Azure Arc-enabled servers using Azure Policy
 
 #### Module overview
 
-#### Task 1
+In this module you will use Azure Policy to Audit Arc-enabled Linux servers that have a certain application installed
 
-#### Task 2
+#### Task 1: Assign a built in Azure Policy to the Arc resource group
+
+- Azure policy can be assigned at Management Group, Subscription or Resource Group scope. In this scenario we will use the Resource Group scope.
+- In the Azure Portal search for the "Policy" resource and navigate to it.
+- Click on "Compliance" in the left mene then click "Assign policy".
+
+    ![Screenshot Navigate to policy assignment](./navigate_to_Policy_initiatives.png)
+
+- Set the scope of the policy assignment to the subscription and the resource group as shown below
+
+    ![Screenshot set Scope of policy](./choose_sub_RG.png)
+
+- Click on the ellipsis next to "Policy definition". This opens the "Available Definitions" panel, where you can start searching for "Audit Linux machines that have the specific applications installed" policy which belongs to the "Guest Configuration" category. Select this policy as shown below.
+
+    ![Screen shot select audit policy](./find_Linux_policy.png)
+
+- Modify the "Assignment name" so that it would be easy to identify our policy in the compliance list later as shown below, then click "Next" twice to reach the "Parameters" tab.
+
+    ![Screenshot change assignment name](./change_assignment_name.png)
+
+- On the "Parameters" Screen, set the "Include Arc connected servers" to "true" and then set the name/s of the applications you want to audit the Linux servers for. If you have more than one application then include them in a semicolon separated list enclosed in single quotes e.g. 'App1; App2; App3'.
+
+    ![Screenshot Arc_Nano](./Arc_Nano.png)
+
+- Move to the "Non-compliance message" tab to add a message of your choice.
+
+    ![Screenshot non-compliance message](./Non_compliance_message.png)
+
+- Next move to the "Review + create" tab and click "Create" to assign the policy.
+
+#### Task 2: Examine the policy compliance
+
+- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list to until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that is faster to show the compliance indication**.
+
+    ![Screenshot of policies and their compliances with the new policy](./Compliance_dashboard.png)
+
+- Click on the policy from the name column and this will take you a more detailed view of the specific policy compliance as shown below. You can then click on "details" which will open another panel on the right hand side. **If the "details" link is not ready yet then you will need to wait for it, or try task 3 for another way of looking at the compliance of specific servers, which is faster to populate.**
+
+    ![Screenshot detailed compliance](./detailed_compliance.png)
+
+- Click on the link below "Last evaluated resource ...". This will open the "Guest Assignment" screen showing exactly why that specific server is not compliant with the policy.
+
+    ![Screenshot Guest Assignment from details](./Guest_assignment_from_details.png)
+
+- The steps above helps you identify non-compliant resources and then you can act on resolving the non-compliance reasons.
+
+#### Task 3: Using the "Guest Assignments" views directly
+
+- As mentioned in Task 2, the policy compliance dashboard can sometimes take a long time before it is updated with the accurate compliance details. We can use a direct route to view the "Guest Assignments" for each resource by searching for "Guest Assignments" from the Azure portal and selecting it.
+
+    ![Screenshot search for guest assignments](./search_for_guest_assignments.png)
+
+- You can now look at the compliance of the individual resources and identify the ones that are affected by our policy assignment.
+
+    ![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
+
+- Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
+
+### Module 12 : Gain security insights from your Arc-enabled servers using Microsoft Sentinel
+
+#### Module overview
+
+In this module you will configure Windows security events collection using Sentinel to inspect failed logins on your Windows Arc-enabled machine
+
+#### Task 1: Configure data collection on Sentinel
+
+- In the Azure Portal, search for _Sentinel_
+
+    ![Screenshot showing searching for Sentinel on the Azure Portal](./portal_search_sentinel.png)
+
+- Click on "Content Hub" and search for "Windows Security Events" and install it.
+
+    ![Screenshot showing searching for windows security events](./sentinel_content_hub.png)
+
+- After installation, click on "Manage" to configure the collector.
+
+    ![Screenshot managing the data collection](./sentinel_manage_data_collector.png)
+
+- Select the data connector and make sure you've selected the _Windows Security Events via AMA_ and click "open connector page".
+
+    ![Screenshot selecting the AMA data collection](./sentinel_data_collector_ama.png)
+
+- Create a new data collection rule.
+
+    ![Screenshot showing creating a new data collection rule](./sentinel_create_new_dcr.png)
+
+- Provide a name for the data collection rule and select the same resource group where you've deployed this level-up lab.
+
+    ![Screenshot selecting the data collection rule name](./sentinel_dcr_creation.png)
+
+- Select one or multiple Windows Arc-enabled machines.
+
+    ![Screenshot selecting the arc machines](./sentinel_dcr_select_server.png)
+
+- Select the "Common" event type and create the data collection rule.
+
+    ![Screenshot selecting the common event type](./sentinel_security_events_common.png)
+
+    ![Screenshot selecting the AMA data collection created](./sentinel_security_events_created.png)
+
+
+#### Task 2: Simulating and viewing security events
+
+- After configuring Sentinel, now we need to simulate some failed login attempts on one or more Windows Arc-enabled machines.
+
+- Connect to _ArcBox-Client_ VM, and open the _Hyper-v manager_.
+
+- Right-click one of the Windows machines and connect to it.
+
+    ![Screenshot showing connecting to the nested vm on hyper-v](./hyperv_connect_vm.png)
+
+- Simulate some failed login attempts by trying to login multiple times using an incorrect password.
+
+    ![Screenshot showing failed login attemps on the nested vm](./hyperv_failed_login.png)
+
+- After waiting for about 10-15 minutes for data to start getting ingested into the log analytics workspace, navigate to "Workbooks" and select the "Identity & Access" workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_open_workbook.png)
+
+- Once data is being ingested, you will start seeing the failed login attempts in the workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_failed_login.png)
