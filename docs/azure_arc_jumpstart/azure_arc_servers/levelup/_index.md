@@ -649,7 +649,12 @@ The following are required for this module to function:
 
 Currently, the policies to enable Change tracking and inventory with Azure monitoring Agent are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
 
-![Screenshot showing how to enable change tracking](./changetracking-enable.png)
+![Screenshot showing how to enable preview change tracking](./changetracking-enable.png)
+
+The Automation Account must also enable Change Tracking and Inventory
+![Screenshot showing how to enable inventory in Automation Account](./changetracking-enable-inv.png)
+![Screenshot showing how to enable change tracking in Automation Account](./changetracking-enable-ct.png)
+
 
 #### Current Limitations
 
