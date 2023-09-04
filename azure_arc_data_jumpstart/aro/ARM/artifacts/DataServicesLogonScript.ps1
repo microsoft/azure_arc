@@ -130,13 +130,18 @@ Start-Sleep -Seconds 10
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extensions"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings amalogs.useAADAuth=false logAnalyticsWorkspaceResourceID=$workspaceId
-Write-Host "`n"
+az k8s-extension create --name "azuremonitor-containers" `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $Env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --extension-type Microsoft.AzureMonitor.Containers `
+                        --configuration-settings amalogs.useAADAuth=false logAnalyticsWorkspaceResourceID=$workspaceId
 
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying security context
+Write-Host "`n"
 Write-Host "Adding security context for ARO"
 Write-Host "`n"
 kubectl create namespace arc
