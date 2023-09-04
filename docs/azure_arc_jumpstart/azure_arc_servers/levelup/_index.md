@@ -1132,9 +1132,10 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
 In this module you will use Azure Policy to Audit Arc-enabled Linux servers that have a certain application installed
 
-#### Task 1: Assign a built in Azure Policy to the Arc resource group
+#### Task 1: Assign a built-in Azure Policy to the Arc resource group
 
 - Azure policy can be assigned at Management Group, Subscription or Resource Group scope. In this scenario we will use the Resource Group scope.
+- We will show two ways to accomplish this first task. **First we will use the Azure portal** (but if you prefer to use Powershell then skip to that section at the end of this first task) 
 - In the Azure Portal search for the "Policy" resource and navigate to it.
 - Click on "Compliance" in the left mene then click "Assign policy".
 
@@ -1161,6 +1162,25 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
     ![Screenshot non-compliance message](./Non_compliance_message.png)
 
 - Next move to the "Review + create" tab and click "Create" to assign the policy.
+
+- If you want to use **Powershell as an alternative method** to assign the policy, then the following procedure accomplishes the same as the portal method explained above.
+    - create a policy parameter file, e.g. parameters.json
+    ```javascript
+    {
+      "IncludeArcMachines":{
+        "value":"true"
+      },
+      "ApplicationName": {
+        "value":"nano"
+      }
+    }
+    ```
+    - Run the following powershell commands
+    ```powershell
+    $ResourceGroup = Get-AzResourceGroup -Name 'ArcBox-Levelup' 
+    $Policy = Get-AzPolicyDefinition -BuiltIn | Where-Object {$_.Properties.DisplayName -eq 'Audit Linux machines that have the specified applications installed'} 
+    New-AzPolicyAssignment -Name '(Arc Levelup) Audit Linux machines with python3 installed' -PolicyDefinition $Policy -Scope $ResourceGroup.ResourceId -PolicyParameter .\parameters.json
+    ```
 
 #### Task 2: Examine the policy compliance
 
