@@ -8,19 +8,16 @@ description: >
 
 ## Deploy Azure Video Indexer Arc extension on Kubernetes
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [|||Azure Video Indexer enabled by Arc|||](https://azure.microsoft.com/products/ai-video-indexer) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster.
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Video Indexer enabled by Arc](https://azure.microsoft.com/products/ai-video-indexer) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster.
 
-[Azure Video Indexer](https://learn.microsoft.com/azure/azure-video-indexer/video-indexer-overview) enabled by Arc is aimed at running Video and Audio Analysis on Edge Devices in a connected fashion, only control plane data is passed to the cloud, while data plane data is stored only on the edge device.
-The solution is designed to run on [Azure Stack Edge](https://azure.microsoft.com/products/azure-stack/edge/) Profile, a heavy edge device, and supports three video formats, including MP4 and four additional common formats. During the public preview, the solution supports eigth Azure languages: English (US), Spanish, German, French, Italian, Portuguese, Chinese (Simplified) and Arabic in all basic audio-related models.
-
+[Azure Video Indexer](https://learn.microsoft.com/azure/azure-video-indexer/video-indexer-overview) enabled by Arc is aimed at running Video and Audio Analysis on Edge Devices in a connected fashion, only control plane data is passed to the cloud, **while data plane data is stored only on the edge device**.
+The solution is designed to run on [Azure Stack Edge Profile](https://azure.microsoft.com/products/azure-stack/edge/), a heavy edge device, and supports multiple video formats, including MP4, WAV, Quicktime and additional common formats. During the public preview, the solution supports the following Azure languages: English (US), Spanish, German, French, Italian, Chinese (Simplified) and Arabic in all basic audio-related models.
 
 > **NOTE: This guide assumes you already deployed a Kubernetes cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion for various [Kubernetes distributions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/).**
 
+By the end of this scenario, you will have successfully deployed a fully functional Azure Video Indexer extension on your edge device, including a web portal and web APIs, allowing you to perform advanced operations such as video uploading, insight extraction and retrival within your Video Indexer edge environment.
 
-
-By the end of this scenario, you will have a ready to use Azure Video Indexer on your edge device.....[SHEMER_TO_COMPLETE]
-
-> **NOTE: Currently, Azure Video Indexer enabled by Arc is in preview.**
+>**NOTE: Currently, Azure Video Indexer enabled by Arc is in preview.**
 
 ## Prerequisites
 
@@ -46,8 +43,7 @@ By the end of this scenario, you will have a ready to use Azure Video Indexer on
 
 - Azure Video Indexer Account. The quickest way is using the Azure Portal using this tutorial [Create Video Indexer account](https://learn.microsoft.com/azure/azure-video-indexer/create-account-portal#use-the-azure-portal-to-create-an-azure-video-indexer-account).
 
->**NOTE: In order to succesfully deploy the VI Extension it is __mandatory__ that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register)**.
-
+>**NOTE: In order to succesfully deploy the VI Extension it is mandatory that we approve your Azure subscription id in advance. Therefore you must first sign up using [this form](https://aka.ms/vi-register)**.
 
 ### Minumum Hardware Requirements
 
@@ -71,7 +67,7 @@ The following is the minimum and recommended requirements if the extension conta
 | --- | --- |
 | Operating System | Ubuntu 20.04 LTS or any Linux Compatible OS |
 | Kubernetes | 1.25 |
-| Azure CLI | 2.49.0 | 
+| Azure CLI | 2.49.0 |
 
 ## Automation Flow
 
@@ -85,8 +81,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User is verifying the cluster and ensuring the Video Indexer Cluster extension is deployed.
 
-- [SHEMER_TO_COMPLETE] / [Yehiam to complete] / [RAZ/To/Complete] Add explanation on how to use the API /Swagger Portal
-
+- Once the deployment is ready you can either use the [Web Portal](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapp/) or the [Web API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapi) to upload and index your video content using Video Indexer enabled by Arc environment.
 
 ## Deployment
 
@@ -138,8 +133,7 @@ To create a new Cluster extension instance, we will use the _k8s-extension creat
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-
-- Edit the environment variables in the [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file to match your parameters and run it using the _`./vi-deployment-script.sh`_ command.
+- Edit the environment variables in the [vi-deployment-script.sh](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file to match your parameters and run it using the _`./vi-deployment-script.sh`_ command.
 
 - The deployment is using the following parameters that you will need to edit in the [*vi-deployment-script.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-deployment-script.sh) file. 
 
@@ -157,13 +151,13 @@ To create a new Cluster extension instance, we will use the _k8s-extension creat
 ### Step 2 - Run the deployment script
 
 - One of the prerequisites to installing a Video Indexer Arc extension are speech and translator resources.
-The installation script already contains the neccessary code to create the resources and retreive the cognitive service credentials. 
+The installation script already contains the neccessary code to create the resources and retreive the cognitive service credentials.
 
-- inspect the file under the function **create_cognitive_resources**.
+- Inspect the file under the function **create_cognitive_resources**.
 
 - Once the resources are created, their credentials  are automatically injected into the _k8s-extension create_ command. 
 
-- type  _`./vi_deployment.sh`_ into your shell ( including the leading .) and hit enter to run the script.
+- Type  _`./vi_deployment.sh`_ into your shell ( including the leading .) and hit enter to run the script.
 
    The script will:
 
@@ -208,8 +202,8 @@ az k8s-extension create --name videoindexer \
     --config-protected-settings "translate.secret=${translateSecret}" \
     --config "videoIndexer.accountId=${viAccountId}" \
     --config "frontend.endpointUri=${dnsName}" 
-
 ```
+
 - The script usually takes 10-20 minutes to complete. once it is completed you can see the logs verifying the extension creation.
     ![Screenshot log completion](./05.png)
 
@@ -255,7 +249,8 @@ Example of a modified deploy script :
         --config "videoIndexer.webapi.resources.limits.cpu=1"\
         --config "storage.storageClass=azurefile-csi" 
 ```
-in the above example the script was modifed to use a specific node selector, and to modify the resource requests and limits for the speech and web api pods. 
+
+In the above example the script was modifed to use a specific node selector, and to modify the resource requests and limits for the speech and web api pods. 
 in addition the storage class was changed to azurefile-csi which on Azure Cloud is a ReadWriteMany storage class.
 Those customization should be done according to the cluster resources and the expected load, and according to specific infrastructure capabilities.
 
@@ -291,4 +286,11 @@ To update an existing Cluster extension instance, we will use the _k8s-extension
 > **NOTE: You must specify the cluster name and resurce group name in order to update the extension**.
 
 ## Using Azure Video Indexer Arc Extension
-- [SHEMER_TO_COMPLETE] : once the deployment is ready .........
+
+Once the deployment is ready you can either use the [Web Portal](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapp/) or the [Web API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapi) to upload and index your video content using Video Indexer enabled by Arc environment.
+
+## Cleanup
+
+- If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
+
+    ![Screenshot showing Azure resource group deletion](./08.png)
