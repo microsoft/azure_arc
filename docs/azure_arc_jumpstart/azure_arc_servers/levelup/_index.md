@@ -634,13 +634,39 @@ if ($roleDefinitionIds.Count -gt 0)
 
 #### Task 2
 
-### Module 5: Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
+### Module 5: Monitor changes to your Azure Arc-enabled servers using Change Tracking and Inventory
 
 #### Module overview
 
-#### Task 1
+Change Tracking and Inventory is an inbuilt Azure service, provided by Azure Automation. The old version uses the Log Analytics agent, while the new (preview) version uses the Azure Monitor Agent (AMA). The training here is taken from https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm
 
-#### Task 2
+#### Prerequisites
+
+The following are required for this module to function:
+1. Ensure that the servers are already provisioned in Arc.
+2. Ensure that the AMA is already provisioned on every server.
+3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
+
+Currently, the policies to enable Change tracking and inventory with Azure monitoring Agent are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
+
+![Screenshot showing how to enable change tracking](./changetracking-enable.png)
+
+#### Current Limitations
+
+The following table lists the current limitations for Change Tracking And Inventory
+https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm#current-limitations
+
+#### Enabling Change Tracking and Inventory
+
+To enable a single machine
+
+To enable multiple machines at scale
+
+#### Managing Change Tracking using Data Collection Rules
+
+#### Alert Configuration
+
+
 
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
