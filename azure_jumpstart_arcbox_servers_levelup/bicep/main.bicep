@@ -77,3 +77,11 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
   }
 }
+
+module vmInsightsPolicies 'mgmt/DeployDcrTemplate.bicep' = {
+  name: 'vmInsightsPolicies'
+  params: {
+    WorkspaceResourceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
+    WorkspaceLocation: location
+  }
+}
