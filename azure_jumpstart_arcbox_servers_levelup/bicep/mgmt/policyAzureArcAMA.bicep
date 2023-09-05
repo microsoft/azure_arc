@@ -29,9 +29,6 @@ resource monitoring_policies_Linux 'Microsoft.Authorization/policySetDefinitions
     }
     policyDefinitions: [
       {
-        policyDefinitionId: dependencyAgentLinuxPolicyId
-      }
-      {
         policyDefinitionId: AMALinuxPolicyId
         parameters: {
           dcrResourceId: {
