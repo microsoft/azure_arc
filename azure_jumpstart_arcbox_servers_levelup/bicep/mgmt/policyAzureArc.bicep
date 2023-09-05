@@ -8,7 +8,7 @@ param logAnalyticsWorkspaceId string
 param subscriptionId string = subscription().subscriptionId
 
 var policies = [
-  {
+  /*{
     name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
     definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0'
     roleDefinition: [
@@ -24,7 +24,7 @@ var policies = [
         value: true
       }
     }
-  }
+  }*/
   {
     name: '(ArcBox) Tag resources'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
@@ -88,10 +88,10 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
 
 
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(policies[1].name, policies[1].roleDefinition, resourceGroup().id)
+  name: guid(policies[0].name, policies[0].roleDefinition, resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[1].roleDefinition
-    principalId: policies_name[1].identity.principalId
+    roleDefinitionId: policies[0].roleDefinition
+    principalId: policies_name[0].identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
