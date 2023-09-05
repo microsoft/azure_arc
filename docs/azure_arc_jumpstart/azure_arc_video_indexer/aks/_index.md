@@ -299,7 +299,7 @@ To update an existing Cluster extension instance, we will use the _k8s-extension
 Once the deployment is ready you can either use the [Web Portal](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapp/) or the [Web API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapi) to upload and index your video content using Video Indexer enabled by Arc environment.
 ## Cleanup
 
-To delete the Video Indexer Arc Enabled Extension and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [vi_extension_cleanup]- The deployment is using the following parameters that you will need to edit in the [*vi_extension_cleanup.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi_extension_cleanup.sh) file, upload it to Cloud Shell and run it using the _`. ./vi_extension_cleanup.sh`_ command.
+To delete the Video Indexer Arc Enabled Extension and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [vi-extension-cleanup]- The deployment is using the following parameters that you will need to edit in the [*vi-extension-cleanup.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi-extension-cleanup.sh) file, upload it to Cloud Shell and run it using the _`. ./vi-extension-cleanup.sh`_ command.
 
 - once the script will run and authenticate the service principal credentials, it will ask your consent to delete the extension and perform the delete operation.
 
