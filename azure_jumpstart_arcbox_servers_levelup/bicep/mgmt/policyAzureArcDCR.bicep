@@ -24,7 +24,7 @@ resource ama_dcr_policy_set 'Microsoft.Authorization/policySetDefinitions@2021-0
         policyDefinitionId: linuxAMAPolicyDefinitionId
         parameters: {
           dcrResourceId : {
-            value: '[parameters(\'dcrResourceId\')]'
+            value: parameters('dcrResourceId')
           }
         }
       }
@@ -32,7 +32,7 @@ resource ama_dcr_policy_set 'Microsoft.Authorization/policySetDefinitions@2021-0
         policyDefinitionId: windowsAMAPolicyDefinitionId
         parameters: {
           dcrResourceId : {
-            value: '[parameters(\'dcrResourceId\')]'
+            value: parameters('dcrResourceId')
           }
         }
       }
