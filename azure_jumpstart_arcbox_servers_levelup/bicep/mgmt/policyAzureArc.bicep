@@ -95,22 +95,3 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
     principalType: 'ServicePrincipal'
   }
 }
-
-module policy_dcr_ama 'policyAzureArcDCR.bicep' = {
-  name: 'policy_dcr_ama'
-  scope: subscription(subscriptionId)
-}
-
-/*resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
-  name: '(ArcBox) Enable VM Insights'
-  scope: resourceGroup()
-  identity: {
-    type: 'SystemAssigned'
-  }
-  location: azureLocation
-  properties: {
-    displayName: '(ArcBox) Enable VM Insights'
-    policyDefinitionId: policy_dcr_ama.outputs.ama_dcr_policySet_Id
-  }
-}
-*/
