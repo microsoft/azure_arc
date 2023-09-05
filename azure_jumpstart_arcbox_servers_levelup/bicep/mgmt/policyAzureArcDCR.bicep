@@ -11,12 +11,30 @@ resource ama_dcr_policy_set 'Microsoft.Authorization/policySetDefinitions@2021-0
   name: '(ArcBox) Enable VM Insights'
   properties: {
     displayName: '(ArcBox) Enable VM Insights'
+    parameters: {
+      'dcrResourceId': {
+        'type': string,
+        'metadata': {
+          'displayName': 'VM insight DCR resource Id',
+          'description': 'VM insight DCR resource Id'
+        },
+    }
     policyDefinitions: [
       {
         policyDefinitionId: linuxAMAPolicyDefinitionId
+        parameters: {
+          dcrResourceId : {
+            value: '[parameters(\'dcrResourceId\')]'
+          }
+        }
       }
       {
         policyDefinitionId: windowsAMAPolicyDefinitionId
+        parameters: {
+          dcrResourceId : {
+            value: '[parameters(\'dcrResourceId\')]'
+          }
+        }
       }
     ]
   }

@@ -101,7 +101,7 @@ module policy_dcr_ama 'policyAzureArcDCR.bicep' = {
   scope: subscription(subscriptionId)
 }
 
-resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
+/*resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
   name: '(ArcBox) Enable VM Insights'
   scope: resourceGroup()
   identity: {
@@ -113,3 +113,4 @@ resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@20
     policyDefinitionId: policy_dcr_ama.outputs.ama_dcr_policySet_Id
   }
 }
+*/
