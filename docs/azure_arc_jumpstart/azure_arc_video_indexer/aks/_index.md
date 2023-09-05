@@ -204,6 +204,15 @@ az k8s-extension create --name videoindexer \
     --config "frontend.endpointUri=${dnsName}" 
 ```
 
+- During the Deployment, the Video Indexer Resource provider will provision for you the Cognitive Services resource and will store the credentials in the script variables.
+
+    ![Screenshot Creating Cognitive Resources](./04a.png)
+
+- In case the Cognitive resource are already present and available for the video indexer acocunt, the script will skip its creation and present with a conflict message ( that could be ignored). this is part of the installation process and should not raise concern.
+    
+    ![Screenshot Creating Cognitive Resources](./04b.png)
+
+
 - The script usually takes 10-20 minutes to complete. once it is completed you can see the logs verifying the extension creation.
     ![Screenshot log completion](./05.png)
 
@@ -288,9 +297,10 @@ To update an existing Cluster extension instance, we will use the _k8s-extension
 ## Using Azure Video Indexer Arc Extension
 
 Once the deployment is ready you can either use the [Web Portal](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapp/) or the [Web API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_video_indexer/toturial/webapi) to upload and index your video content using Video Indexer enabled by Arc environment.
-
 ## Cleanup
 
-- If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
+To delete the Video Indexer Arc Enabled Extension and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [vi_extension_cleanup]- The deployment is using the following parameters that you will need to edit in the [*vi_extension_cleanup.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_video_indexer_jumpstart/vi_extension_cleanup.sh) file, upload it to Cloud Shell and run it using the _`. ./vi_extension_cleanup.sh`_ command.
+
+- once the script will run and authenticate the service principal credentials, it will ask your consent to delete the extension and perform the delete operation.
 
     ![Screenshot showing Azure resource group deletion](./08.png)
