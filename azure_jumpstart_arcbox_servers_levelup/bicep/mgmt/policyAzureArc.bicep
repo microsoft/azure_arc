@@ -95,3 +95,22 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
     principalType: 'ServicePrincipal'
   }
 }
+
+module arcAMAPolicies 'policyAzureArcAMA.bicep' = {
+  name: 'ArcBox_AMA_Policies'
+  scope: subscription(subscriptionId)
+}
+
+/*resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
+  name: '(ArcBox) Deploy Azure Monitor agents'
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  location: azureLocation
+  properties: {
+    displayName: 'Deploy Azure Monitor agents'
+    policyDefinitionId: arcAMAPolicies.outputs.policySetDefinitionId
+  }
+}
+*/
