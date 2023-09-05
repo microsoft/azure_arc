@@ -283,3 +283,4 @@ module policyDeployment './policyAzureArc.bicep' = {
 
 output vnetId string = arcVirtualNetwork.id
 output subnetId string = arcVirtualNetwork.properties.subnets[0].id
+output workspaceId string = workspace.id
