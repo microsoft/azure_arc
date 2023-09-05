@@ -653,21 +653,53 @@ Currently, the policies to enable Change tracking and inventory with Azure monit
 
 The Automation Account must also enable Change Tracking and Inventory
 ![Screenshot showing how to enable inventory in Automation Account](./changetracking-enable-inv.png)
-![Screenshot showing how to enable change tracking in Automation Account](./changetracking-enable-ct.png)
 
+Depending on the state of the automation account, you may be asked to enable the preview feature.
+For this levelup - it should not happen since we are using new automation account.
+![Screenshot showing how to enable preview change tracking in Automation Account](./changetracking-enablepreview.png)
 
 #### Current Limitations
 
 The following table lists the current limitations for Change Tracking And Inventory
 https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm#current-limitations
 
+Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both:
+https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
+
 #### Enabling Change Tracking and Inventory
 
-To enable a single machine
+After the automation account has the correct Change Tracking enabled, it will then request how to onboard current and new machines for change tracking
+![Screenshot showing how to onboard CT for each VM in Automation Account](./changetracking-ct-enabled.png)
+![Screenshot showing how to onboard CT for the current and future in Automation Account](./changetracking-enable-allmachines.png)
 
-To enable multiple machines at scale
+
+To enable multiple machines at scale, the easiest method is to choose the option "Enable on all available and Future machines".
+Then all machines onboarding in the future will automatically be enrolled for Change Tracking. 
+As part of onboarding, a Data Collection Rule will usually be created.
+You can check on the rule to see what has happened:
+![Screenshot showing Data Collection Rule](./changetracking-datacollectionrule.png)
+
+Note that some customers are not happy about sending log information over the Internet to Azure. It is now possible to define a private endpoint in an Azure Virtual Network to be the receiving point for AMA logs - it is called Data Collection Endpoints.
+
+
+Please be patient as onboarding machines will take a while for the inventory to populate.
+
+#### Using Change Tracking
+
+By default, Change Tracking will monitor software installation, service states and some registry changes.
+
+Try stopping and starting services.
+
+```PowerShell
+Stop-Service spooler
+Start-service spooler
+```
 
 #### Managing Change Tracking using Data Collection Rules
+
+
+
+
 
 #### Alert Configuration
 
