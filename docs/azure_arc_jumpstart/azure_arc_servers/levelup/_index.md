@@ -277,11 +277,95 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ### Module 1: On-boarding to Azure Arc-enabled servers
 
-#### Module overview
+#### Module overview: In this module we will connect two machines (Windows and Linux) to Azure Arc.
 
-#### Task 1
+#### Task 1: Examine the existing Arc-connected machines.
 
-#### Task 2
+- The deployment process that you have walked through should have set up four VMs running on Hyper-V in the ArcBox-Client machine. Two of these machines have been connected to Azure Arc already. Let us have a look at these in the Azure Portal
+
+- Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
+
+    ![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+
+- We should see the machines that are connected to Arc already: Arcbox-Ubuntu-01 and ArcBox-Win2K19.
+
+    ![Screenshot showing existing Arc connected servers](./First_view_of%20Arc_connected.png) 
+ 
+ - We want to connect the other 2 machines running as VMs in the ArcBox-Client. We can see these (ArcBox-Win2K22 and ArcBox-Ubuntu-02) by running the Hyper-V Manager in the ArcBox-Client (after we have connected to it with RDP as explained earlier in the setup).
+
+    ![Screenshot of 4 machines on Hyper-v](./choose_Hyper-V.png)
+
+#### Task 2: Onboard a Windows machine to ARC
+
+- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/en-us/azure/azure-arc/servers/onboard-service-principal).
+
+- Using the following Powershell commands create a service principal and assign it the Azure Connected Machine Onboarding role for the selected subscription. After the service principal is created, it will print the application ID and secret (copy these somewhere safe for later use):
+
+```powershell
+$sp = New-AzADServicePrincipal -DisplayName "Arc server onboarding account" -Role "Azure Connected Machine Onboarding"
+$sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredentials.SecretText }}
+```
+- Next we will generate a script to automate the download and installation, and to connect to Azure ARC. 
+
+- From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
+
+    ![Screenshot to select add a machine](./Select_Add_a_machine.png)
+
+- In the next screen, go to "Add multiple severs" and click on "Generate script".
+
+    ![Screenshot Add Multiple Servers Script](./Add_multiple_servers_script.png)
+
+- Fill in the Resource Group, Region, Operating System (Windows), keep Connectivity as "Public endpoint" and in the Authentication box select the onboarding service principal that you created in this task. Then download the script to your local machine (or you can copy the content into the clipboard). 
+
+- Go to the ArcBox-Client machine via RDP and from Hyper-V manager right-click on the ArcBox-Win2K22 VM and click "Connect". Then start Windows Powershell ISE and copy the content of the onboarding script in the Script Pane.
+
+- Fill in the Service Principal secret in the script and run it.
+
+    ![Screenshot run onboard windows script](./run_windows_onboard_sctipt.png)
+
+- On successful completion a message is displayed to confirm the machine is connected to Azure Arc. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc).
+
+    ![Screenshot confirm win machine on-boarded](./confirm_windows_machine_onboarding.png)
+
+#### Task 3: Onboard a Linux machine to ARC.
+
+- We will now onboard the Linux vm ArcBox-Ubuntu-02 to Azure Arc using the same service principal method we used above for the Windows machine. We can use the same service principal we created above.
+
+- From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
+
+- In the next screen, go to "Add multiple severs" and click on "Generate script".
+
+- Fill in the required details but this time choose Linux for the Operating System box. Then download the script to your local machine (or you can copy the content into the clipboard).
+
+- Add the client secret to the script using your editor. Also add the following 3 lines just below the last export statement (to allow onboarding of Azure linux machines):
+```
+sudo ufw --force enable\
+sudo ufw deny out from any to 169.254.169.254\
+sudo ufw default allow incoming
+```
+- Go the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
+
+    ![Screenshot IP address of second Ubuntu machine](./IP_address_second_Linux_vm.png)
+
+- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or vscode. 
+
+    ![Screenshot connect with putty](./putty.png)
+
+- Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
+
+- create the onboarding script file using the nano editor, and paste the script content from your local machine.
+```
+nano onboardingscript.sh
+```
+- Save the file (Ctrl-O) and exit (Ctrl-X). Now you can run the script:
+
+```
+sudo bash ./onboardingscript.sh
+```
+
+- Wait for the script to finish successfully. A message should confirm that the machine is now Arc-connected. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc).
+
+    ![Screenshot Linux message confirm connection](./Linux_%20message_confirm_connection.png)
 
 ### Module 2: Monitor your Azure Arc-enabled servers using Azure Monitor
 
