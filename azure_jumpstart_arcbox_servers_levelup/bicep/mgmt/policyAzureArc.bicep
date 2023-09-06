@@ -9,12 +9,12 @@ param subscriptionId string = subscription().subscriptionId
 
 var policies = [
   /*{
-    name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
-    definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0'
+    name: '(ArcBox) Enable Azure Monitor for Hybrid Linux VMs with AMA'
+    definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/118f04da-0375-44d1-84e3-0fd9e1849403'
     roleDefinition: [
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/2ea82cdd-f2e8-4500-af75-67a2e084ca74'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
     ]
     parameters: {
       logAnalyticsWorkspace: {
@@ -100,17 +100,3 @@ module arcAMAPolicies 'policyAzureArcAMA.bicep' = {
   name: 'ArcBox_AMA_Policies'
   scope: subscription(subscriptionId)
 }
-
-/*resource policy_dcr_ama_assignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
-  name: '(ArcBox) Deploy Azure Monitor agents'
-  scope: resourceGroup()
-  identity: {
-    type: 'SystemAssigned'
-  }
-  location: azureLocation
-  properties: {
-    displayName: 'Deploy Azure Monitor agents'
-    policyDefinitionId: arcAMAPolicies.outputs.policySetDefinitionId
-  }
-}
-*/

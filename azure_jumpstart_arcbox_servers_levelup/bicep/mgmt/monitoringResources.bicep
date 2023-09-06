@@ -1,6 +1,9 @@
 @description('Name of the workspace.')
 param workspaceName string
 
+@description('Id of the workspace.')
+param workspaceId string
+
 @description('Specifies the location in which to create the workspace.')
 param location string = resourceGroup().location
 
@@ -13,7 +16,7 @@ param dataRetention int = 30
 param emailAddress string = 'sebassem@microsoft.com'
 
 var intervalSeconds = 60
-var workspaceResourceId = workspace.id
+var workspaceResourceId = workspaceId
 var actionGroupName = 'ag-arc-servers'
 var alertsSeverity = 2
 var windowSize = 'PT5M'
@@ -85,7 +88,7 @@ var windowsEventsWorkbookContent = {
               'value::all'
             ]
             value: [
-              workspace.id
+              workspaceId
             ]
             typeSettings: {
               additionalResourceOptions: []
@@ -592,7 +595,7 @@ var osPerformanceWorkbookContent = {
               'value::all'
             ]
             value: [
-              workspace.id
+              workspaceId
             ]
             typeSettings: {
               additionalResourceOptions: []
@@ -1839,7 +1842,7 @@ var osPerformanceWorkbookContent = {
         queryType: 0
         resourceType: 'microsoft.operationalinsights/workspaces'
         crossComponentResources: [
-          workspace.id
+          workspaceId
         ]
         visualization: 'table'
         gridSettings: {
@@ -1895,7 +1898,7 @@ var osPerformanceWorkbookContent = {
         queryType: 0
         resourceType: 'microsoft.operationalinsights/workspaces'
         crossComponentResources: [
-          workspace.id
+          workspaceId
         ]
         visualization: 'table'
         gridSettings: {
@@ -2265,443 +2268,6 @@ var alertsConsoleWorkbookContent = {
   ]
 }
 
-resource workspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
-  name: workspaceName
-  location: location
-  properties: {
-    sku: {
-      name: 'pergb2018'
-    }
-    retentionInDays: dataRetention
-    features: {
-      searchVersion: 1
-      legacy: 0
-    }
-  }
-}
-
-resource WindowsEventsSystemDCR 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
- name: 'WindowsEventsSystemDCR'
- location: location
- properties: {
-  dataSources: {
-    performanceCounters: [
-      {
-        name: 'Processor'
-        counterSpecifiers: [
-            'Processor(*)/% Processor Time'
-        ]
-      }
-        ]
-      }
-  }
- }
-/*
-resource workspaceName_WindowsEventsSystem 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsEventsSystem'
-  kind: 'WindowsEvent'
-  properties: {
-    eventLogName: 'System'
-    eventTypes: [
-      {
-        eventType: 'Error'
-      }
-      {
-        eventType: 'Warning'
-      }
-    ]
-  }
-}
-
-resource workspaceName_WindowsEventsApplication 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsEventsApplication'
-  kind: 'WindowsEvent'
-  properties: {
-    eventLogName: 'Application'
-    eventTypes: [
-      {
-        eventType: 'Error'
-      }
-      {
-        eventType: 'Warning'
-      }
-    ]
-  }
-}
-
-resource workspaceName_WindowsPerfProcessorPercentage 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfProcessorPercentage'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Processor'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: '% Processor Time'
-  }
-}
-
-resource workspaceName_WindowsPerfProcessPercentage 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfProcessPercentage'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Process'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: '% Processor Time'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskFreeSpace 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskFreeSpace'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: '% Free Space'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskAvgDiskSecRead 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskAvgDiskSecRead'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Avg. Disk sec/Read'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskAvgDiskSecWrite 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskAvgDiskSecWrite'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Avg. Disk sec/Write'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskCurrentDiskQueueLength 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskCurrentDiskQueueLength'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Current Disk Queue Length'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskDiskReadsSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskDiskReadsSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Disk Reads/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskTransfersSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskTransfersSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Disk Transfers/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfLogicDiskWritesSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogicDiskWritesSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Disk Writes/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfLogiDiskFreeMegabytes 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfLogiDiskFreeMegabytes'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'LogicalDisk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Free Megabytes'
-  }
-}
-
-resource workspaceName_WindowsPerfMemoryCommittedBytesInUse 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfMemoryCommittedBytesInUse'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Memory'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: '% Committed Bytes In Use'
-  }
-}
-
-resource workspaceName_WindowsPerfMemoryAvailableMBytes 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfMemoryAvailableMBytes'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Memory'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Available MBytes'
-  }
-}
-
-resource workspaceName_WindowsPerfMemoryPagesSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfMemoryPagesSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Memory'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Pages/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfNetworkAdapterBytesReceivedSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfNetworkAdapterBytesReceivedSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Network Adapter'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Bytes Received/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfNetworkAdapterBytesSentSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfNetworkAdapterBytesSentSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Network Adapter'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Bytes Sent/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfNetworkAdapterBytesTotatSec 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfNetworkAdapterBytesTotatSec'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'Network Adapter'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Bytes Total/sec'
-  }
-}
-
-resource workspaceName_WindowsPerfSystemProcessorQueueLength 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'WindowsPerfSystemProcessorQueueLength'
-  kind: 'WindowsPerformanceCounter'
-  properties: {
-    objectName: 'System'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    counterName: 'Processor Queue Length'
-  }
-}
-
-resource workspaceName_LinuxPerformanceLogicalDisk 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'LinuxPerformanceLogicalDisk'
-  kind: 'LinuxPerformanceObject'
-  properties: {
-    objectName: 'Logical Disk'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    performanceCounters: [
-      {
-        counterName: '% Used Inodes'
-      }
-      {
-        counterName: 'Free Megabytes'
-      }
-      {
-        counterName: '% Used Space'
-      }
-      {
-        counterName: 'Disk Transfers/sec'
-      }
-      {
-        counterName: 'Disk Reads/sec'
-      }
-      {
-        counterName: 'Disk Writes/sec'
-      }
-    ]
-  }
-}
-
-resource workspaceName_LinuxPerformanceMemory 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'LinuxPerformanceMemory'
-  kind: 'LinuxPerformanceObject'
-  properties: {
-    objectName: 'Memory'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    performanceCounters: [
-      {
-        counterName: '% Used Memory'
-      }
-      {
-        counterName: '% Used Swap Space'
-      }
-      {
-        counterName: 'Available MBytes Memory'
-      }
-    ]
-  }
-}
-
-resource workspaceName_LinuxPerformanceNetwork 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'LinuxPerformanceNetwork'
-  kind: 'LinuxPerformanceObject'
-  properties: {
-    objectName: 'Network'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    performanceCounters: [
-      {
-        counterName: 'Total Bytes Received'
-      }
-      {
-        counterName: 'Total Bytes Transmitted'
-      }
-    ]
-  }
-}
-
-resource workspaceName_LinuxPerformanceProcessor 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'LinuxPerformanceProcessor'
-  kind: 'LinuxPerformanceObject'
-  properties: {
-    objectName: 'Processor'
-    instanceName: '*'
-    intervalSeconds: intervalSeconds
-    performanceCounters: [
-      {
-        counterName: '% Privileged Time'
-      }
-      {
-        counterName: '% Processor Time'
-      }
-    ]
-  }
-}
-
-resource workspaceName_SyslogKern 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'SyslogKern'
-  kind: 'LinuxSyslog'
-  properties: {
-    syslogName: 'kern'
-    syslogSeverities: [
-      {
-        severity: 'emerg'
-      }
-      {
-        severity: 'alert'
-      }
-      {
-        severity: 'crit'
-      }
-      {
-        severity: 'err'
-      }
-      {
-        severity: 'warning'
-      }
-      {
-        severity: 'notice'
-      }
-      {
-        severity: 'info'
-      }
-      {
-        severity: 'debug'
-      }
-    ]
-  }
-}
-
-resource workspaceName_SyslogDaemon 'Microsoft.OperationalInsights/workspaces/datasources@2020-08-01' = {
-  parent: workspace
-  name: 'SyslogDaemon'
-  kind: 'LinuxSyslog'
-  properties: {
-    syslogName: 'daemon'
-    syslogSeverities: [
-      {
-        severity: 'emerg'
-      }
-      {
-        severity: 'alert'
-      }
-      {
-        severity: 'crit'
-      }
-      {
-        severity: 'err'
-      }
-      {
-        severity: 'warning'
-      }
-    ]
-  }
-}
-*/
-
-resource VMInsights_workspaceResourceId_8 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
-  location: location
-  name: 'VMInsights(${split(workspaceResourceId, '/')[8]})'
-  properties: {
-    workspaceResourceId: workspaceResourceId
-  }
-  plan: {
-    name: 'VMInsights(${split(workspaceResourceId, '/')[8]})'
-    product: 'OMSGallery/VMInsights'
-    promotionCode: ''
-    publisher: 'Microsoft'
-  }
-}
-
 resource actionGroup 'Microsoft.Insights/actionGroups@2018-03-01' = {
   name: actionGroupName
   location: 'Global'
@@ -2721,7 +2287,7 @@ resource Processor_Time_Percent 'Microsoft.Insights/scheduledQueryRules@2021-02-
   name: 'Processor Time Percent'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -2729,7 +2295,7 @@ resource Processor_Time_Percent 'Microsoft.Insights/scheduledQueryRules@2021-02-
     description: 'Monitor Alert for Processor Time Percent'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -2765,7 +2331,7 @@ resource Microsoft_Insights_metricAlerts_Processor_Time_Percent 'Microsoft.Insig
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for Processor Time Percent'
     evaluationFrequency: evaluationFrequency
@@ -2819,7 +2385,7 @@ resource Memory_Available_MBytes 'Microsoft.Insights/scheduledQueryRules@2021-02
   name: 'Memory Available MBytes'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -2827,7 +2393,7 @@ resource Memory_Available_MBytes 'Microsoft.Insights/scheduledQueryRules@2021-02
     description: 'Monitor alert for Memory Available MBytes'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -2863,7 +2429,7 @@ resource Microsoft_Insights_metricAlerts_Memory_Available_MBytes 'Microsoft.Insi
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor alert for Memory Available MBytes'
     evaluationFrequency: evaluationFrequency
@@ -2917,7 +2483,7 @@ resource Memory_Commited_Bytes_in_use_Percent 'Microsoft.Insights/scheduledQuery
   name: 'Memory Commited Bytes in use Percent'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -2925,7 +2491,7 @@ resource Memory_Commited_Bytes_in_use_Percent 'Microsoft.Insights/scheduledQuery
     description: 'Monitor Alert for Memory Commited Bytes in use Percent'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -2961,7 +2527,7 @@ resource Microsoft_Insights_metricAlerts_Memory_Commited_Bytes_in_use_Percent 'M
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for Memory Commited Bytes in use Percent'
     evaluationFrequency: evaluationFrequency
@@ -3015,7 +2581,7 @@ resource Memory_Pages_per_Sec 'Microsoft.Insights/scheduledQueryRules@2021-02-01
   name: 'Memory Pages per Sec'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3023,7 +2589,7 @@ resource Memory_Pages_per_Sec 'Microsoft.Insights/scheduledQueryRules@2021-02-01
     description: 'Monitor Alert for Memory Pages per Sec'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3059,7 +2625,7 @@ resource Microsoft_Insights_metricAlerts_Memory_Pages_per_Sec 'Microsoft.Insight
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for Memory Pages per Sec'
     evaluationFrequency: evaluationFrequency
@@ -3113,7 +2679,7 @@ resource LogicalDisk_Avg_Disk_sec_per_Read 'Microsoft.Insights/scheduledQueryRul
   name: 'LogicalDisk Avg. Disk sec per Read'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3121,7 +2687,7 @@ resource LogicalDisk_Avg_Disk_sec_per_Read 'Microsoft.Insights/scheduledQueryRul
     description: 'Monitor Alert for LogicalDisk Avg. Disk sec per Read'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3157,7 +2723,7 @@ resource Microsoft_Insights_metricAlerts_LogicalDisk_Avg_Disk_sec_per_Read 'Micr
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for LogicalDisk Avg. Disk sec per Read'
     evaluationFrequency: evaluationFrequency
@@ -3211,7 +2777,7 @@ resource LogicalDisk_Avg_Disk_sec_per_Write 'Microsoft.Insights/scheduledQueryRu
   name: 'LogicalDisk Avg. Disk sec per Write'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3219,7 +2785,7 @@ resource LogicalDisk_Avg_Disk_sec_per_Write 'Microsoft.Insights/scheduledQueryRu
     description: 'Monitor Alert for LogicalDisk Avg. Disk sec per Write'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3255,7 +2821,7 @@ resource Microsoft_Insights_metricAlerts_LogicalDisk_Avg_Disk_sec_per_Write 'Mic
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for LogicalDisk Avg. Disk sec per Write'
     evaluationFrequency: evaluationFrequency
@@ -3309,7 +2875,7 @@ resource LogicalDisk_Current_Queue_Length 'Microsoft.Insights/scheduledQueryRule
   name: 'LogicalDisk Current Queue Length'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3317,7 +2883,7 @@ resource LogicalDisk_Current_Queue_Length 'Microsoft.Insights/scheduledQueryRule
     description: 'Monitor Alert for LogicalDisk Current Queue Length'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3353,7 +2919,7 @@ resource Microsoft_Insights_metricAlerts_LogicalDisk_Current_Queue_Length 'Micro
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for LogicalDisk Current Queue Length'
     evaluationFrequency: evaluationFrequency
@@ -3407,7 +2973,7 @@ resource LogicalDisk_Free_Space_Percent 'Microsoft.Insights/scheduledQueryRules@
   name: 'LogicalDisk Free Space Percent'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3415,7 +2981,7 @@ resource LogicalDisk_Free_Space_Percent 'Microsoft.Insights/scheduledQueryRules@
     description: 'Monitor Alert for LogicalDisk Free Space Percent'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3451,7 +3017,7 @@ resource Microsoft_Insights_metricAlerts_LogicalDisk_Free_Space_Percent 'Microso
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for LogicalDisk Free Space Percent'
     evaluationFrequency: evaluationFrequency
@@ -3505,7 +3071,7 @@ resource LogicalDisk_Idle_Time_Percent 'Microsoft.Insights/scheduledQueryRules@2
   name: 'LogicalDisk Idle Time Percent'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3513,7 +3079,7 @@ resource LogicalDisk_Idle_Time_Percent 'Microsoft.Insights/scheduledQueryRules@2
     description: 'Monitor Alert for LogicalDisk Idle Time Percent'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3549,7 +3115,7 @@ resource Microsoft_Insights_metricAlerts_LogicalDisk_Idle_Time_Percent 'Microsof
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for LogicalDisk Idle Time Percent'
     evaluationFrequency: evaluationFrequency
@@ -3603,7 +3169,7 @@ resource Heartbeat_Missed 'Microsoft.Insights/scheduledQueryRules@2021-02-01-pre
   name: 'Heartbeat Missed'
   location: location
   tags: {
-    '${'${convertRuleTag}${workspace.id}'}': 'Resource'
+    '${'${convertRuleTag}${workspaceId}'}': 'Resource'
   }
   kind: 'LogToMetric'
   properties: {
@@ -3611,7 +3177,7 @@ resource Heartbeat_Missed 'Microsoft.Insights/scheduledQueryRules@2021-02-01-pre
     description: 'Monitor Alert for Heartbeat Missed'
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     criteria: {
       allOf: [
@@ -3640,7 +3206,7 @@ resource Microsoft_Insights_metricAlerts_Heartbeat_Missed 'Microsoft.Insights/me
     severity: alertsSeverity
     enabled: true
     scopes: [
-      workspace.id
+      workspaceId
     ]
     description: 'Monitor Alert for Heartbeat Missed'
     evaluationFrequency: evaluationFrequency
@@ -3693,7 +3259,7 @@ resource Unexpected_System_Shutdown 'microsoft.insights/scheduledqueryrules@2021
     enabled: true
     evaluationFrequency: evaluationFrequency
     scopes: [
-      workspace.id
+      workspaceId
     ]
     targetResourceTypes: [
       'Microsoft.OperationalInsights/workspaces'
@@ -3853,15 +3419,15 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                     Workspace: {
                       type: 5
                       value: [
-                        workspace.id
+                        workspaceId
                       ]
                       isPending: false
                       isWaiting: false
                       isFailed: false
                       isGlobal: false
-                      labelValue: workspace.id
+                      labelValue: workspaceId
                       displayName: 'Workspace'
-                      formattedValue: workspace.id
+                      formattedValue: workspaceId
                     }
                     ComputerFilter: {
                       type: 1
@@ -4131,7 +3697,7 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                     Workspace: {
                       type: 5
                       value: [
-                        workspace.id
+                        workspaceId
                       ]
                       isPending: false
                       isWaiting: false
@@ -4139,7 +3705,7 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                       isGlobal: false
                       labelValue: workspaceName
                       displayName: 'Workspace'
-                      formattedValue: workspace.id
+                      formattedValue: workspaceId
                     }
                   }
                   isOptional: true
