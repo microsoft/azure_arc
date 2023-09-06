@@ -7,16 +7,16 @@ param workspaceId string
 @description('Specifies the location in which to create the workspace.')
 param location string = resourceGroup().location
 
-@description('Number of days to retain data.')
-@minValue(7)
-@maxValue(730)
-param dataRetention int = 30
+//@description('Number of days to retain data.')
+//@minValue(7)
+//@maxValue(730)
+//param dataRetention int = 30
 
 @description('Short name up to 12 characters for the Action group.')
 param emailAddress string = 'sebassem@microsoft.com'
 
-var intervalSeconds = 60
-var workspaceResourceId = workspaceId
+//var intervalSeconds = 60
+//var workspaceResourceId = workspaceId
 var actionGroupName = 'ag-arc-servers'
 var alertsSeverity = 2
 var windowSize = 'PT5M'
