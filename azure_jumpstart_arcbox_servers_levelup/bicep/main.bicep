@@ -77,3 +77,20 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     location: location
   }
 }
+
+module vmInsightsPolicies 'mgmt/DeployDcrTemplate.bicep' = {
+  name: 'vmInsightsPolicies'
+  params: {
+    WorkspaceResourceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
+    WorkspaceLocation: location
+  }
+}
+
+module monitoringResources 'mgmt/monitoringResources.bicep' = {
+  name: 'monitoringResources'
+  params: {
+    workspaceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
+    workspaceName: logAnalyticsWorkspaceName
+    location: location
+  }
+}
