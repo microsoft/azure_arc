@@ -94,3 +94,12 @@ module monitoringResources 'mgmt/monitoringResources.bicep' = {
     location: location
   }
 }
+
+module dataCollectionRules 'mgmt/mgmtDataCollectionRules.bicep' = {
+  name: 'dataCollectionRules'
+  params: {
+    workspaceLocation: location
+    workspaceName: logAnalyticsWorkspaceName
+    workspaceResourceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
+  }
+}
