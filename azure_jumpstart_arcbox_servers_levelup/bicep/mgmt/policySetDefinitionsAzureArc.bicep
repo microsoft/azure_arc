@@ -18,7 +18,7 @@ param changeTrackingDcrWindowsPolicyId string = '/providers/Microsoft.Authorizat
 resource monitoring_policies_Linux 'Microsoft.Authorization/policySetDefinitions@2021-06-01' = {
   name: '(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines'
   properties: {
-    displayName: '(ArcBox) Deploy Azure Monitor on hybridLinux machines'
+    displayName: '(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines'
     description: 'This policy deploys Azure Monitor agents on Linux Arc connected machines.'
     metadata: {
       category: 'Monitoring'
@@ -51,7 +51,7 @@ resource monitoring_policies_Linux 'Microsoft.Authorization/policySetDefinitions
 
 
 resource monitoring_policies_Windows 'Microsoft.Authorization/policySetDefinitions@2021-06-01' = {
-  name: '(ArcBox) Deploy Azure Monitor on hybrid Windows machines'
+  name: '(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines'
   properties: {
     displayName: '(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines'
     description: 'This policy deploys Azure Monitor agents on Windows Arc connected machines.'
