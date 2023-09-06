@@ -1,6 +1,6 @@
 @description('This is the name of the AMA-VMI Data Collection Rule(DCR)')
 @metadata({ displayName: 'Name of the Data Collection Rule(DCR)' })
-param dataCollectionRuleNameVMI string = 'ama-vmi-default-perfAndda-dcr'
+param dataCollectionRuleNameVMI string = 'ama-vmi-perfAndda-dcr'
 
 @description('Workspace Location.')
 param workspaceLocation string
@@ -15,7 +15,7 @@ param workspaceName string
 param dataCollectionRuleNameCt string = 'ama-ct-dcr'
 
 resource MSVMI_PerfandDa_userGivenDcr 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
-  name: 'MSVMI-PerfandDa-${dataCollectionRuleNameVMI}'
+  name: dataCollectionRuleNameVMI
   location: workspaceLocation
   properties: {
     description: 'Data collection rule for VM Insights.'
