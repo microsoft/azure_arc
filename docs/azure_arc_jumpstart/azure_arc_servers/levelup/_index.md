@@ -1071,8 +1071,6 @@ After the query returns its results, select New alert rule in the log search to 
 
 Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
 
-Change to query for tracking changes to hosts file
-
 After the alert logic is set, assign action groups to perform actions in response to triggering of the alert. In this case, we're setting up emails to be sent and an IT Service Management (ITSM) ticket to be created.
 
 To setup an action group that determines what action the alert will trigger:
