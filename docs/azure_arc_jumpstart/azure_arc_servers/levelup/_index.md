@@ -589,6 +589,8 @@ Install-Module -Name PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
 Install-Module -Name PSDscResources -Force -RequiredVersion 2.12.0.0
 ```
 
+- Run _Get-InstalledModule_ to validate that the modules have installed successfully.
+
 The Azure PowerShell modules are used for:
 
 - Publishing the package to Azure storage
@@ -672,7 +674,11 @@ $ConfigurationData = @{
 
 $OutputPath = "$HOME/arc_automanage_machine_configuration_custom_windows"
 New-Item $OutputPath -Force -ItemType Directory
+```
 
+- Execute the newly created configuration.
+
+```PowerShell
 AzureArcLevelUp_Windows -PasswordCredential $winCreds -ConfigurationData $ConfigurationData -OutputPath $OutputPath
 ```
 
