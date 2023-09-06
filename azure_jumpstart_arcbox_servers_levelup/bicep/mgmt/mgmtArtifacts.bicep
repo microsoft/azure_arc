@@ -277,7 +277,7 @@ module policyDeployment './policyAzureArc.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
-    logAnalyticsWorkspaceId: workspace.id
+    //logAnalyticsWorkspaceId: workspace.id
   }
 }
 
