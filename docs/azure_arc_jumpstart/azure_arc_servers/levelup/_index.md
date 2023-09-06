@@ -647,7 +647,7 @@ The following are required for this module to function:
 2. Ensure that the AMA is already provisioned on every server.
 3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
 
-Currently, the policies to enable Change tracking and inventory with Azure monitoring Agent are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
+Currently, the policies to enable Change tracking and inventory with AMA are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
 
 ![Screenshot showing how to enable preview change tracking](./changetracking-enable.png)
 
@@ -675,7 +675,355 @@ After the automation account has the correct Change Tracking enabled, it will th
 For Azure Arc - you must then create a Data Collection Rule (DCR) to specify the data collection characteristics.
 Here is an example DCR for setting up Change Tracking: 
 https://learn.microsoft.com/en-us/azure/automation/change-tracking/change-tracking-data-collection-rule-creation
-
+```json
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dataCollectionRuleName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the name of the data collection rule to create."
+            },
+            "defaultValue": "Microsoft-CT-DCR"
+        },
+        "workspaceResourceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the Azure resource ID of the Log Analytics workspace to use to store change tracking data."
+            }
+        }
+    },
+    "variables": {
+        "subscriptionId": "[substring(parameters('workspaceResourceId'), 15, sub(indexOf(parameters('workspaceResourceId'), '/resourceGroups/'), 15))]",
+        "resourceGroupName": "[substring(parameters('workspaceResourceId'), add(indexOf(parameters('workspaceResourceId'), '/resourceGroups/'), 16), sub(sub(indexOf(parameters('workspaceResourceId'), '/providers/'), indexOf(parameters('workspaceResourceId'), '/resourceGroups/')),16))]",
+        "workspaceName": "[substring(parameters('workspaceResourceId'), add(lastIndexOf(parameters('workspaceResourceId'), '/'), 1), sub(length(parameters('workspaceResourceId')), add(lastIndexOf(parameters('workspaceResourceId'), '/'), 1)))]"
+    },
+    "resources": [
+        {
+            "type": "microsoft.resources/deployments",
+            "name": "get-workspace-region",
+            "apiVersion": "2020-08-01",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [],
+                    "outputs": {
+                        "workspaceLocation": {
+                            "type": "string",
+                            "value": "[reference(parameters('workspaceResourceId'), '2020-08-01', 'Full').location]"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "microsoft.resources/deployments",
+            "name": "CtDcr-Deployment",
+            "apiVersion": "2020-08-01",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "workspaceRegion": {
+                        "value": "[reference('get-workspace-region').outputs.workspaceLocation.value]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "workspaceRegion": {
+                            "type": "string"
+                        }
+                    },
+                    "resources": [
+                        {
+                            "type": "Microsoft.Insights/dataCollectionRules",
+                            "apiVersion": "2021-04-01",
+                            "name": "[parameters('dataCollectionRuleName')]",
+                            "location": "[[parameters('workspaceRegion')]",
+                            "properties": {
+                                "description": "Data collection rule for CT.",
+                                "dataSources": {
+                                    "extensions": [
+                                        {
+                                            "streams": [
+                                                "Microsoft-ConfigurationChange",
+                                                "Microsoft-ConfigurationChangeV2",
+                                                "Microsoft-ConfigurationData"
+                                            ],
+                                            "extensionName": "ChangeTracking-Windows",
+                                            "extensionSettings": {
+                                                "enableFiles": true,
+                                                "enableSoftware": true,
+                                                "enableRegistry": true,
+                                                "enableServices": true,
+                                                "enableInventory": true,
+                                                "registrySettings": {
+                                                    "registryCollectionFrequency": 3000,
+                                                    "registryInfo": [
+                                                        {
+                                                            "name": "Registry_1",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\Scripts\\Startup",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_2",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\Scripts\\Shutdown",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_3",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_4",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_5",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\ShellEx\\ContextMenuHandlers",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_6",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\Background\\ShellEx\\ContextMenuHandlers",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_7",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Classes\\Directory\\Shellex\\CopyHookHandlers",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_8",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_9",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ShellIconOverlayIdentifiers",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_10",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_11",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_12",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Internet Explorer\\Extensions",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_13",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Internet Explorer\\Extensions",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_14",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_15",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_16",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\KnownDlls",
+                                                            "valueName": ""
+                                                        },
+                                                        {
+                                                            "name": "Registry_17",
+                                                            "groupTag": "Recommended",
+                                                            "enabled": false,
+                                                            "recurse": true,
+                                                            "description": "",
+                                                            "keyName": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify",
+                                                            "valueName": ""
+                                                        }
+                                                    ]
+                                                },
+                                                "fileSettings": {
+                                                    "fileCollectionFrequency": 2700
+                                                },
+                                                "softwareSettings": {
+                                                    "softwareCollectionFrequency": 1800
+                                                },
+                                                "inventorySettings": {
+                                                    "inventoryCollectionFrequency": 36000
+                                                },
+                                                "servicesSettings": {
+                                                    "serviceCollectionFrequency": 1800
+                                                }
+                                            },
+                                            "name": "CTDataSource-Windows"
+                                        },
+                                        {
+                                            "streams": [
+                                                "Microsoft-ConfigurationChange",
+                                                "Microsoft-ConfigurationChangeV2",
+                                                "Microsoft-ConfigurationData"
+                                            ],
+                                            "extensionName": "ChangeTracking-Linux",
+                                            "extensionSettings": {
+                                                "enableFiles": true,
+                                                "enableSoftware": true,
+                                                "enableRegistry": false,
+                                                "enableServices": true,
+                                                "enableInventory": true,
+                                                "fileSettings": {
+                                                    "fileCollectionFrequency": 900,
+                                                    "fileInfo": [
+                                                        {
+                                                            "name": "ChangeTrackingLinuxPath_default",
+                                                            "enabled": true,
+                                                            "destinationPath": "/etc/.*.conf",
+                                                            "useSudo": true,
+                                                            "recurse": true,
+                                                            "maxContentsReturnable": 5000000,
+                                                            "pathType": "File",
+                                                            "type": "File",
+                                                            "links": "Follow",
+                                                            "maxOutputSize": 500000,
+                                                            "groupTag": "Recommended"
+                                                        }
+                                                    ]
+                                                },
+                                                "softwareSettings": {
+                                                    "softwareCollectionFrequency": 300
+                                                },
+                                                "inventorySettings": {
+                                                    "inventoryCollectionFrequency": 36000
+                                                },
+                                                "servicesSettings": {
+                                                    "serviceCollectionFrequency": 300
+                                                }
+                                            },
+                                            "name": "CTDataSource-Linux"
+                                        }
+                                    ]
+                                },
+                                "destinations": {
+                                    "logAnalytics": [
+                                        {
+                                            "workspaceResourceId": "[parameters('workspaceResourceId')]",
+                                            "name": "Microsoft-CT-Dest"
+                                        }
+                                    ]
+                                },
+                                "dataFlows": [
+                                    {
+                                        "streams": [
+                                            "Microsoft-ConfigurationChange",
+                                            "Microsoft-ConfigurationChangeV2",
+                                            "Microsoft-ConfigurationData"
+                                        ],
+                                        "destinations": [
+                                            "Microsoft-CT-Dest"
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Microsoft.OperationsManagement/solutions",
+                            "name": "[Concat('ChangeTracking', '(', variables('workspaceName'), ')')]",
+                            "location": "[[parameters('workspaceRegion')]",
+                            "apiVersion": "2015-11-01-preview",
+                            "id": "[Concat('/subscriptions/', variables('subscriptionId'), '/resourceGroups/', variables('resourceGroupName'), '/providers/Microsoft.OperationsManagement/solutions/ChangeTracking', '(', variables('workspaceName'), ')')]",
+                            "properties": {
+                                "workspaceResourceId": "[parameters('workspaceResourceId')]"
+                            },
+                            "plan": {
+                                "name": "[Concat('ChangeTracking', '(', variables('workspaceName'), ')')]",
+                                "product": "OMSGallery/ChangeTracking",
+                                "promotionCode": "",
+                                "publisher": "Microsoft"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
+```
 To enable multiple machines at scale, the easiest method is to choose the option "Enable on all available and Future machines".
 Then all machines onboarding in the future will automatically be enrolled for Change Tracking. 
 
