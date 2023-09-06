@@ -13,7 +13,7 @@ param location string = resourceGroup().location
 //param dataRetention int = 30
 
 @description('Short name up to 12 characters for the Action group.')
-param emailAddress string = 'sebassem@microsoft.com'
+param emailAddress string
 
 //var intervalSeconds = 60
 //var workspaceResourceId = workspaceId

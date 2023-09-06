@@ -38,6 +38,9 @@ param rdpPort string = '3389'
 @description('Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM.')
 param sshPort string = '22'
 
+@description('Your email address to configure alerts.')
+param emailAddress string
+
 param location string = resourceGroup().location
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox_servers_levelup/'
@@ -84,6 +87,7 @@ module monitoringResources 'mgmt/monitoringResources.bicep' = {
     workspaceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
     workspaceName: logAnalyticsWorkspaceName
     location: location
+    emailAddress: emailAddress
   }
 }
 
