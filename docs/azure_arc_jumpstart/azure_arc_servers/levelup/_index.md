@@ -675,6 +675,8 @@ After the automation account has the correct Change Tracking enabled, it will th
 For Azure Arc - you must then create a Data Collection Rule (DCR) to specify the data collection characteristics.
 Here is an example DCR for setting up Change Tracking: 
 https://learn.microsoft.com/en-us/azure/automation/change-tracking/change-tracking-data-collection-rule-creation
+
+Deploy a custom template suing this code snippet:
 ```json
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -1034,7 +1036,7 @@ Please be patient as onboarding machines will take a while for the inventory to 
 
 #### Using Change Tracking
 
-Try stopping and starting services.
+Try stopping and starting services on the Arc machine ArcBox-Win2k19.
 
 ```PowerShell
 Stop-Service spooler
@@ -1048,7 +1050,7 @@ To manage Change Tracking, you can change the types of data collected and how of
 
 First, make sure that a storage account is already configured for file uploads.
 
-![Screenshot showing Storage Account Settings](./changetracking-storageaccounts.png)
+![Screenshot showing Storage Account Settings](./changetracking-storageaccount.png)
 
 Then add files that you want to monitor, for example, the hosts file.
 
