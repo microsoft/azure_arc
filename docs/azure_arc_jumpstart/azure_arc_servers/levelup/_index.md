@@ -924,7 +924,7 @@ The first time you connect to an Arc-enabled server using SSH, you will retrieve
 
 It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
 
-For this exercise, select `y` and press Enter to proceed.
+For this exercise, type `yes` and press Enter to proceed.
 
  ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
