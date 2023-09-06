@@ -672,21 +672,19 @@ After the automation account has the correct Change Tracking enabled, it will th
 ![Screenshot showing how to onboard CT for each VM in Automation Account](./changetracking-ct-enabled.png)
 ![Screenshot showing how to onboard CT for the current and future in Automation Account](./changetracking-enable-allmachines.png)
 
+For Azure Arc - you must then create a Data Collection Rule (DCR) to specify the data collection characteristics.
+Here is an example DCR for setting up Change Tracking: 
+https://learn.microsoft.com/en-us/azure/automation/change-tracking/change-tracking-data-collection-rule-creation
 
 To enable multiple machines at scale, the easiest method is to choose the option "Enable on all available and Future machines".
 Then all machines onboarding in the future will automatically be enrolled for Change Tracking. 
-As part of onboarding, a Data Collection Rule will usually be created.
+
 You can check on the rule to see what has happened:
 ![Screenshot showing Data Collection Rule](./changetracking-datacollectionrule.png)
-
-Note that some customers are not happy about sending log information over the Internet to Azure. It is now possible to define a private endpoint in an Azure Virtual Network to be the receiving point for AMA logs - it is called Data Collection Endpoints.
-
 
 Please be patient as onboarding machines will take a while for the inventory to populate.
 
 #### Using Change Tracking
-
-By default, Change Tracking will monitor software installation, service states and some registry changes.
 
 Try stopping and starting services.
 
@@ -696,14 +694,56 @@ Start-service spooler
 ```
 
 #### Managing Change Tracking using Data Collection Rules
+To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
 
+![Screenshot showing Edit Settings](./changetracking-editsettings.png)
 
+First, make sure that a storage account is already configured for file uploads.
 
+![Screenshot showing Storage Account Settings](./changetracking-storageaccounts.png)
 
+Then add files that you want to monitor, for example, the hosts file.
+
+![Screenshot showing add file monitoring](./changetracking-addfilemonitoring.png)
+
+Eventually, the file changes will show up in the main console.
 
 #### Alert Configuration
 
+On the Change tracking page from your Virtual Machine, select Log Analytics.
 
+In the Logs search, look for content changes to the hosts file with the query 
+```cmd
+ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
+```
+
+After the query returns its results, select New alert rule in the log search to open the Alert creation page. You can also navigate to this page through Azure Monitor in the Azure portal.
+
+Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
+
+Change to query for tracking changes to hosts file
+
+After the alert logic is set, assign action groups to perform actions in response to triggering of the alert. In this case, we're setting up emails to be sent and an IT Service Management (ITSM) ticket to be created.
+
+To setup an action group that determines what action the alert will trigger:
+
+Select the alert created earlier and then select Create New under Action Groups.
+
+Enter a full name and a short name for the action group. The short name will be used when sending notifications using the specified group.
+
+Under Actions, enter a name that specifies the action, for example, Email Notification.
+
+For Action Type, select the appropriate type, for example, Email/SMS message/Push/Voice.
+
+Select the pencil icon to edit the action details.
+
+Fill in the pane for your action type. For example, if using Email/SMS message/Push/Voice to send an email, enter an action name, select the Email checkbox, enter a valid email address, and then select OK.
+
+In the Add action group pane, select OK.
+
+For an alert email, you can customize the email subject. Select Customize actions under Create rule, then select Email subject.
+
+When you're finished, select Create alert rule.
 
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
