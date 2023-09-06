@@ -14,7 +14,7 @@ param workspaceName string
 @description('Specifies the name of the data collection rule to create.')
 param dataCollectionRuleNameCt string = 'ama-ct-dcr'
 
-resource MSVMI_PerfandDa_userGivenDcr 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
+resource dataCollectionRuleChangeTrackingVMI 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
   name: dataCollectionRuleNameVMI
   location: workspaceLocation
   properties: {
@@ -75,7 +75,7 @@ resource MSVMI_PerfandDa_userGivenDcr 'Microsoft.Insights/dataCollectionRules@20
 
 
 
-resource dataCollectionRule 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
+resource dataCollectionRuleChangeTracking 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
   name: dataCollectionRuleNameCt
   location: workspaceLocation
   properties: {
