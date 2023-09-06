@@ -256,7 +256,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_configure.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -415,6 +415,8 @@ As part of the ArcBox automation, some alerts and workbooks have been created to
     ![Screenshot showing restarting the vms in the hyper-v manager](./alerts_hyperv_restart.png)
 
 #### Task 3: View alerts and visualizations
+
+> **NOTE: It might take some time for all visualizations to load properly**
 
 - In Azure Monitor, click on _Alerts_. and select _Alert rules_
 
