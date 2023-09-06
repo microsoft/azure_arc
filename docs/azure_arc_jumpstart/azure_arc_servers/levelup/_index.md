@@ -358,13 +358,81 @@ az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
 
 - Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
 
-- After configuring the agents and VM insights using Azure Policy, it will take 5-15 minutes for the insights data to start showing up.
+- After configuring the agents and VM insights using Azure Policy, it will take 10-25 minutes for the insights data to start showing up.
 
    ![Screenshot showing VM insights on the Windows Arc-enabled machine](./machine_vm_insights.png)
 
    ![Screenshot showing VM insights on the Linux Arc-enabled machine](./machine_vm_insights_linux.png)
 
-#### Task 2: Configure alerts and visualizations
+#### Task 2: Configure data collection for logs and metrics
+
+As part of the ArcBox automation, some alerts and workbooks have been created to demonstrate the different monitoring operations you can perform after onboarding the Arc-enabled machines. You will now configure some data collection rules to start sending the needed metrics and logs to the Log Analytics workspace.
+
+- In the Azure portal, search for _Data Collection rules_.
+
+    ![Screenshot showing searching for data collection rules](./dcr_search_portal.png)
+
+- Create a new data collection rule.
+
+    ![Screenshot showing creating a new data collection rule](./alerts_dcr_create.png)
+
+- Provide a name and select the same resource group where ArcBox is deployed. Make sure to select Windows as the operating system.
+
+    ![Screenshot showing creating a new data collection rule](./alerts_dcr_basics.png)
+
+- In the "Resources" tab, select the right resource group and the Arc-enabled servers onboarded.
+
+    ![Screenshot showing adding resources to the data collection rule](./alerts_dcr_resources.png)
+
+- Add a new "Performance Counters" data source, and make sure to select all the custom counters.
+
+    ![Screenshot showing adding performance counters to the data collection rule](./alerts_dcr_counters.png)
+
+- Add a new "Azure Monitor Logs" destination and select the log analytics workspace deployed in the ArcBox resource group and save.
+
+    ![Screenshot showing adding performance counters to the data collection rule](./alerts_dcr_counters_destination.png)
+
+- Add a new "Windows Event logs" data source.
+
+    ![Screenshot showing adding log data source to the data collection rule](./alerts_dcr_windows_logs_source.png)
+
+- Select _Critial_, _Error_, _Warning_ events in the Application and System logs and add the data source.
+
+    ![Screenshot showing adding log data source to the data collection rule](./alerts_dcr_windows_logs_types.png)
+
+- Save and create the data collection rule.
+
+- Repeat the previous steps to create another Linux data collection rule.
+
+    ![Screenshot showing creating a new linux data collection rule](./alerts_dcr_linux_basics.png)
+
+    ![Screenshot showing adding resources to the data collection rule](./alerts_dcr_resources_linux.png)
+
+    ![Screenshot showing adding logs to the data collection rule](./alerts_dcr_logs_linux.png)
+
+- After waiting for 5-10 minutes for the data collection rule to start collecting data, restart the servers in the Hyper-V manager on the _ArcBox-Client_ VM to trigger some new events.
+
+    ![Screenshot showing restarting the vms in the hyper-v manager](./alerts_hyperv_restart.png)
+
+#### Task 3: View alerts and visualizations
+
+- In Azure Monitor, click on _Alerts_. and select _Alert rules_
+
+    ![Screenshot showing opening the alerts page](./alerts_rules_open.png)
+
+- Explore the alert rules crated for you.
+
+    ![Screenshot showing opening one alert around processor time](./alerts_rules_rules.png)
+
+- Go back to Azure Monitor and click on _Workbooks_. There are three workbooks deployed for you.
+
+    ![Screenshot showing deployed workbooks](./alerts_workbooks_list.png)
+
+    ![Screenshot showing alerts workbook](./alerts_workbooks_alerts.png)
+
+    ![Screenshot showing performance workbook](./alerts_workbooks_perf.png.png)
+
+    ![Screenshot showing events workbook](./alerts_workbooks_events.png)
 
 ### Module 3: Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 
