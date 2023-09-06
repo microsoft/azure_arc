@@ -26,7 +26,6 @@ resource dataCollectionRuleChangeTrackingVMI 'Microsoft.Insights/dataCollectionR
           streams: [
             'Microsoft-InsightsMetrics'
           ]
-          scheduledTransferPeriod: 'PT1M'
           samplingFrequencyInSeconds: 60
           counterSpecifiers: [
             '\\VmInsights\\DetailedMetrics'
