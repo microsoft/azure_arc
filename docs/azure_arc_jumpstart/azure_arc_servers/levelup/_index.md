@@ -202,6 +202,7 @@ az login
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
+  - _`emailAddress`_ - Your email address, to configure alerts for the monitoring action group
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
@@ -287,9 +288,83 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 #### Module overview
 
-#### Task 1
+In this module, you will learn how to deploy the Azure Monitor agent to your Arc-enabled Windows and Linux machines, the dependency agent to your Arc-enabled Windows machines and enable the _VM Insights_ solution to start monitoring your machines using Azure Monitor, run queries on the Log analytics workspace and configure alerts.
 
-#### Task 2
+#### Task 1: Deploy Azure Monitor agents and VM Insights using Azure Policy
+
+Azure Policy lets you set and enforce requirements for all new resources you create and resources you modify. VM insights policy initiatives, which are predefined sets of policies created for VM insights, install the agents required for VM insights and enable monitoring on all new virtual machines in your Azure environment.
+
+- In the Azure portal, search for _Policy_.
+
+    ![Screenshot showing searching for Policy in the azure portal](./portal_policy_search.png)
+
+- Click on "Definitions" and search for the _(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines_ policy.
+
+    ![Screenshot showing searching for the arcbox policies](./policy_arcbox.png)
+
+- Click "Assign Initiative".
+
+    ![Screenshot showing assigning the policy](./policy_monitor_windows_assign.png)
+
+- Select the right scope (management group, subscription and resource group) for the resource group where you deployed _ArcBox_.
+
+    ![Screenshot showing assigning the policy to the right scope](./policy_monitor_windows_scope.png)
+
+- After validating the scope, click "Next" twice to navigate to the parameters tab.
+
+    ![Screenshot showing assigning the policy initiative to the right scope](./policy_monitor_windows_dcr_blank.png)
+
+- To get the "Data Collection Rule" resource Id,  run the following CLI command
+
+```shell
+az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
+                 --resource-group "<resource group name>" `
+                 --resource-type Microsoft.Insights/dataCollectionRules `
+                 --query id `
+                 --output tsv
+```
+
+- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _arcbox-ama-vmi-perfAndda-dcr_ data collection rule.
+
+    ![Screenshot showing searching for data collection rules](./dcr_search_portal.png)
+
+    ![Screenshot showing getting the data collection rules resource Id](./dcr_vm_insights.png)
+
+    ![Screenshot showing getting the data collection rules resource Id](./dcr_json_view.png)
+
+    ![Screenshot showing getting the data collection rules resource Id](./dcr_resource_id.png)
+
+    ![Screenshot showing adding the data collection rules resource Id](./policy_monitor_windows_create.png)
+
+    > **NOTE:The policy will take 5-15 minutes to assess the current resources.**
+
+- After the policy has reported compliance, create a remediation task to remediate existing machines.
+
+    ![Screenshot showing the ama policy not compliant](./policy_monitor_windows_non_compliant.png)
+
+    ![Screenshot showing creating the remediation task](./policy_monitor_windows_create_remediation.png)
+
+    ![Screenshot showing creating the remediation task](./policy_monitor_windows_remediate.png)
+
+- Create one remediation task per policy definition in the initiative.
+
+    ![Screenshot showing creating the remediation task](./policy_monitor_windows_create_remediation_multiple.png)
+
+- After all remediation tasks have completed. You should see the Azure Monitor agent extension and the dependency agent extension deployed to the Arc-enabled machines.
+
+    ![Screenshot showing the remediation tasks successful](./policy_monitor_windows_remediate_tasks.png)
+
+    ![Screenshot showing the monitoring agents installed](./machine_windows_ama_agents.png)
+
+- Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
+
+- After configuring the agents and VM insights using Azure Policy, it will take 5-15 minutes for the insights data to start showing up.
+
+   ![Screenshot showing VM insights on the Windows Arc-enabled machine](./machine_vm_insights.png)
+
+   ![Screenshot showing VM insights on the Linux Arc-enabled machine](./machine_vm_insights_linux.png)
+
+#### Task 2: Configure alerts and visualizations
 
 ### Module 3: Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 
@@ -370,6 +445,16 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
 - After waiting for 30-45 minutes, you should start seeing recommendations for the Arc-enabled machines in the "Security" blade.
 
+> **NOTE: It might take several hours before this recommendation start to appear**
+
+- You should find the recommendation _Machines should have vulnerability findings resolved_ if the vulnerability assessment has been enabled automatically on the subscription.
+
+    ![Screenshot showing defender recommendations](./defenderForCloud_portal_recommendation_vulnerabilities.png)
+
+    ![Screenshot showing defender recommendations](./defenderForCloud_portal_vulnerabilities_list.png)
+
+- If you do not see this recommendation, click on the _Machines should have a vulnerability assessment solution installed_
+
     ![Screenshot showing defender recommendations](./defenderForCloud_portal_recommendations.png)
 
 - Click on the "Machines should have a vulnerability assessment solution" recommendation and click "fix"
@@ -413,6 +498,9 @@ $resourceGroupName = $env:resourceGroup
 $location = $env:azureLocation
 $spnClientId = $env:spnClientID
 $spnClientSecret = $env:spnClientSecret
+$spnTenantId = $env:spnTenantId
+$Win2k19vmName = "ArcBox-Win2K19"
+$Win2k22vmName = "ArcBox-Win2K22"
 
 $SecurePassword = ConvertTo-SecureString -String $spnClientSecret -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $spnClientId, $SecurePassword
@@ -427,8 +515,8 @@ Install-Module -Name Az.PolicyInsights -Force -RequiredVersion 1.5.1
 Install-Module -Name Az.Resources -Force -RequiredVersion 6.5.2
 Install-Module -Name Az.Storage -Force -RequiredVersion 5.4.0
 Install-Module -Name GuestConfiguration -Force -RequiredVersion 4.4.0
-Install-Module PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
-Install-Module PSDscResources -Force -RequiredVersion 2.12.0.0
+Install-Module -Name PSDesiredStateConfiguration -Force -RequiredVersion 2.0.5
+Install-Module -Name PSDscResources -Force -RequiredVersion 2.12.0.0
 ```
 
 The Azure PowerShell modules are used for:
