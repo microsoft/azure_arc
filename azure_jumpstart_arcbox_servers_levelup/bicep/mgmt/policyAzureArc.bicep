@@ -96,7 +96,7 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
   }
 }
 
-module arcAMAPolicies 'policyAzureArcAMA.bicep' = {
+module arcAMAPolicies 'policySetDefinitionsAzureArc.bicep' = {
   name: 'ArcBox_AMA_Policies'
   scope: subscription(subscriptionId)
 }

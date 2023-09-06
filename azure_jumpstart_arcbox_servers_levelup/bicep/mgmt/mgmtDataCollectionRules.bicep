@@ -1,6 +1,6 @@
 @description('This is the name of the AMA-VMI Data Collection Rule(DCR)')
 @metadata({ displayName: 'Name of the Data Collection Rule(DCR)' })
-param dataCollectionRuleNameVMI string = 'ama-vmi-perfAndda-dcr'
+param dataCollectionRuleNameVMI string = 'arcbox-ama-vmi-perfAndda-dcr'
 
 @description('Workspace Location.')
 param workspaceLocation string
@@ -12,7 +12,7 @@ param workspaceResourceId string
 param workspaceName string
 
 @description('Specifies the name of the data collection rule to create.')
-param dataCollectionRuleNameCt string = 'ama-ct-dcr'
+param dataCollectionRuleNameCt string = 'arcbox-ama-ct-dcr'
 
 resource dataCollectionRuleChangeTrackingVMI 'Microsoft.Insights/dataCollectionRules@2021-04-01' = {
   name: dataCollectionRuleNameVMI
