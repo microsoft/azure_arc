@@ -4,15 +4,17 @@ param azureLocation string
 @description('Name of your log analytics workspace')
 param logAnalyticsWorkspaceId string
 
+@description('Subscription Id')
+param subscriptionId string = subscription().subscriptionId
 
 var policies = [
-  {
-    name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
-    definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0'
-    roleDefinition:  [
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
-      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa'
+  /*{
+    name: '(ArcBox) Enable Azure Monitor for Hybrid Linux VMs with AMA'
+    definitionId: '/providers/Microsoft.Authorization/policySetDefinitions/118f04da-0375-44d1-84e3-0fd9e1849403'
+    roleDefinition: [
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/2ea82cdd-f2e8-4500-af75-67a2e084ca74'
+      '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
     ]
     parameters: {
       logAnalyticsWorkspace: {
@@ -22,7 +24,7 @@ var policies = [
         value: true
       }
     }
-  }
+  }*/
   {
     name: '(ArcBox) Tag resources'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
@@ -84,11 +86,17 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
 }
 */
 
+
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
+  name: guid(policies[0].name, policies[0].roleDefinition, resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[1].roleDefinition
-    principalId: policies_name[1].identity.principalId
+    roleDefinitionId: policies[0].roleDefinition
+    principalId: policies_name[0].identity.principalId
     principalType: 'ServicePrincipal'
   }
+}
+
+module arcAMAPolicies 'policyAzureArcAMA.bicep' = {
+  name: 'ArcBox_AMA_Policies'
+  scope: subscription(subscriptionId)
 }
