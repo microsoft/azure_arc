@@ -100,7 +100,7 @@ By the end of this scenario, you will have an ARO cluster deployed with an Azure
 - Get the Azure Red Hat OpenShift resource provider Id which needs to be assigned with the “Contributor” role.
 
   ```shell
-  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: objectId}"
+  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: id}"
   ```
 
   ![Screenshot of Azure resource provider for Aro](./02.png)
