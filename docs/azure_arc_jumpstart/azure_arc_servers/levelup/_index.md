@@ -824,7 +824,125 @@ In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook w
 
 #### Task 1
 
+##### Option 1: Azure portal
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Click on "Create":
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation.png)
+
+- Select the subscription and resource group where you have deployed ArcBox.
+- Enter _ArcBox-Automation_ as the name for the Automation Account.
+- Select the same region as your ArcBox environment is deployed to.
+- Click Next
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_2.png)
+
+- Leave the default settings for _Managed Identities_ in place and click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_3.png)
+
+- Leave the default settings for _Connectivity configuration_ in place and click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_4.png)
+
+- Optionally, add any tags you may want to add to the resource
+- Click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_5.png)
+
+- Click Create:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_6.png)
+##### Option 2: Azure PowerShell
+
+- Open [Azure Cloud Shell](https://shell.azure.com/) and select PowerShell
+- Customize the parameter values to reflect your environment for the subscription name, resource name and location
+- Paste the code in the PowerShell window and press Enter
+
+
+```powershell
+# Define parameters in a hashtable
+$AutomationAccountParams = @{
+    ResourceGroupName = "jan-arcbox-01-rg"
+    Name = "ArcBox-Automation"
+    Location = "East US"
+    AssignSystemIdentity = $true
+}
+
+# Create the Automation account using splatting
+New-AzAutomationAccount @AutomationAccountParams
+```
+
+The output should look similar to this:
+
+![Screenshot showing creation of Automation account using Azure PowerShell](./powershell_create_automation.png)
+
 #### Task 2
+
+##### Option 1: Azure portal
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Navigate to the _ArcBox-Automation_ account you created previously
+- Select _Hybrid worker groups_:
+
+![Screenshot showing Automation account in the Azure Portal](./portal_show_automation.png)
+
+- Click _Create hybrid worker group_:
+
+![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_1.png)
+
+- Type _windows-workers_ as the name of the new Hybrid worker group
+- Leave the default value for _Use Hybrid Worker Credentials_
+- Click Next
+
+![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_2.png)
+
+- Click _Add machines_:
+
+![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_3.png)
+
+- Select _ArcBox-Win2K22_ and click _Add_:
+
+![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_4.png)
+
+- Click _Review + Create_:
+
+![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_5.png)
+
+- Click _Create_:
+
+![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_6.png)
+
+- Wait for the following activities to be finished:
+
+![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_7.png)
+
+- Repeat the above steps to create an additional Hybrid worker group called _linux-workers_ where you select to onboard the machine _ArcBox-Ubuntu01_ to the group.
+
+- After completing this task you should have the following Hybrid worker groups:
+
+![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_8.png)
+
+
+
+#### Task 3
+
+TODO: Add insructions for creating and starting a runbook
+#### Task 4
+
+This task is optional.
+
+Install the Visual Studio Code extension for Azure Automation to create, edit and start runbooks locally.
+
+TODO: Add instructions
+
 
 ### Module 8: SSH into your Azure Arc-enabled servers using SSH access
 
