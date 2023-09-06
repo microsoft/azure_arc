@@ -649,9 +649,32 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 Start-Sleep -Seconds 20
 # Create an array with VM names
 $VMnames = (Get-VM).Name
+
+$sourcePath = "$PsHome\Profile.ps1"
+$destinationPath = "C:\Deployment\Profile.ps1"
+$maxRetries = 3
+
 foreach ($VM in $VMNames) {
-    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
+    $retryCount = 0
+    $copySucceeded = $false
+
+    while (-not $copySucceeded -and $retryCount -lt $maxRetries) {
+        try {
+            Copy-VMFile $VM -SourcePath $sourcePath -DestinationPath $destinationPath -CreateFullPath -FileSource Host -Force -ErrorAction Stop
+            $copySucceeded = $true
+            Write-Host "File copied to $VM successfully."
+        } catch {
+            $retryCount++
+            Write-Host "Attempt $retryCount : File copy to $VM failed. Retrying..."
+            Start-Sleep -Seconds 30  # Wait for 30 seconds before retrying
+        }
+    }
+
+    if (-not $copySucceeded) {
+        Write-Host "File copy to $VM failed after $maxRetries attempts."
+    }
 }
+
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap
 ########################################################################
