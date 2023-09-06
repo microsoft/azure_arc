@@ -38,9 +38,12 @@ param rdpPort string = '3389'
 @description('Override default SSH port 22 using this parameter. Default is 22. No changes will be made to the client VM.')
 param sshPort string = '22'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox_servers_levelup/'
+@description('Your email address to configure alerts.')
+param emailAddress string
 
-var location = resourceGroup().location
+param location string = resourceGroup().location
+
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox_servers_levelup/'
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
@@ -78,19 +81,21 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   }
 }
 
-module vmInsightsPolicies 'mgmt/DeployDcrTemplate.bicep' = {
-  name: 'vmInsightsPolicies'
-  params: {
-    WorkspaceResourceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
-    WorkspaceLocation: location
-  }
-}
-
 module monitoringResources 'mgmt/monitoringResources.bicep' = {
   name: 'monitoringResources'
   params: {
     workspaceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
     workspaceName: logAnalyticsWorkspaceName
     location: location
+    emailAddress: emailAddress
+  }
+}
+
+module dataCollectionRules 'mgmt/mgmtDataCollectionRules.bicep' = {
+  name: 'dataCollectionRules'
+  params: {
+    workspaceLocation: location
+    workspaceName: logAnalyticsWorkspaceName
+    workspaceResourceId: mgmtArtifactsAndPolicyDeployment.outputs.workspaceId
   }
 }
