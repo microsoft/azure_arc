@@ -1075,13 +1075,6 @@ var osPerformanceWorkbookContent = {
       }
     }
     {
-      type: 1
-      content: {
-        json: '## Memory: _Available MBytes_ and _% Committed Bytes in Use_'
-      }
-      name: 'text - 11'
-    }
-    {
       type: 3
       content: {
         version: 'KqlItem/1.0'
