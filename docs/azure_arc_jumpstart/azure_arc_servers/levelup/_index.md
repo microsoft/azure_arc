@@ -815,13 +815,6 @@ Currently, the policies to enable Change tracking and inventory with AMA are in 
 
 ![Screenshot showing how to enable preview change tracking](./changetracking-enable.png)
 
-The Automation Account must also enable Change Tracking and Inventory
-![Screenshot showing how to enable inventory in Automation Account](./changetracking-enable-inv.png)
-
-Depending on the state of the automation account, you may be asked to enable the preview feature.
-For this levelup - it should not happen since we are using new automation account.
-![Screenshot showing how to enable preview change tracking in Automation Account](./changetracking-enablepreview.png)
-
 #### Current Limitations
 
 The following table lists the current limitations for Change Tracking And Inventory
@@ -830,22 +823,33 @@ https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-moni
 Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both:
 https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
 
-#### Enabling Change Tracking and Inventory
+#### Task 1
+Creating an Automation Account
 
-After the automation account has the correct Change Tracking enabled, it will then request how to onboard current and new machines for change tracking
-![Screenshot showing how to onboard CT for each VM in Automation Account](./changetracking-ct-enabled.png)
-![Screenshot showing how to onboard CT for the current and future in Automation Account](./changetracking-enable-allmachines.png)
+First create an automation account in Azure in the same location as Arcbox - ensure that the region mapping is supported as in the table above.
+```cmd
+az automation account create --automation-account-name "arcbox-automation-account" --location $location --sku "Free" --resource-group $resourcegroupname
+```
+The Automation Account must also enable Change Tracking and Inventory by linking to the ArcBox Log Analytics workspace
+![Screenshot showing how to enable inventory in Automation Account](./changetracking-enable-inv.png)
 
-For Azure Arc - you must then create a Data Collection Rule (DCR) to specify the data collection characteristics.
-Here is an example DCR for setting up Change Tracking: 
-https://learn.microsoft.com/en-us/azure/automation/change-tracking/change-tracking-data-collection-rule-creation
-Note - this DCR will have already been deployed as part of the setup for this levelup, but you will need to know where to do this for your own environments in future.
+#### Task 2
+Enabling Change Tracking and Inventory
 
-Now we need to onboard an Azure policy to ensure that the machines are reporting correctly to the Log Anaytics workspace.
+```note
+For Azure Arc - you must then deploy a special policy and create a Data Collection Rule (DCR) to specify the data collection characteristics.
+Follow the link here:
+https://learn.microsoft.com/en-us/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm
 
-Please be patient as onboarding machines will take a while for the inventory to populate.
+These steps  will have already been deployed as part of the setup for this levelup,
+but you will need to know where to do this for your own environments in future.
+``` 
 
-#### Using Change Tracking
+Please be patient as it takes a while for onboarding to work.
+
+#### Task 2
+
+Using Change Tracking
 
 Try stopping and starting services on the Arc machine ArcBox-Win2k19.
 
@@ -854,7 +858,9 @@ Stop-Service spooler
 Start-service spooler
 ```
 
-#### Managing Change Tracking using Data Collection Rules
+####  Task 3
+
+Managing Change Tracking using Data Collection Rules
 To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
 
 ![Screenshot showing Edit Settings](./changetracking-editsettings.png)
@@ -869,14 +875,19 @@ Then add files that you want to monitor, for example, the hosts file.
 
 Eventually, the file changes will show up in the main console.
 
-#### Alert Configuration
+#### Task 4
+
+Alert Configuration
 
 On the Change tracking page from your Virtual Machine, select Log Analytics.
 
 In the Logs search, look for content changes to the hosts file with the query 
+
 ```cmd
 ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
 ```
+
+Alerts are always created based on log analytics query result.
 
 After the query returns its results, select New alert rule in the log search to open the Alert creation page. You can also navigate to this page through Azure Monitor in the Azure portal.
 
