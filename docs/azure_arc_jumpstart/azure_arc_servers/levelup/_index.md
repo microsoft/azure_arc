@@ -851,13 +851,13 @@ Please be patient as it takes a while for onboarding to work.
 
 Using Change Tracking
 
-Try stopping and starting services on the Arc machine ArcBox-Win2k19.
+Try stopping and starting services on the Arc machine ArcBox-Win2k19 using an administrative powershell session.
 
 ```PowerShell
 Stop-Service spooler
 Start-service spooler
 ```
-
+The service changes will eventually show up in the 
 ####  Task 4
 
 To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
