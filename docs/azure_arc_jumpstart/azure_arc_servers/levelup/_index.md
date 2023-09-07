@@ -306,7 +306,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 $sp = New-AzADServicePrincipal -DisplayName "Arc server onboarding account" -Role "Azure Connected Machine Onboarding"
 $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredentials.SecretText }}
 ```
-- Next we will generate a script to automate the download and installation, and to connect to Azure ARC. 
+- Next we will generate a script to automate the download and installation, and to connect to Azure Arc. 
+
 
 - From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
 
