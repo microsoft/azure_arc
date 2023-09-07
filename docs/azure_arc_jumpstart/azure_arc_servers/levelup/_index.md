@@ -295,7 +295,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
     ![Screenshot of 4 machines on Hyper-v](./choose_Hyper-V.png)
 
-#### Task 2: Onboard a Windows machine to ARC
+#### Task 2: Onboard a Windows machine to Azure Arc
+
 
 - We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/en-us/azure/azure-arc/servers/onboard-service-principal).
 
