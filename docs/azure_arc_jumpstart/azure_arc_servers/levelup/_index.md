@@ -278,11 +278,98 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ### Module 1: On-boarding to Azure Arc-enabled servers
 
-#### Module overview
+#### Module overview: In this module we will connect two machines (Windows and Linux) to Azure Arc.
 
-#### Task 1
+#### Task 1: Examine the existing Arc-connected machines.
 
-#### Task 2
+- The deployment process that you have walked through should have set up four VMs running on Hyper-V in the ArcBox-Client machine. Two of these machines have been connected to Azure Arc already. Let us have a look at these in the Azure Portal
+
+- Enter "Machines - Azure Arc" in the top search bar in the Azure portal and select it from the displayed services.
+
+    ![Screenshot showing how to display Arc connected servers in portal](./Arc_servers_search.png)
+
+- We should see the machines that are connected to Arc already: Arcbox-Ubuntu-01 and ArcBox-Win2K19.
+
+    ![Screenshot showing existing Arc connected servers](./First_view_of%20Arc_connected.png) 
+ 
+ - We want to connect the other 2 machines running as VMs in the ArcBox-Client. We can see these (ArcBox-Win2K22 and ArcBox-Ubuntu-02) by running the Hyper-V Manager in the ArcBox-Client (after we have connected to it with RDP as explained earlier in the setup).
+
+    ![Screenshot of 4 machines on Hyper-v](./choose_Hyper-V.png)
+
+#### Task 2: Onboard a Windows machine to Azure Arc
+
+
+- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/en-us/azure/azure-arc/servers/onboard-service-principal).
+
+- Using the following Powershell commands create a service principal and assign it the Azure Connected Machine Onboarding role for the selected subscription. After the service principal is created, it will print the application ID and secret (copy these somewhere safe for later use):
+
+```powershell
+$sp = New-AzADServicePrincipal -DisplayName "Arc server onboarding account" -Role "Azure Connected Machine Onboarding"
+$sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredentials.SecretText }}
+```
+- Next we will generate a script to automate the download and installation, and to connect to Azure Arc. 
+
+
+- From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
+
+    ![Screenshot to select add a machine](./Select_Add_a_machine.png)
+
+- In the next screen, go to "Add multiple severs" and click on "Generate script".
+
+    ![Screenshot Add Multiple Servers Script](./Add_multiple_servers_script.png)
+
+- Fill in the Resource Group, Region, Operating System (Windows), keep Connectivity as "Public endpoint" and in the Authentication box select the onboarding service principal that you created in this task. Then download the script to your local machine (or you can copy the content into the clipboard). 
+
+- Go to the ArcBox-Client machine via RDP and from Hyper-V manager right-click on the ArcBox-Win2K22 VM and click "Connect". Then start Windows Powershell ISE and copy the content of the onboarding script in the Script Pane.
+
+- Fill in the Service Principal secret in the script and run it.
+
+    ![Screenshot run onboard windows script](./run_windows_onboard_sctipt.png)
+
+- On successful completion a message is displayed to confirm the machine is connected to Azure Arc. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc).
+
+    ![Screenshot confirm win machine on-boarded](./confirm_windows_machine_onboarding.png)
+
+#### Task 3: Onboard a Linux machine to Azure Arc.
+
+
+- We will now onboard the Linux vm ArcBox-Ubuntu-02 to Azure Arc using the same service principal method we used above for the Windows machine. We can use the same service principal we created above.
+
+- From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
+
+- In the next screen, go to "Add multiple severs" and click on "Generate script".
+
+- Fill in the required details but this time choose Linux for the Operating System box. Then download the script to your local machine (or you can copy the content into the clipboard).
+
+- Add the client secret to the script using your editor. Also add the following 3 lines just below the last export statement (to allow onboarding of Azure linux machines):
+```
+sudo ufw --force enable\
+sudo ufw deny out from any to 169.254.169.254\
+sudo ufw default allow incoming
+```
+- Go the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
+
+    ![Screenshot IP address of second Ubuntu machine](./IP_address_second_Linux_vm.png)
+
+- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or vscode. 
+
+    ![Screenshot connect with putty](./putty.png)
+
+- Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
+
+- create the onboarding script file using the nano editor, and paste the script content from your local machine.
+```
+nano onboardingscript.sh
+```
+- Save the file (Ctrl-O) and exit (Ctrl-X). Now you can run the script:
+
+```
+sudo bash ./onboardingscript.sh
+```
+
+- Wait for the script to finish successfully. A message should confirm that the machine is now Arc-connected. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc).
+
+    ![Screenshot Linux message confirm connection](./Linux_%20message_confirm_connection.png)
 
 ### Module 2: Monitor your Azure Arc-enabled servers using Azure Monitor
 
@@ -1296,9 +1383,10 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
 In this module you will use Azure Policy to Audit Arc-enabled Linux servers that have a certain application installed
 
-#### Task 1: Assign a built in Azure Policy to the Arc resource group
+#### Task 1: Assign a built-in Azure Policy to the Arc resource group
 
 - Azure policy can be assigned at Management Group, Subscription or Resource Group scope. In this scenario we will use the Resource Group scope.
+- We will show two ways to accomplish this first task. **First we will use the Azure portal** (but if you prefer to use Powershell then skip to that section at the end of this first task) 
 - In the Azure Portal search for the "Policy" resource and navigate to it.
 - Click on "Compliance" in the left mene then click "Assign policy".
 
@@ -1326,13 +1414,32 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
 - Next move to the "Review + create" tab and click "Create" to assign the policy.
 
+- If you want to use **Powershell as an alternative method** to assign the policy, then the following procedure accomplishes the same as the portal method explained above.
+    - create a policy parameter file, e.g. parameters.json
+    ```javascript
+    {
+      "IncludeArcMachines":{
+        "value":"true"
+      },
+      "ApplicationName": {
+        "value":"nano"
+      }
+    }
+    ```
+    - Run the following powershell commands
+    ```powershell
+    $ResourceGroup = Get-AzResourceGroup -Name 'ArcBox-Levelup' 
+    $Policy = Get-AzPolicyDefinition -BuiltIn | Where-Object {$_.Properties.DisplayName -eq 'Audit Linux machines that have the specified applications installed'} 
+    New-AzPolicyAssignment -Name '(Arc Levelup) Audit Linux machines with python3 installed' -PolicyDefinition $Policy -Scope $ResourceGroup.ResourceId -PolicyParameter .\parameters.json
+    ```
+
 #### Task 2: Examine the policy compliance
 
-- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list to until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that is faster to show the compliance indication**.
+- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that might faster to show the compliance indication**. We can also attempt to force a policy scan (see note at end of this task) which **might** improve the speed to populate the compliance dashboard. 
 
     ![Screenshot of policies and their compliances with the new policy](./Compliance_dashboard.png)
 
-- Click on the policy from the name column and this will take you a more detailed view of the specific policy compliance as shown below. You can then click on "details" which will open another panel on the right hand side. **If the "details" link is not ready yet then you will need to wait for it, or try task 3 for another way of looking at the compliance of specific servers, which is faster to populate.**
+- Click on the policy from the name column and this will take you to a more detailed view of the specific policy compliance as shown below. You can then click on "details" which will open another panel on the right hand side. **If the "details" link is not ready yet then you will need to wait for it, or try task 3 for another way of looking at the compliance of specific servers, which might be faster to populate.**
 
     ![Screenshot detailed compliance](./detailed_compliance.png)
 
@@ -1341,6 +1448,13 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
     ![Screenshot Guest Assignment from details](./Guest_assignment_from_details.png)
 
 - The steps above helps you identify non-compliant resources and then you can act on resolving the non-compliance reasons.
+
+- NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
+
+```powershell
+$job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob 
+$job | Wait-Job 
+```
 
 #### Task 3: Using the "Guest Assignments" views directly
 
