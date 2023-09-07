@@ -328,7 +328,8 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 
     ![Screenshot confirm win machine on-boarded](./confirm_windows_machine_onboarding.png)
 
-#### Task 3: Onboard a Linux machine to ARC.
+#### Task 3: Onboard a Linux machine to Azure Arc.
+
 
 - We will now onboard the Linux vm ArcBox-Ubuntu-02 to Azure Arc using the same service principal method we used above for the Windows machine. We can use the same service principal we created above.
 
