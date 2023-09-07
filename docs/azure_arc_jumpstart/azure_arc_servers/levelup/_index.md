@@ -831,7 +831,7 @@ First create an automation account in Azure in the same location as Arcbox - ens
 az automation account create --automation-account-name "arcbox-automation-account" --location $location --sku "Free" --resource-group $resourcegroupname
 ```
 The Automation Account must also enable Change Tracking and Inventory by linking to the ArcBox Log Analytics workspace
-![Screenshot showing how to enable inventory in Automation Account](./changetracking-enable-inv.png)
+![Screenshot showing how to enable inventory in Automation Account](./changetracking-ct-enabled.png)
 
 #### Task 2
 Enabling Change Tracking and Inventory
@@ -847,7 +847,7 @@ but you will need to know where to do this for your own environments in future.
 
 Please be patient as it takes a while for onboarding to work.
 
-#### Task 2
+#### Task 3
 
 Using Change Tracking
 
@@ -858,9 +858,8 @@ Stop-Service spooler
 Start-service spooler
 ```
 
-####  Task 3
+####  Task 4
 
-Managing Change Tracking using Data Collection Rules
 To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
 
 ![Screenshot showing Edit Settings](./changetracking-editsettings.png)
@@ -873,9 +872,15 @@ Then add files that you want to monitor, for example, the hosts file.
 
 ![Screenshot showing add file monitoring](./changetracking-addfilemonitoring.png)
 
+Modify the hosts file on the ArcBox-Win2K22 machine. 
+
+Add a line like this from an administrative notepad and save the file:
+```cmd
+1.1.1.1      www.fakehost.com
+```
 Eventually, the file changes will show up in the main console.
 
-#### Task 4
+#### Task 5
 
 Alert Configuration
 
@@ -887,33 +892,12 @@ In the Logs search, look for content changes to the hosts file with the query
 ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
 ```
 
-Alerts are always created based on log analytics query result.
+In Log Analytics, alerts are always created based on log analytics query result.
 
 After the query returns its results, select New alert rule in the log search to open the Alert creation page. You can also navigate to this page through Azure Monitor in the Azure portal.
 
 Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
 
-After the alert logic is set, assign action groups to perform actions in response to triggering of the alert. In this case, we're setting up emails to be sent and an IT Service Management (ITSM) ticket to be created.
-
-To setup an action group that determines what action the alert will trigger:
-
-Select the alert created earlier and then select Create New under Action Groups.
-
-Enter a full name and a short name for the action group. The short name will be used when sending notifications using the specified group.
-
-Under Actions, enter a name that specifies the action, for example, Email Notification.
-
-For Action Type, select the appropriate type, for example, Email/SMS message/Push/Voice.
-
-Select the pencil icon to edit the action details.
-
-Fill in the pane for your action type. For example, if using Email/SMS message/Push/Voice to send an email, enter an action name, select the Email checkbox, enter a valid email address, and then select OK.
-
-In the Add action group pane, select OK.
-
-For an alert email, you can customize the email subject. Select Customize actions under Create rule, then select Email subject.
-
-When you're finished, select Create alert rule.
 
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
