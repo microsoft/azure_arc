@@ -930,6 +930,75 @@ The output should look similar to this:
 
 ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_8.png)
 
+##### Option 2: Azure PowerShell
+
+```powershell
+
+# Retrieve service URL for Automation account (used when registering Arc-enabled Servers as Hybrid Runbook Workers)
+$AutomationAccountParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    Name = "ArcBox-Automation"
+}
+
+$AutomationAccount = Get-AzResource @AutomationAccountParams
+
+$AutomationAccountInfo = Invoke-AzRestMethod -SubscriptionId $AutomationAccount.SubscriptionId -ResourceGroupName $AutomationAccount.ResourceGroupName -ResourceProviderName Microsoft.Automation -ResourceType automationAccounts -Name $AutomationAccount.Name -ApiVersion 2021-06-22 -Method GET
+$AutomationHybridServiceUrl = ($AutomationAccountInfo.Content | ConvertFrom-Json).Properties.automationHybridServiceUrl
+
+$HybridWorkerGroupParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    Name = "linux-workers"
+}
+
+# Create the Linux Hybrid Worker Group
+New-AzAutomationHybridRunbookWorkerGroup @HybridWorkerGroupParams
+
+# Define parameters in a hashtable
+$HybridWorkerParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    HybridRunbookWorkerGroupName = "linux-workers"
+    Name = "ArcBox-Ubuntu01"
+}
+
+# Add the Hybrid Worker to the group
+New-AzAutomationHybridRunbookWorker @HybridWorkerParams
+
+$ArcResource = Get-AzConnectedMachine -ResourceGroupName $HybridWorkerParams.ResourceGroupName -Name
+
+New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupName -Location $ArcResource.Location -MachineName $ArcResource.Name -Name "HybridWorkerExtension" -Publisher "Microsoft.Azure.Automation.HybridWorker" -ExtensionType HybridWorkerForLinux -TypeHandlerVersion 1.1 -Setting $settings -EnableAutomaticUpgrade
+
+
+$HybridWorkerGroupParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    Name = "windows-workers"
+}
+
+# Create the Windows Hybrid Worker Group using splatting
+New-AzAutomationHybridRunbookWorkerGroup @HybridWorkerGroupParams
+
+# Define parameters in a hashtable
+$HybridWorkerParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    HybridRunbookWorkerGroupName = "windows-workers"
+    Name = "ArcBox-Win2K22"
+}
+
+# Add the Hybrid Worker to the group
+New-AzAutomationHybridRunbookWorker @HybridWorkerParams
+
+$settings = @{
+      "AutomationAccountURL"  = $AutomationHybridServiceUrl
+  }
+
+$ArcResource = Get-AzConnectedMachine -ResourceGroupName $HybridWorkerParams.ResourceGroupName -Name
+
+New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupName -Location $ArcResource.Location -MachineName $ArcResource.Name -Name "HybridWorkerExtension" -Publisher "Microsoft.Azure.Automation.HybridWorker" -ExtensionType HybridWorkerForWindows -TypeHandlerVersion 1.1 -Setting $settings -EnableAutomaticUpgrade
+
+```
 
 
 #### Task 3
