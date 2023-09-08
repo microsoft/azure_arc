@@ -965,7 +965,37 @@ az resource show --name "MSVMI-ama-vmi-default-dcr" `
 - You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _MSVMI-ama-vmi-default-dcr_ data collection rule.
 
 - Then click create for the initiave to be assigned to the _arcbox_ resource group.
-  
+- Once it has been assigned, copy the assignmentID, as you will need it in the next part.
+
+![Screenshot showing the policyassignment](./changetracking-assignmentid.png)
+
+
+Once the policy assignments have been made, you may need to force remediate each policy unless you are willing to wait.
+To force remediation, either use the GUI to select each policy in the initiative  (just like the monitor section) and then force the task, or just run some AZ CLI commands in a powershell window:
+
+```powershell
+
+$subscriptionid = "<your subscription id>
+$resourcegroup = "<your resource group name>
+$policyassignmentid = "<your policy assignment id>"
+
+#This are the definition IDs for the ChangeTracking initiative - it will be the same worldwide until this initiative is changed
+$defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f", `
+"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187", `
+"/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5", `
+"/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278", `
+"/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb", `
+"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
+
+$defid | foreach {
+az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking to start" --policy-assignment `
+$policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ `
+}
+```
+You can see the processing state of each rememdiation task by clicking on the _Remediation_ tab
+
+![Screenshot showing the policyassignment](./changetracking-forcingremediation.png)
+
 Please be patient as it takes a while for onboarding to work.
 
 #### Task 3
