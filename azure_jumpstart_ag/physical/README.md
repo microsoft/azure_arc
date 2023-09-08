@@ -57,7 +57,7 @@ Plesae follow the next steps to prepare your environment for succesfull deployme
 
     Change this values on the psd1 file:
 
-     ```json
+     ```psd1
         GitHub                 = @{
             githubAccount      = ""
             githubBranch       = ""
