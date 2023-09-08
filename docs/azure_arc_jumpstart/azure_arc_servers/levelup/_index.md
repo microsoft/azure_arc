@@ -928,10 +928,44 @@ For Azure Arc - you must then deploy a special policy and create a Data Collecti
 Follow the link here:
 https://learn.microsoft.com/en-us/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm
 
-These steps  will have already been deployed as part of the setup for this levelup,
+The DCR will have already been deployed as part of the setup for this levelup,
 but you will need to know where to do this for your own environments in future.
-``` 
+```
+You will need to deploy an Azure Initiative to enable Change Tracking on ARC enabled Virtual Machines.
 
+- In the Azure portal, search for the text "_Preview_" and for a definition type of "_Initiative_".
+
+    ![Screenshot showing searching for changeTracking Initiative in the azure portal](./changetracking-lookforpolicy.png)
+
+- Click on "_[Preview]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines".
+
+    ![Screenshot showing the 6 policies in the Initiative](./changetracking-6policies.png)
+
+- Click "Assign Initiative".
+
+    ![Screenshot showing assigning the policy](./changetracking-assignpolicy1.png)
+
+- Select the right scope (management group, subscription and resource group) for the resource group where you deployed _ArcBox_.
+
+    ![Screenshot showing assigning the policy to the right scope](./changetracking-assignpolicy2.png)
+
+- After validating the scope, click "Next" twice to navigate to the parameters tab.
+
+- To get the "Data Collection Rule" resource Id,  run the following CLI command
+
+
+```shell
+az resource show --name "MSVMI-ama-vmi-default-dcr" `
+                 --resource-group "<resource group name>" `
+                 --resource-type Microsoft.Insights/dataCollectionRules `
+                 --query id `
+                 --output tsv
+```
+
+- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _MSVMI-ama-vmi-default-dcr_ data collection rule.
+
+- Then click create for the initiave to be assigned to the _arcbox_ resource group.
+  
 Please be patient as it takes a while for onboarding to work.
 
 #### Task 3
