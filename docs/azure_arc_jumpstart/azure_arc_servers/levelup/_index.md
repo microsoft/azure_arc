@@ -1101,7 +1101,7 @@ or
 ```powershell
 
 $serverName = "ArcBox-Ubuntu-01"
-$localUser = "Administrator"
+$localUser = "arcdemo"
 
 Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
 ```
