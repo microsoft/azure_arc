@@ -914,10 +914,14 @@ https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
 Creating an Automation Account
 
 First create an automation account in Azure in the same location as Arcbox - ensure that the region mapping is supported as in the table above.
-```cmd
-az automation account create --automation-account-name "arcbox-automation-account" --location $location --sku "Free" --resource-group $resourcegroupname
+```powershell
+$automationaccountname = "<your automation account name>"
+$location = "<your azure location>"
+$resourcegroupname = "<Your resource group name>"
+az automation account create --automation-account-name $automationaccountname --location $location --sku "Free" --resource-group $resourcegroupname
 ```
-The Automation Account must also enable Change Tracking and Inventory by linking to the ArcBox Log Analytics workspace
+
+The Automation Account must also enable Change Tracking and Inventory by linking to the ArcBox Log Analytics workspace crated previously.
 ![Screenshot showing how to enable inventory in Automation Account](./changetracking-ct-enabled.png)
 
 #### Task 2
@@ -930,18 +934,20 @@ https://learn.microsoft.com/en-us/azure/automation/change-tracking/enable-vms-mo
 
 The DCR will have already been deployed as part of the setup for this levelup,
 but you will need to know where to do this for your own environments in future.
+The policy deployment is done below.
 ```
+
 You will need to deploy an Azure Initiative to enable Change Tracking on ARC enabled Virtual Machines.
 
-- In the Azure portal, search for the text "_Preview_" and for a definition type of "_Initiative_".
+- In the Azure portal, search for the text "Preview" and for a definition type of "Initiative".
 
     ![Screenshot showing searching for changeTracking Initiative in the azure portal](./changetracking-lookforpolicy.png)
 
-- Click on "_[Preview]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines".
+- Click on "_[Preview]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines_".
 
     ![Screenshot showing the 6 policies in the Initiative](./changetracking-6policies.png)
 
-- Click "Assign Initiative".
+- Click "_Assign Initiative_".
 
     ![Screenshot showing assigning the policy](./changetracking-assignpolicy1.png)
 
@@ -987,9 +993,10 @@ $defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3
 "/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb", `
 "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
 
-$defid | foreach {
-az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking to start" --policy-assignment `
-$policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ `
+$count=1
+$defid | foreach { `
+az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment ` $policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
+$count++
 }
 ```
 You can see the processing state of each rememdiation task by clicking on the _Remediation_ tab
