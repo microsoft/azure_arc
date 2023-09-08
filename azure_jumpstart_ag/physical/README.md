@@ -96,7 +96,8 @@ onfigure a GitHub fine-grained personal access token (PAT) with permissions to m
 
 ## Deployment
 
-1. Open the physical_agora_params.psd1 and update the following fields:
+1. Download (or clone) this repo to your local machine.
+2. Open the physical_agora_params.psd1 and update the following fields:
 
     Change this values on the psd1 file:
 
@@ -119,7 +120,7 @@ onfigure a GitHub fine-grained personal access token (PAT) with permissions to m
         }  spnClientID        = ""
     ```
 
-2. Open a Powershell Windows (with Admin rights) and execute the physical_deployment.ps1 file. 
+3. Open a Powershell Windows (with Admin rights) and execute the physical_deployment.ps1 file. 
    
    > __NOTE: The physical_agora_params.psd1 and the physical_deployment.ps1 file must be in the same directory..__
 
