@@ -995,7 +995,8 @@ $defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3
 
 $count=1
 $defid | foreach { `
-az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment ` $policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
+az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment `
+$policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
 $count++
 }
 
