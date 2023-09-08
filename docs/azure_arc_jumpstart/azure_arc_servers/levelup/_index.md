@@ -998,6 +998,13 @@ $defid | foreach { `
 az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment ` $policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
 $count++
 }
+
+#Sometimes, the portal does not show the remediation task created via AZ CLI.
+#In that case, run
+
+az policy remediation list
+
+#to see the status of the remediation task.
 ```
 You can see the processing state of each rememdiation task by clicking on the _Remediation_ tab
 
