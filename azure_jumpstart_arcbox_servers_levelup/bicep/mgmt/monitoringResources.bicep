@@ -527,6 +527,7 @@ var windowsEventsWorkbookContent = {
     'Azure Monitor'
   ]
 }
+
 var osPerformanceWorkbookContent = {
   version: 'Notebook/1.0'
   items: [
@@ -663,7 +664,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = ( Heartbeat\r\n    | make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step 15m by Computer\r\n    | extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend)-1)); \r\n\r\nlet PerfCPU = (Perf\r\n    | where ObjectName == "Processor" and CounterName == "% Processor Time" and InstanceName=="_Total"\r\n    | summarize AvgCPU=round(avg(CounterValue),2), MaxCPU=round(max(CounterValue),2) by Computer\r\n    | extend StatusCPU = case (\r\n                  AvgCPU > 80, 2,\r\n                  AvgCPU > 50, 1,\r\n                  AvgCPU <= 50, 0, -1\r\n                )\r\n    );\r\n\r\nlet PerfMemory = (Perf\r\n    | where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory")\r\n    | summarize AvgMEM=round(avg(CounterValue/1024),2), MaxMEM=round(max(CounterValue/1024),2) by Computer\r\n    | extend StatusMEM = case (\r\n                  AvgMEM > 4, 0,\r\n                  AvgMEM >= 1, 1,\r\n                  AvgMEM < 1, 2, -1\r\n            )\r\n    );\r\n\r\nlet PerfDisk = (Perf\r\n    | where (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk") and CounterName == "Free Megabytes" and (InstanceName =~ "C:" or InstanceName == "/")\r\n    | summarize AvgDisk=round(avg(CounterValue),2), (TimeGenerated,LastDisk)=arg_max(TimeGenerated,round(CounterValue,2)) by Computer\r\n    | extend StatusDisk = case (\r\n                  AvgDisk < 5000, 2,\r\n                  AvgDisk < 30000, 1,\r\n                  AvgDisk >= 30000, 0,-1\r\n)\r\n    | project Computer, AvgDisk , LastDisk ,StatusDisk\r\n    );\r\nPerfCPU\r\n| join (PerfMemory) on Computer\r\n| join (PerfDisk) on Computer\r\n| join (trend) on Computer\r\n| project Computer,StatusCPU, AvgCPU,MaxCPU,StatusMEM,AvgMEM,MaxMEM,StatusDisk,AvgDisk,LastDisk, Trend\r\n| sort by Computer '
+        query: 'let trend = ( Heartbeat\r\n   | make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step 15m by Computer\r\n    | extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend)-1)); \r\n\r\nlet PerfCPU = (Perf\r\n    | where ObjectName contains "Processor" and CounterName == "% Processor Time" and (InstanceName=="_Total" or InstanceName=="total")\r\n    | summarize AvgCPU=round(avg(CounterValue),2), MaxCPU=round(max(CounterValue),2) by Computer\r\n    | extend StatusCPU = case (\r\n                  AvgCPU > 80, 2,\r\n                  AvgCPU > 50, 1,\r\n                  AvgCPU <= 50, 0, -1\r\n                )\r\n    );\r\n\r\nlet PerfMemory = (Perf\r\n    | where ObjectName contains "Memory" and (CounterName == "Available Bytes" or CounterName == "Available MBytes Memory")\r\n    | summarize AvgMEM=round(avg(CounterValue/1024),2), MaxMEM=round(max(CounterValue/1024),2) by Computer\r\n    | extend StatusMEM = case (\r\n                  AvgMEM > 4, 0,\r\n                  AvgMEM >= 1, 1,\r\n                  AvgMEM < 1, 2, -1\r\n            )\r\n    );\r\n\r\nlet PerfDisk = (Perf\r\n    | where (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk") and CounterName == "Free Megabytes" and (InstanceName == "_Total" or InstanceName == "/")\r\n    | summarize AvgDisk=round(avg(CounterValue),2), (TimeGenerated,LastDisk)=arg_max(TimeGenerated,round(CounterValue,2)) by Computer\r\n    | extend StatusDisk = case (\r\n                  AvgDisk < 5000, 2,\r\n                  AvgDisk < 30000, 1,\r\n                  AvgDisk >= 30000, 0,-1\r\n)\r\n    | project Computer, AvgDisk , LastDisk ,StatusDisk\r\n    );\r\nPerfCPU\r\n| join (PerfMemory) on Computer\r\n| join (PerfDisk) on Computer\r\n| join (trend) on Computer\r\n| project Computer,StatusCPU, AvgCPU,MaxCPU,StatusMEM,AvgMEM,MaxMEM,StatusDisk,AvgDisk,LastDisk, Trend\r\n| sort by Computer '
         size: 0
         showAnalytics: true
         title: 'Top servers (data aggregated based on TimeRange)'
@@ -954,7 +955,7 @@ var osPerformanceWorkbookContent = {
     {
       type: 1
       content: {
-        json: '## Processor(_Total)\\% Processor Time'
+        json: '## Processor(total)\\% Processor Time'
       }
       name: 'text - 10'
     }
@@ -962,7 +963,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let TopComputers = Perf \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == \'Processor\' and CounterName == \'% Processor Time\' and InstanceName == \'_Total\' \r\n| summarize AvgCPU = avg(CounterValue) by Computer \r\n| top 10 by AvgCPU desc\r\n| project Computer; \r\nPerf \r\n| where Computer in (TopComputers) \r\n| where ObjectName == "Processor" and CounterName == "% Processor Time" and InstanceName == "_Total" \r\n| summarize Used_CPU = round(avg(CounterValue),1) by Computer, bin(TimeGenerated, ({TimeRange:end} - {TimeRange:start})/100)\r\n| render timechart'
+        query: 'let TopComputers = Perf \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName contains "Processor" and CounterName == "% Processor Time" and (InstanceName=="_Total" or InstanceName=="total")\r\n| summarize AvgCPU = avg(CounterValue) by Computer \r\n| top 10 by AvgCPU desc\r\n| project Computer; \r\nPerf \r\n| where Computer in (TopComputers) \r\n| where ObjectName contains "Processor" and CounterName == "% Processor Time" and (InstanceName=="_Total" or InstanceName=="total") \r\n| summarize Used_CPU = round(avg(CounterValue),1) by Computer, bin(TimeGenerated, ({TimeRange:end} - {TimeRange:start})/100)\r\n| render timechart'
         size: 0
         aggregation: 3
         showAnalytics: true
@@ -996,7 +997,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Processor" and CounterName == "% Processor Time" and InstanceName == "_Total" \r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Computer     \r\n| project Computer, [\'Trend\'] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Processor" and CounterName == "% Processor Time" and InstanceName == "_Total" \r\n| summarize Average=round(avg(CounterValue),3) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  Average > 80, "Critical",\r\n                  Average > 50, "Warning",\r\n                  Average <= 50, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer, Average, Trend\r\n| sort by Average '
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName contains "Processor" and CounterName == "% Processor Time" and (InstanceName=="_Total" or InstanceName=="total") \r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Computer     \r\n| project Computer, ["Trend"] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName contains "Processor" and CounterName == "% Processor Time" and (InstanceName=="_Total" or InstanceName=="total")\r\n| summarize Average=round(avg(CounterValue),3) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  Average > 80, "Critical",\r\n                  Average > 50, "Warning",\r\n                  Average <= 50, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer, Average, Trend\r\n| sort by Average '
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning>50; Critical>80) - All Computers'
@@ -1074,13 +1075,6 @@ var osPerformanceWorkbookContent = {
       }
     }
     {
-      type: 1
-      content: {
-        json: '## Memory: _Available MBytes_ and _% Committed Bytes in Use_'
-      }
-      name: 'text - 11'
-    }
-    {
       type: 3
       content: {
         version: 'KqlItem/1.0'
@@ -1134,7 +1128,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory" )\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Computer     \r\n| project Computer, [\'Trend\'] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory" )\r\n| summarize ["Available GBytes"]=round(avg(CounterValue)/1024,2) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  ["Available GBytes"] > 4, "Healthy",\r\n                  ["Available GBytes"] >= 1, "Warning",\r\n                  ["Available GBytes"] < 1, "Critical", "Unknown"\r\n)\r\n| project Status, Computer, ["Available GBytes"], Trend\r\n| sort by ["Available GBytes"] asc'
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory" )\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Computer     \r\n| project Computer, ["Trend"] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory" )\r\n| summarize ["Available GBytes"]=round(avg(CounterValue)/1024,2) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  ["Available GBytes"] > 4, "Healthy",\r\n                  ["Available GBytes"] >= 1, "Warning",\r\n                  ["Available GBytes"] < 1, "Critical", "Unknown"\r\n)\r\n| project Status, Computer, ["Available GBytes"], Trend\r\n| sort by ["Available GBytes"] asc'
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning < 4 GB; Critical < 1 GB) - All Computers'
@@ -1261,7 +1255,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "% Committed Bytes In Use" or CounterName=="% Used Memory")\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Computer     \r\n| project Computer, [\'Trend\'] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "% Committed Bytes In Use" or CounterName=="% Used Memory") \r\n| summarize Average=round(avg(CounterValue),3) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  Average > 90, "Critical",\r\n                  Average > 60, "Warning",\r\n                  Average <= 60, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer, Average, Trend\r\n| sort by Average '
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "% Committed Bytes In Use" or CounterName=="% Used Memory")\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Computer     \r\n| project Computer, ["Trend"] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where ObjectName == "Memory" and (CounterName == "% Committed Bytes In Use" or CounterName=="% Used Memory") \r\n| summarize Average=round(avg(CounterValue),3) by Computer\r\n| join (trend) on Computer\r\n| extend Status = case (\r\n                  Average > 90, "Critical",\r\n                  Average > 60, "Warning",\r\n                  Average <= 60, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer, Average, Trend\r\n| sort by Average '
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning>60; Critical>90) - All Computers'
@@ -1395,7 +1389,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Free Megabytes" and (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or (InstanceName contains "/")\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Disco     \r\n| project Disco, [\'Trend\'] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Free Megabytes" and (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or (InstanceName contains "/")\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize Average=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  Average <5000, "Critical",\r\n                  Average < 30000, "Warning",\r\n                  Average >= 30000, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer,Disk=InstanceName, Average, Trend\r\n| sort by Average asc '
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Free Megabytes" and (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or (InstanceName contains "/")\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| make-series Average = round(avg(CounterValue), 3) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Disco     \r\n| project Disco, ["Trend"] = Average; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Free Megabytes" and (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or (InstanceName contains "/")\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize Average=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  Average <5000, "Critical",\r\n                  Average < 30000, "Warning",\r\n                  Average >= 30000, "Healthy", "Unknown"\r\n)\r\n\r\n| project Status, Computer,Disk=InstanceName, Average, Trend\r\n| sort by Average asc '
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning < 30GB; Critical < 5GB) - All Computers-Volumes'
@@ -1501,7 +1495,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk") and CounterName == "Disk Reads/sec" and ((strlen(InstanceName) == 2 and InstanceName contains ":") or (InstanceName == "/"))\r\n| extend Disco = strcat(InstanceName, " - ",Computer)\r\n| make-series AVGReads = round(avg(CounterValue),2) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Disco     \r\n| project Disco, [\'Trend\'] = AVGReads; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk") and CounterName == "Disk Reads/sec" and ((strlen(InstanceName) == 2 and InstanceName contains ":") or (InstanceName == "/"))\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGReads=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  AVGReads > 25, "Critical",\r\n                  AVGReads > 15, "Warning",\r\n                  AVGReads <= 15, "Healthy", "Unknown"\r\n)\r\n| project  Status, Computer,Disk=InstanceName, ["Reads"]=AVGReads, Trend\r\n| sort by ["Reads"] desc '
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk") and CounterName == "Disk Reads/sec" and ((strlen(InstanceName) == 2 and InstanceName contains ":") or (InstanceName == "/"))\r\n| extend Disco = strcat(InstanceName, " - ",Computer)\r\n| make-series AVGReads = round(avg(CounterValue),2) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Disco     \r\n| project Disco, ["Trend"] = AVGReads; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk") and CounterName == "Disk Reads/sec" and ((strlen(InstanceName) == 2 and InstanceName contains ":") or (InstanceName == "/"))\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGReads=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  AVGReads > 25, "Critical",\r\n                  AVGReads > 15, "Warning",\r\n                  AVGReads <= 15, "Healthy", "Unknown"\r\n)\r\n| project  Status, Computer,Disk=InstanceName, ["Reads"]=AVGReads, Trend\r\n| sort by ["Reads"] desc '
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning > 15Reads/sec; Critical > 25Reads/sec) - All Computers-Volumes'
@@ -1619,7 +1613,7 @@ var osPerformanceWorkbookContent = {
       type: 3
       content: {
         version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}"  or "{Computer}"=="All"\r\n| where CounterName == "Disk Writes/sec" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| make-series AVGWrites = round(avg(CounterValue),2) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Disco     \r\n| project Disco, [\'Trend\'] = AVGWrites; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Disk Writes/sec" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGWrites=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  AVGWrites > 25, "Critical",\r\n                  AVGWrites > 15, "Warning",\r\n                  AVGWrites <= 15, "Healthy", "Unknown"\r\n)\r\n\r\n| project  Status, Computer,Disk=InstanceName, ["Writes"]=AVGWrites, Trend\r\n| sort by ["Writes"] desc '
+        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}"  or "{Computer}"=="All"\r\n| where CounterName == "Disk Writes/sec" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| make-series AVGWrites = round(avg(CounterValue),2) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan("00:30:00") by Disco     \r\n| project Disco, ["Trend"] = AVGWrites; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Disk Writes/sec" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGWrites=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  AVGWrites > 25, "Critical",\r\n                  AVGWrites > 15, "Warning",\r\n                  AVGWrites <= 15, "Healthy", "Unknown"\r\n)\r\n\r\n| project  Status, Computer,Disk=InstanceName, ["Writes"]=AVGWrites, Trend\r\n| sort by ["Writes"] desc '
         size: 0
         showAnalytics: true
         title: 'Thresholds (Warning > 15Writes/sec; Critical > 25Writes/sec) - All Computers-Volumes'
@@ -1706,246 +1700,13 @@ var osPerformanceWorkbookContent = {
         showBorder: true
       }
     }
-    {
-      type: 3
-      content: {
-        version: 'KqlItem/1.0'
-        query: 'let TopDiscos = Perf \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Current Disk Queue Length" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGQueue = avg(CounterValue) by Disco\r\n| top 10 by AVGQueue desc\r\n| project Disco; \r\nPerf \r\n| where CounterName == "Current Disk Queue Length" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| where Disco in (TopDiscos) \r\n| summarize AVGQueue = avg(CounterValue) by Disco, bin(TimeGenerated, ({TimeRange:end} - {TimeRange:start})/100)\r\n| render timechart\r\n\r\n\r\n'
-        size: 0
-        aggregation: 3
-        showAnalytics: true
-        title: 'Current Disk Queue Length - Top 10 Computers-Volumes'
-        timeContextFromParameter: 'TimeRange'
-        queryType: 0
-        resourceType: 'microsoft.operationalinsights/workspaces'
-        crossComponentResources: [
-          '{Workspace}'
-        ]
-        visualization: 'timechart'
-        chartSettings: {
-          group: 'Disco'
-          createOtherGroup: 22
-          showLegend: true
-        }
-      }
-      customWidth: '50'
-      name: 'query - 6 - Copy - Copy - Copy'
-      styleSettings: {
-        showBorder: true
-      }
-    }
-    {
-      type: 3
-      content: {
-        version: 'KqlItem/1.0'
-        query: 'let trend = \r\nPerf           \r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Current Disk Queue Length" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| make-series AVGQueue = round(avg(CounterValue),2) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step totimespan(\'00:30:00\') by Disco     \r\n| project Disco, [\'Trend\'] = AVGQueue; \r\n\r\nPerf\r\n| where Computer contains "{Computer}" or "{Computer}"=="All"\r\n| where CounterName == "Disk Writes/sec" and (ObjectName == "LogicalDisk" or ObjectName=="Logical Disk")\r\n| where (strlen(InstanceName) ==2 and InstanceName contains ":") or InstanceName=="/"\r\n| extend Disco = strcat(InstanceName, " - ",Computer )\r\n| summarize AVGQueue=round(avg(CounterValue),2) by Disco,Computer,InstanceName\r\n| join (trend) on Disco\r\n| extend Status = case (\r\n                  AVGQueue > 4, "Critical",\r\n                  AVGQueue > 1, "Warning",\r\n                  AVGQueue <= 1, "Healthy", "Unknown"\r\n)\r\n\r\n| project  Status, Computer, Disk=InstanceName, ["Queue"]=AVGQueue, Trend\r\n| sort by ["Queue"] desc '
-        size: 0
-        showAnalytics: true
-        title: 'Thresholds (Warning > 1; Critical > 4) - All Computers-Volumes'
-        timeContextFromParameter: 'TimeRange'
-        queryType: 0
-        resourceType: 'microsoft.operationalinsights/workspaces'
-        crossComponentResources: [
-          '{Workspace}'
-        ]
-        gridSettings: {
-          formatters: [
-            {
-              columnMatch: 'Status'
-              formatter: 18
-              formatOptions: {
-                thresholdsOptions: 'icons'
-                thresholdsGrid: [
-                  {
-                    operator: '=='
-                    thresholdValue: 'Healthy'
-                    representation: 'success'
-                    text: '{1}'
-                  }
-                  {
-                    operator: '=='
-                    thresholdValue: 'Warning'
-                    representation: '2'
-                    text: '{1}'
-                  }
-                  {
-                    operator: '=='
-                    thresholdValue: 'Critical'
-                    representation: 'critical'
-                    text: '{1}'
-                  }
-                  {
-                    operator: 'Default'
-                    thresholdValue: null
-                    representation: 'unknown'
-                    text: '{1}'
-                  }
-                ]
-              }
-            }
-            {
-              columnMatch: 'Trend'
-              formatter: 21
-              formatOptions: {
-                palette: 'green'
-              }
-            }
-            {
-              columnMatch: 'Average'
-              formatter: 8
-              formatOptions: {
-                min: 0
-                max: 100
-                palette: 'blue'
-              }
-            }
-          ]
-          labelSettings: [
-            {
-              columnId: 'Queue'
-              label: 'Average'
-            }
-          ]
-        }
-        sortBy: []
-      }
-      customWidth: '50'
-      name: 'query - CDQL'
-      styleSettings: {
-        showBorder: true
-      }
-    }
-    {
-      type: 1
-      content: {
-        json: '## %CPU Usage by Process (Windows)'
-      }
-      customWidth: '50'
-      name: 'text - 21'
-    }
-    {
-      type: 1
-      content: {
-        json: '## Network Usage by Process (VMConnection)'
-      }
-      customWidth: '50'
-      name: 'text - 25'
-    }
-    {
-      type: 3
-      content: {
-        version: 'KqlItem/1.0'
-        query: 'let WindowsComputer = Heartbeat\r\n    | where Computer contains "{Computer}" or "{Computer}"=="All"\r\n    | where OSType == "Windows"\r\n    | distinct Computer;\r\nlet TopComputers = Perf \r\n    | where Computer in (WindowsComputer)\r\n    | where ObjectName == \'Processor\' and CounterName == \'% Processor Time\' and InstanceName == \'_Total\' \r\n    | summarize AggregatedValue = avg(CounterValue) by Computer \r\n    | top 5 by AggregatedValue desc\r\n    | project Computer; \r\nlet FindCPU = Perf\r\n| where Computer in (TopComputers)\r\n    | where ObjectName == "Processor" and CounterName == "% Processor Time" \r\n    | where InstanceName != "_Total"\r\n    | summarize CPUs=dcount(InstanceName) by Computer;\r\nlet ProcessUsage = Perf\r\n| where Computer in (TopComputers)\r\n    | where ObjectName == "Process" and CounterName == "% Processor Time"\r\n    | where InstanceName != "_Total" and InstanceName != "Idle"\r\n    | extend Process = iff(InstanceName has "#",substring(InstanceName,0,indexof(InstanceName,"#",0)),InstanceName)\r\n    | extend newTimeGenerated = format_datetime(TimeGenerated, "yyyy-MM-dd HH:mm:ss")\r\n    | summarize TotalCPU = sum(CounterValue) by Computer, newTimeGenerated, Process\r\n    | summarize average = avg(TotalCPU) by Computer, Process;\r\nlet ProcessUsageByCPU = ProcessUsage \r\n| join kind= inner (\r\n    FindCPU\r\n) on Computer\r\n| project Computer, Process, AvgUsage = average/CPUs; \r\nProcessUsageByCPU\r\n| extend Name = strcat(\'🎫 \', Process)\r\n| project ParentId = Computer, Id = strcat(Process,"-",Computer), AvgUsage, Name\r\n| union (\r\nProcessUsageByCPU\r\n| summarize AvgUsage = sum(AvgUsage) by Id = Computer\r\n| extend ParentId = \'\', Name = strcat(\'💻 \', Id))\r\n| project Name, AvgUsage = round(AvgUsage, 2) , Id, ParentId\r\n| order by AvgUsage'
-        size: 0
-        title: '%CPU Usage by Process (Windows) - Top 5 Computers'
-        timeContextFromParameter: 'TimeRange'
-        queryType: 0
-        resourceType: 'microsoft.operationalinsights/workspaces'
-        crossComponentResources: [
-          workspaceId
-        ]
-        visualization: 'table'
-        gridSettings: {
-          formatters: [
-            {
-              columnMatch: 'AvgUsage'
-              formatter: 3
-              formatOptions: {
-                palette: 'blue'
-                customColumnWidthSetting: '617px'
-              }
-              numberFormat: {
-                unit: 1
-                options: {
-                  style: 'decimal'
-                }
-              }
-            }
-            {
-              columnMatch: 'Id'
-              formatter: 5
-            }
-            {
-              columnMatch: 'ParentId'
-              formatter: 5
-            }
-          ]
-          rowLimit: 500
-          hierarchySettings: {
-            idColumn: 'Id'
-            parentColumn: 'ParentId'
-            treeType: 0
-            expanderColumn: 'Name'
-            expandTopLevel: true
-          }
-        }
-      }
-      customWidth: '50'
-      showPin: true
-      name: 'query - 22'
-      styleSettings: {
-        showBorder: true
-      }
-    }
-    {
-      type: 3
-      content: {
-        version: 'KqlItem/1.0'
-        query: 'let TopComputers = VMConnection\r\n| summarize AggregatedValue = (sum(BytesSent)+sum(BytesReceived)) by Computer\r\n| top 5 by AggregatedValue desc\r\n| project Computer; \r\nVMConnection\r\n| where Computer in (TopComputers)\r\n| extend Name = strcat(\'🎫 \', iff(isnotempty(ProcessName), ProcessName, "unknown"))\r\n| summarize ["Total Traffic"] = (sum(BytesSent)+sum(BytesReceived))  by ParentId = Computer, Id = strcat(Name,"-", Computer), Name\r\n| union (\r\n        VMConnection\r\n        | where Computer in (TopComputers)\r\n        | where isnotempty(ProcessName)\r\n        | summarize ["Total Traffic"] = (sum(BytesSent)+sum(BytesReceived)) by Id = Computer\r\n        | extend ParentId = \'\', Name = strcat(\'💻 \', Id)\r\n    )\r\n    | project Name, ["Total Traffic"], Id, ParentId\r\n    | order by ["Total Traffic"]'
-        size: 0
-        title: 'Amount of Network Traffic by Process (VMConnection) - Top 5 Computers'
-        timeContextFromParameter: 'TimeRange'
-        queryType: 0
-        resourceType: 'microsoft.operationalinsights/workspaces'
-        crossComponentResources: [
-          workspaceId
-        ]
-        visualization: 'table'
-        gridSettings: {
-          formatters: [
-            {
-              columnMatch: 'Total'
-              formatter: 3
-              formatOptions: {
-                palette: 'blue'
-                customColumnWidthSetting: '617px'
-              }
-              numberFormat: {
-                unit: 2
-                options: {
-                  style: 'decimal'
-                }
-              }
-            }
-            {
-              columnMatch: 'Id'
-              formatter: 5
-            }
-            {
-              columnMatch: 'ParentId'
-              formatter: 5
-            }
-          ]
-          rowLimit: 500
-          hierarchySettings: {
-            idColumn: 'Id'
-            parentColumn: 'ParentId'
-            treeType: 0
-            expanderColumn: 'Name'
-            expandTopLevel: true
-          }
-        }
-        sortBy: []
-      }
-      customWidth: '50'
-      name: 'query - 26'
-    }
   ]
   isLocked: false
   fallbackResourceIds: [
     'azure monitor'
   ]
 }
+
 var alertsConsoleWorkbookContent = {
   version: 'Notebook/1.0'
   items: [
@@ -2120,7 +1881,7 @@ var alertsConsoleWorkbookContent = {
             multiSelect: true
             quote: '\''
             delimiter: ','
-            query: '{"version":"1.0.0","content":"[ \\r\\n    {\\"id\\":\\"New\\", \\"label\\": \\"New\\"},\\r\\n    {\\"id\\":\\"Acknowledged\\", \\"label\\": \\"Acknowledged\\"},\\r\\n    {\\"id\\":\\"Closed\\", \\"label\\": \\"Closed\\"}\\r\\n]","transformers":null}'
+            query: '{"version":"1.0.0","content":"[ \\r\\n    {"id":"New", "label": "New"},\\r\\n    {"id":"Acknowledged", "label": "Acknowledged"},\\r\\n    {"id":"Closed", "label": "Closed"}\\r\\n]","transformers":null}'
             crossComponentResources: [
               '{Subscription}'
             ]
@@ -3397,7 +3158,7 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                 }
                 {
                   name: 'StepSettings'
-                  value: '{"version":"KqlItem/1.0","query":"let trend = ( Heartbeat\\r\\n    | make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step 15m by Computer\\r\\n    | extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend)-1)); \\r\\n\\r\\nlet PerfCPU = (Perf\\r\\n    | where ObjectName == \\"Processor\\" and CounterName == \\"% Processor Time\\" and InstanceName==\\"_Total\\"\\r\\n    | summarize AvgCPU=round(avg(CounterValue),2), MaxCPU=round(max(CounterValue),2) by Computer\\r\\n    | extend StatusCPU = case (\\r\\n                  AvgCPU > 80, 2,\\r\\n                  AvgCPU > 50, 1,\\r\\n                  AvgCPU <= 50, 0, -1\\r\\n                )\\r\\n    );\\r\\n\\r\\nlet PerfMemory = (Perf\\r\\n    | where ObjectName == \\"Memory\\" and (CounterName == \\"Available MBytes\\" or CounterName == \\"Available MBytes Memory\\")\\r\\n    | summarize AvgMEM=round(avg(CounterValue/1024),2), MaxMEM=round(max(CounterValue/1024),2) by Computer\\r\\n    | extend StatusMEM = case (\\r\\n                  AvgMEM > 4, 0,\\r\\n                  AvgMEM >= 1, 1,\\r\\n                  AvgMEM < 1, 2, -1\\r\\n            )\\r\\n    );\\r\\n\\r\\nlet PerfDisk = (Perf\\r\\n    | where (ObjectName == \\"LogicalDisk\\" or ObjectName == \\"Logical Disk\\") and CounterName == \\"Free Megabytes\\" and (InstanceName =~ \\"C:\\" or InstanceName == \\"/\\")\\r\\n    | summarize AvgDisk=round(avg(CounterValue),2), (TimeGenerated,LastDisk)=arg_max(TimeGenerated,round(CounterValue,2)) by Computer\\r\\n    | extend StatusDisk = case (\\r\\n                  AvgDisk < 5000, 2,\\r\\n                  AvgDisk < 30000, 1,\\r\\n                  AvgDisk >= 30000, 0,-1\\r\\n)\\r\\n    | project Computer, AvgDisk , LastDisk ,StatusDisk\\r\\n    );\\r\\nPerfCPU\\r\\n| join (PerfMemory) on Computer\\r\\n| join (PerfDisk) on Computer\\r\\n| join (trend) on Computer\\r\\n| project Computer,StatusCPU, AvgCPU,MaxCPU,StatusMEM,AvgMEM,MaxMEM,StatusDisk,AvgDisk,LastDisk, Trend\\r\\n| sort by Computer ","size":0,"showAnalytics":true,"title":"Top servers (data aggregated based on TimeRange)","timeContextFromParameter":"TimeRange","exportFieldName":"Computer","exportParameterName":"Computer","exportDefaultValue":"All","queryType":0,"resourceType":"microsoft.operationalinsights/workspaces","crossComponentResources":["{Workspace}"],"gridSettings":{"formatters":[{"columnMatch":"StatusCPU","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"4","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"Unknown","text":"{1}"}]}},{"columnMatch":"AvgCPU","formatter":2,"numberFormat":{"unit":1,"options":{"style":"decimal"}}},{"columnMatch":"MaxCPU","formatter":0,"numberFormat":{"unit":1,"options":{"style":"decimal"}}},{"columnMatch":"StatusMEM","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"critical","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"unknown","text":"{1}"}]}},{"columnMatch":"AvgMEM","formatter":0,"numberFormat":{"unit":5,"options":{"style":"decimal"}}},{"columnMatch":"MaxMEM","formatter":0,"numberFormat":{"unit":39,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"StatusDisk","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"4","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"success","text":"{1}"}]}},{"columnMatch":"AvgDisk","formatter":0,"numberFormat":{"unit":38,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"LastDisk","formatter":0,"numberFormat":{"unit":4,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"Trend","formatter":10,"formatOptions":{"palette":"blue"}},{"columnMatch":"Max","formatter":0,"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Average","formatter":8,"formatOptions":{"palette":"yellowOrangeRed"},"numberFormat":{"unit":0,"options":{"style":"decimal","useGrouping":false}}},{"columnMatch":"Min","formatter":8,"formatOptions":{"palette":"yellowOrangeRed","aggregation":"Min"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}}],"sortBy":[{"itemKey":"$gen_number_AvgCPU_2","sortOrder":2}],"labelSettings":[{"columnId":"StatusCPU","label":"CPU"},{"columnId":"AvgCPU","label":"CPU (avg)"},{"columnId":"MaxCPU","label":"CPU (max)"},{"columnId":"StatusMEM","label":"Memory"},{"columnId":"AvgMEM","label":"Memory (avg)"},{"columnId":"MaxMEM","label":"Memory (max)"},{"columnId":"StatusDisk","label":"Disk"},{"columnId":"AvgDisk","label":"Disk (avg)"},{"columnId":"LastDisk","label":"Disk (last)"}]},"sortBy":[{"itemKey":"$gen_number_AvgCPU_2","sortOrder":2}]}'
+                  value: '{"version":"KqlItem/1.0","query":"let trend = ( Heartbeat\\r\\n    | make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step 15m by Computer\\r\\n    | extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend)-1)); \\r\\n\\r\\nlet PerfCPU = (Perf\\r\\n    | where ObjectName == "Processor" and CounterName == "% Processor Time" and InstanceName=="total"\\r\\n    | summarize AvgCPU=round(avg(CounterValue),2), MaxCPU=round(max(CounterValue),2) by Computer\\r\\n    | extend StatusCPU = case (\\r\\n                  AvgCPU > 80, 2,\\r\\n                  AvgCPU > 50, 1,\\r\\n                  AvgCPU <= 50, 0, -1\\r\\n                )\\r\\n    );\\r\\n\\r\\nlet PerfMemory = (Perf\\r\\n    | where ObjectName == "Memory" and (CounterName == "Available MBytes" or CounterName == "Available MBytes Memory")\\r\\n    | summarize AvgMEM=round(avg(CounterValue/1024),2), MaxMEM=round(max(CounterValue/1024),2) by Computer\\r\\n    | extend StatusMEM = case (\\r\\n                  AvgMEM > 4, 0,\\r\\n                  AvgMEM >= 1, 1,\\r\\n                  AvgMEM < 1, 2, -1\\r\\n            )\\r\\n    );\\r\\n\\r\\nlet PerfDisk = (Perf\\r\\n    | where (ObjectName == "LogicalDisk" or ObjectName == "Logical Disk") and CounterName == "Free Megabytes" and (InstanceName =~ "C:" or InstanceName == "/")\\r\\n    | summarize AvgDisk=round(avg(CounterValue),2), (TimeGenerated,LastDisk)=arg_max(TimeGenerated,round(CounterValue,2)) by Computer\\r\\n    | extend StatusDisk = case (\\r\\n                  AvgDisk < 5000, 2,\\r\\n                  AvgDisk < 30000, 1,\\r\\n                  AvgDisk >= 30000, 0,-1\\r\\n)\\r\\n    | project Computer, AvgDisk , LastDisk ,StatusDisk\\r\\n    );\\r\\nPerfCPU\\r\\n| join (PerfMemory) on Computer\\r\\n| join (PerfDisk) on Computer\\r\\n| join (trend) on Computer\\r\\n| project Computer,StatusCPU, AvgCPU,MaxCPU,StatusMEM,AvgMEM,MaxMEM,StatusDisk,AvgDisk,LastDisk, Trend\\r\\n| sort by Computer ","size":0,"showAnalytics":true,"title":"Top servers (data aggregated based on TimeRange)","timeContextFromParameter":"TimeRange","exportFieldName":"Computer","exportParameterName":"Computer","exportDefaultValue":"All","queryType":0,"resourceType":"microsoft.operationalinsights/workspaces","crossComponentResources":["{Workspace}"],"gridSettings":{"formatters":[{"columnMatch":"StatusCPU","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"4","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"Unknown","text":"{1}"}]}},{"columnMatch":"AvgCPU","formatter":2,"numberFormat":{"unit":1,"options":{"style":"decimal"}}},{"columnMatch":"MaxCPU","formatter":0,"numberFormat":{"unit":1,"options":{"style":"decimal"}}},{"columnMatch":"StatusMEM","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"critical","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"unknown","text":"{1}"}]}},{"columnMatch":"AvgMEM","formatter":0,"numberFormat":{"unit":5,"options":{"style":"decimal"}}},{"columnMatch":"MaxMEM","formatter":0,"numberFormat":{"unit":39,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"StatusDisk","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"0","representation":"success","text":"{1}"},{"operator":"==","thresholdValue":"1","representation":"2","text":"{1}"},{"operator":"==","thresholdValue":"2","representation":"4","text":"{1}"},{"operator":"Default","thresholdValue":null,"representation":"success","text":"{1}"}]}},{"columnMatch":"AvgDisk","formatter":0,"numberFormat":{"unit":38,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"LastDisk","formatter":0,"numberFormat":{"unit":4,"options":{"style":"decimal","maximumFractionDigits":2}}},{"columnMatch":"Trend","formatter":10,"formatOptions":{"palette":"blue"}},{"columnMatch":"Max","formatter":0,"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Average","formatter":8,"formatOptions":{"palette":"yellowOrangeRed"},"numberFormat":{"unit":0,"options":{"style":"decimal","useGrouping":false}}},{"columnMatch":"Min","formatter":8,"formatOptions":{"palette":"yellowOrangeRed","aggregation":"Min"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}}],"sortBy":[{"itemKey":"$gen_number_AvgCPU_2","sortOrder":2}],"labelSettings":[{"columnId":"StatusCPU","label":"CPU"},{"columnId":"AvgCPU","label":"CPU (avg)"},{"columnId":"MaxCPU","label":"CPU (max)"},{"columnId":"StatusMEM","label":"Memory"},{"columnId":"AvgMEM","label":"Memory (avg)"},{"columnId":"MaxMEM","label":"Memory (max)"},{"columnId":"StatusDisk","label":"Disk"},{"columnId":"AvgDisk","label":"Disk (avg)"},{"columnId":"LastDisk","label":"Disk (last)"}]},"sortBy":[{"itemKey":"$gen_number_AvgCPU_2","sortOrder":2}]}'
                   isOptional: true
                 }
                 {
@@ -3522,7 +3283,7 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                 }
                 {
                   name: 'StepSettings'
-                  value: '{"version":"KqlItem/1.0","query":"AlertsManagementResources \\r\\n| where type =~ \'microsoft.alertsmanagement/alerts\'\\r\\n| where properties.essentials.startDateTime {timeRange}  \\r\\n| where properties.essentials.actionStatus.isSuppressed == false\\r\\n| extend Severity=tostring(properties.essentials.severity)\\r\\n| extend State=tostring(properties.essentials.alertState)\\r\\n| extend comp = properties.context.context.condition.allOf[0].dimensions\\r\\n| mvexpand comp\\r\\n| where comp.name == \'Computer\' or comp.name == \'TestConfigurationName\' or isnull(comp)\\r\\n| where \\"*\\" in ({State}) or State in ({State})\\r\\n| where \\"*\\" in ({ResourceTypes}) or properties.essentials.targetResourceType in~ ({ResourceTypes})\\r\\n| where \\"*\\" in ({ResourceGroups}) or properties.essentials.targetResourceGroup in~ ({ResourceGroups})\\r\\n| where \\"*\\" in ({Resources}) or properties.essentials.targetResource in~ ({Resources})\\r\\n| project AlertId=id, StartTime=todatetime(tostring(properties.essentials.startDateTime)), Name=name, Severity, State=tostring(properties.essentials.alertState), MonitorCondition=tostring(properties.essentials.monitorCondition), SignalType=tostring(properties.essentials.signalType), TargetResource = split(comp.value, \'.\')[0]\\r\\n| order by StartTime desc\\r\\n","size":0,"title":"Azure Monitor alerts","queryType":1,"resourceType":"microsoft.resourcegraph/resources","crossComponentResources":["{Subscription}"],"gridSettings":{"formatters":[{"columnMatch":"AlertId","formatter":5},{"columnMatch":"StartTime","formatter":6},{"columnMatch":"Name","formatter":1,"formatOptions":{"linkTarget":"OpenBlade","linkIsContextBlade":true,"bladeOpenContext":{"bladeName":"AlertDetailsTemplateBlade","extensionName":"Microsoft_Azure_Monitoring","bladeParameters":[{"name":"alertId","source":"column","value":"AlertId"},{"name":"alertName","source":"column","value":"Name"},{"name":"invokedFrom","source":"static","value":"Workbooks"}]}},"tooltipFormat":{"tooltip":"View alert details"}},{"columnMatch":"Severity","formatter":11},{"columnMatch":"State","formatter":1},{"columnMatch":"MonitorCondition","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"Fired","representation":"Fired","text":"{0}{1}"},{"operator":"==","thresholdValue":"Resolved","representation":"Resolved","text":"{0}{1}"},{"operator":"Default","thresholdValue":null,"representation":"success","text":"{0}{1}"}]}},{"columnMatch":"TargetResource","formatter":13,"formatOptions":{"linkTarget":null,"showIcon":true}},{"columnMatch":"ResourceType","formatter":16,"formatOptions":{"showIcon":true}},{"columnMatch":"Resource Type","formatter":11},{"columnMatch":"essentials","formatter":5}]}}'
+                  value: '{"version":"KqlItem/1.0","query":"AlertsManagementResources \\r\\n| where type =~ \'microsoft.alertsmanagement/alerts\'\\r\\n| where properties.essentials.startDateTime {timeRange}  \\r\\n| where properties.essentials.actionStatus.isSuppressed == false\\r\\n| extend Severity=tostring(properties.essentials.severity)\\r\\n| extend State=tostring(properties.essentials.alertState)\\r\\n| extend comp = properties.context.context.condition.allOf[0].dimensions\\r\\n| mvexpand comp\\r\\n| where comp.name == \'Computer\' or comp.name == \'TestConfigurationName\' or isnull(comp)\\r\\n| where "*" in ({State}) or State in ({State})\\r\\n| where "*" in ({ResourceTypes}) or properties.essentials.targetResourceType in~ ({ResourceTypes})\\r\\n| where "*" in ({ResourceGroups}) or properties.essentials.targetResourceGroup in~ ({ResourceGroups})\\r\\n| where "*" in ({Resources}) or properties.essentials.targetResource in~ ({Resources})\\r\\n| project AlertId=id, StartTime=todatetime(tostring(properties.essentials.startDateTime)), Name=name, Severity, State=tostring(properties.essentials.alertState), MonitorCondition=tostring(properties.essentials.monitorCondition), SignalType=tostring(properties.essentials.signalType), TargetResource = split(comp.value, \'.\')[0]\\r\\n| order by StartTime desc\\r\\n","size":0,"title":"Azure Monitor alerts","queryType":1,"resourceType":"microsoft.resourcegraph/resources","crossComponentResources":["{Subscription}"],"gridSettings":{"formatters":[{"columnMatch":"AlertId","formatter":5},{"columnMatch":"StartTime","formatter":6},{"columnMatch":"Name","formatter":1,"formatOptions":{"linkTarget":"OpenBlade","linkIsContextBlade":true,"bladeOpenContext":{"bladeName":"AlertDetailsTemplateBlade","extensionName":"Microsoft_Azure_Monitoring","bladeParameters":[{"name":"alertId","source":"column","value":"AlertId"},{"name":"alertName","source":"column","value":"Name"},{"name":"invokedFrom","source":"static","value":"Workbooks"}]}},"tooltipFormat":{"tooltip":"View alert details"}},{"columnMatch":"Severity","formatter":11},{"columnMatch":"State","formatter":1},{"columnMatch":"MonitorCondition","formatter":18,"formatOptions":{"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"==","thresholdValue":"Fired","representation":"Fired","text":"{0}{1}"},{"operator":"==","thresholdValue":"Resolved","representation":"Resolved","text":"{0}{1}"},{"operator":"Default","thresholdValue":null,"representation":"success","text":"{0}{1}"}]}},{"columnMatch":"TargetResource","formatter":13,"formatOptions":{"linkTarget":null,"showIcon":true}},{"columnMatch":"ResourceType","formatter":16,"formatOptions":{"showIcon":true}},{"columnMatch":"Resource Type","formatter":11},{"columnMatch":"essentials","formatter":5}]}}'
                   isOptional: true
                 }
                 {
@@ -3675,7 +3436,7 @@ resource azureDashboard 'Microsoft.Portal/dashboards@2015-08-01-preview' = {
                 }
                 {
                   name: 'StepSettings'
-                  value: '{"version":"KqlItem/1.0","query":"Event\\r\\n|  where EventLog in (\\"System\\",\\"Application\\",\\"Operations Manager\\")\\r\\n| project EventLog,EventLevelName\\r\\n| evaluate pivot(EventLevelName)","size":1,"showAnalytics":true,"title":"Windows Events - Summary","timeContext":{"durationMs":0},"timeContextFromParameter":"TimeRange","exportFieldName":"EventLog","exportParameterName":"EventLog","queryType":0,"resourceType":"microsoft.operationalinsights/workspaces","crossComponentResources":["{Workspace}"],"gridSettings":{"formatters":[{"columnMatch":"Information","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"info","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Warning","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"warning","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Error","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"3","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}}]}}'
+                  value: '{"version":"KqlItem/1.0","query":"Event\\r\\n|  where EventLog in ("System","Application","Operations Manager")\\r\\n| project EventLog,EventLevelName\\r\\n| evaluate pivot(EventLevelName)","size":1,"showAnalytics":true,"title":"Windows Events - Summary","timeContext":{"durationMs":0},"timeContextFromParameter":"TimeRange","exportFieldName":"EventLog","exportParameterName":"EventLog","queryType":0,"resourceType":"microsoft.operationalinsights/workspaces","crossComponentResources":["{Workspace}"],"gridSettings":{"formatters":[{"columnMatch":"Information","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"info","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Warning","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"warning","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}},{"columnMatch":"Error","formatter":18,"formatOptions":{"showIcon":true,"thresholdsOptions":"icons","thresholdsGrid":[{"operator":"Default","thresholdValue":null,"representation":"3","text":"{0}{1}"}],"aggregation":"Unique"},"numberFormat":{"unit":0,"options":{"style":"decimal"}}}]}}'
                   isOptional: true
                 }
                 {
