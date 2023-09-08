@@ -320,7 +320,7 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 
 - Fill in the Resource Group, Region, Operating System (Windows), keep Connectivity as "Public endpoint" and in the Authentication box select the onboarding service principal that you created in this task. Then download the script to your local machine (or you can copy the content into the clipboard). 
 
-- Go to the ArcBox-Client machine via RDP and from Hyper-V manager right-click on the ArcBox-Win2K22 VM and click "Connect". Then start Windows Powershell ISE and copy the content of the onboarding script in the Script Pane.
+- Go to the ArcBox-Client machine via RDP and from Hyper-V manager right-click on the ArcBox-Win2K22 VM and click "Connect" (Administrator default password is ArcDemo123!!). Then start Windows Powershell ISE in the ArcBox-Win2K22 VM and copy the content of the onboarding script in the Script Pane.
 
 - Fill in the Service Principal secret in the script and run it.
 
@@ -342,26 +342,26 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 - Fill in the required details but this time choose Linux for the Operating System box. Then download the script to your local machine (or you can copy the content into the clipboard).
 
 - Add the client secret to the script using your editor. Also add the following 3 lines just below the last export statement (to allow onboarding of Azure linux machines):
-```
-sudo ufw --force enable\
-sudo ufw deny out from any to 169.254.169.254\
+```shell
+sudo ufw --force enable
+sudo ufw deny out from any to 169.254.169.254
 sudo ufw default allow incoming
 ```
 - Go the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
 
     ![Screenshot IP address of second Ubuntu machine](./IP_address_second_Linux_vm.png)
 
-- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or vscode. 
+- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or "Vscode". 
 
     ![Screenshot connect with putty](./putty.png)
 
 - Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
 
-- create the onboarding script file using the nano editor, and paste the script content from your local machine.
+- create an empty onboarding script file using the nano editor, and paste the script content from your local machine.
 ```
 nano onboardingscript.sh
 ```
-- Save the file (Ctrl-O) and exit (Ctrl-X). Now you can run the script:
+- Save the file (Ctrl-O then Enter) and exit (Ctrl-X). Now you can run the script:
 
 ```
 sudo bash ./onboardingscript.sh
@@ -1174,7 +1174,7 @@ or
 
 #### Azure PowerShell
 ```powershell
-# Log out from the Service Principcal context
+# Log out from the Service Principal context
 Disconnect-AzAccount
 
 # Log in using your personal account
@@ -1292,7 +1292,7 @@ In this first step, you will assign Azure resource tags to some of your Azure Ar
 - In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/equals-operator).
 
 ```shell
-Resources \
+Resources 
 | where type =~ 'Microsoft.HybridCompute/machines'
 ```
 
