@@ -1,4 +1,4 @@
-# Jumpstart Agora - Contoso Supermarket deployment guide
+# Jumpstart Agora - Physical Deployment
 
 ## Overview
 
@@ -119,7 +119,9 @@ onfigure a GitHub fine-grained personal access token (PAT) with permissions to m
         }  spnClientID        = ""
     ```
 
-2. Open a Powershell Windows (with Admin rights) and execute the physical_deployment.ps1 file. Note: the physical_agora_params.psd1 and the physical_deployment.ps1 file must be in the same directory.
+2. Open a Powershell Windows (with Admin rights) and execute the physical_deployment.ps1 file. 
+   
+   > __NOTE: The physical_agora_params.psd1 and the physical_deployment.ps1 file must be in the same directory..__
 
  ```shell
     ./physical_deployment.ps1
