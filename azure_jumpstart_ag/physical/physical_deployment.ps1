@@ -30,6 +30,7 @@ $gitHubUser         = $AgConfig.GitHub["gitHubUser"]
 $githubPat          = $AgConfig.GitHub["githubPat"]
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+$appsRepo           = "jumpstart-agora-apps"
 
 #Deployment Info
 $deploymentName     = $AgConfig.AzureDeployment["deploymentName"]
@@ -40,6 +41,8 @@ $appId              = $AgConfig.AzureDeployment["appId"]
 $spnClientSecret    = $AgConfig.AzureDeployment["spnClientSecret"]
 $spnTenantId        = $AgConfig.AzureDeployment["spnTenantId"]
 $spnClientID        = $AgConfig.AzureDeployment["spnClientID"]
+$database           = "Orders"
+$container          = "Orders"
 
 # Azure Account Info
 $uniqueGuid         = [Guid]::NewGuid().ToString("N").Substring(0, 5)
@@ -166,12 +169,12 @@ Write-Host "[$(Get-Date -Format t)] INFO: Container Registry $acrName Created" -
 
 # CosmosDB
 az cosmosdb create --name $cosmosDBName --resource-group $resourceGroup --kind GlobalDocumentDB --capabilities EnableServerless
-Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Account Created" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Account $cosmosDBName Created" -ForegroundColor Gray
 
-az cosmosdb sql database create --account-name $cosmosDBName --resource-group $resourceGroup --name $cosmosDBName
+az cosmosdb sql database create --account-name $cosmosDBName --resource-group $resourceGroup --name "Orders"
 Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB DB Created" -ForegroundColor Gray
 
-az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name $cosmosDBName --name $container --partition-key-path '/OrderId'
+az cosmosdb sql container create --account-name $cosmosDBName --resource-group $resourceGroup --database-name "Orders" --name $container --partition-key-path '/OrderId'
 Write-Host "[$(Get-Date -Format t)] INFO: CosmosDB Container Created" -ForegroundColor DarkGreen
 
 
@@ -639,5 +642,25 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     
 }
 
+$services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
+$matchingServices = $services.items | Where-Object {
+    $_.spec.ports.port -contains 5000 -and
+    $_.spec.type -eq "LoadBalancer"
+}
+$posIps = $matchingServices.status.loadBalancer.ingress.ip
+$posIps = "http://" + $posIps + ":5000"
+
+
+$matchingServices = $services.items | Where-Object {
+    $_.spec.ports.port -contains 81 -and
+    $_.spec.type -eq "LoadBalancer"
+}
+$storemanagerip = $matchingServices.status.loadBalancer.ingress.ip
+$storemanagerip = "http://" + $storemanagerip + ":81"
+
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+Write-Host "Agora Physical Deployment Complete." -ForegroundColor Green
+Write-Host "Resource Group: "  $resourceGroup -ForegroundColor Green
+Write-Host "POS Endpoint: " $posIps -ForegroundColor Green
+Write-Host "Store Manager Endpoint: " $storemanagerip -ForegroundColor Green
 Write-Host

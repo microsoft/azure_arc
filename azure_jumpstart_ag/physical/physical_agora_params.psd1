@@ -24,16 +24,12 @@
         githubBranch       = "physical_ag"
         gitHubUser         = "agoraedge"
         githubPat          = ""
-        appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
-        appsRepo           = "jumpstart-agora-apps"
     }
     # Required URLs
 
     AzureDeployment             =@{
         deploymentName     = ""
         azureLocation      = "westus2"
-        database           = "Orders"
-        container          = "Orders"
         appId              = ""
         spnClientSecret    = ""
         spnTenantId        = ""
