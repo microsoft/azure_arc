@@ -822,7 +822,7 @@ You have also seen some of the default reports, and since they use workbooks, yo
 
 In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook workers in Azure Automation. We will then create and start runbooks on the hybrid runbook workers to see how this feature can be leveraged.
 
-#### Task 1
+#### Task 1 - create Automation account
 
 ##### Option 1: Azure portal
 
@@ -881,13 +881,13 @@ The output should look similar to this:
 
 ![Screenshot showing creation of Automation account using Azure PowerShell](./powershell_create_automation.png)
 
-#### Task 2
+#### Task 2 - Add Hybrid Runbook Workers
 
 ##### Option 1: Azure portal
 
 - In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
 
-    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
 
 - Navigate to the _ArcBox-Automation_ account you created previously
 - Select _Hybrid worker groups_:
@@ -1001,17 +1001,133 @@ New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupNam
 ```
 
 
-#### Task 3
+#### Task 3 - Install PowerShell 7 on Hybrid Runbook Workers
 
-TODO: Add insructions for creating and starting a runbook
-#### Task 4
+```powershell
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
 
-This task is optional.
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
 
-Install the Visual Studio Code extension for Azure Automation to create, edit and start runbooks locally.
+# Install PowerShell
+sudo snap install powershell --classic
 
-TODO: Add instructions
+# Start PowerShell to verify it is available
+pwsh
 
+exit #exit from PowerShell
+exit #exit SSH connection
+```
+
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
+```
+
+- When logged into the machine, press the _Start-button_ and open _Microsoft Edge_
+- Navigate to [https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package).
+- Click the link to download _PowerShell-7.3.6-win-x64.msi_
+- When the file has downloaded, click _Open file_
+
+![Screenshot showing PowerShell 7 download](./powershell_installation_windows_1.png)
+
+- Click _Next_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_2.png)
+
+- Leave default values and click _Next_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_3.png)
+
+- Leave default values and click _Next_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_4.png)
+
+- Leave default values and click _Next_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_5.png)
+
+- Click _Install_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_6.png)
+
+- Check _Launch PowerShell_ and click _Finish_
+
+![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_7.png)
+
+- After PowerShell has launched, type `Restart-Service -Name HybridWorkerService` and press Enter
+- Close the Window and sign-out from the machine
+
+![Screenshot showing PowerShell 7 installaed](./powershell_installation_windows_8.png)
+
+$ Task 4 - Create and start a runbook
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Navigate to the _ArcBox-Automation_ account you created previously
+- Select _Runbooks_ and click _Create a runbook_
+
+![Screenshot showing Automation account runbooks overview in the Azure Portal](./portal_show_automation_runbooks.png)
+
+- Enter the following values
+  - Name: Start-DiskClean
+  - Runbook type: PowerShell
+  - Runtime version: 7.2 (preview)
+  - Description: Invoke disk cleanup
+- Click _Create_
+
+![Screenshot showing Automation account runbook creation in the Azure Portal](./portal_create_automation_runbooks_1.png)
+
+- After provisioning, the runbook editor will open the newly created runbook:
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_2.png)
+
+- Paste the following script into the editor pane:
+        - dd
+- Click Save
+- Click Publish
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_3.png)
+
+-
+- Click _Start_
+    - Note: You may need to click _Refresh_ for the _Start_ button to become active
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
+
+- Select _Hybrid Worker_ and select _linux-workers_ under _Choose Hybrid Worker group_
+- Click _OK_
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_2.png)
+
+- Click on the _Output_ tab and wait for the job to finish
+  - You should notice that the amount of free space is lower after the cleanup action has been triggered
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_3.png)
+
+The provided runbook is a starting point for cleaning a single directory. Additional logic and directories may be added as required for specific scenarios. For example, it may also be added logic to connect to other machines in order to perform cleanup actions on those.
+
+Next, you will be running the same runbook on a Windows machine.
+
+- Navigate back to the runbook overview page for _Start-DiskClean_ and click _Start_
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
+
+- Select _Hybrid Worker_ and select _windows-workers_ under _Choose Hybrid Worker group_
+- Click _OK_
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_4.png)
+
+- Click on the _Output_ tab and wait for the job to finish
+  - The cleanup action may run for a few minutes, so feel free to continue and revisit the job output later
+  - When completed, you should notice that the amount of free space is lower after the cleanup action has been triggered
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_5.png)
 
 ### Module 8: SSH into your Azure Arc-enabled servers using SSH access
 
