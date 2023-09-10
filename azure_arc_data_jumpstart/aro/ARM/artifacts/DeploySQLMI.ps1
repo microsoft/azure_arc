@@ -25,7 +25,7 @@ $vCoresLimit =  "4"
 $memoryLimit = "8Gi"
 
 # Storage
-$StorageClassName = "managed-premium"
+$StorageClassName = "managed-csi"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
