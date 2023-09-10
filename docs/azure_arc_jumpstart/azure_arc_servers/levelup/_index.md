@@ -302,7 +302,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 #### Task 2: Onboard a Windows machine to Azure Arc
 
 
-- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/en-us/azure/azure-arc/servers/onboard-service-principal).
+- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/azure/azure-arc/servers/onboard-service-principal).
 
 - Using the following Powershell commands create a service principal and assign it the Azure Connected Machine Onboarding role for the selected subscription. After the service principal is created, it will print the application ID and secret (copy these somewhere safe for later use):
 
@@ -1049,7 +1049,7 @@ New-AzAutomationAccount @AutomationAccountParams
 
 The output should look similar to this:
 
-![Screenshot showing creation of Automation account using Azure PowerShell](./powershell_create_automation.png)
+   ![Screenshot showing creation of Automation account using Azure PowerShell](./powershell_create_automation.png)
 
 #### Task 2 - Add Hybrid Runbook Workers
 
@@ -1057,48 +1057,48 @@ The output should look similar to this:
 
 - In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
 
-![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+   ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
 
 - Navigate to the _ArcBox-Automation_ account you created previously
 - Select _Hybrid worker groups_:
 
-![Screenshot showing Automation account in the Azure Portal](./portal_show_automation.png)
+   ![Screenshot showing Automation account in the Azure Portal](./portal_show_automation.png)
 
 - Click _Create hybrid worker group_:
 
-![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_1.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_1.png)
 
 - Type _windows-workers_ as the name of the new Hybrid worker group
 - Leave the default value for _Use Hybrid Worker Credentials_
 - Click Next
 
-![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_2.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_2.png)
 
 - Click _Add machines_:
 
-![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_3.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_3.png)
 
 - Select _ArcBox-Win2K22_ and click _Add_:
 
-![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_4.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_4.png)
 
 - Click _Review + Create_:
 
-![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_5.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_5.png)
 
 - Click _Create_:
 
-![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_6.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_6.png)
 
 - Wait for the following activities to be finished:
 
-![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_7.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_7.png)
 
 - Repeat the above steps to create an additional Hybrid worker group called _linux-workers_ where you select to onboard the machine _ArcBox-Ubuntu01_ to the group.
 
 - After completing this task you should have the following Hybrid worker groups:
 
-![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_8.png)
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_8.png)
 
 ##### Option 2: Azure PowerShell
 
@@ -1198,51 +1198,53 @@ Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $l
 ```
 
 - When logged into the machine, press the _Start-button_ and open _Microsoft Edge_
-- Navigate to [https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package).
+
+- Navigate to [https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package).
+
 - Click the link to download _PowerShell-7.3.6-win-x64.msi_
 - When the file has downloaded, click _Open file_
 
-![Screenshot showing PowerShell 7 download](./powershell_installation_windows_1.png)
+    ![Screenshot showing PowerShell 7 download](./powershell_installation_windows_1.png)
 
 - Click _Next_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_2.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_2.png)
 
 - Leave default values and click _Next_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_3.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_3.png)
 
 - Leave default values and click _Next_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_4.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_4.png)
 
 - Leave default values and click _Next_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_5.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_5.png)
 
 - Click _Install_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_6.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_6.png)
 
 - Check _Launch PowerShell_ and click _Finish_
 
-![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_7.png)
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_7.png)
 
 - After PowerShell has launched, type `Restart-Service -Name HybridWorkerService` and press Enter
 - Close the Window and sign-out from the machine
 
-![Screenshot showing PowerShell 7 installaed](./powershell_installation_windows_8.png)
+    ![Screenshot showing PowerShell 7 installaed](./powershell_installation_windows_8.png)
 
-$ Task 4 - Create and start a runbook
+#### Task 4 - Create and start a runbook
 
 - In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
 
-![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
 
 - Navigate to the _ArcBox-Automation_ account you created previously
 - Select _Runbooks_ and click _Create a runbook_
 
-![Screenshot showing Automation account runbooks overview in the Azure Portal](./portal_show_automation_runbooks.png)
+    ![Screenshot showing Automation account runbooks overview in the Azure Portal](./portal_show_automation_runbooks.png)
 
 - Enter the following values
   - Name: Start-DiskClean
@@ -1251,11 +1253,11 @@ $ Task 4 - Create and start a runbook
   - Description: Invoke disk cleanup
 - Click _Create_
 
-![Screenshot showing Automation account runbook creation in the Azure Portal](./portal_create_automation_runbooks_1.png)
+    ![Screenshot showing Automation account runbook creation in the Azure Portal](./portal_create_automation_runbooks_1.png)
 
 - After provisioning, the runbook editor will open the newly created runbook:
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_2.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_2.png)
 
 - Paste the following script into the editor pane:
 ```powershell
@@ -1303,25 +1305,25 @@ if ($IsWindows) {
 }
 ```
 - Click Save
+
 - Click Publish
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_3.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_3.png)
 
--
 - Click _Start_
     - Note: You may need to click _Refresh_ for the _Start_ button to become active
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
 
 - Select _Hybrid Worker_ and select _linux-workers_ under _Choose Hybrid Worker group_
+
 - Click _OK_
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_2.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_2.png)
 
-- Click on the _Output_ tab and wait for the job to finish
-  - You should notice that the amount of free space is lower after the cleanup action has been triggered
+- Click on the _Output_ tab and wait for the job to finish. You should notice that the amount of free space is lower after the cleanup action has been triggered
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_3.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_3.png)
 
 The provided runbook is a starting point for cleaning a single directory. Additional logic and directories may be added as required for specific scenarios. For example, it may also be added logic to connect to other machines in order to perform cleanup actions on those.
 
@@ -1332,15 +1334,16 @@ Next, you will be running the same runbook on a Windows machine.
 ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
 
 - Select _Hybrid Worker_ and select _windows-workers_ under _Choose Hybrid Worker group_
+
 - Click _OK_
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_4.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_4.png)
 
 - Click on the _Output_ tab and wait for the job to finish
   - The cleanup action may run for a few minutes, so feel free to continue and revisit the job output later
   - When completed, you should notice that the amount of free space is lower after the cleanup action has been triggered
 
-![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_5.png)
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_5.png)
 
 ### Module 8: SSH into your Azure Arc-enabled servers using SSH access
 
@@ -1438,13 +1441,13 @@ Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $l
 The first time you connect to an Arc-enabled server using SSH, you will retrieve the following question:
 > Port 22 is not allowed for SSH connections in this resource. Would you like to update the current Service Configuration in the endpoint to allow connections to port 22? If you would like to update the Service Configuration to allow connections to a different port, please provide the -Port parameter or manually set up the Service Configuration. (y/n)
 
-It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
+It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
 
 For this exercise, type `yes` and press Enter to proceed.
 
- ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
- ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
 
 Following the previous method, connect to _ArcBox-Win2K22_ via SSH.
 
@@ -1466,9 +1469,9 @@ $localUser = "Administrator"
 Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
 ```
 
-![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
 
-![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
 
 In addition to SSH, you can also connect to the Azure Arc-enabled servers, Windows Server virtual machines using **Remote Desktop** tunneled via SSH.
 
@@ -1490,7 +1493,7 @@ $localUser = "Administrator"
 Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
 ```
 
-  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
+   ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
 
 #### Task 4 - Optional: Azure AD/Entra ID based SSH Login
 
@@ -1642,7 +1645,7 @@ In this first step, you will assign Azure resource tags to some of your Azure Ar
 
 #### Task 3: Run a query to show all Azure Arc-enabled servers in your subscription
 
-- In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/equals-operator).
+- In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/azure/data-explorer/kusto/query/equals-operator).
 
 ```shell
 Resources 
@@ -1802,7 +1805,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
 - The steps above helps you identify non-compliant resources and then you can act on resolving the non-compliance reasons.
 
-- NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
+- NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
 
 ```powershell
 $job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob 
