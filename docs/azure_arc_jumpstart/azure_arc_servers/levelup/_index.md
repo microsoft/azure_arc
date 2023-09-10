@@ -294,7 +294,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 - We should see the machines that are connected to Arc already: Arcbox-Ubuntu-01 and ArcBox-Win2K19.
 
     ![Screenshot showing existing Arc connected servers](./First_view_of%20Arc_connected.png) 
- 
+
  - We want to connect the other 2 machines running as VMs in the ArcBox-Client. We can see these (ArcBox-Win2K22 and ArcBox-Ubuntu-02) by running the Hyper-V Manager in the ArcBox-Client (after we have connected to it with RDP as explained earlier in the setup).
 
     ![Screenshot of 4 machines on Hyper-v](./choose_Hyper-V.png)
@@ -379,6 +379,10 @@ sudo bash ./onboardingscript.sh
 #### Module overview
 
 In this module, you will learn how to deploy the Azure Monitor agent to your Arc-enabled Windows and Linux machines, the dependency agent to your Arc-enabled Windows machines and enable the _VM Insights_ solution to start monitoring your machines using Azure Monitor, run queries on the Log analytics workspace and configure alerts.
+
+#### Pre-requisites
+
+- Make sure that the policy _Enable Azure Monitor for Hybrid VMs with AMA_ is not assigned or inherited on the subscription you will use for this level-up.
 
 #### Task 1: Deploy Azure Monitor agents and VM Insights using Azure Policy
 
