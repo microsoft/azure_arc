@@ -72,11 +72,39 @@ az login
 
 #!markdown
 
+- Set the default subscription using Azure CLI.
+
+```shell
+$subscriptionId = "<Subscription Id>"
+az account set -s $subscriptionId
+```
+
+#!pwsh
+
+$subscriptionId = "<Subscription Id>"
+az account set -s $subscriptionId
+
+#!markdown
+
 Login to Azure PowerShell the ```Connect-AzAccount``` command.
 
 #!pwsh
 
 Connect-AzAccount
+
+#!markdown
+
+- Set the default subscription using Azure PowerShell.
+
+```shell
+$subscriptionId = "<Subscription Id>"
+Set-AzContext -SubscriptionId $subscriptionId
+```
+
+#!pwsh
+
+$subscriptionId = "<Subscription Id>"
+Set-AzContext -SubscriptionId $subscriptionId
 
 #!markdown
 
