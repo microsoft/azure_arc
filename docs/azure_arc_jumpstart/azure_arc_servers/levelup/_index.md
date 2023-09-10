@@ -8,34 +8,37 @@ After completion of this workshop, you will be able to:
 
 - Understand pre-requisites to onboard Windows and Linux servers to Azure Arc
 - Onboard Windows and Linux servers running using different onboarding methods
-- Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 - Monitor your Azure Arc-enabled servers using Azure Monitor
-- Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
+- Enroll your Windows Server 2012/R2 or SQL Server 2012 machines for Extended Security Updates through Azure Arc
+- Secure your Azure Arc-enabled servers using Microsoft Defender for servers
+- Gain security insights from your Arc-enabled servers using Microsoft Sentinel
+- Enforce governance across your Azure Arc-enabled servers using Azure Policy
+- Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)
+- Query and inventory your Azure Arc-enabled servers using Azure Resource Graph
 - Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
 - Keep your Azure Arc-enabled servers patched using Azure Update Manager
-- Gain security insights from your Arc-enabled servers using Microsoft Sentinel
-- Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
 - SSH into your Azure Arc-enabled servers using SSH access
-- Manage your Azure Arc-enabled servers using Admin Center (Preview)
-- Query and inventory your Azure Arc-enabled servers using Azure resource graph
-- Enforce governance across your Azure Arc-enabled servers using Azure Policy
+- Run scripts in your Arc-enabled Windows server by using Run Commands
+- Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
+- Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
 | LevelUp Module | Duration | Facilitator |
 |---------------|---------------|---------------|
-|**1. Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Owner |
-|**2. Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Owner |
-|**3. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
-|**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
-|**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
-|**6. Keep your Azure Arc-enabled servers patched using Azure Update Manager** | x minutes | Owner |
-|**7. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
-|**8. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
-|**9. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
-|**10. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
-|**11. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
-|**12. Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | x minutes | Owner |
-|**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
-|**14. Run command** | x minutes | Jan Egil Ring |
+|**Understand pre-requisites to onboard Windows and Linux servers to Azure Arc** | x minutes | Seif Bassem |
+|**Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Basim Majeed |
+|**Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Basim Majeed |
+|**Enroll your Windows Server 2012/R2 or SQL Server 2012 machines for Extended Security Updates through Azure Arc** | x minutes | Alexander Ortha/Aurnov Chattopadhyay|
+|**Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Seif Bassem |
+|**Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | x minutes | Seif Bassem |
+|**Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Basim Majeed |
+|**Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)** | x minutes | Basim Majeed |
+|**Query and inventory your Azure Arc-enabled servers using Azure Resource Graph** | x minutes | Basim Majeed |
+|**Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Lloyd Lim |
+|**Keep your Azure Arc-enabled servers patched using Azure Update Manager** | x minutes | Lloyd Lim |
+|**SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Jan Egil Ring |
+|**Run scripts in your Arc-enabled Windows server by using Run Commands** | x minutes | Jan Egil Ring |
+|**Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Jan Egil Ring |
+|**Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Jan Egil Ring |
 
 ## LevelUp Lab Environment
 
