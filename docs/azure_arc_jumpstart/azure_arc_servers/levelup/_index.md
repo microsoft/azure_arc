@@ -913,13 +913,170 @@ if ($roleDefinitionIds.Count -gt 0)
 
 #### Task 2
 
-### Module 5: Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
+### Module 5: Monitor changes to your Azure Arc-enabled servers using Change Tracking and Inventory
 
 #### Module overview
 
-#### Task 1
+Change Tracking and Inventory is an built-in Azure service, provided by Azure Automation. The old version uses the Log Analytics agent, while the new (preview) version uses the Azure Monitor Agent (AMA).
 
-#### Task 2
+
+#### Prerequisites
+
+The following are required for this module to function:
+1. Ensure that the servers are already on-boarded to Azure Arc.
+
+2. Ensure that the Azure Monitor agent (AMA) is already deployed on every Arc-enabled server.
+
+3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
+
+Currently, the policies to enable Change tracking and inventory with AMA are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
+
+![Screenshot showing how to enable preview change tracking](./changetracking-enable.png)
+
+#### Current Limitations
+
+The following table lists the current limitations for Change Tracking And Inventory
+https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm#current-limitations
+
+Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both:
+https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
+
+#### Task 1: Enabling Change Tracking and Inventory
+
+```note
+For Azure Arc - you must then deploy a special policy and create a Data Collection Rule (DCR) to specify the data collection characteristics.
+Follow the link here:
+https://learn.microsoft.com/en-us/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm
+
+The DCR will have already been deployed as part of the setup for this levelup,
+but you will need to know where to do this for your own environments in future.
+The policy deployment is done below.
+```
+
+You will need to deploy an Azure Initiative to enable Change Tracking on ARC enabled Virtual Machines.
+
+- In the Azure portal, search for the text "(Arcbox)" and for a definition type of "Initiative".
+
+    ![Screenshot showing searching for changeTracking Initiative in the azure portal](./changetracking-lookforpolicy.png)
+
+- Click on "_[ArcBox]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines_".
+
+    ![Screenshot showing the 6 policies in the Initiative](./changetracking-6policies.png)
+
+- Click "_Assign Initiative_".
+
+    ![Screenshot showing assigning the policy](./changetracking-assignpolicy1.png)
+
+- Select the right scope (management group, subscription and resource group) for the resource group where you deployed _ArcBox_.
+
+    ![Screenshot showing assigning the policy to the right scope](./changetracking-assignpolicy2.png)
+
+- After validating the scope, click "Next" twice to navigate to the parameters tab.
+
+- To get the "Data Collection Rule" resource Id,  run the following CLI command
+
+
+```shell
+az resource show --name "arcbox-ama-ct-dcr" `
+                 --resource-group "<resource group name>" `
+                 --resource-type Microsoft.Insights/dataCollectionRules `
+                 --query id `
+                 --output tsv
+```
+
+- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _arcbox-ama-ct-dcr_ data collection rule.
+
+- Then click create for the initiave to be assigned to the _arcbox_ resource group.
+- Once it has been assigned, copy the assignmentID, as you will need it in the next part.
+
+Once the policy assignments have been made, you may need to force remediate each policy unless you are willing to wait.
+To force remediation, either use the GUI to select each policy in the initiative  (just like the monitor section) and then force the task, or just run some AZ CLI commands in a powershell window:
+
+```powershell
+
+$subscriptionid = "<your subscription id>
+$resourcegroup = "<your resource group name>
+$policyassignmentid = "<your policy assignment id>"
+
+#This are the definition IDs for the ChangeTracking initiative - it will be the same worldwide until this initiative is changed
+#You can find the definition IDs for a policy from the initiative by clicking on the policy itself.
+
+$defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f", `
+"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187", `
+"/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5", `
+"/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278", `
+"/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb", `
+"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
+
+$count=1
+$defid | foreach { `
+az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment `
+$policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
+$count++
+}
+
+#Sometimes, the portal does not show the remediation task created via AZ CLI.
+#In that case, run
+
+az policy remediation list
+
+#to see the status of the remediation task.
+```
+You can see the processing state of each rememdiation task by clicking on the _Remediation_ tab
+
+![Screenshot showing the policyassignment](./changetracking-forcingremediation.png)
+
+Please be patient as it takes a while for onboarding to work.
+
+#### Task 2: Using Change Tracking
+
+Try stopping and starting services on the Arc machine ArcBox-Win2k19 using an administrative powershell session.
+
+```PowerShell
+Stop-Service spooler
+Start-service spooler
+```
+The service changes will eventually show up in the portal
+
+####  Task 3: Manage Change Tracking
+
+To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
+
+![Screenshot showing Edit Settings](./changetracking-editsettings.png)
+
+First, make sure that a storage account is already configured for file uploads.
+
+![Screenshot showing Storage Account Settings](./changetracking-storageaccount.png)
+
+Then add files that you want to monitor, for example, the hosts file.
+
+![Screenshot showing add file monitoring](./changetracking-addfilemonitoring.png)
+
+Modify the hosts file on the ArcBox-Win2K22 machine. 
+
+Add a line like this from an administrative notepad and save the file:
+```cmd
+1.1.1.1      www.fakehost.com
+```
+Eventually, the file changes will show up in the portal.
+
+#### Task 4: Alert Configuration
+
+If you want to be alerted when someone changes a host file on any one of your server, then configure alerting.
+
+On the Change tracking page from your Virtual Machine, select Log Analytics.
+
+In the Logs search, look for content changes to the hosts file with the query 
+
+```cmd
+ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
+```
+
+In Log Analytics, alerts are always created based on log analytics query result.
+
+After the query returns its results, select New alert rule in the log search to open the Alert creation page. You can also navigate to this page through Azure Monitor in the Azure portal.
+
+Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
 
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
