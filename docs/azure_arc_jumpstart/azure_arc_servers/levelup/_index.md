@@ -1048,7 +1048,6 @@ Please be patient as it takes a while for onboarding to work.
 #### Task 3: Using Change Tracking
 
 
-Using Change Tracking
 
 Try stopping and starting services on the Arc machine ArcBox-Win2k19 using an administrative powershell session.
 
