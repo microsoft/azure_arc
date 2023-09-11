@@ -1032,11 +1032,11 @@ Start-service spooler
 
 ####  Task 3: Manage Change Tracking
 
-- To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
+- Navigate to one of the Arc-enabled Windows machines and select _Change Tracking_. You can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
 
     ![Screenshot showing Edit Settings](./changetracking-editsettings.png)
 
-- First, make sure that a storage account is already configured for file uploads.
+- First, make sure that a storage account is already created for file uploads.
 
     ![Screenshot showing Storage Account Settings](./changetracking-storageaccount.png)
 
