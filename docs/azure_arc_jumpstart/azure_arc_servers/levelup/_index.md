@@ -977,20 +977,17 @@ You will need to deploy an Azure Initiative to enable Change Tracking on ARC ena
 
 
 ```shell
-az resource show --name "MSVMI-ama-vmi-default-dcr" `
+az resource show --name "arcbox-ama-ct-dcr" `
                  --resource-group "<resource group name>" `
                  --resource-type Microsoft.Insights/dataCollectionRules `
                  --query id `
                  --output tsv
 ```
 
-- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _MSVMI-ama-vmi-default-dcr_ data collection rule.
+- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _arcbox-ama-ct-dcr_ data collection rule.
 
 - Then click create for the initiave to be assigned to the _arcbox_ resource group.
 - Once it has been assigned, copy the assignmentID, as you will need it in the next part.
-
-![Screenshot showing the policyassignment](./changetracking-assignmentid.png)
-
 
 Once the policy assignments have been made, you may need to force remediate each policy unless you are willing to wait.
 To force remediation, either use the GUI to select each policy in the initiative  (just like the monitor section) and then force the task, or just run some AZ CLI commands in a powershell window:
@@ -1002,6 +999,8 @@ $resourcegroup = "<your resource group name>
 $policyassignmentid = "<your policy assignment id>"
 
 #This are the definition IDs for the ChangeTracking initiative - it will be the same worldwide until this initiative is changed
+#You can find the definition IDs for a policy from the initiative by clicking on the policy itself.
+
 $defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f", `
 "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187", `
 "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5", `
