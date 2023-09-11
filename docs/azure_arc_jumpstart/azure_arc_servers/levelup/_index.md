@@ -1045,7 +1045,8 @@ You can see the processing state of each rememdiation task by clicking on the _R
 
 Please be patient as it takes a while for onboarding to work.
 
-#### Task 3
+#### Task 3: Using Change Tracking
+
 
 Using Change Tracking
 
