@@ -158,17 +158,14 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
         # APAC Storage account
         $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
         $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
-        Write-Host "Downloading nested VMs VHDX files from APAC Storage account"
     } elseif ($europeLocations -contains $azureLocation) {
         $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
         $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
-        write-host "Downloading nested VMs VHDX files from Europe Storage account"
-    } elseif ($usLocations -contains $azureLocation) {
+    } else {
         $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
         $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
-        write-host "Downloading nested VMs VHDX files from US Storage account"
     }
-    azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --from-to BlobLocal
+    azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck
 }
 
 # Create the nested VMs if not already created
