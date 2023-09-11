@@ -923,7 +923,8 @@ Change Tracking and Inventory is an built-in Azure service, provided by Azure Au
 #### Prerequisites
 
 The following are required for this module to function:
-1. Ensure that the servers are already provisioned in Arc.
+1. Ensure that the servers are already on-boarded to Azure Arc.
+
 2. Ensure that the AMA is already provisioned on every server.
 3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
 
