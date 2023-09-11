@@ -943,7 +943,6 @@ https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
 
 #### Task 1: Creating an Automation account
 
-Creating an Automation Account
 
 First create an automation account in Azure in the same location as Arcbox - ensure that the region mapping is supported as in the table above.
 ```powershell
