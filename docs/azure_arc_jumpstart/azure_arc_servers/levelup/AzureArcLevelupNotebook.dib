@@ -450,7 +450,7 @@ Azure Policy lets you set and enforce requirements for all new resources you cre
 
 $resourceGroupName = "<resource-group-name>"
 
-az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
+az resource show --name "arcbox-ama-vmi-perfAndda-dcr" `
                  --resource-group $resourceGroupName `
                  --resource-type Microsoft.Insights/dataCollectionRules `
                  --query id `
