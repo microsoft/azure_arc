@@ -120,7 +120,7 @@ Now that you have completed the first data pipeline scenario, it's time to conti
 
 ## Troubleshooting
 
-### Principal 'msauser=xyz@abc.com' is not authorized to read database Orders
+### User principal is not authorized to read database Orders
 
 Depending on the type of user account being used to access ADX dashboards, you might have issues accessing data in the _Orders_ database in the ADX cluster through ADX dashboard reports. Microsoft Accounts (MSAs) are all of the Microsoft-managed non-organizational user accounts. For example, **_hotmail.com, live.com, outlook.com_**. These MSAs require special syntax to grant database access permissions in the ADX cluster. Refer to [Referencing security principals](https://learn.microsoft.com/azure/data-explorer/kusto/management/referencing-security-principals#microsoft-accounts-msas) to use the correct syntax to grant user permissions to the ADX database.
 
@@ -133,7 +133,7 @@ Follow the below steps to address this permissions error.
 - In the [Azure portal](https://portal.azure.com/), locate the ADX cluster deployed in the resource group and open.
 - Click on _Query_ under Data, select the _Orders_ database, and enter the Kusto query as shown below to grant user access to the _Orders_ database. Replace the user principal with the correct principal to grant permissions.
 
-  ```
+  ```kusto
   .add database Orders users ('msauser=xyz@hotmail.com') 'XYZ (hotmail.com)'
   ```
 
