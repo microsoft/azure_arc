@@ -941,7 +941,8 @@ https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-moni
 Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both:
 https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
 
-#### Task 1
+#### Task 1: Creating an Automation account
+
 Creating an Automation Account
 
 First create an automation account in Azure in the same location as Arcbox - ensure that the region mapping is supported as in the table above.
