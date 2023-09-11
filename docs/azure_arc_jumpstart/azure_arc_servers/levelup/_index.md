@@ -917,7 +917,8 @@ if ($roleDefinitionIds.Count -gt 0)
 
 #### Module overview
 
-Change Tracking and Inventory is an inbuilt Azure service, provided by Azure Automation. The old version uses the Log Analytics agent, while the new (preview) version uses the Azure Monitor Agent (AMA). The training here is taken from https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm
+Change Tracking and Inventory is an built-in Azure service, provided by Azure Automation. The old version uses the Log Analytics agent, while the new (preview) version uses the Azure Monitor Agent (AMA).
+
 
 #### Prerequisites
 
