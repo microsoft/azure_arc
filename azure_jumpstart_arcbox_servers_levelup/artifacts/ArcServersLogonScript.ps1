@@ -18,8 +18,10 @@ $resourceGroup = $env:resourceGroup
 #$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
 # Change to use the level-up CDN for VHDs
-$vhdSourceFolder = "https://levelupVHDs-fvdmbzd4eaedcten.z01.azurefd.net/arcbox"
-$sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+
+$usLocations = @('eastus', 'eastus2', 'centralus', 'westus2')
+$europeLocations = @('northeurope', 'westeurope', 'francecentral', 'uksouth')
+$apacLocations = @( 'southeastasia', 'australiaeast', 'japaneast', 'koreacentral')
 
 # Archive exising log file and crate new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -152,6 +154,17 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
     $Env:AZCOPY_BUFFER_GB = 4
     # Other ArcBox flavors does not have an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+    if ($apacLocations -contains $azureLocation) {
+        # APAC Storage account
+        $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
+    } elseif ($europeLocations -contains $azureLocation) {
+        $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
+    } elseif ($usLocations -contains $azureLocation) {
+        $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+    }
     azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --from-to BlobLocal
 }
 
@@ -263,7 +276,7 @@ Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Start-Process -FilePath $Us
 
 # Onboarding to Vulnerability assessment solution
 Write-Header "Onboarding to Vulnerability assessment solution"
-$resourceId=$(az resource show --name $Win2k19vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
+$resourceId = $(az resource show --name $Win2k19vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
 $Uri = "https://management.azure.com${resourceId}/providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
 az rest --uri $Uri --method PUT
 
@@ -287,7 +300,7 @@ Write-Header "Installing the Azure Monitor Agent on the Linux Arc-enabled server
 
 # Onboarding to Vulnerability assessment solution
 Write-Header "Onboarding to Vulnerability assessment solution"
-$resourceId=$(az resource show --name $Ubuntu01vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
+$resourceId = $(az resource show --name $Ubuntu01vmName --resource-group $resourceGroup --resource-type Microsoft.HybridCompute/machines --query id --output tsv)
 $Uri = "https://management.azure.com${resourceId}/providers/Microsoft.Security/serverVulnerabilityAssessments/mdetvm?api-version=2015-06-01-preview"
 az rest --uri $Uri --method PUT
 
