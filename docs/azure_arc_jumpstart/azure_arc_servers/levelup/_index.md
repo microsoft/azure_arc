@@ -941,22 +941,7 @@ https://learn.microsoft.com/en-us/azure/automation/change-tracking/overview-moni
 Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both:
 https://learn.microsoft.com/en-us/azure/automation/how-to/region-mappings
 
-#### Task 1: Creating an Automation account
-
-
-First create an automation account in Azure in the same location as Arcbox - ensure that the region mapping is supported as in the table above.
-```powershell
-$automationaccountname = "<your automation account name>"
-$location = "<your azure location>"
-$resourcegroupname = "<Your resource group name>"
-az automation account create --automation-account-name $automationaccountname --location $location --sku "Free" --resource-group $resourcegroupname
-```
-
-The Automation Account must also enable Change Tracking and Inventory by linking to the ArcBox Log Analytics workspace crated previously.
-![Screenshot showing how to enable inventory in Automation Account](./changetracking-ct-enabled.png)
-
-#### Task 2
-Enabling Change Tracking and Inventory
+#### Task 1: Enabling Change Tracking and Inventory
 
 ```note
 For Azure Arc - you must then deploy a special policy and create a Data Collection Rule (DCR) to specify the data collection characteristics.
@@ -970,11 +955,11 @@ The policy deployment is done below.
 
 You will need to deploy an Azure Initiative to enable Change Tracking on ARC enabled Virtual Machines.
 
-- In the Azure portal, search for the text "Preview" and for a definition type of "Initiative".
+- In the Azure portal, search for the text "(Arcbox)" and for a definition type of "Initiative".
 
     ![Screenshot showing searching for changeTracking Initiative in the azure portal](./changetracking-lookforpolicy.png)
 
-- Click on "_[Preview]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines_".
+- Click on "_[ArcBox]: Enable ChangeTracking and Inventory for Arc-Enabled virtual machines_".
 
     ![Screenshot showing the 6 policies in the Initiative](./changetracking-6policies.png)
 
@@ -1044,9 +1029,7 @@ You can see the processing state of each rememdiation task by clicking on the _R
 
 Please be patient as it takes a while for onboarding to work.
 
-#### Task 3: Using Change Tracking
-
-
+#### Task 2: Using Change Tracking
 
 Try stopping and starting services on the Arc machine ArcBox-Win2k19 using an administrative powershell session.
 
@@ -1056,7 +1039,7 @@ Start-service spooler
 ```
 The service changes will eventually show up in the portal
 
-####  Task 4
+####  Task 3: Manage Change Tracking
 
 To manage Change Tracking, you can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
 
@@ -1078,9 +1061,7 @@ Add a line like this from an administrative notepad and save the file:
 ```
 Eventually, the file changes will show up in the portal.
 
-#### Task 5
-
-Alert Configuration
+#### Task 4: Alert Configuration
 
 If you want to be alerted when someone changes a host file on any one of your server, then configure alerting.
 
@@ -1097,7 +1078,6 @@ In Log Analytics, alerts are always created based on log analytics query result.
 After the query returns its results, select New alert rule in the log search to open the Alert creation page. You can also navigate to this page through Azure Monitor in the Azure portal.
 
 Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
-
 
 ### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
 
