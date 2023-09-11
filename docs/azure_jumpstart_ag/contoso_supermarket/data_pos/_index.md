@@ -117,3 +117,28 @@ By default there is no data available in Cosmos DB database after the deployment
 ## Next steps
 
 Now that you have completed the first data pipeline scenario, it's time to continue to the next scenario, [Data pipeline and reporting across cloud and edge for sensor telemetry](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/freezer_monitor/).
+
+## Troubleshooting
+
+### Principal 'msauser=xyz@abc.com' is not authorized to read database Orders
+
+Depending on the type of user account being used to access ADX dashboards, you might have issues accessing data in Orders database in ADX cluster through ADX dashboard reports. Microsoft Accounts (MSAs) are all of the Microsoft-managed non-organizational user accounts. For example, hotmail.com, live.com, outlook.com. These MSAs require special syntax to grant database access permissions in ADX cluster. Refer [Referencing security principals](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/management/referencing-security-principals#microsoft-accounts-msas) to use correct syntax to grant user permissions to the ADX database.
+
+Screenshot below shows permissions error when using MSAs.
+
+  ![Screenshot showing the principal not authorized to read database error](./img/adx-principal-not-authorized.png)
+
+Follow the steps below to address this permissions error.
+
+- In the [Azure Portal](https://portal.azure.com/), locate ADX cluster deployed in the resource group and open.
+- Click on Query under Data, select Orders database and enter Kusto query as shown below to grant user access to Orders database. Replace user principal with correct principal to grant permissions.
+
+  ```
+  .add database Orders users ('msauser=xyz@hotmail.com') 'XYZ (hotmail.com)'
+  ```
+
+- Click Run to execute Kusto query to grant permissions
+
+  ![Screenshot showing how to grant user permissions](./img/adx-database-grant-user-access.png)
+
+- Once user permission is granted go to [ADX dashboards](https://dataexplorer.azure.com/dashboards) and refresh dashboard report to view Orders data.
