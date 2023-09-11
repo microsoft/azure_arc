@@ -925,7 +925,8 @@ Change Tracking and Inventory is an built-in Azure service, provided by Azure Au
 The following are required for this module to function:
 1. Ensure that the servers are already on-boarded to Azure Arc.
 
-2. Ensure that the AMA is already provisioned on every server.
+2. Ensure that the Azure Monitor agent (AMA) is already deployed on every Arc-enabled server.
+
 3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
 
 Currently, the policies to enable Change tracking and inventory with AMA are in preview. For a seamless policy experience, we recommend that you begin by enabling the Microsoft.Compute/AutomaticExtensionUpgradePreview feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
