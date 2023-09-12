@@ -83,15 +83,6 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
   }
 }
 
-resource changeTrackingRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01'={
-  name: guid(changeTrackingPolicyAssignemnt.name,contributorRoleDefinition,resourceGroup().id)
-  properties:{
-    roleDefinitionId: contributorRoleDefinition
-    principalId: changeTrackingPolicyAssignemnt.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
 /*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
