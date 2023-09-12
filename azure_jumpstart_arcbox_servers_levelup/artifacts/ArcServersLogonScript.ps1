@@ -17,9 +17,6 @@ $resourceGroup = $env:resourceGroup
 #$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
 #$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
-$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
-
 # Change to use the level-up CDN for VHDs
 
 $usLocations = @('eastus', 'eastus2', 'centralus', 'westus2')
