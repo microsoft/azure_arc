@@ -17,9 +17,8 @@ $resourceGroup = $env:resourceGroup
 #$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
 #$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
-
-$vhdSourceFolder = "https://levelupvhdcdn.azureedge.net/arcbox"
-$sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
 # Change to use the level-up CDN for VHDs
 
@@ -158,18 +157,18 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
     $Env:AZCOPY_BUFFER_GB = 4
     # Other ArcBox flavors does not have an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-    #if ($apacLocations -contains $azureLocation) {
-    #    # APAC Storage account
-    #    $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
-    #    $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
-    #} elseif ($europeLocations -contains $azureLocation) {
-    #    $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
-    #    $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
-    #} else {
-    #    $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
-    #    $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
-    #}
-    azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck --from-to BlobLocal
+    if ($apacLocations -contains $azureLocation) {
+        # APAC Storage account
+        $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
+    } elseif ($europeLocations -contains $azureLocation) {
+        $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
+    } else {
+        $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
+        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+    }
+    azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck
 }
 
 # Create the nested VMs if not already created
