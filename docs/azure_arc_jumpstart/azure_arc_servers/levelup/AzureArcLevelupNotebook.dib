@@ -90,7 +90,7 @@ Login to Azure PowerShell the ```Connect-AzAccount``` command.
 
 #!pwsh
 
-Connect-AzAccount
+Connect-AzAccount -UseDeviceAuthentication
 
 #!markdown
 
