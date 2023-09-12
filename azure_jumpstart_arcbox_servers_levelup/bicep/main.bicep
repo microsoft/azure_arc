@@ -91,6 +91,18 @@ module monitoringResources 'mgmt/monitoringResources.bicep' = {
   }
 }
 
+module policyDeployment 'mgmt/policyAzureArc.bicep' = {
+  name: 'policyDeployment'
+  dependsOn: [
+    mgmtArtifactsAndPolicyDeployment
+  ]
+  params: {
+    azureLocation: location
+    changeTrackingDCR: dataCollectionRules.outputs.changeTrackingDCR
+    //logAnalyticsWorkspaceId: workspace.id
+  }
+}
+
 module dataCollectionRules 'mgmt/mgmtDataCollectionRules.bicep' = {
   name: 'dataCollectionRules'
   params: {

@@ -2042,7 +2042,6 @@ In this module you will configure Windows security events collection using Senti
 
     ![Screenshot selecting the AMA data collection created](./sentinel_security_events_created.png)
 
-
 #### Task 2: Simulating and viewing security events
 
 - After configuring Sentinel, now we need to simulate some failed login attempts on one or more Windows Arc-enabled machines.

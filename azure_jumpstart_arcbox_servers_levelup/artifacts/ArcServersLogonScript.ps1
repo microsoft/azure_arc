@@ -288,7 +288,7 @@ $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -W
 $command = "curl -o ~/Downloads/eicar.com.txt"
 $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-Write-Header "Installing the Azure Monitor Agent on the Linux Arc-enabled server"
+#Write-Header "Installing the Azure Monitor Agent on the Linux Arc-enabled server"
 #az connectedmachine extension create --name AzureMonitorLinuxAgent `
 #                                     --publisher Microsoft.Azure.Monitor `
 #                                     --type AzureMonitorLinuxAgent `
@@ -335,7 +335,7 @@ foreach ($extension in $VSCodeExtensions) {
 # Install PowerShell 7
 #############################################################
 Write-Header "Installing PowerShell 7 on the client VM"
-Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
+#Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
 Start-Process msiexec.exe -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
 
 Write-Header "Installing PowerShell 7 on the nested ArcBox-Ubuntu-01 VM"
