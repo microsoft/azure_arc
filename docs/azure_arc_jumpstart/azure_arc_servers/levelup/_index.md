@@ -82,7 +82,6 @@ $subscriptionId = "<Subscription Id>"
 Set-AzContext -SubscriptionId $subscriptionId
 ```
 
-
 - Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
 
 - ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
@@ -371,7 +370,7 @@ sudo ufw deny out from any to 169.254.169.254
 sudo ufw default allow incoming
 ```
 
-- Go the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
+- Connect the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
 
     ![Screenshot IP address of second Ubuntu machine](./IP_address_second_Linux_vm.png)
 
@@ -434,7 +433,7 @@ Azure Policy lets you set and enforce requirements for all new resources you cre
 - To get the "Data Collection Rule" resource Id,  run the following CLI command
 
 ```shell
-az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
+az resource show --name "arcbox-ama-vmi-perfAndda-dcr" `
                  --resource-group "<resource group name>" `
                  --resource-type Microsoft.Insights/dataCollectionRules `
                  --query id `
@@ -1022,8 +1021,8 @@ Set-Service -Name sshd -StartupType 'Automatic'
 
 # Confirm the Windows Firewall is configured to allow SSH. The rule should be created automatically by setup. Run the following to verify:
 if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
-    Write-Output "Firewall Rule 'OpenSSH-Server-In-TCP' does not exist, creating it..."
-    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+    Write-Output "Firewall Rule "OpenSSH-Server-In-TCP" does not exist, creating it..."
+    New-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -DisplayName "OpenSSH Server (sshd)" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 } else {
     Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
 }
@@ -2059,7 +2058,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 - NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
 
 ```powershell
-$job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob 
+$job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob
 $job | Wait-Job
 ```
 
