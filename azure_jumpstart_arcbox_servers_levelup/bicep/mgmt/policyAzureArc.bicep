@@ -66,6 +66,7 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = 
 resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
   name: '(ArcBox) Enable ChangeTracking for Arc-enabled machines'
   location: azureLocation
+  scope: resourceGroup()
   identity: {
     type: 'SystemAssigned'
   }
