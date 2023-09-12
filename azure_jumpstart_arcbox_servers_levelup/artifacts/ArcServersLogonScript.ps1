@@ -336,7 +336,7 @@ foreach ($extension in $VSCodeExtensions) {
 #############################################################
 Write-Header "Installing PowerShell 7 on the client VM"
 Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
-Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
+Start-Process msiexec.exe -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
 
 Write-Header "Installing PowerShell 7 on the nested ArcBox-Ubuntu-01 VM"
 $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
