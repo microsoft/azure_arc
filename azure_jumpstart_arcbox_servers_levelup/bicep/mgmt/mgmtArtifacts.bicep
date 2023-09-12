@@ -273,13 +273,6 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBas
   }
 }
 
-module policyDeployment './policyAzureArc.bicep' = {
-  name: 'policyDeployment'
-  params: {
-    azureLocation: location
-    //logAnalyticsWorkspaceId: workspace.id
-  }
-}
 
 output vnetId string = arcVirtualNetwork.id
 output subnetId string = arcVirtualNetwork.properties.subnets[0].id
