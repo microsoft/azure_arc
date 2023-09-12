@@ -1439,8 +1439,12 @@ if ($IsWindows) {
 
     Get-Volume -DriveLetter C | Out-String
 
-    # Run Disk Cleanup
-    Start-Process -Wait -NoNewWindow -FilePath 'C:\Windows\System32\cleanmgr.exe' -ArgumentList '/d C: /VERYLOWDISK'
+    Write-Output "Windows Update component store cleanup"
+    Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
+
+    $SystemTemp = "$env:SystemRoot\Temp"
+    Write-Output "Empty the system temporary folder: $SystemTemp"
+    Get-ChildItem -Path $SystemTemp -Recurse | Remove-Item -Force -Recurse
 
     Write-Output 'Free disk space after cleanup action'
 
