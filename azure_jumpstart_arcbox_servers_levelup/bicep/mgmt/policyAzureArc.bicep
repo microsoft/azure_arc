@@ -11,7 +11,7 @@ param subscriptionId string = subscription().subscriptionId
 param changeTrackingDCR string
 
 param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
-param contributorRoleDefinition string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 var policies = [
   /*{
