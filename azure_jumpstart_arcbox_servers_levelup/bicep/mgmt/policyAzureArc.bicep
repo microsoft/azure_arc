@@ -11,6 +11,7 @@ param subscriptionId string = subscription().subscriptionId
 param changeTrackingDCR string
 
 param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
+param contributorRoleDefinition string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 var policies = [
   /*{
@@ -79,6 +80,15 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
         value: changeTrackingDCR
       }
     }
+  }
+}
+
+resource changeTrackingRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01'={
+  name: guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines',resourceGroup().id)
+  properties:{
+    roleDefinitionId: contributorRoleDefinition
+    principalId: changeTrackingPolicyAssignemnt.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
