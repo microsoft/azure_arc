@@ -1881,7 +1881,7 @@ var alertsConsoleWorkbookContent = {
             multiSelect: true
             quote: '\''
             delimiter: ','
-            query: '{"version":"1.0.0","content":"[ \\r\\n    {\\"id\\":\\"New\\", \\"label\\": \\"New\\"},\\r\\n    {\\"id\\":\\"Acknowledged\\", \\"label\\": \\"Acknowledged\\"},\\r\\n    {\\"id\\":\\"Closed\\", \\"label\\": \\"Closed\\"}\\r\\n]\",\"transformers\":null}'
+            query: '{"version":"1.0.0","content":"[ \r\n    {"id":"New", "label": "New"},\r\n    {"id":"Acknowledged", "label": "Acknowledged"},\r\n    {"id":"Closed", "label": "Closed"}\r\n]","transformers":null}'
             crossComponentResources: [
               '{Subscription}'
             ]
