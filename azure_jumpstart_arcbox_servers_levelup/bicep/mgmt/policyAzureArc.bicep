@@ -84,7 +84,7 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
 }
 
 resource changeTrackingRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01'={
-  name: guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines',resourceGroup().id)
+  name: guid(changeTrackingPolicyAssignemnt.name,contributorRoleDefinition,resourceGroup().id)
   properties:{
     roleDefinitionId: contributorRoleDefinition
     principalId: changeTrackingPolicyAssignemnt.identity.principalId
