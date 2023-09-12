@@ -123,7 +123,7 @@ az extension add --name connectedmachine --yes --only-show-errors
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+az login --service-principal --username $spnClientId --password=$spnClientSecret --tenant $spnTenantId
 
 az account set -s $subscriptionId
 
