@@ -76,6 +76,8 @@ To view the Freezer Monitoring dashboard you will first need to import it into A
 
   ![Screenshot showing the default freezer dashboard](./img/adx_freezer_dashboard_default.png)
 
+  > __NOTE: Depending on the type of user account being used to access ADX dashboards, you might have issues accessing data in the _Orders_ database in the ADX cluster with an error _User principal 'msauser=xyz@abc.com' is not authorized to read database 'Orders'_. If you experience this access issue, refer [Jumpstart Agora - Contoso Supermarket scenario troubleshooting](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/troubleshooting#user-principal-is-not-authorized-to-read-database-orders) guide to troubleshoot and address this access issue__.
+
 ## Scenarios
 
 Below are a few scenarios that Contoso Supermarket might encounter, and how they can be addressed using the data collected by the IoT sensors.
@@ -301,3 +303,7 @@ To see the ADX dashboard, review the steps from ["Scenario 1: View the data in A
 ## Next steps
 
 Now that you have seen how the data flows in the various Contoso Supermarket scenarios, you can now explore how to [enable AI at the edge and experiment with software configurations rollout using basic GitOps flow](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/ai/).
+
+## Troubleshooting
+
+Refer [Jumpstart Agora - Contoso Supermarket scenario troubleshooting](../troubleshooting/_index.md) guide to troubleshoot and address issues with IoT sensor telemetry data pipeline.
