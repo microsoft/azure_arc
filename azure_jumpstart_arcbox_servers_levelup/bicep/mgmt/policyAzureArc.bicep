@@ -89,7 +89,7 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
 }
 
 resource changeTrackingPolicyRoleAssignments1 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  name: guid(changeTrackingPolicyAssignemnt.name,connectedMachineResourceAdminRole, resourceGroup().id)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
@@ -99,7 +99,7 @@ resource changeTrackingPolicyRoleAssignments1 'Microsoft.Authorization/roleAssig
 }
 
 resource changeTrackingPolicyRoleAssignments2 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  name: guid(changeTrackingPolicyAssignemnt.name,logAnalyticsContributor, resourceGroup().id)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
@@ -109,7 +109,7 @@ resource changeTrackingPolicyRoleAssignments2 'Microsoft.Authorization/roleAssig
 }
 
 resource changeTrackingPolicyRoleAssignments3 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  name: guid(changeTrackingPolicyAssignemnt.name,monitoringContributorRole, resourceGroup().id)
   scope: resourceGroup()
   properties: {
     principalType: 'ServicePrincipal'
