@@ -20,7 +20,7 @@ param emailAddress string
 var actionGroupName = 'ag-arc-servers'
 var alertsSeverity = 2
 var windowSize = 'PT5M'
-var evaluationFrequency = 'PT15M'
+var evaluationFrequency = 'PT5M'
 var convertRuleTag = 'hidden-link:'
 var singlequote = '\''
 var azureDashboardName = 'Azure Arc-enabled servers'
