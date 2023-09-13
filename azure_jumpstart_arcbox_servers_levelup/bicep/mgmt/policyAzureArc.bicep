@@ -13,6 +13,11 @@ param changeTrackingDCR string
 param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
 //param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
+
+param connectedMachineResourceAdminRole string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
+param monitoringContributorRole string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa'
+param logAnalyticsContributor string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+
 var policies = [
   /*{
     name: '(ArcBox) Enable Azure Monitor for Hybrid Linux VMs with AMA'
@@ -82,6 +87,37 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
     }
   }
 }
+
+resource changeTrackingPolicyRoleAssignments1 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: connectedMachineResourceAdminRole
+    principalId: changeTrackingPolicyAssignemnt.identity.principalId
+  }
+}
+
+resource changeTrackingPolicyRoleAssignments2 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: logAnalyticsContributor
+    principalId: changeTrackingPolicyAssignemnt.identity.principalId
+  }
+}
+
+resource changeTrackingPolicyRoleAssignments3 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(changeTrackingPolicyAssignemnt.name,changeTrackingPolicySetDefintion, resourceGroup().id)
+  scope: resourceGroup()
+  properties: {
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: monitoringContributorRole
+    principalId: changeTrackingPolicyAssignemnt.identity.principalId
+  }
+}
+
 
 /*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
