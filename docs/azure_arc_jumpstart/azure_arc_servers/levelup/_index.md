@@ -7,35 +7,38 @@ The purpose of this workshop is to train Microsoft employees who are working in 
 After completion of this workshop, you will be able to:
 
 - Understand pre-requisites to onboard Windows and Linux servers to Azure Arc
+- Enroll your Windows Server 2012/R2 or SQL Server 2012 machines for Extended Security Updates through Azure Arc
 - Onboard Windows and Linux servers running using different onboarding methods
-- Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 - Monitor your Azure Arc-enabled servers using Azure Monitor
-- Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
-- Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
-- Keep your Azure Arc-enabled servers patched using Azure Update Manager
+- Secure your Azure Arc-enabled servers using Microsoft Defender for servers
 - Gain security insights from your Arc-enabled servers using Microsoft Sentinel
-- Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
+- Keep your Azure Arc-enabled servers patched using Azure Update Manager
+- Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
 - SSH into your Azure Arc-enabled servers using SSH access
-- Manage your Azure Arc-enabled servers using Admin Center (Preview)
-- Query and inventory your Azure Arc-enabled servers using Azure resource graph
+- Run scripts in your Arc-enabled Windows server by using Run Commands
+- Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
+- Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 - Enforce governance across your Azure Arc-enabled servers using Azure Policy
+- Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)
+- Query and inventory your Azure Arc-enabled servers using Azure Resource Graph
 
 | LevelUp Module | Duration | Facilitator |
 |---------------|---------------|---------------|
-|**1. Onboard Windows and Linux servers running using different onboarding methods** | x minutes | Owner |
-|**2. Monitor your Azure Arc-enabled servers using Azure Monitor** | x minutes | Owner |
-|**3. Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | x minutes | Owner |
-|**4. Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | x minutes | Owner |
-|**5. Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | x minutes | Owner |
-|**6. Keep your Azure Arc-enabled servers patched using Azure Update Manager** | x minutes | Owner |
-|**7. Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | x minutes | Owner |
-|**8. SSH into your Azure Arc-enabled servers using SSH access** | x minutes | Owner |
-|**9. Manage your Azure Arc-enabled servers using Admin Center (Preview)** | x minutes | Owner |
-|**10. Query and inventory your Azure Arc-enabled servers using Azure resource graph** | x minutes | Owner |
-|**11. Enforce governance across your Azure Arc-enabled servers using Azure Policy** | x minutes | Owner |
-|**12. Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | x minutes | Owner |
-|**13. Extended Security Updates for your Windows Server 2012 workloads enabled by Azure Arc (TBD)** | x minutes | Owner |
-|**14. Run command** | x minutes | Jan Egil Ring |
+|**Understand pre-requisites to onboard Windows and Linux servers to Azure Arc** | 40 minutes | Seif Bassem |
+|**Enroll your Windows Server 2012/R2 or SQL Server 2012 machines for Extended Security Updates through Azure Arc** | 15 minutes | Alexander Ortha/Aurnov Chattopadhyay|
+|**Onboard Windows and Linux servers running using different onboarding methods** | 15 minutes | Basim Majeed |
+|**Monitor your Azure Arc-enabled servers using Azure Monitor** | 55 minutes | Basim Majeed |
+|**Secure your Azure Arc-enabled servers using Microsoft Defender for servers** | 15 minutes | Seif Bassem |
+|**Gain security insights from your Arc-enabled servers using Microsoft Sentinel** | 15 minutes | Seif Bassem |
+|**Keep your Azure Arc-enabled servers patched using Azure Update Manager** | 15 minutes | Lloyd Lim |
+|**Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory** | 15 minutes | Lloyd Lim |
+|**SSH into your Azure Arc-enabled servers using SSH access** | 10 minutes | Jan Egil Ring |
+|**Run scripts in your Arc-enabled Windows server by using Run Commands** | 5 minutes | Jan Egil Ring |
+|**Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers** | 15 minutes | Jan Egil Ring |
+|**Configure your Azure Arc-enabled servers using Azure Automanage machine configuration** | 30 minutes | Jan Egil Ring |
+|**Enforce governance across your Azure Arc-enabled servers using Azure Policy** | 15 minutes | Basim Majeed |
+|**Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)** | 15 minutes | Basim Majeed |
+|**Query and inventory your Azure Arc-enabled servers using Azure Resource Graph** | 15 minutes | Basim Majeed |
 
 ## LevelUp Lab Environment
 
@@ -57,6 +60,26 @@ ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for 
 
 ```shell
 az login
+```
+
+- Login to Azure PowerShell the ```Connect-AzAccount``` command.
+
+```shell
+Connect-AzAccount
+```
+
+- Set the default subscription using Azure CLI.
+
+```shell
+$subscriptionId = "<Subscription Id>"
+az account set -s $subscriptionId
+```
+
+- Set the default subscription using Azure PowerShell.
+
+```shell
+$subscriptionId = "<Subscription Id>"
+Set-AzContext -SubscriptionId $subscriptionId
 ```
 
 - Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
@@ -278,9 +301,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ### Module 1: On-boarding to Azure Arc-enabled servers
 
-#### Module overview: In this module we will connect two machines (Windows and Linux) to Azure Arc.
+#### Module overview: In this module we will connect two machines (Windows and Linux) to Azure Arc
 
-#### Task 1: Examine the existing Arc-connected machines.
+#### Task 1: Examine the existing Arc-connected machines
 
 - The deployment process that you have walked through should have set up four VMs running on Hyper-V in the ArcBox-Client machine. Two of these machines have been connected to Azure Arc already. Let us have a look at these in the Azure Portal
 
@@ -290,9 +313,9 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 - We should see the machines that are connected to Arc already: Arcbox-Ubuntu-01 and ArcBox-Win2K19.
 
-    ![Screenshot showing existing Arc connected servers](./First_view_of%20Arc_connected.png) 
- 
- - We want to connect the other 2 machines running as VMs in the ArcBox-Client. We can see these (ArcBox-Win2K22 and ArcBox-Ubuntu-02) by running the Hyper-V Manager in the ArcBox-Client (after we have connected to it with RDP as explained earlier in the setup).
+    ![Screenshot showing existing Arc connected servers](./First_view_of%20Arc_connected.png)
+
+- We want to connect the other 2 machines running as VMs in the ArcBox-Client. We can see these (ArcBox-Win2K22 and ArcBox-Ubuntu-02) by running the Hyper-V Manager in the ArcBox-Client (after we have connected to it with RDP as explained earlier in the setup).
 
     ![Screenshot of 4 machines on Hyper-v](./choose_Hyper-V.png)
 
@@ -307,8 +330,8 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 $sp = New-AzADServicePrincipal -DisplayName "Arc server onboarding account" -Role "Azure Connected Machine Onboarding"
 $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredentials.SecretText }}
 ```
-- Next we will generate a script to automate the download and installation, and to connect to Azure Arc. 
 
+- Next we will generate a script to automate the download and installation, and to connect to Azure Arc.
 
 - From the Azure portal go to the "Machines - Azure Arc" page and select "Add/Create" at the upper left, then select "Add a machine".
 
@@ -330,8 +353,7 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 
     ![Screenshot confirm win machine on-boarded](./confirm_windows_machine_onboarding.png)
 
-#### Task 3: Onboard a Linux machine to Azure Arc.
-
+#### Task 3: Onboard a Linux machine to Azure Arc
 
 - We will now onboard the Linux vm ArcBox-Ubuntu-02 to Azure Arc using the same service principal method we used above for the Windows machine. We can use the same service principal we created above.
 
@@ -342,28 +364,32 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 - Fill in the required details but this time choose Linux for the Operating System box. Then download the script to your local machine (or you can copy the content into the clipboard).
 
 - Add the client secret to the script using your editor. **Also add** the following 3 firewall commands just below the last export statement (to allow onboarding of Azure linux machines):
+
 ```shell
 sudo ufw --force enable
 sudo ufw deny out from any to 169.254.169.254
 sudo ufw default allow incoming
 ```
-- Go the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
+
+- Connect the the ArcBox-Client machine, and from the "Networking" tab on Hyper-v Manager find the IP address of the Linux machine.
 
     ![Screenshot IP address of second Ubuntu machine](./IP_address_second_Linux_vm.png)
 
-- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or "Vscode". 
+- SSH into the ArcBox-Ubuntu-02 machine using "Putty" or "Vscode".
 
     ![Screenshot connect with putty](./putty.png)
 
 - Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
 
 - create an empty onboarding script file using the nano editor, and paste the script content from your local machine.
-```
+
+```shell
 nano onboardingscript.sh
 ```
+
 - Save the file (Ctrl-O then Enter) and exit (Ctrl-X). Now you can run the script:
 
-```
+```shell
 sudo bash ./onboardingscript.sh
 ```
 
@@ -376,6 +402,10 @@ sudo bash ./onboardingscript.sh
 #### Module overview
 
 In this module, you will learn how to deploy the Azure Monitor agent to your Arc-enabled Windows and Linux machines, the dependency agent to your Arc-enabled Windows machines and enable the _VM Insights_ solution to start monitoring your machines using Azure Monitor, run queries on the Log analytics workspace and configure alerts.
+
+#### Pre-requisites
+
+- Make sure that the policy _Enable Azure Monitor for Hybrid VMs with AMA_ is not assigned or inherited on the subscription you will use for this level-up.
 
 #### Task 1: Deploy Azure Monitor agents and VM Insights using Azure Policy
 
@@ -404,7 +434,7 @@ Azure Policy lets you set and enforce requirements for all new resources you cre
 - To get the "Data Collection Rule" resource Id,  run the following CLI command
 
 ```shell
-az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
+az resource show --name "arcbox-ama-vmi-perfAndda-dcr" `
                  --resource-group "<resource group name>" `
                  --resource-type Microsoft.Insights/dataCollectionRules `
                  --query id `
@@ -432,6 +462,8 @@ az resource show --name "MSVMI-PerfandDa-ama-vmi-default-perfAndda-dcr" `
     ![Screenshot showing creating the remediation task](./policy_monitor_windows_create_remediation.png)
 
     ![Screenshot showing creating the remediation task](./policy_monitor_windows_remediate.png)
+
+> **NOTE: When creating the remediation task, make sure to select the same region where you deployed ArcBox**
 
 - Create one remediation task per policy definition in the initiative.
 
@@ -626,7 +658,827 @@ Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process -FilePath $Us
 
 > **NOTE: The same steps can be applied to the Linux Arc-enabled machines**
 
-### Module 4: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
+### Module 4 : Gain security insights from your Arc-enabled servers using Microsoft Sentinel
+
+#### Module overview
+
+In this module you will configure Windows security events collection using Sentinel to inspect failed logins on your Windows Arc-enabled machine
+
+#### Task 1: Configure data collection on Sentinel
+
+- In the Azure Portal, search for _Sentinel_
+
+    ![Screenshot showing searching for Sentinel on the Azure Portal](./portal_search_sentinel.png)
+
+- Click on "Content Hub" and search for "Windows Security Events" and install it.
+
+    ![Screenshot showing searching for windows security events](./sentinel_content_hub.png)
+
+- After installation, click on "Manage" to configure the collector.
+
+    ![Screenshot managing the data collection](./sentinel_manage_data_collector.png)
+
+- Select the data connector and make sure you've selected the _Windows Security Events via AMA_ and click "open connector page".
+
+    ![Screenshot selecting the AMA data collection](./sentinel_data_collector_ama.png)
+
+- Create a new data collection rule.
+
+    ![Screenshot showing creating a new data collection rule](./sentinel_create_new_dcr.png)
+
+- Provide a name for the data collection rule and select the same resource group where you've deployed this level-up lab.
+
+    ![Screenshot selecting the data collection rule name](./sentinel_dcr_creation.png)
+
+- Select one or multiple Windows Arc-enabled machines.
+
+    ![Screenshot selecting the arc machines](./sentinel_dcr_select_server.png)
+
+- Select the "Common" event type and create the data collection rule.
+
+    ![Screenshot selecting the common event type](./sentinel_security_events_common.png)
+
+    ![Screenshot selecting the AMA data collection created](./sentinel_security_events_created.png)
+
+#### Task 2: Simulating and viewing security events
+
+- After configuring Sentinel, now we need to simulate some failed login attempts on one or more Windows Arc-enabled machines.
+
+- Connect to _ArcBox-Client_ VM, and open the _Hyper-v manager_.
+
+- Right-click one of the Windows machines and connect to it.
+
+    ![Screenshot showing connecting to the nested vm on hyper-v](./hyperv_connect_vm.png)
+
+- Simulate some failed login attempts by trying to login multiple times using an incorrect password.
+
+    ![Screenshot showing failed login attemps on the nested vm](./hyperv_failed_login.png)
+
+- After waiting for about 10-15 minutes for data to start getting ingested into the log analytics workspace, navigate to "Workbooks" and select the "Identity & Access" workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_open_workbook.png)
+
+- Once data is being ingested, you will start seeing the failed login attempts in the workbook.
+
+    ![Screenshot selecting the Identity and access workbook](./sentinel_failed_login.png)
+
+### Module 5: Keep your Azure Arc-enabled servers patched using Azure Manager
+
+#### Module overview
+
+Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
+This service is NOT dependent on Log analytics agent. (The older Azure Automation Update service relies on Log Analytics agent)
+
+Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc).
+These modules will take a while to run, up to 15 minutes for each VM, due to processing required at the various VMs, although it is all running simultaneously.
+
+This new service is currently in preview and has no powershell scripting option (as of Aug 2023)
+
+#### Onboarding the Arc-enabled servers
+
+Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Manager service.
+
+   ![Screenshot showing initial view of all VMs](./updatemgmt-allvms.png)
+
+#### Refresh the VMs
+
+- Once the VMs have been onboarded, clicking on the refresh button will refresh the current status of selected VMs.
+This can also be set as an automatic recurring task for at scale refresh - once every 24 hours. This automatic refresh interval cannot be changed.
+
+   ![Screenshot showing automatic refresh configuration](./updatemgmt-updatesettings.png)
+
+#### Setup Maintenance Configuration
+
+- Setup a list of maintenance configurations for each specific group of VMs in your environment. For countries in Asia and Europe, it is a good idea to use second Tuesday + 1 day to coincode with Patch Tuesday. Do not use "Second Wednesday of the month".
+
+   ![Screenshot showing how to add a maintenance config](./updatemgmt-maintenanceconfig.png)
+
+- Then choose how machines are added to this maintenance configuration (by OS, location, resource group)
+
+   ![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
+
+- Or choose machines specifically instead of dynamically
+
+   ![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
+
+- Then choose what type of updates will be installed by this config
+
+   ![Screenshot showing which updates are going to be installed](./updatemgmt-specificupdates.png)
+
+#### Forcing one-time updates
+
+- Instead of using maintenance configs with specific recurring cycles, you can also setup one-time updates (immediately!). Start by forcing an immediate refresh.
+
+   ![Screenshot showing onetime refresh](./updatemgmt-onetimerefresh.png)
+
+- Then specify which machines
+
+   ![Screenshot showing what updates for each machines](./updatemgmt-installonetimeupdates.png)
+
+- Choose which types of updates
+
+   ![Screenshot showing which types of updates to install](./updatemgmt-showwhichupdates.png)
+
+- Look at the update options
+
+   ![Screenshot showing changes to be made in the onboard script](./updatemgmt-installoptions.png)
+
+- Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
+
+   ![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
+
+#### Reporting
+
+Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Azure Update Manager. There are a few views in there that show the total number of machines connected, history of runs, and the status.
+
+- View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
+
+   ![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
+
+- View of manual vs periodic assessments and manual vs automatically updated.
+
+   ![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
+
+- View of updates by classification
+
+   ![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
+
+#### Module recap
+
+In this session, you have setup Update Management and learnt how to enable it to efficiently manage all updates for your machines, regardless of where they are.
+You have also seen some of the default reports, and since they use workbooks, you can easily create your own customized reports.
+
+### Module 6: Monitor changes to your Azure Arc-enabled servers using Change Tracking and Inventory
+
+#### Module overview
+
+Change Tracking and Inventory is an built-in Azure service, provided by Azure Automation. The old version uses the Log Analytics agent, while the new (preview) version uses the Azure Monitor Agent (AMA).
+
+#### Prerequisites
+
+The following are required for this module to function:
+
+1. Ensure that the servers are already on-boarded to Azure Arc.
+2. Ensure that the Azure Monitor agent (AMA) is already deployed on every Arc-enabled server
+3. Ensure that the servers are already enrolled in Defender for Servers (this is required for File Integrity Monitoring)
+
+Currently, the policies to enable Change tracking and inventory with AMA are in preview. For a seamless policy experience, we recommend that you begin by enabling the _Microsoft.Compute/AutomaticExtensionUpgradePreview_ feature flag for your specific subscription. To register for this feature flag, go to Azure portal > Subscriptions > Select specific subscription name. In the Preview features, select Automatic Extension Upgrade Preview and then select Register.
+
+![Screenshot showing how to enable preview change tracking](./changetracking-enable.png)
+
+#### Current Limitations
+
+The following table lists the current limitations for Change Tracking And Inventory
+
+https://learn.microsoft.com/azure/automation/change-tracking/overview-monitoring-agent?tabs=win-az-vm#current-limitations
+
+Ensure that you have the correct region mappings for Azure Automation account and Log Analytics workspace as not all regions support both. More information can be found [here](https://learn.microsoft.com/azure/automation/how-to/region-mappings).
+
+#### Task 1: Enabling Change Tracking and Inventory
+
+> **NOTE: This task usually requires the following:
+>1. Creation of an Automation Account.
+>2. Linking the Automation Account to Log Analytics.
+>3. Enabling Change Tracking on the Automation Account.
+>4. Setting up a Data Collection Rule that would collect the right events and data.
+>5. Creating an Azure policy to onboard your Arc-enabled machines for Change Tracking.
+**
+
+For the purposes of this levelup - these tasks have all been done for you, so you do not need to them manually.  
+Follow the link [here](https://learn.microsoft.com/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm) to know how to do these yourself in future.
+
+Verify that Change Tracking and Inventory is now enabled and the Arc VMs are reporting status:
+
+![Screenshot showing Inventory](./changetracking-enable-inv.png)
+
+#### Task 2: Using Change Tracking
+
+- Try stopping and starting services on the Arc machine ArcBox-Win2k19 using an administrative powershell session.
+
+```PowerShell
+Stop-Service spooler
+Start-service spooler
+```
+
+- The service changes will eventually show up in the portal
+(By default Windows services status are updated every 30 minutes)
+
+#### Task 3: Manage Change Tracking
+
+- Navigate to one of the Arc-enabled Windows machines and select _Change Tracking_. You can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
+
+    ![Screenshot showing Edit Settings](./changetracking-editsettings.png)
+
+- First, make sure that a storage account is already created for file uploads.
+
+    ![Screenshot showing Storage Account Settings](./changetracking-storageaccount.png)
+
+- Then add files that you want to monitor, for example, the hosts file.
+
+    ![Screenshot showing add file monitoring](./changetracking-addfilemonitoring.png)
+
+- Modify the hosts file on the _ArcBox-Win2K22_ machine (c:\Windows\System32\Drivers\etc\hosts).
+
+> **NOTE: To modify the hosts file, open _Notepad_ as administrator, select File>Open, and then browse to c:\Windows\System32\Drivers\etc\hosts file**
+
+- Add a line like this from an administrative notepad and save the file.
+
+```shell
+1.1.1.1      www.fakehost.com
+```
+
+- Eventually, the file changes will show up in the portal.
+
+#### Task 4: Alert Configuration
+
+- If you want to be alerted when someone changes a host file on any one of your server, then configure alerting.
+
+- On the Change tracking page from your Arc-enabled machine, select _Log Analytics_.
+
+- In the Logs search, look for content changes to the hosts file with the query .
+
+```cmd
+ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
+```
+
+- In Log Analytics, alerts are always created based on log analytics query result.
+
+- Check your query again and modify the alert logic. In this case, you want the alert to be triggered if there's even one change detected across all the machines in the environment.
+
+### Module 7: SSH into your Azure Arc-enabled servers using SSH access
+
+#### Module overview
+
+SSH for Arc-enabled servers enables SSH based connections to Arc-enabled servers without requiring a public IP address or additional open ports.
+In this module, you will learn how to enable and configure this functionality. At the end, you will interactively explore how to access to Arc-enabled Windows and Linux machines.
+
+#### Task 1 - Install prerequisites on client machine
+
+It is possible to leverage both Azure CLI and Azure PowerShell to connect to Arc-enabled servers, you may choose which one to use based on your own preferences.
+
+- RDP into the _ArcBox-Client_ VM
+- Open PowerShell and install either the Azure CLI extension or the Azure PowerShell modules based on your preference of tooling
+
+#### Azure CLI
+
+```cmd
+az extension add --name ssh
+```
+
+or
+
+#### Azure PowerShell
+
+```powershell
+Install-Module -Name Az.Ssh -Scope CurrentUser -Repository PSGallery
+Install-Module -Name Az.Ssh.ArcProxy -Scope CurrentUser -Repository PSGallery
+```
+
+  > NOTE: We recommend that you install the tools on the ArcBox Client virtual machine, but you may also choose to use your local machine if you want to verify that the Arc-enabled servers is reachable from any internet-connected machine after performing the tasks in this module.
+
+#### Task 2 - Enable SSH service on Arc-enabled servers
+
+We will use two Arc-enabled servers running in ArcBox for this module:
+
+- _ArcBox-Win2K22_
+- _ArcBox-Ubuntu-01_
+
+Perform the following steps in order to enable and verify SSH configuration on both machines:
+
+- RDP into the _ArcBox-Client_ VM
+- Open Hyper-V Manager
+- Right click _ArcBox-Win2K22_ and select Connect twice
+- Login to the operating system using username Administrator and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
+- Open Windows PowerShell and install OpenSSH for Windows by running the following:
+
+```powershell
+# Install the OpenSSH Server
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0`
+
+# Start the sshd service
+Start-Service sshd
+
+# Configure the service to start automatically
+Set-Service -Name sshd -StartupType 'Automatic'
+
+# Confirm the Windows Firewall is configured to allow SSH. The rule should be created automatically by setup. Run the following to verify:
+if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
+    Write-Output "Firewall Rule "OpenSSH-Server-In-TCP" does not exist, creating it..."
+    New-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -DisplayName "OpenSSH Server (sshd)" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+} else {
+    Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
+}
+```
+
+- Close the connection to _ArcBox-Win2K22_
+- Right click _ArcBox-Ubuntu-01_ in Hyper-V Manager and select Connect
+- Login to the operating system using username arcbox and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
+- Run the command `systemctl status sshd` to verify that the SSH service is active and running
+- Close the connection to _ArcBox-Ubuntu-01_
+
+#### Task 3 - Connect to Arc-enabled servers
+
+From the _ArcBox-Client_ VM, open a PowerShell session and use the below commands to connect to **ArcBox-Ubuntu-01** using SSH:
+
+#### Azure CLI
+
+```powershell
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+```
+
+or
+
+#### Azure PowerShell
+
+```powershell
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
+```
+
+The first time you connect to an Arc-enabled server using SSH, you will retrieve the following question:
+> Port 22 is not allowed for SSH connections in this resource. Would you like to update the current Service Configuration in the endpoint to allow connections to port 22? If you would like to update the Service Configuration to allow connections to a different port, please provide the -Port parameter or manually set up the Service Configuration. (y/n)
+
+It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
+
+For this exercise, type `yes` and press Enter to proceed.
+
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
+
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
+
+Following the previous method, connect to _ArcBox-Win2K22_ via SSH.
+
+#### Azure CLI
+
+```powershell
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
+```
+
+or
+#### Azure PowerShell
+
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
+```
+
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
+
+   ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
+
+In addition to SSH, you can also connect to the Azure Arc-enabled servers, Windows Server virtual machines using **Remote Desktop** tunneled via SSH.
+
+#### Azure CLI
+
+  ```powershell
+  $serverName = "ArcBox-Win2K22"
+  $localUser = "Administrator"
+
+  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
+  ```
+
+or
+#### Azure PowerShell
+
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
+```
+
+   ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
+
+#### Task 4 - Optional: Azure AD/Entra ID based SSH Login
+
+The `Azure AD based SSH Login – Azure Arc` VM extension can be added from the extensions menu of the Arc server in the Azure portal. The Azure AD login extension can also be installed locally via a package manager via: `apt-get install aadsshlogin` or the following command:
+
+```PowerShell
+$serverName = "ArcBox-Ubuntu-01"
+
+az connectedmachine extension create --machine-name $serverName --resource-group $Env:resourceGroup --publisher Microsoft.Azure.ActiveDirectory --name AADSSHLogin --type AADSSHLoginForLinux --location $env:azureLocation
+```
+
+- Configure role assignments for the Arc-enabled server _ArcBox-Ubuntu-01_ using the Azure portal.  Two Azure roles are used to authorize VM login:
+   - **Virtual Machine Administrator Login**: Users who have this role assigned can log in to an Azure virtual machine with administrator privileges.
+   - **Virtual Machine User Login**: Users who have this role assigned can log in to an Azure virtual machine with regular user privileges.
+
+After assigning one of the two roles for your personal Azure AD/Entra ID user account, run the following command to connect to _ArcBox-Ubuntu-01_ using SSH and AAD/Entra ID-based authentication:
+
+#### Azure CLI
+
+```powershell
+# Log out from the Service Principcal context
+az logout
+
+# Log in using your personal account
+az login
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+az ssh arc --resource-group $Env:resourceGroup --name $serverName
+```
+
+or
+
+#### Azure PowerShell
+
+```powershell
+# Log out from the Service Principal context
+Disconnect-AzAccount
+
+# Log in using your personal account
+Connect-AzAccount
+
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName
+```
+
+You should now be connected and authenticated using your Azure AD/Entra ID account.
+
+### Module 8: Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
+
+#### Module overview
+
+In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook workers in Azure Automation. We will then create and start runbooks on the hybrid runbook workers to see how this feature can be leveraged.
+
+#### Task 1 - create Automation account
+
+##### Option 1: Azure portal
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Click on "Create":
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation.png)
+
+- Select the subscription and resource group where you have deployed ArcBox.
+- Enter _ArcBox-Automation_ as the name for the Automation Account.
+- Select the same region as your ArcBox environment is deployed to.
+- Click Next
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_2.png)
+
+- Leave the default settings for _Managed Identities_ in place and click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_3.png)
+
+- Leave the default settings for _Connectivity configuration_ in place and click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_4.png)
+
+- Optionally, add any tags you may want to add to the resource
+
+- Click Next:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_5.png)
+
+- Click Create:
+
+    ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_6.png)
+
+##### Option 2: Azure PowerShell
+
+- Open [Azure Cloud Shell](https://shell.azure.com/) and select PowerShell
+- Customize the parameter values to reflect your environment for the subscription name, resource name and location
+- Paste the code in the PowerShell window and press Enter
+
+```powershell
+# Define parameters in a hashtable
+$AutomationAccountParams = @{
+    ResourceGroupName = "jan-arcbox-01-rg"
+    Name = "ArcBox-Automation"
+    Location = "East US"
+    AssignSystemIdentity = $true
+}
+
+# Create the Automation account using splatting
+New-AzAutomationAccount @AutomationAccountParams
+```
+
+The output should look similar to this:
+
+   ![Screenshot showing creation of Automation account using Azure PowerShell](./powershell_create_automation.png)
+
+#### Task 2 - Add Hybrid Runbook Workers
+
+##### Option 1: Azure portal
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+   ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Navigate to the _ArcBox-Automation_ account you created previously
+- Select _Hybrid worker groups_:
+
+   ![Screenshot showing Automation account in the Azure Portal](./portal_show_automation.png)
+
+- Click _Create hybrid worker group_:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_1.png)
+
+- Type _windows-workers_ as the name of the new Hybrid worker group
+- Leave the default value for _Use Hybrid Worker Credentials_
+- Click Next
+
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_2.png)
+
+- Click _Add machines_:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_3.png)
+
+- Select _ArcBox-Win2K22_ and click _Add_:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_4.png)
+
+- Click _Review + Create_:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_5.png)
+
+- Click _Create_:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_6.png)
+
+- Wait for the following activities to be finished:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_7.png)
+
+- Repeat the above steps to create an additional Hybrid worker group called _linux-workers_ where you select to onboard the machine _ArcBox-Ubuntu01_ to the group.
+
+- After completing this task you should have the following Hybrid worker groups:
+
+   ![Screenshot showing Automation account Hybrid Worker Groups creation in the Azure Portal](./portal_automation_hybrid_worker_group_8.png)
+
+##### Option 2: Azure PowerShell
+
+```powershell
+
+# Retrieve service URL for Automation account (used when registering Arc-enabled Servers as Hybrid Runbook Workers)
+$AutomationAccountParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    Name = "ArcBox-Automation"
+}
+
+$AutomationAccount = Get-AzResource @AutomationAccountParams
+
+$AutomationAccountInfo = Invoke-AzRestMethod -SubscriptionId $AutomationAccount.SubscriptionId -ResourceGroupName $AutomationAccount.ResourceGroupName -ResourceProviderName Microsoft.Automation -ResourceType automationAccounts -Name $AutomationAccount.Name -ApiVersion 2021-06-22 -Method GET
+$AutomationHybridServiceUrl = ($AutomationAccountInfo.Content | ConvertFrom-Json).Properties.automationHybridServiceUrl
+
+$HybridWorkerGroupParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    Name = "linux-workers"
+}
+
+# Create the Linux Hybrid Worker Group
+New-AzAutomationHybridRunbookWorkerGroup @HybridWorkerGroupParams
+
+# Define parameters in a hashtable
+$HybridWorkerParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    HybridRunbookWorkerGroupName = "linux-workers"
+    Name = "ArcBox-Ubuntu01"
+}
+
+# Add the Hybrid Worker to the group
+New-AzAutomationHybridRunbookWorker @HybridWorkerParams
+
+$ArcResource = Get-AzConnectedMachine -ResourceGroupName $HybridWorkerParams.ResourceGroupName -Name
+
+New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupName -Location $ArcResource.Location -MachineName $ArcResource.Name -Name "HybridWorkerExtension" -Publisher "Microsoft.Azure.Automation.HybridWorker" -ExtensionType HybridWorkerForLinux -TypeHandlerVersion 1.1 -Setting $settings -EnableAutomaticUpgrade
+
+
+$HybridWorkerGroupParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    Name = "windows-workers"
+}
+
+# Create the Windows Hybrid Worker Group using splatting
+New-AzAutomationHybridRunbookWorkerGroup @HybridWorkerGroupParams
+
+# Define parameters in a hashtable
+$HybridWorkerParams = @{
+    ResourceGroupName = "arcbox-demo-rg"
+    AutomationAccountName = "ArcBox-Automation"
+    HybridRunbookWorkerGroupName = "windows-workers"
+    Name = "ArcBox-Win2K22"
+}
+
+# Add the Hybrid Worker to the group
+New-AzAutomationHybridRunbookWorker @HybridWorkerParams
+
+$settings = @{
+      "AutomationAccountURL"  = $AutomationHybridServiceUrl
+  }
+
+$ArcResource = Get-AzConnectedMachine -ResourceGroupName $HybridWorkerParams.ResourceGroupName -Name
+
+New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupName -Location $ArcResource.Location -MachineName $ArcResource.Name -Name "HybridWorkerExtension" -Publisher "Microsoft.Azure.Automation.HybridWorker" -ExtensionType HybridWorkerForWindows -TypeHandlerVersion 1.1 -Setting $settings -EnableAutomaticUpgrade
+
+```
+
+#### Task 3 - Install PowerShell 7 on Hybrid Runbook Workers
+
+```powershell
+$serverName = "ArcBox-Ubuntu-01"
+$localUser = "arcdemo"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
+
+# Install PowerShell
+sudo snap install powershell --classic
+
+# Start PowerShell to verify it is available
+pwsh
+
+exit #exit from PowerShell
+exit #exit SSH connection
+```
+
+```powershell
+
+$serverName = "ArcBox-Win2K22"
+$localUser = "Administrator"
+
+Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
+```
+
+- When logged into the machine, press the _Start-button_ and open _Microsoft Edge_
+
+- Navigate to [https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3#installing-the-msi-package).
+
+- Click the link to download _PowerShell-7.3.6-win-x64.msi_
+- When the file has downloaded, click _Open file_
+
+    ![Screenshot showing PowerShell 7 download](./powershell_installation_windows_1.png)
+
+- Click _Next_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_2.png)
+
+- Leave default values and click _Next_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_3.png)
+
+- Leave default values and click _Next_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_4.png)
+
+- Leave default values and click _Next_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_5.png)
+
+- Click _Install_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_6.png)
+
+- Check _Launch PowerShell_ and click _Finish_
+
+    ![Screenshot showing PowerShell 7 installation wizard](./powershell_installation_windows_7.png)
+
+- After PowerShell has launched, type `Restart-Service -Name HybridWorkerService` and press Enter
+- Close the Window and sign-out from the machine
+
+    ![Screenshot showing PowerShell 7 installaed](./powershell_installation_windows_8.png)
+
+#### Task 4 - Create and start a runbook
+
+- In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
+
+    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
+
+- Navigate to the _ArcBox-Automation_ account you created previously
+- Select _Runbooks_ and click _Create a runbook_
+
+    ![Screenshot showing Automation account runbooks overview in the Azure Portal](./portal_show_automation_runbooks.png)
+
+- Enter the following values
+  - Name: Start-DiskClean
+  - Runbook type: PowerShell
+  - Runtime version: 7.2 (preview)
+  - Description: Invoke disk cleanup
+- Click _Create_
+
+    ![Screenshot showing Automation account runbook creation in the Azure Portal](./portal_create_automation_runbooks_1.png)
+
+- After provisioning, the runbook editor will open the newly created runbook:
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_2.png)
+
+- Paste the following script into the editor pane:
+
+```powershell
+if ($IsWindows) {
+
+    Write-Output 'Free disk space before cleanup action'
+
+    Get-Volume -DriveLetter C | Out-String
+
+    Write-Output "Windows Update component store cleanup"
+    Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase
+
+    $SystemTemp = "$env:SystemRoot\Temp"
+    Write-Output "Empty the system temporary folder: $SystemTemp"
+    Get-ChildItem -Path $SystemTemp -Recurse | Remove-Item -Force -Recurse
+
+    Write-Output 'Free disk space after cleanup action'
+
+    Get-Volume -DriveLetter C | Out-String
+
+} elseif ($IsLinux) {
+
+    Write-Output 'Free disk space before cleanup action'
+    df -h -m
+
+    # Specify the directory where your log files are located
+    $logDir = '/var/log'
+
+    # Define the number of days to retain log files
+    $daysToKeep = 7
+
+    # Get the current date
+    $currentDate = Get-Date
+
+    # Calculate the date threshold for log file deletion
+    $thresholdDate = $currentDate.AddDays(-$daysToKeep)
+
+    # List log files in the specified directory that are older than the threshold
+    $filesToDelete = Get-ChildItem -Path $logDir -File | Where-Object { $_.LastWriteTime -lt $thresholdDate }
+
+    # Delete the old log files
+    foreach ($file in $filesToDelete) {
+        Remove-Item -Path $file.FullName -Force
+    }
+
+    Write-Output 'Free disk space after cleanup action'
+    df -h -m
+
+}
+```
+
+- Click Save
+
+- Click Publish
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_create_automation_runbooks_3.png)
+
+- Click _Start_
+
+>**Note: You may need to click _Refresh_ for the _Start_ button to become active**
+
+   ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
+
+- Select _Hybrid Worker_ and select _linux-workers_ under _Choose Hybrid Worker group_
+
+- Click _OK_
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_2.png)
+
+- Click on the _Output_ tab and wait for the job to finish. You should notice that the amount of free space is lower after the cleanup action has been triggered
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_3.png)
+
+The provided runbook is a starting point for cleaning a single directory. Additional logic and directories may be added as required for specific scenarios. For example, it may also be added logic to connect to other machines in order to perform cleanup actions on those.
+
+Next, you will be running the same runbook on a Windows machine.
+
+- Navigate back to the runbook overview page for _Start-DiskClean_ and click _Start_
+
+![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_1.png)
+
+- Select _Hybrid Worker_ and select _windows-workers_ under _Choose Hybrid Worker group_
+
+- Click _OK_
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_4.png)
+
+- Click on the _Output_ tab and wait for the job to finish
+  - The cleanup action may run for a few minutes, so feel free to continue and revisit the job output later
+  - When completed, you should notice that the amount of free space is lower after the cleanup action has been triggered
+
+    ![Screenshot showing Automation account runbook editing in the Azure Portal](./portal_start_automation_runbooks_5.png)
+
+### Module 9: Configure your Azure Arc-enabled servers using Azure Automanage machine configuration
 
 #### Module overview
 
@@ -859,15 +1711,15 @@ if ($roleDefinitionIds.Count -gt 0)
 
 > **NOTE: It may take 15-20 minutes for the policy remediation to be completed.**
 
-- To get a Machine Configuration status for a specific machine, navigate to *Azure Arc* -> *Machines*
+- To get a Machine Configuration status for a specific machine, navigate to _Azure Arc_ -> _Machines_
 
 - Click on ArcBox-Win2K22 -> Machine Configuration
 
-- If the status for *ArcBox-Win2K22/AzureArcLevelUp_Windows* is not *Compliant*, wait a few more minutes and click *Refresh*
+- If the status for _ArcBox-Win2K22/AzureArcLevelUp_Windows_ is not _Compliant_, wait a few more minutes and click *Refresh*
 
     ![Screenshot of Azure Portal showing Azure Machine Configuration compliance](./portal_machine_config_compliance.png)
 
-- Click on *ArcBox-Win2K22/AzureArcLevelUp_Windows* to get a per-resource view of the compliance state in the assigned configuration
+- Click on _ArcBox-Win2K22/AzureArcLevelUp_Windows_ to get a per-resource view of the compliance state in the assigned configuration
 
     ![Screenshot of Azure Portal showing Azure Machine Configuration compliance detailed view](./portal_machine_config_configs.png)
 
@@ -883,316 +1735,9 @@ if ($roleDefinitionIds.Count -gt 0)
 
   ![Screenshot of VScode showing Azure Machine Configuration validation on Windows](./vscode_win_machine_config_validation.png)
 
-#### Task 2
-
-### Module 5: Monitor changes to your Azure Arc-enabled servers using Change tracking and inventory
+### Module 10: Manage your Azure Arc-enabled servers using Admin Center (Preview)
 
 #### Module overview
-
-#### Task 1
-
-#### Task 2
-
-### Module 6: Keep your Azure Arc-enabled servers patched using Azure Update Manager
-
-#### Module overview
-
-Azure Update Manager is the new service that unifies all VMs running in Azure together with Azure Arc, putting all update tasks in 1 common area for all supported Linux and Windows versions.
-This service is NOT dependent on Log analytics agent. (The older Azure Automation Update service relies on Log Analytics agent)
-
-Extended Security Updates (ESU) for older Windows like Windows 2012 and 2012R2 are also available through this service (Free for Azure VMs, and an opt-in paid service for Arc).
-These modules will take a while to run, up to 15 minutes for each VM, due to processing required at the various VMs, although it is all running simultaneously.
-
-This new service is currently in preview and has no powershell scripting option (as of Aug 2023)
-
-#### Onboarding the Arc-enabled servers
-
-Note that all Azure VMs and Arc Server VMs are already visible in this Azure Update Manager service.
-
-   ![Screenshot showing initial view of all VMs](./updatemgmt-allvms.png)
-
-#### Refresh the VMs
-
-- Once the VMs have been onboarded, clicking on the refresh button will refresh the current status of selected VMs.
-This can also be set as an automatic recurring task for at scale refresh - once every 24 hours. This automatic refresh interval cannot be changed.
-
-   ![Screenshot showing automatic refresh configuration](./updatemgmt-updatesettings.png)
-
-#### Setup Maintenance Configuration
-
-- Setup a list of maintenance configurations for each specific group of VMs in your environment. For countries in Asia and Europe, it is a good idea to use second Tuesday + 1 day to coincode with Patch Tuesday. Do not use "Second Wednesday of the month".
-
-   ![Screenshot showing how to add a maintenance config](./updatemgmt-maintenanceconfig.png)
-
-- Then choose how machines are added to this maintenance configuration (by OS, location, resource group)
-
-   ![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
-
-- Or choose machines specifically instead of dynamically
-
-   ![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
-
-- Then choose what type of updates will be installed by this config
-
-   ![Screenshot showing which updates are going to be installed](./updatemgmt-specificupdates.png)
-
-#### Forcing one-time updates
-
-- Instead of using maintenance configs with specific recurring cycles, you can also setup one-time updates (immediately!). Start by forcing an immediate refresh.
-
-   ![Screenshot showing onetime refresh](./updatemgmt-onetimerefresh.png)
-
-- Then specify which machines
-
-   ![Screenshot showing what updates for each machines](./updatemgmt-installonetimeupdates.png)
-
-- Choose which types of updates
-
-   ![Screenshot showing which types of updates to install](./updatemgmt-showwhichupdates.png)
-
-- Look at the update options
-
-   ![Screenshot showing changes to be made in the onboard script](./updatemgmt-installoptions.png)
-
-- Then wait for a few hours and a few reboots - this can take repeated forcing for machines that have not been updated for a long time
-
-   ![Screenshot showing final state](./updatemgmgt-allupdatescompleted.png)
-
-#### Reporting
-
-Under the Monitoring part of the Update Manager, there is a default workbook, which is an overview of the Azure Update Manager. There are a few views in there that show the total number of machines connected, history of runs, and the status.
-
-- View of currently connected machines, split by Azure and Azure Arc VMs, and Windows and Linux numbers.
-
-   ![Screenshot showing overall machine Status](./updatemgmt-reporting1.png)
-
-- View of manual vs periodic assessments and manual vs automatically updated.
-
-   ![Screenshot showing overall machine Status](./updatemgmt-repoting2.png)
-
-- View of updates by classification
-
-   ![Screenshot showing overall machine Status](./updatemgmt-reporting3.png)
-
-#### Module recap
-
-In this session, you have setup Update Management and learnt how to enable it to efficiently manage all updates for your machines, regardless of where they are.
-You have also seen some of the default reports, and since they use workbooks, you can easily create your own customized reports.
-
-### Module 7: Run automation runbooks on your Azure Arc-enabled servers using Hybrid runbook workers
-
-#### Module overview
-
-In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook workers in Azure Automation. We will then create and start runbooks on the hybrid runbook workers to see how this feature can be leveraged.
-
-#### Task 1
-
-#### Task 2
-
-### Module 8: SSH into your Azure Arc-enabled servers using SSH access
-
-#### Module overview
-
-SSH for Arc-enabled servers enables SSH based connections to Arc-enabled servers without requiring a public IP address or additional open ports.
-In this module, you will learn how to enable and configure this functionality. At the end, you will interactively explore how to access to Arc-enabled Windows and Linux machines.
-
-#### Task 1 - Install prerequisites on client machine
-
-It is possible to leverage both Azure CLI and Azure PowerShell to connect to Arc-enabled servers, you may choose which one to use based on your own preferences.
-
-- RDP into the _ArcBox-Client_ VM
-- Open PowerShell and install either the Azure CLI extension or the Azure PowerShell modules based on your preference of tooling
-
-#### Azure CLI
-
-```cmd
-az extension add --name ssh
-```
-
-or
-
-#### Azure PowerShell
-
-```powershell
-Install-Module -Name Az.Ssh -Scope CurrentUser -Repository PSGallery
-Install-Module -Name Az.Ssh.ArcProxy -Scope CurrentUser -Repository PSGallery
-```
-
-  > NOTE: We recommend that you install the tools on the ArcBox Client virtual machine, but you may also choose to use your local machine if you want to verify that the Arc-enabled servers is reachable from any internet-connected machine after performing the tasks in this module.
-
-#### Task 2 - Enable SSH service on Arc-enabled servers
-
-We will use two Arc-enabled servers running in ArcBox for this module:
-
-- _ArcBox-Win2K22_
-- _ArcBox-Ubuntu-01_
-
-Perform the following steps in order to enable and verify SSH configuration on both machines:
-
-- RDP into the _ArcBox-Client_ VM
-- Open Hyper-V Manager
-- Right click _ArcBox-Win2K22_ and select Connect twice
-- Login to the operating system using username Administrator and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
-- Open Windows PowerShell and install OpenSSH for Windows by running the following:
-```powershell
-# Install the OpenSSH Server
-Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0`
-
-# Start the sshd service
-Start-Service sshd
-
-# Configure the service to start automatically
-Set-Service -Name sshd -StartupType 'Automatic'
-
-# Confirm the Windows Firewall is configured to allow SSH. The rule should be created automatically by setup. Run the following to verify:
-if (!(Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue | Select-Object Name, Enabled)) {
-    Write-Output "Firewall Rule 'OpenSSH-Server-In-TCP' does not exist, creating it..."
-    New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
-} else {
-    Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
-}
-```
-- Close the connection to _ArcBox-Win2K22_
-- Right click _ArcBox-Ubuntu-01_ in Hyper-V Manager and select Connect
-- Login to the operating system using username arcbox and the password you used when deploying ArcBox, by default this is **ArcPassword123!!**
-- Run the command `systemctl status sshd` to verify that the SSH service is active and running
-- Close the connection to _ArcBox-Ubuntu-01_
-
-
-#### Task 3 - Connect to Arc-enabled servers
-
-From the _ArcBox-Client_ VM, open a PowerShell session and use the below commands to connect to **ArcBox-Ubuntu-01** using SSH:
-
-#### Azure CLI
-```powershell
-$serverName = "ArcBox-Ubuntu-01"
-$localUser = "arcdemo"
-
-az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
-```
-
-or
-
-#### Azure PowerShell
-```powershell
-
-$serverName = "ArcBox-Ubuntu-01"
-$localUser = "Administrator"
-
-Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
-```
-
-The first time you connect to an Arc-enabled server using SSH, you will retrieve the following question:
-> Port 22 is not allowed for SSH connections in this resource. Would you like to update the current Service Configuration in the endpoint to allow connections to port 22? If you would like to update the Service Configuration to allow connections to a different port, please provide the -Port parameter or manually set up the Service Configuration. (y/n)
-
-It is possible to pre-configure this setting on the Arc-enabled servers by following the steps in the section *Enable functionality on your Arc-enabled server* in the [documentation](https://learn.microsoft.com/en-us/azure/azure-arc/servers/ssh-arc-overview?tabs=azure-powershell#getting-started).
-
-For this exercise, select `y` and press Enter to proceed.
-
- ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
-
- ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_02.png)
-
-Following the previous method, connect to _ArcBox-Win2K22_ via SSH.
-
-#### Azure CLI
-```powershell
-$serverName = "ArcBox-Win2K22"
-$localUser = "Administrator"
-
-az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
-```
-
-or
-#### Azure PowerShell
-```powershell
-
-$serverName = "ArcBox-Win2K22"
-$localUser = "Administrator"
-
-Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser
-```
-
-![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_03.png)
-
-![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_04.png)
-
-In addition to SSH, you can also connect to the Azure Arc-enabled servers, Windows Server virtual machines using **Remote Desktop** tunneled via SSH.
-
-#### Azure CLI
-  ```powershell
-  $serverName = "ArcBox-Win2K22"
-  $localUser = "Administrator"
-
-  az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser --rdp
-  ```
-
-or
-#### Azure PowerShell
-```powershell
-
-$serverName = "ArcBox-Win2K22"
-$localUser = "Administrator"
-
-Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName -LocalUser $localUser -Rdp
-```
-
-  ![Screenshot showing usage of Remote Desktop tunnelled via SSH](./rdp_via_az_cli.png)
-
-#### Task 4 - Optional: Azure AD/Entra ID based SSH Login
-
-
-The `Azure AD based SSH Login – Azure Arc` VM extension can be added from the extensions menu of the Arc server in the Azure portal. The Azure AD login extension can also be installed locally via a package manager via: `apt-get install aadsshlogin` or the following command:
-
-```
-$serverName = "ArcBox-Ubuntu-01"
-
-az connectedmachine extension create --machine-name $serverName --resource-group $Env:resourceGroup --publisher Microsoft.Azure.ActiveDirectory --name AADSSHLogin --type AADSSHLoginForLinux --location $env:azureLocation
-```
-
-- Configure role assignments for the Arc-enabled server _ArcBox-Ubuntu-01_ using the Azure portal.  Two Azure roles are used to authorize VM login:
-   - **Virtual Machine Administrator Login**: Users who have this role assigned can log in to an Azure virtual machine with administrator privileges.
-   - **Virtual Machine User Login**: Users who have this role assigned can log in to an Azure virtual machine with regular user privileges.
-
-After assigning one of the two roles for your personal Azure AD/Entra ID user account, run the following command to connect to _ArcBox-Ubuntu-01_ using SSH and AAD/Entra ID-based authentication:
-
-#### Azure CLI
-```powershell
-# Log out from the Service Principcal context
-az logout
-
-# Log in using your personal account
-az login
-
-$serverName = "ArcBox-Ubuntu-01"
-$localUser = "arcdemo"
-
-az ssh arc --resource-group $Env:resourceGroup --name $serverName
-```
-
-or
-
-#### Azure PowerShell
-```powershell
-# Log out from the Service Principal context
-Disconnect-AzAccount
-
-# Log in using your personal account
-Connect-AzAccount
-
-$serverName = "ArcBox-Ubuntu-01"
-$localUser = "Administrator"
-
-Enter-AzVM -ResourceGroupName $Env:resourceGroup -Name $serverName
-```
-
-You should now be connected and authenticated using your Azure AD/Entra ID account.
-
-
-### Module 9: Manage your Azure Arc-enabled servers using Admin Center (Preview)
-
-#### Module overview
-
 
 In this module you will learn how to use the Windows Admin Center in the Azure portal to manage the Windows operating system of your Arc-enabled servers, known as hybrid machines. You can securely manage hybrid machines from anywhere without needing a VPN, public IP address, or other inbound connectivity to your machine.
 
@@ -1253,7 +1798,7 @@ Pre-requisite: Azure permissions
 
         ![Screenshot Group membership](./Admin_centre_group_membership_1.png)
 
-### Module 10: Query and inventory your Azure Arc-enabled servers using Azure resource graph
+### Module 11: Query and inventory your Azure Arc-enabled servers using Azure resource graph
 
 #### Module overview
 
@@ -1289,10 +1834,10 @@ In this first step, you will assign Azure resource tags to some of your Azure Ar
 
 #### Task 3: Run a query to show all Azure Arc-enabled servers in your subscription
 
-- In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/equals-operator).
+- In the query window, enter and run the following query and examine the results which should show your Arc-enabled servers. Note the use of the KQL equals operator (=~) which is case insensitive [KQL =~ (equals) operator](https://learn.microsoft.com/azure/data-explorer/kusto/query/equals-operator).
 
 ```shell
-Resources 
+Resources
 | where type =~ 'Microsoft.HybridCompute/machines'
 ```
 
@@ -1377,7 +1922,7 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
     ![Screenshot of extra properties](./extra_properties.png)
 
-### Module 11: Enforce governance across your Azure Arc-enabled servers using Azure Policy
+### Module 12: Enforce governance across your Azure Arc-enabled servers using Azure Policy
 
 #### Module overview
 
@@ -1386,7 +1931,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 #### Task 1: Assign a built-in Azure Policy to the Arc resource group
 
 - Azure policy can be assigned at Management Group, Subscription or Resource Group scope. In this scenario we will use the Resource Group scope.
-- We will show two ways to accomplish this first task. **First we will use the Azure portal** (but if you prefer to use Powershell then skip to that section at the end of this first task) 
+- We will show two ways to accomplish this first task. **First we will use the Azure portal** (but if you prefer to use Powershell then skip to that section at the end of this first task)
 - In the Azure Portal search for the "Policy" resource and navigate to it.
 - Click on "Compliance" in the left mene then click "Assign policy".
 
@@ -1416,6 +1961,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
 - If you want to use **Powershell as an alternative method** to assign the policy, then the following procedure accomplishes the same as the portal method explained above.
     - create a policy parameter file, e.g. parameters.json
+
     ```javascript
     {
       "IncludeArcMachines":{
@@ -1426,9 +1972,11 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
       }
     }
     ```
+
     - Run the following powershell commands
+
     ```powershell
-    $ResourceGroup = Get-AzResourceGroup -Name 'ArcBox-Levelup' 
+    $ResourceGroup = Get-AzResourceGroup -Name 'ArcBox-Levelup'
     $Policy = Get-AzPolicyDefinition -BuiltIn | Where-Object {$_.Properties.DisplayName -eq 'Audit Linux machines that have the specified applications installed'} 
     New-AzPolicyAssignment -Name '(Arc Levelup) Audit Linux machines with python3 installed' -PolicyDefinition $Policy -Scope $ResourceGroup.ResourceId -PolicyParameter .\parameters.json
     ```
@@ -1449,11 +1997,11 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
 - The steps above helps you identify non-compliant resources and then you can act on resolving the non-compliance reasons.
 
-- NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/en-us/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
+- NOTE (Optional): As mentioned at the beginning of this task, to force a policy scan we can use the [Start-AzPolicyComplianceScan powershell command](https://learn.microsoft.com/powershell/module/az.policyinsights/start-azpolicycompliancescan?view=azps-10.2.0). For example the following Powershell commands will focus the scan on our resource group, run the scan as a job and wait for it to complete in the background:
 
 ```powershell
-$job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob 
-$job | Wait-Job 
+$job = Start-AzPolicyComplianceScan  -ResourceGroupName "ArcBox-Levelup" -AsJob
+$job | Wait-Job
 ```
 
 #### Task 3: Using the "Guest Assignments" views directly
@@ -1467,68 +2015,3 @@ $job | Wait-Job
     ![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
 
 - Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
-
-### Module 12 : Gain security insights from your Arc-enabled servers using Microsoft Sentinel
-
-#### Module overview
-
-In this module you will configure Windows security events collection using Sentinel to inspect failed logins on your Windows Arc-enabled machine
-
-#### Task 1: Configure data collection on Sentinel
-
-- In the Azure Portal, search for _Sentinel_
-
-    ![Screenshot showing searching for Sentinel on the Azure Portal](./portal_search_sentinel.png)
-
-- Click on "Content Hub" and search for "Windows Security Events" and install it.
-
-    ![Screenshot showing searching for windows security events](./sentinel_content_hub.png)
-
-- After installation, click on "Manage" to configure the collector.
-
-    ![Screenshot managing the data collection](./sentinel_manage_data_collector.png)
-
-- Select the data connector and make sure you've selected the _Windows Security Events via AMA_ and click "open connector page".
-
-    ![Screenshot selecting the AMA data collection](./sentinel_data_collector_ama.png)
-
-- Create a new data collection rule.
-
-    ![Screenshot showing creating a new data collection rule](./sentinel_create_new_dcr.png)
-
-- Provide a name for the data collection rule and select the same resource group where you've deployed this level-up lab.
-
-    ![Screenshot selecting the data collection rule name](./sentinel_dcr_creation.png)
-
-- Select one or multiple Windows Arc-enabled machines.
-
-    ![Screenshot selecting the arc machines](./sentinel_dcr_select_server.png)
-
-- Select the "Common" event type and create the data collection rule.
-
-    ![Screenshot selecting the common event type](./sentinel_security_events_common.png)
-
-    ![Screenshot selecting the AMA data collection created](./sentinel_security_events_created.png)
-
-
-#### Task 2: Simulating and viewing security events
-
-- After configuring Sentinel, now we need to simulate some failed login attempts on one or more Windows Arc-enabled machines.
-
-- Connect to _ArcBox-Client_ VM, and open the _Hyper-v manager_.
-
-- Right-click one of the Windows machines and connect to it.
-
-    ![Screenshot showing connecting to the nested vm on hyper-v](./hyperv_connect_vm.png)
-
-- Simulate some failed login attempts by trying to login multiple times using an incorrect password.
-
-    ![Screenshot showing failed login attemps on the nested vm](./hyperv_failed_login.png)
-
-- After waiting for about 10-15 minutes for data to start getting ingested into the log analytics workspace, navigate to "Workbooks" and select the "Identity & Access" workbook.
-
-    ![Screenshot selecting the Identity and access workbook](./sentinel_open_workbook.png)
-
-- Once data is being ingested, you will start seeing the failed login attempts in the workbook.
-
-    ![Screenshot selecting the Identity and access workbook](./sentinel_failed_login.png)

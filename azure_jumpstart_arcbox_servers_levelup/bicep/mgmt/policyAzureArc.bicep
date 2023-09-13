@@ -7,6 +7,12 @@ param azureLocation string
 @description('Subscription Id')
 param subscriptionId string = subscription().subscriptionId
 
+@description('Id of change tracking DCR')
+param changeTrackingDCR string
+
+param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
+//param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+
 var policies = [
   /*{
     name: '(ArcBox) Enable Azure Monitor for Hybrid Linux VMs with AMA'
@@ -58,6 +64,25 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = 
   }
 }]
 
+resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
+  name: '(ArcBox) Enable ChangeTracking for Arc-enabled machines'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Enable ChangeTracking for Arc-enabled machines'
+    description: 'Enable ChangeTracking for Arc-enabled machines'
+    policyDefinitionId: changeTrackingPolicySetDefintion
+    parameters: {
+      dcrResourceId:{
+        value: changeTrackingDCR
+      }
+    }
+  }
+}
+
 /*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
@@ -97,6 +122,6 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
 }
 
 module arcAMAPolicies 'policySetDefinitionsAzureArc.bicep' = {
-  name: 'ArcBox_AMA_Policies'
+  name: guid('ARCBOX_AMA_POLICIES',subscriptionId,azureLocation)
   scope: subscription(subscriptionId)
 }

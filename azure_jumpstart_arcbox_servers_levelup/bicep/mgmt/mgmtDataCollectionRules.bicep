@@ -349,3 +349,5 @@ resource ChangeTracking_variables_workspace 'Microsoft.OperationsManagement/solu
   }
 }
 
+
+output changeTrackingDCR string = dataCollectionRuleChangeTracking.id
