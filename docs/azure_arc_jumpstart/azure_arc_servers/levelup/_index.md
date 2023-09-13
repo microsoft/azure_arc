@@ -848,7 +848,7 @@ Follow the link [here](https://learn.microsoft.com/azure/automation/change-track
 
 Verify that Change Tracking and Inventory is now enabled and the Arc VMs are reporting status:
 
-    ![Screenshot showing Inventory](./changetracking-enable-inv.png)
+![Screenshot showing Inventory](./changetracking-enable-inv.png)
 
 #### Task 2: Using Change Tracking
 
