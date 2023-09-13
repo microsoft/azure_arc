@@ -835,80 +835,20 @@ Ensure that you have the correct region mappings for Azure Automation account an
 
 #### Task 1: Enabling Change Tracking and Inventory
 
->**NOTE: For Azure Arc - you must then deploy a special policy and create a Data Collection Rule (DCR) to specify the data collection characteristics. Follow the link [here](https://learn.microsoft.com/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm). The DCR will have already been deployed as part of the setup for this levelup, but you will need to know where to do this for your own environments in future. The policy deployment is done below.**
+> **NOTE: This task usually requires the following:
+>1. Creation of an Automation Account.
+>2. Linking the Automation Account to Log Analytics.
+>3. Enabling Change Tracking on the Automation Account.
+>4. Setting up a Data Collection Rule that would collect the right events and data.
+>5. Creating an Azure policy to onboard your Arc-enabled machines for Change Tracking.
+**
 
-You will need to deploy an Azure Initiative to enable Change Tracking on Arc-enabled servers.
+For the purposes of this levelup - these tasks have all been done for you, so you do not need to them manually.  
+Follow the link [here](https://learn.microsoft.com/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm) to know how to do these yourself in future.
 
-- In the Azure portal, search for the text "(Arcbox)" and for a definition type of "Initiative".
+Verify that Change Tracking and Inventory is now enabled and the Arc VMs are reporting status:
 
-    ![Screenshot showing searching for changeTracking Initiative in the azure portal](./changetracking-lookforpolicy.png)
-
-- Click on "_[ArcBox]: (ArcBox)Enable ChangeTracking and Inventory for Arc-Enabled virtual machines_".
-
-- Click "_Assign Initiative_".
-
-    ![Screenshot showing the 6 policies in the Initiative](./changetracking-6policies.png)
-
-- Select the right scope (management group, subscription and resource group) for the resource group where you deployed _ArcBox_.
-
-    ![Screenshot showing assigning the policy](./changetracking-assignpolicy1.png)
-
-- After validating the scope, click "Next" twice to navigate to the parameters tab.
-
-- To get the "Data Collection Rule" resource Id,  run the following CLI command
-
-```shell
-az resource show --name "arcbox-ama-ct-dcr" `
-                 --resource-group "<resource group name>" `
-                 --resource-type Microsoft.Insights/dataCollectionRules `
-                 --query id `
-                 --output tsv
-```
-
-- You can also find the "Data Collection Rule" resource Id from the Azure portal. Search for the _arcbox-ama-ct-dcr_ data collection rule.
-
-- Then click create for the initiave to be assigned to the _arcbox_ resource group.
-- Once it has been assigned, copy the assignmentID, as you will need it in the next part.
-
-Once the policy assignments have been made, you may need to force remediate each policy unless you are willing to wait.
-To force remediation, either use the GUI to select each policy in the initiative  (just like the monitor section) and then force the task, or just run some AZ CLI commands in a powershell window:
-
-```powershell
-
-$subscriptionid = "<your subscription id>"
-$resourcegroup = "<your resource group name>"
-$policyassignmentid = "<your policy assignment id>"
-
-#This are the definition IDs for the ChangeTracking initiative - it will be the same worldwide until this initiative is changed
-#You can find the definition IDs for a policy from the initiative by clicking on the policy itself.
-
-$defID = "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f", `
-"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187", `
-"/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5", `
-"/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278", `
-"/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb", `
-"/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
-
-$count=1
-$defid | foreach { `
-az policy remediation create --resource-group $resourcegroup -n "Force ChangeTracking policy $count " --policy-assignment `
-$policyassignmentid --resource-discovery-mode ReEvaluateCompliance --definition-reference-id $_ ;`
-$count++
-}
-
-#Sometimes, the portal does not show the remediation task created via AZ CLI.
-#In that case, run
-
-az policy remediation list
-
-#to see the status of the remediation task.
-```
-
-- You can see the processing state of each remediation task by clicking on the _Remediation_ tab
-
-   ![Screenshot showing the policyassignment](./changetracking-forcingremediation.png)
-
-Please be patient as it takes a while for onboarding to work.
+![Screenshot showing Inventory](./changetracking-enable-inv.png)
 
 #### Task 2: Using Change Tracking
 
@@ -920,6 +860,7 @@ Start-service spooler
 ```
 
 - The service changes will eventually show up in the portal
+(By default Windows services status are updated every 30 minutes)
 
 #### Task 3: Manage Change Tracking
 
