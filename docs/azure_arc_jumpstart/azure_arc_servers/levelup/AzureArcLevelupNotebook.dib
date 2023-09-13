@@ -1480,39 +1480,7 @@ New-AzConnectedMachineExtension -ResourceGroupName $ArcResource.ResourceGroupNam
 
 #!markdown
 
-#### Task 3 - Install PowerShell 7 on Hybrid Runbook Workers
-
-- Connect to the _ArcBox-Client_ VM using RDP.
-
-- Open _PowerShell ISE_ and run the following script.
-
-#!pwsh
-
-## Run this cell to copy the commands to your Clipboard
-
-$scriptText = @"
-`$serverName = 'ArcBox-Ubuntu-01'
-`$localUser = 'arcdemo'
-
-Enter-AzVM -ResourceGroupName `$Env:resourceGroup -Name `$serverName -LocalUser `$localUser
-
-# Install PowerShell
-sudo snap install powershell --classic
-
-# Start PowerShell to verify it is available
-pwsh
-
-exit #exit from PowerShell
-exit #exit SSH connection
-"@
-
-Set-Clipboard -Value $scriptText | Out-Null
-
-Write-Host "Copied!!"
-
-#!markdown
-
-#### Task 4 - Create and start a runbook
+#### Task 3 - Create and start a runbook
 
 - In the Azure Portal, search for _automation_ and navigate to _Automation accounts_
 
