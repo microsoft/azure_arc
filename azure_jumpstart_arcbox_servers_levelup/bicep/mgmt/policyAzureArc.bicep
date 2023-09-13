@@ -83,6 +83,15 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
   }
 }
 
+resource changeTrackingPolicyRemediation 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
+  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
+  properties: {
+    policyAssignmentId: changeTrackingPolicyAssignemnt.id
+    policyDefinitionReferenceId: changeTrackingPolicySetDefintion
+    parallelDeployments: 4
+  }
+}
+
 /*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
