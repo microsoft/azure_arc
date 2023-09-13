@@ -800,6 +800,10 @@ This can also be set as an automatic recurring task for at scale refresh - once 
 
    ![Screenshot showing the dynamic scopes for update groups](./updatemgmt-dynamicscopes.png)
 
+>**Note: If you want to enable dynamic scopes, you will need to enable the "Dynamic Scoping" preview feature in the subscription
+
+   ![Screenshot showing the dynamic scopes for update groups](./updatemgmt-previewdynamicscope.png)
+
 - Or choose machines specifically instead of dynamically
 
    ![Screenshot showing which machines to be selected for config](./updatemgmt-specificmachineselection.png)
