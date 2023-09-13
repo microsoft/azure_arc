@@ -863,9 +863,6 @@ Start-service spooler
 - The service changes will eventually show up in the portal
 (By default Windows services status are updated every 30 minutes)
 
- ![Screenshot showing Service Changes](./changetracking-servicechanges.png)
- ![Screenshot showing Service Changes-Applicationdetails](./changetracking-servicechanges2.png)
-
 #### Task 3: Manage Change Tracking
 
 - Navigate to one of the Arc-enabled Windows machines and select _Change Tracking_. You can change the types of data collected and how often (for example, 60s for specific CPU and RAM counters, or 1 hour for file changes.)
@@ -891,8 +888,6 @@ Start-service spooler
 ```
 
 - Eventually, the file changes will show up in the portal.
-
- ![Screenshot showing Inventory](./changetracking-filechanges.png)
 
 #### Task 4: Alert Configuration
 
