@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "14114369986585116662"
+      "templateHash": "11149384174819022311"
     }
   },
   "parameters": {
@@ -911,7 +911,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "6773533706087214524"
+              "templateHash": "212689542187748615"
             }
           },
           "parameters": {
@@ -2804,7 +2804,7 @@
                         "multiSelect": true,
                         "quote": "'",
                         "delimiter": ",",
-                        "query": "{\"version\":\"1.0.0\",\"content\":\"[ \\r\\n    {\"id\":\"New\", \"label\": \"New\"},\\r\\n    {\"id\":\"Acknowledged\", \"label\": \"Acknowledged\"},\\r\\n    {\"id\":\"Closed\", \"label\": \"Closed\"}\\r\\n]\",\"transformers\":null}",
+                        "jsonData": "{\"version\":\"1.0.0\",\"content\":\"[ \r\n    {\"id\":\"New\", \"label\": \"New\"},\r\n    {\"id\":\"Acknowledged\", \"label\": \"Acknowledged\"},\r\n    {\"id\":\"Closed\", \"label\": \"Closed\"}\r\n]\",\"transformers\":null}",
                         "crossComponentResources": [
                           "{Subscription}"
                         ],
@@ -4511,7 +4511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "1484316831421426512"
+              "templateHash": "14197804845999167783"
             }
           },
           "parameters": {
@@ -4602,19 +4602,6 @@
                   }
                 }
               }
-            },
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('contributorRoleDefinition'), resourceGroup().id)]",
-              "properties": {
-                "roleDefinitionId": "[parameters('contributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines'), '2022-06-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines')]"
-              ]
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
