@@ -381,7 +381,7 @@ sudo ufw default allow incoming
 
 - Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
 
-- create an empty onboarding script file using the nano editor, and paste the script content from your local machine.
+- create an empty onboarding script file using the nano editor, and paste the script content from your local machine (you can paste by right-clicking inside the nano editor window).
 
 ```shell
 nano onboardingscript.sh
