@@ -504,7 +504,7 @@ az resource show --name "arcbox-ama-vmi-perfAndda-dcr" `
 
     ![Screenshot showing the monitoring agents installed](./machine_windows_ama_agents.png)
 
-- Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
+- (Optional) Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
 
 - After configuring the agents and VM insights using Azure Policy, it will take 10-25 minutes for the insights data to start showing up.
 

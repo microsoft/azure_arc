@@ -474,7 +474,7 @@ az resource show --name "arcbox-ama-vmi-perfAndda-dcr" `
 
     ![Screenshot showing the monitoring agents installed](./machine_windows_ama_agents.png)
 
-- Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
+- (Optional) Repeat the same steps in _Task 2_ to assign the Linux policy for data collection _(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines._
 
 - After configuring the agents and VM insights using Azure Policy, it will take 10-25 minutes for the insights data to start showing up.
 
@@ -1988,7 +1988,7 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
 
 #### Task 2: Examine the policy compliance
 
-- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that might faster to show the compliance indication**. We can also attempt to force a policy scan (see note at end of this task) which **might** improve the speed to populate the compliance dashboard. 
+- The creation of the assignment and for it to take effect and get evaluated might take some time. You can keep refreshing the "Compliance" list until you can see an indication that there is at least one resource which is non-compliant with the policy we created (this depends on how many Arc-connected Linux servers with the specified applications we have). **If this does not happen in a reasonable time then go to task 3 where there is another view that might faster to show the compliance indication**. We can also attempt to force a policy scan (see note at end of this task) which **might** improve the speed to populate the compliance dashboard.
 
     ![Screenshot of policies and their compliances with the new policy](./Compliance_dashboard.png)
 
