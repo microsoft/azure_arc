@@ -550,7 +550,7 @@ As part of the ArcBox automation, some alerts and workbooks have been created to
 
     ![Screenshot showing alerts workbook](./alerts_workbooks_alerts.png)
 
-    ![Screenshot showing performance workbook](./alerts_workbooks_perf.png.png)
+    ![Screenshot showing performance workbook](./alerts_workbooks_perf.png)
 
     ![Screenshot showing events workbook](./alerts_workbooks_events.png)
 
@@ -840,10 +840,10 @@ Ensure that you have the correct region mappings for Azure Automation account an
 >2. Linking the Automation Account to Log Analytics.
 >3. Enabling Change Tracking on the Automation Account.
 >4. Setting up a Data Collection Rule that would collect the right events and data.
->5. Creating an Azure policy to onboard your Arc-enabled machines for Change Tracking.
+>5. Creating an Azure policy to onboard your Arc-enabled machines to Change Tracking.
 **
 
-For the purposes of this levelup - these tasks have all been done for you, so you do not need to them manually.  
+For the purposes of this levelup - these tasks have all been done for you, so you do not need to them manually.
 Follow the link [here](https://learn.microsoft.com/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm) to know how to do these yourself in future.
 
 Verify that Change Tracking and Inventory is now enabled and the Arc VMs are reporting status:
@@ -896,7 +896,7 @@ Start-service spooler
 
 - In the Logs search, look for content changes to the hosts file with the query .
 
-```cmd
+```shell
 ConfigurationChange | where FieldsChanged contains "FileContentChecksum" and FileSystemPath == "c:\windows\system32\drivers\etc\hosts"
 ```
 
@@ -1117,7 +1117,7 @@ You should now be connected and authenticated using your Azure AD/Entra ID accou
 
 In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook workers in Azure Automation. We will then create and start runbooks on the hybrid runbook workers to see how this feature can be leveraged.
 
-#### Task 1 - create Automation account
+#### Task 1 - Create Automation account
 
 ##### Option 1: Azure portal
 
@@ -1130,8 +1130,11 @@ In this module we will onboard two Azure Arc-enabled servers as Hybrid runbook w
     ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation.png)
 
 - Select the subscription and resource group where you have deployed ArcBox.
+
 - Enter _ArcBox-Automation_ as the name for the Automation Account.
+
 - Select the same region as your ArcBox environment is deployed to.
+
 - Click Next
 
     ![Screenshot showing creation of Automation account on the Azure Portal](./portal_create_automation_2.png)
@@ -1186,6 +1189,7 @@ The output should look similar to this:
    ![Screenshot showing searching for Automation on the Azure Portal](./portal_search_automation.png)
 
 - Navigate to the _ArcBox-Automation_ account you created previously
+
 - Select _Hybrid worker groups_:
 
    ![Screenshot showing Automation account in the Azure Portal](./portal_show_automation.png)
@@ -1195,7 +1199,9 @@ The output should look similar to this:
    ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_1.png)
 
 - Type _windows-workers_ as the name of the new Hybrid worker group
+
 - Leave the default value for _Use Hybrid Worker Credentials_
+
 - Click Next
 
    ![Screenshot showing Automation account Hybrid Worker Groups in the Azure Portal](./portal_automation_hybrid_worker_group_2.png)
@@ -1863,10 +1869,10 @@ Then run the query in PowerShell
 - Use PowerShell and the Resource Graph Explorer to summarize the server count by "logical cores" which is one of the detected properties referred to in the previous task. Remember to only use the query string, which is enclosed in double quotes, in the portal.
 
 ```powershell
-Search-AzGraph -Query  “Resources
+Search-AzGraph -Query  "Resources
 | where type =~ 'Microsoft.HybridCompute/machines'
 | extend logicalCores = tostring(properties.detectedProperties.logicalCoreCount)
-| summarize serversCount = count() by logicalCores”
+| summarize serversCount = count() by logicalCores"
 ```
 
 - The Graph Explorer allows you to get a graphical view of your results by selecting the "charts" option.
@@ -1878,7 +1884,7 @@ Search-AzGraph -Query  “Resources
 - Let’s now build a query that uses the tag we assigned earlier to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the Scenario tag. Feel free to use the portal of PowerShell. Check that the results match the servers that you set tags for earlier.
 
 ```powershell
-Search-AzGraph -Query  “Resources
+Search-AzGraph -Query  "Resources
 | where type =~ 'Microsoft.HybridCompute/machines' and isnotempty(tags['Scenario'])
 | extend Scenario = tags['Scenario']
 | project name, tags"
@@ -1889,7 +1895,7 @@ Search-AzGraph -Query  “Resources
 - Run the following advanced query which allows you to see what extensions are installed on the Arc-enabled servers. Notice that running the query in PowerShell requires us to escape the $ character as explained in [Escape Characters](https://learn.microsoft.com/azure/governance/resource-graph/concepts/query-language#escape-characters)
 
 ```powershell
-Search-AzGraph -Query “Resources
+Search-AzGraph -Query "Resources
 | where type == 'microsoft.hybridcompute/machines'
 | project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)
 | join kind=leftouter(
@@ -1898,7 +1904,7 @@ Search-AzGraph -Query “Resources
     | project MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))), ExtensionName = name
 ) on `$left.JoinID == `$right.MachineId
 | summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName
-| order by tolower(OSName) desc”
+| order by tolower(OSName) desc"
 ```
 
 - If you have used the portal to run the query then you should see something like the following
@@ -1910,7 +1916,7 @@ Search-AzGraph -Query “Resources
 - Azure Arc provides additional properties on the Azure Arc-enabled server resource that we can query with Resource Graph Explorer. In the following example, we list some of these key properties, like the Azure Arc Agent version installed on your Azure Arc-enabled servers
 
 ```powershell
-Search-AzGraph -Query  “Resources
+Search-AzGraph -Query  "Resources
 | where type =~ 'Microsoft.HybridCompute/machines'
 | extend arcAgentVersion = tostring(properties.['agentVersion']), osName = tostring(properties.['osName']), osVersion = tostring(properties.['osVersion']), osSku = tostring(properties.['osSku']),
 lastStatusChange = tostring(properties.['lastStatusChange'])
