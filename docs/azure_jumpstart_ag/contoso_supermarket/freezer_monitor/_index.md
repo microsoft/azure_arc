@@ -303,7 +303,3 @@ To see the ADX dashboard, review the steps from ["Scenario 1: View the data in A
 ## Next steps
 
 Now that you have seen how the data flows in the various Contoso Supermarket scenarios, you can now explore how to [enable AI at the edge and experiment with software configurations rollout using basic GitOps flow](https://azurearcjumpstart.io/azure_jumpstart_ag/contoso_supermarket/ai/).
-
-## Troubleshooting
-
-Refer [Jumpstart Agora - Contoso Supermarket scenario troubleshooting](../troubleshooting/_index.md) guide to troubleshoot and address issues with IoT sensor telemetry data pipeline.
