@@ -13,14 +13,6 @@ param changeTrackingDCR string
 param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
 //param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
-param changeTrackingLinuxPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187'
-param changeTrackingLinuxExtensionPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278'
-param changeTrackingDcrLinuxPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192'
-param changeTrackingWindowsPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f'
-param changeTrackingWindowsExtensionPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5'
-param changeTrackingDcrWindowsPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb'
-
-
 var policies = [
   /*{
     name: '(ArcBox) Enable Azure Monitor for Hybrid Linux VMs with AMA'
@@ -88,60 +80,6 @@ resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignmen
         value: changeTrackingDCR
       }
     }
-  }
-}
-
-resource changeTrackingPolicyRemediation1 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingLinuxPolicyId
-    parallelDeployments: 4
-  }
-}
-
-resource changeTrackingPolicyRemediation2 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingLinuxExtensionPolicyId
-    parallelDeployments: 4
-  }
-}
-
-resource changeTrackingPolicyRemediation3 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingDcrLinuxPolicyId
-    parallelDeployments: 4
-  }
-}
-
-resource changeTrackingPolicyRemediation4 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingWindowsPolicyId
-    parallelDeployments: 4
-  }
-}
-
-resource changeTrackingPolicyRemediation5 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingWindowsExtensionPolicyId
-    parallelDeployments: 4
-  }
-}
-
-resource changeTrackingPolicyRemediation6 'Microsoft.PolicyInsights/remediations@2021-10-01' = {
-  name: guid('Remediate',changeTrackingPolicySetDefintion,subscriptionId)
-  properties: {
-    policyAssignmentId: changeTrackingPolicyAssignemnt.id
-    policyDefinitionReferenceId: changeTrackingDcrWindowsPolicyId
-    parallelDeployments: 4
   }
 }
 
