@@ -338,6 +338,12 @@ Write-Header "Installing PowerShell 7 on the client VM"
 #Invoke-WebRequest "https://github.com/PowerShell/PowerShell/releases/download/v7.3.6/PowerShell-7.3.6-win-x64.msi" -OutFile $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi
 Start-Process msiexec.exe -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi /quiet"
 
+
+Write-Header "Installing PowerShell 7 on the ArcBox-Win2K22 machine"
+Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi" -DestinationPath "$Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi" -CreateFullPath -FileSource Host -Force
+Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process msiexec.exe -ArgumentList "/I C:\ArcBox\PowerShell-7.3.6-win-x64.msi /quiet"} -Credential $winCreds
+
+
 Write-Header "Installing PowerShell 7 on the nested ArcBox-Ubuntu-01 VM"
 $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "wget https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/powershell_7.3.3-1.deb_amd64.deb;sudo dpkg -i /home/arcdemo/powershell_7.3.3-1.deb_amd64.deb"
