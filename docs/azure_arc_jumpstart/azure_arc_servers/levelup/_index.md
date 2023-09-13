@@ -835,17 +835,16 @@ Ensure that you have the correct region mappings for Azure Automation account an
 
 #### Task 1: Enabling Change Tracking and Inventory
 
->**NOTE:
-This task usually requires the following:
-1. Creation of an Automation Account.
-2. Linking the Automation Account to Log Analytics.
-3. Enabling Change Tracking on the Automation Account.
-4. Setting up a Data Collection Rule that would collect the right events and data.
-5. Creating an Azure policy to onboard your Arc-enabled machines for Change Tracking.
+> **NOTE: This task usually requires the following:
+>1. Creation of an Automation Account.
+>2. Linking the Automation Account to Log Analytics.
+>3. Enabling Change Tracking on the Automation Account.
+>4. Setting up a Data Collection Rule that would collect the right events and data.
+>5. Creating an Azure policy to onboard your Arc-enabled machines for Change Tracking.
+**
 
 For the purposes of this levelup - these tasks have all been done for you, so you do not need to them manually.  
 Follow the link [here](https://learn.microsoft.com/azure/automation/change-tracking/enable-vms-monitoring-agent?tabs=multiplevms%2Carcvm) to know how to do these yourself in future.
-**
 
 Verify that Change Tracking and Inventory is now enabled and the Arc VMs are reporting status:
 
