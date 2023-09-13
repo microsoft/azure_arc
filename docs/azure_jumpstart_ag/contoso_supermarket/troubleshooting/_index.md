@@ -75,7 +75,7 @@ Follow the below steps to address this permissions error.
 - In the [Azure portal](https://portal.azure.com/), locate the ADX cluster deployed in the resource group and open.
 - Click on _Query_ under Data, select the _Orders_ database, and enter the Kusto query as shown below to grant user access to the _Orders_ database. Replace the user principal with the correct principal to grant permissions.
 
-  ```kusto
+  ```shell
   .add database Orders users ('msauser=xyz@hotmail.com') 'XYZ (hotmail.com)'
   ```
 
