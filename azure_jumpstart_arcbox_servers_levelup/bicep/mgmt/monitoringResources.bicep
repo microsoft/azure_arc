@@ -19,7 +19,7 @@ param emailAddress string
 //var workspaceResourceId = workspaceId
 var actionGroupName = 'ag-arc-servers'
 var alertsSeverity = 2
-var windowSize = 'PT5M'
+var windowSize = 'PT15M'
 var evaluationFrequency = 'PT5M'
 var convertRuleTag = 'hidden-link:'
 var singlequote = '\''
