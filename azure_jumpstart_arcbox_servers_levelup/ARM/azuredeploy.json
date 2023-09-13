@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.20.4.51522",
-      "templateHash": "17146760889069254842"
+      "version": "0.21.1.54444",
+      "templateHash": "11149384174819022311"
     }
   },
   "parameters": {
@@ -163,8 +163,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "16663494484573561443"
+              "version": "0.21.1.54444",
+              "templateHash": "9936808633692311044"
             }
           },
           "parameters": {
@@ -446,8 +446,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "16005523363649818244"
+              "version": "0.21.1.54444",
+              "templateHash": "15380055722308461871"
             }
           },
           "parameters": {
@@ -525,8 +525,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "10787338659082252059"
+              "version": "0.21.1.54444",
+              "templateHash": "12120746486574356340"
             }
           },
           "parameters": {
@@ -862,300 +862,6 @@
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
               ]
-            },
-            {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "policyDeployment",
-              "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
-                },
-                "mode": "Incremental",
-                "parameters": {
-                  "azureLocation": {
-                    "value": "[parameters('location')]"
-                  }
-                },
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.20.4.51522",
-                      "templateHash": "9440631972277069226"
-                    }
-                  },
-                  "parameters": {
-                    "azureLocation": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Location of your Azure resources"
-                      }
-                    },
-                    "subscriptionId": {
-                      "type": "string",
-                      "defaultValue": "[subscription().subscriptionId]",
-                      "metadata": {
-                        "description": "Subscription Id"
-                      }
-                    }
-                  },
-                  "variables": {
-                    "policies": [
-                      {
-                        "name": "(ArcBox) Tag resources",
-                        "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
-                        "flavors": [
-                          "Full",
-                          "ITPro",
-                          "DevOps",
-                          "DataOps"
-                        ],
-                        "roleDefinition": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
-                        "parameters": {
-                          "tagName": {
-                            "value": "Project"
-                          },
-                          "tagValue": {
-                            "value": "jumpstart_arcbox"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "resources": [
-                    {
-                      "copy": {
-                        "name": "policies_name",
-                        "count": "[length(variables('policies'))]"
-                      },
-                      "type": "Microsoft.Authorization/policyAssignments",
-                      "apiVersion": "2021-06-01",
-                      "name": "[variables('policies')[copyIndex()].name]",
-                      "location": "[parameters('azureLocation')]",
-                      "identity": {
-                        "type": "SystemAssigned"
-                      },
-                      "properties": {
-                        "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
-                        "parameters": "[variables('policies')[copyIndex()].parameters]"
-                      }
-                    },
-                    {
-                      "type": "Microsoft.Authorization/roleAssignments",
-                      "apiVersion": "2020-10-01-preview",
-                      "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition, resourceGroup().id)]",
-                      "properties": {
-                        "roleDefinitionId": "[variables('policies')[0].roleDefinition]",
-                        "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
-                        "principalType": "ServicePrincipal"
-                      },
-                      "dependsOn": [
-                        "[resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name)]"
-                      ]
-                    },
-                    {
-                      "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
-                      "name": "[guid('ARCBOX_AMA_POLICIES', parameters('subscriptionId'), parameters('azureLocation'))]",
-                      "subscriptionId": "[parameters('subscriptionId')]",
-                      "location": "[resourceGroup().location]",
-                      "properties": {
-                        "expressionEvaluationOptions": {
-                          "scope": "inner"
-                        },
-                        "mode": "Incremental",
-                        "template": {
-                          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-                          "contentVersion": "1.0.0.0",
-                          "metadata": {
-                            "_generator": {
-                              "name": "bicep",
-                              "version": "0.20.4.51522",
-                              "templateHash": "14902887640254417331"
-                            }
-                          },
-                          "parameters": {
-                            "AzureMonitorAgentLinuxPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122"
-                            },
-                            "AMALinuxPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/2ea82cdd-f2e8-4500-af75-67a2e084ca74"
-                            },
-                            "changeTrackingLinuxPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187"
-                            },
-                            "changeTrackingLinuxExtensionPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278"
-                            },
-                            "changeTrackingDcrLinuxPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
-                            },
-                            "AzureMonitorAgentWindowsPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/94f686d6-9a24-4e19-91f1-de937dc171a4"
-                            },
-                            "AMAWindowsPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/eab1f514-22e3-42e3-9a1f-e1dc9199355c"
-                            },
-                            "dependencyAgentWindowsPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4"
-                            },
-                            "changeTrackingWindowsPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f"
-                            },
-                            "changeTrackingWindowsExtensionPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5"
-                            },
-                            "changeTrackingDcrWindowsPolicyId": {
-                              "type": "string",
-                              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb"
-                            }
-                          },
-                          "resources": [
-                            {
-                              "type": "Microsoft.Authorization/policySetDefinitions",
-                              "apiVersion": "2021-06-01",
-                              "name": "(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines",
-                              "properties": {
-                                "displayName": "(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines",
-                                "description": "This policy deploys Azure Monitor agents on Linux Arc connected machines.",
-                                "metadata": {
-                                  "category": "Monitoring",
-                                  "version": "1.0.0"
-                                },
-                                "parameters": {
-                                  "dcrResourceId": {
-                                    "type": "String",
-                                    "metadata": {
-                                      "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
-                                      "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the Linux machines in scope."
-                                    }
-                                  }
-                                },
-                                "policyDefinitions": [
-                                  {
-                                    "policyDefinitionId": "[parameters('AMALinuxPolicyId')]",
-                                    "parameters": {
-                                      "dcrResourceId": {
-                                        "value": "[[parameters('dcrResourceId')]"
-                                      }
-                                    }
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('AzureMonitorAgentLinuxPolicyId')]"
-                                  }
-                                ]
-                              }
-                            },
-                            {
-                              "type": "Microsoft.Authorization/policySetDefinitions",
-                              "apiVersion": "2021-06-01",
-                              "name": "(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines",
-                              "properties": {
-                                "displayName": "(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines",
-                                "description": "This policy deploys Azure Monitor agents on Windows Arc connected machines.",
-                                "metadata": {
-                                  "category": "Monitoring",
-                                  "version": "1.0.0"
-                                },
-                                "parameters": {
-                                  "dcrResourceId": {
-                                    "type": "String",
-                                    "metadata": {
-                                      "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
-                                      "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the Linux machines in scope."
-                                    }
-                                  }
-                                },
-                                "policyDefinitions": [
-                                  {
-                                    "policyDefinitionId": "[parameters('dependencyAgentWindowsPolicyId')]"
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('AMAWindowsPolicyId')]",
-                                    "parameters": {
-                                      "dcrResourceId": {
-                                        "value": "[[parameters('dcrResourceId')]"
-                                      }
-                                    }
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('AzureMonitorAgentWindowsPolicyId')]"
-                                  }
-                                ]
-                              }
-                            },
-                            {
-                              "type": "Microsoft.Authorization/policySetDefinitions",
-                              "apiVersion": "2021-06-01",
-                              "name": "(ArcBox) Enable ChangeTracking for Arc-enabled machines",
-                              "properties": {
-                                "displayName": "(ArcBox) Enable ChangeTracking and Inventory for Arc-enabled machines",
-                                "description": "Enable ChangeTracking and Inventory for Arc-enabled virtual machines. Takes Data Collection Rule ID as parameter and asks for an option to input applicable locations.",
-                                "metadata": {
-                                  "category": "ChangeTrackingAndInventory",
-                                  "version": "1.0.0"
-                                },
-                                "parameters": {
-                                  "dcrResourceId": {
-                                    "type": "String",
-                                    "metadata": {
-                                      "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
-                                      "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the machines in scope."
-                                    }
-                                  }
-                                },
-                                "policyDefinitions": [
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingLinuxPolicyId')]"
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingLinuxExtensionPolicyId')]"
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingDcrLinuxPolicyId')]",
-                                    "parameters": {
-                                      "dcrResourceId": {
-                                        "value": "[[parameters('dcrResourceId')]"
-                                      }
-                                    }
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingWindowsPolicyId')]"
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingWindowsExtensionPolicyId')]"
-                                  },
-                                  {
-                                    "policyDefinitionId": "[parameters('changeTrackingDcrWindowsPolicyId')]",
-                                    "parameters": {
-                                      "dcrResourceId": {
-                                        "value": "[[parameters('dcrResourceId')]"
-                                      }
-                                    }
-                                  }
-                                ]
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
             }
           ],
           "outputs": {
@@ -1204,8 +910,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "11395337838481927519"
+              "version": "0.21.1.54444",
+              "templateHash": "212689542187748615"
             }
           },
           "parameters": {
@@ -3098,7 +2804,7 @@
                         "multiSelect": true,
                         "quote": "'",
                         "delimiter": ",",
-                        "query": "{\"version\":\"1.0.0\",\"content\":\"[ \\r\\n    {\"id\":\"New\", \"label\": \"New\"},\\r\\n    {\"id\":\"Acknowledged\", \"label\": \"Acknowledged\"},\\r\\n    {\"id\":\"Closed\", \"label\": \"Closed\"}\\r\\n]\",\"transformers\":null}",
+                        "jsonData": "{\"version\":\"1.0.0\",\"content\":\"[ \r\n    {\"id\":\"New\", \"label\": \"New\"},\r\n    {\"id\":\"Acknowledged\", \"label\": \"Acknowledged\"},\r\n    {\"id\":\"Closed\", \"label\": \"Closed\"}\r\n]\",\"transformers\":null}",
                         "crossComponentResources": [
                           "{Subscription}"
                         ],
@@ -4784,6 +4490,340 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
+      "name": "policyDeployment",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "azureLocation": {
+            "value": "[parameters('location')]"
+          },
+          "changeTrackingDCR": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'dataCollectionRules'), '2022-09-01').outputs.changeTrackingDCR.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.21.1.54444",
+              "templateHash": "14197804845999167783"
+            }
+          },
+          "parameters": {
+            "azureLocation": {
+              "type": "string",
+              "metadata": {
+                "description": "Location of your Azure resources"
+              }
+            },
+            "subscriptionId": {
+              "type": "string",
+              "defaultValue": "[subscription().subscriptionId]",
+              "metadata": {
+                "description": "Subscription Id"
+              }
+            },
+            "changeTrackingDCR": {
+              "type": "string",
+              "metadata": {
+                "description": "Id of change tracking DCR"
+              }
+            },
+            "changeTrackingPolicySetDefintion": {
+              "type": "string",
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('subscriptionId'))]"
+            },
+            "contributorRoleDefinition": {
+              "type": "string",
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]"
+            }
+          },
+          "variables": {
+            "policies": [
+              {
+                "name": "(ArcBox) Tag resources",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
+                "flavors": [
+                  "Full",
+                  "ITPro",
+                  "DevOps",
+                  "DataOps"
+                ],
+                "roleDefinition": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
+                "parameters": {
+                  "tagName": {
+                    "value": "Project"
+                  },
+                  "tagValue": {
+                    "value": "jumpstart_arcbox"
+                  }
+                }
+              }
+            ]
+          },
+          "resources": [
+            {
+              "copy": {
+                "name": "policies_name",
+                "count": "[length(variables('policies'))]"
+              },
+              "type": "Microsoft.Authorization/policyAssignments",
+              "apiVersion": "2021-06-01",
+              "name": "[variables('policies')[copyIndex()].name]",
+              "location": "[parameters('azureLocation')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
+                "parameters": "[variables('policies')[copyIndex()].parameters]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/policyAssignments",
+              "apiVersion": "2022-06-01",
+              "name": "(ArcBox) Enable ChangeTracking for Arc-enabled machines",
+              "location": "[parameters('azureLocation')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "displayName": "(ArcBox) Enable ChangeTracking for Arc-enabled machines",
+                "description": "Enable ChangeTracking for Arc-enabled machines",
+                "policyDefinitionId": "[parameters('changeTrackingPolicySetDefintion')]",
+                "parameters": {
+                  "dcrResourceId": {
+                    "value": "[parameters('changeTrackingDCR')]"
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[variables('policies')[0].roleDefinition]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name)]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[guid('ARCBOX_AMA_POLICIES', parameters('subscriptionId'), parameters('azureLocation'))]",
+              "subscriptionId": "[parameters('subscriptionId')]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.21.1.54444",
+                      "templateHash": "6601295840436213171"
+                    }
+                  },
+                  "parameters": {
+                    "AzureMonitorAgentLinuxPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122"
+                    },
+                    "AMALinuxPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/2ea82cdd-f2e8-4500-af75-67a2e084ca74"
+                    },
+                    "changeTrackingLinuxPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187"
+                    },
+                    "changeTrackingLinuxExtensionPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278"
+                    },
+                    "changeTrackingDcrLinuxPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5192"
+                    },
+                    "AzureMonitorAgentWindowsPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/94f686d6-9a24-4e19-91f1-de937dc171a4"
+                    },
+                    "AMAWindowsPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/eab1f514-22e3-42e3-9a1f-e1dc9199355c"
+                    },
+                    "dependencyAgentWindowsPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4"
+                    },
+                    "changeTrackingWindowsPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f"
+                    },
+                    "changeTrackingWindowsExtensionPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5"
+                    },
+                    "changeTrackingDcrWindowsPolicyId": {
+                      "type": "string",
+                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Authorization/policySetDefinitions",
+                      "apiVersion": "2021-06-01",
+                      "name": "(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines",
+                      "properties": {
+                        "displayName": "(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines",
+                        "description": "This policy deploys Azure Monitor agents on Linux Arc connected machines.",
+                        "metadata": {
+                          "category": "Monitoring",
+                          "version": "1.0.0"
+                        },
+                        "parameters": {
+                          "dcrResourceId": {
+                            "type": "String",
+                            "metadata": {
+                              "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
+                              "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the Linux machines in scope."
+                            }
+                          }
+                        },
+                        "policyDefinitions": [
+                          {
+                            "policyDefinitionId": "[parameters('AMALinuxPolicyId')]",
+                            "parameters": {
+                              "dcrResourceId": {
+                                "value": "[[parameters('dcrResourceId')]"
+                              }
+                            }
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('AzureMonitorAgentLinuxPolicyId')]"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Authorization/policySetDefinitions",
+                      "apiVersion": "2021-06-01",
+                      "name": "(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines",
+                      "properties": {
+                        "displayName": "(ArcBox) Deploy Azure Monitor on Arc-enabled Windows machines",
+                        "description": "This policy deploys Azure Monitor agents on Windows Arc connected machines.",
+                        "metadata": {
+                          "category": "Monitoring",
+                          "version": "1.0.0"
+                        },
+                        "parameters": {
+                          "dcrResourceId": {
+                            "type": "String",
+                            "metadata": {
+                              "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
+                              "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the Linux machines in scope."
+                            }
+                          }
+                        },
+                        "policyDefinitions": [
+                          {
+                            "policyDefinitionId": "[parameters('dependencyAgentWindowsPolicyId')]"
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('AMAWindowsPolicyId')]",
+                            "parameters": {
+                              "dcrResourceId": {
+                                "value": "[[parameters('dcrResourceId')]"
+                              }
+                            }
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('AzureMonitorAgentWindowsPolicyId')]"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Authorization/policySetDefinitions",
+                      "apiVersion": "2021-06-01",
+                      "name": "(ArcBox) Enable ChangeTracking for Arc-enabled machines",
+                      "properties": {
+                        "displayName": "(ArcBox) Enable ChangeTracking and Inventory for Arc-enabled machines",
+                        "description": "Enable ChangeTracking and Inventory for Arc-enabled virtual machines. Takes Data Collection Rule ID as parameter and asks for an option to input applicable locations.",
+                        "metadata": {
+                          "category": "ChangeTrackingAndInventory",
+                          "version": "1.0.0"
+                        },
+                        "parameters": {
+                          "dcrResourceId": {
+                            "type": "String",
+                            "metadata": {
+                              "displayName": "Data Collection Rule Resource Id or Data Collection Endpoint Resource Id",
+                              "description": "Resource Id of the Data Collection Rule or the Data Collection Endpoint to be applied on the machines in scope."
+                            }
+                          }
+                        },
+                        "policyDefinitions": [
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingLinuxPolicyId')]"
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingLinuxExtensionPolicyId')]"
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingDcrLinuxPolicyId')]",
+                            "parameters": {
+                              "dcrResourceId": {
+                                "value": "[[parameters('dcrResourceId')]"
+                              }
+                            }
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingWindowsPolicyId')]"
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingWindowsExtensionPolicyId')]"
+                          },
+                          {
+                            "policyDefinitionId": "[parameters('changeTrackingDcrWindowsPolicyId')]",
+                            "parameters": {
+                              "dcrResourceId": {
+                                "value": "[[parameters('dcrResourceId')]"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'dataCollectionRules')]",
+        "[resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
       "name": "dataCollectionRules",
       "properties": {
         "expressionEvaluationOptions": {
@@ -4807,8 +4847,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "10046078548121015030"
+              "version": "0.21.1.54444",
+              "templateHash": "7528395501644142499"
             }
           },
           "parameters": {
@@ -5183,7 +5223,13 @@
                 "publisher": "Microsoft"
               }
             }
-          ]
+          ],
+          "outputs": {
+            "changeTrackingDCR": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('dataCollectionRuleNameCt'))]"
+            }
+          }
         }
       },
       "dependsOn": [
