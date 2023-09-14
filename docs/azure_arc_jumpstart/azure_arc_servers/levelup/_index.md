@@ -56,6 +56,15 @@ code --install-extension ms-dotnettools.dotnet-interactive-vscode
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sebassem/azure_arc/arc_servers_level_up/docs/azure_arc_jumpstart/azure_arc_servers/levelup/AzureArcLevelupNotebook.dib" -OutFile ./AzureArcLevelupNotebook.dib
 code ./AzureArcLevelupNotebook.dib
 ```
+- VSCode will open in restricted mode. To trust this file, click "Manage".
+
+    ![Screenshot showing vscode in restricted mode](./vscode_restricted_mode.png)
+
+- Click on "Trust".
+
+    ![Screenshot showing vscode in restricted mode](./vscode_restricted_mode_trust.png)
+
+- The notebook now is ready to be used.
 
 ## LevelUp Lab Environment
 
