@@ -25,6 +25,9 @@
         },
         "rdpPort": {
             "value": "3389"
+        },
+        "emailaddress": {
+            "value": "<Your email address for alerts>"
         }
     }
 }
