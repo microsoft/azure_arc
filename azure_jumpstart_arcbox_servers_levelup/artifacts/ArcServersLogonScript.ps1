@@ -178,7 +178,6 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
          "australiaeast" {
             $vhdSourceFolder = "https://jsvhdslevelupausteast.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=GEkCDlxRclmP4NcuXHr1OFC7UoKwMJRLGolfGnTIYrk%3D"
-            write-host "australia east"
          }
          "japaneast" {
             $vhdSourceFolder = "https://jsvhdslevelupjapaneast.blob.core.windows.net/arcbox"
