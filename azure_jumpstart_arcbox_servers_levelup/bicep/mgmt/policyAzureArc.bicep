@@ -11,11 +11,13 @@ param subscriptionId string = subscription().subscriptionId
 param changeTrackingDCR string
 
 param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
-//param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 param connectedMachineResourceAdminRole string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
 param monitoringContributorRole string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa'
 param logAnalyticsContributor string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+
+param taggingPolicyDefintionId string = '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
 
 var policies = [
   /*{
@@ -37,7 +39,7 @@ var policies = [
   }*/
   {
     name: '(ArcBox) Tag resources'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
+    definitionId: taggingPolicyDefintionId
     flavors: [
       'Full'
       'ITPro'
@@ -56,7 +58,30 @@ var policies = [
   }
 ]
 
-resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for item in policies: {
+
+resource taggingPolicyAssignment 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
+  name: '(ArcBox) Tag resources'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Tag resources'
+    description: 'Tag resources'
+    policyDefinitionId: taggingPolicyDefintionId
+    parameters: {
+      tagName: {
+        value: 'Project'
+      }
+      tagValue: {
+        value: 'jumpstart_arcbox'
+      }
+    }
+  }
+}
+
+/*resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for item in policies: {
   name: item.name
   location: azureLocation
   identity: {
@@ -67,6 +92,7 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = 
     parameters: item.parameters
   }
 }]
+*/
 
 resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
   name: '(ArcBox) Enable ChangeTracking for Arc-enabled machines'
@@ -118,40 +144,11 @@ resource changeTrackingPolicyRoleAssignments3 'Microsoft.Authorization/roleAssig
 }
 
 
-/*resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
-  properties: {
-    roleDefinitionId: policies[0].roleDefinition[0]
-    principalId: policies_name[0].identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( policies[0].name, policies[0].roleDefinition[1],resourceGroup().id)
-  properties: {
-    roleDefinitionId: policies[0].roleDefinition[1]
-    principalId: policies_name[0].identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
-  properties: {
-    roleDefinitionId: policies[0].roleDefinition[2]
-    principalId: policies_name[0].identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-*/
-
-
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(policies[0].name, policies[0].roleDefinition, resourceGroup().id)
+  name: guid(taggingPolicyAssignment.name, policies[0].roleDefinition, resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[0].roleDefinition
-    principalId: policies_name[0].identity.principalId
+    roleDefinitionId: contributorRoleDefinition
+    principalId: taggingPolicyAssignment.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
