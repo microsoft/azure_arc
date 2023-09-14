@@ -10,7 +10,7 @@ param subscriptionId string = subscription().subscriptionId
 @description('Id of change tracking DCR')
 param changeTrackingDCR string
 
-param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking and Inventory for Arc-enabled machines'
+param changeTrackingPolicySetDefintion string = '/subscriptions/${subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines'
 //param contributorRoleDefinition string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 param connectedMachineResourceAdminRole string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302'
