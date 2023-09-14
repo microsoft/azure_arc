@@ -180,6 +180,11 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=GEkCDlxRclmP4NcuXHr1OFC7UoKwMJRLGolfGnTIYrk%3D"
             write-host "australia east"
          }
+         "japaneast" {
+            $vhdSourceFolder = "https://jsvhdslevelupjapaneast.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=%2Bhl6euOEP0xw2OCDwViLuRy8wShfThb62%2F9dkEsJBao%3D"
+
+         }
         Default {
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
