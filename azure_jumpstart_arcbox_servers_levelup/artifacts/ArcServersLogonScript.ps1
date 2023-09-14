@@ -127,6 +127,13 @@ az login --service-principal --username $spnClientId --password=$spnClientSecret
 
 az account set -s $subscriptionId
 
+# Connect to azure using azure powershell
+$SecurePassword = ConvertTo-SecureString -String $spnClientSecret -AsPlainText -Force
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $spnClientId, $SecurePassword
+Connect-AzAccount -ServicePrincipal -TenantId $spnTenantId -Credential $Credential
+
+Set-AzContext -Subscription $subscriptionId
+
 # Register Azure providers
 Write-Header "Registering Providers"
 az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
