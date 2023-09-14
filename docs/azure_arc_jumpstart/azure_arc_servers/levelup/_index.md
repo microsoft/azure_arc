@@ -40,9 +40,27 @@ After completion of this workshop, you will be able to:
 |**Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)** | 15 minutes | Basim Majeed |
 |**Query and inventory your Azure Arc-enabled servers using Azure Resource Graph** | 15 minutes | Basim Majeed |
 
+## LevelUp lab guidance
+
+There are two ways to get access to the lab modules and guidance.
+
+1. You can use this GitHub repository.
+2. You can download the LevelUp Notebook which is an interactive guide that you can open using VSCode to walk you through each module of this levelup.
+
+To download the notebook, please run the following commands from a Powershell or Windows Terminal window to install VScode if not already installed, install Dot Net SDK 7 and add the notebook extension to VSCode:
+
+```shell
+winget install -e --id Microsoft.VisualStudioCode --no-upgrade
+winget install -e --id Microsoft.DotNet.SDK.7 --no-upgrade
+code --install-extension ms-dotnettools.dotnet-interactive-vscode
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sebassem/azure_arc/arc_servers_level_up/docs/azure_arc_jumpstart/azure_arc_servers/levelup/AzureArcLevelupNotebook.dib" -OutFile ./AzureArcLevelupNotebook.dib
+code ./AzureArcLevelupNotebook.dib
+```
+
 ## LevelUp Lab Environment
 
-ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc-enabled servers' capabilities in a sandbox environment. Screenshot below shows layout of the lab environment.
+ArcBox LevelUp edition is a special “flavor” of ArcBox that is intended for users who want to experience Azure Arc-enabled servers' capabi
+ties in a sandbox environment. Screenshot below shows layout of the lab environment.
 
   ![Screenshot showing ArcBox architecture](ArcBox-architecture.png)
 
