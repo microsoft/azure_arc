@@ -24,7 +24,7 @@ param logAnalyticsWorkspaceName string
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'arc_servers_level_up'
+param githubBranch string = 'arc_servers_levelup'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false

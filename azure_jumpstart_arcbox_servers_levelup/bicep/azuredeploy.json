@@ -56,7 +56,7 @@
     },
     "githubBranch": {
       "type": "string",
-      "defaultValue": "arc_servers_level_up",
+      "defaultValue": "arc_servers_levelup",
       "metadata": {
         "description": "Target GitHub branch"
       }
