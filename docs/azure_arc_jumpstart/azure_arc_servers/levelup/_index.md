@@ -47,7 +47,7 @@ There are two ways to get access to the lab modules and guidance.
 1. You can use this GitHub repository.
 2. You can download the LevelUp Notebook which is an interactive guide that you can open using VSCode to walk you through each module of this levelup.
 
-To download the notebook, please run the following commands from a Powershell or Windows Terminal window to install VScode if not already installed, install Dot Net SDK 7 and add the notebook extension to VSCode:
+To download the notebook, please run the following commands from a Powershell or Windows Terminal window to [install VScode](https://code.visualstudio.com/download) if not already installed, [install Dot Net SDK 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) and install the [notebook extension to VSCode](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode):
 
 ```shell
 winget install -e --id Microsoft.VisualStudioCode --no-upgrade
@@ -56,6 +56,9 @@ code --install-extension ms-dotnettools.dotnet-interactive-vscode
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/sebassem/azure_arc/arc_servers_level_up/docs/azure_arc_jumpstart/azure_arc_servers/levelup/AzureArcLevelupNotebook.dib" -OutFile ./AzureArcLevelupNotebook.dib
 code ./AzureArcLevelupNotebook.dib
 ```
+
+>**NOTE: The notebook can be also downloaded from [here](https://github.com/sebassem/azure_arc/blob/arc_servers_level_up/docs/azure_arc_jumpstart/azure_arc_servers/levelup/AzureArcLevelupNotebook.dib) manually**
+
 - VSCode will open in restricted mode. To trust this file, click "Manage".
 
     ![Screenshot showing vscode in restricted mode](./vscode_restricted_mode.png)
