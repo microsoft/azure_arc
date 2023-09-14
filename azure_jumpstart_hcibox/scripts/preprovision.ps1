@@ -100,7 +100,7 @@ Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) 
 
 $location = $env:AZURE_LOCATION
 $minCores = 32 # 32 vCPUs required for standard deployment with E32s v5
-$skuFriendlyNames = "Standard DSv5 Family vCPUs|Total Regional vCPUs"
+$skuFriendlyNames = "Standard ESv5 Family vCPUs|Total Regional vCPUs"
 
 Write-Host "`nChecking for available capacity in $location region..."
 
