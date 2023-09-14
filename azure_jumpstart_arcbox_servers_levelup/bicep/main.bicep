@@ -21,7 +21,7 @@ param windowsAdminPassword string
 param logAnalyticsWorkspaceName string
 
 @description('Target GitHub account')
-param githubAccount string = 'sebassem'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
 param githubBranch string = 'arc_servers_level_up'
@@ -30,7 +30,7 @@ param githubBranch string = 'arc_servers_level_up'
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'microsoft'
+param githubUser string = 'sebassem'
 
 @description('Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
