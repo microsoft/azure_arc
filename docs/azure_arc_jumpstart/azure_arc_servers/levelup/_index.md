@@ -321,9 +321,10 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 #### Task 2: Onboard a Windows machine to Azure Arc
 
-- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/azure/azure-arc/servers/onboard-service-principal).
 
-- Using the following Powershell commands create a service principal and assign it the Azure Connected Machine Onboarding role for the selected subscription. After the service principal is created, it will print the application ID and secret (copy these somewhere safe for later use):
+- We will onboard the Windows machine ArcBox-Win2K22 using the [Service Principal onboarding method](https://learn.microsoft.com/en-us/azure/azure-arc/servers/onboard-service-principal).
+
+- Using the following Powershell commands (run the notebook cell to execute directly on your local machine) create a service principal and assign it the Azure Connected Machine Onboarding role for the selected subscription. After the service principal is created, it will print the application ID and secret (copy these somewhere safe for later use). Note :
 
 ```powershell
 $sp = New-AzADServicePrincipal -DisplayName "Arc server onboarding account" -Role "Azure Connected Machine Onboarding"
@@ -362,7 +363,7 @@ $sp | Format-Table AppId, @{ Name = "Secret"; Expression = { $_.PasswordCredenti
 
 - Fill in the required details but this time choose Linux for the Operating System box. Then download the script to your local machine (or you can copy the content into the clipboard).
 
-- Add the client secret to the script using your editor. Also add the following 3 lines just below the last export statement (to allow onboarding of Azure linux machines):
+- Add the client secret to the script using your editor. **Also add** the following 3 firewall commands just below the last export statement (to allow onboarding of Azure linux machines):
 
 ```shell
 sudo ufw --force enable
@@ -380,7 +381,7 @@ sudo ufw default allow incoming
 
 - Enter the user name and password (defaults "arcdemo" and "ArcDemo123!!") and log-in to the Linux VM.
 
-- create an empty onboarding script file using the nano editor, and paste the script content from your local machine.
+- create an empty onboarding script file using the nano editor, and paste the script content from your local machine (you can paste by right-clicking inside the nano editor window).
 
 ```shell
 nano onboardingscript.sh
@@ -392,7 +393,7 @@ nano onboardingscript.sh
 sudo bash ./onboardingscript.sh
 ```
 
-- Wait for the script to finish successfully. A message should confirm that the machine is now Arc-connected. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc).
+- Wait for the script to finish successfully. A message should confirm that the machine is now Arc-connected. We can also verify that our Windows machine is connected in the Azure portal (Machines - Azure Arc). **If the script returns an error then check that you have added the three firewall (ufw) commands mentioned above.**
 
     ![Screenshot Linux message confirm connection](./Linux_%20message_confirm_connection.png)
 
