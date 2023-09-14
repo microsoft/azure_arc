@@ -166,24 +166,24 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
         "eastus2" {
             $vhdSourceFolder = "https://jsvhdslevelupeus2.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=1eyW6VmrDzlJNsFSssBCoyNH4i6zt5mSvcuVgFuPv%2BM%3D"
-         }
-         "eastus" {
+        }
+        "eastus" {
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
-         }
-         "southeastasia" {
+        }
+        "southeastasia" {
             $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
-         }
-         "australiaeast" {
+        }
+        "australiaeast" {
             $vhdSourceFolder = "https://jsvhdslevelupausteast.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=GEkCDlxRclmP4NcuXHr1OFC7UoKwMJRLGolfGnTIYrk%3D"
-         }
-         "japaneast" {
+        }
+        "japaneast" {
             $vhdSourceFolder = "https://jsvhdslevelupjapaneast.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=%2Bhl6euOEP0xw2OCDwViLuRy8wShfThb62%2F9dkEsJBao%3D"
 
-         }
+        }
         Default {
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
@@ -377,7 +377,7 @@ Start-Process msiexec.exe -ArgumentList "/I $Env:ArcBoxDir\PowerShell-7.3.6-win-
 
 Write-Header "Installing PowerShell 7 on the ArcBox-Win2K22 machine"
 Copy-VMFile $Win2k22vmName -SourcePath "$Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi" -DestinationPath "$Env:ArcBoxDir\PowerShell-7.3.6-win-x64.msi" -CreateFullPath -FileSource Host -Force
-Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process msiexec.exe -ArgumentList "/I C:\ArcBox\PowerShell-7.3.6-win-x64.msi /quiet"} -Credential $winCreds
+Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Start-Process msiexec.exe -ArgumentList "/I C:\ArcBox\PowerShell-7.3.6-win-x64.msi /quiet" } -Credential $winCreds
 
 Write-Header "Installing PowerShell 7 on the nested ArcBox-Ubuntu-01 VM"
 $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
