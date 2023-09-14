@@ -161,7 +161,33 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
     $Env:AZCOPY_BUFFER_GB = 4
     # Other ArcBox flavors does not have an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-    if ($apacLocations -contains $azureLocation) {
+
+    switch ($azureLocation) {
+        "eastus2" {
+            $vhdSourceFolder = "https://jsvhdslevelupeus2.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=1eyW6VmrDzlJNsFSssBCoyNH4i6zt5mSvcuVgFuPv%2BM%3D"
+         }
+         "eastus" {
+            $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+         }
+         "southeastasia" {
+            $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
+            write-host "south east asia"
+         }
+         "australiaeast" {
+            $vhdSourceFolder = "https://jsvhdslevelupausteast.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=GEkCDlxRclmP4NcuXHr1OFC7UoKwMJRLGolfGnTIYrk%3D"
+
+         }
+        Default {
+            $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
+        }
+    }
+
+    <#if ($apacLocations -contains $azureLocation) {
         # APAC Storage account
         $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
         $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
@@ -171,7 +197,7 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
     } else {
         $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
         $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
-    }
+    }#>
     azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck
 }
 
