@@ -47,7 +47,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-    az extension add --upgrade --version 0.2.29 --name arcappliance --only-show-errors
+    az extension add --upgrade --version 0.2.31 --name arcappliance --only-show-errors
     az extension add --upgrade --name connectedk8s --only-show-errors
     az extension add --upgrade --name k8s-configuration --only-show-errors
     az extension add --upgrade --name k8s-extension --only-show-errors
@@ -136,7 +136,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $vnetName="vlan200"
-    New-MocGroup -name "Default_Group" -location "MocLocation"
+    # New-MocGroup -name "Default_Group" -location "MocLocation" ## No longer needed with appliance version 0.2.31
     New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -tags @{'VSwitch-Name' = "sdnSwitch"} -vlanID $using:SDNConfig.AKSVlanID
     [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")

@@ -61,3 +61,26 @@ After deploying Agora, if you try to access the Kubernetes resources on the clus
 
 - To able to access the Kubernetes resources on the AKS cluster from the Azure portal, follow the guidance mentioned in [this article](https://learn.microsoft.com/azure/aks/kubernetes-portal?tabs=azure-cli#unauthorized-access).
 - To able to access the Kubernetes resources on the AKS Edge Essentials clusters from the Azure Portal, follow the guidance mentioned in [this article](https://learn.microsoft.com/azure/azure-arc/kubernetes/cluster-connect).
+
+### User principal is not authorized to read database Orders
+
+Depending on the type of user account being used to access ADX dashboards, you might have issues accessing data in the _Orders_ database in the ADX cluster. Microsoft Accounts (MSAs) are all of the Microsoft-managed non-organizational user accounts. For example, **_hotmail.com, live.com, outlook.com_**. These MSAs require special syntax to grant database access permissions in the ADX cluster. Refer to [Referencing security principals](https://learn.microsoft.com/azure/data-explorer/kusto/management/referencing-security-principals#microsoft-accounts-msas) to use the correct syntax to grant user permissions to the ADX database.
+
+The screenshot below shows a permissions error when using MSAs.
+
+  ![Screenshot showing the principal not authorized to read database error](./img/adx-principal-not-authorized.png)
+
+Follow the below steps to address this permissions error.
+
+- In the [Azure portal](https://portal.azure.com/), locate the ADX cluster deployed in the resource group and open.
+- Click on _Query_ under Data, select the _Orders_ database, and enter the Kusto query as shown below to grant user access to the _Orders_ database. Replace the user principal with the correct principal to grant permissions.
+
+  ```shell
+  .add database Orders users ('msauser=xyz@hotmail.com') 'XYZ (hotmail.com)'
+  ```
+
+- Click _Run_ to execute the Kusto query to grant permissions.
+
+  ![Screenshot showing how to grant user permissions](./img/adx-database-grant-user-access.png)
+
+- Once user permission is granted go to [ADX dashboards](https://dataexplorer.azure.com/dashboards) and refresh the dashboard report to view _Orders_ data.
