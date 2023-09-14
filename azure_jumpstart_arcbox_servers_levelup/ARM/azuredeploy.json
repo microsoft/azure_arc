@@ -49,7 +49,7 @@
     },
     "githubAccount": {
       "type": "string",
-      "defaultValue": "sebassem",
+      "defaultValue": "microsoft",
       "metadata": {
         "description": "Target GitHub account"
       }
