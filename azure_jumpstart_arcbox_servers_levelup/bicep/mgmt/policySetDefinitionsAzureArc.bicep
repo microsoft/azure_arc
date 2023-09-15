@@ -15,6 +15,7 @@ param dependencyAgentWindowsPolicyId string = '/providers/Microsoft.Authorizatio
 param changeTrackingWindowsExtensionPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5'
 param changeTrackingDcrWindowsPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/ef9fe2ce-a588-4edd-829c-6247069dcfdb'
 
+
 resource monitoring_policies_Linux 'Microsoft.Authorization/policySetDefinitions@2021-06-01' = {
   name: '(ArcBox) Deploy Azure Monitor on Arc-enabled Linux machines'
   properties: {

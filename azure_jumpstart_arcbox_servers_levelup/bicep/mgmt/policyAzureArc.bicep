@@ -94,8 +94,16 @@ resource taggingPolicyAssignment 'Microsoft.Authorization/policyAssignments@2022
 }]
 */
 
+module arcAMAPolicies 'policySetDefinitionsAzureArc.bicep' = {
+  name: guid('ARCBOX_AMA_POLICIES',subscriptionId,azureLocation)
+  scope: subscription(subscriptionId)
+}
+
 resource changeTrackingPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
   name: '(ArcBox) Enable ChangeTracking for Arc-enabled machines'
+  dependsOn: [
+    arcAMAPolicies
+  ]
   location: azureLocation
   scope: resourceGroup()
   identity: {
@@ -151,9 +159,4 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
     principalId: taggingPolicyAssignment.identity.principalId
     principalType: 'ServicePrincipal'
   }
-}
-
-module arcAMAPolicies 'policySetDefinitionsAzureArc.bicep' = {
-  name: guid('ARCBOX_AMA_POLICIES',subscriptionId,azureLocation)
-  scope: subscription(subscriptionId)
 }
