@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "9884677028427442020"
+      "templateHash": "7914472848973798288"
     }
   },
   "parameters": {
@@ -4511,7 +4511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "15788902405369218191"
+              "templateHash": "9724992126789550541"
             }
           },
           "parameters": {
@@ -4536,7 +4536,7 @@
             },
             "changeTrackingPolicySetDefintion": {
               "type": "string",
-              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('subscriptionId'))]"
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/policySetDefinitions/(ArcBox) Enable ChangeTracking for Arc-enabled machines', subscription().subscriptionId)]"
             },
             "contributorRoleDefinition": {
               "type": "string",
@@ -4681,6 +4681,7 @@
               "apiVersion": "2022-09-01",
               "name": "[guid('ARCBOX_AMA_POLICIES', parameters('subscriptionId'), parameters('azureLocation'))]",
               "subscriptionId": "[parameters('subscriptionId')]",
+              "resourceGroup": "[resourceGroup().name]",
               "location": "[resourceGroup().location]",
               "properties": {
                 "expressionEvaluationOptions": {
