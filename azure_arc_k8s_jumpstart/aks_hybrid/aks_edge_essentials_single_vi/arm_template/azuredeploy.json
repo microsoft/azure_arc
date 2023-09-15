@@ -160,9 +160,7 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
         "virtualNetworkName": "[concat(parameters('vmName'), '-VNET')]",
-        "bastionSubnetName": "AzureBastionSubnet",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), parameters('subnetName'))]",
-        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
@@ -170,9 +168,61 @@
         "bastionSubnetIpPrefix": "10.1.1.64/26",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-        }
+        },
+        "storageAccountName": "[format('jsmediastorage{0}', uniqueString(resourceGroup().id))]",
+        "mediaServiceName": "[format('jsmediaservice{0}', uniqueString(resourceGroup().id))]",
+        "videoIndexerAccountName": "[format('jsviaccount{0}', uniqueString(resourceGroup().id))]"
     },
     "resources": [
+        {
+            "type": "Microsoft.Media/mediaservices",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('mediaServiceName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "storageAccounts": [
+                    {
+                        "id": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                        "type": "Primary"
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-08-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.VideoIndexer/accounts",
+            "apiVersion": "2022-08-01",
+            "name": "[variables('videoIndexerAccountName')]",
+            
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned",
+
+            },
+            "properties": {
+                "mediaServices": {
+                    "resourceId": "[parameters('mediaServiceAccountResourceId')]",
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Media/mediaservices', variables('mediaServiceName'))]"
+            ]
+        },
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2022-07-01",
