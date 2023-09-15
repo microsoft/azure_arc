@@ -4681,6 +4681,7 @@
               "apiVersion": "2022-09-01",
               "name": "[guid('ARCBOX_AMA_POLICIES', parameters('subscriptionId'), parameters('azureLocation'))]",
               "subscriptionId": "[parameters('subscriptionId')]",
+              "resourceGroup": "[resourceGroup().name]",
               "location": "[resourceGroup().location]",
               "properties": {
                 "expressionEvaluationOptions": {
