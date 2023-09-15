@@ -171,6 +171,10 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
         }
+        "westeus2" {
+            $vhdSourceFolder = "https://jsvhdslevelupwus2.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=SlV3WhjWTty%2Bb3xRs3ah50CPbeirU%2FwMk6zlQf5XP80%3D"
+        }
         "southeastasia" {
             $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
@@ -189,8 +193,8 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
         }
         "northeurope" {
-            $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
-            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
+            $vhdSourceFolder = "https://jsvhdslevelupnortheu.blob.core.windows.net/arcbox"
+            $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=ldvkO%2FWUJsNV%2FvFVjyMGtORZzeHA4QZN75ipkeT5T94%3D"
         }
         Default {
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
