@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "7914472848973798288"
+      "templateHash": "17451104258800589884"
     }
   },
   "parameters": {
@@ -4511,7 +4511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "9724992126789550541"
+              "templateHash": "796759751366984410"
             }
           },
           "parameters": {
@@ -4622,7 +4622,10 @@
                     "value": "[parameters('changeTrackingDCR')]"
                   }
                 }
-              }
+              },
+              "dependsOn": [
+                "[subscriptionResourceId(parameters('subscriptionId'), 'Microsoft.Resources/deployments', guid('ARCBOX_AMA_POLICIES', parameters('subscriptionId'), parameters('azureLocation')))]"
+              ]
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
