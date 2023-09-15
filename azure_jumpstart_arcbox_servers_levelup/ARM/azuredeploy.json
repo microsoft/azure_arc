@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "11149384174819022311"
+      "templateHash": "9884677028427442020"
     }
   },
   "parameters": {
@@ -70,7 +70,7 @@
     },
     "githubUser": {
       "type": "string",
-      "defaultValue": "microsoft",
+      "defaultValue": "sebassem",
       "metadata": {
         "description": "User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       }
@@ -911,7 +911,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "212689542187748615"
+              "templateHash": "11552563371433586512"
             }
           },
           "parameters": {
@@ -944,7 +944,7 @@
           "variables": {
             "actionGroupName": "ag-arc-servers",
             "alertsSeverity": 2,
-            "windowSize": "PT5M",
+            "windowSize": "PT15M",
             "evaluationFrequency": "PT5M",
             "convertRuleTag": "hidden-link:",
             "singlequote": "'",
@@ -4511,7 +4511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "14197804845999167783"
+              "templateHash": "15788902405369218191"
             }
           },
           "parameters": {
@@ -4541,13 +4541,29 @@
             "contributorRoleDefinition": {
               "type": "string",
               "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]"
+            },
+            "connectedMachineResourceAdminRole": {
+              "type": "string",
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/cd570a14-e51a-42ad-bac8-bafd67325302', subscription().subscriptionId)]"
+            },
+            "monitoringContributorRole": {
+              "type": "string",
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa', subscription().subscriptionId)]"
+            },
+            "logAnalyticsContributor": {
+              "type": "string",
+              "defaultValue": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293', subscription().subscriptionId)]"
+            },
+            "taggingPolicyDefintionId": {
+              "type": "string",
+              "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26"
             }
           },
           "variables": {
             "policies": [
               {
                 "name": "(ArcBox) Tag resources",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
+                "definitionId": "[parameters('taggingPolicyDefintionId')]",
                 "flavors": [
                   "Full",
                   "ITPro",
@@ -4568,20 +4584,25 @@
           },
           "resources": [
             {
-              "copy": {
-                "name": "policies_name",
-                "count": "[length(variables('policies'))]"
-              },
               "type": "Microsoft.Authorization/policyAssignments",
-              "apiVersion": "2021-06-01",
-              "name": "[variables('policies')[copyIndex()].name]",
+              "apiVersion": "2022-06-01",
+              "name": "(ArcBox) Tag resources",
               "location": "[parameters('azureLocation')]",
               "identity": {
                 "type": "SystemAssigned"
               },
               "properties": {
-                "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
-                "parameters": "[variables('policies')[copyIndex()].parameters]"
+                "displayName": "(ArcBox) Tag resources",
+                "description": "Tag resources",
+                "policyDefinitionId": "[parameters('taggingPolicyDefintionId')]",
+                "parameters": {
+                  "tagName": {
+                    "value": "Project"
+                  },
+                  "tagValue": {
+                    "value": "jumpstart_arcbox"
+                  }
+                }
               }
             },
             {
@@ -4605,15 +4626,54 @@
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2020-10-01-preview",
-              "name": "[guid(variables('policies')[0].name, variables('policies')[0].roleDefinition, resourceGroup().id)]",
+              "apiVersion": "2022-04-01",
+              "name": "[guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('connectedMachineResourceAdminRole'), resourceGroup().id)]",
               "properties": {
-                "roleDefinitionId": "[variables('policies')[0].roleDefinition]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name), '2021-06-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[parameters('connectedMachineResourceAdminRole')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines'), '2022-06-01', 'full').identity.principalId]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('logAnalyticsContributor'), resourceGroup().id)]",
+              "properties": {
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[parameters('logAnalyticsContributor')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines'), '2022-06-01', 'full').identity.principalId]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid('(ArcBox) Enable ChangeTracking for Arc-enabled machines', parameters('monitoringContributorRole'), resourceGroup().id)]",
+              "properties": {
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[parameters('monitoringContributorRole')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines'), '2022-06-01', 'full').identity.principalId]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Enable ChangeTracking for Arc-enabled machines')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "name": "[guid('(ArcBox) Tag resources', variables('policies')[0].roleDefinition, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[parameters('contributorRoleDefinition')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Tag resources'), '2022-06-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[0].name)]"
+                "[resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Tag resources')]"
               ]
             },
             {
@@ -4634,7 +4694,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.21.1.54444",
-                      "templateHash": "6601295840436213171"
+                      "templateHash": "9791853663415928832"
                     }
                   },
                   "parameters": {
@@ -4645,10 +4705,6 @@
                     "AMALinuxPolicyId": {
                       "type": "string",
                       "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/2ea82cdd-f2e8-4500-af75-67a2e084ca74"
-                    },
-                    "changeTrackingLinuxPolicyId": {
-                      "type": "string",
-                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/09a1f130-7697-42bc-8d84-8a9ea17e5187"
                     },
                     "changeTrackingLinuxExtensionPolicyId": {
                       "type": "string",
@@ -4669,10 +4725,6 @@
                     "dependencyAgentWindowsPolicyId": {
                       "type": "string",
                       "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4"
-                    },
-                    "changeTrackingWindowsPolicyId": {
-                      "type": "string",
-                      "defaultValue": "/providers/Microsoft.Authorization/policyDefinitions/a7acfae7-9497-4a3f-a3b5-a16a50abbe2f"
                     },
                     "changeTrackingWindowsExtensionPolicyId": {
                       "type": "string",
@@ -4779,9 +4831,6 @@
                         },
                         "policyDefinitions": [
                           {
-                            "policyDefinitionId": "[parameters('changeTrackingLinuxPolicyId')]"
-                          },
-                          {
                             "policyDefinitionId": "[parameters('changeTrackingLinuxExtensionPolicyId')]"
                           },
                           {
@@ -4791,9 +4840,6 @@
                                 "value": "[[parameters('dcrResourceId')]"
                               }
                             }
-                          },
-                          {
-                            "policyDefinitionId": "[parameters('changeTrackingWindowsPolicyId')]"
                           },
                           {
                             "policyDefinitionId": "[parameters('changeTrackingWindowsExtensionPolicyId')]"
