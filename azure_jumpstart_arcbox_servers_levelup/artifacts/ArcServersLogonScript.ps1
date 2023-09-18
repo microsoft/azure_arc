@@ -435,11 +435,11 @@ namespace Win32{
         [DllImport("user32.dll", CharSet=CharSet.Auto)] 
         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
         
-        public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+        public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
         }
     }
-} 
+}
 '@
 
 # Set wallpaper image based on the ArcBox Flavor deployed
