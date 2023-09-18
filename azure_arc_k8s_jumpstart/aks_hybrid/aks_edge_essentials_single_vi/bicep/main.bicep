@@ -53,9 +53,9 @@ module mediaServices 'mediaServices.bicep' = {
 module videoIndexer 'videoIndexer.bicep' = {
   name: 'videoIndexerDeployment'
   params: {
-    mediaServiceAccountResourceId: mediaServices.outputs.mediaServiceAccountId
+    mediaServiceAccountResourceId: mediaServices.outputs.mediaServiceAccountResourceId
     location: location
-    managedIdentityResourceId: 'temp'
+    //managedIdentityResourceId: mediaServices.outputs.
   }
 }
 
@@ -78,8 +78,8 @@ module clientVmDeployment 'clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
-    videoIndexerAccountName: temp
-    videoIndexerAccountId: temp
+    videoIndexerAccountName: videoIndexer.outputs.videoIndexerAccountName
+    videoIndexerAccountId: videoIndexer.outputs.videoIndexerAccountId
     templateBaseUrl: templateBaseUrl
     deployBastion: deployBastion
 
