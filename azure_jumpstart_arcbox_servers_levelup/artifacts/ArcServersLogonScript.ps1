@@ -450,7 +450,7 @@ Add-Type $code
 
 # Send telemtry
 $Url = "https://arcboxleveluptelemtry.azurewebsites.net/api/triggerDeployment?"
-$rowKey = (New-Guid).Guid.substring(0,8)
+$rowKey = -join ((97..122) | Get-Random -Count 10 | ForEach-Object {[char]$_})
 $headers = @{
     'Content-Type'='application/json'
     }
