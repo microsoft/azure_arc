@@ -448,7 +448,6 @@ $imgPath = "$Env:ArcBoxDir\wallpaper.png"
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-
 # Send telemtry
 $Url = "https://arcboxleveluptelemtry.azurewebsites.net/api/triggerDeployment?"
 $rowKey = (New-Guid).Guid
