@@ -450,13 +450,14 @@ Add-Type $code
 
 
 # Send telemtry
-$Url = "https://arcboxleveluptelemtry.azurewebsites.net/api/triggerDeployment?code=YZGnrL4YbZJK8gS1xiG-vJfy3N-UckABtgKF_1pysgs6AzFuGd1D3A=="
+$Url = "https://arcboxleveluptelemtry.azurewebsites.net/api/triggerDeployment?"
+$rowKey = (New-Guid).Guid
 $headers = @{
     'Content-Type'='application/json'
     }
 $Body = @{
-    Location = "westerupe"
-    PartitionKey = $partitionKey
+    Location = $azureLocation
+    PartitionKey = "Location"
     RowKey = $rowKey
 }
 $Body = $Body | ConvertTo-Json
