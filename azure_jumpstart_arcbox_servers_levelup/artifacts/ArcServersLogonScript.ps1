@@ -448,18 +448,18 @@ $imgPath = "$Env:ArcBoxDir\wallpaper.png"
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-<#
+
 # Send telemtry
+$Url = "https://arcboxleveluptelemtry.azurewebsites.net/api/triggerDeployment?code=YZGnrL4YbZJK8gS1xiG-vJfy3N-UckABtgKF_1pysgs6AzFuGd1D3A=="
+$headers = @{
+    'Content-Type'='application/json'
+    }
+$Body = @{
+    Location = "westerupe"
+    PartitionKey = $partitionKey
+    RowKey = $rowKey
+}
+$Body = $Body | ConvertTo-Json
+Invoke-RestMethod -Method 'Post' -Uri $url -Body $body -Headers $headers
 
-# Set the Azure Storage account name and table name
-$storageAccountName = "jsvhdslevelup"
-$tableName = "arcboxtelemtry"
-
-# Set the partition key and row key for the new record
-$partitionKey = "location"
-$rowKey = (New-Guid).Guid
-
-# Add the record to the Azure Storage table
-az storage entity insert --account-name $storageAccountName --table-name $tableName --entity PartitionKey=$partitionKey RowKey=$rowKey Content=$azureLocation --only-show-errors
-#>
 Stop-Transcript
