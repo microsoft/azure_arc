@@ -33,3 +33,4 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
 
 output mediaAccountName string = mediaService.name
 output mediaServiceAccountId string = mediaService.properties.mediaServiceId
+output mediaServiceAccountResourceId string = mediaService.id
