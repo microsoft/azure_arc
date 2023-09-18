@@ -96,7 +96,7 @@ if ($env:windowsNode -eq $true) {
         {
             "LinuxNode": {
                 "CpuCount": 4,
-                "MemoryInMB": 4096,
+                "MemoryInMB": 16384,
                 "DataSizeInGB": 20
             }
         }
@@ -234,8 +234,8 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$Env:arcClusterName = "$Env:resourceGroup-$guid"
-az connectedk8s connect --name $Env:arcClusterName `
+$clusterName = "$Env:resourceGroup-$guid"
+az connectedk8s connect --name $clusterName `
     --resource-group $Env:resourceGroup `
     --location $env:location `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
@@ -320,30 +320,51 @@ add-type $code
 ### Video Indexer setup
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
+$extensionName="videoindexer"
 # loc="eus"
 # region="eastus"
 # groupPrefix="vi-arc"
-# version="1.0.24-preview"
+$version="1.0.24-preview"
 # aksVersion="1.26.3"
-# namespace="video-indexer"
-# extension_name="videoindexer"
-# releaseTrain="preview"
+$namespace="video-indexer"
+$releaseTrain="preview"
+$storageClass="local-path"
+
+Write-Host "Creating local storage class on AKS EE cluster."
+kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
 
 Write-Host "Creating Cognitive Services on Video Indexer Resource Provider"
 
-Write-Host "Getting ARM token..."
-$createResourceURI="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/CreateExtensionDependencies?api-version=2023-06-02-preview"
+# Write-Host "Getting ARM token..."
+# $createResourceURI="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/CreateExtensionDependencies?api-version=2023-06-02-preview"
 
-$result=$(az rest --method post --uri $createResourceUr)
-Write-Host $result
-Write-Host
+# $result=$(az rest --method post --uri $createResourceURI)
+# Write-Host $result
+# Write-Host
 Write-Host "Retrieving Cognitive Service Credentials..."
+$getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
+$csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
 Write-Host
 
-$getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
-$csResourcesData=$(az rest --method post --uri $getSecretsUri)
-Write-Host $csResourcesData
-Write-Host
+Write-Host "Installing Video Indexer extension into AKS EE cluster."
+az k8s-extension create --name $extensionName `
+                        --extension-type Microsoft.VideoIndexer `
+                        --scope cluster `
+                        --release-namespace $namespace `
+                        --cluster-name $clusterName `
+                        --resource-group $Env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --release-train $releaseTrain `
+                        --version $version `
+                        --auto-upgrade-minor-version false `
+                        --config-protected-settings "speech.endpointUri=${csResourcesData.speechCognitiveServicesEndpoint}" `
+                        --config-protected-settings "speech.secret=${csResourcesData.speechCognitiveServicesPrimaryKey}" `
+                        --config-protected-settings "translate.endpointUri=${csResourcesData.translatorCognitiveServicesEndpoint}" `
+                        --config-protected-settings "translate.secret=${csResourcesData.translatorCognitiveServicesPrimaryKey}" `
+                        --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
+                        --config "frontend.endpointUri=https://10.43.0.1" `
+                        --config "storage.storageClass=${storageClass}" `
+                        --config "storage.accessMode=ReadWriteMany"
 
 
 # Kill the open PowerShell monitoring kubectl get pods
