@@ -448,7 +448,7 @@ $imgPath = "$Env:ArcBoxDir\wallpaper.png"
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-
+<#
 # Send telemtry
 
 # Set the Azure Storage account name and table name
@@ -461,5 +461,5 @@ $rowKey = (New-Guid).Guid
 
 # Add the record to the Azure Storage table
 az storage entity insert --account-name $storageAccountName --table-name $tableName --entity PartitionKey=$partitionKey RowKey=$rowKey Content=$azureLocation --only-show-errors
-
+#>
 Stop-Transcript
