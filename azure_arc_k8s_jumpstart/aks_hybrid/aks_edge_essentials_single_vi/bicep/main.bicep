@@ -41,7 +41,7 @@ param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_single_vi/'
 
 module mediaServices 'mediaServices.bicep' = {
   name: 'mediaServicesDeployment'
