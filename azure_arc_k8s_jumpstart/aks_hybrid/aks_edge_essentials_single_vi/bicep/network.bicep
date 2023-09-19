@@ -1,11 +1,8 @@
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string
-
-@description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string
+@description('Name of the subnet in the cloud virtual network')
+param subnetName string
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -19,18 +16,17 @@ param resourceTags object = {
 param deployBastion bool = false
 
 @description('Name of the prod Network Security Group')
-param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
+param networkSecurityGroupNameCloud string = 'NSG-Prod'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
+param bastionNetworkSecurityGroupName string = 'NSG-Bastion'
 
 var addressPrefixCloud = '10.16.0.0/16'
-var subnetAddressPrefixAksDev = '10.16.80.0/21'
-var subnetAddressPrefixInnerLoop = '10.16.64.0/21'
+var subnetAddressPrefix = '10.16.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
-var bastionName = 'Ag-Bastion'
+var bastionName = 'JS-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
 
@@ -45,25 +41,12 @@ var bastionSubnet = [
     }
   }
 ]
-var cloudAKSDevSubnet = [
-  {
-    name: subnetNameCloudAksStaging
-    properties: {
-      addressPrefix: subnetAddressPrefixAksDev
-      privateEndpointNetworkPolicies: 'Enabled'
-      privateLinkServiceNetworkPolicies: 'Enabled'
-      networkSecurityGroup: {
-        id: networkSecurityGroupCloud.id
-      }
-    }
-  }
-]
 
-var cloudAKSInnerLoopSubnet = [
+var cloudSubnet = [
   {
-    name: subnetNameCloudAksInnerLoop
+    name: subnetName
     properties: {
-      addressPrefix: subnetAddressPrefixInnerLoop
+      addressPrefix: subnetAddressPrefix
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
@@ -83,7 +66,7 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false) ? cloudSubnet : union(cloudSubnet,bastionSubnet)
   }
 }
 
@@ -146,45 +129,6 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationPortRange: '443'
         }
       }
-      {
-        name: 'allow_pos_5000'
-        properties: {
-          priority: 1006
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '5000'
-        }
-      }
-      {
-        name: 'allow_pos_81'
-        properties: {
-          priority: 1007
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '81'
-        }
-      }
-      {
-        name: 'allow_prometheus_9090'
-        properties: {
-          priority: 1008
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '9090'
-        }
-      }       
     ]
   }
 }
