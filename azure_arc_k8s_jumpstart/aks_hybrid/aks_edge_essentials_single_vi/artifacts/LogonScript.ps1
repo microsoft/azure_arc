@@ -310,8 +310,8 @@ $namespace="video-indexer"
 $releaseTrain="preview"
 $storageClass="local-path"
 
-Write-Host "Creating local storage class on AKS EE cluster."
-kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
+#Write-Host "Creating local storage class on AKS EE cluster."
+#kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
 
 Write-Host "Retrieving Cognitive Service Credentials..."
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
