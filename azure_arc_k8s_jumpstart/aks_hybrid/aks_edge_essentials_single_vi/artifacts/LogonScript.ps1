@@ -246,7 +246,7 @@ Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
-$workspaceName = ($Env:arcClusterName).ToLower()
+$workspaceName = ($clusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
     --resource-group $Env:resourceGroup `
     --workspace-name "$workspaceName-law" `
@@ -255,7 +255,7 @@ $workspaceResourceId = az monitor log-analytics workspace create `
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" `
-    --cluster-name $Env:arcClusterName `
+    --cluster-name $clusterName `
     --resource-group $Env:resourceGroup `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
