@@ -80,7 +80,7 @@ module clientVmDeployment 'clientVm.bicep' = {
     deployBastion: deployBastion
 
     location: location
-    subnetId: networkDeployment.outputs.innerLoopSubnetId
+    subnetId: networkDeployment.outputs.subnetId
 
     rdpPort: rdpPort
 
