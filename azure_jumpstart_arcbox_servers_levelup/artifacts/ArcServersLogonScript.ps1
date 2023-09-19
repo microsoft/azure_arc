@@ -132,7 +132,7 @@ $SecurePassword = ConvertTo-SecureString -String $spnClientSecret -AsPlainText -
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $spnClientId, $SecurePassword
 Connect-AzAccount -ServicePrincipal -TenantId $spnTenantId -Credential $Credential
 
-Set-AzContext -Subscription $subscriptionId
+Set-AzContext -Subscription $subscriptionId -tenant $spnTenantId
 
 # Register Azure providers
 Write-Header "Registering Providers"
