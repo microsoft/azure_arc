@@ -138,6 +138,12 @@ $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\L
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
+# Install Hyper-V and reboot
+Write-Host "Installing Hyper-V and restart"
+Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
 # Clean up Bootstrap.log
 Stop-Transcript
 $logSuppress = Get-Content C:\Temp\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
