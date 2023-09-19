@@ -54,8 +54,8 @@ module videoIndexer 'videoIndexer.bicep' = {
   name: 'videoIndexerDeployment'
   params: {
     mediaServiceAccountResourceId: mediaServices.outputs.mediaServiceAccountResourceId
+    mediaServiceAccountName: mediaServices.outputs.mediaAccountName
     location: location
-    //managedIdentityResourceId: mediaServices.outputs.
   }
 }
 
