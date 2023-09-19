@@ -308,7 +308,7 @@ $version="1.0.24-preview"
 # aksVersion="1.26.3"
 $namespace="video-indexer"
 $releaseTrain="preview"
-$storageClass="local-path"
+$storageClass="azure-disk"
 
 #Write-Host "Creating local storage class on AKS EE cluster."
 #kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
