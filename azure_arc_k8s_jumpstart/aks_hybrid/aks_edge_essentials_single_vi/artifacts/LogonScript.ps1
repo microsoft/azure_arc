@@ -293,25 +293,23 @@ az connectedk8s connect --name $clusterName `
 #     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
 #     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
-
-
+#####################################################################
+### Rook setup for RWX-capable storage class
+#####################################################################
+Write-Host "Creating longhorn storage on AKS EE cluster."
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.1/deploy/longhorn.yaml
 
 #####################################################################
 ### Video Indexer setup
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="videoindexer"
-# loc="eus"
-# region="eastus"
-# groupPrefix="vi-arc"
 $version="1.0.24-preview"
-# aksVersion="1.26.3"
 $namespace="video-indexer"
 $releaseTrain="preview"
-$storageClass="azure-disk"
+$storageClass="longhorn"
 
-#Write-Host "Creating local storage class on AKS EE cluster."
-#kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
+
 
 Write-Host "Retrieving Cognitive Service Credentials..."
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
