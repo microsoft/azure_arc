@@ -30,13 +30,10 @@ param githubBranch string = 'main'
 param deployBastion bool = false
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
+param virtualNetworkNameCloud string = 'Vnet-Prod'
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
-
-@description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
+@description('Name of the subnet in the cloud virtual network')
+param subnetName string = 'Subnet-VM'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -63,8 +60,7 @@ module networkDeployment 'network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
-    subnetNameCloudAksStaging: subnetNameCloudAksStaging
-    subnetNameCloudAksInnerLoop: subnetNameCloudAksInnerLoop
+    subnetName: subnetName
     deployBastion: deployBastion
     location: location
   }
