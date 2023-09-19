@@ -63,8 +63,8 @@ if ($env:windowsNode -eq $true) {
     "Machines": [
         {
             "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
+                "CpuCount": 8,
+                "MemoryInMB": 32768,
                 "DataSizeInGB": 20
             },
             "WindowsNode": {
@@ -95,8 +95,8 @@ if ($env:windowsNode -eq $true) {
     "Machines": [
         {
             "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 16384,
+                "CpuCount": 8,
+                "MemoryInMB": 32768,
                 "DataSizeInGB": 20
             }
         }
@@ -295,8 +295,6 @@ az connectedk8s connect --name $clusterName `
 
 
 
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 #####################################################################
 ### Video Indexer setup
@@ -315,14 +313,6 @@ $storageClass="local-path"
 Write-Host "Creating local storage class on AKS EE cluster."
 kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
 
-Write-Host "Creating Cognitive Services on Video Indexer Resource Provider"
-
-# Write-Host "Getting ARM token..."
-# $createResourceURI="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/CreateExtensionDependencies?api-version=2023-06-02-preview"
-
-# $result=$(az rest --method post --uri $createResourceURI)
-# Write-Host $result
-# Write-Host
 Write-Host "Retrieving Cognitive Service Credentials..."
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
 $csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
@@ -373,6 +363,8 @@ namespace Win32{
  } 
 '@
 
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 Stop-Process -Name powershell -Force
 
 Stop-Transcript
