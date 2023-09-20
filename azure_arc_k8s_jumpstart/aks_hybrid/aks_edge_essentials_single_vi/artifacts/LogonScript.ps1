@@ -16,8 +16,10 @@ $installPath = "$($letter.DriveLetter):\AKSEdge"
 New-Item -Path $installPath -ItemType Directory
 $aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
 $tempDir = "C:\Temp"
+$ProgressPreference = "SilentlyContinue"
 Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
 msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
+$ProgressPreference = "Continue"
 
 Import-Module AksEdge
 Get-Command -Module AKSEdge | Format-Table Name, Version
