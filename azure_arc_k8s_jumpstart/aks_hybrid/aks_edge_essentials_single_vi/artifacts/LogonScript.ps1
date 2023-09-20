@@ -1,50 +1,29 @@
 Start-Transcript -Path C:\Temp\LogonScript.log
 
-## Deploy AKS EE
+Set-ExecutionPolicy Bypass -Scope Process -Force
 
 # Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
-$schemaVersion = "1.1"
 $schemaVersionAksEdgeConfig = "1.8"
 $versionAksEdgeConfig = "1.0"
-$aksEdgeDeployModules = "main"
+$schemaVersionAksEdgeConfig = "1.8"
+$versionAksEdgeConfig = "1.0"
+$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
+$clusterName = "$Env:resourceGroup-$guid"
 
-# Requires -RunAsAdministrator
+# Install AKS EE
+$letter = Get-Volume | Where-Object FileSystemLabel -eq "DataDisk"
+$installPath = "$($letter.DriveLetter):\AKSEdge"
+New-Item -Path $installPath -ItemType Directory
+$aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
+$tempDir = "C:\Temp"
+Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
+msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
 
-New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
-
-if (! [Environment]::Is64BitProcess) {
-    Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
-    exit -1
-}
-
-if ($env:kubernetesDistribution -eq "k8s") {
-    $productName = "AKS Edge Essentials - K8s"
-    $networkplugin = "calico"
-} else {
-    $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "flannel"
-}
+Import-Module AksEdge
+Get-Command -Module AKSEdge | Format-Table Name, Version
 
 # Here string for the json content
-$aideuserConfig = @"
-{
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$env:subscriptionId",
-        "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$env:resourceGroup",
-        "Location": "$env:location"
-    },
-    "AksEdgeConfigFile": "aksedge-config.json"
-}
-"@
-
-if ($env:windowsNode -eq $true) {
-    $aksedgeConfig = @"
+$aksedgeConfig = @"
 {
     "SchemaVersion": "$schemaVersionAksEdgeConfig",
     "Version": "$versionAksEdgeConfig",
@@ -60,119 +39,30 @@ if ($env:windowsNode -eq $true) {
         "AcceptEula": true,
         "AcceptOptionalTelemetry": true
     },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 12,
-                "MemoryInMB": 55000,
-                "DataSizeInGB": 20
-            },
-            "WindowsNode": {
-                "CpuCount": 2,
-                "MemoryInMB": 4096
-            }
-        }
-    ]
-}
-"@
-} else {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
+    "Arc": {
+        "ClusterName": "$clusterName",
+        "Location": "${env:location}",
+        "ResourceGroupName": "${env:resourceGroup}",
+        "SubscriptionId": "${env:subscriptionId}",
+        "TenantId": "${env:tenantId}",
+        "ClientId": "${env:appId}",
+        "ClientSecret": "${env:password}"
     },
     "Machines": [
         {
             "LinuxNode": {
                 "CpuCount": 12,
                 "MemoryInMB": 55000,
-                "DataSizeInGB": 20
+                "DataSizeInGB": 100
             }
         }
     ]
 }
 "@
-}
 
-Set-ExecutionPolicy Bypass -Scope Process -Force
-# Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
-$zipFile = "$aksEdgeDeployModules.zip"
-$installDir = "C:\AksEdgeScript"
-$workDir = "$installDir\AKS-Edge-main"
+Set-Content -Path $tempDir\aksedge-config.json -Value $aksedgeConfig -Force
 
-if (-not (Test-Path -Path $installDir)) {
-    Write-Host "Creating $installDir..."
-    New-Item -Path "$installDir" -ItemType Directory | Out-Null
-}
-
-Push-Location $installDir
-
-Write-Host "`n"
-Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
-Write-Host "`n"
-
-try {
-    function download2() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri $url -OutFile $installDir\$zipFile }
-    download2
-}
-catch {
-    Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if (!(Test-Path -Path "$workDir")) {
-    Expand-Archive -Path $installDir\$zipFile -DestinationPath "$installDir" -Force
-}
-
-$aidejson = (Get-ChildItem -Path "$workDir" -Filter aide-userconfig.json -Recurse).FullName
-Set-Content -Path $aidejson -Value $aideuserConfig -Force
-$aksedgejson = (Get-ChildItem -Path "$workDir" -Filter aksedge-config.json -Recurse).FullName
-Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
-
-$aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
-. $aksedgeShell
-
-# Download, install and deploy AKS EE 
-Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
-# invoke the workflow, the json file already stored above.
-$retval = Start-AideWorkflow -jsonFile $aidejson
-# report error via Write-Error for Intune to show proper status
-if ($retval) {
-    Write-Host "Deployment Successful. "
-} else {
-    Write-Error -Message "Deployment failed" -Category OperationStopped
-    Stop-Transcript | Out-Null
-    Pop-Location
-    exit -1
-}
-
-if ($env:windowsNode -eq $true) {
-    # Get a list of all nodes in the cluster
-    $nodes = kubectl get nodes -o json | ConvertFrom-Json
-
-    # Loop through each node and check the OSImage field
-    foreach ($node in $nodes.items) {
-        $os = $node.status.nodeInfo.osImage
-        if ($os -like '*windows*') {
-            # If the OSImage field contains "windows", assign the "worker" role
-            kubectl label nodes $node.metadata.name node-role.kubernetes.io/worker=worker
-        }
-    }
-}
+New-AksEdgeDeployment -JsonConfigFilePath $tempDir\aksedge-config.json
 
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
@@ -197,7 +87,7 @@ az account set --subscription $Env:subscriptionId
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
-az extension add --name connectedk8s --version 1.3.17
+# az extension add --name connectedk8s --version 1.3.17
 az extension add --name k8s-extension
 Write-Host "`n"
 
@@ -231,15 +121,15 @@ Write-Host "`n"
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
-$clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
-
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $clusterName = "$Env:resourceGroup-$guid"
-az connectedk8s connect --name $clusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+# Connect Arc-enabled kubernetes
+Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
+# az connectedk8s connect --name $clusterName `
+#     --resource-group $Env:resourceGroup `
+#     --location $env:location `
+#     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+#     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Write-Host "`n"
 # Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
