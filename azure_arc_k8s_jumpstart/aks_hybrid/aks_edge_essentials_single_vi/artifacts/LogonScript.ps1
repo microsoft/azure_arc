@@ -53,9 +53,9 @@ $aksedgeConfig = @"
     "Machines": [
         {
             "LinuxNode": {
-                "CpuCount": 12,
-                "MemoryInMB": 55000,
-                "DataSizeInGB": 100
+                "CpuCount": 24,
+                "MemoryInMB": 96000,
+                "DataSizeInGB": 500
             }
         }
     ]
@@ -85,7 +85,6 @@ az login --service-principal --username $Env:appId --password $Env:password --te
 az account set --subscription $Env:subscriptionId
 
 # Installing Azure CLI extensions
-# Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
@@ -123,70 +122,11 @@ Write-Host "`n"
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
-$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$clusterName = "$Env:resourceGroup-$guid"
 # Connect Arc-enabled kubernetes
 Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
-# az connectedk8s connect --name $clusterName `
-#     --resource-group $Env:resourceGroup `
-#     --location $env:location `
-#     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-#     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-
-# Write-Host "`n"
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# Write-Host "`n"
-
-# # Deploying Azure log-analytics workspace
-# $workspaceName = ($clusterName).ToLower()
-# $workspaceResourceId = az monitor log-analytics workspace create `
-#     --resource-group $Env:resourceGroup `
-#     --workspace-name "$workspaceName-law" `
-#     --query id -o tsv
-
-# # Deploying Azure Monitor for containers Kubernetes extension instance
-# Write-Host "`n"
-# az k8s-extension create --name "azuremonitor-containers" `
-#     --cluster-name $clusterName `
-#     --resource-group $Env:resourceGroup `
-#     --cluster-type connectedClusters `
-#     --extension-type Microsoft.AzureMonitor.Containers `
-#     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-
-
-## Arc - enabled Server
-## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
-# Write-Host "`n"
-# Write-Host "Configure the OS to allow Azure Arc Agent to be deployed on an Azure VM"
-# Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-# Stop-Service WindowsAzureGuestAgent -Force -Verbose
-# New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-
-# ## Azure Arc agent Installation
-# Write-Host "`n"
-# Write-Host "Onboarding the Azure VM to Azure Arc..."
-
-# # Download the package
-# function download1() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi }
-# download1
-
-# # Install the package
-# msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-String
-
-# # Run connect command
-# & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-#     --service-principal-id $env:appId `
-#     --service-principal-secret $env:password `
-#     --resource-group $env:resourceGroup `
-#     --tenant-id $env:tenantId `
-#     --location $env:location `
-#     --subscription-id $env:subscriptionId `
-#     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
-#     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 #####################################################################
-### Rook setup for RWX-capable storage class
+### Longhorn setup for RWX-capable storage class
 #####################################################################
 Write-Host "Creating longhorn storage on AKS EE cluster."
 kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.1/deploy/longhorn.yaml
@@ -200,8 +140,6 @@ $version="1.0.24-preview"
 $namespace="video-indexer"
 $releaseTrain="preview"
 $storageClass="longhorn"
-
-
 
 Write-Host "Retrieving Cognitive Service Credentials..."
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
