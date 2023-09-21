@@ -30,7 +30,7 @@ param githubBranch string = 'arc_servers_levelup'
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'sebassem'
+param githubUser string = 'microsoft'
 
 @description('Override default RDP port 3389 using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
