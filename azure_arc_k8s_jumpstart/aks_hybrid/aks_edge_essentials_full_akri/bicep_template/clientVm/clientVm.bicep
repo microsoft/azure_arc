@@ -45,10 +45,10 @@ param templateBaseUrl string
 param deployBastion bool = false
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'lanicolas'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'edge'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'AKS-EE-Full-Bastion'
