@@ -20,6 +20,7 @@ $ProgressPreference = "SilentlyContinue"
 Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
 msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
 $ProgressPreference = "Continue"
+Start-Sleep 60
 
 Import-Module AksEdge
 Get-Command -Module AKSEdge | Format-Table Name, Version
@@ -53,8 +54,8 @@ $aksedgeConfig = @"
     "Machines": [
         {
             "LinuxNode": {
-                "CpuCount": 24,
-                "MemoryInMB": 96000,
+                "CpuCount": 28,
+                "MemoryInMB": 98000,
                 "DataSizeInGB": 500
             }
         }
@@ -125,11 +126,19 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 # Connect Arc-enabled kubernetes
 Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 
+
+#####################################################################
+### Install ingress-nginx
+#####################################################################
+# helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+# helm install ingress-nginx ingress-nginx/ingress-nginx
+
+
 #####################################################################
 ### Longhorn setup for RWX-capable storage class
 #####################################################################
 Write-Host "Creating longhorn storage on AKS EE cluster."
-kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.1/deploy/longhorn.yaml
+# kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.1/deploy/longhorn.yaml
 
 #####################################################################
 ### Video Indexer setup
