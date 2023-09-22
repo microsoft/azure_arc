@@ -68,12 +68,13 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 
 # Downloading GitHub artifacts
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/longhorn.yaml") -OutFile "C:\Temp\longhorn.yaml"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubernetes-helm,vscode'
             #Run commands in parallel.
             Parallel 
                 {
