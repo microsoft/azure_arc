@@ -3958,7 +3958,7 @@ metadata:
   name: longhorn-frontend
   namespace: longhorn-system
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: longhorn-ui
   ports:
