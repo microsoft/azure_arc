@@ -101,7 +101,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
     # Configure the ESU Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
     Write-Host "Blocking IMDS"
-    Write-Output "Configure the ESU VM to allow the nested VMs onboard as Azure Arc-enabled servers"
+    Write-Host "Configure the ESU VM to allow the nested VMs onboard as Azure Arc-enabled servers"
     Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
     Stop-Service WindowsAzureGuestAgent -Force -Verbose
 
@@ -147,7 +147,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     if (!([System.IO.File]::Exists($vmvhdPath) )) {
         <# Action when all if and elseif conditions are false #>
         $Env:AZCOPY_BUFFER_GB = 4
-        Write-Output "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
+        Write-Host "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
         azcopy copy $vhdDownload --include-pattern "${imageName}.vhdx" $Env:ESUVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
     }
 
@@ -193,13 +193,13 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 90
 
     # Copy installation script to nested Windows VMs
-    Write-Output "Transferring installation script to nested Windows VMs..."
+    Write-Host "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ESUDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
     Write-Host "Onboarding Arc-enabled servers"
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
-    Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+    Write-Host "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
     Invoke-Command -ComputerName $vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
     }
@@ -217,7 +217,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     if (!([System.IO.File]::Exists($vmvhdPath) )) {
         <# Action when all if and elseif conditions are false #>
         $Env:AZCOPY_BUFFER_GB = 4
-        Write-Output "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
+        Write-Host "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
         azcopy copy $vhdDownload --include-pattern "${imageName}.vhdx" $Env:ESUVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
     }
 
@@ -261,13 +261,13 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 90
 
     # Copy installation script to nested Windows VMs
-    Write-Output "Transferring installation script to nested Windows VMs..."
+    Write-Host "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $vmName -SourcePath "$agentScript\installArcAgentSQL.ps1" -DestinationPath "$Env:ESUDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 
     Write-Host "Onboarding Arc-enabled servers"
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
-    Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+    Write-Host "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
     Invoke-Command -ComputerName $vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $SQLCreds
 
     }
@@ -294,7 +294,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     }
 
 
-          Write-Output "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
+          Write-Host "Downloading nested VMs VHDX file for VM. This can take some time, hold tight..."
           azcopy copy $SiteConfig.JSWin2K12Base.vhdDownload $Env:ESUVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
           azcopy copy $SiteConfig.JSSQL12Base.vhdDownload $Env:ESUVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
 
@@ -352,23 +352,23 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
           if ( $site.Value.type -eq "Windows")
           {
-            Write-Output "Transferring installation script to nested Windows VMs..."
+            Write-Host "Transferring installation script to nested Windows VMs..."
             Copy-VMFile $site.Value.vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ESUDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
             Write-Host "Onboarding Arc-enabled servers"
       
             # Onboarding the nested VMs as Azure Arc-enabled servers
-            Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
+            Write-Host "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
             Invoke-Command -ComputerName $site.Value.vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
           }
 
           if ( $site.Value.type -eq "SQL")
           {
-            Write-Output "Transferring installation script to nested SQL VMs..."
+            Write-Host "Transferring installation script to nested SQL VMs..."
             Copy-VMFile $site.Value.vmName -SourcePath "$agentScript\installArcAgentSQL.ps1" -DestinationPath "$Env:ESUDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
             Write-Host "Onboarding Arc-enabled SQL Server"
       
             # Onboarding the nested VMs as Azure Arc-enabled SQL Server
-            Write-Output "Onboarding the nested SQL VMs as Azure Arc-enabled SQL server"
+            Write-Host "Onboarding the nested SQL VMs as Azure Arc-enabled SQL server"
             Invoke-Command -ComputerName $site.Value.vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $SQLCreds
           }
         }

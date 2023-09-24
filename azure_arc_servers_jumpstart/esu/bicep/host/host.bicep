@@ -116,41 +116,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-03-01' = {
         sku: windowsOSVersion
         version: 'latest'
       }
-      dataDisks: [
-        {
-          name: 'ESUHost001_DataDisk_0'
-          diskSizeGB: 256
-          createOption: 'Empty'
-          lun: 0
-          caching: 'None'
-          writeAcceleratorEnabled: false
-          managedDisk: {
-            storageAccountType: 'Premium_LRS'
-          }
-        }
-        {
-          name: 'ESUHost001_DataDisk_1'
-          diskSizeGB: 256
-          createOption: 'Empty'
-          lun: 1
-          caching: 'None'
-          writeAcceleratorEnabled: false
-          managedDisk: {
-            storageAccountType: 'Premium_LRS'
-          }
-        }
-        {
-          name: 'ESUHost001_DataDisk_2'
-          diskSizeGB: 256
-          createOption: 'Empty'
-          lun: 2
-          caching: 'None'
-          writeAcceleratorEnabled: false
-          managedDisk: {
-            storageAccountType: 'Premium_LRS'
-          }
-        }
-      ]
     }
     networkProfile: {
       networkInterfaces: [
