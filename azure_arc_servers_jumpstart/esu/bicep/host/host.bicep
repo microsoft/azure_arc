@@ -60,7 +60,7 @@ var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2023-04-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -79,7 +79,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2023-04-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
   properties: {
@@ -92,7 +92,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2023-03-01' = {
   name: vmName
   location: location
   tags: resourceTags
@@ -171,7 +171,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
 }
 
-resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
