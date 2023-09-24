@@ -63,8 +63,8 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
     $switchName = 'InternalNATSwitch'
     
     # Verify if internal switch is already created, if not create a new switch
-    $inernalSwitch = Get-VMSwitch
-    if ($inernalSwitch.Name -ne $switchName) {
+    $internalSwitch = Get-VMSwitch
+    if ($internalSwitch.Name -ne $switchName) {
         New-VMSwitch -Name $switchName -SwitchType Internal
         $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
 
