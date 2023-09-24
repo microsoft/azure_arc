@@ -66,8 +66,15 @@ Write-Output "Installing DHCP service"
 Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 # Installing tools
+Write-Header "Installing Azure CLI (64-bit not available via Chocolatey)"
+
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
+
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,vcredist140,microsoft-edge,azcopy10,7zip,ssms,dotnet-sdk,setdefaultbrowser,zoomit,openssl.light'
+$chocolateyAppList = 'az.powershell,vcredist140,microsoft-edge,azcopy10,7zip,ssms,dotnet-sdk,setdefaultbrowser,zoomit,openssl.light'
 
 try {
     choco config get cacheLocation
