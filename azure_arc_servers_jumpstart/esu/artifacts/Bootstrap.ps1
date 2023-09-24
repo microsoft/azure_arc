@@ -30,7 +30,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('esu', $esu, [System.EnvironmentVariableTarget]::Machine)
 
 # Creating ESU path
-Write-Output "Creating ESU path"
+Write-Host "Creating ESU path"
+ 
 $Env:ESUDir = "C:\ESU"
 $Env:ESULogsDir = "$Env:ESUDir\Logs"
 $Env:ESUVMDir = "$Env:ESUDir\Virtual Machines"
@@ -62,7 +63,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 # Installing DHCP service
-Write-Output "Installing DHCP service"
+Write-Host "Installing DHCP service"
 Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 # Installing tools
@@ -80,7 +81,7 @@ try {
     choco config get cacheLocation
 }
 catch {
-    Write-Output "Chocolatey not detected, trying to install now"
+    Write-Host "Chocolatey not detected, trying to install now"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
@@ -90,7 +91,7 @@ $appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())"
 
 foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
+    & choco install $app /y -Force | Write-Host
 
 }
 
