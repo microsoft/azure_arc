@@ -20,7 +20,7 @@ $ProgressPreference = "SilentlyContinue"
 Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
 msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
 $ProgressPreference = "Continue"
-Start-Sleep 60
+Start-Sleep 30
 
 Import-Module AksEdge
 Get-Command -Module AKSEdge | Format-Table Name, Version
@@ -32,7 +32,7 @@ $aksedgeConfig = @"
     "Version": "$versionAksEdgeConfig",
     "DeploymentType": "SingleMachineCluster",
     "Init": {
-        "ServiceIPRangeSize": 0
+        "ServiceIPRangeSize": 30
     },
     "Network": {
         "NetworkPlugin": "$networkplugin",
@@ -138,7 +138,7 @@ Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 ### Longhorn setup for RWX-capable storage class
 #####################################################################
 Write-Host "Creating longhorn storage on AKS EE cluster."
-# kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.1/deploy/longhorn.yaml
+# kubectl apply -f c:\temp\longhorn.yaml
 
 #####################################################################
 ### Video Indexer setup
