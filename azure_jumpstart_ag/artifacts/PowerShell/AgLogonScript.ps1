@@ -625,13 +625,24 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
+
+        if ($site.Name -eq "Chicago") {
         New-VM -Name $site.Name `
+            -Path $destPath `
+            -MemoryStartupBytes 51GB `
+            -BootDevice VHD `
+            -VHDPath $destVhdxPath `
+            -Generation 2 `
+            -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        } else {
+            New-VM -Name $site.Name `
             -Path $destPath `
             -MemoryStartupBytes $AgConfig.L1VMMemory `
             -BootDevice VHD `
             -VHDPath $destVhdxPath `
             -Generation 2 `
             -Switch $AgConfig.L1SwitchName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+        }
 
         # Set up the virtual machine before coping all AKS Edge Essentials automation files
         Set-VMProcessor -VMName $site.Name `
