@@ -3,9 +3,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 Set-ExecutionPolicy Bypass -Scope Process -Force
 
 # Parameters
-$schemaVersionAksEdgeConfig = "1.8"
-$versionAksEdgeConfig = "1.0"
-$schemaVersionAksEdgeConfig = "1.8"
+$schemaVersionAksEdgeConfig = "1.9"
 $versionAksEdgeConfig = "1.0"
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $clusterName = "$Env:resourceGroup-$guid"
@@ -171,7 +169,7 @@ Write-Host "Installing Video Indexer extension into AKS EE cluster."
 #                         --config-protected-settings "translate.endpointUri=${csResourcesData.translatorCognitiveServicesEndpoint}" `
 #                         --config-protected-settings "translate.secret=${csResourcesData.translatorCognitiveServicesPrimaryKey}" `
 #                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
-#                         --config "frontend.endpointUri=https://10.43.0.1" `
+#                         --config "frontend.endpointUri=https://192.168.0.10" `
 #                         --config "storage.storageClass=${storageClass}" `
 #                         --config "storage.accessMode=ReadWriteMany"
 
