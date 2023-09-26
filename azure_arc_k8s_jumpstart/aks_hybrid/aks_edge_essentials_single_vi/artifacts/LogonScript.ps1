@@ -154,24 +154,24 @@ $csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Jso
 Write-Host
 
 Write-Host "Installing Video Indexer extension into AKS EE cluster."
-# az k8s-extension create --name $extensionName `
-#                         --extension-type Microsoft.VideoIndexer `
-#                         --scope cluster `
-#                         --release-namespace $namespace `
-#                         --cluster-name $clusterName `
-#                         --resource-group $Env:resourceGroup `
-#                         --cluster-type connectedClusters `
-#                         --release-train $releaseTrain `
-#                         --version $version `
-#                         --auto-upgrade-minor-version false `
-#                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
-#                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
-#                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
-#                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
-#                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
-#                         --config "frontend.endpointUri=https://192.168.0.10" `
-#                         --config "storage.storageClass=$storageClass" `
-#                         --config "storage.accessMode=ReadWriteMany"
+az k8s-extension create --name $extensionName `
+                        --extension-type Microsoft.VideoIndexer `
+                        --scope cluster `
+                        --release-namespace $namespace `
+                        --cluster-name $clusterName `
+                        --resource-group $Env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --release-train $releaseTrain `
+                        --version $version `
+                        --auto-upgrade-minor-version false `
+                        --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
+                        --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
+                        --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
+                        --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
+                        --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
+                        --config "frontend.endpointUri=https://192.168.0.40" `
+                        --config "storage.storageClass=$storageClass" `
+                        --config "storage.accessMode=ReadWriteMany"
 
 
 # Kill the open PowerShell monitoring kubectl get pods
