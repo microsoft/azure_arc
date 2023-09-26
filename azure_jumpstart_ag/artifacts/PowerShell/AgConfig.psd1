@@ -58,7 +58,6 @@
 
     # Chocolatey packages list
     ChocolateyPackagesList  = @(
-        'azure-cli',
         'az.powershell',
         'kubernetes-cli',
         'vcredist140',
