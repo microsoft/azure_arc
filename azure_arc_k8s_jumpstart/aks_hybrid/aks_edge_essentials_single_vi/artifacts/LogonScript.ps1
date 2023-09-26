@@ -164,13 +164,13 @@ Write-Host "Installing Video Indexer extension into AKS EE cluster."
 #                         --release-train $releaseTrain `
 #                         --version $version `
 #                         --auto-upgrade-minor-version false `
-#                         --config-protected-settings "speech.endpointUri=${csResourcesData.speechCognitiveServicesEndpoint}" `
-#                         --config-protected-settings "speech.secret=${csResourcesData.speechCognitiveServicesPrimaryKey}" `
-#                         --config-protected-settings "translate.endpointUri=${csResourcesData.translatorCognitiveServicesEndpoint}" `
-#                         --config-protected-settings "translate.secret=${csResourcesData.translatorCognitiveServicesPrimaryKey}" `
+#                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
+#                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
+#                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
+#                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
 #                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
 #                         --config "frontend.endpointUri=https://192.168.0.10" `
-#                         --config "storage.storageClass=${storageClass}" `
+#                         --config "storage.storageClass=$storageClass" `
 #                         --config "storage.accessMode=ReadWriteMany"
 
 
