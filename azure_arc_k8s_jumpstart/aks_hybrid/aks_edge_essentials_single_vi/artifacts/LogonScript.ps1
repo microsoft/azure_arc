@@ -52,8 +52,8 @@ $aksedgeConfig = @"
     "Machines": [
         {
             "LinuxNode": {
-                "CpuCount": 28,
-                "MemoryInMB": 98000,
+                "CpuCount": 12,
+                "MemoryInMB": 50000,
                 "DataSizeInGB": 500
             }
         }
@@ -128,15 +128,14 @@ Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 #####################################################################
 ### Install ingress-nginx
 #####################################################################
-# helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-# helm install ingress-nginx ingress-nginx/ingress-nginx
-
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install ingress-nginx ingress-nginx/ingress-nginx
 
 #####################################################################
 ### Longhorn setup for RWX-capable storage class
 #####################################################################
 Write-Host "Creating longhorn storage on AKS EE cluster."
-# kubectl apply -f c:\temp\longhorn.yaml
+kubectl apply -f c:\temp\longhorn.yaml
 
 #####################################################################
 ### Video Indexer setup
@@ -169,7 +168,7 @@ az k8s-extension create --name $extensionName `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
-                        --config "frontend.endpointUri=https://192.168.0.40" `
+                        --config "frontend.endpointUri=https://192.168.0.4" `
                         --config "storage.storageClass=$storageClass" `
                         --config "storage.accessMode=ReadWriteMany"
 

@@ -145,6 +145,8 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 #     New-Partition -AssignDriveLetter -UseMaximumSize |
 #     Format-Volume -FileSystem NTFS -NewFileSystemLabel "DataDisk" -Confirm:$false
 
+
+
 # Install Hyper-V and reboot
 Write-Host "Installing Hyper-V and restart"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
