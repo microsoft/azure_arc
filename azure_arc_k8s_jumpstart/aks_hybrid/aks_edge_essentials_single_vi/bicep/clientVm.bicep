@@ -121,8 +121,26 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
       }
       dataDisks: [
         {
-          diskSizeGB: 1024
+          diskSizeGB: 256
           lun: 0
+          createOption: 'Empty'
+          caching: 'ReadWrite'
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          diskSizeGB: 256
+          lun: 1
+          createOption: 'Empty'
+          caching: 'ReadWrite'
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          diskSizeGB: 256
+          lun: 2
           createOption: 'Empty'
           caching: 'ReadWrite'
           managedDisk: {

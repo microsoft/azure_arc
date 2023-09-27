@@ -140,10 +140,10 @@ Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUse
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Initialize attached data disk
-$volume = Get-Disk | Where-Object PartitionStyle -eq 'raw' |
-    Initialize-Disk -PartitionStyle MBR -PassThru |
-    New-Partition -AssignDriveLetter -UseMaximumSize |
-    Format-Volume -FileSystem NTFS -NewFileSystemLabel "DataDisk" -Confirm:$false
+# $volume = Get-Disk | Where-Object PartitionStyle -eq 'raw' |
+#     Initialize-Disk -PartitionStyle MBR -PassThru |
+#     New-Partition -AssignDriveLetter -UseMaximumSize |
+#     Format-Volume -FileSystem NTFS -NewFileSystemLabel "DataDisk" -Confirm:$false
 
 # Install Hyper-V and reboot
 Write-Host "Installing Hyper-V and restart"
