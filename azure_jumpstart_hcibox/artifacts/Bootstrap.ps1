@@ -100,6 +100,12 @@ foreach ($app in $appsToInstall)
     & choco install $app /y -Force | Write-Output
 }
 
+Write-Header "Install Azure CLI (64-bit not available via Chocolatey)"
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
+
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HCIBoxWACDir\WindowsAdminCenter.msi
