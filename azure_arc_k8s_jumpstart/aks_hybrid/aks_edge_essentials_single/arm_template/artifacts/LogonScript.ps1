@@ -5,7 +5,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 # Parameters
 $AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.8"
+$schemaVersionAksEdgeConfig = "1.9"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 
