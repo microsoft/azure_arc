@@ -28,6 +28,7 @@ $cosmosDBEndpoint   = $Env:cosmosDBEndpoint
 $templateBaseUrl    = $Env:templateBaseUrl
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
+$aksEEReleasesUrl   = "https://api.github.com/repos/Azure/AKS-Edge/releases"
 $adxClusterName     = $Env:adxClusterName
 $namingGuid         = $Env:namingGuid
 $appsRepo           = "jumpstart-agora-apps"
@@ -783,7 +784,22 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $namingGuid = $using:namingGuid
     $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
+
+    # Fetch schemaVersion release from the AgConfig file
+    $schemaVersionRelease = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
+    if($schemaVersionRelease){
+        Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
+        $releaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+        $releaseBody = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].body
+    }
+    else {
+        Write-Host "[$(Get-Date -Format t)] INFO: Fetching the previous AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
+        $releaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[1].tag_name
+        $releaseBody = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[1].body
+    }
+
     $replacementParams = @{
+        "SchemaVersion-null"          = $SchemaVersion
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeSize
         "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ControlPlaneEndpointIp
