@@ -145,6 +145,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx
 #####################################################################
 Write-Host "Creating longhorn storage on AKS EE cluster."
 kubectl apply -f c:\temp\longhorn.yaml
+Start-Sleep -Seconds 30
 
 #####################################################################
 ### Video Indexer setup
