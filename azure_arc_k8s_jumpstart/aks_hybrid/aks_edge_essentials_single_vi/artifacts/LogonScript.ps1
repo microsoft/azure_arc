@@ -27,7 +27,7 @@ $ProgressPreference = "SilentlyContinue"
 Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
 msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
 $ProgressPreference = "Continue"
-Start-Sleep 30
+Start-Sleep 45
 
 Import-Module AksEdge
 Get-Command -Module AKSEdge | Format-Table Name, Version
@@ -162,6 +162,11 @@ $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}
 $csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
 Write-Host
 
+Write-Host "Getting VM public IP address..."
+$hostname = hostname
+$ipAddresses = az vm list-ip-addresses -g $env:resourceGroup -n $hostname | ConvertFrom-Json
+$ipAddress = $ipAddresses.virtualMachine.network.publicIpAddresses[0].ipAddress
+
 Write-Host "Installing Video Indexer extension into AKS EE cluster."
 az k8s-extension create --name $extensionName `
                         --extension-type Microsoft.VideoIndexer `
@@ -178,10 +183,16 @@ az k8s-extension create --name $extensionName `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
-                        --config "frontend.endpointUri=https://192.168.0.4" `
+                        --config "frontend.endpointUri=https://$ipAddress" `
                         --config "storage.storageClass=$storageClass" `
                         --config "storage.accessMode=ReadWriteMany"
 
+# Allow access to the frontend through the VM NIC interface
+Write-Host "Adding port forward for VI frontend..."
+$ing = kubectl get ing videoindexer-vi-arc -n $namespace -o json | ConvertFrom-Json
+$ingIp = $ing.status.loadBalancer.ingress.ip
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=$ingIp connectport=80
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=443 connectaddress=$ingIp connectport=443
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
