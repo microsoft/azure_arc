@@ -8,6 +8,15 @@ $versionAksEdgeConfig = "1.0"
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $clusterName = "$Env:resourceGroup-$guid"
 
+# Configure AKS disk
+$storagePoolName = "AKS"
+$diskName = "AKSData"
+$disks = Get-Disk | Where-Object partitionStyle -eq "raw" | Get-PhysicalDisk
+$storageName = Get-StorageSubsystem | Select-Object -expand FriendlyName
+New-StoragePool -FriendlyName $storagePoolName -StorageSubSystemFriendlyName $storageName -PhysicalDisks $disks
+New-VirtualDisk -StoragePoolFriendlyName $storagePoolName -FriendlyName $diskName -Size (500GB) -ResiliencySettingName Simple
+Get-VirtualDisk -FriendlyName $diskName | Get-Disk | Initialize-Disk -Passthru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel $diskName
+
 # Install AKS EE
 $letter = Get-Volume | Where-Object FileSystemLabel -eq "DataDisk"
 $installPath = "$($letter.DriveLetter):\AKSEdge"
@@ -54,7 +63,7 @@ $aksedgeConfig = @"
             "LinuxNode": {
                 "CpuCount": 12,
                 "MemoryInMB": 50000,
-                "DataSizeInGB": 500
+                "DataSizeInGB": 300
             }
         }
     ]
@@ -129,6 +138,7 @@ Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 ### Install ingress-nginx
 #####################################################################
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx
 
 #####################################################################
