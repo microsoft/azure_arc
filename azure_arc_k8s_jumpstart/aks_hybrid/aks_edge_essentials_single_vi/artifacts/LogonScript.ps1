@@ -129,7 +129,6 @@ Write-Host "`n"
 
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
-#Tag
 # Connect Arc-enabled kubernetes
 Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 
