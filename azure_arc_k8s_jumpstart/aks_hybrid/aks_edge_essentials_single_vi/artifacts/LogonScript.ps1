@@ -18,7 +18,7 @@ New-VirtualDisk -StoragePoolFriendlyName $storagePoolName -FriendlyName $diskNam
 Get-VirtualDisk -FriendlyName $diskName | Get-Disk | Initialize-Disk -Passthru | New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel $diskName
 
 # Install AKS EE
-$letter = Get-Volume | Where-Object FileSystemLabel -eq "DataDisk"
+$letter = Get-Volume | Where-Object FileSystemLabel -eq $diskName
 $installPath = "$($letter.DriveLetter):\AKSEdge"
 New-Item -Path $installPath -ItemType Directory
 $aksEEk3sUrl = 'https://aka.ms/aks-edge/k3s-msi'
