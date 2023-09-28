@@ -66,6 +66,9 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+# Allow web traffic
+netsh advfirewall firewall add rule name="HTTP" dir=in action=allow protocol=TCP localport=80,443 enable=yes
+
 # Downloading GitHub artifacts
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/longhorn.yaml") -OutFile "C:\Temp\longhorn.yaml"
