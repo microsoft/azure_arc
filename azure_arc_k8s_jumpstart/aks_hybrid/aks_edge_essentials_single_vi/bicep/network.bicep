@@ -104,19 +104,6 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
         }
       }
       {
-        name: 'allow_k8s_8080'
-        properties: {
-          priority: 1004
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '8080'
-        }
-      }
-      {
         name: 'allow_k8s_443'
         properties: {
           priority: 1005
