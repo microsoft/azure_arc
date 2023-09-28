@@ -143,6 +143,7 @@
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -165,6 +166,7 @@
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -186,8 +188,8 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Staging = @{
             ArcClusterName     = "Ag-AKS-Staging"
