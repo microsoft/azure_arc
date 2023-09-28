@@ -80,7 +80,7 @@ Install-Module -Name Posh-SSH -Force
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnet-sdk,setdefaultbrowser,zoomit,azure-data-studio'
+$chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnet-sdk,setdefaultbrowser,zoomit,azure-data-studio'
 
 try {
     choco config get cacheLocation
@@ -99,6 +99,12 @@ foreach ($app in $appsToInstall)
     Write-Host "Installing $app"
     & choco install $app /y -Force | Write-Output
 }
+
+Write-Header "Install Azure CLI (64-bit not available via Chocolatey)"
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
 
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
