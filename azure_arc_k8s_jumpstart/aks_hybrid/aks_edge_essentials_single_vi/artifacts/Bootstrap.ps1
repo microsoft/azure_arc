@@ -85,7 +85,7 @@ Remove-Item .\AzureCLI.msi
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode'
+            $chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode,postman'
             #Run commands in parallel.
             Parallel 
                 {
