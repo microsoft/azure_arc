@@ -189,6 +189,7 @@ az k8s-extension create --name $extensionName `
 
 # Allow access to the frontend through the VM NIC interface
 Write-Host "Adding port forward for VI frontend..."
+Start-Sleep -Seconds 20
 $ing = kubectl get ing videoindexer-vi-arc -n $namespace -o json | ConvertFrom-Json
 $ingIp = $ing.status.loadBalancer.ingress.ip
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=$ingIp connectport=80
