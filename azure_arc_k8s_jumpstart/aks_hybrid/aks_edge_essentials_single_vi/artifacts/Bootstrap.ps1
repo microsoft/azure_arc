@@ -81,7 +81,7 @@ Remove-Item .\AzureCLI.msi
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode,postman'
+$chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode'
 
 try {
     choco config get cacheLocation
