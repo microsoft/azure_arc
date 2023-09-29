@@ -80,41 +80,26 @@ Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
 Remove-Item .\AzureCLI.msi
 
 # Installing tools
-workflow ClientTools_01
-        {
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode,postman'
-            #Run commands in parallel.
-            Parallel 
-                {
-                    InlineScript {
-                        param (
-                            [string]$chocolateyAppList
-                        )
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-                        {
-                            try{
-                                choco config get cacheLocation
-                            }catch{
-                                Write-Output "Chocolatey not detected, trying to install now"
-                                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-                            }
-                        }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
-                            $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-                        
-                            foreach ($app in $appsToInstall)
-                            {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
-                            }
-                        }                        
-                    }
-                }
-        }
+Write-Header "Installing Chocolatey Apps"
+$chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode,postman'
 
-ClientTools_01 | Format-Table
+try {
+    choco config get cacheLocation
+}
+catch {
+    Write-Output "Chocolatey not detected, trying to install now"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
+Write-Host "Chocolatey Apps Specified"
+
+$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall)
+{
+    Write-Host "Installing $app"
+    & choco install $app /y -Force | Write-Output
+}
 
 # Enable VirtualMachinePlatform feature, the vm reboot will be done in DSC extension
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
@@ -147,14 +132,6 @@ Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUse
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# Initialize attached data disk
-# $volume = Get-Disk | Where-Object PartitionStyle -eq 'raw' |
-#     Initialize-Disk -PartitionStyle MBR -PassThru |
-#     New-Partition -AssignDriveLetter -UseMaximumSize |
-#     Format-Volume -FileSystem NTFS -NewFileSystemLabel "DataDisk" -Confirm:$false
-
-
-
 # Install Hyper-V and reboot
 Write-Host "Installing Hyper-V and restart"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
@@ -163,5 +140,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content C:\Temp\Bootstrap.log -Force
