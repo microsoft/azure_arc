@@ -26,7 +26,6 @@ $tempDir = "C:\Temp"
 $ProgressPreference = "SilentlyContinue"
 Invoke-WebRequest $aksEEk3sUrl -OutFile $tempDir\AKSEEK3s.msi
 msiexec.exe /i $tempDir\AKSEEK3s.msi INSTALLDIR=$installPath /q /passive
-$ProgressPreference = "Continue"
 Start-Sleep 45
 
 Import-Module AksEdge
@@ -201,6 +200,7 @@ Stop-Process -Id $kubectlMonShell.Id
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
+$ProgressPreference = "Continue"
 
 # Changing to Client VM wallpaper
 $imgPath = "C:\Temp\wallpaper.png"
