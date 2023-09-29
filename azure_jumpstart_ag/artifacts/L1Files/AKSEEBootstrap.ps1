@@ -70,7 +70,8 @@ foreach ($url in $websiteUrls) {
 }
 
 ##############################################################
-# Deplying AKS Edge Essentials clusters
+# Deploying AKS Edge Essentials clusters
+
 ##############################################################
 Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
 # Force time sync
@@ -80,6 +81,13 @@ net start w32time
 W32tm /resync
 $string = Get-Date
 Write-Host "INFO: Time after forced time sync:" $string.ToString("u") -ForegroundColor Gray
+
+
+Write-Host "INFO: Adding Defender exclusion for path c:\program files\aksedge " -ForegroundColor Gray
+add-mppreference -exclusionpath 'c:\program files\aksedge'
+
+Write-Host "INFO: Stopping Windows Search service" -ForegroundColor Gray
+stop-service 'wsearch'
 
 ########################################################################################
 # Creating Hyper-V External Virtual Switch for AKS Edge Essentials cluster deployment
