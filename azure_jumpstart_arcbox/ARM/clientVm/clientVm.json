@@ -94,7 +94,7 @@
         },
         "azdataPassword": {
             "type": "securestring",
-            "defaultValue": "aRkcQleMi$925!"
+            "defaultValue": "fMQch2T58L9H3v$7"
         },
         "acceptEula": {
             "type": "string",
