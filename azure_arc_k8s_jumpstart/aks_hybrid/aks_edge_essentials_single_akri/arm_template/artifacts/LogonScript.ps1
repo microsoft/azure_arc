@@ -5,7 +5,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 # Parameters
 $AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.8"
+$schemaVersionAksEdgeConfig = "1.9"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 
@@ -235,11 +235,21 @@ $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clus
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
-az connectedk8s connect --name $Env:arcClusterName `
+if ($env:kubernetesDistribution -eq "k8s") {
+    az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
     --location $env:location `
+    --distribution aks_edge_k8s `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+} else {
+    az connectedk8s connect --name $Env:arcClusterName `
+    --resource-group $Env:resourceGroup `
+    --location $env:location `
+    --distribution aks_edge_k3s `
+    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+}
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
