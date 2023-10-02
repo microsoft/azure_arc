@@ -72,7 +72,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2023-04-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : null
         }
       }
     ]
