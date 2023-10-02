@@ -31,7 +31,7 @@ param deployBastion bool = false
 
 @description('Location to deploy resources')
 param location string = resourceGroup().location
-
+@allowed(['ws', 'sql', 'both'])
 @description('ESU deployment type, could be ws, sql or both')
 param esu string = 'both'
 
