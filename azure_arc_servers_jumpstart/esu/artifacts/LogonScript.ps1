@@ -12,7 +12,7 @@ $spnTenantId = $env:spnTenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
-$esu = $env:esu
+$esu = ($env:esu).toLower()
 
 
 # Archive exising log file and crate new one
