@@ -22,7 +22,7 @@ param subnetId string
 param resourceTags object = {
   Project: 'jumpstart_servers'
 }
-
+@allowed(['ws', 'sql', 'both'])
 @description('ESU deployment type, could be ws, sql or both')
 param esu string = 'both'
 
