@@ -793,14 +793,13 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
         $output = Join-Path $AgToolsDir "$releaseTag.zip"
         Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-        Expand-Archive $output -Force
+        Expand-Archive $output -DestinationPath $AgToolsDir -Force
         $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
         $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
         $schemaVersion = $jsonContent.SchemaVersion
         # Clean up the downloaded release files
         Remove-Item -Path $output -Force
-        $extractedFolder = [System.IO.Path]::GetFileNameWithoutExtension($output)
-        Remove-Item -Path $extractedFolder -Force -Recurse
+        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
     }
     else {
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching the previous AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
@@ -808,14 +807,13 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
         $output = Join-Path $AgToolsDir "$releaseTag.zip"
         Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-        Expand-Archive $output -Force
+        Expand-Archive $output -DestinationPath $AgToolsDir -Force
         $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
         $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
         $schemaVersion = $jsonContent.SchemaVersion
         # Clean up the downloaded release files
         Remove-Item -Path $output -Force
-        $extractedFolder = [System.IO.Path]::GetFileNameWithoutExtension($output)
-        Remove-Item -Path $extractedFolder -Force -Recurse
+        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
     }
 
     $replacementParams = @{
