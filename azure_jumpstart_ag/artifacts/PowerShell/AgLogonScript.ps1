@@ -808,9 +808,8 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
 
     # Fetch schemaVersion release from the AgConfig file
-    $schemaVersionRelease = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
-    if($schemaVersionRelease){
-
+    $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
+    if($AKSEESchemaVersionUseLatest){
         $schemaVersion = $using:AKSEESchemaVersions[0]
     }
     else {
