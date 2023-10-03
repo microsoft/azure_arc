@@ -708,9 +708,9 @@ $beforeLatestReleaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Jso
 $AKSEEReleasesTags = ($latestReleaseTag,$beforeLatestReleaseTag)
 $AKSEESchemaVersions = @()
 
-foreach ($AKSEEReleaseTag in $AKSEEReleasesTags){
-    $releaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
-    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$AKSEEReleaseTag.zip"
+for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
+    $releaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[$i].tag_name
+    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
     $output = Join-Path $AgToolsDir "$releaseTag.zip"
     Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
     Expand-Archive $output -DestinationPath $AgToolsDir -Force
