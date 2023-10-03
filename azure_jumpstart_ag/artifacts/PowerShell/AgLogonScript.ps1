@@ -703,7 +703,6 @@ foreach ($VM in $VMNames) {
 }
 
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
-
 $latestReleaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 $beforeLatestReleaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[1].tag_name
 $AKSEEReleasesTags = ($latestReleaseTag,$beforeLatestReleaseTag)
