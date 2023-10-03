@@ -731,6 +731,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $logsFolder = "$deploymentFolder\Logs"
     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
     $AgConfig = $using:AgConfig
+    $AgToolsDir = $using:AgToolsDir
     $websiteUrls = $using:websiteUrls
 
     ##########################################
