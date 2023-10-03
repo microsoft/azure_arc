@@ -31,7 +31,7 @@ try {
     & "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId `
     --resourceGroup $resourceGroup --location $Azurelocation `
     --tenantid $spnTenantId --service-principal-app-id $spnClientId `
-    --service-principal-secret $spnClientSecret --licenseType $licenseType --machineName $vmName
+    --service-principal-secret $spnClientSecret --licenseType $licenseType 
 	
 
 	if($LASTEXITCODE -eq 0){
