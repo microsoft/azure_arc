@@ -702,6 +702,28 @@ foreach ($VM in $VMNames) {
     }
 }
 
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
+
+$latestReleaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+$beforeLatestReleaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[1].tag_name
+$AKSEEReleasesTags = ($latestReleaseTag,$beforeLatestReleaseTag)
+$AKSEESchemaVersions = @()
+
+foreach ($AKSEEReleaseTag in $AKSEEReleasesTags){
+    $releaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$AKSEEReleaseTag.zip"
+    $output = Join-Path $AgToolsDir "$releaseTag.zip"
+    Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+    Expand-Archive $output -DestinationPath $AgToolsDir -Force
+    $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
+    $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+    $schemaVersion = $jsonContent.SchemaVersion
+    $AKSEESchemaVersions += $schemaVersion
+    # Clean up the downloaded release files
+    Remove-Item -Path $output -Force
+    Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+}
+
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
@@ -789,32 +811,11 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetch schemaVersion release from the AgConfig file
     $schemaVersionRelease = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
     if($schemaVersionRelease){
-        Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
-        $releaseTag = (Invoke-WebRequest $using:AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
-        $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
-        $output = Join-Path $AgToolsDir "$releaseTag.zip"
-        Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-        Expand-Archive $output -DestinationPath $AgToolsDir -Force
-        $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
-        $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-        $schemaVersion = $jsonContent.SchemaVersion
-        # Clean up the downloaded release files
-        Remove-Item -Path $output -Force
-        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+
+        $schemaVersion = $using:AKSEESchemaVersions[0]
     }
     else {
-        Write-Host "[$(Get-Date -Format t)] INFO: Fetching the previous AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
-        $releaseTag = (Invoke-WebRequest $using:AKSEEReleasesUrl | ConvertFrom-Json)[1].tag_name
-        $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
-        $output = Join-Path $AgToolsDir "$releaseTag.zip"
-        Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-        Expand-Archive $output -DestinationPath $AgToolsDir -Force
-        $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
-        $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-        $schemaVersion = $jsonContent.SchemaVersion
-        # Clean up the downloaded release files
-        Remove-Item -Path $output -Force
-        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+        $schemaVersion = $using:AKSEESchemaVersions[1]
     }
 
     $replacementParams = @{
