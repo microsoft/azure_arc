@@ -810,10 +810,10 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetch schemaVersion release from the AgConfig file
     $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
     if($AKSEESchemaVersionUseLatest){
-        $schemaVersion = $using:AKSEESchemaVersions[0]
+        $SchemaVersion = $using:AKSEESchemaVersions[0]
     }
     else {
-        $schemaVersion = $using:AKSEESchemaVersions[1]
+        $SchemaVersion = $using:AKSEESchemaVersions[1]
     }
 
     $replacementParams = @{
