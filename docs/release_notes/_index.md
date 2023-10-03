@@ -15,6 +15,7 @@ weight: 6
 
 #### Release highlights
 
+- Announcing [Jumpstart HCI general availability](https://aka.ms/HCIBoxGABlog)!
 - New scenarios: 0
 - New features: 1
 - Enhancements: 6
