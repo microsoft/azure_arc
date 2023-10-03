@@ -789,7 +789,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $schemaVersionRelease = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
     if($schemaVersionRelease){
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
-        $releaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+        $releaseTag = (Invoke-WebRequest $using:AKSEEReleasesUrl | ConvertFrom-Json)[0].tag_name
         $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
         $output = Join-Path $AgToolsDir "$releaseTag.zip"
         Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
@@ -803,7 +803,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
     else {
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching the previous AKS Edge Essentials schema version on $hostname." -ForegroundColor Gray
-        $releaseTag = (Invoke-WebRequest $AKSEEReleasesUrl | ConvertFrom-Json)[1].tag_name
+        $releaseTag = (Invoke-WebRequest $using:AKSEEReleasesUrl | ConvertFrom-Json)[1].tag_name
         $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
         $output = Join-Path $AgToolsDir "$releaseTag.zip"
         Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
