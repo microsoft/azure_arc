@@ -9,7 +9,7 @@ description: >
 ## Connect Azure Arc-enabled servers to Microsoft Sentinel
 
 The following Jumpstart scenario will guide you on how to onboard Azure Arc-enabled servers on to [Microsoft Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
-in this scenario, you will enable and configure Azure Sentinel on your Azure subscription. To complete this process you will:
+in this scenario, you will enable and configure Microsoft Sentinel on your Azure subscription. To complete this process you will:
 
 - Setup a Log Analytics Workspace where logs and events will be aggregated for analysis and correlation.
 
