@@ -100,7 +100,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         Write-Host "Waiting on Arc Resource Bridge deployment to complete..."
         Start-Sleep 60
         $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name --only-show-errors | ConvertFrom-Json
-        if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Running")) {
+        if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Connected")) {
             $rbReady = $true
         }
     } Until ($rbReady)
