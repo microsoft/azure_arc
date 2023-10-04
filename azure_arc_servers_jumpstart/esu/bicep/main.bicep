@@ -21,10 +21,10 @@ param windowsAdminPassword string
 param natDNS string = '8.8.8.8'
 
 @description('Target GitHub account')
-param githubAccount string = 'lanicolas'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'esu2k12'
+param githubBranch string = 'main'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
