@@ -166,7 +166,7 @@
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
-            AKSEEReleaseUseLatest  = $false                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
