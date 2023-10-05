@@ -149,7 +149,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you are able to manage ESU licenses for these servers.
 
-- Navigate to the Azure Arc page
+- Navigate to the Azure Arc page.
 
   ![Screenshot Azure Arc navigate](./13.png)
 
