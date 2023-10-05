@@ -151,21 +151,21 @@ Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you
 
 - Navigate to the Azure Arc page.
 
-  ![Screenshot Azure Arc navigate](./13.png)
+  ![Screenshot of Azure Arc navigate](./13.png)
 
 - Select Extended Security Updates in the left pane.
 
-  ![Screenshot Azure Arc Extended](./14.png)
+  ![Screenshot of Azure Arc Extended](./14.png)
 
 - Provision Windows Server 2012 and 2012 R2 Extended Security Update licenses from Azure Arc.
 
-  ![Screenshot ESU Licenses](./15.png)
+  ![Screenshot of ESU Licenses](./15.png)
 
-  ![Screenshot ESU Licenses](./16.png)
+  ![Screenshot of ESU Licenses](./16.png)
 
 - Select one or more Arc-enabled servers to link to an Extended Security Update license.
 
-  ![Screenshot Enable ESU Licenses](./17.png)
+  ![Screenshot of Enable ESU Licenses](./17.png)
 
 **NOTE: Verify that the databases running on your Azure Arc-enabled SQL Server are being discovered. If the databases are not shown in the Azure Portal, follow these steps to fix it.**
 
