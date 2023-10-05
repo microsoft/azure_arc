@@ -171,21 +171,21 @@ Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you
 
 - Select the Azure Arc-enabled SQL Server.
 
- ![Screenshot Azure Arc-enabled SQL Server resource](./18.png)
+ ![Screenshot of Azure Arc-enabled SQL Server resource](./18.png)
 
 - Select "Databases" under "Data Management". Click on "Change License Type".
 
- ![Screenshot Azure Arc-enabled SQL Server resource](./19.png)
+ ![Screenshot of Azure Arc-enabled SQL Server resource](./19.png)
 
- ![Screenshot Change License Type](./20.png)
+ ![Screenshot of Change License Type](./20.png)
 
 - Choose "License with Software Assurance".
 
- ![Screenshot software assurance](./21.png)
+ ![Screenshot of software assurance](./21.png)
 
 - The databases will be discovered and shown in the Azure Portal after a few seconds.
 
- ![Screenshot Databases in Portal](./22.png)
+ ![Screenshot of Databases in Azure portal](./22.png)
 
 ## Clean up environment
 
