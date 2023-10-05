@@ -84,7 +84,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - _`sql`_: to only deploy a SQL Server 2012 Standard Edition VM that will be registered as an Arc-enabled SQL Server.
     - _`both`_: to deploy both a Windows Server 2012 R2 VM and a SQL Server 2012 Standard Edition VM that will be Arc-enabled.
 
-    > **NOTE: Make sure to set the _esu_ parameter to _sql_ or _both_ to have an Arc-enabled SQL server deployed**.
+    > **NOTE: Make sure to set the _esu_ parameter to _sql_ or _both_ to have an Arc-enabled SQL Server deployed**.
 
   ![Screenshot of Parameters file](./01.png)
 
@@ -139,7 +139,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     > **NOTE: The script run time is ~10-15 min long.**
 
-- Upon successful run, a new Azure Arc-enabled server and/or Azure Arc-enabled SQL server will be added to the resource group.
+- Upon successful run, a new Azure Arc-enabled server and/or Azure Arc-enabled SQL Server will be added to the resource group.
 
   ![Screenshot Azure Arc-enabled resources on resource group](./12.png)
 
@@ -167,9 +167,9 @@ Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you
 
   ![Screenshot Enable ESU Licenses](./17.png)
 
-**NOTE: Verify that the databases running on your Azure Arc-enabled SQL server are being discovered. If the databases are not shown in the Azure Portal, follow these steps to fix it.**
+**NOTE: Verify that the databases running on your Azure Arc-enabled SQL Server are being discovered. If the databases are not shown in the Azure Portal, follow these steps to fix it.**
 
-- Select the Azure Arc-enabled SQL server.
+- Select the Azure Arc-enabled SQL Server.
 
  ![Screenshot Azure Arc-enabled SQL Server resource](./18.png)
 

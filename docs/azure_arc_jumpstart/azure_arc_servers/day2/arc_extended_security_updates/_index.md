@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Using Azure Arc to deliver Extended Security Updates for Windows Server 2012 and SQL Server 2012"
-linkTitle: "Using Azure Arc to deliver Extended Security Updates for Windows Server and SQL Server 2012"
+title: "Using Azure Arc to deliver Extended Security Updates (ESU) for Windows Server 2012 and SQL Server 2012"
+linkTitle: "Using Azure Arc to deliver Extended Security Updates (ESU) for Windows Server and SQL Server 2012"
 weight: 1
 description: >
 ---
@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to use Azure Arc to enroll Windows Server and optionally SQL Server 2012/2012 R2 machines in [Extented Security Updates (ESUs)](https://learn.microsoft.com/windows-server/get-started/extended-security-updates-overview). This scenario creates an Azure VM with Hyper-V installed where the Windows Server and/or SQL Server VMs will run and will be onboard as Azure Arc-enabled server and/or Azure Arc-enabled SQL Server respectively. Once these VMs are registered in Azure you will have visibility into their ESU coverage and can enroll them through the Azure portal one month before Windows Server 2012 end of support.
 
-In this scenario you can choose between working with Windows Server 2012 R2, SQL Server 2012 Standard edition or both. For a detailed deployment of Extended Security Updates for SQL Server 2012 make sure to the [SQL Server ESU scenario]
+In this scenario you can choose between working with Windows Server 2012 R2, SQL Server 2012 Standard edition or both. For a detailed deployment of Extended Security Updates for SQL Server 2012 make sure to the [SQL Server ESU scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/day2/esu/)
 
 **NOTE: In this scenario, ESU licenses are not provided or created, and will require you to provision them separately. The scenario will however create Windows Server 2012 R2 and/or SQL Server 2012 (Standard) machines that are connected to Azure Arc that you will be able to enroll on Extended Security Updates via the Azure portal and get billed monthly via your Azure subscription.**
 
@@ -139,7 +139,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     > **NOTE: The script run time is ~10-15 min long.**
 
-- Upon successful run, a new Azure Arc-enabled server and/or Azure Arc-enabled SQL server will be added to the resource group.
+- Upon successful run, a new Azure Arc-enabled server and/or Azure Arc-enabled SQL Server will be added to the resource group.
 
   ![Screenshot Azure Arc-enabled resources on resource group](./12.png)
 
@@ -169,7 +169,7 @@ Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you
 
 **NOTE: If you chose to deploy Azure Arc-enabled SQL Server exclusively or together with Windows Server, verify that the databases are being discovered. If the databases are not shown in the Azure Portal, follow these steps to fix it.**
 
-- Select the Azure Arc-enabled SQL server.
+- Select the Azure Arc-enabled SQL Server.
 
  ![Screenshot Azure Arc-enabled SQL Server resource](./18.png)
 
