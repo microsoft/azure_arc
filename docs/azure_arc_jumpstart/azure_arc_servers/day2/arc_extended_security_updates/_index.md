@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Using Azure Arc to deliver Extended Security Updates for Windows Server and SQL Server 2012
+## Using Azure Arc to deliver Extended Security Updates(ESU) for Windows Server and SQL Server 2012
 
 The following Jumpstart scenario will guide you on how to use Azure Arc to enroll Windows Server and optionally SQL Server 2012/2012 R2 machines in [Extented Security Updates (ESUs)](https://learn.microsoft.com/windows-server/get-started/extended-security-updates-overview). This scenario creates an Azure VM with Hyper-V installed where the Windows Server and/or SQL Server VMs will run and will be onboard as Azure Arc-enabled server and/or Azure Arc-enabled SQL Server respectively. Once these VMs are registered in Azure you will have visibility into their ESU coverage and can enroll them through the Azure portal one month before Windows Server 2012 end of support.
 
