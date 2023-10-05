@@ -189,8 +189,6 @@ Now that you have Windows Server 2012 R2 and/or SQL Server 2012 Arc-enabled, you
 
 ## Clean up environment
 
-Complete the following steps to clean up your environment.
-
-Remove the Azure Resource group from the portal.
+To clean up your deployment, simply delete the resource group from the portal.
 
 ![Screenshot of Azure Resource Group delete](./23.png)
