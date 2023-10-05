@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to use Azure Arc to enroll Windows Server and optionally SQL Server 2012/2012 R2 machines in [Extented Security Updates (ESUs)](https://learn.microsoft.com/windows-server/get-started/extended-security-updates-overview). This scenario creates an Azure VM with Hyper-V installed where the Windows Server and/or SQL Server VMs will run and will be onboard as Azure Arc-enabled server and/or Azure Arc-enabled SQL Server respectively. Once these VMs are registered in Azure you will have visibility into their ESU coverage and can enroll them through the Azure portal one month before Windows Server 2012 end of support.
 
-In this scenario you can choose between working with Windows Server 2012 R2, SQL Server 2012 Standard edition or both. For a detailed deployment of Extended Security Updates for SQL Server 2012 make sure to the [SQL Server ESU scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/day2/esu/)
+In this scenario, you can choose between working with Windows Server 2012 R2, SQL Server 2012 Standard Edition, or both. For a detailed deployment of Extended Security Updates for SQL Server 2012 make sure to use the [SQL Server ESU scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/day2/esu/).
 
 **NOTE: In this scenario, ESU licenses are not provided or created, and will require you to provision them separately. The scenario will however create Windows Server 2012 R2 and/or SQL Server 2012 (Standard) machines that are connected to Azure Arc that you will be able to enroll on Extended Security Updates via the Azure portal and get billed monthly via your Azure subscription.**
 
