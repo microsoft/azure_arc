@@ -84,7 +84,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - _`sql`_: to only deploy a SQL Server 2012 Standard Edition VM that will be registered as an Arc-enabled SQL Server.
     - _`both`_: to deploy both a Windows Server 2012 R2 VM and a SQL Server 2012 Standard Edition VM that will be Arc-enabled.
 
-    > **NOTE: Make sure to set the _esu_ parameter to _ws_ or _both_ to have an Arc-enabled server deployed**.
+    > **NOTE: Make sure to set the _esu_ parameter to _ws_ or _both_ to have an Arc-enabled server deployed.**
 
   ![Screenshot of Parameters file](./01.png)
 
