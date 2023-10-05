@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Using Azure Arc to deliver Extended Security Updates for Windows Server 2012 and SQL Server 2012"
-linkTitle: "Using Azure Arc to deliver Extended Security Updates for Windows Server and SQL Server 2012"
+title: "Using Azure Arc to deliver Extended Security Updates (ESU) for Windows Server 2012 and SQL Server 2012"
+linkTitle: "Using Azure Arc to deliver Extended Security Updates (ESU) for Windows Server and SQL Server 2012"
 weight: 1
 description: >
 ---
