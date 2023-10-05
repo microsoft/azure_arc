@@ -78,7 +78,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`windowsAdminUsername`_: Windows admin username for your Azure VM.
   - _`windowsAdminPassword`_: password for the Windows admin username.
   - _`deployBastion`_: whether or not you'd like to deploy Azure Bastion to access the Azure VM. Values can be "true" or "false"
-  - _`esu`_: this parameter will allow you to control what VMs will be deployed. It can be:
+  - _`esu`_: this parameter will allow you to control what VMs will be deployed. It can be either:
     - _`ws`_: to only deploy a Windows Server 2012 R2 VM that will be registered as an Arc-enabled server.
     - _`sql`_: to only deploy a SQL Server 2012 Standard Edition VM that will be registered as an Arc-enabled SQL Server.
     - _`both`_: to deploy both a Windows Server 2012 R2 VM and a SQL Server 2012 Standard Edition VM that will be Arc-enabled.
