@@ -52,7 +52,6 @@ param videoIndexerAccountName string
 @description('ID of the video indexer account')
 param videoIndexerAccountId string
 
-var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Jumpstart-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
