@@ -266,6 +266,16 @@ At this point the video is being indexed by the Video Indexer extension. This st
 
   ![Upload Video step 5](./video_processing.png)
 
+- You can repeat the same API call to monitor the progress. When complete, the state will change to "Processed" and the processingProgress should show 100%. Note the id field for the next step.
+
+  ![Upload Video step 6](./video_processed.png)
+
+Now we can use other API calls to examine the indexed video content. 
+
+- From the Postman client, make a new GET request to the following URI - https://192.168.0.4/Accounts/<accountId>/Videos/<videoId>/Index where AccountID is your Video Indexer account id and videoId is the id of the video. Review the JSON response to see insights of the video extracted by the Video Indexer extension.
+
+  ![Upload Video step 6](./video_insights.png)
+
 ### Exploring logs from the Client VM
 
 Occasionally, you may need to review log output from scripts that run on the _AKS-EE-Demo_ VM in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on _AKS-EE-Demo_ Azure VM. A short description of the logs and their purpose can be seen in the list below:
@@ -282,4 +292,4 @@ Occasionally, you may need to review log output from scripts that run on the _AK
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./31.png)
+    ![Screenshot showing Azure resource group deletion](./placeholder.png)
