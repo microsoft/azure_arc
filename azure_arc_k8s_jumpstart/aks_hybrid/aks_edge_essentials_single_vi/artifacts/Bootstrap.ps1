@@ -69,7 +69,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 # Downloading GitHub artifacts
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/longhorn.yaml") -OutFile "C:\Temp\longhorn.yaml"
-Invoke-WebRequest ($templateBaseUrl + "video/video.mp4") -OutFile "C:\Temp\video.mp4"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/video/video.mp4") -OutFile "C:\Temp\video.mp4"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 ##############################################################
