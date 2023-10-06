@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "spnClientId": {
+        "value": "<spn client id>"
+      },
+      "spnClientSecret": {
+          "value": "<spn client secret>"
+      },
+      "spnTenantId": {
+          "value": "<spn tenant id>"
+      },
+      "windowsAdminUsername": {
+        "value": "arcdemo"
+      },
+      "windowsAdminPassword": {
+        "value": "ArcPassword123!!"
+      },
+      "rdpPort": {
+        "value": "3389"
+      }
+    }
+  }
+  
