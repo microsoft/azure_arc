@@ -197,6 +197,9 @@ netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=443 connec
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 
+# Install Postman
+choco install postman /y -Force
+
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
