@@ -33,6 +33,7 @@
         prometheus         = 'https://prometheus-community.github.io/helm-charts'
         vcLibs             = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
+        aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
     }
 
     # Azure required registered resource providers
@@ -58,7 +59,6 @@
 
     # Chocolatey packages list
     ChocolateyPackagesList  = @(
-        'azure-cli',
         'az.powershell',
         'kubernetes-cli',
         'vcredist140',
@@ -143,6 +143,7 @@
             GrafanaDataSource      = "seattle"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Chicago = @{
             ArcClusterName         = "Ag-ArcK8s-Chicago"
@@ -165,6 +166,7 @@
             GrafanaDataSource      = "chicago"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Dev     = @{
             ArcClusterName         = "Ag-ArcK8s-Dev"
@@ -186,8 +188,8 @@
             HelmService            = "service/prometheus-grafana"
             GrafanaDataSource      = "prometheus"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-
             IoTDevices             = @("Freezer-1", "Freezer-2")
+            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
         Staging = @{
             ArcClusterName     = "Ag-AKS-Staging"

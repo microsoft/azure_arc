@@ -11,6 +11,50 @@ weight: 6
 
 ## 2023
 
+### September 2023
+
+#### Release highlights
+
+- Announcing [Jumpstart HCIBox general availability](https://aka.ms/HCIBoxGABlog)!
+- New scenarios: 0
+- New features: 1
+- Enhancements: 6
+- Bug fixes: 17
+- Documentation updates: 1
+
+#### Cross-scenario
+
+- [Enhancement: September versions bump #2138](https://github.com/microsoft/azure_arc/issues/2138)
+
+#### Jumpstart Agora
+
+- [Enhancement: Upgrade Azure CLI to 64-bit #2128](https://github.com/microsoft/azure_arc/issues/2128)
+- [Enhancement: Bump AKS and AKSEE versions in Agora #2121](https://github.com/microsoft/azure_arc/issues/2121)
+- [Bug: Copy-VMFile failed due to "The device is not ready for use" #2091](https://github.com/microsoft/azure_arc/issues/2091)
+- [Documentation: Azure Data Explorer reports doesn't show data. Principal xxx is not authorized to read database 'Orders'. #2098](https://github.com/microsoft/azure_arc/issues/2098)
+
+#### Jumpstart ArcBox
+
+- [Enhancement: Upgrade Azure CLI to 64-bit #2129](https://github.com/microsoft/azure_arc/issues/2129)
+
+#### Jumpstart HCIBox
+
+- [Enhancement: Upgrade Azure CLI to 64-bit #2127](https://github.com/microsoft/azure_arc/issues/2127)
+- [Bug: The hcibox azd provision scripts is checking DSv5 cores quota instead of ESv5 cores (As documented). #2100](https://github.com/microsoft/azure_arc/issues/2100)
+- [Bug: Deploy-ArcResourceBridge.ps1 fails to install the arcappliance extension #2102](https://github.com/microsoft/azure_arc/issues/2102)
+- [Bug: Deploy-ArcResourceBridge is blocked: Default_Group already exists #2106](https://github.com/microsoft/azure_arc/issues/2106)
+- [Bug: Unable to enable Insights after HCIBox cluster registration #2114](https://github.com/microsoft/azure_arc/issues/2114)
+- [Bug: Update HCIBox vhdx images to latest servicing updates for HCI 22H2 and WinServer 22h2 #2117](https://github.com/microsoft/azure_arc/issues/2117)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Enhancement: AKS Edge Essentials - Scheme Update #2122](https://github.com/microsoft/azure_arc/issues/2122)
+- [Bug: Modify AKS EE Arc onboarding to allow Managed Prometheus Microsoft.AzureMonitor.Containers.Metrics Arc extension deployment #2132](https://github.com/microsoft/azure_arc/issues/2132)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - Sept release #2099](https://github.com/microsoft/azure_arc/issues/2099)
+
 ### August 2023
 
 #### Release highlights
