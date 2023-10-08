@@ -18,6 +18,7 @@ $vhdxUri = "https://jsvhds.blob.core.windows.net/scenarios/prod/JSW11IoTBase.vhd
 $hypervVMUser = "Administrator"
 $hypervVMPassword = "JS123!!"
 $kubernetesDistribution = $env:kubernetesDistribution
+$aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
 
 Write-Header "Executing LogonScript.ps1"
 
@@ -297,6 +298,20 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 }
 
+Write-Host "Fetching the latest AKS Edge Essentials release."
+$latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+
+$AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
+$output = Join-Path "C:\temp" "$latestReleaseTag.zip"
+Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+Expand-Archive $output -DestinationPath $AgToolsDir -Force
+$AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
+$jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+$schemaVersion = $jsonContent.SchemaVersion
+# Clean up the downloaded release files
+Remove-Item -Path $output -Force
+Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
+
 ###############################################################################
 # Setting up replacment parameters for AKS Edge Essentials config json file
 ###############################################################################
@@ -307,6 +322,7 @@ Invoke-Command -VMName "Node1" -Credential $Credentials -ScriptBlock {
     $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $replacementParams = @{
+        "SchemaVersion-null"          = $using:schemaVersion
         "NetworkPlugin-null"          = $SiteConfig[$env:COMPUTERNAME].Networkplugin
         "ServiceIPRangeStart-null"    = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $SiteConfig[$env:COMPUTERNAME].ServiceIPRangeSize
@@ -402,6 +418,7 @@ Invoke-Command -VMName "Node2" -Credential $Credentials -ScriptBlock {
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     if ($using:kubernetesDistribution -eq "k8s") {
         $replacementParams = @{
+            "SchemaVersion-null"          = $using:schemaVersion
             "NetworkPlugin-null"          = $SiteConfig[$env:COMPUTERNAME].Networkplugin
             "ClusterJoinToken-null"       = $using:ClusterJoinToken
             "DiscoveryTokenHash-null"     = $using:DiscoveryTokenHash
@@ -416,6 +433,7 @@ Invoke-Command -VMName "Node2" -Credential $Credentials -ScriptBlock {
         }
     } else {
         $replacementParams = @{
+            "SchemaVersion-null"          = $using:schemaVersion
             "NetworkPlugin-null"          = $SiteConfig[$env:COMPUTERNAME].Networkplugin
             "ClusterJoinToken-null"       = $using:ClusterJoinToken
             "ClusterId-null"              = $using:ClusterId
