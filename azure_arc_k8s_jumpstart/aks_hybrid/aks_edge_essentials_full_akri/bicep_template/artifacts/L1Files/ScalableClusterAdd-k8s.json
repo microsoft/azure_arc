@@ -1,5 +1,5 @@
 {
-  "SchemaVersion": "1.9",
+  "SchemaVersion": "SchemaVersion-null",
   "Version": "1.0",
   "DeploymentType": "ScalableCluster",
   "Join": {
