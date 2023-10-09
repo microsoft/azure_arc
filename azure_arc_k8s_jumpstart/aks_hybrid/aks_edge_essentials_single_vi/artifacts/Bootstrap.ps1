@@ -71,6 +71,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\
 Invoke-WebRequest ($templateBaseUrl + "artifacts/longhorn.yaml") -OutFile "C:\Temp\longhorn.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/video/video.mp4") -OutFile "C:\Temp\video.mp4"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+Invoke-WebRequest "https://github.com/certbot/certbot/releases/latest/download/certbot-beta-installer-win_amd64_signed.exe" -OutFile "C:\Temp\certbot-beta-installer-win_amd64_signed.exe"
 
 ##############################################################
 # Install Azure CLI (64-bit not available via Chocolatey)
@@ -83,6 +84,9 @@ Remove-Item .\AzureCLI.msi
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
 $chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm,vscode'
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Start-Process "C:\Temp\certbot-beta-installer-win_amd64_signed.exe" -Wait -ArgumentList '/S'
 
 try {
     choco config get cacheLocation
