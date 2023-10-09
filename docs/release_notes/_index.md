@@ -126,7 +126,7 @@ weight: 6
 
 #### Jumpstart HCIBox
 
-No updates this release.
+No updates in this release.
 
 #### Azure Arc-enabled Kubernetes
 
@@ -252,8 +252,8 @@ No updates this release.
 
 #### Azure Arc-enabled servers
 
-- [New scenario: Enable Azure Automanage custom profiles on an Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_custom_profiles/)
-- [Updated scenario: Enable Azure Automanage built-in profiles on an Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_builtin_profiles/)
+- [New scenario: Enable Azure Automanage custom profiles on Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_custom_profiles/)
+- [Updated scenario: Enable Azure Automanage built-in profiles on Azure Arc-enabled servers using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_builtin_profiles/)
 
 #### Azure Arc-enabled SQL Server
 
