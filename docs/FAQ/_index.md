@@ -11,7 +11,7 @@ weight: 8
 
 ### Can I contribute to the Jumpstart?
 
-Absolutely! The Jumpstart is a community-driven open-source project and all contributions are welcomed. To get started, review the [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) and our [Code of Conduct](https://azurearcjumpstart.io/code_of_conduct/).
+Absolutely! The Jumpstart is a community-driven open-source project, and all contributions are welcomed. To get started, review the [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) and our [Code of Conduct](https://azurearcjumpstart.io/code_of_conduct/).
 
 ## Jumpstart ArcBox
 
@@ -49,9 +49,9 @@ ArcBox offers three different configurations, or "flavors", that allow the user 
 - [ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps) - This essential Azure Arc-enabled Kubernetes sandbox with the included capabilities such as GitOps, Open Service Mesh (OSM), secretes management, monitoring, and more.
 - [ArcBox for DataOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps) - This essential Azure Arc-enabled SQL Managed Instance sandbox with the included capabilities such as AD authentication, disaster recovery, point-in-time restore, migration, and more.
 
-### What are the costs for using ArcBox?
+### What are the costs of using ArcBox?
 
-ArcBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. Each flavor of ArcBox uses a different combination of Azure resources and therefore costs vary depending on the flavor used. You can view example estimates of ArcBox costs per flavor by clicking the links below.
+ArcBox incurs normal Azure consumption charges for various Azure resources, such as virtual machines and storage. Each flavor of ArcBox uses a different combination of Azure resources and therefore, costs vary depending on the flavor used. You can view example estimates of ArcBox costs per flavor by clicking the links below.
 
 - [ArcBox Full cost estimate](https://aka.ms/ArcBoxFullCost)
 - [ArcBox for ITPro cost estimate](https://aka.ms/ArcBoxITProCost)
@@ -80,7 +80,7 @@ HCIBox can be deployed to the following regions:
 - West US 2
 - North Europe
 
-### What are the costs for using HCIBox?
+### What are the costs of using HCIBox?
 
 HCIBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. You can view example estimates of HCIBox costs per flavor by clicking the links below.
 
