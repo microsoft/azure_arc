@@ -30,7 +30,7 @@ Agora can be deployed to the following regions:
 - North Europe
 - West Europe
 
-## What are the costs for using Agora?
+## What are the costs of using Agora?
 
 Agora incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. Each industry scenario in Agora may use a different combination of Azure resources and therefore costs vary depending on the industry scenario used. You can view example estimates of Agora costs by clicking the links below.
 
