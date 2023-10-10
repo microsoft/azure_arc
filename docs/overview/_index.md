@@ -11,7 +11,7 @@ The Azure Arc Jumpstart is designed to provide a "zero to hero" experience so yo
 
 The Jumpstart provides step-by-step guides for independent Azure Arc scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and a rich and comprehensive experience while getting started with the Azure Arc platform.
 
-Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
+Our goal is for you to have a working Azure Arc environment spin-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
 
 <p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="270"></p>
 
@@ -27,7 +27,7 @@ Ready to get going?! This website offers you detailed guides, automation, code s
 
 Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/) section and enjoy the ride.
 
-> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code. Jumpstart scenarios, ArcBox, HCIBox, and Agora are all intended for evaluation, training and demo purposes only and are not supported for production use cases.**
+> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use cases, and ease of use. It does not focus on Azure best practices or the other tech and OSS projects being leveraged in the scenarios and code. Jumpstart scenarios, ArcBox, HCIBox, and Agora are all intended for evaluation, training and demo purposes only and are not supported for production use cases.**
 
 ## Jumpstart Agora
 
@@ -69,9 +69,9 @@ Jumpstart Lightning is the show where you get a chance to share with our team an
 
 <p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="270"></a></p>
 
-* Are you an awesome Azure Arc customer or a Microsoft partner that has an awesome story you would like to talk about?!
-* Ever contributed to the Jumpstart project and want to share it with the world?!
-* Do you have a unique Azure Arc demo and content to show-off?!
+* Are you an awesome Azure Arc customer or a Microsoft partner who has an awesome story you would like to talk about?!
+* Have you ever contributed to the Jumpstart project and want to share it with the world?!
+* Do you have a unique Azure Arc demo and content to show off?!
 
 What are you waiting for?! [Fill the submission form](https://forms.office.com/r/cyg2DduG1W) and if it’s snazzy enough, you will be hearing from us soon.
 
@@ -93,7 +93,7 @@ For customers who want to simplify complex and distributed environments across o
 
 ## Azure Arc Story Time
 
-Contoso Global Manufacturing runs workloads on different hardware, across on-premises datacenters, and multiple public clouds, with Microsoft Azure being the primary cloud. They also support IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platform-as-a-Service (PaaS) services, and container-based applications.
+Contoso Global Manufacturing runs workloads on different hardware, across on-premises data centers, and multiple public clouds, with Microsoft Azure being the primary cloud. They also support IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platform-as-a-Service (PaaS) services, and container-based applications.
 
 As mentioned, Contoso’s R&D teams are well-invested in containerized workloads for their modernized applications. As a result, they are using Kubernetes as their container orchestration platform. Kubernetes is deployed both as self-managed Kubernetes clusters in their on-premises environments and managed Kubernetes deployments in the cloud.
 
@@ -111,4 +111,4 @@ We would love to have you! We are always looking for community support so if you
 
 ## Jumpstart Roadmap
 
-Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/orgs/microsoft/projects/162).
+An up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/orgs/microsoft/projects/162).
