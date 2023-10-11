@@ -1,0 +1,1 @@
+Get-Process | Sort-Object CPU -desc | Select-Object -first 5
