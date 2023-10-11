@@ -206,7 +206,7 @@ sleep 120
 echo ""
 # sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
 helm repo add projectcalico https://docs.tigera.io/calico/charts --kubeconfig=./$CLUSTER_NAME.kubeconfig && \
-helm install calico projectcalico/tigera-operator --version v3.25.2--kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
+helm install calico projectcalico/tigera-operator --version v3.25.2 --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
 
 echo ""
 while true; do
