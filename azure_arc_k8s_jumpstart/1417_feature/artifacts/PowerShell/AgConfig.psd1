@@ -92,7 +92,6 @@
     # Git branches
     GitBranches             = @(
         'production',
-        'staging',
         'canary' ,
         'main'
     )
@@ -189,19 +188,6 @@
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             IoTDevices             = @("Freezer-1", "Freezer-2")
             AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
-        }
-        Staging = @{
-            ArcClusterName     = "Ag-AKS-Staging"
-            FriendlyName       = "Staging"
-            IsProduction       = $false
-            Type               = "AKS"
-            posNamespace       = "contoso-supermarket"
-            Branch             = "staging"
-            HelmSetValue       = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
-            HelmService        = "service/prometheus-grafana"
-            GrafanaDataSource  = "prometheus"
-            HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
-            IoTDevices          = @("Freezer-1", "Freezer-2")
         }
     }
 
