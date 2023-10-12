@@ -66,7 +66,7 @@ param resourceTags object = {
 @description('Deploy Windows Node for AKS Edge Essentials')
 param windowsNode bool = false
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_single/arm_template/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var bastionSubnetName = 'AzureBastionSubnet'
