@@ -1,11 +1,8 @@
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string
-
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string
+param subnetNameCloudInnerLoop string
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -25,7 +22,6 @@ param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
 param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
 
 var addressPrefixCloud = '10.16.0.0/16'
-var subnetAddressPrefixAksDev = '10.16.80.0/21'
 var subnetAddressPrefixInnerLoop = '10.16.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionSubnetName = 'AzureBastionSubnet'
@@ -45,23 +41,10 @@ var bastionSubnet = [
     }
   }
 ]
-var cloudAKSDevSubnet = [
-  {
-    name: subnetNameCloudAksStaging
-    properties: {
-      addressPrefix: subnetAddressPrefixAksDev
-      privateEndpointNetworkPolicies: 'Enabled'
-      privateLinkServiceNetworkPolicies: 'Enabled'
-      networkSecurityGroup: {
-        id: networkSecurityGroupCloud.id
-      }
-    }
-  }
-]
 
-var cloudAKSInnerLoopSubnet = [
+var cloudInnerLoopSubnet = [
   {
-    name: subnetNameCloudAksInnerLoop
+    name: subnetNameCloudInnerLoop
     properties: {
       addressPrefix: subnetAddressPrefixInnerLoop
       privateEndpointNetworkPolicies: 'Enabled'
@@ -83,7 +66,7 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false) ? cloudInnerLoopSubnet : union(cloudInnerLoopSubnet,bastionSubnet)
   }
 }
 
@@ -184,7 +167,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationAddressPrefix: '*'
           destinationPortRange: '9090'
         }
-      }       
+      }
     ]
   }
 }
