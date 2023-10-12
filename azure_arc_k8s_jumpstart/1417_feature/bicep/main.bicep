@@ -13,7 +13,7 @@ param adminUsername string = 'arcdemo'
 
 @description('Windows password for the Virtual Machine')
 @secure()
-param adminPassword string = 'ArcPassword123!!'
+param adminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version.')
 param windowsOSVersion string = '2022-datacenter-g2'
@@ -31,13 +31,16 @@ param bastionHostName string = 'AKS-EE-Demo-Bastion'
 param vmSize string = 'Standard_D8s_v3'
 
 @description('Unique SPN app ID')
-param appId string
+param spnClientId string
 
 @description('Unique SPN password')
-param password string
+@minLength(12)
+@maxLength(123)
+@secure()
+param spnClientSecret string
 
 @description('Unique SPN tenant ID')
-param tenantId string
+param spnTenantId string
 
 @description('Azure subscription ID')
 param subscriptionId string = subscription().subscriptionId
@@ -220,7 +223,7 @@ resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${adminUsername} -appId ${appId} -password ${password} -tenantId ${tenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${adminUsername} -spnClientId ${spnClientId} -password ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
     }
   }
 }
