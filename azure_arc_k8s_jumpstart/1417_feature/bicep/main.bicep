@@ -24,9 +24,6 @@ param windowsAdminUsername string
 @secure()
 param windowsAdminPassword string
 
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
@@ -51,14 +48,8 @@ param githubPAT string
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
-
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
-
-@description('The name of the Staging Kubernetes cluster resource')
-param aksStagingClusterName string = 'Ag-AKS-Staging'
+param subnetNameCloudInnerLoop string = 'Ag-Subnet-InnerLoop'
 
 @description('The name of the IotHub')
 param iotHubName string = 'Ag-IotHub-${namingGuid}'
@@ -91,8 +82,7 @@ module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
-    subnetNameCloudAksStaging: subnetNameCloudAksStaging
-    subnetNameCloudAksInnerLoop: subnetNameCloudAksInnerLoop
+    subnetNameCloudInnerLoop: subnetNameCloudInnerLoop
     deployBastion: deployBastion
     location: location
   }
@@ -102,20 +92,6 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
   params: {
     location: location
-  }
-}
-
-module kubernetesDeployment 'kubernetes/aks.bicep' = {
-  name: 'kubernetesDeployment'
-  params: {
-    aksStagingClusterName: aksStagingClusterName
-    virtualNetworkNameCloud: networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameStaging: subnetNameCloudAksStaging
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    location: location
-    sshRSAPublicKey: sshRSAPublicKey
-    acrName: acrName
   }
 }
 
@@ -137,7 +113,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksStagingClusterName: aksStagingClusterName
     iotHubHostName: iotHubDeployment.outputs.iotHubHostName
     cosmosDBName: accountName
     cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
