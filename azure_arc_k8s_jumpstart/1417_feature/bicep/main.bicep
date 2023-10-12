@@ -49,7 +49,7 @@ param subscriptionId string = subscription().subscriptionId
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = '1417-feature-br'
 
 @description('Name of the VNET')
 param virtualNetworkName string = 'AKS-EE-Demo-VNET'
