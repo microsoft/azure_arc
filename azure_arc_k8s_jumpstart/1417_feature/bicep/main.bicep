@@ -1,31 +1,49 @@
-@description('Azure service principal client id')
-param spnClientId string
+@description('The name of you Virtual Machine.')
+param vmName string = 'AKS-EE-Demo'
 
-@description('Azure service principal client secret')
+@description('Kubernetes distribution')
+@allowed([
+  'k8s'
+  'k3s'
+])
+param kubernetesDistribution string = 'k3s'
+
+@description('Username for the Virtual Machine.')
+param adminUsername string = 'arcdemo'
+
+@description('Windows password for the Virtual Machine')
 @secure()
-param spnClientSecret string
+param adminPassword string
 
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
+@description('The Windows version for the VM. This will pick a fully patched image of this given Windows version.')
+param windowsOSVersion string = '2022-datacenter-g2'
 
-@description('Location for all resources')
+@description('Location for all resources.')
 param location string = resourceGroup().location
 
-@maxLength(5)
-@description('Random GUID')
-param namingGuid string = toLower(substring(newGuid(), 0, 5))
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool
 
-@description('Username for Windows account')
-param windowsAdminUsername string
+@description('the Azure Bastion host name')
+param bastionHostName string = 'AKS-EE-Demo-Bastion'
 
-@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
+@description('The size of the VM')
+param vmSize string = 'Standard_D8s_v3'
+
+@description('Unique SPN app ID')
+param spnClientId string
+
+@description('Unique SPN password')
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param spnClientSecret string
 
-@description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
+@description('Unique SPN tenant ID')
+param spnTenantId string
+
+@description('Azure subscription ID')
+param subscriptionId string = subscription().subscriptionId
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -33,108 +51,226 @@ param githubAccount string = 'microsoft'
 @description('Target GitHub branch')
 param githubBranch string = '1417-feature-br'
 
-@description('Choice to deploy Bastion to connect to the client VM')
-param deployBastion bool = false
+@description('Name of the VNET')
+param virtualNetworkName string = 'AKS-EE-Demo-VNET'
 
-@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
-@minLength(1)
-param githubUser string
+@description('Name of the subnet in the virtual network')
+param subnetName string = 'Subnet'
 
-@description('GitHub Personal access token for the user account')
-@minLength(1)
-@secure()
-param githubPAT string
+@description('Name of the Network Security Group')
+param networkSecurityGroupName string = 'AKS-EE-Demo-NSG'
+param resourceTags object = {
+  Project: 'jumpstart_azure_arc_servers'
+}
 
-@description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
+@description('Deploy Windows Node for AKS Edge Essentials')
+param windowsNode bool = false
 
-@description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudInnerLoop string = 'Ag-Subnet-InnerLoop'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_single/arm_template/'
+var publicIpAddressName = '${vmName}-PIP'
+var networkInterfaceName = '${vmName}-NIC'
+var bastionSubnetName = 'AzureBastionSubnet'
+var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, subnetName)
+var bastionSubnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, bastionSubnetName)
+var osDiskType = 'Premium_LRS'
+var subnetAddressPrefix = '10.1.0.0/24'
+var addressPrefix = '10.1.0.0/16'
+var bastionName = concat(bastionHostName)
+var bastionSubnetIpPrefix = '10.1.1.64/26'
+var PublicIPNoBastion = {
+  id: publicIpAddress.id
+}
 
-@description('The name of the IotHub')
-param iotHubName string = 'Ag-IotHub-${namingGuid}'
-
-@description('The name of the Cosmos DB account')
-param accountName string = 'agcosmos${namingGuid}'
-
-@description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'Orders'
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the Azure Container Registry')
-param acrName string = 'agacr${namingGuid}'
-
-@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
-param rdpPort string = '3389'
-
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/'
-
-module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
-  name: 'mgmtArtifactsAndPolicyDeployment'
-  params: {
-    workspaceName: logAnalyticsWorkspaceName
-    location: location
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-07-01' = {
+  name: networkInterfaceName
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnetRef
+          }
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: ((!deployBastion) ? PublicIPNoBastion : null)
+        }
+      }
+    ]
+    networkSecurityGroup: {
+      id: networkSecurityGroup.id
+    }
   }
 }
 
-module networkDeployment 'mgmt/network.bicep' = {
-  name: 'networkDeployment'
-  params: {
-    virtualNetworkNameCloud: virtualNetworkNameCloud
-    subnetNameCloudInnerLoop: subnetNameCloudInnerLoop
-    deployBastion: deployBastion
-    location: location
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+  name: networkSecurityGroupName
+  location: location
+}
+
+resource networkSecurityGroupName_allow_RDP_3389 'Microsoft.Network/networkSecurityGroups/securityRules@2022-05-01' = if (deployBastion) {
+  parent: networkSecurityGroup
+  name: 'allow_RDP_3389'
+  properties: {
+    priority: 1001
+    protocol: 'TCP'
+    access: 'Allow'
+    direction: 'Inbound'
+    sourceAddressPrefix: bastionSubnetIpPrefix
+    sourcePortRange: '*'
+    destinationAddressPrefix: '*'
+    destinationPortRange: '3389'
   }
 }
 
-module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
-  name: 'storageAccountDeployment'
-  params: {
-    location: location
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
+  name: virtualNetworkName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        addressPrefix
+      ]
+    }
+    subnets: [
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: bastionSubnetIpPrefix
+        }
+      }
+    ]
   }
 }
 
-module clientVmDeployment 'clientVm/clientVm.bicep' = {
-  name: 'clientVmDeployment'
-  params: {
-    windowsAdminUsername: windowsAdminUsername
-    windowsAdminPassword: windowsAdminPassword
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
-    workspaceName: logAnalyticsWorkspaceName
-    storageAccountName: storageAccountDeployment.outputs.storageAccountName
-    templateBaseUrl: templateBaseUrl
-    deployBastion: deployBastion
-    githubAccount: githubAccount
-    githubBranch: githubBranch
-    githubUser: githubUser
-    githubPAT: githubPAT
-    location: location
-    subnetId: networkDeployment.outputs.innerLoopSubnetId
-    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName: accountName
-    cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
-    acrName: acrName
-    rdpPort: rdpPort
-    namingGuid: namingGuid
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-07-01' = {
+  name: publicIpAddressName
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: ((!deployBastion) ? 'Basic' : 'Standard')
   }
 }
 
-module iotHubDeployment 'data/iotHub.bicep' = {
-  name: 'iotHubDeployment'
-  params: {
-    location: location
-    iotHubName: iotHubName
+resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
+  name: vmName
+  location: location
+  tags: resourceTags
+  properties: {
+    hardwareProfile: {
+      vmSize: vmSize
+    }
+    storageProfile: {
+      osDisk: {
+        name: '${vmName}-OSDisk'
+        caching: 'ReadWrite'
+        createOption: 'fromImage'
+        managedDisk: {
+          storageAccountType: osDiskType
+        }
+      }
+      imageReference: {
+        publisher: 'MicrosoftWindowsServer'
+        offer: 'WindowsServer'
+        sku: windowsOSVersion
+        version: 'latest'
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: networkInterface.id
+        }
+      ]
+    }
+    osProfile: {
+      computerName: vmName
+      adminUsername: adminUsername
+      adminPassword: adminPassword
+      windowsConfiguration: {
+        provisionVMAgent: true
+        enableAutomaticUpdates: false
+      }
+    }
   }
 }
 
-module cosmosDBDeployment 'data/cosmosDB.bicep' = {
-  name: 'cosmosDBDeployment'
-  params: {
-    location: location
-    accountName: accountName
-    posOrdersDBName: posOrdersDBName
+resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+  parent: vm
+  name: 'Bootstrap'
+  location: location
+  tags: {
+    displayName: 'Run Bootstrap'
+  }
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    protectedSettings: {
+      fileUris: [
+        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+      ]
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${adminUsername} -spnClientId ${spnClientId} -password ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
+    }
   }
 }
+
+resource vmName_InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+  parent: vm
+  name: 'InstallWindowsFeatures'
+  location: location
+  properties: {
+    publisher: 'Microsoft.Powershell'
+    type: 'DSC'
+    typeHandlerVersion: '2.77'
+    autoUpgradeMinorVersion: true
+    settings: {
+      wmfVersion: 'latest'
+      configuration: {
+        url: uri(templateBaseUrl, 'artifacts/DSCInstallWindowsFeatures.zip')
+        script: 'DSCInstallWindowsFeatures.ps1'
+        function: 'InstallWindowsFeatures'
+      }
+    }
+  }
+}
+
+resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion) {
+  name: bastionName
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'IpConf'
+        properties: {
+          subnet: {
+            id: bastionSubnetRef
+          }
+          publicIPAddress: {
+            id: publicIpAddress.id
+          }
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    virtualNetwork
+
+  ]
+}
+
+output adminUsername string = adminUsername
+output publicIP string = concat(publicIpAddress.properties.ipAddress)
