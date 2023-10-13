@@ -1,8 +1,8 @@
 param (
     [string]$adminUsername,
-    [string]$adminPassword,
+    [securestring]$adminPassword,
     [string]$spnClientId,
-    [string]$spnClientSecret,
+    [securestring]$spnClientSecret,
     [string]$spnTenantId,
     [string]$subscriptionId,
     [string]$resourceGroup,
@@ -36,8 +36,20 @@ param (
 [System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating HCIBox path
+$HCIPath = "C:\HCIBox"
+[System.Environment]::SetEnvironmentVariable('HCIBoxDir', $HCIPath,[System.EnvironmentVariableTarget]::Machine)
+New-Item -Path $HCIPath -ItemType directory -Force
+
+# Downloading configuration file
+$ConfigurationDataFile = "$HCIPath\HCIBox-Config.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBox-Config.psd1") -OutFile $ConfigurationDataFile
+
+# Importing configuration data
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+
+## This section needs to be imported from data file, not hardcoded
 Write-Output "Creating HCIBox paths"
-$Env:HCIBoxDir = "C:\HCIBox"
+
 $Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
 $Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
 $Env:HCIBoxIconDir = "C:\HCIBox\Icons"
@@ -67,7 +79,7 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\Bootstrap.log
 $ErrorActionPreference = 'SilentlyContinue'
 
 # Copy PowerShell Profile and Reload
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
 
 # Extending C:\ partition to the maximum size
@@ -109,16 +121,16 @@ Remove-Item .\AzureCLI.msi
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HCIBoxWACDir\WindowsAdminCenter.msi
-Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBoxLogonScript.ps1") -OutFile $Env:HCIBoxDir\HCIBoxLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HCIBoxDir\New-HCIBoxCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HCIBoxDir\Register-AzSHCI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HCIBoxDir\Deploy-AKS.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-AKS.ps1") -OutFile $Env:HCIBoxDir\Uninstall-AKS.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-ResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Uninstall-ResourceBridge.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-GitOps.ps1") -OutFile $Env:HCIBoxDir\Deploy-GitOps.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $Env:HCIBoxDir\HCIBoxLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $Env:HCIBoxDir\New-HCIBoxCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Register-AzSHCI.ps1") -OutFile $Env:HCIBoxDir\Register-AzSHCI.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-AKS.ps1") -OutFile $Env:HCIBoxDir\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-AKS.ps1") -OutFile $Env:HCIBoxDir\Uninstall-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-ArcResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-ResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Uninstall-ResourceBridge.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-GitOps.ps1") -OutFile $Env:HCIBoxDir\Deploy-GitOps.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/GetServiceAccountBearerToken.ps1") -OutFile $Env:HCIBoxDir\GetServiceAccountBearerToken.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HCIBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerRESTWrappers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
@@ -128,7 +140,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -Ou
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressUI.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HCIBoxSDNDir\Single-NC.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
-Invoke-WebRequest ($templateBaseUrl + "artifacts/GetServiceAccountBearerToken.ps1") -OutFile $Env:HCIBoxDir\GetServiceAccountBearerToken.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $Env:HCIBoxDir\jumpstart-user-secret.yaml
 
 # Replace password and DNS placeholder

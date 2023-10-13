@@ -2,20 +2,38 @@
 
     # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
     
-    # Version 1.0.0
+    # HCIBox Folders
+    HCIBoxPaths = @{
+        HCIBoxLogsDir = "C:\HCIBox\Logs"
+        HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+        HCIBoxIconDir = "C:\HCIBox\Icons"
+        HCIBoxVHDDir = "C:\HCIBox\VHD"
+        HCIBoxSDNDir = "C:\HCIBox\SDN"
+        HCIBoxKVDir = "C:\HCIBox\KeyVault"
+        HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+        agentScript = "C:\HCIBox\agentScript"
+        ToolsDir = "C:\Tools"
+        tempDir = "C:\Temp"
+        VMPath = "C:\VMs"
+
+    }
+
+    HostVMDriveLetter = "V"
+    HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
+    guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
+    azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
 
     # HCI host names
     HostList                             = "AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
 
     # VHDX Paths 
-    guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
-    azsHCIVHDXPath                       = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
+
     
     # SDN Lab Admin Password
     SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
 
     # VM Configuration
-    HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
+    
     NestedVMMemoryinGB                   = 105GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.

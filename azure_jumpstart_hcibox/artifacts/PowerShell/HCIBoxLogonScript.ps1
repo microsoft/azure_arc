@@ -1,3 +1,16 @@
+# Script runtime environment: Level-0 Azure virtual machine ("Client VM")
+$ProgressPreference = "SilentlyContinue"
+Set-PSDebug -Strict
+Start-Transcript -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
+
+#####################################################################
+# Initialize the environment
+#####################################################################
+
+# Load config file
+$ConfigurationDataFile = "C:\HCIBox\"
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
 $Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
@@ -13,8 +26,11 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
+
+#####################################################################
+# Setup Azure CLI
+#####################################################################
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
 
 if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -24,6 +40,22 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
+# Login to Azure CLI with service principal provided by user
+Write-Header "Az CLI Login"
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+#####################################################################
+# Setup Azure PowerShell and register Azure providers
+#####################################################################
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+
+#####################################################################
+# Configure virtualization infrastructure
+#####################################################################
+
 # Configure storage pools and data disks
 Write-Header "Configuring storage"
 New-StoragePool -FriendlyName AsHciPool -StorageSubSystemFriendlyName '*storage*' -PhysicalDisks (Get-PhysicalDisk -CanPool $true)
@@ -32,16 +64,15 @@ $diskNum = $disks.Count
 New-VirtualDisk -StoragePoolFriendlyName AsHciPool -FriendlyName AsHciDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
 $vDisk = Get-VirtualDisk -FriendlyName AsHciDisk
 if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
-    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $HCIBoxConfig. -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
     $vDisk | Get-Disk | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 New-Item -Path "V:\" -Name "VMs" -ItemType "directory"
 
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+
 
 # Register Azure providers
 Write-Header "Registering Providers"
