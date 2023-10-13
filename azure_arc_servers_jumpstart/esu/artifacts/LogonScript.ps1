@@ -268,7 +268,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Host "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-    Invoke-Command -ComputerName $vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $SQLCreds
+    Invoke-Command -ComputerName $vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation, -vmName $Using:vmName } -Credential $SQLCreds
 
     }
 
@@ -369,7 +369,8 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
       
             # Onboarding the nested VMs as Azure Arc-enabled SQL Server
             Write-Host "Onboarding the nested SQL VMs as Azure Arc-enabled SQL server"
-            Invoke-Command -ComputerName $site.Value.vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $SQLCreds
+            $vmName =  $site.Value.vmName
+            Invoke-Command -ComputerName $site.Value.vmName -ScriptBlock { powershell -File $Using:nestedVMESUDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation, -vmName $Using:vmName } -Credential $SQLCreds
           }
         }
     }

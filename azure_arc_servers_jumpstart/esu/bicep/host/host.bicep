@@ -98,7 +98,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_E32s_v5'
+      vmSize: 'Standard_E8ads_v5'
     }
     storageProfile: {
       osDisk: {
