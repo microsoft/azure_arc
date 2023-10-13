@@ -49,6 +49,7 @@ New-Item -Path $HCIPath -ItemType directory -Force
 
 # Downloading configuration file
 $ConfigurationDataFile = "$HCIPath\HCIBox-Config.psd1"
+[System.Environment]::SetEnvironmentVariable('HCIBoxConfigFile', $ConfigurationDataFile,[System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBox-Config.psd1") -OutFile $ConfigurationDataFile
 
 # Importing configuration data
