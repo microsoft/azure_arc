@@ -11,6 +11,7 @@
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::Ssl3
 [Net.ServicePointManager]::SecurityProtocol = "Tls, Tls11, Tls12, Ssl3"
 
+$licenseType="Paid"
 try {
 		Invoke-WebRequest -Uri https://aka.ms/AzureExtensionForSQLServer -OutFile AzureExtensionForSQLServer.msi
 }
@@ -30,7 +31,7 @@ try {
     & "$env:ProgramW6432\AzureExtensionForSQLServer\AzureExtensionForSQLServer.exe" --subId $subscriptionId `
     --resourceGroup $resourceGroup --location $Azurelocation `
     --tenantid $spnTenantId --service-principal-app-id $spnClientId `
-    --service-principal-secret $spnClientSecret --licenseType Paid  
+    --service-principal-secret $spnClientSecret --licenseType $licenseType --machineName $vmName
 	
 
 	if($LASTEXITCODE -eq 0){
