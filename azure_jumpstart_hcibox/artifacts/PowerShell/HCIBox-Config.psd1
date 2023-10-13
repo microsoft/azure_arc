@@ -4,19 +4,38 @@
     
     # HCIBox Folders
     HCIBoxPaths = @{
-        HCIBoxLogsDir = "C:\HCIBox\Logs"
-        HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-        HCIBoxIconDir = "C:\HCIBox\Icons"
-        HCIBoxVHDDir = "C:\HCIBox\VHD"
-        HCIBoxSDNDir = "C:\HCIBox\SDN"
-        HCIBoxKVDir = "C:\HCIBox\KeyVault"
-        HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-        agentScript = "C:\HCIBox\agentScript"
+        LogsDir = "C:\HCIBox\Logs"
+        VMDir = "C:\HCIBox\Virtual Machines"
+        IconDir = "C:\HCIBox\Icons"
+        VHDDir = "C:\HCIBox\VHD"
+        SDNDir = "C:\HCIBox\SDN"
+        KVDir = "C:\HCIBox\KeyVault"
+        WACDir = "C:\HCIBox\Windows Admin Center"
+        AgentScriptDir = "C:\HCIBox\agentScript"
         ToolsDir = "C:\Tools"
-        tempDir = "C:\Temp"
+        TempDir = "C:\Temp"
         VMPath = "C:\VMs"
 
     }
+
+    ChocolateyPackagesList = @(
+        'az.powershell',
+        'kubernetes-cli',
+        'vcredist140',
+        'microsoft-edge',
+        'azcopy10',
+        'vscode',
+        'git',
+        '7zip',
+        'kubectx',
+        'terraform',
+        'putty.install',
+        'kubernetes-helm',
+        'dotnet-sdk',
+        'setdefaultbrowser',
+        'zoomit',
+        'azure-data-studio'
+    )
 
     HostVMDriveLetter = "V"
     HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
