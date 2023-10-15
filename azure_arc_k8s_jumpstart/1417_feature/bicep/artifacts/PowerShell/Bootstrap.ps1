@@ -32,6 +32,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -Ou
 $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
+$Ft1PowerShellDir  = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {
@@ -77,9 +78,9 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 ##############################################################
 # Download artifacts
 ##############################################################
-[System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1Directory\PowerShell\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$Ft1Directory\PowerShell\LogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1Directory\PowerShell\Ft1Config.psd1"
+[System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1PowerShellDir\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$Ft1PowerShellDir\LogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1PowerShellDir\Ft1Config.psd1"
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
 
@@ -207,7 +208,7 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 
 # Creating scheduled task for LogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Ft1Directory\PowerShell\LogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Ft1PowerShellDir\LogonScript.ps1"
 Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
