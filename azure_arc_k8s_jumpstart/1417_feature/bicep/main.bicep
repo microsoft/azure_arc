@@ -9,11 +9,11 @@ param vmName string = 'AKS-EE-Demo'
 param kubernetesDistribution string = 'k3s'
 
 @description('Username for the Virtual Machine.')
-param adminUsername string = 'arcdemo'
+param windowsAdminUsername string = 'arcdemo'
 
 @description('Windows password for the Virtual Machine')
 @secure()
-param adminPassword string
+param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version.')
 param windowsOSVersion string = '2022-datacenter-g2'
@@ -60,13 +60,13 @@ param subnetName string = 'Subnet'
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'AKS-EE-Demo-NSG'
 param resourceTags object = {
-  Project: 'jumpstart_azure_arc_servers'
+  Project: 'jumpstart_azure_ft1'
 }
 
 @description('Deploy Windows Node for AKS Edge Essentials')
 param windowsNode bool = false
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/1417_feature/bicep/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var bastionSubnetName = 'AzureBastionSubnet'
@@ -197,8 +197,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
     }
     osProfile: {
       computerName: vmName
-      adminUsername: adminUsername
-      adminPassword: adminPassword
+      adminUsername: windowsAdminUsername
+      adminPassword: windowsAdminPassword
       windowsConfiguration: {
         provisionVMAgent: true
         enableAutomaticUpdates: false
@@ -207,7 +207,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
 }
 
-resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+resource Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
@@ -221,16 +221,19 @@ resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+        uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${adminUsername} -spnClientId ${spnClientId} -password ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
     }
   }
 }
 
-resource vmName_InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+resource InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vm
   name: 'InstallWindowsFeatures'
+  dependsOn: [
+    Bootstrap
+  ]
   location: location
   properties: {
     publisher: 'Microsoft.Powershell'
@@ -240,7 +243,7 @@ resource vmName_InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extens
     settings: {
       wmfVersion: 'latest'
       configuration: {
-        url: uri(templateBaseUrl, 'artifacts/DSCInstallWindowsFeatures.zip')
+        url: uri(templateBaseUrl, 'artifacts/Settings/DSCInstallWindowsFeatures.zip')
         script: 'DSCInstallWindowsFeatures.ps1'
         function: 'InstallWindowsFeatures'
       }
@@ -272,5 +275,5 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
   ]
 }
 
-output adminUsername string = adminUsername
+output windowsAdminUsername string = windowsAdminUsername
 output publicIP string = concat(publicIpAddress.properties.ipAddress)
