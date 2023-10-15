@@ -1,4 +1,15 @@
-Start-Transcript -Path C:\Temp\LogonScript.log
+$ProgressPreference = "SilentlyContinue"
+Set-PSDebug -Strict
+
+#####################################################################
+# Initialize the environment
+#####################################################################
+$Ft1Config           = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
+$Ft1TempDir         = $Ft1Config.Ft1Directories["Ft1TempDir"]
+$Ft1IconsDir         = $Ft1Config.Ft1Directories["Ft1IconDir"]
+$Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
+
+Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
 
 ## Deploy AKS EE
 
@@ -30,15 +41,15 @@ Write-Host "Fetching the latest AKS Edge Essentials release."
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
 $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
-$output = Join-Path "C:\temp" "$latestReleaseTag.zip"
+$output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath "C:\temp" -Force
-$AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
+Expand-Archive $output -DestinationPath $Ft1TempDir -Force
+$AKSEEReleaseConfigFilePath = "$Ft1TempDir\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
 $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
 $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
 # Clean up the downloaded release files
 Remove-Item -Path $output -Force
-Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
+Remove-Item -Path "$Ft1TempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
 # Here string for the json content
 $aideuserConfig = @"
@@ -343,7 +354,7 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Changing to Client VM wallpaper
-$imgPath = "C:\Temp\wallpaper.png"
+$imgPath = "$Ft1TempDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
