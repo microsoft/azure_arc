@@ -10,8 +10,6 @@ $Ft1IconsDir         = $Ft1Config.Ft1Directories["Ft1IconDir"]
 $Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
 $websiteUrls         = $Ft1Config.URLs
 $aksEEReleasesUrl    = $websiteUrls["aksEEReleases"]
-$aksEEDownloadUrl    = $websiteUrls["aksEEDownload"]
-$aksEEDeployModules  = $websiteUrls["aksEEDeployModules"]
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
 $startTime = Get-Date
@@ -43,7 +41,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
-$AKSEEReleaseDownloadUrl = "$aksEEDownloadUrl/$latestReleaseTag.zip"
+$AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
 $output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath $Ft1TempDir -Force
@@ -135,7 +133,7 @@ if ($env:windowsNode -eq $true) {
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "$aksEEDeployModules/$aksEdgeDeployModules.zip"
+$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
 $installDir = "C:\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
