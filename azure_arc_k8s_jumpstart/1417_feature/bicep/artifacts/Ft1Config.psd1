@@ -9,7 +9,7 @@
         Ft1IconDir         = "C:\Ft1\Icons"
         Ft1ToolsDir        = "C:\Tools"
         Ft1TempDir         = "C:\Temp"
-        Ft1VHDXDir         = "V:\VMs"
+        Ft1VHDXDir         = "C:\VMs"
         Ft1ConfigMapDir    = "C:\Ft1\ConfigMaps"
         Ft1AppsRepo        = "C:\Ft1\AppsRepo"
         Ft1DataEmulator    = "C:\Ft1\DataEmulator"
