@@ -11,11 +11,11 @@ $Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
 $Ft1ToolsDir         = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls         = $Ft1Config.URLs
 $aksEEReleasesUrl    = $websiteUrls["aksEEReleases"]
-$resourceGroup       = $resourceGroup
+$resourceGroup       = $Env:resourceGroup
 $location            = $Env:location
-$spnClientId         = $spnClientID
-$spnClientSecret     = $spnClientSecret
-$spnTenantId         = $spnTenantId
+$spnClientId         = $Env:spnClientID
+$spnClientSecret     = $Env:spnClientSecret
+$spnTenantId         = $Env:spnTenantId
 $subscriptionId      = $Env:subscriptionId
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
