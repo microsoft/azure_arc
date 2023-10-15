@@ -4,31 +4,27 @@ Set-PSDebug -Strict
 #####################################################################
 # Initialize the environment
 #####################################################################
-$Ft1Config           = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
-$Ft1TempDir          = $Ft1Config.Ft1Directories["Ft1TempDir"]
-$Ft1IconsDir         = $Ft1Config.Ft1Directories["Ft1IconDir"]
-$Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
-$Ft1ToolsDir         = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$websiteUrls         = $Ft1Config.URLs
-$aksEEReleasesUrl    = $websiteUrls["aksEEReleases"]
-$resourceGroup       = $Env:resourceGroup
-$location            = $Env:location
-$spnClientId         = $Env:spnClientID
-$spnClientSecret     = $Env:spnClientSecret
-$spnTenantId         = $Env:spnTenantId
-$subscriptionId      = $Env:subscriptionId
+$Ft1Config                  = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
+$Ft1TempDir                 = $Ft1Config.Ft1Directories["Ft1TempDir"]
+$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
+$Ft1AppsRepo                = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
+$Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
+$websiteUrls                = $Ft1Config.URLs
+$aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
+$resourceGroup              = $Env:resourceGroup
+$location                   = $Env:location
+$spnClientId                = $Env:spnClientId
+$spnClientSecret            = $Env:spnClientSecret
+$spnTenantId                = $Env:spnTenantId
+$subscriptionId             = $Env:subscriptionId
+$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
+$schemaVersion              = "1.1"
+$versionAksEdgeConfig       = "1.0"
+$aksEdgeDeployModules       = "main"
+
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
 $startTime = Get-Date
-## Deploy AKS EE
-
-# Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
-$schemaVersion = "1.1"
-$versionAksEdgeConfig = "1.0"
-$aksEdgeDeployModules = "main"
-
-# Requires -RunAsAdministrator
 
 New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
@@ -145,6 +141,11 @@ $zipFile = "$aksEdgeDeployModules.zip"
 $installDir = "$Ft1ToolsDir\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
 
+if (-not (Test-Path -Path $installDir)) {
+    Write-Host "Creating $installDir..."
+    New-Item -Path "$installDir" -ItemType Directory | Out-Null
+}
+
 Push-Location $installDir
 
 Write-Host "`n"
@@ -228,6 +229,9 @@ Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service 
 az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId
 az account set --subscription $subscriptionId
 
+# Installing Azure CLI extensions
+az extension add --name connectedk8s --version 1.3.17
+
 # Making extension install dynamic
 if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($Ft1Config.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -254,7 +258,7 @@ $subscriptionId = (Get-AzSubscription).Id
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
     foreach ($module in $Ft1Config.PowerShellModules) {
-        Install-Module -Name $module -Force | Out-File -Append -FilePath ($Ft1Config.AgDirectories["Ft1LogsDir"] + "\AzPowerShell.log")
+        Install-Module -Name $module -Force
     }
 }
 
@@ -278,18 +282,18 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$Env:arcClusterName = "$resourceGroup-$guid"
+$arcClusterName = "$resourceGroup-$guid"
 
 
 if ($env:kubernetesDistribution -eq "k8s") {
-    az connectedk8s connect --name $Env:arcClusterName `
+    az connectedk8s connect --name $arcClusterName `
     --resource-group $resourceGroup `
     --location $location `
     --distribution aks_edge_k8s `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 } else {
-    az connectedk8s connect --name $Env:arcClusterName `
+    az connectedk8s connect --name $arcClusterName `
     --resource-group $resourceGroup `
     --location $location `
     --distribution aks_edge_k3s `
@@ -304,7 +308,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Create Azure Monitor for containers Ku
 Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
-$workspaceName = ($Env:arcClusterName).ToLower()
+$workspaceName = ($arcClusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
     --resource-group $resourceGroup `
     --workspace-name "$workspaceName-law" `
@@ -313,7 +317,7 @@ $workspaceResourceId = az monitor log-analytics workspace create `
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" `
-    --cluster-name $Env:arcClusterName `
+    --cluster-name $arcClusterName `
     --resource-group $resourceGroup `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
@@ -324,7 +328,7 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Write-Host "Creating Azure Defender Kubernetes extension..."
 # Write-Host "`n"
 # az k8s-extension create --name "azure-defender" `
-#                         --cluster-name $Env:arcClusterName `
+#                         --cluster-name $arcClusterName `
 #                         --resource-group $resourceGroup `
 #                         --cluster-type connectedClusters `
 #                         --extension-type Microsoft.AzureDefender.Kubernetes
@@ -334,7 +338,7 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Write-Host "Create Azure Policy extension..."
 # Write-Host "`n"
 # az k8s-extension create --cluster-type connectedClusters `
-#                         --cluster-name $Env:arcClusterName `
+#                         --cluster-name $arcClusterName `
 #                         --resource-group $resourceGroup `
 #                         --extension-type Microsoft.PolicyInsights `
 #                         --name azurepolicy
@@ -363,10 +367,10 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 
 # Run connect command
 & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-    --service-principal-id $env:appId `
-    --service-principal-secret $env:password `
+    --service-principal-id $spnClientId `
+    --service-principal-secret $spnClientSecret `
     --resource-group $resourceGroup `
-    --tenant-id $env:tenantId `
+    --tenant-id $spnTenantId `
     --location $location `
     --subscription-id $subscriptionId `
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
