@@ -5,6 +5,7 @@
     Ft1Directories           = @{
         Ft1Dir             = "C:\Ft1"
         Ft1LogsDir         = "C:\Ft1\Logs"
+        Ft1PowerShellDir   = "C:\Ft1\PowerShell"
         Ft1ToolsDir        = "C:\Tools"
         Ft1TempDir         = "C:\Temp"
         Ft1ConfigMapDir    = "C:\Ft1\ConfigMaps"
@@ -71,7 +72,6 @@
 
     # VSCode extensions
     VSCodeExtensions        = @(
-        'ms-vscode-remote.remote-containers',
         'ms-vscode-remote.remote-wsl',
         'ms-vscode.powershell',
         'redhat.vscode-yaml',
