@@ -58,7 +58,6 @@
         'az.powershell',
         'kubernetes-cli',
         'vcredist140',
-        'microsoft-edge',
         'azcopy10',
         'vscode',
         'git',
