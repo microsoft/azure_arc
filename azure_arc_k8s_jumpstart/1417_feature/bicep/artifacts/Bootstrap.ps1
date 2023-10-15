@@ -71,11 +71,17 @@ Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.lo
 
 $ErrorActionPreference = "SilentlyContinue"
 
-# Downloading GitHub artifacts
+##############################################################
+# Get latest Grafana OSS release
+##############################################################
+$latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.replace('v', '')
+
+##############################################################
+# Download artifacts
+##############################################################
 [System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1Directory\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
-
 
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$Ft1ToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
@@ -121,11 +127,6 @@ foreach ($url in $websiteUrls.Values) {
   
     Test-Url $url -maxRetries $maxRetries -retryDelaySeconds $retryDelaySeconds
 }
-
-##############################################################
-# Get latest Grafana OSS release
-##############################################################
-$latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.replace('v', '')
 
 ##############################################################
 # Install Chocolatey packages

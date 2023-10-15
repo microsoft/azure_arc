@@ -5,9 +5,13 @@ Set-PSDebug -Strict
 # Initialize the environment
 #####################################################################
 $Ft1Config           = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
-$Ft1TempDir         = $Ft1Config.Ft1Directories["Ft1TempDir"]
+$Ft1TempDir          = $Ft1Config.Ft1Directories["Ft1TempDir"]
 $Ft1IconsDir         = $Ft1Config.Ft1Directories["Ft1IconDir"]
 $Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
+$websiteUrls         = $Ft1Config.URLs
+$aksEEReleasesUrl    = $websiteUrls["aksEEReleases"]
+$aksEEDownloadUrl    = $websiteUrls["aksEEDownload"]
+$aksEEDeployModules  = $websiteUrls["aksEEDeployModules"]
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
 
@@ -18,7 +22,6 @@ $AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
-$aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
 
 # Requires -RunAsAdministrator
 
@@ -40,7 +43,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 Write-Host "Fetching the latest AKS Edge Essentials release."
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
-$AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
+$AKSEEReleaseDownloadUrl = "$aksEEDownloadUrl/$latestReleaseTag.zip"
 $output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath $Ft1TempDir -Force
@@ -132,7 +135,7 @@ if ($env:windowsNode -eq $true) {
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
-$url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
+$url = "$aksEEDeployModules/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
 $installDir = "C:\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
@@ -171,7 +174,7 @@ Set-Content -Path $aksedgejson -Value $aksedgeConfig -Force
 $aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurse).FullName
 . $aksedgeShell
 
-# Download, install and deploy AKS EE 
+# Download, install and deploy AKS EE
 Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
 # invoke the workflow, the json file already stored above.
 $retval = Start-AideWorkflow -jsonFile $aidejson
@@ -208,46 +211,62 @@ Write-Host "`n"
 # az version
 az -v
 
-# Login as service principal
-az login --service-principal --username $Env:appId --password $Env:password --tenant $Env:tenantId
+#####################################################################
+# Setup Azure CLI
+#####################################################################
+Write-Host "Configuring Azure CLI"
+$cliDir = New-Item -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\.cli\") -Name ".ft1" -ItemType Directory
 
-# Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
-# Principal has access to multiple subscriptions, which can break the automation logic
+if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
+    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
+    $folder.Attributes += [System.IO.FileAttributes]::Hidden
+}
+
+$Env:AZURE_CONFIG_DIR = $cliDir.FullName
+
+Write-Host "Logging into Az CLI using the service principal and secret provided at deployment"
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 az account set --subscription $Env:subscriptionId
 
-# Installing Azure CLI extensions
 # Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-Write-Host "Installing Azure CLI extensions"
-az extension add --name connectedk8s --version 1.3.17
-az extension add --name k8s-extension
-Write-Host "`n"
+if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
+    Write-Host "Installing Azure CLI extensions: " ($Ft1Config.AzCLIExtensions -join ', ')
+    az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+    # Installing Azure CLI extensions
+    foreach ($extension in $Ft1Config.AzCLIExtensions) {
+        az extension add --name $extension --system --only-show-errors
+    }
+}
 
-# Registering Azure Arc providers
-Write-Host "Registering Azure Arc providers, hold tight..."
-Write-Host "`n"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
-az provider register --namespace Microsoft.HybridConnectivity --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
+Write-Host "Az CLI configuration complete!"
+Write-Host
 
-az provider show --namespace Microsoft.Kubernetes -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.HybridCompute -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.GuestConfiguration -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.HybridConnectivity -o table
-Write-Host "`n"
-az provider show --namespace Microsoft.ExtendedLocation -o table
-Write-Host "`n"
+#####################################################################
+# Setup Azure PowerShell and register providers
+#####################################################################
+Write-Host "Configuring Azure PowerShell"
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+$subscriptionId = (Get-AzSubscription).Id
+
+# Install PowerShell modules
+if ($Ft1Config.PowerShellModules.Count -ne 0) {
+    Write-Host "Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
+    foreach ($module in $Ft1Config.PowerShellModules) {
+        Install-Module -Name $module -Force | Out-File -Append -FilePath ($Ft1Config.AgDirectories["Ft1LogsDir"] + "\AzPowerShell.log")
+    }
+}
+
+# Register Azure providers
+if ($Ft1Config.AzureProviders.Count -ne 0) {
+    Write-Host "Registering Azure providers in the current subscription: " ($Ft1Config.AzureProviders -join ', ')
+    foreach ($provider in $Ft1Config.AzureProviders) {
+        Register-AzResourceProvider -ProviderNamespace $provider
+    }
+}
+Write-Host "Azure PowerShell configuration and resource provider registration complete!"
+Write-Host
 
 # Onboarding the cluster to Azure Arc
 Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
