@@ -14,7 +14,7 @@ $aksEEDownloadUrl    = $websiteUrls["aksEEDownload"]
 $aksEEDeployModules  = $websiteUrls["aksEEDeployModules"]
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
-
+$startTime = Get-Date
 ## Deploy AKS EE
 
 # Parameters
@@ -28,7 +28,7 @@ $aksEdgeDeployModules = "main"
 New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
 if (! [Environment]::Is64BitProcess) {
-    Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
+    Write-Host "[$(Get-Date -Format t)] Error: Run this in 64bit Powershell session" -ForegroundColor Red
     exit -1
 }
 
@@ -40,7 +40,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "flannel"
 }
 
-Write-Host "Fetching the latest AKS Edge Essentials release."
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
 $AKSEEReleaseDownloadUrl = "$aksEEDownloadUrl/$latestReleaseTag.zip"
@@ -141,14 +141,14 @@ $installDir = "C:\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
 
 if (-not (Test-Path -Path $installDir)) {
-    Write-Host "Creating $installDir..."
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating $installDir..." -ForegroundColor Gray
     New-Item -Path "$installDir" -ItemType Directory | Out-Null
 }
 
 Push-Location $installDir
 
 Write-Host "`n"
-Write-Host "About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Green
+Write-Host "[$(Get-Date -Format t)] INFO: About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Gray
 Write-Host "`n"
 
 try {
@@ -156,7 +156,7 @@ try {
     download2
 }
 catch {
-    Write-Host "Error: Downloading Aide Powershell Modules failed" -ForegroundColor Red
+    Write-Host "[$(Get-Date -Format t)] ERROR: Downloading Aide Powershell Modules failed" -ForegroundColor Red
     Stop-Transcript | Out-Null
     Pop-Location
     exit -1
@@ -175,14 +175,14 @@ $aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurs
 . $aksedgeShell
 
 # Download, install and deploy AKS EE
-Write-Host "Step 2: Download, install and deploy AKS Edge Essentials"
+Write-Host "[$(Get-Date -Format t)] INFO: Step 2: Download, install and deploy AKS Edge Essentials" -ForegroundColor Gray
 # invoke the workflow, the json file already stored above.
 $retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
-    Write-Host "Deployment Successful. "
+    Write-Host "[$(Get-Date -Format t)] INFO: Deployment Successful. " -ForegroundColor Green
 } else {
-    Write-Error -Message "Deployment failed" -Category OperationStopped
+    Write-Host -Message "[$(Get-Date -Format t)] Error: Deployment failed" -Category OperationStopped
     Stop-Transcript | Out-Null
     Pop-Location
     exit -1
@@ -203,7 +203,7 @@ if ($env:windowsNode -eq $true) {
 }
 
 Write-Host "`n"
-Write-Host "Checking kubernetes nodes"
+Write-Host "[$(Get-Date -Format t)] INFO: Checking kubernetes nodes" -ForegroundColor Gray
 Write-Host "`n"
 kubectl get nodes -o wide
 Write-Host "`n"
@@ -214,7 +214,7 @@ az -v
 #####################################################################
 # Setup Azure CLI
 #####################################################################
-Write-Host "Configuring Azure CLI"
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI" -ForegroundColor DarkGreen
 $cliDir = New-Item -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\.cli\") -Name ".ft1" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -224,13 +224,13 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-Write-Host "Logging into Az CLI using the service principal and secret provided at deployment"
+Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 az account set --subscription $Env:subscriptionId
 
 # Making extension install dynamic
 if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
-    Write-Host "Installing Azure CLI extensions: " ($Ft1Config.AzCLIExtensions -join ', ')
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($Ft1Config.AzCLIExtensions -join ', ') -ForegroundColor Gray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $Ft1Config.AzCLIExtensions) {
@@ -238,13 +238,13 @@ if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
     }
 }
 
-Write-Host "Az CLI configuration complete!"
+Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
 Write-Host
 
 #####################################################################
 # Setup Azure PowerShell and register providers
 #####################################################################
-Write-Host "Configuring Azure PowerShell"
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell" -ForegroundColor DarkGreen
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
@@ -252,7 +252,7 @@ $subscriptionId = (Get-AzSubscription).Id
 
 # Install PowerShell modules
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
-    Write-Host "Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
     foreach ($module in $Ft1Config.PowerShellModules) {
         Install-Module -Name $module -Force | Out-File -Append -FilePath ($Ft1Config.AgDirectories["Ft1LogsDir"] + "\AzPowerShell.log")
     }
@@ -260,16 +260,16 @@ if ($Ft1Config.PowerShellModules.Count -ne 0) {
 
 # Register Azure providers
 if ($Ft1Config.AzureProviders.Count -ne 0) {
-    Write-Host "Registering Azure providers in the current subscription: " ($Ft1Config.AzureProviders -join ', ')
+    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($Ft1Config.AzureProviders -join ', ') -ForegroundColor Gray
     foreach ($provider in $Ft1Config.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
-Write-Host "Azure PowerShell configuration and resource provider registration complete!"
+Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
 
 # Onboarding the cluster to Azure Arc
-Write-Host "Onboarding the AKS Edge Essentials cluster to Azure Arc..."
+Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
 
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
@@ -300,7 +300,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 
 
 Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+Write-Host "[$(Get-Date -Format t)] INFO: Create Azure Monitor for containers Kubernetes extension instance" -ForegroundColor Gray
 Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
@@ -342,14 +342,14 @@ az k8s-extension create --name "azuremonitor-containers" `
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
 Write-Host "`n"
-Write-Host "Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM"
+Write-Host "[$(Get-Date -Format t)] INFO: Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM" -ForegroundColor Gray
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
 
 ## Azure Arc agent Installation
 Write-Host "`n"
-Write-Host "Onboarding the Azure VM to Azure Arc..."
+Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the Azure VM to Azure Arc..." -ForegroundColor Gray
 
 # Download the package
 function download1() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi }
@@ -400,5 +400,11 @@ Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 Stop-Process -Name powershell -Force
+
+$endTime = Get-Date
+$timeSpan = New-TimeSpan -Start $starttime -End $endtime
+Write-Host
+Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
+Write-Host
 
 Stop-Transcript
