@@ -11,6 +11,12 @@ $Ft1AppsRepo         = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
 $Ft1ToolsDir         = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls         = $Ft1Config.URLs
 $aksEEReleasesUrl    = $websiteUrls["aksEEReleases"]
+$resourceGroup       = $resourceGroup
+$location            = $Env:location
+$spnClientId         = $spnClientID
+$spnClientSecret     = $spnClientSecret
+$spnTenantId         = $spnTenantId
+$subscriptionId      = $Env:subscriptionId
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
 $startTime = Get-Date
@@ -61,10 +67,10 @@ $aideuserConfig = @"
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
     "Azure": {
-        "SubscriptionId": "$env:subscriptionId",
+        "SubscriptionId": "$subscriptionId",
         "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$env:resourceGroup",
-        "Location": "$env:location"
+        "ResourceGroupName": "$resourceGroup",
+        "Location": "$location"
     },
     "AksEdgeConfigFile": "aksedge-config.json"
 }
@@ -136,13 +142,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
 $url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
-$installDir = "C:\AksEdgeScript"
+$installDir = "$Ft1ToolsDir\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
-
-if (-not (Test-Path -Path $installDir)) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating $installDir..." -ForegroundColor Gray
-    New-Item -Path "$installDir" -ItemType Directory | Out-Null
-}
 
 Push-Location $installDir
 
@@ -224,8 +225,8 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-az account set --subscription $Env:subscriptionId
+az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId
+az account set --subscription $subscriptionId
 
 # Making extension install dynamic
 if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
@@ -244,9 +245,9 @@ Write-Host
 # Setup Azure PowerShell and register providers
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell" -ForegroundColor DarkGreen
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal
 $subscriptionId = (Get-AzSubscription).Id
 
 # Install PowerShell modules
@@ -277,20 +278,20 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$Env:arcClusterName = "$Env:resourceGroup-$guid"
+$Env:arcClusterName = "$resourceGroup-$guid"
 
 
 if ($env:kubernetesDistribution -eq "k8s") {
     az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
+    --resource-group $resourceGroup `
+    --location $location `
     --distribution aks_edge_k8s `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 } else {
     az connectedk8s connect --name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $env:location `
+    --resource-group $resourceGroup `
+    --location $location `
     --distribution aks_edge_k3s `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
@@ -305,7 +306,7 @@ Write-Host "`n"
 # Deploying Azure log-analytics workspace
 $workspaceName = ($Env:arcClusterName).ToLower()
 $workspaceResourceId = az monitor log-analytics workspace create `
-    --resource-group $Env:resourceGroup `
+    --resource-group $resourceGroup `
     --workspace-name "$workspaceName-law" `
     --query id -o tsv
 
@@ -313,7 +314,7 @@ $workspaceResourceId = az monitor log-analytics workspace create `
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" `
     --cluster-name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
+    --resource-group $resourceGroup `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
@@ -324,7 +325,7 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Write-Host "`n"
 # az k8s-extension create --name "azure-defender" `
 #                         --cluster-name $Env:arcClusterName `
-#                         --resource-group $Env:resourceGroup `
+#                         --resource-group $resourceGroup `
 #                         --cluster-type connectedClusters `
 #                         --extension-type Microsoft.AzureDefender.Kubernetes
 
@@ -334,7 +335,7 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Write-Host "`n"
 # az k8s-extension create --cluster-type connectedClusters `
 #                         --cluster-name $Env:arcClusterName `
-#                         --resource-group $Env:resourceGroup `
+#                         --resource-group $resourceGroup `
 #                         --extension-type Microsoft.PolicyInsights `
 #                         --name azurepolicy
 
@@ -364,15 +365,15 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
     --service-principal-id $env:appId `
     --service-principal-secret $env:password `
-    --resource-group $env:resourceGroup `
+    --resource-group $resourceGroup `
     --tenant-id $env:tenantId `
-    --location $env:location `
-    --subscription-id $env:subscriptionId `
+    --location $location `
+    --subscription-id $subscriptionId `
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Changing to Client VM wallpaper
-$imgPath = "$Ft1TempDir\wallpaper.png"
+$imgPath = "$Ft1Directory\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
