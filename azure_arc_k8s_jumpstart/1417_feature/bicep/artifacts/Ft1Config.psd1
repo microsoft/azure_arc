@@ -5,11 +5,8 @@
     Ft1Directories           = @{
         Ft1Dir             = "C:\Ft1"
         Ft1LogsDir         = "C:\Ft1\Logs"
-        Ft1VMDir           = "C:\Ft1\Virtual Machines"
-        Ft1IconDir         = "C:\Ft1\Icons"
         Ft1ToolsDir        = "C:\Tools"
         Ft1TempDir         = "C:\Temp"
-        Ft1VHDXDir         = "C:\VMs"
         Ft1ConfigMapDir    = "C:\Ft1\ConfigMaps"
         Ft1AppsRepo        = "C:\Ft1\AppsRepo"
         Ft1DataEmulator    = "C:\Ft1\DataEmulator"
@@ -21,7 +18,6 @@
         chocoInstallScript = 'https://chocolatey.org/install.ps1'
         wslUbuntu          = 'https://aka.ms/wslubuntu'
         wslStoreStorage    = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
-        docker             = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
         githubAPI          = 'https://api.github.com'
         grafana            = 'https://api.github.com/repos/grafana/grafana/releases/latest'
         azurePortal        = 'https://portal.azure.com'
