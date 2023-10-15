@@ -173,6 +173,14 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
 }
 
+##############################################################
+# Install Azure CLI (64-bit not available via Chocolatey)
+##############################################################
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
+
 # Enable VirtualMachinePlatform feature, the vm reboot will be done in DSC extension
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 
