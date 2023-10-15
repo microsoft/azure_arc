@@ -30,8 +30,6 @@
         vcLibs             = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
         aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
-        aksEEDownload      = 'https://github.com/Azure/AKS-Edge/archive/refs/tags'
-        aksEEDeployModules = 'https://github.com/Azure/AKS-Edge/archive'
     }
 
     # Azure required registered resource providers
