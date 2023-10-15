@@ -66,9 +66,6 @@
         'kubectx',
         'putty.install',
         'kubernetes-helm',
-        'dotnet-sdk',
-        'zoomit',
-        'openssl.light',
         'mqtt-explorer',
         'gh'
     )
