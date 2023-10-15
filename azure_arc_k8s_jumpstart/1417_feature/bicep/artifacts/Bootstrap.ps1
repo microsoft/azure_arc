@@ -27,7 +27,7 @@ param (
 # Download configuration data file and declaring directories
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\Ft1Config.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Ft1Config.psd1") -OutFile $ConfigurationDataFile
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile $ConfigurationDataFile
 
 $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
@@ -78,8 +78,8 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 # Download artifacts
 ##############################################################
 [System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1Directory\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\Temp\LogonScript.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$Ft1Directory\PowerShell\LogonScript.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
 
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$Ft1ToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
@@ -137,7 +137,7 @@ $success = $false
 
 while (-not $success -and $retryCount -lt $maxRetries) {
     try {
-        Write-Header "Installing Chocolatey packages"
+        Write-Host "Installing Chocolatey packages"
         try {
             choco config get cacheLocation
         }
@@ -163,6 +163,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
         # If the maximum number of retries is not reached yet, display an error message
         if ($retryCount -lt $maxRetries) {
             Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
+            write-Host "Failed app: $app"
             Start-Sleep -Seconds $retryDelay
         }
         else {
@@ -205,7 +206,7 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 
 # Creating scheduled task for LogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\LogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Ft1Directory\PowerShell\LogonScript.ps1"
 Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
@@ -213,5 +214,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
-$logSuppress | Set-Content C:\Temp\Bootstrap.log -Force
+$logSuppress = Get-Content ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.log") | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
+$logSuppress | Set-Content ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.log") -Force
