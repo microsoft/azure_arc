@@ -32,8 +32,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Ft1Config.psd1") -OutFile $Conf
 $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$Ft1IconsDir = $Ft1Config.Ft1Directories["Ft1IconDir"]
-$Ft1MonitoringDir = $Ft1Config.Ft1Directories["Ft1MonitoringDir"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {
@@ -50,7 +48,7 @@ function BITSRequest {
             Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
         }
         [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
-        Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+        Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress;
     }
     Complete-BitsTransfer $download.JobId
     Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
@@ -95,7 +93,7 @@ Function Test-Url($url, $maxRetries = 3, $retryDelaySeconds = 5) {
         try {
             $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
             $statusCode = $response.StatusCode
-    
+
             if ($statusCode -eq 200) {
                 Write-Host "$url is reachable."
                 break  # Break out of the loop if website is reachable
@@ -107,24 +105,24 @@ Function Test-Url($url, $maxRetries = 3, $retryDelaySeconds = 5) {
         catch {
             Write-Host "An error occurred while testing the website: $url - $_"
         }
-    
+
         $retryCount++
         if ($retryCount -le $maxRetries) {
             Write-Host "Retrying in $retryDelaySeconds seconds..."
             Start-Sleep -Seconds $retryDelaySeconds
         }
     } while ($retryCount -le $maxRetries)
-    
+
     if ($retryCount -gt $maxRetries) {
         Write-Host "Exceeded maximum number of retries. Exiting..."
         exit 1  # Stop script execution if maximum retries reached
     }
 }
-  
+
 foreach ($url in $websiteUrls.Values) {
     $maxRetries = 3
     $retryDelaySeconds = 5
-  
+
     Test-Url $url -maxRetries $maxRetries -retryDelaySeconds $retryDelaySeconds
 }
 
@@ -147,14 +145,14 @@ while (-not $success -and $retryCount -lt $maxRetries) {
             Write-Output "Chocolatey not detected, trying to install now"
             Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($Ft1Config.URLs.chocoInstallScript))
         }
-    
+
         Write-Host "Chocolatey packages specified"
-    
+
         foreach ($app in $Ft1Config.ChocolateyPackagesList) {
             Write-Host "Installing $app"
             & choco install $app /y -Force | Write-Output
         }
-      
+
         # If the command succeeds, set $success to $true to exit the loop
         $success = $true
     }
@@ -215,5 +213,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content C:\Temp\Bootstrap.log -Force
