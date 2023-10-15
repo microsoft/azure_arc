@@ -207,7 +207,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
 }
 
-resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+resource Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
@@ -228,9 +228,12 @@ resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-
   }
 }
 
-resource vmName_InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
+resource InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
   parent: vm
   name: 'InstallWindowsFeatures'
+  dependsOn: [
+    Bootstrap
+  ]
   location: location
   properties: {
     publisher: 'Microsoft.Powershell'
