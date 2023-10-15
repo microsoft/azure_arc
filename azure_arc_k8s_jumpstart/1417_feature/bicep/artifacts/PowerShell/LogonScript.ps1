@@ -258,7 +258,7 @@ $subscriptionId = (Get-AzSubscription).Id
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
     foreach ($module in $Ft1Config.PowerShellModules) {
-        Install-Module -Name $module -Force
+        Install-Module -Name $module -Force -Confirm:$false
     }
 }
 
@@ -376,8 +376,18 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
+
+#############################################################
+# Install VSCode extensions
+#############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($Ft1Config.VSCodeExtensions -join ', ') -ForegroundColor Gray
+# Install VSCode extensions
+foreach ($extension in $Ft1Config.VSCodeExtensions) {
+    code --install-extension $extension 2>&1 | Out-Null
+}
+
 # Changing to Client VM wallpaper
-$imgPath = "$Ft1Directory\wallpaper.png"
+$imgPath = Join-Path $Ft1Config.Ft1Directories["Ft1Dir"] "wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
