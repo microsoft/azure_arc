@@ -221,7 +221,7 @@ resource vmName_Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+        uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
       commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -windowsAdminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -password ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl}'
     }
@@ -240,7 +240,7 @@ resource vmName_InstallWindowsFeatures 'Microsoft.Compute/virtualMachines/extens
     settings: {
       wmfVersion: 'latest'
       configuration: {
-        url: uri(templateBaseUrl, 'artifacts/DSCInstallWindowsFeatures.zip')
+        url: uri(templateBaseUrl, 'artifacts/Settings/DSCInstallWindowsFeatures.zip')
         script: 'DSCInstallWindowsFeatures.ps1'
         function: 'InstallWindowsFeatures'
       }
