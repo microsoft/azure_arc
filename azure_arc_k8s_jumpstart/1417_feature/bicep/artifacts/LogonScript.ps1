@@ -40,7 +40,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "flannel"
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
 $AKSEEReleaseDownloadUrl = "$aksEEDownloadUrl/$latestReleaseTag.zip"
