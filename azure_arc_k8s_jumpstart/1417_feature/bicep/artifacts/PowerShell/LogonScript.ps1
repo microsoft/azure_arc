@@ -18,6 +18,8 @@ $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
+$aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
+$aksEdgeNodes                   = $Ft1Config.AKSEEConfig["Nodes"]
 $aksEdgeDeployModules       = "main"
 
 
@@ -61,69 +63,25 @@ $aideuserConfig.Azure.Location = $location
 $aideuserConfig.Azure.SubscriptionId = $subscriptionId
 $aideuserConfig.Azure.TenantId = $spnTenantId
 $aideuserConfig.Azure.ResourceGroupName = $resourceGroup
-$aideuserConfig = $aideuserConfig | ConvertTo-Json
+$aideuserConfig = $aideuserConfig | ConvertTo-Json -Depth 20
+
+
+$aksedgeConfig.SchemaVersion = $schemaVersionAksEdgeConfig
+$aksedgeConfig.Network.NetworkPlugin = $networkplugin
 
 if ($env:windowsNode -eq $true) {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            },
-            "WindowsNode": {
-                "CpuCount": 2,
-                "MemoryInMB": 4096
-            }
-        }
-    ]
+    $aksedgeConfig.Machines += @{
+        'LinuxNode' = $aksEdgeNodes["LinuxNode"]
+        'WindowsNode' = $aksEdgeNodes["WindowsNode"]
+    }
 }
-"@
-} else {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            }
-        }
-    ]
+else {
+    $aksedgeConfig.Machines += @{
+        'LinuxNode' = $aksEdgeNodes["LinuxNode"]
+    }
 }
-"@
-}
+
+$aksedgeConfig | ConvertTo-Json -Depth 20
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
