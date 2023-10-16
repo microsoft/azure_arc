@@ -82,7 +82,7 @@ else {
     }
 }
 
-$aksedgeConfig | ConvertTo-Json -Depth 20
+$aksedgeConfig = $aksedgeConfig | ConvertTo-Json -Depth 20
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
