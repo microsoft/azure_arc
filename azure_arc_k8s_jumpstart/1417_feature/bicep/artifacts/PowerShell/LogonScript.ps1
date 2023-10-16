@@ -344,8 +344,6 @@ Stop-Process -Id $kubectlMonShell.Id
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-Stop-Process -Name powershell -Force
-
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 Write-Host
