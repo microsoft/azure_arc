@@ -83,6 +83,9 @@
 
 
     AKSEEConfig             = @{
+        AksEdgeRemoteDeployVersion = "1.0.230221.1200"
+        aksEdgeDeployModules       = "main"
+
         aideuserConfig = @{
             SchemaVersion       = "1.1"
             Version             = "1.0"

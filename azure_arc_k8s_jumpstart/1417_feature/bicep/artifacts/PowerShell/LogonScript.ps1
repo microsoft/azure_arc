@@ -19,8 +19,9 @@ $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
-$aksEdgeNodes                   = $Ft1Config.AKSEEConfig["Nodes"]
-$aksEdgeDeployModules       = "main"
+$aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
+$aksEdgeDeployModules       = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
+$AksEdgeRemoteDeployVersion = $Ft1Config.AKSEEConfig["AksEdgeRemoteDeployVersion"]
 
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
