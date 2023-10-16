@@ -17,10 +17,11 @@ $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
-$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
-$schemaVersion              = "1.1"
-$versionAksEdgeConfig       = "1.0"
-$aksEdgeDeployModules       = "main"
+$aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
+$aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
+$aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
+$aksEdgeDeployModules       = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
+$AksEdgeRemoteDeployVersion = $Ft1Config.AKSEEConfig["AksEdgeRemoteDeployVersion"]
 
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
@@ -55,84 +56,33 @@ $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
 Remove-Item -Path $output -Force
 Remove-Item -Path "$Ft1TempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
-# Here string for the json content
-$aideuserConfig = @"
-{
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$subscriptionId",
-        "TenantId": "$env:tenantId",
-        "ResourceGroupName": "$resourceGroup",
-        "Location": "$location"
-    },
-    "AksEdgeConfigFile": "aksedge-config.json"
-}
-"@
+# Create AKSEE configuration files
+Write-host "[$(Get-Date -Format t)] INFO: Creating AKS Edge Essentials configuration files" -ForegroundColor DarkGreen
+
+$aideuserConfig.AksEdgeProduct = $productName
+$aideuserConfig.Azure.Location = $location
+$aideuserConfig.Azure.SubscriptionId = $subscriptionId
+$aideuserConfig.Azure.TenantId = $spnTenantId
+$aideuserConfig.Azure.ResourceGroupName = $resourceGroup
+$aideuserConfig = $aideuserConfig | ConvertTo-Json -Depth 20
+
+
+$aksedgeConfig.SchemaVersion = $schemaVersionAksEdgeConfig
+$aksedgeConfig.Network.NetworkPlugin = $networkplugin
 
 if ($env:windowsNode -eq $true) {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            },
-            "WindowsNode": {
-                "CpuCount": 2,
-                "MemoryInMB": 4096
-            }
-        }
-    ]
+    $aksedgeConfig.Machines += @{
+        'LinuxNode' = $aksEdgeNodes["LinuxNode"]
+        'WindowsNode' = $aksEdgeNodes["WindowsNode"]
+    }
 }
-"@
-} else {
-    $aksedgeConfig = @"
-{
-    "SchemaVersion": "$schemaVersionAksEdgeConfig",
-    "Version": "$versionAksEdgeConfig",
-    "DeploymentType": "SingleMachineCluster",
-    "Init": {
-        "ServiceIPRangeSize": 0
-    },
-    "Network": {
-        "NetworkPlugin": "$networkplugin",
-        "InternetDisabled": false
-    },
-    "User": {
-        "AcceptEula": true,
-        "AcceptOptionalTelemetry": true
-    },
-    "Machines": [
-        {
-            "LinuxNode": {
-                "CpuCount": 4,
-                "MemoryInMB": 4096,
-                "DataSizeInGB": 20
-            }
-        }
-    ]
+else {
+    $aksedgeConfig.Machines += @{
+        'LinuxNode' = $aksEdgeNodes["LinuxNode"]
+    }
 }
-"@
-}
+
+$aksedgeConfig = $aksedgeConfig | ConvertTo-Json -Depth 20
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
@@ -257,6 +207,7 @@ $subscriptionId = (Get-AzSubscription).Id
 # Install PowerShell modules
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
+    Install-PackageProvider -Name NuGet -Confirm:$false -Force
     foreach ($module in $Ft1Config.PowerShellModules) {
         Install-Module -Name $module -Force -Confirm:$false
     }
@@ -322,26 +273,6 @@ az k8s-extension create --name "azuremonitor-containers" `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-# # Deploying Azure Defender Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Creating Azure Defender Kubernetes extension..."
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" `
-#                         --cluster-name $arcClusterName `
-#                         --resource-group $resourceGroup `
-#                         --cluster-type connectedClusters `
-#                         --extension-type Microsoft.AzureDefender.Kubernetes
-
-# # Deploying Azure Policy Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Policy extension..."
-# Write-Host "`n"
-# az k8s-extension create --cluster-type connectedClusters `
-#                         --cluster-name $arcClusterName `
-#                         --resource-group $resourceGroup `
-#                         --extension-type Microsoft.PolicyInsights `
-#                         --name azurepolicy
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
