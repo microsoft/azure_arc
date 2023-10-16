@@ -37,6 +37,17 @@
         'azure-data-studio'
     )
 
+    # VSCode extensions
+    VSCodeExtensions        = @(
+        'ms-vscode-remote.remote-containers',
+        'ms-vscode-remote.remote-wsl',
+        'ms-vscode.powershell',
+        'redhat.vscode-yaml',
+        'ZainChen.json',
+        'esbenp.prettier-vscode',
+        'ms-kubernetes-tools.vscode-kubernetes-tools'
+    )
+
     HostVMDriveLetter = "V"
     HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
     guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              

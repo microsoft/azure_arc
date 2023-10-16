@@ -62,7 +62,7 @@ foreach ($path in $HCIBoxConfig.HCIBoxPaths) {
 }
 
 # Begin transcript
-Start-Transcript -Path $HCIBoxConfig.HCIBoxPaths.LogsDir\Bootstrap.log
+Start-Transcript -Path $HCIBoxConfig.HCIBoxPaths["LogsDir"]\Bootstrap.log
 
 #$ErrorActionPreference = 'SilentlyContinue'
 
@@ -100,7 +100,7 @@ Remove-Item .\AzureCLI.msi
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $HCIPath\wallpaper.png
-Invoke-WebRequest https://aka.ms/wacdownload -OutFile $HCIBoxConfig.HCIBoxPaths.WACDir\WindowsAdminCenter.msi
+Invoke-WebRequest https://aka.ms/wacdownload -OutFile $HCIBoxConfig.HCIBoxPaths["WACDir"]\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Register-AzSHCI.ps1") -OutFile $HCIPath\Register-AzSHCI.ps1
@@ -111,7 +111,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-ArcResourceBr
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-ResourceBridge.ps1") -OutFile $HCIPath\Uninstall-ResourceBridge.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-GitOps.ps1") -OutFile $HCIPath\Deploy-GitOps.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/GetServiceAccountBearerToken.ps1") -OutFile $HCIPath\GetServiceAccountBearerToken.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $HCIBoxConfig.HCIBoxPaths.LogsDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $HCIBoxConfig.HCIBoxPaths["LogsDir"]\LogInstructions.txt
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $HCIPath\jumpstart-user-secret.yaml
 
 # Replace password and DNS placeholder
@@ -213,5 +213,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content $($HCIBoxConfig.HCIBoxPaths.LogsDir)\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $($HCIBoxConfig.HCIBoxPaths.LogsDir)\Bootstrap.log -Force
+$logSuppress = Get-Content $($HCIBoxConfig.HCIBoxPaths["LogsDir"])\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $($HCIBoxConfig.HCIBoxPaths["LogsDir"])\Bootstrap.log -Force

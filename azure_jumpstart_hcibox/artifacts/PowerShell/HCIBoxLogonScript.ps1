@@ -1,32 +1,15 @@
 # Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 $ProgressPreference = "SilentlyContinue"
 Set-PSDebug -Strict
-Start-Transcript -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
 #####################################################################
 # Initialize the environment
 #####################################################################
 
 # Load config file
-$ConfigurationDataFile = "C:\HCIBox\"
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
-# Set paths
-$Env:HCIBoxDir = "C:\HCIBox"
-$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
-$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
-$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
-$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
-$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
-$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-$Env:agentScript = "C:\HCIBox\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:VMPath = "C:\VMs"
-
-
+Start-Transcript -Path $HCIBoxConfig.HCIBoxPaths["LogsDir"]\HCIBoxLogonScript.log
 
 #####################################################################
 # Setup Azure CLI
@@ -45,12 +28,29 @@ Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 #####################################################################
-# Setup Azure PowerShell and register Azure providers
+# Register Azure providers
 #####################################################################
+
+# Register Azure providers
+Write-Header "Registering Providers"
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace Microsoft.OperationsManagement --wait
+az provider register --namespace Microsoft.AzureStackHCI --wait
+az provider register --namespace Microsoft.ResourceConnector --wait
 
 #############################################################
 # Install VSCode extensions
 #############################################################
+
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($HCIBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+foreach ($extension in $AgConfig.VSCodeExtensions) {
+    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.HCIBoxPaths["LogsDir"] + "\Tools.log")
+}
 
 #####################################################################
 # Configure virtualization infrastructure
@@ -64,27 +64,17 @@ $diskNum = $disks.Count
 New-VirtualDisk -StoragePoolFriendlyName AsHciPool -FriendlyName AsHciDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
 $vDisk = Get-VirtualDisk -FriendlyName AsHciDisk
 if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
-    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $HCIBoxConfig. -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter $HCIBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
-    $vDisk | Get-Disk | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
+    $vDisk | Get-Disk | New-Partition -DriveLetter $HCIBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
 New-Item -Path "V:\" -Name "VMs" -ItemType "directory"
 
 
 
 
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.HybridCompute --wait
-az provider register --namespace Microsoft.GuestConfiguration --wait
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-az provider register --namespace Microsoft.OperationsManagement --wait
-az provider register --namespace Microsoft.AzureStackHCI --wait
-az provider register --namespace Microsoft.ResourceConnector --wait
+
 
 Stop-Transcript
 
