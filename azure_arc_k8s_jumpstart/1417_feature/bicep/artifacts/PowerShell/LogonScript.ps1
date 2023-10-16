@@ -17,7 +17,6 @@ $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
-$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion              = "1.1"
 $versionAksEdgeConfig       = "1.0"
 $aksEdgeDeployModules       = "main"
@@ -58,13 +57,13 @@ Remove-Item -Path "$Ft1TempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
 # Here string for the json content
 $aideuserConfig = @"
 {
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
+    "SchemaVersion": "$schemaVersion",
+    "Version": "$versionAksEdgeConfig",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
     "Azure": {
         "SubscriptionId": "$subscriptionId",
-        "TenantId": "$env:tenantId",
+        "TenantId": "$spnTenantId",
         "ResourceGroupName": "$resourceGroup",
         "Location": "$location"
     },
@@ -322,26 +321,6 @@ az k8s-extension create --name "azuremonitor-containers" `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-# # Deploying Azure Defender Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Creating Azure Defender Kubernetes extension..."
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" `
-#                         --cluster-name $arcClusterName `
-#                         --resource-group $resourceGroup `
-#                         --cluster-type connectedClusters `
-#                         --extension-type Microsoft.AzureDefender.Kubernetes
-
-# # Deploying Azure Policy Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Policy extension..."
-# Write-Host "`n"
-# az k8s-extension create --cluster-type connectedClusters `
-#                         --cluster-name $arcClusterName `
-#                         --resource-group $resourceGroup `
-#                         --extension-type Microsoft.PolicyInsights `
-#                         --name azurepolicy
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
