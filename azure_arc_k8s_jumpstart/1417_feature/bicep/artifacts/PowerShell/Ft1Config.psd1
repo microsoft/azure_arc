@@ -97,10 +97,22 @@
             AksEdgeConfigFile   = "aksedge-config.json"
         }
 
+        Nodes = @{
+            'LinuxNode' = @{
+                'CpuCount'     = 4
+                'MemoryInMB'   = 4096
+                'DataSizeInGB' = 20
+            }
+            'WindowsNode' = @{
+                'CpuCount'   = 2
+                'MemoryInMB' = 4096
+            }
+        }
+
         aksedgeConfig = @{
             SchemaVersion       = ""
-            Version             = ""
-            DeploymentType      = ""
+            Version             = "1.0"
+            DeploymentType      = "SingleMachineCluster"
             Init                =@{
                 ServiceIPRangeSize          = 0
             }
@@ -112,21 +124,7 @@
                 AcceptEula                 = $true
                 AcceptOptionalTelemetry    = $true
             }
-            Machines            = @(
-                {
-                LinuxNode = @{
-                    CpuCount            = 4
-                    MemoryInMB          = 4096
-                    DataSizeInGB        = 20
-                }
-            }
-            {
-                WindowsNode = @{
-                    CpuCount            = 2
-                    MemoryInMB          = 4096
-                }
-            }
-            )
+            Machines            = @()
         }
     }
     # AKS Edge Essentials variables
