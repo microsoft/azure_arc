@@ -61,7 +61,7 @@ $aideuserConfig.Azure.Location = $location
 $aideuserConfig.Azure.SubscriptionId = $subscriptionId
 $aideuserConfig.Azure.TenantId = $spnTenantId
 $aideuserConfig.Azure.ResourceGroupName = $resourceGroup
-
+$aideuserConfig = $aideuserConfig | ConvertTo-Json
 
 if ($env:windowsNode -eq $true) {
     $aksedgeConfig = @"
