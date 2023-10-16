@@ -207,6 +207,7 @@ $subscriptionId = (Get-AzSubscription).Id
 # Install PowerShell modules
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
+    Install-PackageProvider -Name NuGet -Confirm:$false -Force
     foreach ($module in $Ft1Config.PowerShellModules) {
         Install-Module -Name $module -Force -Confirm:$false
     }
