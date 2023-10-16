@@ -81,6 +81,54 @@
         'github.vscode-pull-request-github'
     )
 
+
+    AKSEEConfig             = @{
+        aideuserConfig = @{
+            SchemaVersion       = "1.1"
+            Version             = "1.0"
+            AksEdgeProduct      = ""
+            AksEdgeProductUrl   = ""
+            Azure               = @{
+                SubscriptionId    = ""
+                TenantId          = ""
+                ResourceGroupName = ""
+                Location          = ""
+            }
+            AksEdgeConfigFile   = "aksedge-config.json"
+        }
+
+        aksedgeConfig = @{
+            SchemaVersion       = ""
+            Version             = ""
+            DeploymentType      = ""
+            Init                =@{
+                ServiceIPRangeSize          = 0
+            }
+            Network             = @{
+                NetworkPlugin               = ""
+                InternetDisabled            = $false
+            }
+            User                = @{
+                AcceptEula                 = $true
+                AcceptOptionalTelemetry    = $true
+            }
+            Machines            = @(
+                {
+                LinuxNode = @{
+                    CpuCount            = 4
+                    MemoryInMB          = 4096
+                    DataSizeInGB        = 20
+                }
+            }
+            {
+                WindowsNode = @{
+                    CpuCount            = 2
+                    MemoryInMB          = 4096
+                }
+            }
+            )
+        }
+    }
     # AKS Edge Essentials variables
     SiteConfig              = @{
         Seattle = @{

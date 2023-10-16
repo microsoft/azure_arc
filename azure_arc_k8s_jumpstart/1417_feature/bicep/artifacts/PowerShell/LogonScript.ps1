@@ -17,8 +17,7 @@ $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
-$schemaVersion              = "1.1"
-$versionAksEdgeConfig       = "1.0"
+$aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksEdgeDeployModules       = "main"
 
 
@@ -54,22 +53,15 @@ $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
 Remove-Item -Path $output -Force
 Remove-Item -Path "$Ft1TempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
-# Here string for the json content
-$aideuserConfig = @"
-{
-    "SchemaVersion": "$schemaVersion",
-    "Version": "$versionAksEdgeConfig",
-    "AksEdgeProduct": "$productName",
-    "AksEdgeProductUrl": "",
-    "Azure": {
-        "SubscriptionId": "$subscriptionId",
-        "TenantId": "$spnTenantId",
-        "ResourceGroupName": "$resourceGroup",
-        "Location": "$location"
-    },
-    "AksEdgeConfigFile": "aksedge-config.json"
-}
-"@
+# Create AKSEE configuration files
+Write-host "[$(Get-Date -Format t)] INFO: Creating AKS Edge Essentials configuration files" -ForegroundColor DarkGreen
+
+$aideuserConfig.AksEdgeProduct = $productName
+$aideuserConfig.Azure.Location = $location
+$aideuserConfig.Azure.SubscriptionId = $subscriptionId
+$aideuserConfig.Azure.TenantId = $spnTenantId
+$aideuserConfig.Azure.ResourceGroupName = $resourceGroup
+
 
 if ($env:windowsNode -eq $true) {
     $aksedgeConfig = @"
