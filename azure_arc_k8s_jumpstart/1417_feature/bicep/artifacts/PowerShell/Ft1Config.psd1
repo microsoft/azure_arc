@@ -117,15 +117,15 @@
             Version             = "1.0"
             DeploymentType      = "SingleMachineCluster"
             Init                =@{
-                ServiceIPRangeSize          = 0
+                ServiceIPRangeSize = 0
             }
             Network             = @{
-                NetworkPlugin               = ""
-                InternetDisabled            = $false
+                NetworkPlugin = ""
+                InternetDisabled  = $false
             }
             User                = @{
-                AcceptEula                 = $true
-                AcceptOptionalTelemetry    = $true
+                AcceptEula = $true
+                AcceptOptionalTelemetry = $true
             }
             Machines            = @()
         }
