@@ -5,9 +5,9 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 # Parameters
 $AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
-$schemaVersionAksEdgeConfig = "1.8"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
+$aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
 
 # Requires -RunAsAdministrator
 
@@ -25,6 +25,20 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $productName = "AKS Edge Essentials - K3s"
     $networkplugin = "flannel"
 }
+
+Write-Host "Fetching the latest AKS Edge Essentials release."
+$latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+
+$AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
+$output = Join-Path "C:\temp" "$latestReleaseTag.zip"
+Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+Expand-Archive $output -DestinationPath "C:\temp" -Force
+$AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
+$jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+$schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
+# Clean up the downloaded release files
+Remove-Item -Path $output -Force
+Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
 # Here string for the json content
 $aideuserConfig = @"
@@ -209,6 +223,7 @@ az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.HybridConnectivity --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
 
 az provider show --namespace Microsoft.Kubernetes -o table
 Write-Host "`n"
@@ -219,6 +234,8 @@ Write-Host "`n"
 az provider show --namespace Microsoft.GuestConfiguration -o table
 Write-Host "`n"
 az provider show --namespace Microsoft.HybridConnectivity -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.ExtendedLocation -o table
 Write-Host "`n"
 
 # Onboarding the cluster to Azure Arc
@@ -232,11 +249,25 @@ $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clus
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $Env:arcClusterName = "$Env:resourceGroup-$guid"
-az connectedk8s connect --name $Env:arcClusterName `
+
+
+if ($env:kubernetesDistribution -eq "k8s") {
+    az connectedk8s connect --name $Env:arcClusterName `
     --resource-group $Env:resourceGroup `
     --location $env:location `
+    --distribution aks_edge_k8s `
     --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+} else {
+    az connectedk8s connect --name $Env:arcClusterName `
+    --resource-group $Env:resourceGroup `
+    --location $env:location `
+    --distribution aks_edge_k3s `
+    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+}
+
+
 
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
