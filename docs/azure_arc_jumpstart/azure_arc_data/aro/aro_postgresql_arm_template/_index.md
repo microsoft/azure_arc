@@ -102,7 +102,7 @@ By the end of this scenario, you will have an ARO cluster deployed with an Azure
 - Get the Azure Red Hat OpenShift resource provider Id which needs to be assigned with the “Contributor” role.
 
   ```shell
-  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: objectId}"
+  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: id}"
   ```
 
   ![Screenshot of Azure resource provider for Aro](./02.png)
@@ -169,6 +169,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     ```
 
     > **NOTE: The deployment time for this scenario can take ~15-20min**
+
+    > **NOTE: If you receive an error message stating that the requested VM size is not available in the desired location (as an example: 'Standard_D8s_v3'), it means that there is currently a capacity restriction for that specific VM size in that particular region. Capacity restrictions can occur due to various reasons, such as high demand or maintenance activities. Microsoft Azure periodically adjusts the available capacity in each region based on usage patterns and resource availability. To continue deploying this scenario, please try to re-run the deployment using another region.**
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **9 Azure resources**).
 

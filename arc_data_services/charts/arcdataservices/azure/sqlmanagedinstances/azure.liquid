@@ -24,8 +24,10 @@ However, Liquid template does not support merging objects. In order for it to wo
 {%- assign preferredPrimaryReplicaSpec = resource.k8sRaw.spec.preferredPrimaryReplicaSpec -%}
 {%- assign backup = resource.k8sRaw.spec.backup -%}
 {%- assign settings = resource.k8sRaw.spec.settings -%}
+{%- assign fileOverrideConfigMap = resource.k8sRaw.spec.fileOverrideConfigMap -%}
 
 {%- assign securityActiveDirectory = resource.k8sRaw.spec.security.activeDirectory -%}
+{%- assign securityTransparentDataEncryption = resource.k8sRaw.spec.security.transparentDataEncryption -%}
 {%- assign serviceCertificateSecret = resource.k8sRaw.spec.security.serviceCertificateSecret -%}
 {%- assign update = resource.k8sRaw.spec.update -%}
 
@@ -35,6 +37,7 @@ However, Liquid template does not support merging objects. In order for it to wo
   "spec": {
     {% if docker != nil %} "docker": {{ docker }}, {% endif %}
     {% if services != nil %} "services": {{ services }}, {% endif %}
+    {% if fileOverrideConfigMap != nil %} "fileOverrideConfigMap": {{ fileOverrideConfigMap | json }}, {% endif %}
     "security": {
       {% if securityActiveDirectory != nil %}
         "activeDirectory": {
@@ -46,6 +49,12 @@ However, Liquid template does not support merging objects. In order for it to wo
             "keytabSecret": {{ keytab.Name | json }},
           {% endif %}
           {% if securityActiveDirectory.encryptionTypes != nil %} "encryptionTypes": {{ securityActiveDirectory.encryptionTypes | json }}, {% endif %}
+        },
+      {% endif %}
+      {% if securityTransparentDataEncryption != nil %}
+        "transparentDataEncryption": {
+          {% if securityTransparentDataEncryption.mode != nil %} "mode": {{ securityTransparentDataEncryption.mode | json }}, {% endif %}
+          {% if securityTransparentDataEncryption.protectorSecret != nil %} "protectorSecret": {{ securityTransparentDataEncryption.protectorSecret | json }}, {% endif %}
         },
       {% endif %}
       {% if serviceCertificateSecret != nil %} "serviceCertificateSecret": {{ serviceCertificateSecret | json }}, {% endif %}

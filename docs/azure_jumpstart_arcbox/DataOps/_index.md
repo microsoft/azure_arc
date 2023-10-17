@@ -166,7 +166,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     }
     ```
   
-  - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install Azure PowerShell modules.
+  - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install or update Azure PowerShell to version 10.4.0 or above.
 
     ```PowerShell
     $account = Connect-AzAccount

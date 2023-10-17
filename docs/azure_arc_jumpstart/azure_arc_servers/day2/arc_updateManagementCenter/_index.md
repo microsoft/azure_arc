@@ -2,7 +2,7 @@
 type: docs
 title: "Update Management Center"
 linkTitle: "Update Management Center"
-weight: 15
+weight: 17
 description: >
 ---
 

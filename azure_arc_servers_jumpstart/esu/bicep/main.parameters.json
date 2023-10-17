@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "spnClientId": {
+            "value": "XXXX-XXXX-XXXX-XXXX-XXXX"
+        },
+        "spnClientSecret": {
+            "value": "XXXX-XXXX-XXXX-XXXX-XXXX"
+        },
+        "spnTenantId": {
+            "value": "XXXX-XXXX-XXXX-XXXX-XXXX"
+        },
+        "windowsAdminUsername": {
+            "value": "arcdemo"
+        },
+        "windowsAdminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "deployBastion": {
+            "value": true
+        },
+        "esu": {
+            "value": "both"
+        }
+
+    }
+}

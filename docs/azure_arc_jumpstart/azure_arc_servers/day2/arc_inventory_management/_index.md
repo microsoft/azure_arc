@@ -2,7 +2,7 @@
 type: docs
 title: "Inventory Management"
 linkTitle: "Inventory Management"
-weight: 1
+weight: 3
 description: >
 ---
 

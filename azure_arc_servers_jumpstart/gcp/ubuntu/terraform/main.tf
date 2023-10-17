@@ -12,7 +12,7 @@ resource "google_compute_instance" "default" {
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
     }
   }
 
@@ -23,6 +23,13 @@ resource "google_compute_instance" "default" {
       // Include this section to give the VM an external ip address
     }
   }
+
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email = data.google_compute_default_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
+
   metadata = {
     ssh-keys = "${var.admin_username}:${file("~/.ssh/id_rsa.pub")}"
   }
@@ -67,6 +74,13 @@ resource "local_file" "install_arc_agent_sh" {
     }
   )
   filename = "scripts/install_arc_agent.sh"
+}
+
+data "google_compute_default_service_account" "default" {
+}
+
+output "default_account" {
+    value = data.google_compute_default_service_account.default.email
 }
 
 // A variable for extracting the external ip of the instance

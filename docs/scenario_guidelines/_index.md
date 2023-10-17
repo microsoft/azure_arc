@@ -13,7 +13,7 @@ The scenarios published as part of the Jumpstart project are high-quality docume
 
 In this document, our goal is to provide you with as many details as possible for you to be efficient and successful and as a result, produce an awesome Jumpstart scenario. Our intent here is to give you pointers and tools to achieve just that.
 
-> **IMPORTANT: If you are only getting started with contributing Jumpstart scenarios, it is highly recommended you will review the raw code for existing scenarios. These will help you understand what an approved scenario should look like and will represent all the guidelines provided. For any questions, please reach out or tag one of the Jumpstart project maintainers.**
+> **IMPORTANT: If you are only getting started with contributing Jumpstart scenarios, it is highly recommended you review the raw code for existing scenarios. These will help you understand what an approved scenario should look like and will represent all the guidelines provided. For any questions, please reach out or tag one of the Jumpstart project maintainers.**
 
 ## Code reviews
 
@@ -23,7 +23,7 @@ Before a scenario is published, it will go through a code review process by one 
 
 ## Pull requests and issues
 
-Rather you are working on a new scenario or updating an existing one, a contribution must be submitted with a dedicated pull request (PR) to make the review process easier.
+Whether you are working on a new scenario or updating an existing one, a contribution must be submitted with a dedicated pull request (PR) to make the review process easier.
 
 - New scenario
 
@@ -45,7 +45,7 @@ Rather you are working on a new scenario or updating an existing one, a contribu
 
 The Azure Arc Jumpstart GitHub repository follows a specific folder structure that you should get familiar with before creating or updating a scenario.
 
-- Automation, scripts, templates, JSON & YAML files, etc. must be placed under each Azure Arc technology that corresponds to each scenario.
+- Automation, scripts, templates, JSON & YAML files, etc., must be placed under each Azure Arc technology that corresponds to each scenario.
 - The guide for the scenario must be under docs and follow a similar structure.
 
 ![Screenshot of folder structure](./folder_structure.png)
@@ -62,7 +62,7 @@ The Azure Arc Jumpstart website is using [HUGO](https://gohugo.io/) as its web f
 
     ![Screenshot of matching link and linkTitle](./link_title.png)
 
-- The "_Weight_" value number represents the location of the scenario comparing to other scenarios on the same page on the website.
+- The "_Weight_" value number represents the location of the scenario compared to other scenarios on the same page on the website.
 
     ![Screenshot of weight value in the code](./weight_code.png)
 
@@ -80,10 +80,10 @@ This description should also mention the starting point for the automation, for 
 
 ## Prerequisites
 
-Every Jumpstart scenario must have a "Prerequisites" section as the first section. Below you can find guidelines on what to consider for this section.
+Every Jumpstart scenario must have a "Prerequisites" section as the first section. Below, you can find guidelines on what to consider for this section.
 
 - The first rule of thumb is to know what should be considered a prerequisite and what can be automated. Generally speaking, if a prerequisite can be automated, it should be incorporated as part of the overall automation flow of the scenario.
-- We would love for you to use good judgment and if the scenario's reviewer will find that a certain prerequisite should be automated he will point that out as part of the pull request code review.
+- We would love for you to use good judgment and if the scenario's reviewer finds that a certain prerequisite should be automated he will point that out as part of the pull request code review.
 - As mentioned at the beginning of this guidelines readme, to avoid a situation where you will need to refactor code or make unforced changes, it is highly recommended for you to use existing scenarios as a reference and work from there.
 
 ## Markdown linting and style
@@ -93,7 +93,7 @@ Every Jumpstart scenario must have a "Prerequisites" section as the first sectio
 
 ![Screenshot of the markdownlint extension](./markdownlint_extension.png)
 
-- Below you can find an example of common markdown lint issues that will be presented to you as you are writing your scenario and must be fixed. [Here](https://marketplace.visualstudio.com/items?itemName=DavidAnson.VS Code-markdownlint), you can find detailed explanations of the markdown rules highlighted by the extension and how to fix a violation of these rules.
+- Below, you can find an example of common markdown lint issues that will be presented to you as you are writing your scenario and must be fixed. [Here](https://marketplace.visualstudio.com/items?itemName=DavidAnson.VS Code-markdownlint), you can find detailed explanations of the markdown rules highlighted by the extension and how to fix a violation of these rules.
 
 ![Screenshot of the markdown lint errors](./lint_errors.png)
 
@@ -105,7 +105,7 @@ Every Jumpstart scenario must have a "Prerequisites" section as the first sectio
 
 ## Screenshots
 
-Quality, accurate and clean screenshots are critical when it comes to providing a great Jumpstart scenario and reader experience. In this section, you will find examples and guidelines on screenshots standards.
+Quality, accurate, and clean screenshots are critical when it comes to providing a great Jumpstart scenario and reader experience. In this section, you will find examples and guidelines on screenshots standards.
 
 ### Format, location and file ordering
 
@@ -136,7 +136,7 @@ Quality, accurate and clean screenshots are critical when it comes to providing 
     ![Screenshot of correct step numbers positioning and color](./correct_numbers_positioning.png)
 
 - Be aware of sensitive information on your screenshots and be sure to blur it out: subscription ID, passwords, service principals, etc.
-- For Azure portal related screenshots, we recommend using the ["Az Mask" Edge/Chrome browser extension](https://chrome.google.com/webstore/detail/az-mask/amobeamdmdnloajcaiomgegpakjdiacm).
+- For Azure portal-related screenshots, we recommend using the ["Az Mask" Edge/Chrome browser extension](https://chrome.google.com/webstore/detail/az-mask/amobeamdmdnloajcaiomgegpakjdiacm).
 
     ![Screenshot of Az Mask extension page](az_mask.png)
 
@@ -162,7 +162,7 @@ As you can see in the below examples, each block is represented differently, dep
 
 ### Image positioning
 
-Images links position must be aligned with its respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of what such alignment looks like in the code and on the website.
+Image link's position must be aligned with their respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of what such alignment looks like in the code and on the website.
 
 ![Screenshot of a correct image positioning in the code](./image_position_code.png)
 
@@ -170,7 +170,7 @@ Images links position must be aligned with its respective bulletining or header.
 
 ### Code block positioning
 
-Code blocks must be positionally aligned with its respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like on the website.
+Code blocks must be positionally aligned with their respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like on the website.
 
 ![Screenshot of a wrong code block positioning](./wrong_code_block_positioning.png)
 
@@ -180,7 +180,7 @@ Code blocks must be positionally aligned with its respective bulletining or head
 
 There is no need to mention how important secrets and passwords are. As you are writing your code and the guide for the scenario, be very cognizant of what code you are committing.
 
-Rather it's a credential that should be included or a secret/password as part of a terminal out, make sure these are mask from the reader.
+Whether it's a credential that should be included or a secret/password as part of a terminal out, make sure these are masked from the reader.
 
 ![Screenshot of unwanted credentials files](./unwanted_credentials_files.png)
 
@@ -214,7 +214,7 @@ The project maintainers are keeping a naming convention list which can be found 
 
 ## Examples
 
-Examples of what a result of output should look like are very useful and contribute to the overall confidence of the reader as well can significantly reduce potential user errors.
+Examples of what a result of output should look like are very useful and contribute to the overall confidence of the reader as well as significantly reduce potential user errors.
 
 Rather if it's in an example code block, a command, or a screenshot, wherever it makes sense, include an example of how something should look like.
 
@@ -222,7 +222,7 @@ Rather if it's in an example code block, a command, or a screenshot, wherever it
 
 ## File trails
 
-Before submitting your PR, make sure to not include unwanted files such as logs, credentials, state files, scripts testing files, etc. If it's not part of the scenario, it shouldn't be included.
+Before submitting your PR, make sure not to include unwanted files such as logs, credentials, state files, scripts testing files, etc. If it's not part of the scenario, it shouldn't be included.
 
 ![Screenshot of unwanted file trails](./unwanted_file_trails.png)
 

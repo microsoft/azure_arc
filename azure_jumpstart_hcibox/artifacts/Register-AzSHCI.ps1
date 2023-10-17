@@ -60,7 +60,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     Write-Verbose "Installing Az CLI"
     $ProgressPreference = "SilentlyContinue"
-    Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi;
+    Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi;
     Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet';
     Start-Sleep -Seconds 30
     $ProgressPreference = "Continue"

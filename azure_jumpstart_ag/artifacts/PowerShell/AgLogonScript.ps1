@@ -649,9 +649,32 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 Start-Sleep -Seconds 20
 # Create an array with VM names
 $VMnames = (Get-VM).Name
+
+$sourcePath = "$PsHome\Profile.ps1"
+$destinationPath = "C:\Deployment\Profile.ps1"
+$maxRetries = 3
+
 foreach ($VM in $VMNames) {
-    Copy-VMFile $VM -SourcePath "$PsHome\Profile.ps1" -DestinationPath "C:\Deployment\Profile.ps1" -CreateFullPath -FileSource Host -Force
+    $retryCount = 0
+    $copySucceeded = $false
+
+    while (-not $copySucceeded -and $retryCount -lt $maxRetries) {
+        try {
+            Copy-VMFile $VM -SourcePath $sourcePath -DestinationPath $destinationPath -CreateFullPath -FileSource Host -Force -ErrorAction Stop
+            $copySucceeded = $true
+            Write-Host "File copied to $VM successfully."
+        } catch {
+            $retryCount++
+            Write-Host "Attempt $retryCount : File copy to $VM failed. Retrying..."
+            Start-Sleep -Seconds 30  # Wait for 30 seconds before retrying
+        }
+    }
+
+    if (-not $copySucceeded) {
+        Write-Host "File copy to $VM failed after $maxRetries attempts."
+    }
 }
+
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap
 ########################################################################
@@ -676,6 +699,27 @@ foreach ($VM in $VMNames) {
         write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
         Start-Sleep -Seconds 5
     }
+}
+
+Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
+$latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
+$beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
+$AKSEEReleasesTags = ($latestReleaseTag,$beforeLatestReleaseTag)
+$AKSEESchemaVersions = @()
+
+for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
+    $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
+    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
+    $output = Join-Path $AgToolsDir "$releaseTag.zip"
+    Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+    Expand-Archive $output -DestinationPath $AgToolsDir -Force
+    $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
+    $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+    $schemaVersion = $jsonContent.SchemaVersion
+    $AKSEESchemaVersions += $schemaVersion
+    # Clean up the downloaded release files
+    Remove-Item -Path $output -Force
+    Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
 }
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
@@ -707,6 +751,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $logsFolder = "$deploymentFolder\Logs"
     Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
     $AgConfig = $using:AgConfig
+    $AgToolsDir = $using:AgToolsDir
     $websiteUrls = $using:websiteUrls
 
     ##########################################
@@ -760,7 +805,18 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
     $namingGuid = $using:namingGuid
     $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
+
+    # Fetch schemaVersion release from the AgConfig file
+    $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
+    if($AKSEESchemaVersionUseLatest){
+        $SchemaVersion = $using:AKSEESchemaVersions[0]
+    }
+    else {
+        $SchemaVersion = $using:AKSEESchemaVersions[1]
+    }
+
     $replacementParams = @{
+        "SchemaVersion-null"          = $SchemaVersion
         "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeStart
         "1000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeSize
         "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ControlPlaneEndpointIp

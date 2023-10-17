@@ -18,7 +18,7 @@
       "type": "string"
     },
     "servicePrincipalClientSecret": {
-      "type": "string"
+      "type": "securestring"
     },
     "masterNodesSubnet": {
       "type": "string",

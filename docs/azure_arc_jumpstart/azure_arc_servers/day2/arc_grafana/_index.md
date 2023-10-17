@@ -2,7 +2,7 @@
 type: docs
 title: "Grafana and Azure Monitor Agent (AMA)"
 linkTitle: "Grafana and Azure Monitor Agent (AMA)"
-weight: 16
+weight: 18
 description: >
 ---
 
