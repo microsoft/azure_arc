@@ -3041,6 +3041,7 @@ $params = @{
     domainCred = $domainCred
 }
 New-HyperConvergedEnvironment @params
+Start-Sleep -Seconds 30
 
 # Create S2D Cluster
 $params = @{
