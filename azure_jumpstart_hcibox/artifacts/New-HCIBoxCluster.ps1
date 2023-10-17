@@ -3005,7 +3005,7 @@ $params = @{
 Test-AzSHOSTVMConnection @params
     
 # This step has to be done as during the Hyper-V install as hosts reboot twice.
-Start-Sleep -Seconds 60
+Start-Sleep -Seconds 15
 Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
 Test-AzSHOSTVMConnection @params
     
