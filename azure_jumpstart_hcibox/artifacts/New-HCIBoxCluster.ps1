@@ -492,13 +492,21 @@ function Test-AzSHOSTVMConnection {
             $VerbosePreference = "Continue"    
             
             $localCred = $using:localCred   
-            $testconnection = $null
     
-            While (!$testconnection) {
     
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-VMSwitch } -Credential $localCred -ErrorAction Ignore
+            Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { 
+                $ErrorOccurred = $false
+                do { 
+                    try { 
+                        $ErrorActionPreference = 'Stop'
+                        Get-VMSwitchx 
+                    } 
+                    catch { 
+                        $ErrorOccurred = $true
+                    } 
+                } while ($ErrorOccurred -eq $true)
+            } -Credential $localCred -ErrorAction Ignore
     
-            }
         
             Write-Verbose "Successfully contacted $($using:SDNVM.AzSHOST)"
                          
