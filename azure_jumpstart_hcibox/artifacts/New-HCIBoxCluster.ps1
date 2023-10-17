@@ -496,7 +496,7 @@ function Test-AzSHOSTVMConnection {
     
             While (!$testconnection) {
     
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-Process } -Credential $localCred -ErrorAction Ignore
+                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-VMSwitch } -Credential $localCred -ErrorAction Ignore
     
             }
         
