@@ -456,8 +456,7 @@ function New-DataDrive {
 
     foreach ($SDNVM in $VMPlacement) {
         
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-
+        Invoke-Command -ComputerName $SDNVM.VMHost -ScriptBlock {
             $VerbosePreference = "Continue"
             Write-Verbose "Onlining, partitioning, and formatting Data Drive on $($Using:SDNVM.AzSHOST)"
 
@@ -488,20 +487,25 @@ function Test-AzSHOSTVMConnection {
     foreach ($SDNVM in $VMPlacement) {
 
         Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            
-            $VerbosePreference = "Continue"    
-            
+            $VerbosePreference = "Continue"            
             $localCred = $using:localCred   
             $testconnection = $null
-    
             While (!$testconnection) {
-    
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-Process } -Credential $localCred -ErrorAction Ignore
-    
+                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { 
+                    $ErrorOccurred = $false
+                    do { 
+                        try { 
+                            $ErrorActionPreference = 'Stop'
+                            Get-VMHost
+                        } 
+                        catch { 
+                            $ErrorOccurred = $true
+                        } 
+                    } while ($ErrorOccurred -eq $true)
+                } -Credential $localCred -ErrorAction Ignore
             }
-        
+    
             Write-Verbose "Successfully contacted $($using:SDNVM.AzSHOST)"
-                         
         }
     }    
 }
@@ -2822,12 +2826,12 @@ $WarningPreference = "SilentlyContinue"
 $ProgressPreference = 'SilentlyContinue'
 
 # Download HCIBox VHDs
-Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-BITSRequest -Params @{'Uri'='https://aka.ms/AAijhe3'; 'Filename'="$env:HCIBoxVHDDir\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://aka.ms/AAij9n9'; 'Filename'="$env:HCIBoxVHDDir\GUI.vhdx"}
-BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
-Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
-Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
+# Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
+# BITSRequest -Params @{'Uri'='https://aka.ms/AAijhe3'; 'Filename'="$env:HCIBoxVHDDir\AZSHCI.vhdx" }
+# BITSRequest -Params @{'Uri'='https://aka.ms/AAij9n9'; 'Filename'="$env:HCIBoxVHDDir\GUI.vhdx"}
+# BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
+# Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
+# Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
 # Set VM Host Memory
 # $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
@@ -3001,7 +3005,7 @@ $params = @{
 Test-AzSHOSTVMConnection @params
     
 # This step has to be done as during the Hyper-V install as hosts reboot twice.
-
+Start-Sleep -Seconds 60
 Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
 Test-AzSHOSTVMConnection @params
     
