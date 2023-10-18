@@ -277,9 +277,13 @@ az k8s-extension create --name "azuremonitor-containers" `
 ##############################################################
 # Install Azure edge CLI
 ##############################################################
-Invoke-WebRequest -Uri https://aka.ms/azedgecli-latest -OutFile "$Ft1ToolsDir\azure_edgeCLI.whl"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure Edge CLI extension" -ForegroundColor Gray
-az extension add --source "$Ft1ToolsDir\azure_edgeCLI.whl" -y
+$url = "https://aka.ms/azedgecli-latest"
+$response = Invoke-WebRequest -Uri $Url -MaximumRedirection 1
+$fileName=$response.BaseResponse.ResponseUri.AbsoluteUri.split('/')[4]
+
+Invoke-WebRequest -Uri "https://aka.ms/azedgecli-latest" -OutFile "$Ft1ToolsDir\$fileName"
+az extension add --source "$Ft1ToolsDir\$fileName" -y
 
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -ForegroundColor Gray

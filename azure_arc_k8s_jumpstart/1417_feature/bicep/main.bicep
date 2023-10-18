@@ -19,7 +19,14 @@ param windowsAdminPassword string
 param windowsOSVersion string = '2022-datacenter-g2'
 
 @description('Location for all resources.')
-param location string = resourceGroup().location
+@allowed([
+  'westus3'
+  'eastus2'
+  'westeurope'
+  'centraluseuap'
+  'eastus2euap'
+])
+param location string
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
