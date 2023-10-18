@@ -288,7 +288,7 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
 }
 
 module storageAccount 'storage/storageAccount.bicep' = {
-  name: 'Ft1StorageAccount'
+  name: 'storageAccount'
   params: {
     storageAccountName: ft1StorageAccountName
     location: location
@@ -310,7 +310,7 @@ module eventGrid 'data/eventGrid.bicep' = {
   params: {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     queueName: storageQueueName
-    storageAccountQueueResourceId: storageAccount.outputs.queueId
+    storageAccountResourceId: storageAccount.outputs.storageAccountId
     location: location
   }
 }
