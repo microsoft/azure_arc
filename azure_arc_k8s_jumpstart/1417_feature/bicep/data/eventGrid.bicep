@@ -152,7 +152,7 @@ resource eventHubTopicSubscription 'Microsoft.EventGrid/topics/eventSubscription
   }
 }
 
-resource storageTopicSubscription 'Microsoft.EventGrid/eventSubscriptions@2023-06-01-preview' = {
+resource storageTopicSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@2023-06-01-preview' = {
   name: storageTopicSubscriptionName
   properties: {
     destination: {
