@@ -125,6 +125,10 @@ resource eventGridsubscriberBindingName 'Microsoft.EventGrid/namespaces/permissi
 
 resource eventGridTopic 'Microsoft.EventGrid/topics@2023-06-01-preview' = {
   name: eventGridTopicName
+  dependsOn:[
+    eventGrid
+    eventGridTopicSpace
+  ]
   location: location
   sku: {
     name: eventGridTopicSku
