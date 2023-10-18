@@ -2,7 +2,7 @@
 param eventHubNamespaceName string = 'ft1hubns${uniqueString(resourceGroup().id)}'
 
 @description('The name of the EventHub')
-param eventHubName string = 'Ft1EventHub'
+param eventHubName string = 'ft1EventHub'
 
 @description('EventHub Sku')
 param eventHubSku string = 'Basic'

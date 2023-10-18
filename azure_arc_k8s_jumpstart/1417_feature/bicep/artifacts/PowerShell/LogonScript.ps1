@@ -280,7 +280,7 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Install Azure edge CLI
 ##############################################################
 Invoke-WebRequest -Uri https://aka.ms/azedgecli-latest -OutFile "$Ft1ToolsDir\azure_edgeCLI.whl"
-Write-Host "Installing the Azure Edge CLI extension" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure Edge CLI extension" -ForegroundColor Gray
 az extension add --source "$Ft1ToolsDir\azure_edgeCLI.whl" -y
 
 Write-Host "`n"
