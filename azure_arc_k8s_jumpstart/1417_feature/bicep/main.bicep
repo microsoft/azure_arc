@@ -63,27 +63,30 @@ param resourceTags object = {
   Project: 'jumpstart_azure_ft1'
 }
 
+@maxLength(5)
+@description('Random GUID')
+param namingGuid string = toLower(substring(newGuid(), 0, 5))
+
 @description('Deploy Windows Node for AKS Edge Essentials')
 param windowsNode bool = false
 
 @description('Name of the storage account')
-param ft1StorageAccountName string = 'ft1stg${uniqueString(resourceGroup().id)}'
+param ft1StorageAccountName string = 'ft1stg${namingGuid}'
 
 @description('Name of the storage queue')
 param storageQueueName string = 'ft1queue'
 
 @description('Name of the event hub')
-param eventHubName string = 'ft1eventhub'
+param eventHubName string = 'ft1eventhub${namingGuid}'
 
 @description('Name of the event hub namespace')
-param eventHubNamespaceName string = 'ft1eventhubns${uniqueString(resourceGroup().id)}'
+param eventHubNamespaceName string = 'ft1eventhubns${namingGuid}'
 
-@maxLength(5)
-@description('Random GUID')
-param namingGuid string = toLower(substring(newGuid(), 0, 5))
+@description('Name of the event grid namespace')
+param eventGridNamespaceName string = 'ft1eventgridns${namingGuid}'
 
 @description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'ftadx${namingGuid}'
+param adxClusterName string = 'ft1adx${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
@@ -315,6 +318,7 @@ module eventHub 'data/eventHub.bicep' = {
 module eventGrid 'data/eventGrid.bicep' = {
   name: 'eventGrid'
   params: {
+    eventGridNamespaceName: eventGridNamespaceName
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     queueName: storageQueueName
     storageAccountResourceId: storageAccount.outputs.storageAccountId
