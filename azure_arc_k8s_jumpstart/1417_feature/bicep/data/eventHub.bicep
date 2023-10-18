@@ -13,7 +13,6 @@ param eventHubCapacity int = 1
 @description('The location of the Azure Data Explorer cluster')
 param location string = resourceGroup().location
 
-
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
   location: location
