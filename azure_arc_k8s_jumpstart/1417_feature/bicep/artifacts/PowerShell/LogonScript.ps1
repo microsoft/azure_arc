@@ -274,8 +274,6 @@ az k8s-extension create --name "azuremonitor-containers" `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
-
-
 ##############################################################
 # Install Azure edge CLI
 ##############################################################
@@ -288,7 +286,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -Fore
 # Setting up local storage policy and port forwarding for MQTT Broker.
 kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
 New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
-az edge init --cluster $ClusterName --cluster-namespace alice-springs --resource-group $resourceGroup
+az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resource-group $resourceGroup
 $DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
 
