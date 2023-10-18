@@ -53,17 +53,8 @@ param storageAccountName string
 @description('The name of the Staging Kubernetes cluster resource')
 param aksStagingClusterName string = 'Ag-AKS-Staging'
 
-@description('The name of the IoT Hub')
-param iotHubHostName string = 'Ag-IoTHub'
-
 @description('The login server name of the Azure Container Registry')
 param acrName string
-
-@description('The name of the Cosmos DB account')
-param cosmosDBName string
-
-@description('The URL of the Cosmos DB endpoint')
-param cosmosDBEndpoint string
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -77,9 +68,6 @@ param githubBranch string = 'main'
 @description('GitHub Personal access token for the user account')
 @secure()
 param githubPAT string
-
-@description('The name of the Azure Data Explorer cluster')
-param adxClusterName string
 
 @description('Random GUID')
 param namingGuid string
@@ -198,7 +186,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksStagingClusterName ${aksStagingClusterName} -iotHubHostName ${iotHubHostName} -acrName ${acrName} -cosmosDBName ${cosmosDBName} -cosmosDBEndpoint ${cosmosDBEndpoint} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -adxClusterName ${adxClusterName} -namingGuid ${namingGuid}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksStagingClusterName ${aksStagingClusterName} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -namingGuid ${namingGuid}'
     }
   }
 }
