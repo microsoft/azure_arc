@@ -2,44 +2,29 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vmSize": {
-      "value": "Standard_D8s_v3"
-    },
-    "vmName": {
-      "value": "AKS-EE-Win-Demo"
-    },
     "kubernetesDistribution": {
       "value": "k3s"
     },
-    "windowsNode": {
-      "value": false
-    },
-    "adminUsername": {
+    "windowsAdminUsername": {
       "value": "arcdemo"
     },
-    "adminPassword": {
+    "windowsAdminPassword": {
       "value": "ArcPassword123!!"
     },
-    "appId": {
+    "spnClientId": {
       "value": "XXXXX-XXXXX-XXXXX"
     },
-    "password": {
+    "spnClientSecret": {
       "value": "XXXXX-XXXXX-XXXXX"
     },
-    "tenantId": {
-      "value": "XXXXX-XXXXX-XXXXX"
-    },
-    "subscriptionId": {
+    "spnTenantId": {
       "value": "XXXXX-XXXXX-XXXXX"
     },
     "location": {
-      "value": "eastus"
+      "value": "eastus2"
     },
     "deployBastion": {
       "value": false
-    },
-    "bastionHostName": {
-      "value": "Arc-Win-Demo-Bastion"
     }
   }
 }
