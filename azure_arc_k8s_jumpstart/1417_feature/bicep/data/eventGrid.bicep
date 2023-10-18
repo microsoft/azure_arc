@@ -43,13 +43,13 @@ param publisherBindingName string = 'publisherBinding'
 param subscriberBindingName string = 'subscriberBindingName'
 
 @description('The name of the EventHub topic subscription')
-param eventGridTopicSubscriptionName string = 'Ft1EventHubSubscription'
+param eventGridTopicSubscriptionName string = 'ft1EventHubSubscription'
 
 @description('The name of the storage topic subscription')
-param storageTopicSubscriptionName string = 'Ft1StorageSubscription'
+param storageTopicSubscriptionName string = 'ft1StorageSubscription'
 
 @description('The name of the EventGrid topic')
-param eventGridTopicName string = 'Ft1Topic'
+param eventGridTopicName string = 'ft1Topic'
 
 @description('The name of the EventGrid topic sku')
 param eventGridTopicSku string = 'Basic'
