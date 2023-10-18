@@ -456,8 +456,7 @@ function New-DataDrive {
 
     foreach ($SDNVM in $VMPlacement) {
         
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-
+        Invoke-Command -ComputerName $SDNVM.VMHost -ScriptBlock {
             $VerbosePreference = "Continue"
             Write-Verbose "Onlining, partitioning, and formatting Data Drive on $($Using:SDNVM.AzSHOST)"
 
@@ -488,20 +487,25 @@ function Test-AzSHOSTVMConnection {
     foreach ($SDNVM in $VMPlacement) {
 
         Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            
-            $VerbosePreference = "Continue"    
-            
+            $VerbosePreference = "Continue"            
             $localCred = $using:localCred   
             $testconnection = $null
-    
             While (!$testconnection) {
-    
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-Process } -Credential $localCred -ErrorAction Ignore
-    
+                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { 
+                    $ErrorOccurred = $false
+                    do { 
+                        try { 
+                            $ErrorActionPreference = 'Stop'
+                            Get-VMHost
+                        } 
+                        catch { 
+                            $ErrorOccurred = $true
+                        } 
+                    } while ($ErrorOccurred -eq $true)
+                } -Credential $localCred -ErrorAction Ignore
             }
-        
+    
             Write-Verbose "Successfully contacted $($using:SDNVM.AzSHOST)"
-                         
         }
     }    
 }
@@ -3001,7 +3005,7 @@ $params = @{
 Test-AzSHOSTVMConnection @params
     
 # This step has to be done as during the Hyper-V install as hosts reboot twice.
-
+Start-Sleep -Seconds 15
 Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
 Test-AzSHOSTVMConnection @params
     
@@ -3037,6 +3041,7 @@ $params = @{
     domainCred = $domainCred
 }
 New-HyperConvergedEnvironment @params
+Start-Sleep -Seconds 30
 
 # Create S2D Cluster
 $params = @{
