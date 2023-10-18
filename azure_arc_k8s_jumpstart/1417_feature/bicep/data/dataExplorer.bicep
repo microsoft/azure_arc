@@ -16,7 +16,7 @@ param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 param skuTier string = 'Basic'
 
 @description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string
+param posOrdersDBName string = 'pos-orders'
 
 @description('# of nodes')
 @minValue(1)

@@ -78,6 +78,9 @@ param eventHubName string = 'ft1eventhub'
 @description('Name of the event hub namespace')
 param eventHubNamespaceName string = 'ft1eventhubns${uniqueString(resourceGroup().id)}'
 
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string = 'agadx${uniqueString(resourceGroup().id)}'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -311,6 +314,14 @@ module eventGrid 'data/eventGrid.bicep' = {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     queueName: storageQueueName
     storageAccountResourceId: storageAccount.outputs.storageAccountId
+    location: location
+  }
+}
+
+module adxCluster 'data/dataExplorer.bicep' = {
+  name: 'data explorer'
+  params: {
+    adxClusterName: adxClusterName
     location: location
   }
 }

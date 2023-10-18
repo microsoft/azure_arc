@@ -154,6 +154,7 @@ resource eventHubTopicSubscription 'Microsoft.EventGrid/topics/eventSubscription
 
 resource storageTopicSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@2023-06-01-preview' = {
   name: storageTopicSubscriptionName
+  parent:eventGridTopic
   properties: {
     destination: {
       endpointType: 'StorageQueue'
