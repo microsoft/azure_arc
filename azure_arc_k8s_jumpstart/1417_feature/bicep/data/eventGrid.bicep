@@ -28,7 +28,7 @@ param eventGridAuthThumbprint array = [
 param authValidationSchema string = 'ThumbprintMatch'
 
 @description('The name of the EventGrid namespace')
-param eventGridTopicSpaceName string = 'Ft1TopicSpace'
+param eventGridTopicSpaceName string = 'ft1TopicSpace'
 
 @description('The name of the EventGrid topic templates')
 param eventGridTopicTemplates array = [
