@@ -36,4 +36,4 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
 
 
 output queueName string = storageQueueName
-output queueId string = storageQueue.id
+output storageAccountId string = storageAccount.id

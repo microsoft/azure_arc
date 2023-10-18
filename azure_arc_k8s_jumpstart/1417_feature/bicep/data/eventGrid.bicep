@@ -58,7 +58,7 @@ param eventGridTopicSku string = 'Basic'
 param eventHubResourceId string
 
 @description('The resource Id of the storage account queue')
-param storageAccountQueueResourceId string
+param storageAccountResourceId string
 
 @description('The name of the storage account queue')
 param queueName string
@@ -158,7 +158,7 @@ resource storageTopicSubscription 'Microsoft.EventGrid/eventSubscriptions@2023-0
     destination: {
       endpointType: 'StorageQueue'
       properties: {
-        resourceId: storageAccountQueueResourceId
+        resourceId: storageAccountResourceId
         queueName: queueName
         queueMessageTimeToLiveInSeconds: queueTTL
       }

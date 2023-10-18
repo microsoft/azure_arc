@@ -1,5 +1,5 @@
 @description('The name of the EventHub namespace')
-param eventHubNamespaceName string = 'ft1eventhubns${uniqueString(resourceGroup().id)}'
+param eventHubNamespaceName string = 'ft1hubns${uniqueString(resourceGroup().id)}'
 
 @description('The name of the EventHub')
 param eventHubName string = 'Ft1EventHub'
@@ -27,6 +27,9 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = 
 resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2023-01-01-preview' = {
   name: eventHubName
   parent: eventHubNamespace
+  properties: {
+    messageRetentionInDays: 1
+  }
 }
 
 resource eventHubAuthRule 'Microsoft.EventHub/namespaces/authorizationRules@2023-01-01-preview' = {
