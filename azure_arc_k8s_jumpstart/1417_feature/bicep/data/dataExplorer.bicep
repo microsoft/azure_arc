@@ -33,8 +33,6 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
     tier: skuTier
     capacity: skuCapacity
   }
-
-  // Assign system assigned identity
   identity: {
     type: 'SystemAssigned'
   }
