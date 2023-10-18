@@ -19,6 +19,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   sku: {
     name: skuName
   }
+  properties: {
+    supportsHttpsTrafficOnly: true
+  }
 }
 
 resource storageQueueServices 'Microsoft.Storage/storageAccounts/queueServices@2023-01-01' = {
