@@ -274,6 +274,26 @@ az k8s-extension create --name "azuremonitor-containers" `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
+##############################################################
+# Install Azure edge CLI
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure Edge CLI extension" -ForegroundColor Gray
+$url = "https://aka.ms/azedgecli-latest"
+$response = Invoke-WebRequest -Uri $Url -MaximumRedirection 1
+$fileName=$response.BaseResponse.ResponseUri.AbsoluteUri.split('/')[4]
+
+Invoke-WebRequest -Uri "https://aka.ms/azedgecli-latest" -OutFile "$Ft1ToolsDir\$fileName"
+az extension add --source "$Ft1ToolsDir\$fileName" -y
+
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -ForegroundColor Gray
+# Setting up local storage policy and port forwarding for MQTT Broker.
+kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
+New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
+az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resource-group $resourceGroup
+$DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
+
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
 Write-Host "`n"
@@ -343,8 +363,6 @@ Stop-Process -Id $kubectlMonShell.Id
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
-
-Stop-Process -Name powershell -Force
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime

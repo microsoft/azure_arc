@@ -19,7 +19,14 @@ param windowsAdminPassword string
 param windowsOSVersion string = '2022-datacenter-g2'
 
 @description('Location for all resources.')
-param location string = resourceGroup().location
+@allowed([
+  'westus3'
+  'eastus2'
+  'westeurope'
+  'centraluseuap'
+  'eastus2euap'
+])
+param location string
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
@@ -63,8 +70,30 @@ param resourceTags object = {
   Project: 'jumpstart_azure_ft1'
 }
 
+@maxLength(5)
+@description('Random GUID')
+param namingGuid string = toLower(substring(newGuid(), 0, 5))
+
 @description('Deploy Windows Node for AKS Edge Essentials')
 param windowsNode bool = false
+
+@description('Name of the storage account')
+param ft1StorageAccountName string = 'ft1stg${namingGuid}'
+
+@description('Name of the storage queue')
+param storageQueueName string = 'ft1queue'
+
+@description('Name of the event hub')
+param eventHubName string = 'ft1hub${namingGuid}'
+
+@description('Name of the event hub namespace')
+param eventHubNamespaceName string = 'ft1hubns${namingGuid}'
+
+@description('Name of the event grid namespace')
+param eventGridNamespaceName string = 'ft1eventgridns${namingGuid}'
+
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string = 'ft1adx${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
@@ -273,6 +302,43 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
     virtualNetwork
 
   ]
+}
+
+module storageAccount 'storage/storageAccount.bicep' = {
+  name: 'storageAccount'
+  params: {
+    storageAccountName: ft1StorageAccountName
+    location: location
+    storageQueueName: storageQueueName
+  }
+}
+
+module eventHub 'data/eventHub.bicep' = {
+  name: 'eventHub'
+  params: {
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
+    location: location
+  }
+}
+
+module eventGrid 'data/eventGrid.bicep' = {
+  name: 'eventGrid'
+  params: {
+    eventGridNamespaceName: eventGridNamespaceName
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    queueName: storageQueueName
+    storageAccountResourceId: storageAccount.outputs.storageAccountId
+    location: location
+  }
+}
+
+module adxCluster 'data/dataExplorer.bicep' = {
+  name: 'dataExplorer'
+  params: {
+    adxClusterName: adxClusterName
+    location: location
+  }
 }
 
 output windowsAdminUsername string = windowsAdminUsername
