@@ -79,43 +79,10 @@ jobs:
         git commit -m "Update ACR name"
         git push
 
-    - name: Replace the correct Cosmos DB endpoint
-      continue-on-error: true
-      env:
-        GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
-      run: |
-        git config --global user.name "GitHub Action"
-        git config --global user.email "action@github.com"
-        git pull
-
-        branches=("seattle.yaml" "staging.yaml" "chicago.yaml" "dev.yaml")
-        for branch in "${branches[@]}"; do
-          FILE_PATHS=($(find . -name $branch))
-          if [ ${#FILE_PATHS[@]} -eq 0 ]; then
-            echo "No files found for $branch"
-            continue
-          fi
-          for FILE_PATH in "${FILE_PATHS[@]}"; do
-            newLine="      endpoint: $COSMOS_ENDPOINT"
-            if grep -q "endpoint" "$FILE_PATH"; then
-              sed -i "s#.*endpoint.*#$newLine#" "$FILE_PATH"
-            else
-              echo "endpoint not found in $FILE_PATH"
-            fi
-          done
-        done
-
-        # Push changes
-        git add .
-        git commit -m "Update Cosmos DB endpoint"
-        git push
-
     - name: Replace the correct GitHub account
       continue-on-error: true
       env:
         GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-        COSMOS_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
       run: |
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"

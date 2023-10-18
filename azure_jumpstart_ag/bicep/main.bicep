@@ -60,18 +60,6 @@ param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 @description('The name of the Staging Kubernetes cluster resource')
 param aksStagingClusterName string = 'Ag-AKS-Staging'
 
-@description('The name of the IotHub')
-param iotHubName string = 'Ag-IotHub-${namingGuid}'
-
-@description('The name of the Cosmos DB account')
-param accountName string = 'agcosmos${namingGuid}'
-
-@description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'agadx${namingGuid}'
-
-@description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'Orders'
-
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -141,41 +129,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     aksStagingClusterName: aksStagingClusterName
-    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName: accountName
-    cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
     acrName: acrName
     rdpPort: rdpPort
-    adxClusterName: adxClusterName
     namingGuid: namingGuid
-  }
-}
-
-module iotHubDeployment 'data/iotHub.bicep' = {
-  name: 'iotHubDeployment'
-  params: {
-    location: location
-    iotHubName: iotHubName
-  }
-}
-
-module adxDeployment 'data/dataExplorer.bicep' = {
-  name: 'adxDeployment'
-  params: {
-    location: location
-    adxClusterName: adxClusterName
-    iotHubId: iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-    cosmosDBAccountName: accountName
-    posOrdersDBName: posOrdersDBName
-  }
-}
-
-module cosmosDBDeployment 'data/cosmosDB.bicep' = {
-  name: 'cosmosDBDeployment'
-  params: {
-    location: location
-    accountName: accountName
-    posOrdersDBName: posOrdersDBName
   }
 }
