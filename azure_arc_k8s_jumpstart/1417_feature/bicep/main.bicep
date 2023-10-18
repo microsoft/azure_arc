@@ -77,10 +77,10 @@ param ft1StorageAccountName string = 'ft1stg${namingGuid}'
 param storageQueueName string = 'ft1queue'
 
 @description('Name of the event hub')
-param eventHubName string = 'ft1eventhub${namingGuid}'
+param eventHubName string = 'ft1hub${namingGuid}'
 
 @description('Name of the event hub namespace')
-param eventHubNamespaceName string = 'ft1eventhubns${namingGuid}'
+param eventHubNamespaceName string = 'ft1hubns${namingGuid}'
 
 @description('Name of the event grid namespace')
 param eventGridNamespaceName string = 'ft1eventgridns${namingGuid}'
