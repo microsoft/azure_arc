@@ -83,7 +83,7 @@ param eventHubNamespaceName string = 'ft1eventhubns${uniqueString(resourceGroup(
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'agadx${namingGuid}'
+param adxClusterName string = 'ftadx${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
