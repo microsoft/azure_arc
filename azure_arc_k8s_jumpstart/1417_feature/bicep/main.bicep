@@ -323,7 +323,7 @@ module eventGrid 'data/eventGrid.bicep' = {
 }
 
 module adxCluster 'data/dataExplorer.bicep' = {
-  name: 'data explorer'
+  name: 'dataExplorer'
   params: {
     adxClusterName: adxClusterName
     location: location
