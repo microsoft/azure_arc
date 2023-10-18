@@ -66,6 +66,18 @@ param resourceTags object = {
 @description('Deploy Windows Node for AKS Edge Essentials')
 param windowsNode bool = false
 
+@description('Name of the storage account')
+param ft1StorageAccountName string = 'ft1stg${uniqueString(resourceGroup().id)}'
+
+@description('Name of the storage queue')
+param storageQueueName string = 'ft1queue'
+
+@description('Name of the event hub')
+param eventHubName string = 'ft1eventhub'
+
+@description('Name of the event hub namespace')
+param eventHubNamespaceName string = 'ft1eventhubns${uniqueString(resourceGroup().id)}'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -273,6 +285,34 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
     virtualNetwork
 
   ]
+}
+
+module storageAccount 'storage/storageAccount.bicep' = {
+  name: 'Ft1StorageAccount'
+  params: {
+    storageAccountName: ft1StorageAccountName
+    location: location
+    storageQueueName: storageQueueName
+  }
+}
+
+module eventHub 'data/eventHub.bicep' = {
+  name: 'eventHub'
+  params: {
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
+    location: location
+  }
+}
+
+module eventGrid 'data/eventGrid.bicep' = {
+  name: 'eventGrid'
+  params: {
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    queueName: storageQueueName
+    storageAccountQueueResourceId: storageAccount.outputs.queueId
+    location: location
+  }
 }
 
 output windowsAdminUsername string = windowsAdminUsername
