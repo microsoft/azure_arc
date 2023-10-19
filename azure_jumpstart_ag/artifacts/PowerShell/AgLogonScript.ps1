@@ -1056,13 +1056,9 @@ foreach ($VM in $VMNames) {
         $retryDelay = 30  # Delay in seconds between retries
 
         for ($retry = 1; $retry -le $retryCount; $retry++) {
-            try {
-                Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath -ErrorAction Stop
-                Write-Output "Successfully onboarded AKS Edge Essentials cluster to Azure Arc."
-                break  # Exit the loop if the connection is successful
-            }
-            catch {
-                Write-Host "Failed to onboard AKS Edge Essentials cluster to Azure Arc. Retrying (Attempt $retry of $retryCount)..."
+            $return = Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+            if ($return -ne "OK") {
+                Write-Output "Failed to onboard AKS Edge Essentials cluster to Azure Arc. Retrying (Attempt $retry of $retryCount)..."
                 if ($retry -lt $retryCount) {
                     Start-Sleep -Seconds $retryDelay  # Wait before retrying
                 }
@@ -1070,6 +1066,9 @@ foreach ($VM in $VMNames) {
                     Write-Output "Exceeded maximum retry attempts. Exiting."
                     break  # Exit the loop after the maximum number of retries
                 }
+            } else {
+                Write-Output "Successfully onboarded AKS Edge Essentials cluster to Azure Arc."
+                break  # Exit the loop if the connection is successful
             }
         }
 
