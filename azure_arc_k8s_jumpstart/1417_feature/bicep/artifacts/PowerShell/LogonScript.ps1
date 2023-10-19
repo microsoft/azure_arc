@@ -17,6 +17,7 @@ $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
+$customLocationRPOID        = $Env:customLocationRPOID
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
@@ -277,6 +278,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-e
 az connectedk8s enable-features --name $arcClusterName `
                                 --resource-group $resourceGroup `
                                 --features cluster-connect custom-locations `
+                                --custom-locations-oid $customLocationRPOID `
                                 --only-show-errors
 
 ##############################################################

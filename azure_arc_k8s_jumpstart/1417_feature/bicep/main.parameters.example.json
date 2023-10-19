@@ -25,6 +25,9 @@
     },
     "deployBastion": {
       "value": false
+    },
+    "customLocationRPOID": {
+      "value": "XXXXX-XXXXX-XXXXX"
     }
   }
 }
