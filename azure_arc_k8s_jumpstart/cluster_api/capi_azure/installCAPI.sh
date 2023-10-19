@@ -15,13 +15,14 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export KUBECTL_VERSION="1.27/stable" # Do not change!
+  export KUBECTL_VERSION="1.28/stable" # Do not change!
   export GUID=$(echo $RANDOM | md5sum | head -c 4; echo;) # Do not change!
-  export CLUSTERCTL_VERSION="1.4.4" # Do not change!
+  export CLUSTERCTL_VERSION="1.5.2" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
   export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
-  export KUBERNETES_VERSION="1.27.1" # Do not change!
-  export K3S_VERSION="1.27.1+k3s1" # Do not change!
+  export KUBERNETES_VERSION="1.28.2" # Do not change!
+  export CALICO_VERSION="v3.25.2" # Do not change!
+  export K3S_VERSION="1.28.2+k3s1" # Do not change!
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
   export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
@@ -204,7 +205,7 @@ EOF
   echo ""
   # kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
   helm repo add projectcalico https://docs.tigera.io/calico/charts --kubeconfig=./$CLUSTER_NAME.kubeconfig && \
-  helm install calico projectcalico/tigera-operator --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
+  helm install calico projectcalico/tigera-operator --version $CALICO_VERSION --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
   echo ""
 
   echo ""
