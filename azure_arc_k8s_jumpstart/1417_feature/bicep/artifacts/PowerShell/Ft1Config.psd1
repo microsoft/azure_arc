@@ -40,7 +40,8 @@
         "Microsoft.Symphony",
         "Microsoft.Bluefin",
         "Microsoft.DeviceRegistry",
-        "Microsoft.EventGrid"
+        "Microsoft.EventGrid",
+        "Microsoft.ExtendedLocation"
     )
 
     # Az CLI required extensions
@@ -48,7 +49,8 @@
         'k8s-extension',
         'k8s-configuration',
         'azure-iot',
-        'eventgrid'
+        'eventgrid',
+        'customlocation'
     )
 
     # PowerShell modules

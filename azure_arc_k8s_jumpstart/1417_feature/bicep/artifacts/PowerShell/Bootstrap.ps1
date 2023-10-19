@@ -8,7 +8,8 @@ param (
     [string]$templateBaseUrl,
     [string]$resourceGroup,
     [string]$windowsNode,
-    [string]$kubernetesDistribution
+    [string]$kubernetesDistribution,
+    [string]$customLocationRPOID
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -21,7 +22,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode, [System.EnvironmentVariableTarget]::Machine)
-
+[System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 
 ##############################################################
 # Download configuration data file and declaring directories
