@@ -17,6 +17,7 @@ $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
 $subscriptionId             = $Env:subscriptionId
+$customLocationRPOID        = $Env:customLocationRPOID
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
@@ -252,8 +253,6 @@ if ($env:kubernetesDistribution -eq "k8s") {
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 }
 
-
-
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Create Azure Monitor for containers Kubernetes extension instance" -ForegroundColor Gray
 Write-Host "`n"
@@ -273,6 +272,14 @@ az k8s-extension create --name "azuremonitor-containers" `
     --cluster-type connectedClusters `
     --extension-type Microsoft.AzureMonitor.Containers `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+
+# Enable custom locations on the Arc-enabled cluster
+Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor Gray
+az connectedk8s enable-features --name $arcClusterName `
+                                --resource-group $resourceGroup `
+                                --features cluster-connect custom-locations `
+                                --custom-locations-oid $customLocationRPOID `
+                                --only-show-errors
 
 ##############################################################
 # Install Azure edge CLI
