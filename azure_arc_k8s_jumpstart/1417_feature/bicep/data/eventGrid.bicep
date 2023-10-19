@@ -109,7 +109,7 @@ resource eventGridPubisherBinding 'Microsoft.EventGrid/namespaces/permissionBind
   properties: {
     clientGroupName: eventGridClientGroupName
     permission: 'Publisher'
-    topicSpaceName: eventGridTopicSpaceName
+    topicSpaceName: eventGridTopicSpace.name
   }
 }
 
@@ -119,7 +119,7 @@ resource eventGridsubscriberBindingName 'Microsoft.EventGrid/namespaces/permissi
   properties: {
     clientGroupName: eventGridClientGroupName
     permission: 'Subscriber'
-    topicSpaceName: eventGridTopicSpaceName
+    topicSpaceName: eventGridTopicSpace.name
   }
 }
 
