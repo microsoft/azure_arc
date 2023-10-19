@@ -53,7 +53,7 @@ HCIBox includes capabilities to support managing, monitoring and governing the c
 
 ## HCIBox Azure Consumption Costs
 
-HCIBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxiliary services. Note that Azure consumption costs may vary depending the region where HCIBox is deployed. Be mindful of your HCIBox deployments and ensure that you disable or delete HCIBox resources when not in use to avoid unwanted charges. Please see the [Jumpstart FAQ](https://aka.ms/Jumpstart-FAQ) for more information on consumption costs.
+HCIBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxiliary services. Note that Azure consumption costs may vary depending on the region where HCIBox is deployed. Be mindful of your HCIBox deployments and ensure that you disable or delete HCIBox resources when not in use to avoid unwanted charges. Please see the [Jumpstart FAQ](https://aka.ms/Jumpstart-FAQ) for more information on consumption costs.
 
 ## Deployment Options and Automation Flow
 
@@ -61,7 +61,7 @@ HCIBox provides two methods for deploying and configuring the necessary resource
 
 - A [Bicep](https://learn.microsoft.com/azure/azure-resource-manager/bicep/overview?tabs=bicep) template that can be deployed manually via Azure CLI.
 
-- An [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) template that can be used to for a more streamlined experience.
+- An [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) template that can be used for a more streamlined experience.
 
 ![Screenshot showing deployment flow diagram for Bicep-based deployments](./deployment_flow.png)
 
@@ -73,7 +73,7 @@ HCIBox uses an advanced automation flow to deploy and configure all necessary re
   - Storage account template - used for staging files in automation scripts and as the cloud witness for the HCI cluster
   - Management artifacts template - deploys Azure Log Analytics workspace and solutions and Azure Policy artifacts
 - User remotes into _HCIBox-Client_ VM, which automatically kicks off a PowerShell script that:
-  - Deploys and configure three (3) nested virtual machines in Hyper-V
+  - Deploy and configure three (3) nested virtual machines in Hyper-V
     - Two (2) Azure Stack HCI virtual nodes
     - One (1) Windows Server 2019 virtual machine
   - Configures the necessary virtualization and networking infrastructure on the Hyper-V host to support the HCI cluster.
@@ -114,11 +114,11 @@ The following prerequisites must be completed in order to deploy HCIBox using th
   - West US 2
   - North Europe
 
-  > __NOTE: Some HCIBox resources will be created in regions other than the one you initially specify. This is due to limited regional availability of the various services included in HCIBox.__
+  > __NOTE: Some HCIBox resources will be created in regions other than the one you initially specified. This is due to the limited regional availability of the various services included in HCIBox.__
 
 - __HCIBox requires 32 ESv5-series vCPUs__ when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy HCIBox. You can use the below Az CLI command to check your vCPU utilization.
 
-  > __NOTE: If using Azure Developer CLI the preprovision step will check your subscription for available capacity.__
+  > __NOTE: If using Azure Developer CLI the pre-provision step will check your subscription for available capacity.__
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -159,7 +159,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
     az ad sp create-for-rbac -n "JumpstartHCIBox" --role "Owner" --scopes /subscriptions/$subscriptionId
     ```
 
-    Output should look similar to this:
+    The output should look similar to this:
 
     ```json
     {
@@ -170,7 +170,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
     }
     ```
   
-  - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install Azure PowerShell modules.
+  - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install or update Azure PowerShell to version 10.4.0 or above.
 
     ```PowerShell
     $account = Connect-AzAccount
@@ -188,17 +188,17 @@ The following prerequisites must be completed in order to deploy HCIBox using th
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
     ```
 
-    Output should look similar to this:
+    The output should look similar to this:
 
     ![Screenshot showing creating an SPN with PowerShell](./create_spn_powershell.png)
 
     > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.__
 
-    > __NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
+    > __NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
 
 ## Azure Developer CLI deployment
 
-- Follow to install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
+- Follow the install guide for the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd?tabs=winget-windows%2Cbrew-mac%2Cscript-linux&pivots=os-linux) for your environment.
 
   > __NOTE: PowerShell is required for using azd with HCIBox. If you are running in a Linux environment be sure that you have [PowerShell for Linux](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.3) installed.__
 
@@ -218,7 +218,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
 
 ## Bicep deployment via Azure CLI
 
-- Upgrade to latest Bicep version
+- Upgrade to the latest Bicep version
 
   ```shell
   az bicep upgrade
@@ -231,7 +231,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the HCIBox Log Analytics workspace
-  - _`deployBastion`_ - Option to deploy Azure Bastion which used to connect to the _HCIBox-Client_ VM instead of normal RDP.
+  - _`deployBastion`_ - Option to deploy Azure Bastion which is used to connect to the _HCIBox-Client_ VM instead of normal RDP.
   - _`registerCluster`_ - Option to automatically register the cluster; set to true by default
   - _`deployAKSHCI`_ - Option to automatically deploy and configure AKS on HCI; set to true by default
   - _`deployResourceBridge`_ - Option to automatically deploy and configure Arc Resource Bridge; set to true by default
@@ -249,7 +249,7 @@ The following prerequisites must be completed in order to deploy HCIBox using th
 
 ## Start post-deployment automation
 
-Once your deployment is complete, you can open the Azure portal and see the initial HCIBox resources inside your resource group. You will be using both Azure portal the _HCIBox-Client_ Azure virtual machine to interact with the HCIBox resources.
+Once your deployment is complete, you can open the Azure portal and see the initial HCIBox resources inside your resource group. You will be using both the Azure portal and the _HCIBox-Client_ Azure virtual machine to interact with the HCIBox resources.
 
   ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
 
@@ -404,7 +404,7 @@ HCIBox provides a full Azure Stack HCI sandbox experience with minimal configura
 
 ### Next steps
   
-HCIBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or a to jumpstart a proof of concept projects. Ultimately, you are free to do whatever you wish with HCIBox. Some suggested next steps for you to try in your HCIBox are:
+HCIBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or to jumpstart proof of concept projects. Ultimately, you are free to do whatever you wish with HCIBox. Some suggested next steps for you to try in your HCIBox are:
 
 - Explore Windows Admin Center from either Azure portal or from the WAC gateway server
 - Deploy GitOps configurations with Azure Arc-enabled Kubernetes
@@ -440,7 +440,7 @@ Occasionally deployments of HCIBox may fail at various stages. Common reasons fo
 - Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _main.parameters.json_ file. This can cause failures when running automation that requires logging into Azure, such as the scripts that register the HCI cluster, deploy AKS-HCI, or configure Arc resource bridge.
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 48 available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running HCIBox in one of the supported regions. See the [prerequisites](#prerequisites) section for more details.
-- Authentication issues - Most HCIBox operations require the use of the domain credentials configured during deployment. These credentials take the UPN format of _<username>@jumpstart.local_. If you have issues accessing services such as Windows Admin Center make sure you are using the correct credential.
+- Authentication issues - Most HCIBox operations require the use of the domain credentials configured during deployment. These credentials take the UPN format of _<username>@jumpstart.local_. If you have issues accessing services such as Windows Admin Center, make sure you are using the correct credential.
 - Script failures due to upstream dependencies - This can happen due to network issues or failures in upstream services that HCIBox depends on (such as package repositories) - in most cases deleting the deployment and redeploying is the simplest resolution.
 
 If you have issues that you cannot resolve when deploying HCIBox please submit an issue on the [Github repo](https://github.com/microsoft/azure_arc/issues)

@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Security Baseline"
 linkTitle: "Azure Security Baseline"
-weight: 12
+weight: 14
 description: >
 ---
 

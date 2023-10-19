@@ -45,7 +45,7 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
 }
 
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
-    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az extension add --upgrade --version 0.2.31 --name arcappliance --only-show-errors
     az extension add --upgrade --name connectedk8s --only-show-errors
@@ -86,7 +86,7 @@ $ErrorActionPreference = "Continue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Deploying Arc Resource Bridge. This will take a while."
     $WarningPreference = "SilentlyContinue"
-    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
@@ -100,7 +100,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         Write-Host "Waiting on Arc Resource Bridge deployment to complete..."
         Start-Sleep 60
         $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name --only-show-errors | ConvertFrom-Json
-        if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Running")) {
+        if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Connected")) {
             $rbReady = $true
         }
     } Until ($rbReady)
@@ -110,7 +110,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Creating custom location"
     $hciClusterId= (Get-AzureStackHci).AzureResourceUri
     az k8s-extension create --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator --extension-type Microsoft.AZStackHCI.Operator --scope cluster --release-namespace helm-operator2 --configuration-settings Microsoft.CustomLocation.ServiceAccount=hci-vmoperator --configuration-protected-settings-file $using:csv_path\ResourceBridge\hci-config.json --configuration-settings HCIClusterID=$hciClusterId --auto-upgrade true --only-show-errors
-
+    Start-Sleep -Seconds 90
+    
     $clReady = $false
     Do {
         Write-Host "Waiting for custom location to provision..."
@@ -138,7 +139,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $vnetName="vlan200"
     # New-MocGroup -name "Default_Group" -location "MocLocation" ## No longer needed with appliance version 0.2.31
     New-MocVirtualNetwork -name "$vnetName" -group "Default_Group" -tags @{'VSwitch-Name' = "sdnSwitch"} -vlanID $using:SDNConfig.AKSVlanID
-    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
+    [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName --vlan $using:SDNConfig.AKSVlanID --only-show-errors
     

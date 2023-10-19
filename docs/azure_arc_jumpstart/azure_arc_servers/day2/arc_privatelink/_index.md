@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Private Link"
 linkTitle: "Azure Private Link"
-weight: 9
+weight: 11
 description: >
 ---
 
