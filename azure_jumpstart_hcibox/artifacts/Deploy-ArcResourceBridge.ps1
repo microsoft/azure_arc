@@ -110,7 +110,8 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Creating custom location"
     $hciClusterId= (Get-AzureStackHci).AzureResourceUri
     az k8s-extension create --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator --extension-type Microsoft.AZStackHCI.Operator --scope cluster --release-namespace helm-operator2 --configuration-settings Microsoft.CustomLocation.ServiceAccount=hci-vmoperator --configuration-protected-settings-file $using:csv_path\ResourceBridge\hci-config.json --configuration-settings HCIClusterID=$hciClusterId --auto-upgrade true --only-show-errors
-
+    Start-Sleep -Seconds 90
+    
     $clReady = $false
     Do {
         Write-Host "Waiting for custom location to provision..."
