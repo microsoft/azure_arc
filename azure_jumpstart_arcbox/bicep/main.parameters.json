@@ -3,31 +3,31 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sshRSAPublicKey": {
-            "value": "<your RSA public key>"
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM8LFiO3oNRIxXqP4WPfdX/kUBhBQHpYE9Kc5a5Vis3JHBfnV4yQl5cobKnvYM3/If8PueH0fe3KhRqXjQeygpGu34KInklj1IizFjhX08IgW32zC+BIcc4rfi5IgM1XNJf7tztp0imhrFbG1XVcrIbVfDGHabkUoB13NE0hOjPDRLH8P4GiSSiZ/m/4E0r+hHFaDdNqxCVo8pz4557XspvQCaxuX4iC+sPJfvmsO+cb8vGwdVRKupJSeM0pu71eEBwAAohRDSW+VsRTpfM+N+wJBGrYjjznbXKSCsImAtmROtpj2ClZCOYnuGEMmzcGoiFWmDZXaCLpr1e88nfDTV"
         },
         "spnClientId": {
-            "value": "<your service principal client id>"
+            "value": "b41e32e5-3354-45f4-ab63-6e40af0740dc"
         },
         "spnClientSecret": {
-            "value": "<your service principal secret>"
+            "value": "QWX8Q~G~VZ5~oL4_UA6z3.RmwdRanB_PMg.HPacb"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "6e86c5ae-e78f-4878-a19f-bb0016a53c5e"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
         },
         "windowsAdminPassword": {
-            "value": "<your windows admin password>"
+            "value": "ArcPassword123!!"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "<your unique Log Analytics workspace name>"
+            "value": "arcboxworkspacehtd"
         },
         "flavor": {
             "value":  "Full"
         },
         "deployBastion": {
-            "value": false
+            "value": true
         }
     }
 }
