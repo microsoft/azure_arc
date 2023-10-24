@@ -105,7 +105,7 @@ if (-not (Test-Path -Path $installDir)) {
 Push-Location $installDir
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials, this will take a few minutes." -ForegroundColor DarkGreen
 Write-Host "`n"
 
 try {
