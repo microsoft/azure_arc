@@ -30,7 +30,7 @@ param githubBranch string = 'main'
 param deployBastion bool = false
 
 @description('Name of the Cloud VNet')
-param virtualNetworkNameCloud string = 'Vnet-Prod'
+param virtualNetworkNameCloud string = 'VNet-Prod'
 
 @description('Name of the subnet in the cloud virtual network')
 param subnetName string = 'Subnet-VM'
