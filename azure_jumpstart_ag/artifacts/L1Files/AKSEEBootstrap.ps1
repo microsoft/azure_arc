@@ -147,20 +147,10 @@ Start-Process msiexec.exe -ArgumentList "/i `"$msiFilePath`" /passive /qb! /log 
 Import-Module AksEdge.psm1 -Force
 Install-AksEdgeHostFeatures -Force
 
-if ($env:computername -eq "Chicago") {
-    Write-Output "Started perf tracing"
-    wpr -start CPU.light -start DiskIO.light -start FileIO.light
-}
-
 # Deploying AKS Edge Essentials cluster
 Set-Location $deploymentFolder
 New-AksEdgeDeployment -JsonConfigFilePath ".\Config.json"
 Write-Host
-
-if ($env:computername -eq "Chicago") {
-    Write-Output "Stopped perf tracing"
-    wpr -stop log_file.etl
-}
 
 # kubeconfig work for changing context and coping to the Hyper-V host machine
 $newKubeContext = $(hostname).ToLower()
