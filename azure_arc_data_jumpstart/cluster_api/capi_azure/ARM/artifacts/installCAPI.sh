@@ -58,10 +58,8 @@ echo ""
 # Installing snap
 sudo apt install snapd
 
-# Installing Docker
-sudo snap install docker
-sudo groupadd docker
-sudo usermod -aG docker $adminUsername
+# Installing jq
+sudo apt install jq -y
 
 # Installing kustomize
 sudo snap install kustomize
@@ -72,6 +70,7 @@ export CLUSTERCTL_VERSION="1.5.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
 export KUBERNETES_VERSION="1.28.2" # Do not change!
+export CALICO_VERSION="v3.25.2" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.29.0" # Do not change!
 export K3S_VERSION="1.28.2+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -189,13 +188,39 @@ until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do
 echo ""
 sudo kubectl get kubeadmcontrolplane --all-namespaces
 clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+sleep 120
 echo ""
-sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+helm repo add projectcalico https://docs.tigera.io/calico/charts --kubeconfig=./$CLUSTER_NAME.kubeconfig && \
+helm install calico projectcalico/tigera-operator --version $CALICO_VERSION --kubeconfig=./$CLUSTER_NAME.kubeconfig -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico/values.yaml --namespace tigera-operator --create-namespace
 
 echo ""
-CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
-export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+while true; do
+  # Retrieve the list of nodes
+  nodes=$(kubectl get nodes --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.items[].metadata.name')
+
+  # Flag to keep track of readiness status
+  all_ready=true
+
+  # Iterate over each node and check its status
+  for node in $nodes; do
+    ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
+    
+    if [[ $ready != "True" ]]; then
+      echo "Node $node is not ready."
+      all_ready=false
+    fi
+  done
+
+  # Check if all nodes are ready
+  if [[ $all_ready == true ]]; then
+    echo "All nodes are ready."
+    break
+  else
+    echo "Waiting for 30 seconds..."
+    sleep 30
+  fi
+done
+
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
