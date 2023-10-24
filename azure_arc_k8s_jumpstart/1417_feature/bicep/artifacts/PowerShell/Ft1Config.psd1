@@ -29,7 +29,6 @@
         aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
         stepCliReleases    = 'https://api.github.com/repos/smallstep/cli/releases'
     }
-    https://api.github.com/repos/smallstep/cli/releases
     # Azure required registered resource providers
     AzureProviders          = @(
         "Microsoft.Kubernetes",
