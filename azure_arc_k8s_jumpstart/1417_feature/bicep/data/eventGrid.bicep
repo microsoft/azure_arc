@@ -4,6 +4,10 @@ param eventGridNamespaceName string = 'Ft1Namespace'
 @description('The location of the Azure Data Explorer cluster')
 param location string = resourceGroup().location
 
+@maxLength(5)
+@description('Random GUID')
+param namingGuid string
+
 @description('EventGrid Sku')
 param eventGridSku string = 'Standard'
 
@@ -28,7 +32,7 @@ param eventGridAuthThumbprint array = [
 param authValidationSchema string = 'ThumbprintMatch'
 
 @description('The name of the EventGrid namespace')
-param eventGridTopicSpaceName string = 'ft1TopicSpace'
+param eventGridTopicSpaceName string = 'ft1TopicSpace${namingGuid}'
 
 @description('The name of the EventGrid topic templates')
 param eventGridTopicTemplates array = [
@@ -49,7 +53,7 @@ param eventGridTopicSubscriptionName string = 'ft1EventHubSubscription'
 param storageTopicSubscriptionName string = 'ft1StorageSubscription'
 
 @description('The name of the EventGrid topic')
-param eventGridTopicName string = 'ft1Topic'
+param eventGridTopicName string = 'ft1Topic${namingGuid}'
 
 @description('The name of the EventGrid topic sku')
 param eventGridTopicSku string = 'Basic'

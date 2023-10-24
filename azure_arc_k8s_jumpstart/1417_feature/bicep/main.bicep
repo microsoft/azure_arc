@@ -336,6 +336,7 @@ module eventGrid 'data/eventGrid.bicep' = {
     queueName: storageQueueName
     storageAccountResourceId: storageAccount.outputs.storageAccountId
     location: location
+    namingGuid: namingGuid
   }
 }
 
