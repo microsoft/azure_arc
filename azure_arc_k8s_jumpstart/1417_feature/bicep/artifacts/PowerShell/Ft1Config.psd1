@@ -33,7 +33,6 @@
     AzureProviders          = @(
         "Microsoft.Kubernetes",
         "Microsoft.KubernetesConfiguration",
-        "Microsoft.ExtendedLocation",
         "Microsoft.HybridCompute",
         "Microsoft.GuestConfiguration",
         "Microsoft.HybridConnectivity",
