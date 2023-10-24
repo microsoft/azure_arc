@@ -349,7 +349,7 @@ Once your deployment is complete, you can open the Azure portal and see the ArcB
 
 Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connect-using-just-in-time-accessjit).
+- [RDP](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-Time access (JIT)](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connect-using-just-in-time-access-jit).
 - [Azure Bastion](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 #### Connecting directly with RDP
@@ -467,7 +467,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     az ssh arc --resource-group $Env:resourceGroup --name $serverName --local-user $localUser
     ```
 
-    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the _az ssh_ commands will run successfully.**.
+    > **NOTE: Server-side SSH is being provisioned asynchronously to the VMs in the automated provisioning scripts, so it might take up to 5 minutes after the ArcBox deployment scripts is finished until the _az ssh_ commands will run successfully.**
 
     ![Screenshot showing usage of SSH via Azure CLI](./ssh_via_az_cli_01.png)
 
