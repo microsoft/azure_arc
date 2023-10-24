@@ -2817,8 +2817,13 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 
 # Create Virtual Machines
 # First create the Management VM (AzSMGMT)
-New-ManagementVM -Name $HCIBoxConfig.MgmtHostName -VHDXPath "$HostVMPath\GUI.vhdx"
 $vmMacs = @()
+$mac = New-ManagementVM -Name $HCIBoxConfig.MgmtHostName -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+$vmMacs += [PSCustomObject]@{
+    Hostname = $HCIBoxConfig.MgmtHostName
+    vmMAC    = $mac
+}
+
 foreach ($VM in $VMPlacement) {
     Write-Verbose "Generating the VM: $VM" 
     $params = @{
