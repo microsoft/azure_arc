@@ -11,6 +11,7 @@ $Ft1AppsRepo                = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
 $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
+$stepCliReleasesUrl         = $websiteUrls["stepCliReleases"]
 $resourceGroup              = $Env:resourceGroup
 $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
@@ -43,6 +44,10 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "flannel"
 }
 
+
+##############################################################
+# AKS EE setup
+##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 
@@ -301,8 +306,9 @@ az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resou
 $DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
 
-## Arc - enabled Server
-## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
+##############################################################
+# Arc-enabling the Windows server host
+##############################################################
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM" -ForegroundColor Gray
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
@@ -334,6 +340,20 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
+
+##############################################################
+# Install Step Cli
+##############################################################
+$latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "step_windows_${versionToDownload}_amd64.zip"}).browser_download_url
+$output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
+Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
+Expand-Archive $output -DestinationPath $Ft1TempDir -Force
+$stepCliPath = "$Ft1TempDir\bin\step.exe"
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$newPathVariable = $currentPathVariable + ";" + $stepCliPath
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
 
 #############################################################
 # Install VSCode extensions

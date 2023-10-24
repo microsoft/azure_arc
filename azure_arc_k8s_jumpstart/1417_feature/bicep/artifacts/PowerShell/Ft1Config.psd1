@@ -27,8 +27,9 @@
         vcLibs             = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
         aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
+        stepCliReleases    = 'https://api.github.com/repos/smallstep/cli/releases'
     }
-
+    https://api.github.com/repos/smallstep/cli/releases
     # Azure required registered resource providers
     AzureProviders          = @(
         "Microsoft.Kubernetes",
