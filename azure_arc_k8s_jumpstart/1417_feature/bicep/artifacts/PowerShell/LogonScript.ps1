@@ -350,7 +350,7 @@ $stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFr
 $output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
-$stepCliPath = "$Ft1ToolsDir\bin\step.exe"
+$stepCliPath = "$Ft1ToolsDir\step_$versionToDownload\bin\step.exe"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
