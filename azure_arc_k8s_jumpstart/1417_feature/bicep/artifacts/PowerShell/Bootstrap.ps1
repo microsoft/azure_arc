@@ -9,7 +9,8 @@ param (
     [string]$resourceGroup,
     [string]$windowsNode,
     [string]$kubernetesDistribution,
-    [string]$customLocationRPOID
+    [string]$customLocationRPOID,
+    [string]$rdpPort
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -24,6 +25,40 @@ param (
 [System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 
+
+
+##############################################################
+# Change RDP Port
+##############################################################
+Write-Host "RDP port number from configuration is $rdpPort"
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
+    Write-Host "Configuring RDP port number to $rdpPort"
+    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+
+    # RDP port
+    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+    Write-Host "Current RDP PortNumber: $portNumber"
+    if (!($portNumber -eq $rdpPort)) {
+        Write-Host Setting RDP PortNumber to $rdpPort
+        Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+        Restart-Service TermService -force
+    }
+
+    #Setup firewall rules
+    if ($rdpPort -eq 3389) {
+        netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    }
+    else {
+        $systemroot = get-content env:systemroot
+        netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    }
+
+    Write-Host "RDP port configuration complete."
+}
+
+
 ##############################################################
 # Download configuration data file and declaring directories
 ##############################################################
@@ -33,7 +68,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -Ou
 $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$Ft1PowerShellDir  = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
+$Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {
