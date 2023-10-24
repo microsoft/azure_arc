@@ -51,7 +51,6 @@
         'azure-iot',
         'eventgrid',
         'customlocation',
-        'eventhub',
         'kusto',
         'storage-preview'
     )
