@@ -347,10 +347,10 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 $latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "step_windows_${versionToDownload}_amd64.zip"}).browser_download_url
-$output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
+$output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath $Ft1TempDir -Force
-$stepCliPath = "$Ft1TempDir\bin\step.exe"
+Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
+$stepCliPath = "$Ft1ToolsDir\bin\step.exe"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
