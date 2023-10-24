@@ -3963,7 +3963,7 @@ spec:
     app: longhorn-ui
   ports:
   - name: http
-    port: 80
+    port: 8888
     targetPort: http
     nodePort: null
 ---
