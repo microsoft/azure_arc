@@ -354,6 +354,7 @@ $stepCliPath = "$Ft1TempDir\bin\step.exe"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+Remove-Item -Path $output -Force
 
 #############################################################
 # Install VSCode extensions
