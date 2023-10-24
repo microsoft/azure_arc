@@ -187,6 +187,10 @@ az k8s-extension create --name $extensionName `
                         --config "storage.accessMode=ReadWriteMany"
 
 # Allow access to the frontend through the VM NIC interface
+Write-Host "Adding Windows Defender firewall rule for VI frontend..."
+New-NetFirewallRule -DisplayName "Allow Inbound Port 80" -Direction Inbound -LocalPort 80 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "Allow Inbound Port 443" -Direction Inbound -LocalPort 443 -Protocol TCP -Action Allow
+
 Write-Host "Adding port forward for VI frontend..."
 Start-Sleep -Seconds 20
 $ing = kubectl get ing videoindexer-vi-arc -n $namespace -o json | ConvertFrom-Json
