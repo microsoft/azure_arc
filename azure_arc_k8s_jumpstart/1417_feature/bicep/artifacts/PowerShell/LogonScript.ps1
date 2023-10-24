@@ -105,7 +105,7 @@ if (-not (Test-Path -Path $installDir)) {
 Push-Location $installDir
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: About to silently install AKS Edge Essentials, this will take a few minutes." -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials, this will take a few minutes." -ForegroundColor DarkGreen
 Write-Host "`n"
 
 try {
@@ -350,7 +350,7 @@ $stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFr
 $output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
-$stepCliPath = "$Ft1ToolsDir\step_$versionToDownload\bin\step.exe"
+$stepCliPath = "$Ft1ToolsDir\step_$versionToDownload\bin\"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
