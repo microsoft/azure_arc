@@ -50,7 +50,10 @@
         'k8s-configuration',
         'azure-iot',
         'eventgrid',
-        'customlocation'
+        'customlocation',
+        'eventhub',
+        'kusto',
+        'storage-preview'
     )
 
     # PowerShell modules
@@ -58,7 +61,9 @@
         'Az.ConnectedKubernetes',
         'Az.KubernetesConfiguration',
         'Az.Kusto',
-        'Az.EventGrid'
+        'Az.EventGrid',
+        'Az.Storage',
+        'Az.EventHub'
     )
 
     # Chocolatey packages list
