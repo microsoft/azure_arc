@@ -114,8 +114,8 @@
         Nodes = @{
             'LinuxNode' = @{
                 'CpuCount'     = 4
-                'MemoryInMB'   = 8192
-                'DataSizeInGB' = 30
+                'MemoryInMB'   = 16384
+                'DataSizeInGB' = 50
             }
             'WindowsNode' = @{
                 'CpuCount'   = 2
