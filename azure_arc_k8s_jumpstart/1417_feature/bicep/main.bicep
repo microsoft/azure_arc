@@ -35,7 +35,7 @@ param deployBastion bool
 param bastionHostName string = 'AKS-EE-Demo-Bastion'
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D4s_v3'
+param vmSize string = 'Standard_D8s_v3'
 
 @description('Unique SPN app ID')
 param spnClientId string

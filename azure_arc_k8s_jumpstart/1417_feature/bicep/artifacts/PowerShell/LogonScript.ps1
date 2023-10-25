@@ -239,7 +239,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
-$arcClusterName = "$resourceGroup-$guid"
+$arcClusterName = "ft1-$guid"
 
 
 if ($env:kubernetesDistribution -eq "k8s") {
