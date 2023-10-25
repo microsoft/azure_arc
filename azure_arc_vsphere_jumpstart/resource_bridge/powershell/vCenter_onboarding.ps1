@@ -12,7 +12,6 @@ $vcenterPassword = '<vCenter Password>'
 $spnClientId = '<Service principal appId>'
 $spnClientSecret = '<Service principal password>'
 $spnTenantId = '<Service principal Tenant ID>'
-$vSphereRP = '<Connected VMware vSphere resource provider Id>'
 
 ## vSphere parameters
 $vmTemplate = '<Arc appliance template name>'
@@ -22,6 +21,7 @@ $folder = '<vSphere template folder>'
 $dnsServer = '<DNS server to be used for the appliance>'
 $gateway = '<Gateway address to be used for the appliance>'
 $ipAddressPrefix = '<Network address in CIDR notation>'
+
 ## Minimum size of two available IP addresses are required. One IP address is for the VM, and the other is reserved for upgrade scenarios
 $k8sNodeIpPoolStart = '<IP range start>'
 $k8sNodeIpPoolEnd = '<IP range end>'
@@ -29,6 +29,7 @@ $segment = '<Name of the virtual network or segment to which the appliance VM mu
 $resourcePool = '<Name of the resource pool>'
 $controlPlaneEndpoint = '<IP address of the Kubernetes cluster control plane>'
 
+$vSphereRP = 'Microsoft.VMware Resource Provider'
 # <--- Change the following environment variables according to your environment --->
 
 # Copying the config files
@@ -40,7 +41,7 @@ Copy-Item .\config\arcbridge-resource-stage.yaml -Force -Destination .
 $InfraParams = ".\arcbridge-infra-stage.yaml"
 (Get-Content -Path $InfraParams) -replace 'vmTemplate-stage',$vmTemplate | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'datacenter-stage',$datacenter | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'datastore',$datastore | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'datastore-stage',$datastore | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'folder-stage',$folder | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'dnsServer-stage',$dnsServer | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'gateway-stage',$gateway | Set-Content -Path $InfraParams
@@ -81,29 +82,101 @@ New-Item -Force -Path "." -Name ".temp" -ItemType "directory" > $null
 
 $ProgressPreference = 'SilentlyContinue'
 
-log "Validating and installing 64-bit python"
-try {
-    $bitSize = py -c "import struct; print(struct.calcsize('P') * 8)"
-    if ($bitSize -ne "64") {
-        throw "Python is not 64-bit"
+function getLatestAzVersion() {
+    # https://github.com/Azure/azure-cli/blob/4e21baa4ff126ada2bc232dff74d6027fd1323be/src/azure-cli-core/azure/cli/core/util.py#L295
+    $gitUrl = "https://raw.githubusercontent.com/Azure/azure-cli/main/src/azure-cli/setup.py"
+    try {
+        $response = Invoke-WebRequest -Uri $gitUrl -TimeoutSec 30
     }
-    log "64-bit python is already installed"
+    catch {
+        logWarn "Failed to get the latest version from '$gitUrl': $($_.Exception.Message)"
+        return $null
+    }
+    if ($response.StatusCode -ne 200) {
+        logWarn "Failed to fetch the latest version from '$gitUrl' with status code '$($response.StatusCode)' and reason '$($response.StatusDescription)'"
+        return $null
+    }
+    $content = $response.Content
+    foreach ($line in $content -split "`n") {
+        if ($line.StartsWith('VERSION')) {
+            $match = [System.Text.RegularExpressions.Regex]::Match($line, 'VERSION = "(.*)"')
+            if ($match.Success) {
+                return $match.Groups[1].Value
+            }
+        }
+    }
+    logWarn "Failed to extract the latest version from the content of '$gitUrl'"
+    return $null
 }
-catch {
-    log "Installing python..."
-    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.8.8/python-3.8.8-amd64.exe" -OutFile ".temp/python-3.8.8-amd64.exe"
-    $p = Start-Process .\.temp\python-3.8.8-amd64.exe -Wait -PassThru -ArgumentList '/quiet InstallAllUsers=0 PrependPath=1 Include_test=0'
+
+function shouldInstallAzCli() {
+    # This function returns a boolean value, but any undirected / uncaptured stdout
+    # inside the function might be interpreted as true value by the caller.
+    # We can redirect using *>> to avoid this.
+    log "Validating and installing 64-bit azure-cli"
+    $azCmd = (Get-Command az -ErrorAction SilentlyContinue)
+    if ($null -eq $azCmd) {
+        log "Azure CLI is not installed. Installing..."
+        return $true
+    }
+
+    $currentAzVersion = az version --query '\"azure-cli\"' -o tsv 2>> $logFile
+    log "Azure CLI version $currentAzVersion found in PATH at location: '$($azCmd.Source)'"
+    $azVersion = az --version *>&1;
+    $azVersionLines = $azVersion -split "`n"
+    # https://github.com/microsoft/knack/blob/e0c14114aea5e4416c70a77623e403773aba73a8/knack/cli.py#L126
+    $pyLoc = $azVersionLines | Where-Object { $_ -match "^Python location" }
+    if ($null -eq $pyLoc) {
+        logWarn "Warning: Python location could not be found from the output of az --version:`n$($azVersionLines -join "`n"))"
+        return $true
+    }
+    log $pyLoc
+    $pythonExe = $pyLoc -replace "^Python location '(.+?)'$", '$1'
+    try {
+        log "Determining the bitness of Python at '$pythonExe'"
+        $arch = & $pythonExe -c "import struct; print(struct.calcsize('P') * 8)";
+        if ($arch -lt 64) {
+            log "Azure CLI is $arch-bit. Installing 64-bit version..."
+            return $true
+        }
+    }
+    catch {
+        log "Warning: Python version could not be determined from the output of az --version:`n$($azVersionLines -join "`n"))"
+        return $true
+    }
+
+    log "$arch-bit Azure CLI is already installed. Checking for updates..."
+    $latestAzVersion = getLatestAzVersion
+    if ($latestAzVersion -and ($latestAzVersion -ne $currentAzVersion)) {
+        log "A newer version of Azure CLI ($latestAzVersion) is available, installing it..."
+        return $true
+    }
+    log "Azure CLI is up to date."
+    return $false
+}
+
+
+function installAzCli64Bit() {
+    $azCliMsi = "https://aka.ms/installazurecliwindowsx64"
+    $azCliMsiPath = "AzureCLI.msi"
+    Invoke-WebRequest -Uri $azCliMsi -OutFile $azCliMsiPath
+    log "Installing 64 bit Azure CLI"
+    log "This might take a while..."
+    $p = Start-Process msiexec.exe -Wait -Passthru -ArgumentList "/i `"$azCliMsiPath`" /quiet /qn /norestart"
     $exitCode = $p.ExitCode
     if ($exitCode -ne 0) {
-        throw "Python installation failed with exit code $LASTEXITCODE"
+        throw "Azure CLI installation failed with exit code $exitCode. See $msiInstallLogPath for additional details."
     }
+    $azCmdDir = Join-Path $env:ProgramFiles "Microsoft SDKs\Azure\CLI2\wbin"
+    [System.Environment]::SetEnvironmentVariable('PATH', $azCmdDir + ';' + $Env:PATH)
+    log "Azure CLI has been installed."
 }
+
+if (shouldInstallAzCli) {
+    installAzCli64Bit
+}
+
 $ProgressPreference = 'Continue'
-
-log "Enabling long path support for python..."
-Start-Process powershell.exe -verb runas -ArgumentList "Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name LongPathsEnabled -Value 1" -Wait
-
-py -m venv .temp\.env
 
 
 log "Checking previous installations of Azure CLI"
@@ -121,10 +194,6 @@ If([string]::IsNullOrWhiteSpace($AzureCLI)) {
 log "Installing 64 bit Azure CLI"
 log "This might take a while..."
 
-.temp\.env\Scripts\python.exe -m pip install --upgrade pip wheel setuptools >> $logFile
-.temp\.env\Scripts\pip install azure-cli >> $logFile
-
-.temp\.env\Scripts\Activate.ps1
 
 
 try {
@@ -244,7 +313,4 @@ try {
 catch {
     $err = $_.Exception | Out-String
     log ("Script execution failed: " + $err)
-}
-finally {
-    deactivate
 }

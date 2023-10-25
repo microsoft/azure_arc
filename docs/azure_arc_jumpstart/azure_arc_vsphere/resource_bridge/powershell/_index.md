@@ -66,17 +66,17 @@ The following README will guide you on how to use the provided PowerShell script
   az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query '{name:displayName,objectId:objectId}'
   ```
   
-    ![Screenshot of Azure resource provider for vSphere](./01.png)
+    ![Screenshot of Azure resource provider for vSphere](./img/01.png)
 
 ### vCenter Prerequisites
 
-- VMware vSphere vCenter Server v6.7.
+- VMware vSphere vCenter Server v6.7 or 8.
 
 - A virtual network that can provide internet access, directly or through a proxy. It must also be possible for VMs on this network to communicate with the vCenter server on TCP port (usually 443).
 
-- At least one free IP address on the above network that isn't in the DHCP range. At least three free IP addresses if there's no DHCP server on the network.
+- At least three free static IP addresses on the above network. If you have a DHCP server on the network, the IP addresses must be outside the DHCP range.
 
-- A vSphere resource pool or a cluster with a minimum capacity of 16 GB of RAM and four vCPUs.
+- A vSphere resource pool or a cluster with a minimum capacity of 16 GB of RAM and 4 vCPUs.
 
 - A vSphere datastore with a minimum of 100 GB of free disk space.
 
@@ -102,32 +102,31 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Change the environment variables according to your environment:
   - _`location`_ - the Azure region you want to deploy to
-  - _`subscriptionId`_ - your subscription ID
+  - _`subscriptionId`_ - your Azure subscription ID
   - _`resourceGroupName`_ - the name of the Azure resource group you will create your resources in
-  - _`applianceName`_ - a name for the Azure Arc resource bridge appliance
+  - _`applianceName`_ - a name for the Azure Arc resource bridge appliance, this will the name that will be used in Azure.
   - _`customLocationName`_ - the name of your Azure Arc custom location
   - _`vcenterName`_ -  the name of your vCenter
   - _`vcenterFqdn`_ - your vCenter fully qualified name
   - _`vcenterUsername`_ - username to authenticate to vCenter
   - _`vcenterPassword`_ - password to authenticate to vCenter
   - _`spnClientId`_ - your service principal App ID
-  - _`spnClientSecret`_ - your service principal password
+  - _`spnClientSecret`_ - your service principal secret
   - _`spnTenantId`_ - your Azure AD tenant ID
   - _`vmTemplate`_ - the Arc appliance template name
-  - _`datacenter`_ - the vSphere datacenter where the appliance will be deployed
-  - _`datastore`_ - the vSphere datastore name where the appliance will be deployed
-  - _`folder`_ - the vSphere folder where the template and appliance will be deployed
-  - _`dnsServer`_ - DNS server to be used for the appliance
-  - _`gateway`_ - Gateway address to be used for the appliance
-  - _`ipAddressPrefix`_ - Network address in CIDR notation to be used by the appliance
+  - _`datacenter`_ - the vSphere datacenter where the appliance will be deployed. Make sure to include the full path, for example: '/Jumpstart - Datacenter'
+  - _`datastore`_ - the vSphere datastore name where the appliance will be deployed. For example: 'NFS'
+  - _`folder`_ - the vSphere folder where the template and appliance will be deployed. Make sure to include the full path, for example: '/Jumpstart - Datacenter/VMs'
+  - _`dnsServer`_ - IP of the DNS server to be used for the appliance
+  - _`gateway`_ - Gateway IP address to be used for the appliance
+  - _`ipAddressPrefix`_ - Network IP address range in CIDR notation to be used by the appliance
   - _`k8sNodeIpPoolStart`_ - IP range start for the IPs to be used by the appliance
   - _`k8sNodeIpPoolEnd`_ - IP range end for the IPs to be used by the appliance
-  - _`segment`_ - Name of the virtual network or segment to which the appliance VM must be connected
-  - _`resourcePool`_ - the name of the vSphere resource pool to be used by the appliance
+  - _`segment`_ - Name of the virtual network or segment to which the appliance VM must be connected. Use the same name as it is displayed in your vCenter, for example: 'Jumpstart VM segment - (VLAN 111)'
+  - _`resourcePool`_ - the name of the vSphere resource pool to be used by the appliance. Make sure to include the full path, for example: '/Jumpstart - Datacenter/host/Jumpstart Cluster/Resources'
   - _`controlPlaneEndpoint`_ - IP address of the Kubernetes cluster control plane
-  - _`vSphereRP`_ - _ConnectedVMwarevSphere_ resource provider Id
   
-  ![Screenshot environment variables](./02.png)
+  ![Screenshot environment variables](./img/02.png)
 
 - Once you have provided all of the required environment variables, open a PowerShell window (as an Administrator) and run the script with the command:
 
@@ -135,69 +134,68 @@ For you to get familiar with the automation and deployment flow, below is an exp
   .\vCenter_onboarding.ps1
   ```
 
-  ![Screenshot showing script output](./03.png)
+  ![Screenshot showing script output](./img/03.png)
   
-  ![Screenshot showing script output](./04.png)
+  ![Screenshot showing script output](./img/04.png)
 
-  ![Screenshot showing script output](./05.png)
+  ![Screenshot showing script output](./img/05.png)
 
-  ![Screenshot showing script output](./06.png)
+  ![Screenshot showing script output](./img/06.png)
 
 - While the script is running, from vCenter you should be able to see a running task:
 
-  ![Screenshot showing vCenter task](./07.png)
+  ![Screenshot showing vCenter task](./img/07.png)
   
-  ![Screenshot showing vCenter task](./08.png)
+  ![Screenshot showing vCenter task](./img/08.png)
   
-  ![Screenshot showing script output](./10.png)
+  ![Screenshot showing script output](./img/10.png)
   
-  ![Screenshot showing script output](./11.png)
-   
-  ![Screenshot showing script output](./12.png)
-    
-  ![Screenshot showing script output](./13.png)
-     
-  ![Screenshot showing script output](./14.png)
-   
-  ![Screenshot showing script output](./15.png)
-   
-  ![Screenshot showing script output](./16.png)
-   
-  ![Screenshot showing script output](./17.png)
+  ![Screenshot showing script output](./img/11.png)
+
+  ![Screenshot showing script output](./img/12.png)
+
+  ![Screenshot showing script output](./img/13.png)
+
+  ![Screenshot showing script output](./img/14.png)
+
+  ![Screenshot showing script output](./img/15.png)
+
+  ![Screenshot showing script output](./img/16.png)
+
+  ![Screenshot showing script output](./img/17.png)
 
 - From the Azure portal, in the resource group, you should see three new resources, including the VMware vCenter.
 
-  ![Screenshot showing the Azure Arc resources in the Azure Portal](./18.png)
+  ![Screenshot showing the Azure Arc resources in the Azure Portal](./img/18.png)
 
-  ![Screenshot showing the connected VMware vCenter](./19.png)
+  ![Screenshot showing the connected VMware vCenter](./img/19.png)
 
 - You should also be able to get a list of VMs, resource pools, templates, networks and data stores that are managed by the vCenter.
 
-  ![Screenshot showing the Azure Arc virtual machines list](./20.png)
+  ![Screenshot showing the Azure Arc virtual machines list](./img/20.png)
   
-  ![Screenshot showing the Resource pools list](./21.png)
+  ![Screenshot showing the Resource pools list](./img/21.png)
   
-  ![Screenshot showing the Templates list](./22.png)
+  ![Screenshot showing the Templates list](./img/22.png)
   
-  ![Screenshot showing the Networks list](./23.png)
+  ![Screenshot showing the Networks list](./img/23.png)
   
-  ![Screenshot showing the Data stores list](./24.png)
+  ![Screenshot showing the Data stores list](./img/24.png)
 
 ## Clean up environment
 
 Complete the following steps to clean up your environment:
 
 - If you want to delete the entire Azure resources, simply delete the deployment resource group from the Azure portal.
-     
-    ![Screenshot showing Azure resource group deletion](./25.png)
-    
+
+    ![Screenshot showing Azure resource group deletion](./img/25.png)
+
 - From the vSphere client, power Off the appliance and remove from disk.
 
-    ![Screenshot showing powering off the appliance from vSphere client](./26.png)
+    ![Screenshot showing powering off the appliance from vSphere client](./img/26.png)
 
-    ![Screenshot showing deleting the appliance from vSphere client](./27.png)
-    
+    ![Screenshot showing deleting the appliance from vSphere client](./img/27.png)
+
 - From the vSphere client, remove the appliance template from disk.
 
-    ![Screenshot showing deleting the appliance template from vSphere client](./28.png)
-
+    ![Screenshot showing deleting the appliance template from vSphere client](./img/28.png)
