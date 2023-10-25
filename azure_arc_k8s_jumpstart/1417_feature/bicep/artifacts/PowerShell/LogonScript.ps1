@@ -24,6 +24,7 @@ $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
 $aksEdgeDeployModules       = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
 $AksEdgeRemoteDeployVersion = $Ft1Config.AKSEEConfig["AksEdgeRemoteDeployVersion"]
+$clusterLogSize             = $Ft1Config.AKSEEConfig["clusterLogSize"]
 
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
@@ -167,6 +168,10 @@ Write-Host "`n"
 
 # az version
 az -v
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring cluster log size" -ForegroundColor Gray
+Invoke-AksEdgeNodeCommand "sudo find /var/log -type f -exec truncate -s ${clusterLogSize} {} +"
+Write-Host "`n"
 
 #####################################################################
 # Setup Azure CLI
