@@ -2,7 +2,7 @@
 param eventGridNamespaceName string = 'Ft1Namespace'
 
 @description('The location of the Azure Data Explorer cluster')
-param location string = resourceGroup().location
+param location string = 'westus2'
 
 @maxLength(5)
 @description('Random GUID')
