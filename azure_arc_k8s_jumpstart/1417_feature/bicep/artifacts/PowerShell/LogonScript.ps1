@@ -12,6 +12,7 @@ $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
 $stepCliReleasesUrl         = $websiteUrls["stepCliReleases"]
+$mqttuiReleasesUrl          = $websiteUrls["mqttuiReleases"]
 $resourceGroup              = $Env:resourceGroup
 $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
@@ -358,6 +359,23 @@ Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
 $stepCliPath = "$Ft1ToolsDir\step_$versionToDownload\bin\"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+Remove-Item -Path $output -Force
+
+
+##############################################################
+# Install MQTTUI
+##############################################################
+$latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip"}).browser_download_url
+$output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
+Invoke-WebRequest $mqttuiReleaseDownloadUrl -OutFile $output
+Expand-Archive $output -DestinationPath "$Ft1ToolsDir\mqttui" -Force
+$mqttuiPath = "$Ft1ToolsDir\mqttui\"
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$newPathVariable = $currentPathVariable + ";" + $mqttuiPath
+$newPathVariable
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
 Remove-Item -Path $output -Force
 
