@@ -13,6 +13,7 @@ $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
 $stepCliReleasesUrl         = $websiteUrls["stepCliReleases"]
 $mqttuiReleasesUrl          = $websiteUrls["mqttuiReleases"]
+$mqttExplorerReleasesUrl    = $websiteUrls["mqttExplorerReleases"]
 $resourceGroup              = $Env:resourceGroup
 $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
@@ -43,7 +44,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "calico"
 } else {
     $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "flannel"
+    $networkplugin = "calico"
 }
 
 
@@ -380,6 +381,18 @@ $newPathVariable = $currentPathVariable + ";" + $mqttuiPath
 $newPathVariable
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
 Remove-Item -Path $output -Force
+
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT explorer" -ForegroundColor Gray
+$latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe"}).browser_download_url
+$output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+Start-Process -FilePath $output -ArgumentList "/S" -Wait
 
 #############################################################
 # Install VSCode extensions
