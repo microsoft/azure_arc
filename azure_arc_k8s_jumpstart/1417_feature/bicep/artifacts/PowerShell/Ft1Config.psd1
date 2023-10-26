@@ -96,6 +96,7 @@
     AKSEEConfig             = @{
         AksEdgeRemoteDeployVersion = "1.0.230221.1200"
         aksEdgeDeployModules       = "main"
+        clusterLogSize             = "1024"
 
         aideuserConfig = @{
             SchemaVersion       = "1.1"
