@@ -350,6 +350,7 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 ##############################################################
 # Install Step Cli
 ##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Step Cli" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "step_windows_${versionToDownload}_amd64.zip"}).browser_download_url
@@ -366,6 +367,7 @@ Remove-Item -Path $output -Force
 ##############################################################
 # Install MQTTUI
 ##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip"}).browser_download_url
