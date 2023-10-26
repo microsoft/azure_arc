@@ -28,6 +28,9 @@ param windowsOSVersion string = '2022-datacenter-g2'
 ])
 param location string
 
+@description('The location of the Azure EventGrid namespace')
+param eventGridLocation string = 'westus2'
+
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
 
@@ -336,6 +339,7 @@ module eventGrid 'data/eventGrid.bicep' = {
     queueName: storageQueueName
     storageAccountResourceId: storageAccount.outputs.storageAccountId
     namingGuid: namingGuid
+    location: eventGridLocation
   }
 }
 
