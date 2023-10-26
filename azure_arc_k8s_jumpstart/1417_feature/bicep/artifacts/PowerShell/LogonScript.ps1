@@ -12,6 +12,8 @@ $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
 $stepCliReleasesUrl         = $websiteUrls["stepCliReleases"]
+$mqttuiReleasesUrl          = $websiteUrls["mqttuiReleases"]
+$mqttExplorerReleasesUrl    = $websiteUrls["mqttExplorerReleases"]
 $resourceGroup              = $Env:resourceGroup
 $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
@@ -42,7 +44,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "calico"
 } else {
     $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "flannel"
+    $networkplugin = "calico"
 }
 
 
@@ -349,6 +351,7 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 ##############################################################
 # Install Step Cli
 ##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing Step Cli" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "step_windows_${versionToDownload}_amd64.zip"}).browser_download_url
@@ -360,6 +363,36 @@ $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [Environmen
 $newPathVariable = $currentPathVariable + ";" + $stepCliPath
 [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
 Remove-Item -Path $output -Force
+
+
+##############################################################
+# Install MQTTUI
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gray
+$latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip"}).browser_download_url
+$output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
+Invoke-WebRequest $mqttuiReleaseDownloadUrl -OutFile $output
+Expand-Archive $output -DestinationPath "$Ft1ToolsDir\mqttui" -Force
+$mqttuiPath = "$Ft1ToolsDir\mqttui\"
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$newPathVariable = $currentPathVariable + ";" + $mqttuiPath
+$newPathVariable
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+Remove-Item -Path $output -Force
+
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT explorer" -ForegroundColor Gray
+$latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe"}).browser_download_url
+$output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+Start-Process -FilePath $output -ArgumentList "/S" -Wait
 
 #############################################################
 # Install VSCode extensions
