@@ -54,11 +54,29 @@
     azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
 
     # HCI host names
-    HostList                             = "AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
+    HCIHostList                          = "AzSHOST1", "AzSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
     MgmtHostName                         = "AzSMGMT"
+    
+    # SDN Host IPs
+    AzSMGMTIP                            = "192.168.1.11/24"
+    AzSHOST1IP                           = "192.168.1.12/24"
+    AzSHOST2IP                           = "192.168.1.13/24"
+    
+    MgmtHostConfig = @{
+        HostName = "AzSMGMT"
+        IP       = "192.168.1.11/24"
+    }
 
-    # VHDX Paths 
-
+    NodeHostConfig = @(
+        @{
+            Hostname = "AzSHOST1"
+            IP       = "192.168.1.12/24"
+        },
+        @{
+            Hostname = "AzSHOST2"
+            IP       = "192.168.1.13/24"
+        }
+    )
     
     # SDN Lab Admin Password
     SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
@@ -106,12 +124,6 @@
 
     # Cluster S2D Storage Disk Size (per disk)
     S2D_Disk_Size                        = 170GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
-
-    # SDN Host IPs
-    AzSMGMTIP                            = "192.168.1.11/24"
-    AzSHOST1IP                           = "192.168.1.12/24"
-    AzSHOST2IP                           = "192.168.1.13/24"
-    AzSHOST3IP                           = "192.168.1.14/24"
 
     # Physical Host Internal IP
     PhysicalHostInternalIP               = "192.168.1.20"                          # IP Address assigned to Internal Switch vNIC in a Single Host Configuration

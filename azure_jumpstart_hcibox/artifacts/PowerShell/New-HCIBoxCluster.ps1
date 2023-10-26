@@ -1,7 +1,32 @@
-﻿#region functions
+﻿# Set paths
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
+$Env:tempDir = "C:\Temp"
+$Env:VMPath = "C:\VMs"
+
+# Formerly a parameter
+$ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
+
+
+Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
+$starttime = Get-Date
+
+# Import Configuration data file
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+
+#region functions
 
 function BITSRequest {
-    Param(
+    param (
         [Parameter(Mandatory=$True)]
         [hashtable]$Params
     )
@@ -22,7 +47,7 @@ function BITSRequest {
 }
     
 function New-InternalSwitch {
-    Param (
+    param (
         $pswitchname, 
         $HCIBoxConfig
     )
@@ -52,37 +77,105 @@ function New-InternalSwitch {
         Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
     } 
 }
-    
-function Test-VHDPath {
-    Param (
-        $guiVHDXPath,
-        $azSHCIVHDXPath
-    )
 
-    $Result = Get-ChildItem -Path $guiVHDXPath -ErrorAction Ignore  
-    if (!$result) { Write-Host "Path $guiVHDXPath was not found!" -ForegroundColor Red ; break }
-    $Result = Get-ChildItem -Path $azSHCIVHDXPath -ErrorAction Ignore  
-    if (!$result) { Write-Host "Path $azSHCIVHDXPath was not found!" -ForegroundColor Red ; break }
-}
-    
-    
-function Get-AzSHCIVHDXPath {
-    Param (
-        $azSHCIVHDXPath, 
-        $HostVMPath
+function GenerateAnswerFile {
+    Params(
+        $Hostname,
+        $IsMgmtVM,
+        $IPAddress,
+        $VMMac,
+        $HCIBoxConfig
     )
-    $ParentVHDXPath = $HostVMPath + 'AzSHCI.vhdx'
-    return $ParentVHDXPath
+    $azsmgmtProdKey = ""
+    if ($IsMgmtVM) {
+        $azsmgmtProdKey = "<ProductKey>$($HCIBoxConfig.GUIProductKey)</ProductKey>"
+    }
+    $UnattendXML = @"
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+<settings pass="specialize">
+<component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<DomainProfile_EnableFirewall>false</DomainProfile_EnableFirewall>
+<PrivateProfile_EnableFirewall>false</PrivateProfile_EnableFirewall>
+<PublicProfile_EnableFirewall>false</PublicProfile_EnableFirewall>
+</component>
+<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ComputerName>$Hostname</ComputerName>
+$azsmgmtProdKey
+</component>
+<component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<fDenyTSConnections>false</fDenyTSConnections>
+</component>
+<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<UserLocale>en-us</UserLocale>
+<UILanguage>en-us</UILanguage>
+<SystemLocale>en-us</SystemLocale>
+<InputLocale>en-us</InputLocale>
+</component>
+<component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<IEHardenAdmin>false</IEHardenAdmin>
+<IEHardenUser>false</IEHardenUser>
+</component>
+<component name="Microsoft-Windows-TCPIP" processorArchitecture="wow64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Interfaces>
+<Interface wcm:action="add">
+<Identifier>$VMMac</Identifier>
+<Ipv4Settings>
+<DhcpEnabled>false</DhcpEnabled>
+</Ipv4Settings>
+<UnicastIpAddresses>
+<IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
+</UnicastIpAddresses>
+<Routes>
+<Route wcm:action="add">
+<Identifier>1</Identifier>
+<NextHopAddress>$($HCIBoxConfig.SDNLABRoute)</NextHopAddress>
+<Prefix>0.0.0.0/0</Prefix>
+<Metric>100</Metric>
+</Route>
+</Routes>
+</Interface>
+</Interfaces>
+</component>
+<component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<DNSSuffixSearchOrder>
+<DomainName wcm:action="add" wcm:keyValue="1">$($HCIBoxConfig.SDNDomainFQDN)</DomainName>
+</DNSSuffixSearchOrder>
+<Interfaces>
+<Interface wcm:action="add">
+<DNSServerSearchOrder>
+<IpAddress wcm:action="add" wcm:keyValue="1">$($HCIBoxConfig.SDNLABDNS)</IpAddress>
+</DNSServerSearchOrder>
+<Identifier>$VMMac</Identifier>
+<DisableDynamicUpdate>false</DisableDynamicUpdate>
+<DNSDomain>$($HCIBoxConfig.SDNDomainFQDN)</DNSDomain>
+<EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
+</Interface>
+</Interfaces>
+</component>
+</settings>
+<settings pass="oobeSystem">
+<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<OOBE>
+<HideEULAPage>true</HideEULAPage>
+<SkipMachineOOBE>true</SkipMachineOOBE>
+<SkipUserOOBE>true</SkipUserOOBE>
+<HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+    </OOBE>
+<UserAccounts>
+<AdministratorPassword>
+<Value>$($HCIBoxConfig.SDNAdminPassword)</Value>
+<PlainText>true</PlainText>
+</AdministratorPassword>
+</UserAccounts>
+</component>
+</settings>
+<cpi:offlineImage cpi:source="" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+</unattend>
+"@
+    return $UnattendXML
 }
-    
-function Get-ConsoleVHDXPath {
-    Param (
-        $ConsoleVHDXPath, 
-        $HostVMPath
-    )
-    $ParentVHDXPath = $HostVMPath + 'Console.vhdx'
-    return $ParentVHDXPath
-}
+
 
 function New-ManagementVM {
     Param (
@@ -91,6 +184,7 @@ function New-ManagementVM {
         $VMSwitch,
         $HCIBoxConfig
     )
+    Write-Host "Creating VM $Name"
     # Create disks
     $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing 
     $VHDX2 = New-VHD -Path "$($HCIBoxConfig.HostVMPath)\$Name-Data.vhdx" -SizeBytes 268435456000 -Dynamic
@@ -115,299 +209,150 @@ function New-ManagementVM {
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
+    Write-Host "VM $Name MAC address is $vmMac"
     return $vmMac
 }
 
-function New-NestedVM {
-    Param (
-        $AzSHOST, 
-        $VMHost, 
-        $HostVMPath, 
+function New-HCINodeVM {
+    param (
+        $Name,
+        $VHDXPath,
         $VMSwitch,
         $HCIBoxConfig
     )
-    
-    $parentpath = "$HostVMPath\GUI.vhdx"
-    $coreparentpath = "$HostVMPath\AzSHCI.vhdx"
-    $vmMac = Invoke-Command -ComputerName $VMHost -ScriptBlock {    
+    Write-Host "Creating VM $Name"
+    # Create disks
+    $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing 
+    $VHDX2 = New-VHD -Path "$($HCIBoxConfig.HostVMPath)\$Name-Data.vhdx" -SizeBytes 268435456000 -Dynamic
 
-        $VerbosePreference = "SilentlyContinue"
-        Import-Module Hyper-V
-        $VerbosePreference = "Continue"
+    # Create S2D Storage       
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk1.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk2.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk3.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk4.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk5.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null  
 
-        $AzSHOST = $using:AzSHOST
-        $VMHost = $using:VMHost        
-        $HostVMPath = $using:HostVMPath
-        $VMSwitch = $using:VMSwitch
-        $parentpath = $using:parentpath
-        $coreparentpath = $using:coreparentpath
-        $HCIBoxConfig = $using:SDNConfig                         
-        $S2DDiskSize = $HCIBoxConfig.S2D_Disk_Size
-        $NestedVMMemoryinGB = $HCIBoxConfig.NestedVMMemoryinGB
-        $AzSMGMTMemoryinGB = $HCIBoxConfig.AzSMGMTMemoryinGB
-    
-        # Create Differencing Disk. Note: AzSMGMT is GUI
-        if ($AzSHOST -eq "AzSMGMT") {
-            $VHDX1 = New-VHD -ParentPath $parentpath -Path "$HostVMPath\$AzSHOST.vhdx" -Differencing 
-            $VHDX2 = New-VHD -Path "$HostVMPath\$AzSHOST-Data.vhdx" -SizeBytes 268435456000 -Dynamic
-            $NestedVMMemoryinGB = $AzSMGMTMemoryinGB
-        }
-        else {  
-            $VHDX1 = New-VHD -ParentPath $coreparentpath -Path "$HostVMPath\$AzSHOST.vhdx" -Differencing 
-            $VHDX2 = New-VHD -Path "$HostVMPath\$AzSHOST-Data.vhdx" -SizeBytes 268435456000 -Dynamic
-    
-            # Create S2D Storage       
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk1.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk2.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk3.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk4.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk5.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
-            New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null    
-        }    
-    
-        # Create Nested VM
-        $params = @{
-            Name               = $AzSHOST
-            MemoryStartupBytes = $NestedVMMemoryinGB 
-            VHDPath            = $VHDX1.Path 
-            SwitchName         = $VMSwitch
-            Generation         = 2
-        }
-        New-VM @params | Out-Null
-        Add-VMHardDiskDrive -VMName $AzSHOST -Path $VHDX2.Path
-    
-        if ($AzSHOST -ne "AzSMGMT") {
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk1.vhdx" -VMName $AzSHOST | Out-Null
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk2.vhdx" -VMName $AzSHOST | Out-Null
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk3.vhdx" -VMName $AzSHOST | Out-Null
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk4.vhdx" -VMName $AzSHOST | Out-Null
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk5.vhdx" -VMName $AzSHOST | Out-Null
-            Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -VMName $AzSHOST | Out-Null
-        }
-    
-        Set-VM -Name $AzSHOST -ProcessorCount 20 -AutomaticStartAction Start
-        Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
-        Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
-        Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
-        $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $AzSHOST).MacAddress) -replace '..(?!$)', '$&-'
-        Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
+    # Create Nested VM
+    New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.NestedVMMemoryinGB -VHDPath $VHDXPath -SwitchName $VMSwitch -Generation 2 | Out-Null
+    Add-VMHardDiskDrive -VMName $Name -Path $VHDX2.Path
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk1.vhdx" -VMName $Name | Out-Null
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk2.vhdx" -VMName $Name | Out-Null
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk3.vhdx" -VMName $Name | Out-Null
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk4.vhdx" -VMName $Name | Out-Null
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk5.vhdx" -VMName $Name | Out-Null
+    Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -VMName $Name | Out-Null
 
-        if ($AzSHOST -ne "AzSMGMT") {
-            Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
-            Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
-        }
+    Set-VM -Name $Name -ProcessorCount 20 -AutomaticStartAction Start
+    Get-VMNetworkAdapter -VMName $Name | Rename-VMNetworkAdapter -NewName "SDN"
+    Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
+    Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
+    $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
+    Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
-        Get-VM $AzSHOST | Set-VMProcessor -ExposeVirtualizationExtensions $true
-        Get-VM $AzSHOST | Set-VMMemory -DynamicMemoryEnabled $false
-        Get-VM $AzSHOST | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
+    Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
+    Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
 
-        Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
-        Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+    Get-VM $Name | Set-VMProcessor -ExposeVirtualizationExtensions $true
+    Get-VM $Name | Set-VMMemory -DynamicMemoryEnabled $false
+    Get-VM $Name | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
 
-        if ($AzSHOST -ne "AzSMGMT") {
-            Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName StorageA -Access -VlanId $HCIBoxConfig.StorageAVLAN 
-            Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName StorageB -Access -VlanId $HCIBoxConfig.StorageBVLAN 
-        }
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageA -Access -VlanId $HCIBoxConfig.StorageAVLAN 
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Access -VlanId $HCIBoxConfig.StorageBVLAN 
 
-        Enable-VMIntegrationService -VMName $AzSHOST -Name "Guest Service Interface"
-        return $vmMac
+    Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
+    Write-Host "VM $Name MAC address is $vmMac"
+    return $vmMac
+}
+
+function Set-MGMTVHDX {
+    param (
+        $VMMac,
+        $HCIBoxConfig
+    )
+    $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
+    $path = (("\\$($HCIBoxConfig.MgmtHostConfig.HostName)\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
+    Write-Host "Performing offline installation of Hyper-V to management VM at path $path"
+    Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
+    Start-Sleep -Seconds 20
+
+    # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
+    Write-Verbose "Mounting VHDX file at $path"
+    [string]$MountedDrive = ""
+    $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
+    if (!$partition.DriveLetter) {
+        $MountedDrive = "X"
+        $partition | Set-Partition -NewDriveLetter $MountedDrive
+    }  
+    else {
+        $MountedDrive = $partition.DriveLetter
     }
 
-    return $vmMac          
+    # Inject Answer File
+    Write-Host "Injecting answer file to $path"
+    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IPAddress $HCIBoxConfig.AzSMGMTIP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    
+    Write-Host "Mounted Disk Volume is: $MountedDrive" 
+    $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
+    if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
+
+    Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
+
+    # Creating folder structure on AzSMGMT
+    Write-Host "Creating VMs\Base folder structure on $($HCIBoxConfig.MgmtHostConfig.HostName)"
+    New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
+
+    # Injecting configs into VMs
+    Write-Verbose "Injecting files into $path"
+    Copy-Item -Path "$Env:HCIBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
+    #New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
+    Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
+    Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
+    #Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+    #Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+    #Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
+
+    # Dismount VHDX
+    Write-Verbose "Dismounting VHDX File at path $path"
+    Dismount-VHD $path 
 }
-    
-function Add-Files {
-    Param(
-        $VMPlacement, 
-        $HostVMPath, 
-        $HCIBoxConfig,
-        $guiVHDXPath,
-        $azSHCIVHDXPath,
-        $vmMacs
+
+function Set-HCINodeVHDX {
+    param (
+        $Hostname,
+        $IPAddress,
+        $VMMac,
+        $HCIBoxConfig
     )
-    
-    foreach ($AzSHOST in $VMPlacement) {
-        # Get Drive Paths 
-        $HypervHost = $AzSHOST.VMHost
-        $DriveLetter = $HostVMPath.Split(':')
-        $path = (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $AzSHOST.AzSHOST + ".vhdx")       
+    $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
+    $path = (("\\$Hostname\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
+    Write-Host "Mounting VHDX file at $path"
+    $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
+    if (!$partition.DriveLetter) {
+        $MountedDrive = "Y"
+        $partition | Set-Partition -NewDriveLetter $MountedDrive
+    }   
+    else {
+        $MountedDrive = $partition.DriveLetter
+    }
 
-        # Install Hyper-V Offline
-        Write-Verbose "Performing offline installation of Hyper-V to path $path"
-        $VerbosePreference = "SilentlyContinue"
-        Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
-        $VerbosePreference = "Continue"
-        Start-Sleep -Seconds 20       
+    Write-Host "Injecting answer file to $path"
+    $UnattendXML = GenerateAnswerFile -HostName $Hostname -IsMgmtVM $false -IPAddress $IPAddress -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    Write-Host "Mounted Disk Volume is: $MountedDrive" 
+    $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
+    if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
+    Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
 
-        # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
-        Write-Verbose "Mounting VHDX file at $path"
-        [string]$MountedDrive = ""
-        if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
-            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
-            if (!$partition.DriveLetter) {
-                $MountedDrive = "X"
-                $partition | Set-Partition -NewDriveLetter $MountedDrive
-            }  
-            else {
-                $MountedDrive = $partition.DriveLetter
-            } 
-        } else {
-            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
-            if (!$partition.DriveLetter) {
-                $MountedDrive = "Y"
-                $partition | Set-Partition -NewDriveLetter $MountedDrive
-            }   
-            else {
-                $MountedDrive = $partition.DriveLetter
-            } 
-        }
+    New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
+    Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
+    Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
 
-        # Get Assigned MAC Address so we know what NIC to assign a static IP to
-        $vmMac = ($vmMacs | Where-Object { $_.Hostname -eq $AzSHost.AzSHOST }).vmMac
-
-        # Inject Answer File
-        Write-Verbose "Injecting answer file to $path"
-    
-        $AzSHOSTComputerName = $AzSHOST.AzSHOST
-        $AzSHOSTIP = $HCIBoxConfig.($AzSHOSTComputerName + "IP")
-        $SDNAdminPassword = $HCIBoxConfig.SDNAdminPassword
-        $SDNDomainFQDN = $HCIBoxConfig.SDNDomainFQDN
-        $SDNLABDNS = $HCIBoxConfig.SDNLABDNS    
-        $SDNLabRoute = $HCIBoxConfig.SDNLABRoute         
-        $ProductKey = $HCIBoxConfig.GUIProductKey
-
-        # Only inject product key if host is AzSMGMT
-        $azsmgmtProdKey = $null
-        if ($AzSHOST.AzSHOST -eq "AzSMGMT") { $azsmgmtProdKey = "<ProductKey>$ProductKey</ProductKey>"}
-            
-        $UnattendXML = @"
-<?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend">
-<settings pass="specialize">
-<component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<DomainProfile_EnableFirewall>false</DomainProfile_EnableFirewall>
-<PrivateProfile_EnableFirewall>false</PrivateProfile_EnableFirewall>
-<PublicProfile_EnableFirewall>false</PublicProfile_EnableFirewall>
-</component>
-<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<ComputerName>$AzSHOSTComputerName</ComputerName>
-$azsmgmtProdKey
-</component>
-<component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<fDenyTSConnections>false</fDenyTSConnections>
-</component>
-<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<UserLocale>en-us</UserLocale>
-<UILanguage>en-us</UILanguage>
-<SystemLocale>en-us</SystemLocale>
-<InputLocale>en-us</InputLocale>
-</component>
-<component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<IEHardenAdmin>false</IEHardenAdmin>
-<IEHardenUser>false</IEHardenUser>
-</component>
-<component name="Microsoft-Windows-TCPIP" processorArchitecture="wow64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<Interfaces>
-<Interface wcm:action="add">
-<Identifier>$vmMac</Identifier>
-<Ipv4Settings>
-<DhcpEnabled>false</DhcpEnabled>
-</Ipv4Settings>
-<UnicastIpAddresses>
-<IpAddress wcm:action="add" wcm:keyValue="1">$AzSHOSTIP</IpAddress>
-</UnicastIpAddresses>
-<Routes>
-<Route wcm:action="add">
-<Identifier>1</Identifier>
-<NextHopAddress>$SDNLabRoute</NextHopAddress>
-<Prefix>0.0.0.0/0</Prefix>
-<Metric>100</Metric>
-</Route>
-</Routes>
-</Interface>
-</Interfaces>
-</component>
-<component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<DNSSuffixSearchOrder>
-<DomainName wcm:action="add" wcm:keyValue="1">$SDNDomainFQDN</DomainName>
-</DNSSuffixSearchOrder>
-<Interfaces>
-<Interface wcm:action="add">
-<DNSServerSearchOrder>
-<IpAddress wcm:action="add" wcm:keyValue="1">$SDNLABDNS</IpAddress>
-</DNSServerSearchOrder>
-<Identifier>$vmMac</Identifier>
-<DisableDynamicUpdate>false</DisableDynamicUpdate>
-<DNSDomain>$SDNDomainFQDN</DNSDomain>
-<EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
-</Interface>
-</Interfaces>
-</component>
-</settings>
-<settings pass="oobeSystem">
-<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<OOBE>
-<HideEULAPage>true</HideEULAPage>
-<SkipMachineOOBE>true</SkipMachineOOBE>
-<SkipUserOOBE>true</SkipUserOOBE>
-<HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
- </OOBE>
-<UserAccounts>
-<AdministratorPassword>
-<Value>$SDNAdminPassword</Value>
-<PlainText>true</PlainText>
-</AdministratorPassword>
-</UserAccounts>
-</component>
-</settings>
-<cpi:offlineImage cpi:source="" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
-</unattend>
-"@
- 
-        Write-Verbose "Mounted Disk Volume is: $MountedDrive" 
-        $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
-        if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
-    
-        Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
-
-        if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
-            # Creating folder structure on AzSMGMT
-            Write-Verbose "Creating VMs\Base folder structure on AzSMGMT"
-            New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
-
-            # Injecting configs into VMs
-            Write-Verbose "Injecting VMConfigs to $path"
-            Copy-Item -Path "$Env:HCIBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
-            New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
-            Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
-            Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
-            Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
-        }
-
-        if ($AzSHOST.AzSHOST -eq "AzSHOST1") {
-            New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
-            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
-            Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
-        }
-
-        # Dismount VHDX
-        Write-Verbose "Dismounting VHDX File at path $path"
-        Dismount-VHD $path                                  
-    }    
+    # Dismount VHDX
+    Write-Verbose "Dismounting VHDX File at path $path"
+    Dismount-VHD $path  
 }
-    
-function Start-AzSHOSTS {
-    Param(
-        $VMPlacement
-    )
-    
-    foreach ($VMHost in $VMPlacement) {
-        Write-Verbose "Starting VM: $VMHost"
-        Start-VM -ComputerName $VMHost.VMhost -Name $VMHost.AzSHOST
-    }    
-} 
     
 function New-DataDrive {
     param (
@@ -431,67 +376,94 @@ function New-DataDrive {
         }
     }    
 }
-    
-function Test-AzSHOSTVMConnection {
 
+function Set-DataDrives {
     param (
-
-        $VMPlacement, 
-        $localCred
-
+        $HCIBoxConfig,
+        [PSCredential]$Credential
     )
-
-    foreach ($SDNVM in $VMPlacement) {
-
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            
-            $VerbosePreference = "Continue"    
-            
-            $localCred = $using:localCred   
-            $testconnection = $null
-    
-            While (!$testconnection) {
-    
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { Get-Process } -Credential $localCred -ErrorAction Ignore
-    
-            }
-        
-            Write-Verbose "Successfully contacted $($using:SDNVM.AzSHOST)"
-                         
-        }
-    }    
-}
-
-function Start-PowerShellScriptsOnHosts {
-
-    Param (
-
-        $VMPlacement, 
-        $ScriptPath, 
-        $localCred
-
-    ) 
-    
-    foreach ($SDNVM in $VMPlacement) {
-
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            
-            $VerbosePreference = "Continue"    
-            Write-Verbose "Executing Script: $($using:ScriptPath) on host $($using:SDNVM.AzSHOST)"     
-            Invoke-Command -VMName $using:SDNVM.AzSHOST -ArgumentList $using:Scriptpath -ScriptBlock { Invoke-Expression -Command $args[0] } -Credential $using:localCred 
-            
+    $VMs = @()
+    $VMs += $HCIBoxConfig.MgmtHostName
+    foreach ($node in $HCIBoxConfig.HCIHostList) {
+        $VMs += $node
+    }
+    foreach ($VM in $VMs) {
+        Invoke-Command -VMName $VM -Credential $Credential -ScriptBlock {
+            Set-Disk -Number 1 -IsOffline $false | Out-Null
+                Initialize-Disk -Number 1 | Out-Null
+                New-Partition -DiskNumber 1 -UseMaximumSize -AssignDriveLetter | Out-Null
+                Format-Volume -DriveLetter D | Out-Null  
         }
     }
 }
+
+function Test-VMAvailable {
+    param (
+        $VMName,
+        [PSCredential]$Credential
+    )
+    Invoke-Command -VMName $VMName -ScriptBlock { 
+        $ErrorOccurred = $false
+        do { 
+            try { 
+                $ErrorActionPreference = 'Stop'
+                Get-VMHost
+            } 
+            catch { 
+                $ErrorOccurred = $true
+            } 
+        } while ($ErrorOccurred -eq $true)
+    } -Credential $Credential -ErrorAction Ignore
+    Write-Host "VM $VMName is now online"
+}
+
+function Test-AllVMsAvailable
+ {
+    param (
+        $HCIBoxConfig,
+        [PSCredential]$Credential
+    )
+    Write-Host "Testing whether VMs are available..."
+    Test-VMAvailable -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential
+    foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
+        Test-VMAvailable -Name $VM.Hostname -Credential $Credential
+    }
+}
+    
+function Test-AzSHOSTVMConnection {
+    param (
+        $VMPlacement, 
+        $localCred
+    )
+
+    foreach ($SDNVM in $VMPlacement) {
+        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
+            $VerbosePreference = "Continue"            
+            $localCred = $using:localCred   
+            $testconnection = $null
+            While (!$testconnection) {
+                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { 
+                    $ErrorOccurred = $false
+                    do { 
+                        try { 
+                            $ErrorActionPreference = 'Stop'
+                            Get-VMHost
+                        } 
+                        catch { 
+                            $ErrorOccurred = $true
+                        } 
+                    } while ($ErrorOccurred -eq $true)
+                } -Credential $localCred -ErrorAction Ignore
+            }
+        }
+    }    
+}
     
 function New-NATSwitch {
-    
     Param (
-
         $VMPlacement,
         $SwitchName,
         $HCIBoxConfig
-
     )
     
     $natSwitchTarget = $VMPlacement | Where-Object { $_.AzSHOST -eq "AzSMGMT" }
@@ -499,7 +471,6 @@ function New-NATSwitch {
     Add-VMNetworkAdapter -VMName $natSwitchTarget.AzSHOST -ComputerName $natSwitchTarget.VMHost -DeviceNaming On 
 
     $params = @{
-
         VMName       = $natSwitchTarget.AzSHOST
         ComputerName = $natSwitchTarget.VMHost
     }
@@ -508,190 +479,88 @@ function New-NATSwitch {
     Get-VMNetworkAdapter @params | Where-Object { $_.Name -match "Network" } | Rename-VMNetworkAdapter -NewName "NAT"
     
     Get-VM @params | Get-VMNetworkAdapter -Name NAT | Set-VMNetworkAdapter -MacAddressSpoofing On
-    
-    <# Should not need this anymore
-
-    if ($HCIBoxConfig.natVLANID) {
-    
-        Get-VM @params | Get-VMNetworkAdapter -Name NAT | Set-VMNetworkAdapterVlan -Access -VlanId $natVLANID | Out-Null
-    
-    }
-
-    #>
-    
-    #Create PROVIDER NIC in order for NAT to work from SLB/MUX and RAS Gateways
 
     Add-VMNetworkAdapter @params -Name PROVIDER -DeviceNaming On -SwitchName $SwitchName
     Get-VM @params | Get-VMNetworkAdapter -Name PROVIDER | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VM @params | Get-VMNetworkAdapter -Name PROVIDER | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.providerVLAN | Out-Null    
     
     #Create VLAN 200 NIC in order for NAT to work from L3 Connections
-
     Add-VMNetworkAdapter @params -Name VLAN200 -DeviceNaming On -SwitchName $SwitchName
     Get-VM @params | Get-VMNetworkAdapter -Name VLAN200 | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VM @params | Get-VMNetworkAdapter -Name VLAN200 | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.vlan200VLAN | Out-Null    
-
     
     #Create Simulated Internet NIC in order for NAT to work from L3 Connections
-
     Add-VMNetworkAdapter @params -Name simInternet -DeviceNaming On -SwitchName $SwitchName
     Get-VM @params | Get-VMNetworkAdapter -Name simInternet | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VM @params | Get-VMNetworkAdapter -Name simInternet | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.simInternetVLAN | Out-Null
-
-    
 }  
-        
-function Get-PhysicalNICMTU {
-    
-    Param (
-        
-        $HCIBoxConfig
-    
-    )
-    
-    foreach ($VMHost in $HCIBoxConfig.MultipleHyperVHostNames) {
-    
-        Invoke-Command -ComputerName $VMHost  -ScriptBlock {
-    
-            $HCIBoxConfig = $using:SDNConfig
-    
-            $VswitchNICs = (Get-VMSwitch -Name ($HCIBoxConfig.MultipleHyperVHostExternalSwitchName)).NetAdapterInterfaceDescription
-    
-            if ($VswitchNICs) {
-                foreach ($VswitchNIC in $VswitchNICs) {
-    
-                    $MTUSetting = (Get-NetAdapterAdvancedProperty -InterfaceDescription $VswitchNIC -RegistryKeyword '*JumboPacket').RegistryValue
 
-                    if ($MTUSetting -ne $HCIBoxConfig.SDNLABMTU) {
-    
-                        Write-Error "There is a mismatch in the MTU value for the external switch and the value in the HCIBox-Config.psd1 data file."  
-    
-                    }
-    
-                }
-    
-            }
-    
-            else {
-    
-                Write-Error "The external switch was not found on $Env:COMPUTERNAME"
-    
-            }
-    
-        }    
-    
+function Set-NICs {
+    Param (
+        $HCIBoxConfig,
+        [PSCredential]$Credential
+    )
+
+    Invoke-Command -VMName $HCIBoxConfig.MgmtHostName -Credential $Credential -ScriptBlock {
+        Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
+        Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
-    
-}
 
-function Set-SDNserver {
-
-    Param (
-
-        $VMPlacement, 
-        $HCIBoxConfig, 
-        $localCred 
-
-    )
-
-
-    # Set base number for Storage IPs
     $int = 9
-
-
-    foreach ($SDNVM in $VMPlacement) {
-
-    
-        # Increment Storage IPs
-
+    foreach ($VM in $HCIBoxConfig.HCIHostList) {
         $int++
+        Invoke-Command -VMName $VM -Credential $localCred -ScriptBlock {
+            # Create IP Address of Storage Adapters
+            $storageAIP = $HCIBoxConfig.storageAsubnet.Replace("0/24", $int)
+            $storageBIP = $HCIBoxConfig.storageBsubnet.Replace("0/24", $int)
 
+            # Set Name and IP Addresses on Storage Interfaces
+            $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
+            foreach ($storageNIC in $storageNICs) {
+                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue        
+            }
+            $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
+            foreach ($storageNIC in $storageNICs) {
+                If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }  
+                If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }  
+            }
 
-        Invoke-Command -ComputerName $SDNVM.VMHost -ScriptBlock {
+            # Enable WinRM
+            Write-Verbose "Enabling Windows Remoting in $env:COMPUTERNAME"
+            Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
+            Enable-PSRemoting | Out-Null
 
-            Invoke-Command -VMName $using:SDNVM.AzSHOST -ArgumentList $using:SDNConfig, $using:localCred, $using:int  -ScriptBlock {
+            Start-Sleep -Seconds 60
 
-                $HCIBoxConfig = $args[0]
-                $localCred = $args[1]
-                $int = $args[2]
-                $VerbosePreference = "Continue"
+            # Rename non-storage adapters
+            Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
+            Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
+            # I dont think this is necessary with HCI
+            #Write-Verbose "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
+            #Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
 
-                # Create IP Address of Storage Adapters
+            # Enable CredSSP and MTU Settings
+            Invoke-Command -ComputerName localhost -Credential $localCred -ScriptBlock {
+                $fqdn = $Using:SDNConfig.SDNDomainFQDN
 
-                $storageAIP = $HCIBoxConfig.storageAsubnet.Replace("0/24", $int)
-                $storageBIP = $HCIBoxConfig.storageBsubnet.Replace("0/24", $int)
-
-
-                # Set Name and IP Addresses on Storage Interfaces
-                $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
-
-                foreach ($storageNIC in $storageNICs) {
-
-                    Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue        
-
-                }
-
-                $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
-
-                foreach ($storageNIC in $storageNICs) {
-
-                    If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }  
-                    If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }  
-
-                }
-
-
-
-
-                # Enable WinRM
-
-                Write-Verbose "Enabling Windows Remoting in $env:COMPUTERNAME"
-                $VerbosePreference = "SilentlyContinue" 
-                Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
-                Enable-PSRemoting | Out-Null
-                $VerbosePreference = "Continue" 
-
-                Start-Sleep -Seconds 60
-
-                if ($env:COMPUTERNAME -ne "AzSMGMT") {
-
-                    Write-Verbose "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
-                    $VerbosePreference = "SilentlyContinue"
-                    Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
-                    $VerbosePreference = "Continue"
-                }
-
-                # Enable CredSSP and MTU Settings
-
-                Invoke-Command -ComputerName localhost -Credential $localCred -ScriptBlock {
-
-                    $fqdn = $Using:SDNConfig.SDNDomainFQDN
-
-                    Write-Verbose "Enabling CredSSP on $env:COMPUTERNAME"
-                    Enable-WSManCredSSP -Role Server -Force
-                    Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
-                    Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
-                    Enable-WSManCredSSP -Role Client -DelegateComputer $fqdn -Force
-                    Enable-WSManCredSSP -Role Client -DelegateComputer "*.$fqdn" -Force
-                    New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation `
-                        -Name AllowFreshCredentialsWhenNTLMOnly -Force
-                    New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly `
-                        -Name 1 -Value * -PropertyType String -Force 
-                } -InDisconnectedSession | Out-Null
- 
-            } -Credential $using:localCred
-
+                Write-Verbose "Enabling CredSSP on $env:COMPUTERNAME"
+                Enable-WSManCredSSP -Role Server -Force
+                Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
+                Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
+                Enable-WSManCredSSP -Role Client -DelegateComputer $fqdn -Force
+                Enable-WSManCredSSP -Role Client -DelegateComputer "*.$fqdn" -Force
+                New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation `
+                    -Name AllowFreshCredentialsWhenNTLMOnly -Force
+                New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly `
+                    -Name 1 -Value * -PropertyType String -Force 
+            } -InDisconnectedSession | Out-Null
         }
-
     }
-
 }
 
 function Set-AzSMGMT {
-
     param (
-
         $HCIBoxConfig,
         $localCred,
         $domainCred
@@ -703,9 +572,7 @@ function Set-AzSMGMT {
     $VerbosePreference = "Continue"
 
     Invoke-Command -ComputerName azsmgmt -Credential $localCred  -ScriptBlock {
-
         # Creds
-
         $localCred = $using:localCred
         $domainCred = $using:domainCred
         $HCIBoxConfig = $using:SDNConfig
@@ -1337,17 +1204,13 @@ function New-DCVM {
 }
 
 function New-RouterVM {
-
     Param (
-
         $HCIBoxConfig,
         $localCred,
         $domainCred
-
     )
 
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-
         $HCIBoxConfig = $using:SDNConfig
         $localcred = $using:localcred
         $domainCred = $using:domainCred
@@ -1363,38 +1226,26 @@ function New-RouterVM {
         $VMName = "bgp-tor-router"
     
         # Create Host OS Disk
-
         Write-Verbose "Creating $VMName differencing disks"
-
         $params = @{
-
             ParentPath = ($ParentDiskPath + $OSVHDX)
             Path       = ($vmpath + $VMName + '\' + $VMName + '.vhdx') 
-
         }
-
         New-VHD @params -Differencing | Out-Null
     
         # Create VM
-
         $params = @{
-
             Name       = $VMName
             VHDPath    = ($vmpath + $VMName + '\' + $VMName + '.vhdx')
             Path       = ($vmpath + $VMName)
             Generation = 2
-
         }
-
         Write-Verbose "Creating the $VMName VM."
         New-VM @params | Out-Null
     
         # Set VM Configuration
-
         Write-Verbose "Setting $VMName's VM Configuration"
-
         $params = @{
-
             VMName               = $VMName
             DynamicMemoryEnabled = $true
             StartupBytes         = $HCIBoxConfig.MEM_BGP
@@ -1408,7 +1259,6 @@ function New-RouterVM {
         set-vm -Name $VMName -AutomaticStopAction TurnOff | Out-Null
     
         # Configure VM Networking
-
         Write-Verbose "Configuring $VMName's Networking"
         Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName vSwitch-Fabric -DeviceNaming On
         Add-VMNetworkAdapter -VMName $VMName -Name Provider -SwitchName vSwitch-Fabric -DeviceNaming On
@@ -1418,11 +1268,8 @@ function New-RouterVM {
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN200 -Access -VlanId $HCIBoxConfig.vlan200VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName SIMInternet -Access -VlanId $HCIBoxConfig.simInternetVLAN
            
-    
         # Add NAT Adapter
-
         if ($HCIBoxConfig.natConfigure) {
-
             Add-VMNetworkAdapter -VMName $VMName -Name NAT -SwitchName NAT -DeviceNaming On
         }    
     
@@ -1431,7 +1278,6 @@ function New-RouterVM {
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null      
     
         # Inject Answer File
-
         Write-Verbose "Mounting Disk Image and Injecting Answer File into the $VMName VM." 
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
@@ -1667,17 +1513,14 @@ function New-RouterVM {
 
 function New-AdminCenterVM {
     Param (
-
         $HCIBoxConfig,
         $localCred,
         $domainCred
-
     )
 
     $domainAdminUsername = $env:adminUsername
 
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-
         $VMName = "admincenter"
         $ParentDiskPath = "C:\VMs\Base\"
         $VHDPath = "D:\VMs\"
@@ -2430,147 +2273,6 @@ function New-SDNEnvironment {
     } 
 }
 
-function Remove-AzSHCISandbox {
-    param (
-        $VMPlacement,
-        $HCIBoxConfig,
-        $SingleHostDelete
-    )
-
-    $VerbosePreference = "Continue"
-
-    Write-Verbose "Deleting Azure Stack HCI Sandbox"
-    foreach ($vm in $VMPlacement) {
-        $AzSHOSTName = $vm.vmHost
-        $VMName = $vm.AzSHOST
-
-        Invoke-Command -ComputerName $AzSHOSTName -ArgumentList $VMName -ScriptBlock {
-
-            $VerbosePreference = "SilentlyContinue"
-            Import-Module Hyper-V
-
-            $VerbosePreference = "Continue"
-            $vmname = $args[0]
-            # Delete SBXAccess vNIC (if present)
-            $vNIC = Get-VMNetworkAdapter -ManagementOS | Where-Object { $_.Name -match "SBXAccess" }
-            if ($vNIC) { $vNIC | Remove-VMNetworkAdapter -Confirm:$false }
-
-            $sdnvm = Get-VM | Where-Object { $_.Name -eq $vmname }
-
-            If (!$sdnvm) { Write-Verbose "Could not find $vmname to delete" }
-
-            if ($sdnvm) {
-
-                Write-Verbose "Shutting down VM: $sdnvm)"
-
-                Stop-VM -VM $sdnvm -TurnOff -Force -Confirm:$false 
-                $VHDs = $sdnvm | Select-Object VMId | Get-VHD
-                Remove-VM -VM $sdnvm -Force -Confirm:$false 
-
-                foreach ($VHD in $VHDs) {
-                    Write-Verbose "Removing $($VHD.Path)"
-                    Remove-Item -Path $VHD.Path -Force -Confirm:$false
-                }
-            }
-        }
-    }
-
-    If ($SingleHostDelete -eq $true) { 
-        $RemoveSwitch = Get-VMSwitch | Where-Object { $_.Name -match $HCIBoxConfig.InternalSwitch }
-        If ($RemoveSwitch) {
-            Write-Verbose "Removing Internal Switch: $($HCIBoxConfig.InternalSwitch)"
-            $RemoveSwitch | Remove-VMSwitch -Force -Confirm:$false
-        }
-    }
-
-    Write-Verbose "Deleting RDP links"
-    Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
-
-    Write-Verbose "Deleting NetNAT"
-    Get-NetNAT | Remove-NetNat -Confirm:$false
-
-    Write-Verbose "Deleting Internal Switches"
-    Get-VMSwitch | Where-Object { $_.SwitchType -eq "Internal" } | Remove-VMSwitch -Force -Confirm:$false
-}
-
-function Add-WACtenants {
-    param (
-        $SDNLabSystems,
-        $HCIBoxConfig,
-        $domainCred
-    )
-
-    $VerbosePreference = "Continue"
-    Write-Verbose "Invoking Command to add Windows Admin Center Tenants"
-
-    Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {   
-        $domainCred = $using:domainCred
-        $SDNLabSystems = $using:SDNLabSystems
-        $HCIBoxConfig = $using:SDNConfig
-        $VerbosePreference = "Continue" 
-
-        Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
-            # Set Variables
-            $HCIBoxConfig = Import-PowerShellDataFile -Path C:\SDN\HCIBox-Config.psd1
-            $fqdn = $HCIBoxConfig.SDNDomainFQDN
-            $SDNLabSystems = @("bgp-tor-router", "$($HCIBoxConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
-            $VerbosePreference = "Continue"
-            $domainCred = new-object -typename System.Management.Automation.PSCredential `
-                -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
-            (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
- 
-            # Set Constrained Delegation for NC/MUX/GW Virtual Machines for Windows Admin Center
-            $SDNvms = ("NC01", "MUX01", "GW01", "GW02")
-
-            $VerbosePreference = "Continue"
-            foreach ($SDNvm in $SDNvms) {
-                Write-Verbose "Setting Delegation for $SDNvm"
-                $gateway = "AdminCenter"
-                Write-Verbose "gateway = $gateway"
-                $node = $SDNvm
-                Write-Verbose "node = $node"
-                $gatewayObject = Get-ADComputer -Identity $gateway -Credential $domainCred
-                Write-Verbose "GatewayObject = $gatewayObject"
-                $nodeObject = Get-ADComputer -Identity $node -Credential $domainCred
-                Write-Verbose "nodeObject = $nodeObject"
-                Set-ADComputer -Identity $nodeObject -PrincipalsAllowedToDelegateToAccount $gatewayObject -Credential $domainCred
-            }
-
-            foreach ($SDNLabSystem in $SDNLabSystems) {
-                $json = [pscustomobject]@{
-                    id   = "msft.sme.connection-type.server!$SDNLabSystem"
-                    name = $SDNLabSystem
-                    type = "msft.sme.connection-type.server"
-                } | ConvertTo-Json
-
-                $payload = @"
-[
-$json
-]
-"@
-
-                if ($HCIBoxConfig.WACport -eq "443" -or !$HCIBoxConfig.WACport) {
-                    $uri = "https://admincenter.$($HCIBoxConfig.SDNDomainFQDN)/api/connections"
-                }
-                else {
-                    $uri = "https://admincenter.$($HCIBoxConfig.SDNDomainFQDN):$($HCIBoxConfig.WACport)/api/connections"
-                }
-
-                Write-Verbose "Adding Host: $SDNLabSystem"
-                $param = @{
-                    Uri         = $uri
-                    Method      = 'Put'
-                    Body        = $payload
-                    ContentType = $content
-                    Credential  = $domainCred
-                }
-
-                Invoke-RestMethod @param -UseBasicParsing -DisableKeepAlive | Out-Null
-            }
-        }
-    }
-}
-
 function New-SDNS2DCluster {
     param (
         $HCIBoxConfig,
@@ -2720,33 +2422,6 @@ function enable-singleSignOn {
 #endregion
    
 #region Main
-
-# Set paths
-$Env:HCIBoxDir = "C:\HCIBox"
-$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
-$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
-$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
-$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
-$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
-$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-$Env:agentScript = "C:\HCIBox\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:VMPath = "C:\VMs"
-
-# Formerly a parameter
-$ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-
-
-Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
-$starttime = Get-Date
-
-# Import Configuration data file
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-Copy-Item $ConfigurationDataFile -Destination $Env:HCIBoxSDNDir -Force
-$NestedVMMemoryinGB = $HCIBoxConfig.NestedVMMemoryinGB
 $guiVHDXPath = $HCIBoxConfig.guiVHDXPath
 $azSHCIVHDXPath = $HCIBoxConfig.azSHCIVHDXPath
 $HostVMPath = $HCIBoxConfig.HostVMPath
@@ -2780,9 +2455,6 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
 $NCAdminCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\NCAdmin"), `
     (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword  -AsPlainText -Force)
-
-# Define HCIBox host Names. Please do not change names as these names are hardcoded in the setup.
-$AzSHOSTs = @("AzSMGMT", "AzSHOST1", "AzSHOST2")
    
 # Enable PSRemoting
 Write-Host "Enabling PS Remoting on client..."
@@ -2790,20 +2462,18 @@ $VerbosePreference = "SilentlyContinue"
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
+###############################################################################
+# Configure hyper-v host
+###############################################################################
 # Verify Internet Connectivity
 Write-Host "Verifying internet connectivity"
 Test-InternetConnect
-
-#Write-Verbose "Generating Single Host Placement"
-#$VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
 
 Write-Host "Creating Internal Switch"
 New-InternalSwitch -pswitchname $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 
 Write-Host "Creating NAT Switch"
 Set-HostNAT -HCIBoxConfig $HCIBoxConfig
-
-#$VMSwitch = $InternalSwitch
 
 Write-Host "Configuring HCIBox-Client Hyper-V host"
 Set-VMHost -VirtualHardDiskPath $HostVMPath -VirtualMachinePath $HostVMPath -EnableEnhancedSessionMode $true
@@ -2815,124 +2485,79 @@ $hcipath = "$HostVMPath\AzSHCI.vhdx"
 Copy-Item -Path $HCIBoxConfig.guiVHDXPath -Destination $guipath -Force | Out-Null
 Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-Null
 
-# Create Virtual Machines
+################################################################################
+# Create the three nested Virtual Machines 
+################################################################################
 # First create the Management VM (AzSMGMT)
 $vmMacs = @()
-$mac = New-ManagementVM -Name $HCIBoxConfig.MgmtHostName -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+$mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.HostName) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 $vmMacs += [PSCustomObject]@{
-    Hostname = $HCIBoxConfig.MgmtHostName
+    Hostname = $($HCIBoxConfig.MgmtHostConfig.HostName)
     vmMAC    = $mac
 }
+Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
-foreach ($VM in $VMPlacement) {
-    Write-Verbose "Generating the VM: $VM" 
-    $params = @{
-        VMHost     = $VM.VMHost
-        AzSHOST    = $VM.AzSHOST
-        HostVMPath = $HostVMPath
-        VMSwitch   = $VMSwitch
-        SDNConfig  = $HCIBoxConfig
+# Create the HCI host node VMs
+foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
+    $mac = New-HCINodeVM -Name $VM -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+    $vmMacs += [PSCustomObject]@{
+        Hostname = $VM.Hostname
+        vmMAC    = $mac
     }
-    $vmMac = New-NestedVM @params
-
-    Write-Verbose "Returned VMMac is $vmMac"
-    $vmMacs += [pscustomobject]@{
-        Hostname = $VM.AzSHOST
-        vmMAC    = $vmMac
-    }  
+    Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
-    
-# Inject Answer Files and Binaries into Virtual Machines
-$params = @{
-    VMPlacement    = $VMPlacement
-    HostVMPath     = $HostVMPath
-    SDNConfig      = $HCIBoxConfig
-    guiVHDXPath    = $guiVHDXPath
-    azSHCIVHDXPath = $azSHCIVHDXPath
-    vmMacs         = $vmMacs
-}
-Add-Files @params
     
 # Start Virtual Machines
-Start-AzSHOSTS -VMPlacement $VMPlacement
-    
+Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.HostName)"
+Start-VM -Name $HCIBoxConfig.MgmtHostConfig.HostName
+foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
+    Write-Host "Starting VM: $($VM.Hostname)"
+    Start-VM -Name $VM.Hostname
+}
+
+#######################################################################################
+# Prep virtual machines
+#######################################################################################
 # Wait for AzSHOSTs to come online
-Write-Verbose "Waiting for VMs to provision and then come online"
-$params = @{
-    VMPlacement = $VMPlacement
-    localcred   = $localCred
-}
-Test-AzSHOSTVMConnection @params
-    
-# Online and Format Data Volumes on Virtual Machines
-$params = @{
-    VMPlacement = $VMPlacement
-    SDNConfig   = $HCIBoxConfig
-}
-New-DataDrive @params
-    
-# Install HCIBox Host Software on NestedVMs
-$params = @{
-    SDNConfig   = $HCIBoxConfig
-    VMPlacement = $VMPlacement
-    localcred   = $localCred
-}
-Set-SDNserver @params
-    
-# Rename NICs from Ethernet to FABRIC
-$params = @{
-    scriptpath  = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC'
-    VMPlacement = $VMPlacement
-    localcred   = $localCred
-}
+Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
-Start-PowerShellScriptsOnHosts @params
-
-$params.scriptpath = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2'
-
-Start-PowerShellScriptsOnHosts @params
+# Format and partition data drives
+Set-DataDrives -HCIBoxConfig -Credential $localCred
+    
+# Set-SDNserver needs to be looked at - not sure this is necessary for 23h2
+Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
 # Restart Machines
-
-$params.scriptpath = "Restart-Computer -Force"
-Start-PowerShellScriptsOnHosts @params
+foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
+    Write-Host "Restarting VM: $($VM.Hostname)"
+    Invoke-Command -VMName $VM.Hostname -Credential $localCred -ScriptBlock {
+        Restart-Computer -Force
+    }
+}
+Invoke-Command -VMName $HCIBoxConfig.MgmtHostName -Credential $localCred -ScriptBlock {
+    Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostName)"
+    Restart-Computer -Force
+}
 Start-Sleep -Seconds 30
     
 # Wait for AzSHOSTs to come online
+Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
-Write-Verbose "Waiting for VMs to restart..."
-
-$params = @{
-
-    VMPlacement = $VMPlacement
-    localcred   = $localCred
-
-}
-
-Test-AzSHOSTVMConnection @params
-    
 # This step has to be done as during the Hyper-V install as hosts reboot twice.
-
-Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
-Test-AzSHOSTVMConnection @params
+Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
 # Create NAT Virtual Switch on AzSMGMT
-
-if ($natConfigure) {
-    $SwitchName = $HCIBoxConfig.InternalSwitch 
-
-    Write-Verbose "Creating NAT Switch on switch $SwitchName"
-    $VerbosePreference = "SilentlyContinue"
-    $params = @{
-        SwitchName  = $SwitchName
-        VMPlacement = $VMPlacement
-        SDNConfig   = $HCIBoxConfig
-    }
-
-    New-NATSwitch  @params
-    $VerbosePreference = "Continue"
+$SwitchName = $HCIBoxConfig.InternalSwitch 
+Write-Verbose "Creating NAT Switch on switch $SwitchName"
+$VerbosePreference = "SilentlyContinue"
+$params = @{
+    SwitchName  = $SwitchName
+    VMPlacement = $VMPlacement
+    SDNConfig   = $HCIBoxConfig
 }
-    
+New-NATSwitch  @params
+$VerbosePreference = "Continue"
+
 # Provision AzSMGMT VMs (DC, Router, and AdminCenter)
 Write-Verbose  "Configuring Management VM"
 $params = @{
