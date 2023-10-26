@@ -28,6 +28,7 @@
         windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
         aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
         stepCliReleases    = 'https://api.github.com/repos/smallstep/cli/releases'
+        mqttuiReleases     = 'https://api.github.com/repos/EdJoPaTo/mqttui/releases'
     }
     # Azure required registered resource providers
     AzureProviders          = @(
@@ -77,7 +78,10 @@
         'putty.install',
         'kubernetes-helm',
         'mqtt-explorer',
-        'gh'
+        'gh',
+        'telegraf',
+        'k9s',
+        'grafana'
     )
 
     # VSCode extensions
