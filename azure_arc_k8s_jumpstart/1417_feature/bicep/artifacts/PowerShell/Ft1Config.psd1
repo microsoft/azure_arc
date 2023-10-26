@@ -16,19 +16,20 @@
 
     # Required URLs
     URLs                    = @{
-        chocoInstallScript = 'https://chocolatey.org/install.ps1'
-        wslUbuntu          = 'https://aka.ms/wslubuntu'
-        wslStoreStorage    = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
-        githubAPI          = 'https://api.github.com'
-        grafana            = 'https://api.github.com/repos/grafana/grafana/releases/latest'
-        azurePortal        = 'https://portal.azure.com'
-        aksEEk3s           = 'https://aka.ms/aks-edge/k3s-msi'
-        prometheus         = 'https://prometheus-community.github.io/helm-charts'
-        vcLibs             = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
-        windowsTerminal    = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
-        aksEEReleases      = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
-        stepCliReleases    = 'https://api.github.com/repos/smallstep/cli/releases'
-        mqttuiReleases     = 'https://api.github.com/repos/EdJoPaTo/mqttui/releases'
+        chocoInstallScript      = 'https://chocolatey.org/install.ps1'
+        wslUbuntu               = 'https://aka.ms/wslubuntu'
+        wslStoreStorage         = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
+        githubAPI               = 'https://api.github.com'
+        grafana                 = 'https://api.github.com/repos/grafana/grafana/releases/latest'
+        azurePortal             = 'https://portal.azure.com'
+        aksEEk3s                = 'https://aka.ms/aks-edge/k3s-msi'
+        prometheus              = 'https://prometheus-community.github.io/helm-charts'
+        vcLibs                  = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
+        windowsTerminal         = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
+        aksEEReleases           = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
+        stepCliReleases         = 'https://api.github.com/repos/smallstep/cli/releases'
+        mqttuiReleases          = 'https://api.github.com/repos/EdJoPaTo/mqttui/releases'
+        mqttExplorerReleases    = 'https://api.github.com/repos/thomasnordquist/MQTT-Explorer/releases/latest'
     }
     # Azure required registered resource providers
     AzureProviders          = @(
@@ -133,7 +134,7 @@
             Version             = "1.0"
             DeploymentType      = "SingleMachineCluster"
             Init                =@{
-                ServiceIPRangeSize = 0
+                ServiceIPRangeSize = 10
             }
             Network             = @{
                 NetworkPlugin = ""
