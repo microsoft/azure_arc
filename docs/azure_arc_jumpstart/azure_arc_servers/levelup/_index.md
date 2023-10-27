@@ -39,6 +39,7 @@ After completion of this workshop, you will be able to:
 |[**10 - Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)**](#module-10-manage-your-azure-arc-enabled-servers-using-admin-center-preview) | 15 minutes | Basim Majeed |
 |[**11 - Query and inventory your Azure Arc-enabled servers using Azure Resource Graph**](#module-11-query-and-inventory-your-azure-arc-enabled-servers-using-azure-resource-graph) | 15 minutes | Basim Majeed |
 |[**12 - Enforce governance across your Azure Arc-enabled servers using Azure Policy**](#module-12-enforce-governance-across-your-azure-arc-enabled-servers-using-azure-policy) | 15 minutes | Basim Majeed |
+|[**13 - Enroll your Windows Server 2012/R2 machines for Extended Security Updates with Azure Arc**](#module-13-enroll-your-windows-server-2012R2-machines-for-extended-security-updates-with-azure-arc) | 30 minutes | Yasuhiro Handa |
 
 ## LevelUp lab guidance
 
@@ -2005,3 +2006,127 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
     ![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
 
 - Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
+
+### Module 13: Enroll your Windows Server 2012/R2 machines for Extended Security Updates with Azure Arc
+
+#### Module overview
+
+In this module, you will create an Azure VM with Hyper-V installed where the Windows Server 2012 R2 VM will run and will be onboard as Azure Arc-enabled server, and then assign Extended Security Updates (ESU) to the server through the Azure portal.
+
+#### Task 1: Onboard a Windows Server 2012 R2 machine to Azure Arc
+
+> **NOTE: In the [Prerequisites](#prerequisites) section, you should have already installed or updated Azure CLI and created Azure service principal (SP). If you haven't done so yet, please follow the steps provided in the section.**
+
+- Clone the Azure Arc Jumpstart repository
+  > You can skip this step if you've already cloned the repository in the previous section.
+
+  ```shell
+  $folderPath = <Specify a folder path to clone the repo>
+
+  Set-Location -Path $folderPath
+  git clone -b arc_servers_levelup https://github.com/microsoft/azure_arc.git
+  Set-Location -Path "azure_arc\azure_arc_servers_jumpstart\esu\bicep"
+  ```
+
+- Edit the [parameter file](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/esu/bicep/main.parameters.json) to match your environment. You will need to provide:
+  - _`spnClientId`_: the AppId of the service principal you created before.
+  - _`spnClientSecret`_: the password of the service principal you created before.
+  - _`spnTenantId`_: your Azure AD's tenant ID.
+  - _`windowsAdminUsername`_: Windows admin username for your Azure VM.
+  - _`windowsAdminPassword`_: password for the Windows admin username.
+  - _`deployBastion`_: whether or not you'd like to deploy Azure Bastion to access the Azure VM. Values can be "true" or "false"
+  - _`esu`_: this parameter will allow you to control what VMs will be deployed. It can be either:
+      - _`ws`_: to only deploy a Windows Server 2012 R2 VM that will be registered as an Arc-enabled server.
+      - _`sql`_: to only deploy a SQL Server 2012 Standard Edition VM that will be registered as an Arc-enabled SQL Server.
+      - _`both`_: to deploy both a Windows Server 2012 R2 VM and a SQL Server 2012 Standard Edition VM that will be Arc-enabled.
+
+    >**NOTE: Make sure to set the _esu_ parameter to _ws_ or _both_ to have an Arc-enabled server deployed.**
+
+  ![Screenshot of Parameters file](./esu01.png)
+
+- To run the automation, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/esu/bicep). From the deployment folder run the below command:
+
+  ```shell
+    az group create --name "<resource-group-name>"  --location "<preferred-location>"
+    az deployment group create -g "<resource-group-name>" \
+    -f "main.bicep" -p "main.parameters.json"
+  ```
+
+  For example:
+
+  ```shell
+    az group create --name Arc-ESU-Demo --location "westeurope"
+    az deployment group create --resource-group Arc-ESU-Demo \
+    --name Arc-ESU-Demo --template-file main.bicep \
+    --parameters main.parameters.json
+  ```
+
+- Once the automation finishes its run, you should see an output as follows:
+
+  ![Screenshot of automation output](./esu02.png)
+
+- After the script has finished its run verify the resources are created on the Azure Portal:
+
+    ![Screenshot of resources created on resource group](./esu03.png)
+
+    ![Screenshot of resources created on resource group](./esu04.png)
+
+- Now that the Azure Windows Server VM is created, it is time to connect to it using either RDP or Azure Bastion.
+
+    ![Screenshot of Azure Bastion session 01](./esu05.png)
+
+    ![Screenshot of Azure Bastion session 02](./esu06.png)
+
+    ![Screenshot of Azure Bastion session 03](./esu07.png)
+
+- At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
+
+    ![Screenshot of script's output](./esu08.png)
+
+    ![Screenshot of script's output](./esu09.png)
+
+    ![Screenshot of script's output](./esu10.png)
+
+    ![Screenshot of script's output](./esu11.png)
+
+- Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
+
+  > **NOTE: The script run time is ~10-15 min long.**
+
+- Upon successful run, a new Azure Arc-enabled server and/or Azure Arc-enabled SQL Server will be added to the resource group.
+
+  ![Screenshot Azure Arc-enabled resources on resource group](./esu12.png)
+
+- Now that you have successfully onboarded the Arc-enabled resources, you will be able to manage the Extended Security Updates (ESU) from the Azure Portal.
+
+  > **NOTE: To continue receiving security updates after extended support has ended on October 10, 2023, you must have a [servicing stack updates (SSU)](https://support.microsoft.com/topic/kb5031043-procedure-to-continue-receiving-security-updates-after-extended-support-has-ended-on-october-10-2023-c1a20132-e34c-402d-96ca-1e785ed51d45) installed. It will be installed through Windows Update for September 2023, or through Microsoft Update Catalog or Windows Server Update Services.**
+
+#### Task 2: Enable Extended Security Updates (ESU) license
+
+Now that you have Windows Server 2012 R2 Arc-enabled, you are able to manage ESU licenses for these servers.
+
+- Navigate to the Azure Arc page
+
+  ![Screenshot Azure Arc navigate](./esu13.png)
+
+- Select Extended Security Updates in the left pane.
+
+  ![Screenshot Azure Arc Extended](./esu14.png)
+
+- Provision Windows Server 2012 and 2012 R2 Extended Security Update licenses from Azure Arc.
+
+  ![Screenshot ESU Licenses](./esu15.png)
+
+  ![Screenshot ESU Licenses](./esu16.png)
+
+  > **NOTE: When opting for ESU via Azure Arc for Windows Server, you have two licensing choices:**
+  > 1. **vCore Licensing**: Pay based on the number of virtual cores (vCores) utilized by the operating system. This option uses the Standard edition rate. If you're operating multiple VMs, the cost will be calculated based on the total number of vCores across all VMs. **There is an 8-core minimum per VM for vCore licensing.**
+  > 2. **pCore Licensing**: Pay based on the number of physical cores (pCores) utilized by the host operating system. This option can use either edition. Note that with pCore licensing, up to 2 guest VMs running on a WS Standard host are covered (additional VMs require additional ESU licenses). With the WS Datacenter host, all VMs are covered without the need for additional licenses. **There is a 16-core minimum per server for pCore licensing.**
+  >
+  > Please see [here](https://learn.microsoft.com/azure/azure-arc/servers/license-extended-security-updates) for details.
+
+- Select one or more Arc-enabled servers to link to an Extended Security Update license.
+
+  ![Screenshot Enable ESU Licenses](./esu17.png)
+
+    > **NOTE: Once you've linked a server to an activated ESU license, the server is eligible to receive Windows Server 2012 and 2012 R2 ESUs.**
