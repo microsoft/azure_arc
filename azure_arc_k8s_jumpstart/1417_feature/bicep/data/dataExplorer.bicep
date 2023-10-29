@@ -28,9 +28,6 @@ param ft1EventHubConnectionName string = 'magnemotion-eh-messages'
 @description('The name of the Azure Data Explorer Event Hub connection')
 param ft1EventHubConnectionNamePl string = 'magnemotion-eh-messagespl'
 
-@description('The name of the Azure Data Explorer Event Hub consumer group')
-param consumerGroup string = 'cgadx'
-
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableName string = 'magnemotion_data'
 
@@ -44,7 +41,7 @@ param mappingRuleName string = 'magnemotion_data_mapping'
 param dataFormat string = 'multijson'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string
+param eventHubConsumerGroupName string = 'cgadx'
 
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
