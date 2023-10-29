@@ -226,7 +226,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
         Write-Host "Installing pip packages"
         foreach ($package in $Ft1Config.PipPackagesList) {
             Write-Host "Installing $package"
-            & pip install $package --quiet | Write-Output
+            & pip install $package --quiet 2>$null
         }
 
         # If the command succeeds, set $success to $true to exit the loop
