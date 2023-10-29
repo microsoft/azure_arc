@@ -2,7 +2,7 @@
 param adxClusterName string
 
 @description('The location of the Azure Data Explorer cluster')
-param location string
+param location string = resourceGroup().location
 
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
@@ -76,6 +76,7 @@ resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
 resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionName
   kind: 'EventHub'
+  location: location
   parent: ft1MagnemotionDB
   properties: {
     eventHubResourceId: eventHubResourceId
