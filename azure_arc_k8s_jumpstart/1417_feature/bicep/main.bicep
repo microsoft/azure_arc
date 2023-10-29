@@ -108,7 +108,7 @@ param customLocationRPOID string
 param akvName string = 'ft1akv${namingGuid}'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string = 'ft1ConsumerGroup${namingGuid}'
+param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
