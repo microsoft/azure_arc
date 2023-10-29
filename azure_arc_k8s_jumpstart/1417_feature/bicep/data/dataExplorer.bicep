@@ -9,10 +9,6 @@ param resourceTags object = {
   Project: 'Jumpstart_Ft1'
 }
 
-@maxLength(5)
-@description('Random GUID')
-param namingGuid string
-
 @description('The name of the Azure Data Explorer cluster Sku')
 param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 
@@ -46,6 +42,10 @@ param dataFormat string = 'multijson'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx'
+
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param eventHubConsumerGroupNamePl string = 'cgadxpl'
+
 
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
@@ -107,7 +107,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   }
 }
 
-/*resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionNamePl
   dependsOn: [
     tablesInit
@@ -116,12 +116,12 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   parent: ft1MagnemotionDB
   properties: {
     eventHubResourceId: eventHubResourceId
-    consumerGroup: consumerGroup
-    mappingRuleName: mappingRuleName
-    tableName: tableName
+    consumerGroup: eventHubConsumerGroupNamePl
+    mappingRuleName: mappingRuleNamePl
+    tableName: tableNamePl
     dataFormat: dataFormat
     eventSystemProperties: []
     compression: 'None'
     databaseRouting: 'Single'
   }
-}*/
+}

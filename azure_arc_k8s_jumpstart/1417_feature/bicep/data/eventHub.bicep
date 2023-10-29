@@ -19,6 +19,9 @@ param location string = resourceGroup().location
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'ft1ConsumerGroup'
 
+@description('The name of the Azure Data Explorer Event Hub production line consumer group')
+param eventHubConsumerGroupNamePl string = 'ft1ConsumerGroupPl'
+
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
   location: location
@@ -49,6 +52,11 @@ resource eventHubAuthRule 'Microsoft.EventHub/namespaces/authorizationRules@2023
 
 resource eventHubConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
   name: eventHubConsumerGroupName
+  parent: eventHub
+}
+
+resource eventHubConsumerGroupPl 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: eventHubConsumerGroupNamePl
   parent: eventHub
 }
 
