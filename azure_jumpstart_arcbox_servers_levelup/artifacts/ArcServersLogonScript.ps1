@@ -263,7 +263,7 @@ Start-VM -Name $Win2k19vmName
 Start-VM -Name $Win2k22vmName
 Start-VM -Name $Ubuntu01vmName
 Start-VM -Name $Ubuntu02vmName
-Start-VM -Name @Win2k12MachineName
+Start-VM -Name $Win2k12MachineName
 
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
