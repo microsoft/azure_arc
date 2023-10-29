@@ -52,4 +52,5 @@ resource eventHubConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumer
   parent: eventHub
 }
 
+
 output eventHubResourceId string = eventHub.id
