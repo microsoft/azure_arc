@@ -43,6 +43,9 @@ param vmSize string = 'Standard_D8s_v3'
 @description('Unique SPN app ID')
 param spnClientId string
 
+@description('Unique SPN object ID')
+param spnObjectId string
+
 @description('Unique SPN password')
 @minLength(12)
 @maxLength(123)
@@ -100,6 +103,15 @@ param adxClusterName string = 'ft1adx${namingGuid}'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
+
+@description('The name of the Azure Key Vault')
+param akvName string = 'ft1akv${namingGuid}'
+
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
+
+@description('The name of the Azure Data Explorer Event Hub production line consumer group')
+param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -328,6 +340,8 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
     location: location
+    eventHubConsumerGroupName: eventHubConsumerGroupName
+    eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
   }
 }
 
@@ -347,6 +361,20 @@ module adxCluster 'data/dataExplorer.bicep' = {
   name: 'dataExplorer'
   params: {
     adxClusterName: adxClusterName
+    location: location
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    eventHubConsumerGroupName: eventHubConsumerGroupName
+    eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
+  }
+}
+
+module keyVault 'data/keyVault.bicep' = {
+  name: 'keyVault'
+  params: {
+    spnClientId: spnClientId
+    spnObjectId: spnObjectId
+    tenantId: spnTenantId
+    akvName: akvName
     location: location
   }
 }
