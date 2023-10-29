@@ -37,6 +37,10 @@ param tableNamePl string = 'productionline'
 @description('The name of the Azure Data Explorer Event Hub mapping rule')
 param mappingRuleName string = 'magnemotion_data_mapping'
 
+@description('The name of the Azure Data Explorer Event Hub production Line mapping rule')
+param mappingRuleNamePl string = 'productionline_mapping'
+
+
 @description('The name of the Azure Data Explorer Event Hub data format')
 param dataFormat string = 'multijson'
 
@@ -71,6 +75,16 @@ resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   name: ft1DBName
   location: location
   kind: 'ReadWrite'
+}
+
+resource tablesInit 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'tablesInit'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('script.kql')
+  }
 }
 
 resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
