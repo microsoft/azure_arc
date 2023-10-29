@@ -114,6 +114,7 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
   ]
   kind: 'EventHub'
   parent: ft1MagnemotionDB
+  location: location
   properties: {
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupNamePl
