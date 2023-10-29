@@ -7,7 +7,7 @@ metadata:
   labels:
     app: selfhost
 data:
-  config.service.endpoint: "apiserviceyp6dg3jfbaafi.configuration.azure-api.net"
+  config.service.endpoint: "apiservicezfnonz3f73eko.configuration.azure-api.net"
   neighborhood.host: "selfhost-instance-discovery"
   runtime.deployment.artifact.source: "Azure Portal"
   runtime.deployment.mechanism: "YAML"
