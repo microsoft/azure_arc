@@ -43,6 +43,9 @@ param mappingRuleName string = 'magnemotion_data_mapping'
 @description('The name of the Azure Data Explorer Event Hub data format')
 param dataFormat string = 'multijson'
 
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param eventHubConsumerGroupName string
+
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
 
@@ -80,7 +83,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   parent: ft1MagnemotionDB
   properties: {
     eventHubResourceId: eventHubResourceId
-    consumerGroup: consumerGroup
+    consumerGroup: eventHubConsumerGroupName
     mappingRuleName: mappingRuleName
     tableName: tableName
     dataFormat: dataFormat
