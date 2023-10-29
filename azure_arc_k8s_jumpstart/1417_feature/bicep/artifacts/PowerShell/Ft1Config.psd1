@@ -82,7 +82,13 @@
         'gh',
         'telegraf',
         'k9s',
-        'grafana'
+        'grafana',
+        'python'
+    )
+
+    # Pip packages list
+    PipPackagesList     = @(
+        'paho-mqtt'
     )
 
     # VSCode extensions
