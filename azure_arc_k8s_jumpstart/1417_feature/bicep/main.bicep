@@ -107,6 +107,9 @@ param customLocationRPOID string
 @description('The name of the Azure Key Vault')
 param akvName string = 'ft1akv${namingGuid}'
 
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param eventHubConsumerGroupName string = 'ft1ConsumerGroup${namingGuid}'
+
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
@@ -334,6 +337,7 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
     location: location
+    eventHubConsumerGroupName: eventHubConsumerGroupName
   }
 }
 
@@ -356,6 +360,7 @@ module adxCluster 'data/dataExplorer.bicep' = {
     location: location
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     namingGuid: namingGuid
+    eventHubConsumerGroupName: eventHubConsumerGroupName
   }
 }
 
