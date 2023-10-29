@@ -9,6 +9,10 @@ param resourceTags object = {
   Project: 'Jumpstart_Ft1'
 }
 
+@maxLength(5)
+@description('Random GUID')
+param namingGuid string
+
 @description('The name of the Azure Data Explorer cluster Sku')
 param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 
@@ -16,7 +20,31 @@ param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 param skuTier string = 'Basic'
 
 @description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'pos-orders'
+param ft1DBName string = 'magnemotion'
+
+@description('The name of the Azure Data Explorer Event Hub connection')
+param ft1EventHubConnectionName string = 'magnemotion-eh-messages'
+
+@description('The name of the Azure Data Explorer Event Hub connection')
+param ft1EventHubConnectionNamePl string = 'magnemotion-eh-messagespl'
+
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param consumerGroup string = 'cgadx'
+
+@description('The name of the Azure Data Explorer Event Hub table')
+param tableName string = 'magnemotion_data'
+
+@description('The name of the Azure Data Explorer Event Hub table')
+param tableNamePl string = 'productionline'
+
+@description('The name of the Azure Data Explorer Event Hub mapping rule')
+param mappingRuleName string = 'magnemotion_data_mapping'
+
+@description('The name of the Azure Data Explorer Event Hub data format')
+param dataFormat string = 'multijson'
+
+@description('The resource id of the Event Hub')
+param eventHubResourceId string
 
 @description('# of nodes')
 @minValue(1)
@@ -38,9 +66,41 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   }
 }
 
-resource posOrdersDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
+resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
-  name: posOrdersDBName
+  name: ft1DBName
   location: location
   kind: 'ReadWrite'
 }
+
+resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+  name: ft1EventHubConnectionName
+  kind: 'EventHub'
+  parent: ft1MagnemotionDB
+  properties: {
+    eventHubResourceId: eventHubResourceId
+    consumerGroup: consumerGroup
+    mappingRuleName: mappingRuleName
+    tableName: tableName
+    dataFormat: dataFormat
+    eventSystemProperties: []
+    compression: 'None'
+    databaseRouting: 'Single'
+  }
+}
+
+/*resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+  name: ft1EventHubConnectionNamePl
+  kind: 'EventHub'
+  parent: ft1MagnemotionDB
+  properties: {
+    eventHubResourceId: eventHubResourceId
+    consumerGroup: consumerGroup
+    mappingRuleName: mappingRuleName
+    tableName: tableName
+    dataFormat: dataFormat
+    eventSystemProperties: []
+    compression: 'None'
+    databaseRouting: 'Single'
+  }
+}*/

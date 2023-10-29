@@ -43,6 +43,9 @@ param vmSize string = 'Standard_D8s_v3'
 @description('Unique SPN app ID')
 param spnClientId string
 
+@description('Unique SPN object ID')
+param spnObjectId string
+
 @description('Unique SPN password')
 @minLength(12)
 @maxLength(123)
@@ -348,6 +351,8 @@ module adxCluster 'data/dataExplorer.bicep' = {
   params: {
     adxClusterName: adxClusterName
     location: location
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    namingGuid: namingGuid
   }
 }
 
