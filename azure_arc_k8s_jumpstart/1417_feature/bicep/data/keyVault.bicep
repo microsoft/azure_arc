@@ -17,10 +17,10 @@ param spnClientId string
 param spnObjectId string
 
 @description('Secret name')
-param ft1Secret string = 'PlaceholderSecret'
+param ft1PlaceHolder string = 'PlaceholderSecret'
 
 @description('Secret value')
-param ft1SecretValue string = 'ft1SecretValue'
+param ft1PlaceHolderValue string = 'ft1SecretValue'
 
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvName
@@ -54,9 +54,9 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
 }
 
 resource ft1SecretPlaceholder 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
-  name: ft1Secret
+  name: ft1PlaceHolder
   parent: akv
   properties: {
-    value: ft1SecretValue
+    value: ft1PlaceHolderValue
   }
 }
