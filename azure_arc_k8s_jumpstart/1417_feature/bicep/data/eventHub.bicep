@@ -5,7 +5,10 @@ param eventHubNamespaceName string = 'ft1hubns${uniqueString(resourceGroup().id)
 param eventHubName string = 'ft1EventHub'
 
 @description('EventHub Sku')
-param eventHubSku string = 'Basic'
+param eventHubSku string = 'Standard'
+
+@description('EventHub Tier')
+param eventHubTier string = 'Standard'
 
 @description('EventHub capacity')
 param eventHubCapacity int = 1
@@ -22,7 +25,7 @@ resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = 
   sku: {
     name: eventHubSku
     capacity: eventHubCapacity
-    tier: 'Basic'
+    tier: eventHubTier
   }
 }
 
