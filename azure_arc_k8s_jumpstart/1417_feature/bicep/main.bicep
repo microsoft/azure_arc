@@ -110,6 +110,9 @@ param akvName string = 'ft1akv${namingGuid}'
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
 
+@description('The name of the Azure Data Explorer Event Hub production line consumer group')
+param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
+
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
@@ -338,6 +341,7 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubNamespaceName: eventHubNamespaceName
     location: location
     eventHubConsumerGroupName: eventHubConsumerGroupName
+    eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
   }
 }
 
@@ -359,8 +363,8 @@ module adxCluster 'data/dataExplorer.bicep' = {
     adxClusterName: adxClusterName
     location: location
     eventHubResourceId: eventHub.outputs.eventHubResourceId
-    namingGuid: namingGuid
     eventHubConsumerGroupName: eventHubConsumerGroupName
+    eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
   }
 }
 
