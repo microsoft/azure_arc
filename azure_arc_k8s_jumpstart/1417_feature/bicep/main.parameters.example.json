@@ -14,7 +14,9 @@
     "spnClientId": {
       "value": "XXXXX-XXXXX-XXXXX"
     },
-
+    "spnObjectId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
     "spnClientSecret": {
       "value": "XXXXX-XXXXX-XXXXX"
     },
@@ -26,6 +28,9 @@
     },
     "deployBastion": {
       "value": false
+    },
+    "customLocationRPOID": {
+      "value": "XXXXX-XXXXX-XXXXX"
     }
   }
 }
