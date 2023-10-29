@@ -265,6 +265,18 @@ Start-VM -Name $Ubuntu01vmName
 Start-VM -Name $Ubuntu02vmName
 Start-VM -Name $Win2k12MachineName
 
+# Configure WinRM for 2012 machine
+$2012Machine= Get-VM $Win2k12MachineName
+$privateIpAddress = $2012Machine.networkAdapters.ipaddresses[0]
+Enable-PSRemoting
+set-item wsman:\localhost\client\trustedhosts -Concatenate -value $privateIpAddress -Force
+set-item wsman:\localhost\client\trustedhosts -Concatenate -value "$Win2k12vmName" -Force
+Restart-Service WinRm -Force
+$file = "C:\Windows\System32\drivers\etc\hosts"
+$hostfile = Get-Content $file
+$hostfile += "$privateIpAddress $Win2k12vmName"
+Set-Content -Path $file -Value $hostfile -Force
+
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
 $nestedLinuxUsername = "arcdemo"
@@ -279,7 +291,7 @@ Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
-Invoke-Command -VMName $Win2k12MachineName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -ComputerName $Win2k12vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
 
 # Getting the Ubuntu nested VM IP address
@@ -306,7 +318,8 @@ Write-Header "Onboarding Arc-enabled servers"
 $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-Invoke-Command -VMName $Win2k12MachineName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+Invoke-Command -ComputerName $Win2k12vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+
 #Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
 Write-Header "Installing the Azure Monitor Agent on the Windows Arc-enabled server"
