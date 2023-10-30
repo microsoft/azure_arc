@@ -151,7 +151,7 @@ $JS_WINDOWS_ADMIN_USERNAME = 'arcdemo'
 if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADMIN_USERNAME]") { $JS_WINDOWS_ADMIN_USERNAME = $promptOutput }
 
 # set the env variable
-azd env set JS_WINDOWS_ADMIN_USERNAME -- $JS_WINDOWS_ADMIN_USERNAME
+azd env set JS_WINDOWS_ADMIN_USERNAME $JS_WINDOWS_ADMIN_USERNAME
 
 
 ########################################################################
@@ -166,44 +166,13 @@ if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection 
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
 
-
-########################################################################
-# GitHub User
-########################################################################
-<#$JS_GITHUB_USER = $env:JS_GITHUB_USER
-
-$defaultGhUser = ""
-If ($JS_GITHUB_USER) { $defaultGhUser = " [$JS_GITHUB_USER]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS_GITHUB_USER = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
-
-
-########################################################################
-# GitHub Personal Access Token
-########################################################################
-$JS_GITHUB_PAT = $env:JS_GITHUB_PAT
-
-$defaultPAT = ""
-If ($JS_GITHUB_PAT) { $defaultPAT = " [$JS_GITHUB_PAT]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$defaultPAT") { $JS_GITHUB_PAT = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_PAT -- $JS_GITHUB_PAT
-
-#>
-
-
 ########################################################################
 # Get custom locations RP Id
 ########################################################################
 $customLocationRPOID=(Get-AzADServicePrincipal -DisplayName 'Custom Locations RP')[0].Id
 
 # Set environment variables
-azd env set CUSTOM_LOCATION_RP_ID -- $customLocationRPOID
+azd env set CUSTOM_LOCATION_RP_ID $customLocationRPOID
 
 ########################################################################
 # Create Azure Service Principal
@@ -233,7 +202,7 @@ $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
 $SPN_OBJECT_ID = $spn.Id
 
 # Set environment variables
-azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
-azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
-azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
-azd env set SPN_OBJECT_ID -- $SPN_OBJECT_ID
+azd env set SPN_CLIENT_ID $SPN_CLIENT_ID
+azd env set SPN_CLIENT_SECRET $SPN_CLIENT_SECRET
+azd env set SPN_TENANT_ID $SPN_TENANT_ID
+azd env set SPN_OBJECT_ID $SPN_OBJECT_ID
