@@ -330,10 +330,10 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --auto-upgrade-minor-version false
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
-$eventGridHostName = (az eventgrid namespace list --resource-group testing11111 --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-(Get-Content "$Ft1ToolsDir\mq_bridge_eventgrid.yml" ) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content $_.FullName
-kubectl apply -f $Ft1ToolsDir\e4k.yml
-kubectl apply -f $Ft1ToolsDir\mq_bridge_eventgrid.yml
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+$eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
+(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml
 
 Start-Sleep -Seconds 30
 
@@ -341,8 +341,9 @@ Start-Sleep -Seconds 30
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+$simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 $mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-(Get-Content "$Ft1ToolsDir\mqtt_simulator.yml" ) -replace 'MQTTIPPlaceholder', $mqttIp | Set-Content $_.FullName
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
 ##############################################################
