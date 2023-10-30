@@ -339,6 +339,8 @@ kubectl apply -f $Ft1ToolsDir\mq_bridge_eventgrid.yml
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+$mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+(Get-Content "$Ft1ToolsDir\mqtt_simulator.yml" ) -replace 'MQTTIPPlaceholder', $mqttIp | Set-Content $_.FullName
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
 ##############################################################

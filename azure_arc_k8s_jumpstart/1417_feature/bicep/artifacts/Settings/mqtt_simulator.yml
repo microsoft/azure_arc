@@ -22,7 +22,7 @@ spec:
               memory: "128Mi"
           env:
             - name: MQTT_BROKER
-              value: "10.211.55.23"  
+              value: "MQTTIPPlaceholder"
             - name: MQTT_PORT
               value: "1883"
             - name: FRECUENCY
