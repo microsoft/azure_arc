@@ -1,0 +1,61 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: Broker
+metadata:
+  name: "my-broker"
+  namespace: default
+spec:
+  authImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-authentication
+    tag: 0.1.0-preview-rc2
+  brokerImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-pod
+    tag: 0.1.0-preview-rc2
+  healthManagerImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-operator
+    tag: 0.1.0-preview-rc2
+  mode: distributed
+  cardinality:
+    frontend:
+      replicas: 2
+      workers: 2
+    backendChain:
+      redundancyFactor: 2
+      partitions: 2
+      workers: 2
+  # memoryProfile: medium
+  # diskBackedMessageBufferSettings: ...
+  encryptInternalTraffic: false # or true, requires cert-manager
+  diagnostics:
+    probeImage: e4kpreview.azurecr.io/diagnostics-probe:0.1.0-preview-rc2
+    diagnosticServiceEndpoint: azedge-diagnostics-service:9700
+    enableMetrics: true
+    enableTracing: true
+    logLevel: info,hyper=off,kube_client=off,tower=off,conhash=off,h2=off
+    enableSelfCheck: true
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: "az-mqtt-non-tls-listener"
+  namespace: default
+spec:
+  serviceType: loadBalancer # or clusterIp
+  brokerRef: "my-broker"
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 1883
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: DiagnosticService
+metadata:
+  name: azedge-diagnostics-service
+  namespace: default
+spec:
+  image:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/diagnostics-service
+    tag: 0.1.0-preview-rc2
+  logFormat: "text"
