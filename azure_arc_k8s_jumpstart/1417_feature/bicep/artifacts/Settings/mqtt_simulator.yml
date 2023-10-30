@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-simulator-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-simulator
+  template:
+    metadata:
+      labels:
+        app: mqtt-simulator
+    spec:
+      containers:
+        - name: mqtt-simulator
+          image: contosobaacr.azurecr.io/mqtt-simulator:0.3
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+          env:
+            - name: MQTT_BROKER
+              value: "10.211.55.23"
+            - name: MQTT_PORT
+              value: "1883"
