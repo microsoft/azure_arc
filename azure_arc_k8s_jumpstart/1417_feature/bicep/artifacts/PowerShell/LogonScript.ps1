@@ -44,7 +44,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "calico"
 } else {
     $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "calico"
+    $networkplugin = "flannel"
 }
 
 
@@ -313,6 +313,22 @@ az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resou
 $DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
 
+
+##############################################################
+# Install E4K extension
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
+az k8s-extension create --extension-type microsoft.iotoperations.mq `
+                        --version 0.1.0-preview-rc2 `
+                        --release-namespace default `
+                        --name "E4KExtension" `
+                        --cluster-name $arcClusterName `
+                        --resource-group $resourceGroup `
+                        --cluster-type connectedClusters `
+                        --release-train dev `
+                        --scope cluster `
+                        --auto-upgrade-minor-version false
+
 ##############################################################
 # Arc-enabling the Windows server host
 ##############################################################
@@ -346,7 +362,6 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --subscription-id $subscriptionId `
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-
 
 ##############################################################
 # Install Step Cli
@@ -393,6 +408,16 @@ $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl |
 $output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
 Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
 Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+
+##############################################################
+# Install pip packages
+##############################################################
+Write-Host "Installing pip packages"
+foreach ($package in $Ft1Config.PipPackagesList) {
+    Write-Host "Installing $package"
+    & pip install $package --quiet 2>$null
+}
 
 #############################################################
 # Install VSCode extensions
