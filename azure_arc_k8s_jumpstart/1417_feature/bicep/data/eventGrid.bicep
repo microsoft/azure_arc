@@ -70,6 +70,9 @@ param queueName string
 @description('The time to live of the storage account queue')
 param queueTTL int = 604800
 
+@description('The maximum number of client sessions per authentication name')
+param maximumClientSessionsPerAuthenticationName int = 100
+
 resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   name: eventGridNamespaceName
   location: location
@@ -83,6 +86,12 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   properties: {
     topicSpacesConfiguration: {
       state: 'Enabled'
+      maximumClientSessionsPerAuthenticationName: maximumClientSessionsPerAuthenticationName
+      clientAuthentication: {
+        alternativeAuthenticationNameSources: [
+          'ClientCertificateSubject'
+        ]
+      }
     }
   }
 }
