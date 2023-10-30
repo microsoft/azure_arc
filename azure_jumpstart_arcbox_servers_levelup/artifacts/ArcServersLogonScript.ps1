@@ -14,14 +14,17 @@ $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-#$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-#$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+
+$vhdSourceFolderESU = "https://jsvhds.blob.core.windows.net/scenarios/prod"
+$sasESU = "*?si=JS-RL&spr=https&sv=2022-11-02&sr=c&sig=fIIeEliw5nG78oR6TBCvM70VMz9WXhpF41wdDoOlE8U%3D"
 
 # Change to use the level-up CDN for VHDs
 
-$usLocations = @('eastus', 'eastus2', 'centralus', 'westus2')
-$europeLocations = @('northeurope', 'westeurope', 'francecentral', 'uksouth')
-$apacLocations = @( 'southeastasia', 'australiaeast', 'japaneast', 'koreacentral')
+#$usLocations = @('eastus', 'eastus2', 'centralus', 'westus2')
+#$europeLocations = @('northeurope', 'westeurope', 'francecentral', 'uksouth')
+#$apacLocations = @( 'southeastasia', 'australiaeast', 'japaneast', 'koreacentral')
 
 # Archive exising log file and crate new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -155,14 +158,18 @@ $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu01vmName}.vhdx"
 $Ubuntu02vmName = "ArcBox-Ubuntu-02"
 $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 
+$Win2k12vmName = "JSWin2K12Base"
+$Win2k12MachineName = "ArcBox-Win2k12"
+$win2k12vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k12vmName}.vhdx"
+
 # Verify if VHD files already downloaded especially when re-running this script
-if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))) {
+if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($win2k12vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))) {
     <# Action when all if and elseif conditions are false #>
     $Env:AZCOPY_BUFFER_GB = 4
     # Other ArcBox flavors does not have an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 
-    switch ($azureLocation) {
+    <#switch ($azureLocation) {
         "eastus2" {
             $vhdSourceFolder = "https://jsvhdslevelupeus2.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=1eyW6VmrDzlJNsFSssBCoyNH4i6zt5mSvcuVgFuPv%2BM%3D"
@@ -200,20 +207,10 @@ if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists(
             $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
             $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
         }
-    }
-
-    <#if ($apacLocations -contains $azureLocation) {
-        # APAC Storage account
-        $vhdSourceFolder = "https://jsvhdslevelupapac.blob.core.windows.net/arcbox"
-        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=9gZdHXNd6CXmkKG0NZjDhzT9ACELpsYGcRIbzlyLfJg%3D"
-    } elseif ($europeLocations -contains $azureLocation) {
-        $vhdSourceFolder = "https://jsvhdslevelupeurope.blob.core.windows.net/arcbox"
-        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=Uz0fPIEfBsKglScotYtEnAATSTx187DzyE2gNXV40y4%3D"
-    } else {
-        $vhdSourceFolder = "https://jsvhdslevelup.blob.core.windows.net/arcbox"
-        $sas = "*?si=jsvhds-sas-policy&spr=https&sv=2022-11-02&sr=c&sig=X9L09UCkIaDNWHh6AsDKQ%2Fc%2BZrRBMnMV1uBhT2zrdLE%3D"
     }#>
+
     azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck
+    azcopy cp $vhdSourceFolderESU/$sasESU $Env:ArcBoxVMDir --include-pattern "${Win2k12vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR --check-md5 NoCheck
 }
 
 # Create the nested VMs if not already created
@@ -225,6 +222,13 @@ if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne "Runni
     New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
     Set-VMProcessor -VMName $Win2k19vmName -Count 2
     Set-VM -Name $Win2k19vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
+}
+
+if ((Get-VM -Name $Win2k12MachineName -ErrorAction SilentlyContinue).State -ne "Running") {
+    Remove-VM -Name $Win2k12MachineName -Force -ErrorAction SilentlyContinue
+    New-VM -Name $Win2k12MachineName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k12vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+    Set-VMProcessor -VMName $Win2k12MachineName -Count 2
+    Set-VM -Name $Win2k12MachineName -AutomaticStartAction Start -AutomaticStopAction ShutDown
 }
 
 if ((Get-VM -Name $Win2k22vmName -ErrorAction SilentlyContinue).State -ne "Running") {
@@ -259,6 +263,19 @@ Start-VM -Name $Win2k19vmName
 Start-VM -Name $Win2k22vmName
 Start-VM -Name $Ubuntu01vmName
 Start-VM -Name $Ubuntu02vmName
+Start-VM -Name $Win2k12MachineName
+
+# Configure WinRM for 2012 machine
+$2012Machine= Get-VM $Win2k12MachineName
+$privateIpAddress = $2012Machine.networkAdapters.ipaddresses[0]
+Enable-PSRemoting
+set-item wsman:\localhost\client\trustedhosts -Concatenate -value $privateIpAddress -Force
+set-item wsman:\localhost\client\trustedhosts -Concatenate -value "$Win2k12vmName" -Force
+Restart-Service WinRm -Force
+$file = "C:\Windows\System32\drivers\etc\hosts"
+$hostfile = Get-Content $file
+$hostfile += "$privateIpAddress $Win2k12vmName"
+Set-Content -Path $file -Value $hostfile -Force
 
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
@@ -274,6 +291,7 @@ Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -ComputerName $Win2k12vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
 Start-Sleep -Seconds 5
 
 # Getting the Ubuntu nested VM IP address
@@ -284,6 +302,7 @@ $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty Net
 Write-Output "Transferring installation script to nested Windows VMs..."
 Copy-VMFile $Win2k19vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $Win2k12MachineName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
@@ -299,6 +318,8 @@ Write-Header "Onboarding Arc-enabled servers"
 $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+Invoke-Command -ComputerName $Win2k12vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+
 #Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
 Write-Header "Installing the Azure Monitor Agent on the Windows Arc-enabled server"
