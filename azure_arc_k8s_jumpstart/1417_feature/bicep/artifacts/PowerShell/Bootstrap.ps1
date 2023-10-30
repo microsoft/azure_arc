@@ -215,37 +215,10 @@ while (-not $success -and $retryCount -lt $maxRetries) {
 ##############################################################
 # Install pip packages
 ##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
-
-$retryCount = 0
-$success = $false
-
-while (-not $success -and $retryCount -lt $maxRetries) {
-    try {
-        Write-Host "Installing pip packages"
-        foreach ($package in $Ft1Config.PipPackagesList) {
-            Write-Host "Installing $package"
-            & pip install $package --quiet 2>$null
-        }
-
-        # If the command succeeds, set $success to $true to exit the loop
-        $success = $true
-    }
-    catch {
-        # If an exception occurs, increment the retry count
-        $retryCount++
-
-        # If the maximum number of retries is not reached yet, display an error message
-        if ($retryCount -lt $maxRetries) {
-            Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-            Start-Sleep -Seconds $retryDelay
-        }
-        else {
-            Write-Host "All attempts failed. Exiting..."
-            exit 1  # Stop script execution if maximum retries reached
-        }
-    }
+Write-Host "Installing pip packages"
+foreach ($package in $Ft1Config.PipPackagesList) {
+    Write-Host "Installing $package"
+    & pip install $package --quiet 2>$null
 }
 
 ##############################################################
