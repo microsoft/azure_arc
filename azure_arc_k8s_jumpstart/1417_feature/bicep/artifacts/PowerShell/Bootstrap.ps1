@@ -213,15 +213,6 @@ while (-not $success -and $retryCount -lt $maxRetries) {
 }
 
 ##############################################################
-# Install pip packages
-##############################################################
-Write-Host "Installing pip packages"
-foreach ($package in $Ft1Config.PipPackagesList) {
-    Write-Host "Installing $package"
-    & pip install $package --quiet 2>$null
-}
-
-##############################################################
 # Install Azure CLI (64-bit not available via Chocolatey)
 ##############################################################
 $ProgressPreference = 'SilentlyContinue'
