@@ -39,6 +39,7 @@ After completion of this workshop, you will be able to:
 |[**10 - Manage the Windows operating system of your Arc-enabled servers using Windows Admin Center (Preview)**](#module-10-manage-your-azure-arc-enabled-servers-using-admin-center-preview) | 15 minutes | Basim Majeed |
 |[**11 - Query and inventory your Azure Arc-enabled servers using Azure Resource Graph**](#module-11-query-and-inventory-your-azure-arc-enabled-servers-using-azure-resource-graph) | 15 minutes | Basim Majeed |
 |[**12 - Enforce governance across your Azure Arc-enabled servers using Azure Policy**](#module-12-enforce-governance-across-your-azure-arc-enabled-servers-using-azure-policy) | 15 minutes | Basim Majeed |
+|[**13 - Enroll your Windows Server 2012/R2 machines for Extended Security Updates with Azure Arc**](#module-13-enroll-your-windows-server-2012R2-machines-for-extended-security-updates-with-azure-arc) | 30 minutes | Yasuhiro Handa |
 
 ## LevelUp lab guidance
 
@@ -2005,3 +2006,49 @@ In this module you will use Azure Policy to Audit Arc-enabled Linux servers that
     ![Screenshot Guest Assignment details](./Guest_Assignment_Details.png)
 
 - Click on the identified policy/resource combination and this will take you to the screen that we saw earlier at the end of Task 2, showing the details of the compliance/non-compliance.
+
+### Module 13: Enroll your Windows Server 2012/R2 machines for Extended Security Updates with Azure Arc
+
+#### Module overview
+
+In this module, you will assign Extended Security Updates (ESU) to the server through the Azure portal.
+
+#### Pre-requisites
+
+- Ensure that the Windows 2012/R2 servers are already on-boarded to Azure Arc.
+
+  > **NOTE: To continue receiving security updates after extended support has ended on October 10, 2023, you must have a [servicing stack updates (SSU)](https://support.microsoft.com/topic/kb5031043-procedure-to-continue-receiving-security-updates-after-extended-support-has-ended-on-october-10-2023-c1a20132-e34c-402d-96ca-1e785ed51d45) installed. It will be installed through Windows Update for September 2023, or through Microsoft Update Catalog or Windows Server Update Services.**
+
+#### Task 1: Enable Extended Security Updates (ESU) license
+
+- Navigate to the Azure Arc page
+
+  ![Screenshot Azure Arc navigate](./esu_arc_navigate.png)
+
+- Select Extended Security Updates in the left pane.
+
+  ![Screenshot Azure Arc Extended](./esu_menu.png)
+
+- Provision Windows Server 2012 and 2012 R2 Extended Security Update licenses from Azure Arc.
+
+  ![Screenshot ESU Licenses](./esu_create_licenses1.png)
+
+  ![Screenshot ESU Licenses](./esu_create_licenses2.png)
+
+  > **NOTE: When opting for ESU via Azure Arc for Windows Server, you have two licensing choices:**
+  > 1. **vCore Licensing**: Pay based on the number of virtual cores (vCores) utilized by the operating system. This option uses the Standard edition rate. If you're operating multiple VMs, the cost will be calculated based on the total number of vCores across all VMs. **There is an 8-core minimum per VM for vCore licensing.**
+  > 2. **pCore Licensing**: Pay based on the number of physical cores (pCores) utilized by the host operating system. This option can use either edition. Note that with pCore licensing, up to 2 guest VMs running on a WS Standard host are covered (additional VMs require additional ESU licenses). With the WS Datacenter host, all VMs are covered without the need for additional licenses. **There is a 16-core minimum per server for pCore licensing.**
+  >
+  > Please see [here](https://learn.microsoft.com/azure/azure-arc/servers/license-extended-security-updates) for details.
+
+- Select one or more Arc-enabled servers to link to an Extended Security Update license.
+
+  ![Screenshot Enable ESU Licenses](./esu_enable_licenses1.png)
+
+  ![Screenshot Enable ESU Licenses](./esu_enable_licenses2.png)
+
+- The status of the selected machines changes to **Enabled**.
+
+  ![Screenshot Enable ESU Licenses](./esu_verify_licenses.png)
+
+    > **NOTE: Once you've linked a server to an activated ESU license, the server is eligible to receive Windows Server 2012 and 2012 R2 ESUs.**
