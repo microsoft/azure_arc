@@ -4,13 +4,6 @@ if ($null -ne $env:AZURE_RESOURCE_GROUP){
     $rdpPort = $env:JS_RDP_PORT
 }
 
-
-########################################################################
-# Delete service principal
-########################################################################
-$spnObjectId = $env:SPN_OBJECT_ID
-Remove-AzADServicePrincipal -ObjectId $spnObjectId
-
 ########################################################################
 # RDP Port
 ########################################################################
