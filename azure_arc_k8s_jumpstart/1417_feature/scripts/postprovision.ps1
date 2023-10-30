@@ -19,7 +19,7 @@ Remove-AzADServicePrincipal -ObjectId $spnObjectId
 If ($rdpPort -ne "3389") {
 
     Write-Host "Configuring NSG Rule for RDP..."
-    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name Ag-NSG-Prod
+    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name AKS-EE-Demo-NSG
 
     Add-AzNetworkSecurityRuleConfig `
         -NetworkSecurityGroup $nsg `
