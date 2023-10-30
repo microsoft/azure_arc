@@ -53,17 +53,13 @@
     guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
     azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
 
-    # HCI host names
-    HCIHostList                          = "AzSHOST1", "AzSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
-    MgmtHostName                         = "AzSMGMT"
-    
     # SDN Host IPs
     AzSMGMTIP                            = "192.168.1.11/24"
     AzSHOST1IP                           = "192.168.1.12/24"
     AzSHOST2IP                           = "192.168.1.13/24"
     
     MgmtHostConfig = @{
-        HostName = "AzSMGMT"
+        Hostname = "AzSMGMT"
         IP       = "192.168.1.11/24"
     }
 
@@ -88,6 +84,8 @@
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     AzSMGMTProcCount                     = 20
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.
+    FabricSwitch                         = "vSwitch-Fabric"
+    FabricNIC                            = "FABRIC"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
@@ -138,6 +136,7 @@
     DCIP                                 = "192.168.1.254/24"
     CONSOLEIP                            = "192.168.1.10/24"
     WACIP                                = "192.168.1.9/24"
+    WACMAC                               = "10155D010B00"
 
     # BGP Router Config
     BGPRouterIP_MGMT                     = "192.168.1.1/24"
