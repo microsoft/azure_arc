@@ -315,7 +315,7 @@ netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 conne
 
 
 ##############################################################
-# Install E4K extension
+# Configure E4K extension
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
 az k8s-extension create --extension-type microsoft.iotoperations.mq `
@@ -328,6 +328,18 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --release-train dev `
                         --scope cluster `
                         --auto-upgrade-minor-version false
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
+$eventGridHostName = (az eventgrid namespace list --resource-group testing11111 --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+(Get-Content "$Ft1ToolsDir\mq_bridge_eventgrid.yml" ) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content $_.FullName
+kubectl apply -f $Ft1ToolsDir\mq_bridge_eventgrid.yml
+
+
+##############################################################
+# Deploy the simulator
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
 ##############################################################
 # Arc-enabling the Windows server host
