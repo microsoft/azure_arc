@@ -44,7 +44,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
     $networkplugin = "calico"
 } else {
     $productName = "AKS Edge Essentials - K3s"
-    $networkplugin = "calico"
+    $networkplugin = "flannel"
 }
 
 
@@ -313,6 +313,39 @@ az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resou
 $DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
 
+
+##############################################################
+# Configure E4K extension
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
+az k8s-extension create --extension-type microsoft.iotoperations.mq `
+                        --version 0.1.0-preview-rc2 `
+                        --release-namespace default `
+                        --name "E4KExtension" `
+                        --cluster-name $arcClusterName `
+                        --resource-group $resourceGroup `
+                        --cluster-type connectedClusters `
+                        --release-train dev `
+                        --scope cluster `
+                        --auto-upgrade-minor-version false
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+$eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
+(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml
+
+Start-Sleep -Seconds 30
+
+##############################################################
+# Deploy the simulator
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+$simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
+$mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
+
 ##############################################################
 # Arc-enabling the Windows server host
 ##############################################################
@@ -346,7 +379,6 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --subscription-id $subscriptionId `
     --tags "Project=jumpstart_azure_arc_servers" "AKSEE=$clusterName"`
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-
 
 ##############################################################
 # Install Step Cli
@@ -393,6 +425,16 @@ $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl |
 $output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
 Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
 Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+
+##############################################################
+# Install pip packages
+##############################################################
+Write-Host "Installing pip packages"
+foreach ($package in $Ft1Config.PipPackagesList) {
+    Write-Host "Installing $package"
+    & pip install $package --quiet 2>$null
+}
 
 #############################################################
 # Install VSCode extensions

@@ -117,6 +117,9 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 [System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1PowerShellDir\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$Ft1PowerShellDir\LogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1PowerShellDir\Ft1Config.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
 
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
@@ -191,42 +194,6 @@ while (-not $success -and $retryCount -lt $maxRetries) {
         foreach ($app in $Ft1Config.ChocolateyPackagesList) {
             Write-Host "Installing $app"
             & choco install $app /y -Force | Write-Output
-        }
-
-        # If the command succeeds, set $success to $true to exit the loop
-        $success = $true
-    }
-    catch {
-        # If an exception occurs, increment the retry count
-        $retryCount++
-
-        # If the maximum number of retries is not reached yet, display an error message
-        if ($retryCount -lt $maxRetries) {
-            Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-            Start-Sleep -Seconds $retryDelay
-        }
-        else {
-            Write-Host "All attempts failed. Exiting..."
-            exit 1  # Stop script execution if maximum retries reached
-        }
-    }
-}
-
-##############################################################
-# Install pip packages
-##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
-
-$retryCount = 0
-$success = $false
-
-while (-not $success -and $retryCount -lt $maxRetries) {
-    try {
-        Write-Host "Installing pip packages"
-        foreach ($package in $Ft1Config.PipPackagesList) {
-            Write-Host "Installing $package"
-            & pip install $package --quiet 2>$null
         }
 
         # If the command succeeds, set $success to $true to exit the loop

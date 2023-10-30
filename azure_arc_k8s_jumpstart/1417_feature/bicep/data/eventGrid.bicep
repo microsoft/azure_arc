@@ -32,7 +32,7 @@ param eventGridAuthThumbprint array = [
 param authValidationSchema string = 'ThumbprintMatch'
 
 @description('The name of the EventGrid namespace')
-param eventGridTopicSpaceName string = 'ft1TopicSpace${namingGuid}'
+param eventGridTopicSpaceName string = 'ft1topicSpace${namingGuid}'
 
 @description('The name of the EventGrid topic templates')
 param eventGridTopicTemplates array = [
@@ -53,7 +53,7 @@ param eventGridTopicSubscriptionName string = 'ft1EventHubSubscription'
 param storageTopicSubscriptionName string = 'ft1StorageSubscription'
 
 @description('The name of the EventGrid topic')
-param eventGridTopicName string = 'ft1Topic${namingGuid}'
+param eventGridTopicName string = 'ft1topic${namingGuid}'
 
 @description('The name of the EventGrid topic sku')
 param eventGridTopicSku string = 'Basic'
@@ -70,6 +70,9 @@ param queueName string
 @description('The time to live of the storage account queue')
 param queueTTL int = 604800
 
+@description('The maximum number of client sessions per authentication name')
+param maximumClientSessionsPerAuthenticationName int = 100
+
 resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   name: eventGridNamespaceName
   location: location
@@ -83,6 +86,12 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   properties: {
     topicSpacesConfiguration: {
       state: 'Enabled'
+      maximumClientSessionsPerAuthenticationName: maximumClientSessionsPerAuthenticationName
+      clientAuthentication: {
+        alternativeAuthenticationNameSources: [
+          'ClientCertificateSubject'
+        ]
+      }
     }
   }
 }
