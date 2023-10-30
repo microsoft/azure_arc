@@ -15,13 +15,15 @@ spec:
     spec:
       containers:
         - name: mqtt-simulator
-          image: contosobaacr.azurecr.io/mqtt-simulator:0.3
+          image: jumpstartprod.azurecr.io/mqtt-simulator:latest
           resources:
             limits:
               cpu: "500m"
               memory: "128Mi"
           env:
             - name: MQTT_BROKER
-              value: "10.211.55.23"
+              value: "10.211.55.23"  
             - name: MQTT_PORT
               value: "1883"
+            - name: FRECUENCY
+              value: "10"
