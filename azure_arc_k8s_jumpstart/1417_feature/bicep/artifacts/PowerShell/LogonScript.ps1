@@ -335,6 +335,8 @@ $eventGridHostName = (az eventgrid namespace list --resource-group testing11111 
 kubectl apply -f $Ft1ToolsDir\e4k.yml
 kubectl apply -f $Ft1ToolsDir\mq_bridge_eventgrid.yml
 
+Start-Sleep -Seconds 30
+
 ##############################################################
 # Deploy the simulator
 ##############################################################
