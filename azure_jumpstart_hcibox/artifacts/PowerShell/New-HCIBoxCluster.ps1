@@ -415,8 +415,8 @@ function Set-MGMTVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\$($HCIBoxConfig.MgmtHostConfig.HostName)\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
-    Write-Host "Performing offline installation of Hyper-V to management VM at path $path"
+    $path = (("\\localhost)\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
+    Write-Host "Performing offline installation of Hyper-V on $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 20
 
