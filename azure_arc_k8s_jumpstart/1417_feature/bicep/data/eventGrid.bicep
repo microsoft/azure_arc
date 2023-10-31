@@ -154,6 +154,9 @@ resource eventGridTopic 'Microsoft.EventGrid/topics@2023-06-01-preview' = {
   identity: {
     type: 'SystemAssigned'
   }
+  properties: {
+    inputSchema: 'CloudEventSchemaV1_0'
+  }
 }
 
 
