@@ -625,7 +625,8 @@ foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
 
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "[$(Get-Date -Format t)] INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
-        New-VM -Name $site.Name `
+
+            New-VM -Name $site.Name `
             -Path $destPath `
             -MemoryStartupBytes $AgConfig.L1VMMemory `
             -BootDevice VHD `
@@ -1072,9 +1073,29 @@ foreach ($VM in $VMNames) {
         $deploymentPath = "C:\Deployment\config.json"
         Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
 
-
         kubectl get svc
-        Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+
+        $retryCount = 5  # Number of times to retry the operation
+        $retryDelay = 30  # Delay in seconds between retries
+
+        for ($retry = 1; $retry -le $retryCount; $retry++) {
+            $return = Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+            if ($return -ne "OK") {
+                Write-Output "Failed to onboard AKS Edge Essentials cluster to Azure Arc. Retrying (Attempt $retry of $retryCount)..."
+                if ($retry -lt $retryCount) {
+                    Start-Sleep -Seconds $retryDelay  # Wait before retrying
+                }
+                else {
+                    Write-Output "Exceeded maximum retry attempts. Exiting."
+                    break  # Exit the loop after the maximum number of retries
+                }
+            } else {
+                Write-Output "Successfully onboarded AKS Edge Essentials cluster to Azure Arc."
+                break  # Exit the loop if the connection is successful
+            }
+        }
+
+
     } 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
 }
 
