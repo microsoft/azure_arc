@@ -97,7 +97,7 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
         static: [
           {
             key: 'indicator'
-            valueType: 'int'
+            valueType: 'string'
           }
         ]
       }
