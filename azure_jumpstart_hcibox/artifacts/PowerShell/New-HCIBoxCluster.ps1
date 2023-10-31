@@ -341,7 +341,7 @@ function New-ManagementVM {
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
     Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
     $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
-    Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
+    Write-Host "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
     Get-VM $Name | Set-VMProcessor -ExposeVirtualizationExtensions $true
     Get-VM $Name | Set-VMMemory -DynamicMemoryEnabled $false
