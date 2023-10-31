@@ -75,14 +75,14 @@ function New-InternalSwitch {
 }
 
 function Get-FormattedWACMAC {
-    Params(
+    Param(
         $HCIBoxConfig
     )
     return $HCIBoxConfig.WACMAC -replace '..(?!$)', '$&-'
 }
 
 function GenerateAnswerFile {
-    Params(
+    Param(
         $Hostname,
         $IsMgmtVM,
         $IsGuestVM,
@@ -415,13 +415,13 @@ function Set-MGMTVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost)\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
     Write-Host "Performing offline installation of Hyper-V on $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 20
 
     # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
-    Write-Verbose "Mounting VHDX file at $path"
+    Write-Host "Mounting VHDX file at $path"
     [string]$MountedDrive = ""
     $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
     if (!$partition.DriveLetter) {
@@ -447,7 +447,7 @@ function Set-MGMTVHDX {
     New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
 
     # Injecting configs into VMs
-    Write-Verbose "Injecting files into $path"
+    Write-Host "Injecting files into $path"
     Copy-Item -Path "$Env:HCIBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
     #New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
     Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
@@ -457,7 +457,7 @@ function Set-MGMTVHDX {
     #Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
 
     # Dismount VHDX
-    Write-Verbose "Dismounting VHDX File at path $path"
+    Write-Host "Dismounting VHDX File at path $path"
     Dismount-VHD $path 
 }
 
