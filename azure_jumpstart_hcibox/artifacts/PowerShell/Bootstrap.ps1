@@ -1,8 +1,8 @@
 param (
     [string]$adminUsername,
-    [securestring]$adminPassword,
+    [string]$adminPassword,
     [string]$spnClientId,
-    [securestring]$spnClientSecret,
+    [string]$spnClientSecret,
     [string]$spnTenantId,
     [string]$subscriptionId,
     [string]$resourceGroup,
