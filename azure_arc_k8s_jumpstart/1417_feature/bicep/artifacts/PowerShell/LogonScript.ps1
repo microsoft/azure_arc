@@ -318,7 +318,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 ##############################################################
 # Configure E4K extension
 ##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
+<#Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
 az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --version 0.1.0-preview-rc2 `
                         --release-namespace default `
@@ -329,6 +329,7 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --release-train dev `
                         --scope cluster `
                         --auto-upgrade-minor-version false
+#>
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
