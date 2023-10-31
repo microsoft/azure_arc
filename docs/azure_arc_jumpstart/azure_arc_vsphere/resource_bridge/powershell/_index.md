@@ -70,9 +70,9 @@ The following README will guide you on how to use the provided PowerShell script
 
 ### vCenter Prerequisites
 
-- VMware vSphere vCenter Server v6.7 or 8.
+- VMware vSphere vCenter Server 8.
 
-- A virtual network that can provide internet access, directly or through a proxy. It must also be possible for VMs on this network to communicate with the vCenter server on TCP port (usually 443).
+- A virtual network that can provide internet access, directly or through a proxy. It must also be possible for VMs on this network to communicate with the vCenter server on a TCP port (usually 443).
 
 - At least three free static IP addresses on the above network. If you have a DHCP server on the network, the IP addresses must be outside the DHCP range.
 
@@ -104,7 +104,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`location`_ - the Azure region you want to deploy to
   - _`subscriptionId`_ - your Azure subscription ID
   - _`resourceGroupName`_ - the name of the Azure resource group you will create your resources in
-  - _`applianceName`_ - a name for the Azure Arc resource bridge appliance, this will the name that will be used in Azure.
+  - _`applianceName`_ - a name for the Azure Arc resource bridge appliance, as it will be shown in Azure.
   - _`customLocationName`_ - the name of your Azure Arc custom location
   - _`vcenterName`_ -  the name of your vCenter
   - _`vcenterFqdn`_ - your vCenter fully qualified name
@@ -120,8 +120,8 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`dnsServer`_ - IP of the DNS server to be used for the appliance
   - _`gateway`_ - Gateway IP address to be used for the appliance
   - _`ipAddressPrefix`_ - Network IP address range in CIDR notation to be used by the appliance
-  - _`k8sNodeIpPoolStart`_ - IP range start for the IPs to be used by the appliance
-  - _`k8sNodeIpPoolEnd`_ - IP range end for the IPs to be used by the appliance
+  - _`k8sNodeIpPoolStart`_ - Starting IP address from the subnet to be used by the appliance for node pool
+  - _`k8sNodeIpPoolEnd`_ - End IP address from the subnet to be used by the appliance for node pool
   - _`segment`_ - Name of the virtual network or segment to which the appliance VM must be connected. Use the same name as it is displayed in your vCenter, for example: 'Jumpstart VM segment - (VLAN 111)'
   - _`resourcePool`_ - the name of the vSphere resource pool to be used by the appliance. Make sure to include the full path, for example: '/Jumpstart - Datacenter/host/Jumpstart Cluster/Resources'
   - _`controlPlaneEndpoint`_ - IP address of the Kubernetes cluster control plane

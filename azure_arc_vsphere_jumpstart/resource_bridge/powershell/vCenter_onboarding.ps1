@@ -92,10 +92,12 @@ function getLatestAzVersion() {
         logWarn "Failed to get the latest version from '$gitUrl': $($_.Exception.Message)"
         return $null
     }
+    
     if ($response.StatusCode -ne 200) {
         logWarn "Failed to fetch the latest version from '$gitUrl' with status code '$($response.StatusCode)' and reason '$($response.StatusDescription)'"
         return $null
     }
+
     $content = $response.Content
     foreach ($line in $content -split "`n") {
         if ($line.StartsWith('VERSION')) {
@@ -105,6 +107,7 @@ function getLatestAzVersion() {
             }
         }
     }
+
     logWarn "Failed to extract the latest version from the content of '$gitUrl'"
     return $null
 }
@@ -151,6 +154,7 @@ function shouldInstallAzCli() {
         log "A newer version of Azure CLI ($latestAzVersion) is available, installing it..."
         return $true
     }
+
     log "Azure CLI is up to date."
     return $false
 }
@@ -167,6 +171,7 @@ function installAzCli64Bit() {
     if ($exitCode -ne 0) {
         throw "Azure CLI installation failed with exit code $exitCode. See $msiInstallLogPath for additional details."
     }
+    
     $azCmdDir = Join-Path $env:ProgramFiles "Microsoft SDKs\Azure\CLI2\wbin"
     [System.Environment]::SetEnvironmentVariable('PATH', $azCmdDir + ';' + $Env:PATH)
     log "Azure CLI has been installed."
