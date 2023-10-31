@@ -94,10 +94,10 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
       }
       routeTopicResourceId: eventGridTopic.id
       routingEnrichments: {
-        static: [
+        dynamic:[
           {
             key: 'indicator'
-            valueType: 'string'
+            value: '1'
           }
         ]
       }
