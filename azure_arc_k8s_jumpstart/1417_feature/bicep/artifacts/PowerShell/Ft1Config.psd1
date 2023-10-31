@@ -49,7 +49,6 @@
     AzCLIExtensions         = @(
         'k8s-extension',
         'k8s-configuration',
-        'azure-iot',
         'eventgrid',
         'customlocation',
         'kusto',
