@@ -78,7 +78,6 @@
     SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
 
     # VM Configuration
-    
     NestedVMMemoryinGB                   = 105GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     NestedVMProcCount                    = 20
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
@@ -86,6 +85,7 @@
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.
     FabricSwitch                         = "vSwitch-Fabric"
     FabricNIC                            = "FABRIC"
+    ClusterVSwitchName                   = "hciSwitch"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
@@ -186,7 +186,6 @@
     # AKS and Resource bridge variables
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
-    AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"
     AKSNodeEndIP                         = "192.168.200.100"
     AKSVIPStartIP                        = "192.168.200.125"

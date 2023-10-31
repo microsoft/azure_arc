@@ -15,11 +15,11 @@ $Env:VMPath = "C:\VMs"
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
 $csv_path = "C:\ClusterStorage\S2D_vDISK1"
@@ -31,7 +31,7 @@ $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $custom_location_name = "hcibox-rb-cl"
 
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Removing Arc Resource Bridge."
     $WarningPreference = "SilentlyContinue"
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId

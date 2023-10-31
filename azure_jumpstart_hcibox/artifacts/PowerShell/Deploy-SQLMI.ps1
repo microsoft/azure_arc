@@ -27,12 +27,12 @@ until ($customLocationObjectId -ne "" -and $customLocationObjectId.Length -eq 36
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
 $ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects
 Write-Header 'Creating credentials and connecting to Azure'
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password # Domain credential
 
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
@@ -44,7 +44,7 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 
 # Install latest versions of Nuget and PowershellGet
 Write-Header "Install latest versions of Nuget and PowershellGet"
-Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList -Credential $adcred -ScriptBlock {
     Enable-PSRemoting -Force
     $ProgressPreference = "SilentlyContinue"
     Install-PackageProvider -Name NuGet -Force
@@ -56,7 +56,7 @@ Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
 # Install necessary AZ modules and initialize akshci on each node
 Write-Header "Install necessary AZ modules, AZ CLI extensions, plus AksHCI module and initialize akshci on each node"
 
-Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules"
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $ProgressPreference = "SilentlyContinue"
@@ -82,15 +82,15 @@ Invoke-WebRequest ("https://azuredatastudio-update.azurewebsites.net/latest/win3
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:HCIBoxDir\AZDataCLI.msi
 Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStressNet6.zip" -OutFile $Env:HCIBoxDir\SqlQueryStress.zip
 
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host -Force
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.json" -DestinationPath "C:\VHD\dataController.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\dataController.parameters.json" -DestinationPath "C:\VHD\dataController.parameters.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.json" -DestinationPath "C:\VHD\adConnector.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\adConnector.parameters.json" -DestinationPath "C:\VHD\adConnector.parameters.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.json" -DestinationPath "C:\VHD\sqlmiAD.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\sqlmiAD.parameters.json" -DestinationPath "C:\VHD\sqlmiAD.parameters.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\settingsTemplate.json" -DestinationPath "C:\VHD\settingsTemplate.json" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\azuredatastudio.zip" -DestinationPath "C:\VHD\azuredatastudio.zip" -FileSource Host -Force
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxDir\AZDataCLI.msi" -DestinationPath "C:\VHD\AZDataCLI.msi" -FileSource Host -Force
 $adminCenterSession = New-PSSession -ComputerName "admincenter" -Credential $adcred
 Copy-Item $Env:HCIBoxDir\azuredatastudio.zip -Destination "C:\VHDs\azuredatastudio.zip" -ToSession $adminCenterSession -Force
 Copy-Item $Env:HCIBoxDir\SqlQueryStress.zip -Destination "C:\VHDs\SqlQueryStress.zip" -ToSession $adminCenterSession -Force
@@ -113,7 +113,7 @@ $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $adminUsername = $env:adminUsername
-$adminPassword = $SDNConfig.SDNAdminPassword
+$adminPassword = $HCIBoxConfig.SDNAdminPassword
 $workspaceName = $env:workspaceName
 $dataController = "jumpstart-dc-$namingPrefix"
 $sqlMI = "jumpstart-sql"
@@ -123,7 +123,7 @@ $defaultDomainPartition = "DC=$domainName,DC=local"
 
 # Deploying the Arc Data Controller
 Write-Header "Deploying the Arc Data extension"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin", [System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
@@ -160,7 +160,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 # Configuring Azure Arc Custom Location on the cluster
 Write-Header "Deploying the Azure Arc Data Controller and Custom Location"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Creating the Azure Arc Custom Location"
     Write-Host "`n"
@@ -209,7 +209,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
 
 # Preparing AD for SQL MI AD authenticaion
 Write-Header "Deploying the Azure Arc-enabled SQL Managed Instance"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $ErrorActionPreference = 'SilentlyContinue'
     $WarningPreference = 'SilentlyContinue'
     Add-WindowsFeature -Name "RSAT-AD-PowerShell" -IncludeAllSubFeature
@@ -222,7 +222,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $adminUsername = $using:adminUsername
     $adminPassword = $using:adminPassword
     $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
-    $dcIpv4Secondary = ([System.Net.IPAddress]$using:SDNConfig.dcVLAN200IP).GetAddressBytes()
+    $dcIpv4Secondary = ([System.Net.IPAddress]$using:HCIBoxConfig.dcVLAN200IP).GetAddressBytes()
     $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
     $reverseLookupSecondaryCidr = [System.String]::Concat($dcIpv4Secondary[0], '.', $dcIpv4Secondary[1], '.', $dcIpv4Secondary[2], '.0/24')
 
@@ -502,7 +502,7 @@ Invoke-Command -ComputerName admincenter -Credential $adcred -ScriptBlock {
 }
 
 Write-Header "Configure ADS"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = 'SilentlyContinue'
     $ErrorActionPreference = 'silentlycontinue'
     $adminUsername = $using:adminUsername

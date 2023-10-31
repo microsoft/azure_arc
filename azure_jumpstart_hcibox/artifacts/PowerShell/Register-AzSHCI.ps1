@@ -20,9 +20,9 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\Register-AzSHCI.log
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
 Write-Host "Installing Required Modules" -ForegroundColor Green -BackgroundColor Black
@@ -43,7 +43,7 @@ Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Bla
 $armtoken = Get-AzAccessToken
 $clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
-Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $SDNConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup
+Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $HCIBoxConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup
 Move-Item -Path RegisterHCI_* -Destination $Env:HCIBoxLogsDir\RegisterHCI_PS_Output.log
 
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
@@ -52,12 +52,12 @@ Write-Host "$clustername successfully registered as Az Stack HCI cluster resourc
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 $storageKey = Get-AzStorageAccountKey -Name $env:stagingStorageAccountName -ResourceGroup $env:resourceGroup
 $saName = $env:stagingStorageAccountName
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Set-ClusterQuorum -Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
 }
 
 # Install Az CLI and extensions on each node
-Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.HostList -Credential $adcred -ScriptBlock {
     Write-Verbose "Installing Az CLI"
     $ProgressPreference = "SilentlyContinue"
     Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi;

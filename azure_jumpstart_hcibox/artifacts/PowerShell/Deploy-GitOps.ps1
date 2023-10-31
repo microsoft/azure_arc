@@ -34,9 +34,9 @@ catch {
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
@@ -53,7 +53,7 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 
 # Setting kubeconfig
 $clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
     foreach ($namespace in @('hello-arc')) {
@@ -124,7 +124,7 @@ $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
 Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VMConfigs\$certname.pfx" -FileSource Host
-$localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
+$localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
     Enable-VMIntegrationService -VMName AdminCenter -Name "Guest Service Interface"
 }
@@ -166,10 +166,10 @@ Get-ChildItem -Path $Env:HCIBoxKVDir |
 Write-Header "Creating Ingress Controller"
 
 # Deploy Ingress resources for Bookstore and Hello-Arc App
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\hello-arc.yaml" -DestinationPath "C:\VHD\hello-arc.yaml" -FileSource Host
+Copy-VMFile $HCIBoxConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\hello-arc.yaml" -DestinationPath "C:\VHD\hello-arc.yaml" -FileSource Host
 $clientId = $env:spnClientID
 $clientSecret = $env:spnClientSecret
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     foreach ($namespace in @('hello-arc')) {
         # Create the Kubernetes secret with the service principal credentials
         kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=$using:clientId --from-literal clientsecret=$using:clientSecret
@@ -179,7 +179,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
         kubectl --namespace $namespace apply -f "C:\VHD\hello-arc.yaml"
     }
 }
-[string]$ip = Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+[string]$ip = Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     $ip = kubectl get service/ingress-nginx-controller --namespace $using:ingressNamespace --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
     return $ip
 }

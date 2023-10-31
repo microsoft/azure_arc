@@ -18,12 +18,12 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\Uninstall-AKS.log
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
 $ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects
 Write-Header 'Creating credentials and connecting to Azure'
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password # Domain credential
 
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
@@ -32,13 +32,13 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 # Uninstall AksHci - only need to perform the following on one of the nodes
 $clusterName = $env:AKSClusterName
 Write-Header "Removing AKS-HCI workload cluster"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Disable-AksHciArcConnection -name $using:clusterName
     Remove-AksHciCluster -name $using:clusterName -Confirm:$false
 }
 
 Write-Header "Uninstalling AKS-HCI management plane"
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Uninstall-AksHci -Confirm:$false
 }
 # Set env variable deployAKSHCI to true (in case the script was run manually)

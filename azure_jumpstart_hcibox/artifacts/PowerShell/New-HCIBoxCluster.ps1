@@ -78,15 +78,121 @@ function New-InternalSwitch {
     } 
 }
 
+function Get-FormattedWACMAC {
+    Params(
+        $HCIBoxConfig
+    )
+    return $HCIBoxConfig.WACMAC -replace '..(?!$)', '$&-'
+}
+
 function GenerateAnswerFile {
     Params(
         $Hostname,
         $IsMgmtVM,
         $IsGuestVM,
+        $IsWACVM,
         $IPAddress,
         $VMMac,
         $HCIBoxConfig
     )
+
+    $formattedMAC = Get-FormattedWACMAC -HCIBoxConfig $HCIBoxConfig
+    $wacAnswerXML = @"
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+<settings pass="specialize">
+<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ProductKey>$($HCIBoxConfig.GUIProductKey)</ProductKey>
+<ComputerName>$VMName</ComputerName>
+<RegisteredOwner>$ENV:adminUsername</RegisteredOwner>
+</component>
+<component name="Microsoft-Windows-TCPIP" processorArchitecture="wow64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Interfaces>
+<Interface wcm:action="add">
+<Ipv4Settings>
+<DhcpEnabled>false</DhcpEnabled>
+<Metric>20</Metric>
+<RouterDiscoveryEnabled>true</RouterDiscoveryEnabled>
+</Ipv4Settings>
+<UnicastIpAddresses>
+<IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
+</UnicastIpAddresses>
+<Identifier>$formattedMAC</Identifier>
+<Routes>
+<Route wcm:action="add">
+<Identifier>1</Identifier>
+<NextHopAddress>$($HCIBoxConfig.SDNLABRoute)</NextHopAddress>
+</Route>
+</Routes>
+</Interface>
+</Interfaces>
+</component>
+<component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Interfaces>
+<Interface wcm:action="add">
+<DNSServerSearchOrder>
+<IpAddress wcm:action="add" wcm:keyValue="1">$($HCIBoxConfig.SDNLABDNS)</IpAddress>
+</DNSServerSearchOrder>
+<Identifier>$formattedMAC</Identifier>
+<DNSDomain>$($HCIBoxConfig.SDNDomainFQDN)</DNSDomain>
+<EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
+</Interface>
+</Interfaces>
+</component>
+<component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<DomainProfile_EnableFirewall>false</DomainProfile_EnableFirewall>
+<PrivateProfile_EnableFirewall>false</PrivateProfile_EnableFirewall>
+<PublicProfile_EnableFirewall>false</PublicProfile_EnableFirewall>
+</component>
+<component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<fDenyTSConnections>false</fDenyTSConnections>
+</component>
+<component name="Microsoft-Windows-UnattendedJoin" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Identification>
+<Credentials>
+<Domain>$($HCIBoxConfig.SDNDomainFQDN)</Domain>
+<Password>$($HCIBoxConfig.SDNAdminPassword)</Password>
+<Username>Administrator</Username>
+</Credentials>
+<JoinDomain>$($HCIBoxConfig.SDNDomainFQDN)</JoinDomain>
+</Identification>
+</component>
+<component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<IEHardenAdmin>false</IEHardenAdmin>
+<IEHardenUser>false</IEHardenUser>
+</component>
+</settings>
+<settings pass="oobeSystem">
+<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<UserAccounts>
+<AdministratorPassword>
+<Value>$($HCIBoxConfig.SDNAdminPassword)</Value>
+<PlainText>true</PlainText>
+</AdministratorPassword>
+</UserAccounts>
+<TimeZone>Pacific Standard Time</TimeZone>
+<OOBE>
+<HideEULAPage>true</HideEULAPage>
+<SkipUserOOBE>true</SkipUserOOBE>
+<HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+<HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+<HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+<NetworkLocation>Work</NetworkLocation>
+<ProtectYourPC>1</ProtectYourPC>
+<HideLocalAccountScreen>true</HideLocalAccountScreen>
+</OOBE>
+</component>
+<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<UserLocale>en-US</UserLocale>
+<SystemLocale>en-US</SystemLocale>
+<InputLocale>0409:00000409</InputLocale>
+<UILanguage>en-US</UILanguage>
+</component>
+</settings>
+<cpi:offlineImage cpi:source="" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+</unattend>
+"@
+
     $components = @"
 <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <IEHardenAdmin>false</IEHardenAdmin>
@@ -125,47 +231,6 @@ function GenerateAnswerFile {
 <Identifier>$VMMac</Identifier>
 <DisableDynamicUpdate>false</DisableDynamicUpdate>
 <DNSDomain>$($HCIBoxConfig.SDNDomainFQDN)</DNSDomain>
-<EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
-</Interface>
-</Interfaces>
-</component>
-"@
-
-    $wacComponent = @"
-<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<ProductKey>$ProductKey</ProductKey>
-<ComputerName>$VMName</ComputerName>
-<RegisteredOwner>$ENV:USERNAME</RegisteredOwner>
-</component>
-<component name="Microsoft-Windows-TCPIP" processorArchitecture="wow64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<Interfaces>
-<Interface wcm:action="add">
-<Ipv4Settings>
-<DhcpEnabled>false</DhcpEnabled>
-<Metric>20</Metric>
-<RouterDiscoveryEnabled>true</RouterDiscoveryEnabled>
-</Ipv4Settings>
-<UnicastIpAddresses>
-<IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
-</UnicastIpAddresses>
-<Identifier>10-15-5D-01-0B-00</Identifier>
-<Routes>
-<Route wcm:action="add">
-<Identifier>1</Identifier>
-<NextHopAddress>$Gateway</NextHopAddress>
-</Route>
-</Routes>
-</Interface>
-</Interfaces>
-</component>
-<component name="Microsoft-Windows-DNS-Client" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<Interfaces>
-<Interface wcm:action="add">
-<DNSServerSearchOrder>
-<IpAddress wcm:action="add" wcm:keyValue="1">$DNS</IpAddress>
-</DNSServerSearchOrder>
-<Identifier>10-15-5D-01-0B-00</Identifier>
-<DNSDomain>$Domain</DNSDomain>
 <EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
 </Interface>
 </Interfaces>
@@ -234,6 +299,9 @@ $components
 <cpi:offlineImage cpi:source="" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
 </unattend>
 "@
+    if ($IsWACVM) {
+        $UnattendXML = $wacAnswerXML
+    }
     return $UnattendXML
 }
 
@@ -443,7 +511,7 @@ function New-DataDrive {
             $VerbosePreference = "Continue"
             Write-Verbose "Onlining, partitioning, and formatting Data Drive on $($Using:SDNVM.AzSHOST)"
             $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator" `
-                , (ConvertTo-SecureString $using:SDNConfig.SDNAdminPassword   -AsPlainText -Force)   
+                , (ConvertTo-SecureString $using:HCIBoxConfig.SDNAdminPassword   -AsPlainText -Force)   
 
             Invoke-Command -VMName $using:SDNVM.AzSHOST -Credential $localCred -ScriptBlock {
                 Set-Disk -Number 1 -IsOffline $false | Out-Null
@@ -715,236 +783,6 @@ function Set-FabricNetwork {
     }
 }
 
-function Set-AzSMGMT {
-    param (
-        $HCIBoxConfig,
-        $localCred,
-        $domainCred
-
-    )
-
-    # Sleep to get around race condition on fast systems
-    Start-Sleep -Seconds 10
-    $VerbosePreference = "Continue"
-
-    Invoke-Command -ComputerName azsmgmt -Credential $localCred  -ScriptBlock {
-        # Creds
-        $localCred = $using:localCred
-        $domainCred = $using:domainCred
-        $HCIBoxConfig = $using:SDNConfig
-
-        $ErrorActionPreference = "Stop"
-        $VerbosePreference = "Continue"
-        $WarningPreference = "SilentlyContinue"
-
-        # Disable Fabric2 Network Adapter
-        $fabTwo = $null
-        while ($fabTwo -ne 'Disabled') {
-            Write-Verbose "Disabling Fabric2 Adapter"
-            Get-Netadapter FABRIC2 | Disable-NetAdapter -Confirm:$false | Out-Null
-            $fabTwo = (Get-Netadapter -Name FABRIC2).Status 
-
-        }
-        # Enable WinRM on AzSMGMT
-        $VerbosePreference = "Continue"
-        Write-Verbose "Enabling PSRemoting on $env:COMPUTERNAME"
-        $VerbosePreference = "SilentlyContinue"
-        Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
-        Enable-PSRemoting | Out-Null
-        
-
-        #Disable ServerManager Auto-Start
-        Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask | Out-Null
-
-        # Create Hyper-V Networking for AzSMGMT
-        Import-Module Hyper-V 
-
-        Try {
-            $VerbosePreference = "Continue"
-            Write-Verbose "Creating VM Switch on $env:COMPUTERNAME"
-            New-VMSwitch  -AllowManagementOS $true -Name "vSwitch-Fabric" -NetAdapterName FABRIC -MinimumBandwidthMode None | Out-Null
-
-            # Configure NAT on AzSMGMT
-            if ($HCIBoxConfig.natConfigure) {
-                Write-Verbose "Configuring NAT on $env:COMPUTERNAME"
-                $VerbosePreference = "SilentlyContinue"
-
-                $natSubnet = $HCIBoxConfig.natSubnet
-                $Prefix = ($natSubnet.Split("/"))[1]
-                $natIP = ($natSubnet.TrimEnd("0./$Prefix")) + (".1")
-                $provIP = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24") + "254"
-                $vlan200IP = $HCIBoxConfig.BGPRouterIP_VLAN200.TrimEnd("1/24") + "250"
-                $provGW = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("/24")
-                $provpfx = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.Split("/")[1]
-                $vlanpfx = $HCIBoxConfig.BGPRouterIP_VLAN200.Split("/")[1]
-                $simInternetIP = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.TrimEnd("1/24") + "254"
-                $simInternetPFX = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[1]
-
-                New-VMSwitch -SwitchName NAT -SwitchType Internal -MinimumBandwidthMode None | Out-Null
-                New-NetIPAddress -IPAddress $natIP -PrefixLength $Prefix -InterfaceAlias "vEthernet (NAT)" | Out-Null
-                New-NetNat -Name NATNet -InternalIPInterfaceAddressPrefix $natSubnet | Out-Null
-
-                $VerbosePreference = "Continue"
-                Write-Verbose "Configuring Provider NIC on $env:COMPUTERNAME"
-                $VerbosePreference = "SilentlyContinue"
-
-                $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "PROVIDER" }
-                Rename-NetAdapter -name $NIC.name -newname "PROVIDER" | Out-Null
-                New-NetIPAddress -InterfaceAlias "PROVIDER" -IPAddress $provIP -PrefixLength $provpfx | Out-Null
-
-                $VerbosePreference = "Continue"
-                Write-Verbose "Configuring VLAN200 NIC on $env:COMPUTERNAME"
-                $VerbosePreference = "SilentlyContinue"
-
-                $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
-                Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
-                New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $vlan200IP -PrefixLength $vlanpfx | Out-Null
-
-                $VerbosePreference = "Continue"
-                Write-Verbose "Configuring simulatedInternet NIC on $env:COMPUTERNAME"
-                $VerbosePreference = "SilentlyContinue"
-
-
-                $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "simInternet" }
-                Rename-NetAdapter -name $NIC.name -newname "simInternet" | Out-Null
-                New-NetIPAddress -InterfaceAlias "simInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null
-
-                Write-Verbose "Making NAT Work"
-
-                $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" `
-                | Where-Object { $_.RegistryValue -eq "Network Adapter" -or $_.RegistryValue -eq "NAT" }
-
-                Rename-NetAdapter -name $NIC.name -newname "Internet" | Out-Null 
-
-                $internetIP = $HCIBoxConfig.natHostSubnet.Replace("0/24", "5")
-                $internetGW = $HCIBoxConfig.natHostSubnet.Replace("0/24", "1")
-
-                Start-Sleep -Seconds 30
-
-                $internetIndex = (Get-NetAdapter | Where-Object { $_.Name -eq "Internet" }).ifIndex
-
-                Start-Sleep -Seconds 30
-
-                New-NetIPAddress -IPAddress $internetIP -PrefixLength 24 -InterfaceIndex $internetIndex -DefaultGateway $internetGW -AddressFamily IPv4 | Out-Null
-                Set-DnsClientServerAddress -InterfaceIndex $internetIndex -ServerAddresses ($HCIBoxConfig.natDNS) | Out-Null
-
-                #Enable Large MTU
-
-                $VerbosePreference = "Continue"
-                Write-Verbose "Configuring MTU on all Adapters"
-                $VerbosePreference = "SilentlyContinue"
-                Get-NetAdapter | Where-Object { $_.Status -eq "Up" -and $_.Name -ne "Ethernet" } | Set-NetAdapterAdvancedProperty `
-                    -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
-                $VerbosePreference = "Continue"
-
-                Start-Sleep -Seconds 30
-
-                #Provision Public and Private VIP Route
- 
-                New-NetRoute -DestinationPrefix $HCIBoxConfig.PublicVIPSubnet -NextHop $provGW -InterfaceAlias PROVIDER | Out-Null
-
-                # Remove Gateway from Fabric NIC
-                Write-Verbose "Removing Gateway from Fabric NIC" 
-                $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
-                Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
-            }
-        }
-        Catch {
-            throw $_
-        }
-    }
-
-    # Provision BGP TOR Router
-    New-RouterVM -SDNConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred | Out-Null
-
-    # Provision Domain Controller 
-    Write-Verbose "Provisioning Domain Controller VM"
-    New-DCVM -SDNConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred | Out-Null
-
-    # Join AzSHOSTs to Domain 
-    Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-        $HCIBoxConfig = $using:SDNConfig
-        $VerbosePreference = "Continue"
-
-        function AddAzSHOSTToDomain {
-            Param (
-                $IP,
-                $localCred, 
-                $domainCred, 
-                $AzSHOSTName, 
-                $HCIBoxConfig
-            )
-            Write-Verbose "Joining host $AzSHOSTName ($ip) to domain"
-            Try {
-                $AzSHOSTTest = Test-Connection $IP -Quiet
-
-                While (!$AzSHOSTTest) {
-                    Write-Host "Unable to contact computer $AzSHOSTname at $IP. Please make sure the system is contactable before continuing and the Press Enter to continue." `
-                        -ForegroundColor Red
-                    pause
-                    $AzSHOSTTest = Test-Connection $AzSHOSTName -Quiet -Count 1                      
-                }
-                While ($DomainJoined -ne $HCIBoxConfig.SDNDomainFQDN) {
-                    $params = @{
-                        ComputerName = $IP
-                        Credential   = $localCred
-                        ArgumentList = ($domainCred, $HCIBoxConfig.SDNDomainFQDN)
-                    }
-                    $job = Invoke-Command @params -ScriptBlock { add-computer -DomainName $args[1] -Credential $args[0] } -AsJob 
-
-                    While ($Job.JobStateInfo.State -ne "Completed") { Start-Sleep -Seconds 10 }
-                    $DomainJoined = (Get-WmiObject -ComputerName $ip -Class win32_computersystem).domain
-                }
-                Restart-Computer -ComputerName $IP -Credential $localCred -Force
-            }
-            Catch { 
-                throw $_
-            }
-        }
-        # Set VM Path for Physical Hosts
-        try {
-            $AzSHOST1 = $HCIBoxConfig.AzSHOST1IP.Split("/")[0]
-            $AzSHOST2 = $HCIBoxConfig.AzSHOST2IP.Split("/")[0]
-
-            Write-Verbose "Setting VMStorage Path for all Hosts"
-          
-            Invoke-Command -ComputerName $AzSHOST1 -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
-            Invoke-Command -ComputerName $AzSHOST2  -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
-
-            # 2nd pass
-            Invoke-Command -ComputerName $AzSHOST1 -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
-            Invoke-Command -ComputerName $AzSHOST2 -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
-        }
-        catch {
-            throw $_
-        }
-
-        # Add AzSHOSTS to domain
-        try {
-
-            Write-Verbose "Adding HCIBox Hosts to the Domain"
-            AddAzSHOSTToDomain -IP $AzSHOST1 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST1 -SDNConfig $HCIBoxConfig
-            AddAzSHOSTToDomain -IP $AzSHOST2 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST2 -SDNConfig $HCIBoxConfig
-        }
-        catch {
-            throw $_
-        }
-    } | Out-Null
-
-    # Provision Admincenter
-    Write-Verbose "Provisioning admincenter VM"
-    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\$env:adminUsername"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword  -AsPlainText -Force)
-    New-AdminCenterVM -SDNConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred | Out-Null
-}
-
 function New-DCVM {
     Param (
         $HCIBoxConfig,
@@ -1172,7 +1010,7 @@ function New-RouterVM {
     )
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
-        $HCIBoxConfig = $using:SDNConfig
+        $HCIBoxConfig = $using:HCIBoxConfig
         $localcred = $using:localcred
         $ParentDiskPath = "C:\VMs\Base\AzSHCI.vhdx"
         $vmpath = "D:\VMs\"
@@ -1344,13 +1182,12 @@ function Join-HCINodesToDomain {
     }
 }
 
-function New-AdminCenterVM2 {
+function New-AdminCenterVM {
     Param (
         $HCIBoxConfig,
         $localCred,
         $domainCred
     )
-    $domainAdminUsername = $env:adminUsername
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
         $VMName = "admincenter"
         $ParentDiskPath = "C:\VMs\Base\"
@@ -1389,16 +1226,230 @@ function New-AdminCenterVM2 {
         Set-VMNetworkAdapter -VMName $VMName -StaticMacAddress $HCIBoxConfig.WACMAC # Mac address is linked to the answer file required in next step
 
         # Apply custom Unattend.xml file
-        New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
-        $Password = $HCIBoxConfig.SDNAdminPassword
-        $ProductKey = $HCIBoxConfig.GUIProductKey
-        $Gateway = $HCIBoxConfig.SDNLABRoute
-        $DNS = $HCIBoxConfig.SDNLABDNS
-        $IPAddress = $HCIBoxConfig.WACIP
-        $Domain = $HCIBoxConfig.SDNDomainFQDN
-        
-        $UnattendXML = GenerateAnswerFile -HostName $VMName -IsMgmtVM $false -IsGuestVM $false -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
+        New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null    
+        $UnattendXML = GenerateAnswerFile -HostName $VMName -IsMgmtVM $false -IsGuestVM $false -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
+        Write-Host "Mounting and Injecting Answer File into the $VMName VM." 
+        Set-Content -Value $UnattendXML -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
+        Write-Host "Dismounting Disk"
+        Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
+        Remove-Item "C:\TempWACMount"
+
+        Write-Host "Setting $VMName's VM Configuration"
+        Set-VMProcessor -VMName $VMname -Count 4
+        Set-VM -Name $VMName -AutomaticStopAction TurnOff
+
+        Write-Host "Starting $VMName VM."
+        Start-VM -Name $VMName
+
+        # Wait until the VM is restarted
+        while ((Invoke-Command -VMName $VMName -Credential $domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 5 }
+
+        # Configure WAC
+        Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig, $VMName -ScriptBlock {
+            $HCIBoxConfig = $args[0]
+            Import-Module NetAdapter
+
+            Write-Host "Enabling Remote Access on $VMName"
+            Enable-WindowsOptionalFeature -FeatureName RasRoutingProtocols -All -LimitAccess -Online | Out-Null
+            Enable-WindowsOptionalFeature -FeatureName RemoteAccessPowerShell -All -LimitAccess -Online | Out-Null
+
+            Write-Host "Rename Network Adapter in $VMName" 
+            Get-NetAdapter | Rename-NetAdapter -NewName Fabric
+            Write-Host "Configuring MTU on all Adapters"
+            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
+
+
+            # Set Gateway
+            $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -eq "Fabric" }).InterfaceIndex
+            $NetInterface = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.InterfaceIndex -eq $index }     
+            $NetInterface.SetGateways($HCIBoxConfig.SDNLABRoute) | Out-Null
+
+            # Enable CredSSP
+            Write-Host "Configuring WSMAN Trusted Hosts on $VMName"
+            Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
+            Enable-PSRemoting -force
+            Enable-WSManCredSSP -Role Server -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer $HCIBoxConfig.SDNDomainFQDN -Force
+            Enable-WSManCredSSP -Role Client -DelegateComputer "*.$($HCIBoxConfig.SDNDomainFQDN)" -Force
+            New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation -Name AllowFreshCredentialsWhenNTLMOnly -Force
+            New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Name 1 -Value * -PropertyType String -Force
+
+            $WACIP = $HCIBoxConfig.WACIP.Split("/")[0]
+
+            # Install RSAT-NetworkController
+            $isAvailable = Get-WindowsFeature | Where-Object { $_.Name -eq 'RSAT-NetworkController' }
+            if ($isAvailable) {
+                Write-Host "Installing RSAT-NetworkController on $VMName"
+                Import-Module ServerManager
+                Install-WindowsFeature -Name RSAT-NetworkController -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            }
+            
+            # Install Windows features
+            Write-Host "Installing Hyper-V RSAT Tools on $VMName"
+            Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            Write-Host "Installing Active Directory RSAT Tools on $VMName"
+            Install-WindowsFeature -Name  RSAT-ADDS -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            Write-Host "Installing Failover Clustering RSAT Tools on $VMName"
+            Install-WindowsFeature -Name  RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            Write-Host "Installing DNS Server RSAT Tools on $VMName"
+            Install-WindowsFeature -Name RSAT-DNS-Server -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            Install-RemoteAccess -VPNType RoutingOnly | Out-Null
+            Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
+
+            # Stop Server Manager from starting on boot
+            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
+            
+            # Create BGP Router
+            $params = @{
+                BGPIdentifier  = $WACIP
+                LocalASN       = $HCIBoxConfig.WACASN
+                TransitRouting = 'Enabled'
+                ClusterId      = 1
+                RouteReflector = 'Enabled'
+            }
+            Add-BgpRouter -BGPIdentifier $WACIP -LocalASN $HCIBoxConfig.WACASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
+
+            $RequestInf = @"
+[Version] 
+Signature="`$Windows NT$"
+
+[NewRequest] 
+Subject = "CN=AdminCenter.$($HCIBoxConfig.SDNDomainFQDN)"
+Exportable = True
+KeyLength = 2048                    
+KeySpec = 1                     
+KeyUsage = 0xA0               
+MachineKeySet = True 
+ProviderName = "Microsoft RSA SChannel Cryptographic Provider" 
+ProviderType = 12 
+SMIME = FALSE 
+RequestType = CMC
+FriendlyName = "HCIBox Windows Admin Cert"
+
+[Strings] 
+szOID_SUBJECT_ALT_NAME2 = "2.5.29.17" 
+szOID_ENHANCED_KEY_USAGE = "2.5.29.37" 
+szOID_PKIX_KP_SERVER_AUTH = "1.3.6.1.5.5.7.3.1" 
+szOID_PKIX_KP_CLIENT_AUTH = "1.3.6.1.5.5.7.3.2"
+[Extensions] 
+%szOID_SUBJECT_ALT_NAME2% = "{text}dns=admincenter.$($HCIBoxConfig.SDNDomainFQDN)" 
+%szOID_ENHANCED_KEY_USAGE% = "{text}%szOID_PKIX_KP_SERVER_AUTH%,%szOID_PKIX_KP_CLIENT_AUTH%"
+[RequestAttributes] 
+CertificateTemplate= WebServer
+"@
+
+            New-Item C:\WACCert -ItemType Directory -Force | Out-Null
+            Set-Content -Value $RequestInf -Path C:\WACCert\WACCert.inf -Force | Out-Null
+
+            Register-PSSessionConfiguration -Name 'Microsoft.SDNNested' -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000
+            Write-Host "Requesting and installing SSL Certificate on $VMName" 
+            Invoke-Command -ComputerName $VMName -ConfigurationName 'Microsoft.SDNNested' -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+                $HCIBoxConfig = $args[0]
+                # Get the CA Name
+                $CertDump = certutil -dump
+                $ca = ((((($CertDump.Replace('`', "")).Replace("'", "")).Replace(":", "=")).Replace('\', "")).Replace('"', "") | ConvertFrom-StringData).Name
+                $CertAuth = $HCIBOXConfig.SDNDomainFQDN + '\' + $ca
+
+                Write-Host "CA is: $ca"
+                Write-Host "Certificate Authority is: $CertAuth"
+                Write-Host "Certdump is $CertDump"
+
+                # Request and Accept SSL Certificate
+                Set-Location C:\WACCert
+                certreq -q -f -new WACCert.inf WACCert.req
+                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" -submit WACCert.req  WACCert.cer 
+                certreq -q -accept WACCert.cer
+                certutil -q -store my
+
+                Set-Location 'C:\'
+                Remove-Item C:\WACCert -Recurse -Force
+
+            } -Authentication Credssp
+
+            # Install Windows Admin Center
+            $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "HCIBox Windows Admin Cert" }).Thumbprint
+            Write-Host "Thumbprint: $pfxThumbPrint"
+            Write-Host "WACPort: $($HCIBoxConfig.WACport)"
+            $WindowsAdminCenterGateway = "https://admincenter." + $HCIBOXConfig.SDNDomainFQDN
+            Write-Host $WindowsAdminCenterGateway
+            Write-Host "Installing and Configuring Windows Admin Center"
+            $PathResolve = Resolve-Path -Path 'C:\Windows Admin Center\*.msi'
+            $arguments = "/qn /L*v C:\log.txt SME_PORT=$($HCIBoxConfig.WACport)t SME_THUMBPRINT=$pfxThumbPrint SSL_CERTIFICATE_OPTION=installed SME_URL=$WindowsAdminCenterGateway"
+            Start-Process -FilePath $PathResolve -ArgumentList $arguments -PassThru | Wait-Process
+
+            # Install Chocolatey
+            Write-Host "Installing Chocolatey"
+            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            Start-Sleep -Seconds 10
+
+            # Install Azure PowerShell
+            Write-Host 'Installing Az PowerShell'
+            $expression = "choco install az.powershell -y"
+            Invoke-Expression $expression
     
+            # Create Shortcut for Hyper-V Manager
+            Write-Host "Creating Shortcut for Hyper-V Manager"
+            Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\Public\Desktop"
+
+            # Create Shortcut for Failover-Cluster Manager
+            Write-Host "Creating Shortcut for Failover-Cluster Manager"
+            Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Failover Cluster Manager.lnk" -Destination "C:\Users\Public\Desktop"
+
+            # Create Shortcut for DNS
+            Write-Host "Creating Shortcut for DNS Manager"
+            Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\DNS.lnk" -Destination "C:\Users\Public\Desktop"
+
+            # Create Shortcut for Active Directory Users and Computers
+            Write-Host "Creating Shortcut for AD Users and Computers"
+            Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Active Directory Users and Computers.lnk" -Destination "C:\Users\Public\Desktop"
+    
+            # Set Network Profiles
+            Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq "Public" } | Set-NetConnectionProfile -NetworkCategory Private | Out-Null    
+    
+            # Disable Automatic Updates
+            $WUKey = "HKLM:\software\Policies\Microsoft\Windows\WindowsUpdate"
+            New-Item -Path $WUKey -Force | Out-Null
+            New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 -Force | Out-Null  
+
+            # Install Kubectl
+            Write-Host 'Installing kubectl'
+            $expression = "choco install kubernetes-cli -y"
+            Invoke-Expression $expression
+
+            # Create a shortcut for Windows Admin Center
+            Write-Host "Creating Shortcut for Windows Admin Center"
+            if ($HCIBoxConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $HCIBoxConfig.SDNDomainFQDN + ":" + $HCIBoxConfig.WACport }
+            else { $TargetPath = "https://admincenter." + $HCIBoxConfig.SDNDomainFQDN }
+            $ShortcutFile = "C:\Users\Public\Desktop\Windows Admin Center.url"
+            $WScriptShell = New-Object -ComObject WScript.Shell
+            $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+            $Shortcut.TargetPath = $TargetPath
+            $Shortcut.Save()
+
+            # Disable Edge 'First Run' Setup
+            $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+            $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+            $firstRunRegistryName  = 'HideFirstRunExperience'
+            $firstRunRegistryValue = '0x00000001'
+            $savePasswordRegistryName = 'PasswordManagerEnabled'
+            $savePasswordRegistryValue = '0x00000000'
+            $autoArrangeRegistryName = 'FFlags'
+            $autoArrangeRegistryValue = '1075839525'
+
+            if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+                New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+            }
+            if (-NOT (Test-Path -Path $desktopSettingsRegistryPath)) {
+                New-Item -Path $desktopSettingsRegistryPath -Force | Out-Null
+            }
+
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+            Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force            
+        }
     }
 }
 
@@ -1417,7 +1468,7 @@ function New-AdminCenterVM {
         $VHDPath = "D:\VMs\"
         $OSVHDX = "GUI.vhdx"
         $BaseVHDPath = $ParentDiskPath + $OSVHDX
-        $HCIBoxConfig = $using:SDNConfig
+        $HCIBoxConfig = $using:HCIBoxConfig
 
         $ProgressPreference = "SilentlyContinue"
         $ErrorActionPreference = "Stop"
@@ -1746,7 +1797,7 @@ ProviderName = "Microsoft RSA SChannel Cryptographic Provider"
 ProviderType = 12 
 SMIME = FALSE 
 RequestType = CMC
-FriendlyName = "Nested SDN Windows Admin Cert"
+FriendlyName = "HCIBox Windows Admin Cert"
 
 [Strings] 
 szOID_SUBJECT_ALT_NAME2 = "2.5.29.17" 
@@ -1768,7 +1819,7 @@ CertificateTemplate= WebServer
             $WACVMName = "admincenter"
             $DCFQDN = $HCIBoxConfig.DCName + '.' + $HCIBoxConfig.SDNDomainFQDN
             $WACport = $HCIBoxConfig.WACport
-            $HCIBoxConfig = $Using:SDNConfig
+            $HCIBoxConfig = $using:HCIBoxConfig
             $fqdn = $HCIBoxConfig.SDNDomainFQDN
 
             $params = @{
@@ -1930,6 +1981,36 @@ CertificateTemplate= WebServer
     } 
 }
 
+function New-HyperConvergedEnvironment2 {
+    Param (
+        $HCIBoxConfig,
+        $localCred,
+        $domainCred
+    )
+    Invoke-Command -ComputerName AdminCenter -Credential $domainCred -ScriptBlock {
+        $HCIBoxConfig = $using:HCIBoxConfig
+        $domainCred = $using:domainCred
+        foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
+            Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $HCIBoxConfig -Credential $domainCred -ScriptBlock {
+                # Declare function new-sdnsetswitch
+
+                # Create SET switch
+                $sdnswitchCheck = Get-VMSwitch | Where-Object { $_.Name -eq "sdnSwitch" }
+                # Sleep
+   
+            }
+        }
+        # Reboot all HCI nodes
+        foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
+            Write-Host "Rebooting HCIBox host $($AzSHOST.Hostname)"
+            Restart-Computer $AzSHOST.Hostname -Force -Confirm:$false -Credential $localCred -Protocol WSMan
+            Write-Host "Checking to see if $($AzSHOST.Hostname) is up and online"
+            while ((Invoke-Command -ComputerName $AzSHOST -Credential $localCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 10 }
+            Write-Host "$($AzSHOST.Hostname) is up and online"
+        }
+    }
+}
+
 function New-HyperConvergedEnvironment {
     Param (
         $localCred,
@@ -1937,7 +2018,7 @@ function New-HyperConvergedEnvironment {
     )
 
     Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {
-        $HCIBoxConfig = $Using:SDNConfig
+        $HCIBoxConfig = $using:HCIBoxConfig
 
         $ErrorActionPreference = "Stop"
         $VerbosePreference = "Continue"
@@ -1948,7 +2029,7 @@ function New-HyperConvergedEnvironment {
 
         foreach ($AzSHOST in $HCIBoxConfig.HostList) {
             Write-Verbose "Invoking Command on $AzSHOST"
-            Invoke-Command -ComputerName $AzSHOST -ArgumentList $HCIBoxConfig -Credential $using:domainCred  -ScriptBlock {
+            Invoke-Command -ComputerName $AzSHOST -ArgumentList $HCIBoxConfig -Credential $using:domainCred -ScriptBlock {
                 function New-sdnSETSwitch {
                     param (
                         $sdnswitchName, 
@@ -2057,7 +2138,7 @@ function New-SDNEnvironment {
 
         Register-PSSessionConfiguration -Name microsoft.SDNNestedSetup -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 | Out-Null
 
-        Invoke-Command -ComputerName localhost -Credential $Using:domainCred -ArgumentList $Using:domainCred, $Using:SDNConfig -ConfigurationName microsoft.SDNNestedSetup -ScriptBlock {       
+        Invoke-Command -ComputerName localhost -Credential $Using:domainCred -ArgumentList $Using:domainCred, $using:HCIBoxConfig -ConfigurationName microsoft.SDNNestedSetup -ScriptBlock {       
             $NCConfig = @{ }
 
             $ErrorActionPreference = "Stop"
@@ -2261,7 +2342,6 @@ function New-SDNS2DCluster {
             -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster hciboxcluster | Where-Object { $_.Name -notmatch "Storage" }).ID))
 
         } | Out-Null
-
     } 
 }
 
@@ -2271,7 +2351,7 @@ function Test-InternetConnect {
     $intConnect = Test-NetConnection -ComputerName $testip -Port 53
 
     if (!$intConnect.TcpTestSucceeded) {
-        throw "Unable to connect to DNS by pinging $HCIBoxConfig.natDNS - Network access to this IP is required."
+        throw "Unable to connect to DNS by pinging $($HCIBoxConfig.natDNS) - Network access to this IP is required."
     }
 }
 
@@ -2433,23 +2513,17 @@ New-NATSwitch -HCIBoxConfig $HCIBoxConfig
 # Configure fabric network on AzSMGMT
 Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
-#### TODO: Finish refactor Set-AzSMGMT
-# Provision AzSMGMT VMs (DC, Router, and AdminCenter)
-
 # Provision Router VM on AzSMGMT
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
 # Provision Domain controller VM on AzSMGMT
 New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
-# Set VM Path for Physical hosts (dont think we need this bit from old Set-AzSMGMT - code doesnt do anything)
 # Join hosts to domain
 Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
-# New-AdminCenter VM
-#### END TODO
 
-
-
+# Provision Admincenter VM
+New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 $params = @{
@@ -2460,7 +2534,7 @@ New-HyperConvergedEnvironment @params
 
 # Create S2D Cluster
 $params = @{
-    SDNConfig          = $HCIBoxConfig
+    HCIBoxConfig          = $HCIBoxConfig
     DomainCred         = $domainCred
     AzStackClusterNode = 'AzSHOST2'
 }
@@ -2469,7 +2543,7 @@ New-SDNS2DCluster @params
 # Install and Configure Network Controller if specified
 If ($HCIBoxConfig.ProvisionNC) {
     $params = @{
-        SDNConfig  = $HCIBoxConfig
+        HCIBoxConfig  = $HCIBoxConfig
         domainCred = $domainCred
     }
     New-SDNEnvironment @params
@@ -2482,7 +2556,7 @@ If ($HCIBoxConfig.ProvisionNC) {
     $params = @{
 
         SDNLabSystems = $SDNLabSystems 
-        SDNConfig     = $HCIBoxConfig
+        HCIBoxConfig     = $HCIBoxConfig
         domainCred    = $domainCred
 
     }
@@ -2493,7 +2567,7 @@ If ($HCIBoxConfig.ProvisionNC) {
     #   Add-WACtenants @params
     # Enable Single Sign On
     Write-Verbose "Enabling Single Sign On in WAC"
-    enable-singleSignOn -SDNConfig $HCIBoxConfig 
+    enable-singleSignOn -HCIBoxConfig $HCIBoxConfig 
 }
 
 # Finally - Add RDP Link to Desktop
