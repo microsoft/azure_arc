@@ -22,7 +22,7 @@ $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects
 Write-Header 'Creating credentials and connecting to Azure'
-$user = "jumpstart.local\administrator"
+$user = "jumpstart.local\$env:adminUsername"
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password # Domain credential
 

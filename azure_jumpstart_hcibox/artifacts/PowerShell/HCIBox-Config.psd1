@@ -15,7 +15,6 @@
         ToolsDir = "C:\Tools"
         TempDir = "C:\Temp"
         VMPath = "C:\VMs"
-
     }
 
     ChocolateyPackagesList = @(

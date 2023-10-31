@@ -13,18 +13,14 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-# Formerly a parameter
-$ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-
-
 Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
 $starttime = Get-Date
 
 # Import Configuration data file
+$ConfigurationDataFile = $Env:HCIBoxConfigFile
 $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 #region functions
-
 function BITSRequest {
     param (
         [Parameter(Mandatory=$True)]
@@ -152,7 +148,7 @@ function GenerateAnswerFile {
 <Credentials>
 <Domain>$($HCIBoxConfig.SDNDomainFQDN)</Domain>
 <Password>$($HCIBoxConfig.SDNAdminPassword)</Password>
-<Username>Administrator</Username>
+<Username>$Env:adminUsername</Username>
 </Credentials>
 <JoinDomain>$($HCIBoxConfig.SDNDomainFQDN)</JoinDomain>
 </Identification>
@@ -499,29 +495,6 @@ function Set-HCINodeVHDX {
     Write-Verbose "Dismounting VHDX File at path $path"
     Dismount-VHD $path  
 }
-    
-function New-DataDrive {
-    param (
-        $VMPlacement, 
-        $HCIBoxConfig
-    )
-
-    foreach ($SDNVM in $VMPlacement) {      
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            $VerbosePreference = "Continue"
-            Write-Verbose "Onlining, partitioning, and formatting Data Drive on $($Using:SDNVM.AzSHOST)"
-            $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator" `
-                , (ConvertTo-SecureString $using:HCIBoxConfig.SDNAdminPassword   -AsPlainText -Force)   
-
-            Invoke-Command -VMName $using:SDNVM.AzSHOST -Credential $localCred -ScriptBlock {
-                Set-Disk -Number 1 -IsOffline $false | Out-Null
-                Initialize-Disk -Number 1 | Out-Null
-                New-Partition -DiskNumber 1 -UseMaximumSize -AssignDriveLetter | Out-Null
-                Format-Volume -DriveLetter D | Out-Null         
-            }                      
-        }
-    }    
-}
 
 function Set-DataDrives {
     param (
@@ -574,35 +547,6 @@ function Test-AllVMsAvailable
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
         Test-VMAvailable -Name $VM.Hostname -Credential $Credential
     }
-}
-    
-function Test-AzSHOSTVMConnection {
-    param (
-        $VMPlacement, 
-        $localCred
-    )
-
-    foreach ($SDNVM in $VMPlacement) {
-        Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
-            $VerbosePreference = "Continue"            
-            $localCred = $using:localCred   
-            $testconnection = $null
-            While (!$testconnection) {
-                $testconnection = Invoke-Command -VMName $using:SDNVM.AzSHOST -ScriptBlock { 
-                    $ErrorOccurred = $false
-                    do { 
-                        try { 
-                            $ErrorActionPreference = 'Stop'
-                            Get-VMHost
-                        } 
-                        catch { 
-                            $ErrorOccurred = $true
-                        } 
-                    } while ($ErrorOccurred -eq $true)
-                } -Credential $localCred -ErrorAction Ignore
-            }
-        }
-    }    
 }
     
 function New-NATSwitch {
@@ -906,11 +850,11 @@ function New-DCVM {
             New-ADUser @params
             
             $params = @{
-                Name                  = $HCIBoxConfig.adminUser
+                Name                  = $adminUser
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
-                SamAccountName        = $HCIBoxConfig.adminUser
-                UserPrincipalName     = "$HCIBoxConfig.adminUser@$SDNDomainFQDN"
+                SamAccountName        = $adminUser
+                UserPrincipalName     = "$adminUser@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
                 ChangePasswordAtLogon = $false
@@ -931,14 +875,15 @@ function New-DCVM {
             Add-ADGroupMember "Domain Admins" "NCAdmin"
             Add-ADGroupMember "NCAdmins" "NCAdmin"
             Add-ADGroupMember "NCClients" "NCClient"
-            Add-ADGroupMember "NCClients" "Administrator"
-            Add-ADGroupMember "NCAdmins" "Administrator"
-            Add-ADGroupMember "Domain Admins" $HCIBoxConfig.adminUser
-            Add-ADGroupMember "NCAdmins" $HCIBoxConfig.adminUser
-            Add-ADGroupMember "NCClients" $HCIBoxConfig.adminUser
+            Add-ADGroupMember "NCClients" $adminUser
+            Add-ADGroupMember "NCAdmins" $adminUser
+            Add-ADGroupMember "Domain Admins" $adminUser
+            Add-ADGroupMember "NCAdmins" $adminUser
+            Add-ADGroupMember "NCClients" $adminUser
 
             # Set Administrator Account Not to Expire
             Get-ADUser Administrator | Set-ADUser -PasswordNeverExpires $true  -CannotChangePassword $true
+            Get-ADUser $adminUser | Set-ADUser -PasswordNeverExpires $true  -CannotChangePassword $true
 
             # Set DNS Forwarder
             Write-Host "Adding DNS Forwarders"
@@ -1503,123 +1448,6 @@ function New-HyperConvergedEnvironment {
     }
 }
 
-function New-SDNEnvironment {
-    Param (
-        $domainCred,
-        $HCIBoxConfig
-    )
-
-    Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
-
-        Register-PSSessionConfiguration -Name microsoft.SDNNestedSetup -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 | Out-Null
-
-        Invoke-Command -ComputerName localhost -Credential $Using:domainCred -ArgumentList $Using:domainCred, $using:HCIBoxConfig -ConfigurationName microsoft.SDNNestedSetup -ScriptBlock {       
-            $NCConfig = @{ }
-
-            $ErrorActionPreference = "Stop"
-            $VerbosePreference = "Continue"
-
-            # Set Credential Object
-            $domainCred = $args[0]
-            $HCIBoxConfig = $args[1]
-
-            # Set fqdn
-            $fqdn = $HCIBoxConfig.SDNDomainFQDN
-
-            if ($HCIBoxConfig.ProvisionNC) {
-                # Set NC Configuration Data
-                $NCConfig.RestName = ("NC01.") + $HCIBoxConfig.SDNDomainFQDN
-                $NCConfig.PASubnet = $HCIBoxConfig.ProviderSubnet
-                $NCConfig.JoinDomain = $HCIBoxConfig.SDNDomainFQDN
-                $NCConfig.ManagementGateway = ($HCIBoxConfig.BGPRouterIP_MGMT).Split("/")[0]
-                $NCConfig.PublicVIPSubnet = $HCIBoxConfig.PublicVIPSubnet
-                $NCConfig.PrivateVIPSubnet = $HCIBoxConfig.PrivateVIPSubnet
-                $NCConfig.GRESubnet = $HCIBoxConfig.GRESubnet
-                $NCConfig.LocalAdminDomainUser = ($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"
-                $NCConfig.DomainJoinUsername = ($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"
-                $NCConfig.NCUsername = ($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"
-                $NCConfig.SDNMacPoolStart = "00-1D-D8-B7-1C-09"
-                $NCConfig.SDNMacPoolEnd = "00:1D:D8:B7:1F:FF"
-                $NCConfig.PAGateway = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "1"
-                $NCConfig.PAPoolStart = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "5"
-                $NCConfig.PAPoolEnd = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "254"
-                $NCConfig.Capacity = "10000"
-                $NCConfig.ScriptVersion = "2.0"
-                $NCConfig.SDNASN = $HCIBoxConfig.SDNASN
-                $NCConfig.ManagementVLANID = $HCIBoxConfig.mgmtVLAN
-                $NCConfig.PAVLANID = $HCIBoxConfig.providerVLAN
-                $NCConfig.PoolName = "DefaultAll"
-                $NCConfig.VMLocation = "D:\SDNVMS"
-                $NCConfig.VHDFile = "AzSHCI.vhdx"
-                $NCConfig.VHDPath = "C:\VHDS"
-                $NCConfig.ManagementSubnet = $HCIBoxConfig.MGMTSubnet
-                $NCConfig.ProductKey = $HCIBoxConfig.COREProductKey
-                $NCConfig.HyperVHosts = @("AzSHOST1.$fqdn", "AzSHOST2.$fqdn")
-                $NCConfig.ManagementDNS = @(
-                    ($HCIBoxConfig.BGPRouterIP_MGMT.Split("/")[0].TrimEnd("1")) + "254"
-                ) 
-                $NCConfig.Muxes = @(
-                    @{
-                        ComputerName = 'Mux01'
-                        HostName     = "AzSHOST2.$($HCIBoxConfig.SDNDomainFQDN)"
-                        ManagementIP = ($HCIBoxConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "61"
-                        MACAddress   = '00-1D-D8-B7-1C-01'
-                        PAIPAddress  = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "4"
-                        PAMACAddress = '00-1D-D8-B7-1C-02'
-                    }
-                )
-
-                $NCConfig.Gateways = @(
-                    @{
-                        ComputerName = "GW01"
-                        ManagementIP = ($HCIBoxConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "62"
-                        HostName     = "AzSHOST2.$($HCIBoxConfig.SDNDomainFQDN)"
-                        FrontEndIP   = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "5"
-                        MACAddress   = "00-1D-D8-B7-1C-03"
-                        FrontEndMac  = "00-1D-D8-B7-1C-04"
-                        BackEndMac   = "00-1D-D8-B7-1C-05"
-                    },
-                    @{
-                        ComputerName = "GW02"
-                        ManagementIP = ($HCIBoxConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "63"
-                        HostName     = "AzSHOST1.$($HCIBoxConfig.SDNDomainFQDN)"
-                        FrontEndIP   = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "6"
-                        MACAddress   = "00-1D-D8-B7-1C-06"
-                        FrontEndMac  = "00-1D-D8-B7-1C-07"
-                        BackEndMac   = "00-1D-D8-B7-1C-08"
-                    }
-                )
-
-                $NCConfig.NCs = @{
-                    MACAddress   = "00:1D:D8:B7:1C:00"
-                    ComputerName = "NC01"
-                    HostName     = "AzSHOST2.$($HCIBoxConfig.SDNDomainFQDN)"
-                    ManagementIP = ($HCIBoxConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "60"
-                }
-
-                $NCConfig.Routers = @(
-                    @{
-                        RouterASN       = $HCIBoxConfig.BGPRouterASN
-                        RouterIPAddress = ($HCIBoxConfig.BGPRouterIP_ProviderNetwork).Split("/")[0]
-                    }
-                )
-
-                # Start SDNExpress (Nested Version) Install
-                Set-Location -Path 'C:\SDN'
-                $params = @{
-                    ConfigurationData    = $NCConfig
-                    DomainJoinCredential = $domainCred
-                    LocalAdminCredential = $domainCred
-                    NCCredential         = $domainCred
-                }
-
-                .\SDNExpress.ps1 @params
-            }
-
-        } -Authentication Credssp
-    } 
-}
-
 function New-S2DCluster {
     param (
         $HCIBoxConfig,
@@ -1702,18 +1530,6 @@ function Set-HostNAT {
     }
 }
 
-function enable-singleSignOn {
-    param (
-        $HCIBoxConfig
-    )
-
-    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
-
-    Invoke-Command -ComputerName ("$($HCIBoxConfig.DCName).$($HCIBoxConfig.SDNDomainFQDN)") -ScriptBlock {
-        Get-ADComputer -Filter * | Set-ADComputer -PrincipalsAllowedToDelegateToAccount (Get-ADComputer AdminCenter)
-    } -Credential $domainCred
-}
-
 #endregion
    
 #region Main
@@ -1722,15 +1538,20 @@ $azSHCIVHDXPath = $HCIBoxConfig.azSHCIVHDXPath
 $HostVMPath = $HCIBoxConfig.HostVMPath
 $InternalSwitch = $HCIBoxConfig.InternalSwitch
 $natDNS = $HCIBoxConfig.natDNS
-$natSubnet = $HCIBoxConfig.natSubnet
-$natConfigure = $HCIBoxConfig.natConfigure   
+$natSubnet = $HCIBoxConfig.natSubnet 
 
 Import-Module Hyper-V 
 
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
-$WarningPreference = "SilentlyContinue"
+$WarningPreference = "Continue"
 $ProgressPreference = 'SilentlyContinue'
+
+# Create paths
+foreach ($path in $HCIBoxConfig.HCIBoxPaths.GetEnumerator()) {
+    Write-Host "Creating $($path.Key) path at $($path.Value)"
+    New-Item -Path $path.Value -ItemType Directory -Force | Out-Null
+}
 
 # Download HCIBox VHDs
 Write-Host "Downloading HCIBox VHDs. This will take a while..."
@@ -1740,17 +1561,13 @@ BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/deskto
 Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
 Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
-# Set-Credentials
-$localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
+# Set credentials
+$localCred = new-object -typename System.Management.Automation.PSCredential `
+    -argumentlist "Administrator", (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 $domainCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\Administrator"), `
-    (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword  -AsPlainText -Force)
+    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + $Env:adminUsername), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
-$NCAdminCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + "\NCAdmin"), `
-    (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword  -AsPlainText -Force)
-   
 # Enable PSRemoting
 Write-Host "Enabling PS Remoting on client..."
 $VerbosePreference = "SilentlyContinue"

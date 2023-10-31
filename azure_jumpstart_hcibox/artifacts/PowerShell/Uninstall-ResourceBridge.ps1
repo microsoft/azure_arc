@@ -18,7 +18,7 @@ $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Set AD Domain cred
-$user = "jumpstart.local\administrator"
+$user = "jumpstart.local\$env:adminUsername"
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 

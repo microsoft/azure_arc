@@ -21,7 +21,7 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\Register-AzSHCI.log
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$user = "jumpstart.local\administrator"
+$user = $env:adminUsername
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
