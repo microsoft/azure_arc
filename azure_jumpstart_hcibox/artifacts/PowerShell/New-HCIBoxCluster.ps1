@@ -312,8 +312,8 @@ function Restart-VMs {
             Restart-Computer -Force
         }
     }
+    Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.HostName)"
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential -ScriptBlock {
-        Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.HostName)"
         Restart-Computer -Force
     }
     Start-Sleep -Seconds 30
@@ -376,7 +376,7 @@ function New-HCINodeVM {
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null  
 
     # Create Nested VM
-    New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.NestedVMMemoryinGB -VHDPath $VHDXPath -SwitchName $VMSwitch -Generation 2 | Out-Null
+    New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.NestedVMMemoryinGB -VHDPath $VHDX1.Path -SwitchName $VMSwitch -Generation 2 | Out-Null
     Add-VMHardDiskDrive -VMName $Name -Path $VHDX2.Path
     Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk1.vhdx" -VMName $Name | Out-Null
     Add-VMHardDiskDrive -Path "$HostVMPath\$Name-S2D_Disk2.vhdx" -VMName $Name | Out-Null
@@ -526,7 +526,7 @@ function Test-VMAvailable {
         do { 
             try { 
                 $ErrorActionPreference = 'Stop'
-                Get-VMHost
+                Get-VMHost | Out-Null
             } 
             catch { 
                 $ErrorOccurred = $true
@@ -543,9 +543,9 @@ function Test-AllVMsAvailable
         [PSCredential]$Credential
     )
     Write-Host "Testing whether VMs are available..."
-    Test-VMAvailable -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential
+    Test-VMAvailable -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
-        Test-VMAvailable -Name $VM.Hostname -Credential $Credential
+        Test-VMAvailable -VMName $VM.Hostname -Credential $Credential
     }
 }
     
@@ -582,17 +582,18 @@ function Set-NICs {
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential -ScriptBlock {
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
-        Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
+        Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
 
     $int = 9
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
         $int++
+        Write-Host "Setting NICs on VM $($VM.Hostname)"
         Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
             $HCIBoxConfig = $using:HCIBoxConfig
             # Create IP Address of Storage Adapters
-            $storageAIP = $HCIBoxConfig.storageAsubnet.Replace("0/24", $int)
-            $storageBIP = $HCIBoxConfig.storageBsubnet.Replace("0/24", $int)
+            $storageAIP = $HCIBoxConfig.StorageASubnet.Replace("0/24", $using:int)
+            $storageBIP = $HCIBoxConfig.StorageBSubnet.Replace("0/24", $using:int)
 
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
@@ -606,7 +607,7 @@ function Set-NICs {
             }
 
             # Enable WinRM
-            Write-Verbose "Enabling Windows Remoting in $env:COMPUTERNAME"
+            Write-Host "Enabling Windows Remoting in $env:COMPUTERNAME"
             Set-Item WSMan:\localhost\Client\TrustedHosts *  -Confirm:$false -Force
             Enable-PSRemoting | Out-Null
 
@@ -1538,14 +1539,14 @@ $azSHCIVHDXPath = $HCIBoxConfig.azSHCIVHDXPath
 $HostVMPath = $HCIBoxConfig.HostVMPath
 $InternalSwitch = $HCIBoxConfig.InternalSwitch
 $natDNS = $HCIBoxConfig.natDNS
-$natSubnet = $HCIBoxConfig.natSubnet 
+$natSubnet = $HCIBoxConfig.natSubnet
 
-Import-Module Hyper-V 
+Import-Module Hyper-V
 
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"
-$ProgressPreference = 'SilentlyContinue'
+$ProgressPreference = "SilentlyContinue"
 
 # Create paths
 foreach ($path in $HCIBoxConfig.HCIBoxPaths.GetEnumerator()) {
@@ -1566,11 +1567,10 @@ $localCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist "Administrator", (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 $domainCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) + $Env:adminUsername), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
+    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\$Env:adminUsername"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Enable PSRemoting
 Write-Host "Enabling PS Remoting on client..."
-$VerbosePreference = "SilentlyContinue"
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
@@ -1601,21 +1601,12 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 # Create the three nested Virtual Machines 
 ################################################################################
 # First create the Management VM (AzSMGMT)
-$vmMacs = @()
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.HostName) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
-$vmMacs += [PSCustomObject]@{
-    Hostname = $($HCIBoxConfig.MgmtHostConfig.HostName)
-    vmMAC    = $mac
-}
 Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
-    $vmMacs += [PSCustomObject]@{
-        Hostname = $VM.Hostname
-        vmMAC    = $mac
-    }
     Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
     
@@ -1634,7 +1625,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
 # Format and partition data drives
-Set-DataDrives -HCIBoxConfig -Credential $localCred
+Set-DataDrives -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
 # Set-SDNserver needs to be looked at - not sure this is necessary for 23h2
 Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
