@@ -137,6 +137,7 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
   name: ft1EventHubConnectionNamePl
   dependsOn: [
     tablesInit
+    adxEventHubConnection
   ]
   kind: 'EventHub'
   parent: ft1MagnemotionDB
