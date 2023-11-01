@@ -371,8 +371,6 @@ module adxCluster 'data/dataExplorer.bicep' = {
 module keyVault 'data/keyVault.bicep' = {
   name: 'keyVault'
   params: {
-    spnClientId: spnClientId
-    spnObjectId: spnObjectId
     tenantId: spnTenantId
     akvName: akvName
     location: location
