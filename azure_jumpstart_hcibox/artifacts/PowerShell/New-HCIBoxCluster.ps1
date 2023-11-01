@@ -809,22 +809,22 @@ function New-DCVM {
             $DomainFQDN = $HCIBoxConfig.SDNDomainFQDN
             $DomainNetBiosName = $DomainFQDN.Split(".")[0]
 
-            Write-Host "Configuring NIC Settings for $VMName"
+            Write-Host "Configuring NIC Settings for $DCName"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq $DCName }
             Rename-NetAdapter -name $NIC.name -newname $DCName | Out-Null 
             New-NetIPAddress -InterfaceAlias $DCName -IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
             Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools | Out-Null
 
-            Write-Host "Configuring NIC settings for $VMName VLAN200"
+            Write-Host "Configuring NIC settings for $DCName VLAN200"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
             Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
             New-NetIPAddress -InterfaceAlias VLAN200 -IPAddress $HCIBoxConfig.dcVLAN200IP -PrefixLength ($HCIBoxConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $HCIBoxConfig.AKSGWIP | Out-Null
 
-            Write-Host "Configuring Trusted Hosts on $VMName"
+            Write-Host "Configuring Trusted Hosts on $DCName"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
-            Write-Host "Installing Active Directory on $VMName. This will take some time..."
+            Write-Host "Installing Active Directory on $DCName. This will take some time..."
             $SecureString = ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
             Install-ADDSForest -DomainName $DomainFQDN -DomainMode 'WinThreshold' -DatabasePath "C:\Domain" -DomainNetBiosName $DomainNetBiosName -SafeModeAdministratorPassword $SecureString -InstallDns -Confirm -Force -NoRebootOnCompletion # | Out-Null
         }
