@@ -123,10 +123,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -Ou
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/magnemotion.kql") -OutFile "$Ft1DataExplorer\magnemotion.kql"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/processdata.kql") -OutFile "$Ft1DataExplorer\processdata.kql"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/productionline.kql") -OutFile "$Ft1DataExplorer\productionline.kql"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
 
