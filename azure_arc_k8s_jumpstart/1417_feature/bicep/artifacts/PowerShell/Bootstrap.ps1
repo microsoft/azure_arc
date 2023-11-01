@@ -75,7 +75,7 @@ $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
-$Ft1DataExplorer = $ft1Config.Ft1Directories["Ft1DataExplorer"]
+$Ft1DataExplorer = $Ft1Config.Ft1Directories["Ft1DataExplorer"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {

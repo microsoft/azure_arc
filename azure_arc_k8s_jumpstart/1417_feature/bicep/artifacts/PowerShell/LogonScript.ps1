@@ -363,13 +363,6 @@ catch {
 # Install Azure edge CLI
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
-<#$url = "https://aka.ms/azedgecli-latest"
-$response = Invoke-WebRequest -Uri $Url -MaximumRedirection 1
-$fileName=$response.BaseResponse.ResponseUri.AbsoluteUri.split('/')[4]
-
-Invoke-WebRequest -Uri "https://aka.ms/azedgecli-latest" -OutFile "$Ft1ToolsDir\$fileName"
-az extension add --source "$Ft1ToolsDir\$fileName" -y
-#>
 az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 
 Write-Host "`n"
@@ -378,7 +371,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 
 ## Adding MQTT load balancer
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
-kubectl patch svc aio-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
 
 <#
 ##############################################################

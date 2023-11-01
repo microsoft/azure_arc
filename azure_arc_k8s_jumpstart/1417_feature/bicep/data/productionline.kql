@@ -52,63 +52,6 @@ OEEMorningShift: real,
 OEEDayShift: real,
 OEENightShift: real)
 
-stagging
-| take 10
-| where subject == "topic/productionline"
-| extend data = parse_json( base64_decode_tostring(data_base64) )
-| project
-Timestamp = todatetime(data.data.Timestamp),
-MakeupArea = data.data.MakeupArea,
-Line = data.data.Line,
-Product = data.data.Product,
-Process = data.data.Process,
-Batch = toint(data.data.Batch),
-CurrentShift = data.data.CurrentShift,
-CurrentCutPerMinutes = toint(data.data.CurrentCutPerMinutes),
-TargetCutPerMinutes = toint(data.data.TargetCutPerMinutes),
-StartTime = todatetime(data.data.StartTime),
-FinishTime = todatetime(data.data.FinishTime),
-Waste = toreal(data.data.Waste),
-WasteReason = tostring(data.data.WasteReason),
-LostTime = data.data.LostTime,
-LostTimeReason = data.data.LostTimeReason,
-LostTimeTimeCount = toint(data.data.LostTimeTimeCount),
-ScheduledDoughs = toint(data.data.ScheduledDoughs),
-CompletedDoughs = toint(data.data.CompletedDoughs),
-ScheduledDoughsPerHour = toint(data.data.ScheduledDoughsPerHour),
-DoughTemperature = toreal(data.data.DoughTemperature),
-Weight = toreal(data.data.Weight),
-Height = toreal(data.data.Height),
-OvenTemp = toreal(data.data.OvenTemp),
-DownTime = toint(data.data.DownTime),
-Thruput = toint(data.data.Thruput),
-OverallEfficiency = toint(data.data.OverallEfficiency),
-Availability = toint(data.data.Availability),
-Performance = toint(data.data.Performance),
-Quality = toint(data.data.Quality),
-PlannedProductionTime = toint(data.data.PlannedProductionTime),
-ActualRuntime = toint(data.data.ActualRuntime),
-UnplannedDowntime = toint(data.data.UnplannedDowntime),
-PlannedDowntime = toint(data.data.PlannedDowntime),
-PlannedQuantity = toint(data.data.PlannedQuantity),
-ActualQuantity = toint(data.data.ActualQuantity),
-RejectedQuantity = toint(data.data.RejectedQuantity),
-OEEGoalbyPlant = toreal(data.data.OEEGoalbyPlant),
-OEESeattle = toreal(data.data.OEESeattle),
-OEEMiami = toreal(data.data.OEEMiami),
-OEEBoston = toreal(data.data.OEEBoston),
-OEEMexicoCity = toreal(data.data.OEEMexicoCity),
-OEEGoalbyCountry = toreal(data.data.OEEGoalbyCountry),
-OEEUSA = toreal(data.data.OEEUSA),
-OEEMexico = toreal(data.data.OEEMexico),
-OEEGoalbyProduct = toreal(data.data.OEEGoalbyProduct),
-OEEDonuts = toreal(data.data.OEEDonuts),
-OEECakes = toreal(data.data.OEECakes),
-OEEBreads = toreal(data.data.OEEBreads),
-OEEGoalbyShift = toreal(data.data.OEEGoalbyShift),
-OEEMorningShift = toreal(data.data.OEEMorningShift),
-OEEDayShift = toreal(data.data.OEEDayShift),
-OEENightShift = toreal(data.data.OEENightShift)
 
 .create-or-alter function Expand_productionline_Data() {
     stagging
@@ -170,7 +113,3 @@ OEENightShift = toreal(data.data.OEENightShift)
 }
 
 .alter table productionline policy update @'[{"Source": "stagging", "Query": "Expand_productionline_Data()", "IsEnabled": "True"}]'
-
-productionline
-| take 10
-
