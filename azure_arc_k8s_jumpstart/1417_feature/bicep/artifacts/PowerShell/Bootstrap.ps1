@@ -13,6 +13,7 @@ param (
     [string]$customLocationRPOID,
     [string]$githubAccount,
     [string]$githubBranch,
+    [string]$adxClusterName,
     [string]$rdpPort
 )
 
@@ -30,8 +31,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
-
-
+[System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 
 ##############################################################
 # Change RDP Port
