@@ -149,7 +149,7 @@ function GenerateAnswerFile {
 <Credentials>
 <Domain>$($HCIBoxConfig.SDNDomainFQDN)</Domain>
 <Password>$($HCIBoxConfig.SDNAdminPassword)</Password>
-<Username>$Env:adminUsername</Username>
+<Username>Administrator</Username>
 </Credentials>
 <JoinDomain>$($HCIBoxConfig.SDNDomainFQDN)</JoinDomain>
 </Identification>
@@ -726,7 +726,6 @@ function Set-FabricNetwork {
 
         # Enable Large MTU
         Write-Host "Configuring MTU on all Adapters"
-        $VerbosePreference = "SilentlyContinue"
         Get-NetAdapter | Where-Object { $_.Status -eq "Up" -and $_.Name -ne "Ethernet" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
         Start-Sleep -Seconds 15
 
@@ -752,7 +751,7 @@ function New-DCVM {
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $adminUser = $using:adminUser
         $HCIBoxConfig = $using:HCIBoxConfig
-        $localcred = $using:localcred
+        $localCred = $using:localcred
         $domainCred = $using:domainCred
         $ParentDiskPath = "C:\VMs\Base\"
         $vmpath = "D:\VMs\"
@@ -835,11 +834,10 @@ function New-DCVM {
         Get-VM $VMName | Start-VM 
 
         # Wait until DC is created and rebooted
-        while ((Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $HCIBoxConfig.DCName { (Get-ADDomainController $args[0]).enabled } -ea SilentlyContinue) -ne $true) { Start-Sleep -Seconds 5 }
+        while ((Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig.DCName { (Get-ADDomainController $args[0]).enabled } -ea SilentlyContinue) -ne $true) { Start-Sleep -Seconds 5 }
 
-        $VerbosePreference = "Continue"
         Write-Host "Configuring User Accounts and Groups in Active Directory"
-        Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+        Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
             $HCIBoxConfig = $args[0]
             $adminUser = $using:adminUser
             $SDNDomainFQDN = $HCIBoxConfig.SDNDomainFQDN
@@ -1577,7 +1575,7 @@ $localCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist "Administrator", (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 $domainCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\$Env:adminUsername"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
+    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\Administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Enable PSRemoting
 Write-Host "Enabling PS Remoting on client..."
