@@ -24,6 +24,7 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
+    accessPolicies: []
     enableSoftDelete: false
     tenantId: tenantId
   }
