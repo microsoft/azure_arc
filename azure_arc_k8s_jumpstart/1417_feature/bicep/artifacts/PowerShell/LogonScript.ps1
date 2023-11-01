@@ -309,7 +309,9 @@ az connectedk8s enable-features --name $arcClusterName `
 # Preparing cluster for ft1
 ##############################################################
 
-Write-Host "Deploy local path provisioner"
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for ft1" -ForegroundColor Gray
+Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
     & kubectl apply -f $localPathProvisionerYaml
@@ -321,7 +323,7 @@ catch {
 
 Write-Host "Configuring firewall specific to ft1"
 Write-Host "Add firewall rule for ft1 MQTT Broker"
-New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -LocalPort 1883 -Action Allow | Out-Null
+New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
@@ -371,7 +373,6 @@ az extension add --source "$Ft1ToolsDir\$fileName" -y
 az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 
 Write-Host "`n"
-$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
@@ -401,7 +402,7 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-#$mqttIp = kubectl get service "ft1-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
 #netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
