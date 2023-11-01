@@ -83,13 +83,14 @@ function Get-FormattedWACMAC {
 
 function GenerateAnswerFile {
     Param(
-        $Hostname,
-        $IsMgmtVM,
-        $IsGuestVM,
-        $IsWACVM,
-        $IPAddress,
-        $VMMac,
-        $HCIBoxConfig
+        [Parameter(Mandatory=$True)] $Hostname,
+        [Parameter(Mandatory=$False)] $IsMgmtVM = $false,
+        [Parameter(Mandatory=$False)] $IsRouterVM = $false,
+        [Parameter(Mandatory=$False)] $IsDCVM = $false,
+        [Parameter(Mandatory=$False)] $IsWACVM = $false,
+        [Parameter(Mandatory=$False)] $IPAddress = "",
+        [Parameter(Mandatory=$False)] $VMMac = "",
+        [Parameter(Mandatory=$True)] $HCIBoxConfig
     )
 
     $formattedMAC = Get-FormattedWACMAC -HCIBoxConfig $HCIBoxConfig
@@ -237,16 +238,28 @@ function GenerateAnswerFile {
     if ($IsMgmtVM) {
         $azsmgmtProdKey = "<ProductKey>$($HCIBoxConfig.GUIProductKey)</ProductKey>"
     }
-    $routerVmServicing = ""
-    if ($IsGuestVM) {
+    $vmServicing = ""
+    
+    if ($IsRouterVM -or $IsDCVM) {
         $components = ""
-        $routerVmServicing = @"
+        $optionXML = ""
+        if ($IsRouterVM) {
+            $optionXML = @"
+<selection name="RemoteAccessServer" state="true" />
+<selection name="RasRoutingProtocols" state="true" />
+"@
+        }
+        if ($IsDCVM) {
+            $optionXML = @"
+<selection name="ADCertificateServicesRole" state="true" />
+<selection name="CertificateServices" state="true" />
+"@
+        }
+        $vmServicing = @"
 <servicing>
 <package action="configure">
 <assemblyIdentity name="Microsoft-Windows-Foundation-Package" version="10.0.14393.0" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="" />
-<selection name="ADCertificateServicesRole" state="true" />
-<selection name="CertificateServices" state="true" />
-</package>
+$optionXML</package>
 </servicing>
 "@
     }
@@ -254,8 +267,7 @@ function GenerateAnswerFile {
     $UnattendXML = @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
-$routerVmServicing
-<settings pass="specialize">
+$vmServicing<settings pass="specialize">
 <component name="Networking-MPSSVC-Svc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <DomainProfile_EnableFirewall>false</DomainProfile_EnableFirewall>
 <PrivateProfile_EnableFirewall>false</PrivateProfile_EnableFirewall>
@@ -263,8 +275,7 @@ $routerVmServicing
 </component>
 <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <ComputerName>$Hostname</ComputerName>
-$azsmgmtProdKey
-</component>
+$azsmgmtProdKey</component>
 <component name="Microsoft-Windows-TerminalServices-LocalSessionManager" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <fDenyTSConnections>false</fDenyTSConnections>
 </component>
@@ -274,8 +285,7 @@ $azsmgmtProdKey
 <SystemLocale>en-us</SystemLocale>
 <InputLocale>en-us</InputLocale>
 </component>
-$components
-</settings>
+$components</settings>
 <settings pass="oobeSystem">
 <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <OOBE>
@@ -283,7 +293,7 @@ $components
 <SkipMachineOOBE>true</SkipMachineOOBE>
 <SkipUserOOBE>true</SkipUserOOBE>
 <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-    </OOBE>
+</OOBE>
 <UserAccounts>
 <AdministratorPassword>
 <Value>$($HCIBoxConfig.SDNAdminPassword)</Value>
@@ -430,7 +440,7 @@ function Set-MGMTVHDX {
 
     # Inject Answer File
     Write-Host "Injecting answer file to $path"
-    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IsGuestVM $false -IPAddress $HCIBoxConfig.AzSMGMTIP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IPAddress $HCIBoxConfig.AzSMGMTIP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
     
     Write-Host "Mounted Disk Volume is: $MountedDrive" 
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
@@ -483,7 +493,7 @@ function Set-HCINodeVHDX {
     }
 
     Write-Host "Injecting answer file to $path"
-    $UnattendXML = GenerateAnswerFile -HostName $Hostname -IsMgmtVM $false -IsGuestVM $false -IPAddress $IPAddress -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    $UnattendXML = GenerateAnswerFile -HostName $Hostname -IPAddress $IPAddress -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
     Write-Host "Mounted Disk Volume is: $MountedDrive" 
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
     if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
@@ -738,7 +748,7 @@ function New-DCVM {
     )
     Write-Host "Creating domain controller VM"
     $adminUser = $env:adminUsername
-    $Unattend = GenerateAnswerFile -Hostname $HCIBoxConfig.DCName -IsMgmtVM $false -IsGuestVM $true -IPAddress "" -VMMac "" -HCIBoxConfig $HCIBoxConfig
+    $Unattend = GenerateAnswerFile -Hostname $HCIBoxConfig.DCName -IsDCVM $true -HCIBoxConfig $HCIBoxConfig
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $adminUser = $using:adminUser
         $HCIBoxConfig = $using:HCIBoxConfig
@@ -787,7 +797,7 @@ function New-DCVM {
         Start-VM -Name $VMName | Out-Null
         
         # Wait until the VM is restarted
-        while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
+        while ((Invoke-Command -VMName $VMName -Credential $using:localCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
         Write-Host "Configuring $VMName and Installing Active Directory."
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $HCIBoxConfig -ScriptBlock {
@@ -957,7 +967,7 @@ function New-RouterVM {
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
-        $localcred = $using:localcred
+        $localCred = $using:localcred
         $ParentDiskPath = "C:\VMs\Base\AzSHCI.vhdx"
         $vmpath = "D:\VMs\"
         $VMName = "bgp-tor-router"
@@ -993,7 +1003,7 @@ function New-RouterVM {
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
         New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null
-        $Unattend = GenerateAnswerFile -Hostname $VMName -IsMgmtVM $false -IsGuestVM $true -IPAddress "" -VMMac "" -HCIBoxConfig $HCIBoxConfig
+        $Unattend = GenerateAnswerFile -Hostname $VMName -IsRouterVM $true -HCIBoxConfig $HCIBoxConfig
         Set-Content -Value $Unattend -Path "C:\TempBGPMount\Windows\Panther\Unattend.xml" -Force
         
         # Enable remote access
@@ -1173,7 +1183,7 @@ function New-AdminCenterVM {
 
         # Apply custom Unattend.xml file
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null    
-        $UnattendXML = GenerateAnswerFile -HostName $VMName -IsMgmtVM $false -IsGuestVM $false -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
+        $UnattendXML = GenerateAnswerFile -HostName $VMName -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
         Write-Host "Mounting and Injecting Answer File into the $VMName VM." 
         Set-Content -Value $UnattendXML -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
         Write-Host "Dismounting Disk"
@@ -1634,8 +1644,8 @@ Restart-VMs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
-# This step has to be done as during the Hyper-V install as hosts reboot twice.
-Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
+# Not sure about this one, commenting out - This step has to be done as during the Hyper-V install as hosts reboot twice.
+# Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -HCIBoxConfig $HCIBoxConfig
