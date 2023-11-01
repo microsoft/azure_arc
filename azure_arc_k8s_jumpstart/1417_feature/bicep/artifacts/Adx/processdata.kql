@@ -1,0 +1,26 @@
+.create table magnemotiontemp (Timestamp: datetime, Heater_Outlet_Temp: real, Pump1_Flow_Totalizer: real, Pump2_Flow_Totalizer: real)
+
+stagging
+| take 10
+| where subject == "topic/magnemotion"
+| extend data = parse_json( base64_decode_tostring(data_base64) ) 
+| project 
+Timestamp = todatetime( data.data.Timestamp), 
+Heater_Outlet_Temp = toreal( data.data.Heater_Outlet_Temp), 
+Pump1_Flow_Totalizer = toreal( data.data.Pump1_Flow_Totalizer), 
+Pump2_Flow_Totalizer = toreal( data.data.Pump2_Flow_Totalizer)  
+
+
+//tabla de telemetria
+.create table ftae_data (Active: boolean, EventID: guid, EventTimeStamp: datetime, GroupPath: string, Message: string, SourceName: string, DeviceID: string, EventEnqueuedUtcTime: datetime)
+ 
+.create-or-alter function Expand_Ftae_Data() {
+        iot_telemetry_raw
+        | where isnull(payload.TelemetryType) == false and payload.SqlType == 2
+        | evaluate bag_unpack(payload)
+        | project Active, EventID, EventTimeStamp, GroupPath, Message, SourceName, DeviceID=deviceID, EventEnqueuedUtcTime=enqueuedTime
+        | summarize arg_max(tostring(EventID), *) by Active, EventTimeStamp, GroupPath, Message, SourceName, DeviceID, EventEnqueuedUtcTime
+        | project Active, EventID=toguid(EventID), EventTimeStamp, GroupPath, Message, SourceName, DeviceID, EventEnqueuedUtcTime
+    }
+ 
+.alter table ftae_data policy update @'[{"Source": "iot_telemetry_raw", "Query": "Expand_Ftae_Data()", "IsEnabled": "True"}]'
