@@ -237,6 +237,22 @@ if ($Ft1Config.AzureProviders.Count -ne 0) {
 Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
 
+
+#####################################################################
+# Configuring Kusto cli
+#####################################################################
+Install-PackageProvider -Name NuGet -Force nuget
+$install = (Install-Package Microsoft.Azure.Kusto.Tools -ProviderName NuGet -Force).Payload.Directories[0]
+$path = $install.name + "\tools\net6.0"
+$kustoCliPath = Join-Path -path $install.Location -ChildPath $path
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$newPathVariable = $currentPathVariable + ";" + $kustoCliPath
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+
+#####################################################################
+# Onboarding cluster to Azure Arc
+#####################################################################
+
 # Onboarding the cluster to Azure Arc
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
