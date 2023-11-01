@@ -100,25 +100,12 @@ resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   kind: 'ReadWrite'
 }
 
-resource tablesInit 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
-  name: 'tablesInit'
-  parent: ft1MagnemotionDB
-  dependsOn: [
-    magnemotionScript
-  ]
-  properties: {
-    continueOnErrors: false
-    forceUpdateTag: 'string'
-    scriptContent: loadTextContent('script.kql')
-  }
-}
-
 resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionName
-  dependsOn: [
-    tablesInit
-  ]
   kind: 'EventHub'
+  dependsOn: [
+    productionLineScript
+  ]
   location: location
   parent: ft1MagnemotionDB
   properties: {
@@ -136,7 +123,6 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
 resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionNamePl
   dependsOn: [
-    tablesInit
     adxEventHubConnection
   ]
   kind: 'EventHub'
