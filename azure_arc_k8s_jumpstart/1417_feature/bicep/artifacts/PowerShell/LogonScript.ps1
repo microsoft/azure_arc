@@ -377,7 +377,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 
 ## Adding MQTT load balancer
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
-kubectl patch svc ft1-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc aio-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
 
 <#
 ##############################################################
