@@ -7,15 +7,15 @@ spec:
   authImage:
     pullPolicy: Always
     repository: e4kpreview.azurecr.io/dmqtt-authentication
-    tag: 0.1.0-preview-rc3
+    tag: 0.1.0-preview-rc2
   brokerImage:
     pullPolicy: Always
     repository: e4kpreview.azurecr.io/dmqtt-pod
-    tag: 0.1.0-preview-rc3
+    tag: 0.1.0-preview-rc2
   healthManagerImage:
     pullPolicy: Always
     repository: e4kpreview.azurecr.io/dmqtt-operator
-    tag: 0.1.0-preview-rc3
+    tag: 0.1.0-preview-rc2
   mode: auto
   encryptInternalTraffic: false
 ---
@@ -54,7 +54,7 @@ metadata:
 spec:
   image:
     repository: e4kpreview.azurecr.io/mqttbridge
-    tag: 0.1.0-preview-rc3
+    tag: 0.1.0-preview-rc2
     pullPolicy: IfNotPresent
   protocol: v5
   bridgeInstances: 1
