@@ -734,9 +734,9 @@ function Set-FabricNetwork {
         New-NetRoute -DestinationPrefix $HCIBoxConfig.PublicVIPSubnet -NextHop $provGW -InterfaceAlias PROVIDER | Out-Null
 
         # Remove Gateway from Fabric NIC
-        Write-Host "Removing Gateway from Fabric NIC" 
-        $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
-        Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
+        #Write-Host "Removing Gateway from Fabric NIC" 
+        #$index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
+        #Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
     }
 }
 
@@ -964,7 +964,7 @@ function New-RouterVM {
         $HCIBoxConfig,
         [PSCredential]$localCred
     )
-
+    $Unattend = GenerateAnswerFile -Hostname $VMName -IsRouterVM $true -HCIBoxConfig $HCIBoxConfig
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $localCred = $using:localcred
@@ -1002,9 +1002,8 @@ function New-RouterVM {
         Write-Host "Mounting Disk Image and Injecting Answer File into the $VMName VM." 
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
-        New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null
-        $Unattend = GenerateAnswerFile -Hostname $VMName -IsRouterVM $true -HCIBoxConfig $HCIBoxConfig
-        Set-Content -Value $Unattend -Path "C:\TempBGPMount\Windows\Panther\Unattend.xml" -Force
+        New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null  
+        Set-Content -Value $using:Unattend -Path "C:\TempBGPMount\Windows\Panther\Unattend.xml" -Force
         
         # Enable remote access
         Write-Host "Enabling Remote Access"
@@ -1144,6 +1143,7 @@ function New-AdminCenterVM {
         $localCred,
         $domainCred
     )
+    $UnattendXML = GenerateAnswerFile -HostName $VMName -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
         $VMName = "admincenter"
         $ParentDiskPath = "C:\VMs\Base\"
@@ -1183,9 +1183,9 @@ function New-AdminCenterVM {
 
         # Apply custom Unattend.xml file
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null    
-        $UnattendXML = GenerateAnswerFile -HostName $VMName -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
+        
         Write-Host "Mounting and Injecting Answer File into the $VMName VM." 
-        Set-Content -Value $UnattendXML -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
+        Set-Content -Value $using:UnattendXML -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
         Write-Host "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
         Remove-Item "C:\TempWACMount"
