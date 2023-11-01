@@ -92,6 +92,15 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
           'ClientCertificateSubject'
         ]
       }
+      routeTopicResourceId: eventGridTopic.id
+      routingEnrichments: {
+        static:[
+          {
+            key: 'indicator'
+            valueType: 'String'
+          }
+        ]
+      }
     }
   }
 }
@@ -138,16 +147,15 @@ resource eventGridsubscriberBindingName 'Microsoft.EventGrid/namespaces/permissi
 
 resource eventGridTopic 'Microsoft.EventGrid/topics@2023-06-01-preview' = {
   name: eventGridTopicName
-  dependsOn:[
-    eventGrid
-    eventGridTopicSpace
-  ]
   location: location
   sku: {
     name: eventGridTopicSku
   }
   identity: {
     type: 'SystemAssigned'
+  }
+  properties: {
+    inputSchema: 'CloudEventSchemaV1_0'
   }
 }
 

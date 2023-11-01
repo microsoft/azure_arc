@@ -6,8 +6,8 @@ Set-PSDebug -Strict
 #####################################################################
 $Ft1Config                  = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir                 = $Ft1Config.Ft1Directories["Ft1TempDir"]
-$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
-$Ft1AppsRepo                = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
+#$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
+#$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
 $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
@@ -19,8 +19,12 @@ $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
+$spnObjectId                = $Env:spnObjectId
 $subscriptionId             = $Env:subscriptionId
 $customLocationRPOID        = $Env:customLocationRPOID
+$githubAccount              = $Env:githubAccount
+$githubBranch               = $Env:githubBranch
+$adxClusterName             = $Env:adxClusterName
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
@@ -236,6 +240,10 @@ if ($Ft1Config.AzureProviders.Count -ne 0) {
 Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
 Write-Host
 
+#####################################################################
+# Onboarding cluster to Azure Arc
+#####################################################################
+
 # Onboarding the cluster to Azure Arc
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
@@ -293,27 +301,35 @@ az connectedk8s enable-features --name $arcClusterName `
                                 --custom-locations-oid $customLocationRPOID `
                                 --only-show-errors
 
+
+
 ##############################################################
 # Install Azure edge CLI
 ##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure Edge CLI extension" -ForegroundColor Gray
-$url = "https://aka.ms/azedgecli-latest"
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
+<#$url = "https://aka.ms/azedgecli-latest"
 $response = Invoke-WebRequest -Uri $Url -MaximumRedirection 1
 $fileName=$response.BaseResponse.ResponseUri.AbsoluteUri.split('/')[4]
 
 Invoke-WebRequest -Uri "https://aka.ms/azedgecli-latest" -OutFile "$Ft1ToolsDir\$fileName"
 az extension add --source "$Ft1ToolsDir\$fileName" -y
+#>
+az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -ForegroundColor Gray
 # Setting up local storage policy and port forwarding for MQTT Broker.
 kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
-New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
-az edge init --cluster $arcClusterName --cluster-namespace alice-springs --resource-group $resourceGroup
-$DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$DMQTT_IP
+New-NetFirewallRule -DisplayName "1417 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+$keyVaultId=(az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
+## Adding MQTT load balancer
+kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
+kubectl patch svc aio-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
 
+<#
 ##############################################################
 # Configure E4K extension
 ##############################################################
@@ -328,6 +344,17 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --release-train dev `
                         --scope cluster `
                         --auto-upgrade-minor-version false
+#>
+
+##############################################################
+# Deploy the simulator
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+$simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
+$mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
@@ -337,14 +364,35 @@ kubectl apply -f $eventGrideBrideYaml
 
 Start-Sleep -Seconds 30
 
-##############################################################
-# Deploy the simulator
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
-$simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-$mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
+
+########################################################################
+# ADX Dashboards
+########################################################################
+
+Write-Host "Importing Azure Data Explorer dashboards..."
+
+# Get the ADX/Kusto cluster info
+$kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
+$adxEndPoint = $kustoCluster.Uri
+
+# Update the dashboards files with the new ADX cluster name and URI
+$templateBaseUrl = "https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep"
+$dashboardBody   = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+
+# Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
+
+# Prepare authorization header with access token
+$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
+# Make REST API call to the dashboard endpoint.
+$dashboardApi = "https://dashboards.kusto.windows.net/dashboards"
+
+# Import orders dashboard report
+$httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $dashboardBody -Headers $httpHeaders
+if ($httpResponse.StatusCode -ne 200){
+    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer" -ForegroundColor Red
+}
 
 ##############################################################
 # Arc-enabling the Windows server host
