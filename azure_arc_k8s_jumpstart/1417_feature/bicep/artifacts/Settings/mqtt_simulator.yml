@@ -18,8 +18,8 @@ spec:
           image: jumpstartprod.azurecr.io/mqtt-simulator:latest
           resources:
             limits:
-              cpu: "500m"
-              memory: "128Mi"
+              cpu: "1"
+              memory: "500Mi"
           env:
             - name: MQTT_BROKER
               value: "MQTTIpPlaceholder"

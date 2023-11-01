@@ -3,6 +3,7 @@ param (
     [string]$spnClientId,
     [string]$spnClientSecret,
     [string]$spnTenantId,
+    [string]$spnObjectId,
     [string]$subscriptionId,
     [string]$location,
     [string]$templateBaseUrl,
@@ -10,6 +11,9 @@ param (
     [string]$windowsNode,
     [string]$kubernetesDistribution,
     [string]$customLocationRPOID,
+    [string]$githubAccount,
+    [string]$githubBranch,
+    [string]$adxClusterName,
     [string]$rdpPort
 )
 
@@ -17,6 +21,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('spnClientId', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnObjectId', $spnObjectId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('location', $location, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
@@ -24,8 +29,9 @@ param (
 [System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
-
-
+[System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 
 ##############################################################
 # Change RDP Port
@@ -69,6 +75,7 @@ $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
+$Ft1DataExplorer = $ft1Config.Ft1Directories["Ft1DataExplorer"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {
@@ -119,8 +126,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -O
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1PowerShellDir\Ft1Config.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
-
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_loadBalancer.yml") -OutFile "$Ft1ToolsDir\mq_loadBalancer.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
+#Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
 

@@ -70,6 +70,36 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   }
 }
 
+resource magnemotionScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'magnemotionScript'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('magnemotion.kql')
+  }
+}
+
+resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'productionLineScript'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('productionline.kql')
+  }
+}
+
+resource processDataScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'processDataScript'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('processdata.kql')
+  }
+}
+
 resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
   name: ft1DBName

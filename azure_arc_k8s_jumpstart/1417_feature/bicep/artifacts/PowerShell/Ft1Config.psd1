@@ -10,7 +10,7 @@
         Ft1TempDir         = "C:\Temp"
         Ft1ConfigMapDir    = "C:\Ft1\ConfigMaps"
         Ft1AppsRepo        = "C:\Ft1\AppsRepo"
-        Ft1DataEmulator    = "C:\Ft1\DataEmulator"
+        Ft1DataExplorer    = "C:\Ft1\DataExplorer"
         Ft1MonitoringDir   = "C:\Ft1\Monitoring"
     }
 
@@ -49,7 +49,6 @@
     AzCLIExtensions         = @(
         'k8s-extension',
         'k8s-configuration',
-        'azure-iot',
         'eventgrid',
         'customlocation',
         'kusto',
