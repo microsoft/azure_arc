@@ -90,16 +90,6 @@ resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-0
   }
 }
 
-resource processDataScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
-  name: 'processDataScript'
-  parent: ft1MagnemotionDB
-  properties: {
-    continueOnErrors: false
-    forceUpdateTag: 'string'
-    scriptContent: loadTextContent('processdata.kql')
-  }
-}
-
 resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
   name: ft1DBName

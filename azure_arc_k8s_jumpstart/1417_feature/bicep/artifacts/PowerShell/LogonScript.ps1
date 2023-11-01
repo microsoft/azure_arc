@@ -309,7 +309,9 @@ az connectedk8s enable-features --name $arcClusterName `
 # Preparing cluster for ft1
 ##############################################################
 
-Write-Host "Deploy local path provisioner"
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for ft1" -ForegroundColor Gray
+Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
     & kubectl apply -f $localPathProvisionerYaml
@@ -321,7 +323,7 @@ catch {
 
 Write-Host "Configuring firewall specific to ft1"
 Write-Host "Add firewall rule for ft1 MQTT Broker"
-New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -LocalPort 1883 -Action Allow | Out-Null
+New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
