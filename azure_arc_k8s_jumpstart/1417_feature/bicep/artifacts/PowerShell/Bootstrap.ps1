@@ -3,6 +3,7 @@ param (
     [string]$spnClientId,
     [string]$spnClientSecret,
     [string]$spnTenantId,
+    [string]$spnObjectId,
     [string]$subscriptionId,
     [string]$location,
     [string]$templateBaseUrl,
@@ -17,6 +18,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('spnClientId', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnObjectId', $spnObjectId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('location', $location, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
@@ -69,6 +71,7 @@ $Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
+$Ft1DataExplorer = $ft1Config.Ft1Directories["Ft1DataExplorer"]
 $websiteUrls = $Ft1Config.URLs
 
 function BITSRequest {
@@ -120,7 +123,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -Ou
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
-
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/magnemotion.kql") -OutFile "$Ft1DataExplorer\magnemotion.kql"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/processdata.kql") -OutFile "$Ft1DataExplorer\processdata.kql"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Adx/productionline.kql") -OutFile "$Ft1DataExplorer\productionline.kql"
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
 

@@ -17,7 +17,7 @@ param spnClientId string
 param spnObjectId string
 
 @description('Secret name')
-param ft1PlaceHolder string = 'PlaceholderSecret'
+param ft1PlaceHolder string = 'azure-iot-operations'
 
 @description('Secret value')
 param ft1PlaceHolderValue string = 'ft1SecretValue'

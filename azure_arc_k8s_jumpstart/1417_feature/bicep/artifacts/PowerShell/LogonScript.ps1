@@ -7,7 +7,7 @@ Set-PSDebug -Strict
 $Ft1Config                  = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir                 = $Ft1Config.Ft1Directories["Ft1TempDir"]
 $Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
-$Ft1AppsRepo                = $Ft1Config.Ft1Directories["Ft1AppsRepo"]
+$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
 $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
@@ -19,6 +19,7 @@ $location                   = $Env:location
 $spnClientId                = $Env:spnClientId
 $spnClientSecret            = $Env:spnClientSecret
 $spnTenantId                = $Env:spnTenantId
+$spnObjectId                = $Env:spnObjectId
 $subscriptionId             = $Env:subscriptionId
 $customLocationRPOID        = $Env:customLocationRPOID
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
@@ -293,6 +294,8 @@ az connectedk8s enable-features --name $arcClusterName `
                                 --custom-locations-oid $customLocationRPOID `
                                 --only-show-errors
 
+
+
 ##############################################################
 # Install Azure edge CLI
 ##############################################################
@@ -319,7 +322,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 ##############################################################
 # Configure E4K extension
 ##############################################################
-<#Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
 az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --version 0.1.0-preview-rc2 `
                         --release-namespace default `
@@ -330,7 +333,7 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --release-train dev `
                         --scope cluster `
                         --auto-upgrade-minor-version false
-#>
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
