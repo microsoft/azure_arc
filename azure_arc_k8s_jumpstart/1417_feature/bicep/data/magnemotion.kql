@@ -171,8 +171,5 @@ VacuumPressure = toreal(data.data.VacuumPressure)
         VacuumAlert = toboolean(data.data.VacuumAlert),
         VacuumPressure = toreal(data.data.VacuumPressure)
     }
- 
-.alter table magnemotion policy update @'[{"Source": "stagging", "Query": "Expand_magnemotion_Data()", "IsEnabled": "True"}]'
 
-magnemotion
-| take 10
+.alter table magnemotion policy update @'[{"Source": "stagging", "Query": "Expand_magnemotion_Data()", "IsEnabled": "True"}]'

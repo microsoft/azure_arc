@@ -6,8 +6,8 @@ Set-PSDebug -Strict
 #####################################################################
 $Ft1Config                  = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir                 = $Ft1Config.Ft1Directories["Ft1TempDir"]
-$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
-$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
+#$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
+#$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
 $Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls                = $Ft1Config.URLs
 $aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
@@ -321,7 +321,7 @@ New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -
 #$DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $keyVaultId=(az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret @spnClientSecret
 
 ##############################################################
 # Configure E4K extension
