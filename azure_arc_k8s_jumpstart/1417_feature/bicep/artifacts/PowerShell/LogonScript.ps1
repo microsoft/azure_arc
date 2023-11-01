@@ -24,6 +24,7 @@ $subscriptionId             = $Env:subscriptionId
 $customLocationRPOID        = $Env:customLocationRPOID
 $githubAccount              = $Env:githubAccount
 $githubBranch               = $Env:githubBranch
+$adxClusterName             = $Env:adxClusterName
 $aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
@@ -376,7 +377,7 @@ $adxEndPoint = $kustoCluster.Uri
 
 # Update the dashboards files with the new ADX cluster name and URI
 $templateBaseUrl = "https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep"
-$dashboardBody   = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$dashboardBody   = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
 
 # Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
