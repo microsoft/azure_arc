@@ -469,6 +469,12 @@ function Set-HCINodeVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $HostName + ".vhdx") 
+    Write-Host "Performing offline installation of Hyper-V on $Hostname"
+    Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
+    Start-Sleep -Seconds 20
+
+    $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
     $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
     Write-Host "Mounting VHDX file at $path"
     $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
@@ -1577,7 +1583,6 @@ Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 ###############################################################################
 # Configure Hyper-V host
 ###############################################################################
-# Verify Internet Connectivity
 Write-Host "Verifying internet connectivity"
 Test-InternetConnect
 
@@ -1590,7 +1595,6 @@ Set-HostNAT -HCIBoxConfig $HCIBoxConfig
 Write-Host "Configuring HCIBox-Client Hyper-V host"
 Set-VMHost -VirtualHardDiskPath $HostVMPath -VirtualMachinePath $HostVMPath -EnableEnhancedSessionMode $true
 
-# Copy the parent VHDX file to the specified Parent VHDX Path
 Write-Host "Copying VHDX Files to Host virtualization drive"
 $guipath = "$HostVMPath\GUI.vhdx"
 $hcipath = "$HostVMPath\AzSHCI.vhdx"
