@@ -195,7 +195,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data 
 
 > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
-> **NOTE: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this scenario. Also note that this capability is currently in [preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
+> **Note:** In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["Perform database failover with SQL Managed Instance Availability Groups"](../../day2/aks/aks_mssql_ha/_index.md) Jumpstart scenario as well as the ["High Availability with Azure Arc-enabled SQL Managed Instance"](https://learn.microsoft.com/en-us/azure/azure-arc/data/managed-instance-high-availability) product documentation
 
 - Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/eks/terraform) and run the commands below:
 

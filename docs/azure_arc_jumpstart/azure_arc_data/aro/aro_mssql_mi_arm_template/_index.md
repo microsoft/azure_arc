@@ -142,7 +142,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`bastionHostName`_ - Azure Bastion host name.
   - _`AroProviderId`_ - ARO resource provider Id
 
-    > **NOTE: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this scenario. Also note that this capability is currently in [preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
+    > **Note:** In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["Perform database failover with SQL Managed Instance Availability Groups"](../../day2/aks/aks_mssql_ha/_index.md) Jumpstart scenario as well as the ["High Availability with Azure Arc-enabled SQL Managed Instance"](https://learn.microsoft.com/en-us/azure/azure-arc/data/managed-instance-high-availability) product documentation
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aro/ARM) and run the below command:
 
