@@ -1674,37 +1674,7 @@ New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -localCred $localCred 
 #######################################################################################
 New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
-# # Install and Configure Network Controller if specified
-# If ($HCIBoxConfig.ProvisionNC) {
-#     $params = @{
-#         HCIBoxConfig  = $HCIBoxConfig
-#         domainCred = $domainCred
-#     }
-#     New-SDNEnvironment @params
-
-#     # Add Systems to Windows Admin Center
-#     $fqdn = $HCIBoxConfig.SDNDomainFQDN
-#     $SDNLabSystems = @("bgp-tor-router", "$($HCIBoxConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
-
-#     # Add VMs for Domain Admin
-#     $params = @{
-
-#         SDNLabSystems = $SDNLabSystems 
-#         HCIBoxConfig     = $HCIBoxConfig
-#         domainCred    = $domainCred
-
-#     }
-#     #   Add-WACtenants @params
-#     # Add VMs for NC Admin
-
-#     $params.domainCred = $NCAdminCred
-#     #   Add-WACtenants @params
-#     # Enable Single Sign On
-#     Write-Verbose "Enabling Single Sign On in WAC"
-#     enable-singleSignOn -HCIBoxConfig $HCIBoxConfig 
-# }
-
-# Finally - Add RDP Link to Desktop
+# Cluster complete. Finish up and add RDP Link to Desktop to WAC machine.
 Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
 $wshshell = New-Object -ComObject WScript.Shell
 $lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")
@@ -1715,9 +1685,8 @@ $lnk.Save()
 
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
-Write-Host "`nSuccessfully deployed HCIBox cluster." 
+Write-Host "`nSuccessfully deployed HCIBox Azure Stack HCI cluster." -ForegroundColor Green
 Write-Host "Infrastructure deployment time was $($timeSpan.Hours):$($timeSpan.Minutes) (hh:mm)." -ForegroundColor Green
-Write-Host "Now working on enabling HCIBox features."
 
 Stop-Transcript 
 
