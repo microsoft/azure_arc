@@ -4,33 +4,33 @@ Set-PSDebug -Strict
 #####################################################################
 # Initialize the environment
 #####################################################################
-$Ft1Config                  = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
-$Ft1TempDir                 = $Ft1Config.Ft1Directories["Ft1TempDir"]
+$Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
+$Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
 #$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
 #$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
-$Ft1ToolsDir                = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$websiteUrls                = $Ft1Config.URLs
-$aksEEReleasesUrl           = $websiteUrls["aksEEReleases"]
-$stepCliReleasesUrl         = $websiteUrls["stepCliReleases"]
-$mqttuiReleasesUrl          = $websiteUrls["mqttuiReleases"]
-$mqttExplorerReleasesUrl    = $websiteUrls["mqttExplorerReleases"]
-$resourceGroup              = $Env:resourceGroup
-$location                   = $Env:location
-$spnClientId                = $Env:spnClientId
-$spnClientSecret            = $Env:spnClientSecret
-$spnTenantId                = $Env:spnTenantId
-$spnObjectId                = $Env:spnObjectId
-$subscriptionId             = $Env:subscriptionId
-$customLocationRPOID        = $Env:customLocationRPOID
-$githubAccount              = $Env:githubAccount
-$githubBranch               = $Env:githubBranch
-$adxClusterName             = $Env:adxClusterName
-$aideuserConfig             = $Ft1Config.AKSEEConfig["aideuserConfig"]
-$aksedgeConfig              = $Ft1Config.AKSEEConfig["aksedgeConfig"]
-$aksEdgeNodes               = $Ft1Config.AKSEEConfig["Nodes"]
-$aksEdgeDeployModules       = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
+$Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
+$websiteUrls = $Ft1Config.URLs
+$aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
+$stepCliReleasesUrl = $websiteUrls["stepCliReleases"]
+$mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
+$mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+$resourceGroup = $Env:resourceGroup
+$location = $Env:location
+$spnClientId = $Env:spnClientId
+$spnClientSecret = $Env:spnClientSecret
+$spnTenantId = $Env:spnTenantId
+$spnObjectId = $Env:spnObjectId
+$subscriptionId = $Env:subscriptionId
+$customLocationRPOID = $Env:customLocationRPOID
+$githubAccount = $Env:githubAccount
+$githubBranch = $Env:githubBranch
+$adxClusterName = $Env:adxClusterName
+$aideuserConfig = $Ft1Config.AKSEEConfig["aideuserConfig"]
+$aksedgeConfig = $Ft1Config.AKSEEConfig["aksedgeConfig"]
+$aksEdgeNodes = $Ft1Config.AKSEEConfig["Nodes"]
+$aksEdgeDeployModules = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
 $AksEdgeRemoteDeployVersion = $Ft1Config.AKSEEConfig["AksEdgeRemoteDeployVersion"]
-$clusterLogSize             = $Ft1Config.AKSEEConfig["clusterLogSize"]
+$clusterLogSize = $Ft1Config.AKSEEConfig["clusterLogSize"]
 
 
 Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
@@ -46,7 +46,8 @@ if (! [Environment]::Is64BitProcess) {
 if ($env:kubernetesDistribution -eq "k8s") {
     $productName = "AKS Edge Essentials - K8s"
     $networkplugin = "calico"
-} else {
+}
+else {
     $productName = "AKS Edge Essentials - K3s"
     $networkplugin = "flannel"
 }
@@ -85,7 +86,7 @@ $aksedgeConfig.Network.NetworkPlugin = $networkplugin
 
 if ($env:windowsNode -eq $true) {
     $aksedgeConfig.Machines += @{
-        'LinuxNode' = $aksEdgeNodes["LinuxNode"]
+        'LinuxNode'   = $aksEdgeNodes["LinuxNode"]
         'WindowsNode' = $aksEdgeNodes["WindowsNode"]
     }
 }
@@ -145,7 +146,8 @@ $retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
 if ($retval) {
     Write-Host "[$(Get-Date -Format t)] INFO: Deployment Successful. " -ForegroundColor Green
-} else {
+}
+else {
     Write-Host -Message "[$(Get-Date -Format t)] Error: Deployment failed" -Category OperationStopped
     Stop-Transcript | Out-Null
     Pop-Location
@@ -253,24 +255,25 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
-$guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
+$guid = ([System.Guid]::NewGuid()).ToString().subString(0, 5).ToLower()
 $arcClusterName = "ft1-$guid"
 
 
 if ($env:kubernetesDistribution -eq "k8s") {
     az connectedk8s connect --name $arcClusterName `
-    --resource-group $resourceGroup `
-    --location $location `
-    --distribution aks_edge_k8s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-} else {
+        --resource-group $resourceGroup `
+        --location $location `
+        --distribution aks_edge_k8s `
+        --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+}
+else {
     az connectedk8s connect --name $arcClusterName `
-    --resource-group $resourceGroup `
-    --location $location `
-    --distribution aks_edge_k3s `
-    --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
-    --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+        --resource-group $resourceGroup `
+        --location $location `
+        --distribution aks_edge_k3s `
+        --tags "Project=jumpstart_azure_arc_k8s" "ClusterId=$clusterId" `
+        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 }
 
 Write-Host "`n"
@@ -296,12 +299,63 @@ az k8s-extension create --name "azuremonitor-containers" `
 # Enable custom locations on the Arc-enabled cluster
 Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor Gray
 az connectedk8s enable-features --name $arcClusterName `
-                                --resource-group $resourceGroup `
-                                --features cluster-connect custom-locations `
-                                --custom-locations-oid $customLocationRPOID `
-                                --only-show-errors
+    --resource-group $resourceGroup `
+    --features cluster-connect custom-locations `
+    --custom-locations-oid $customLocationRPOID `
+    --only-show-errors
 
 
+##############################################################
+# Preparing cluster for ft1
+##############################################################
+
+Write-Host "Deploy local path provisioner"
+try {
+    $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+    & kubectl apply -f $localPathProvisionerYaml
+    Write-Host "Successfully deployment the local path provisioner"
+}
+catch {
+    Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
+}
+
+Write-Host "Configuring firewall specific to ft1"
+Write-Host "Add firewall rule for ft1 MQTT Broker"
+New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -LocalPort 1883 -Action Allow | Out-Null
+
+try {
+    $deploymentInfo = Get-AksEdgeDeploymentInfo
+    # Get the service ip address start to determine the connect address
+    $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+    $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
+    if ( $null -eq $portProxyRulExists ) {
+        Write-Host "Configure port proxy for ft1"
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+    }
+    else {
+        Write-Host "Port proxy rule for ft1 exists, skip configuring port proxy..."
+    }
+}
+catch {
+    Write-Host "Error: port proxy update for ft1 failed" -ForegroundColor Red
+}
+
+Write-Host "Update the iptables rules"
+try {
+    $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
+    if ( $null -eq $iptableRulesExist ) {
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
+        Write-Host "Updated runtime iptable rules for node exporter"
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
+        Write-Host "Persisted iptable rules for node exporter"
+    }
+    else {
+        Write-Host "iptable rule exists, skip configuring iptable rules..."
+    }
+}
+catch {
+    Write-Host "Error: iptable rule update failed" -ForegroundColor Red
+}
 
 ##############################################################
 # Install Azure edge CLI
@@ -317,17 +371,13 @@ az extension add --source "$Ft1ToolsDir\$fileName" -y
 az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -ForegroundColor Gray
-# Setting up local storage policy and port forwarding for MQTT Broker.
-kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
-New-NetFirewallRule -DisplayName "1417 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-$keyVaultId=(az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
+$keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
 ## Adding MQTT load balancer
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
-kubectl patch svc aio-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc ft1-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
 
 <#
 ##############################################################
@@ -351,8 +401,8 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-$mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+#$mqttIp = kubectl get service "ft1-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+#netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
@@ -377,7 +427,7 @@ $adxEndPoint = $kustoCluster.Uri
 
 # Update the dashboards files with the new ADX cluster name and URI
 $templateBaseUrl = "https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep"
-$dashboardBody   = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
+$dashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
 
 # Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
@@ -390,7 +440,7 @@ $dashboardApi = "https://dashboards.kusto.windows.net/dashboards"
 
 # Import orders dashboard report
 $httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $dashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200){
+if ($httpResponse.StatusCode -ne 200) {
     Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer" -ForegroundColor Red
 }
 
@@ -434,7 +484,7 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing Step Cli" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
-$stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "step_windows_${versionToDownload}_amd64.zip"}).browser_download_url
+$stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "step_windows_${versionToDownload}_amd64.zip" }).browser_download_url
 $output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
@@ -451,7 +501,7 @@ Remove-Item -Path $output -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
-$mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip"}).browser_download_url
+$mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip" }).browser_download_url
 $output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $mqttuiReleaseDownloadUrl -OutFile $output
 Expand-Archive $output -DestinationPath "$Ft1ToolsDir\mqttui" -Force
@@ -469,7 +519,7 @@ Remove-Item -Path $output -Force
 Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT explorer" -ForegroundColor Gray
 $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
-$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object {$_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe"}).browser_download_url
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
 $output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
 Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
 Start-Process -FilePath $output -ArgumentList "/S" -Wait
