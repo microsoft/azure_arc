@@ -320,7 +320,7 @@ Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -ForegroundColor Gray
 # Setting up local storage policy and port forwarding for MQTT Broker.
 kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
-New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
+New-NetFirewallRule -DisplayName "1417 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $keyVaultId=(az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
