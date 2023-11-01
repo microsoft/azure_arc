@@ -778,7 +778,7 @@ function New-DCVM {
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
 
         # Add NIC for VLAN200 for DHCP server
-        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName "$HCIBoxConfig.FabricSwitch" -DeviceNaming "On"
+        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming "On"
         Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $HCIBoxConfig.AKSVlanID
 
         # Inject Answer File
@@ -964,13 +964,13 @@ function New-RouterVM {
         $HCIBoxConfig,
         [PSCredential]$localCred
     )
-    $Unattend = GenerateAnswerFile -Hostname $VMName -IsRouterVM $true -HCIBoxConfig $HCIBoxConfig
+    $Unattend = GenerateAnswerFile -Hostname $HCIBoxConfig.BGPRouterName -IsRouterVM $true -HCIBoxConfig $HCIBoxConfig
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $localCred = $using:localcred
         $ParentDiskPath = "C:\VMs\Base\AzSHCI.vhdx"
         $vmpath = "D:\VMs\"
-        $VMName = "bgp-tor-router"
+        $VMName = $HCIBoxConfig.BGPRouterName
     
         # Create Host OS Disk
         Write-Host "Creating $VMName differencing disks"

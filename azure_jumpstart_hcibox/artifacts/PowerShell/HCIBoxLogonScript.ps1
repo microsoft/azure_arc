@@ -9,7 +9,7 @@ Set-PSDebug -Strict
 # Load config file
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
-Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths["LogsDir"])\HCIBoxLogonScript.log)"
+Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths["LogsDir"])\HCIBoxLogonScript.log"
 
 #####################################################################
 # Setup Azure CLI
