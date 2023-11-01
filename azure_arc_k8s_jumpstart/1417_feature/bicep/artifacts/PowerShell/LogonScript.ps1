@@ -320,11 +320,15 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring the cluster for Ft1" -Fore
 # Setting up local storage policy and port forwarding for MQTT Broker.
 kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
 New-NetFirewallRule -DisplayName "1417 feature MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
-#$DMQTT_IP = kubectl get svc azedge-dmqtt-frontend -n alice-springs -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $keyVaultId=(az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret @spnClientSecret
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
+## Adding MQTT load balancer
+kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
+kubectl patch svc aio-mq-dmqtt-frontend -n azure-iot-operations -p '{"spec": {"type": "LoadBalancer"}}'
+
+<#
 ##############################################################
 # Configure E4K extension
 ##############################################################
@@ -339,15 +343,7 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
                         --release-train dev `
                         --scope cluster `
                         --auto-upgrade-minor-version false
-
-
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
-$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-$eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
-(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml
-
-Start-Sleep -Seconds 30
+#>
 
 ##############################################################
 # Deploy the simulator
@@ -358,6 +354,15 @@ $mqttIp= kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadB
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+$eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
+(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml
+
+Start-Sleep -Seconds 30
+
 
 ########################################################################
 # ADX Dashboards

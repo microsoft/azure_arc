@@ -32,24 +32,6 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
     }
     enableSoftDelete: false
     tenantId: tenantId
-    accessPolicies: [
-      {
-        applicationId: spnClientId
-        objectId: spnObjectId
-        tenantId: tenantId
-        permissions: {
-          secrets: [
-            'all'
-          ]
-          keys: [
-            'all'
-          ]
-          certificates: [
-            'all'
-          ]
-        }
-      }
-    ]
   }
 }
 

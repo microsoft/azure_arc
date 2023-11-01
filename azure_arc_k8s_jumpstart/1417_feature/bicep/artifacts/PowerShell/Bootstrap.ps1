@@ -126,6 +126,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -O
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1PowerShellDir\Ft1Config.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_loadBalancer.yml") -OutFile "$Ft1ToolsDir\mq_loadBalancer.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
 
