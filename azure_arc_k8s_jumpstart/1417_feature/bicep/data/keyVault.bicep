@@ -10,12 +10,6 @@ param akvSku string = 'standard'
 @description('Azure Key Vault tenant ID')
 param tenantId string = subscription().tenantId
 
-@description('SPN app ID')
-param spnClientId string
-
-@description('SPN object ID')
-param spnObjectId string
-
 @description('Secret name')
 param ft1PlaceHolder string = 'azure-iot-operations'
 
