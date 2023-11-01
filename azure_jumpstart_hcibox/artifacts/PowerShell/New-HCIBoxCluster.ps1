@@ -369,11 +369,11 @@ function New-HCINodeVM {
 
     # Create S2D Storage       
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk1.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk2.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk3.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk4.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk5.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null  
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk2.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk3.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk4.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk5.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null  
 
     # Create Nested VM
     New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.NestedVMMemoryinGB -VHDPath $VHDXPath -SwitchName $VMSwitch -Generation 2 | Out-Null
@@ -392,8 +392,8 @@ function New-HCINodeVM {
     $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
     Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
-    Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
-    Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
+    Add-VMNetworkAdapter -VMName $Name -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
+    Add-VMNetworkAdapter -VMName $Name -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
 
     Get-VM $Name | Set-VMProcessor -ExposeVirtualizationExtensions $true
     Get-VM $Name | Set-VMMemory -DynamicMemoryEnabled $false
@@ -469,7 +469,7 @@ function Set-HCINodeVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\$Hostname\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
     Write-Host "Mounting VHDX file at $path"
     $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
     if (!$partition.DriveLetter) {
@@ -1575,7 +1575,7 @@ Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
 ###############################################################################
-# Configure hyper-v host
+# Configure Hyper-V host
 ###############################################################################
 # Verify Internet Connectivity
 Write-Host "Verifying internet connectivity"
@@ -1611,7 +1611,7 @@ Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
-    $mac = New-HCINodeVM -Name $VM -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+    $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
     $vmMacs += [PSCustomObject]@{
         Hostname = $VM.Hostname
         vmMAC    = $mac
@@ -1719,7 +1719,7 @@ $lnk.Save()
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 Write-Host "`nSuccessfully deployed HCIBox cluster." 
-Write-Host "Infrastructure deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
+Write-Host "Infrastructure deployment time was $($timeSpan.Hours):$($timeSpan.Minutes) (hh:mm)." -ForegroundColor Green
 Write-Host "Now working on enabling HCIBox features."
 
 Stop-Transcript 
