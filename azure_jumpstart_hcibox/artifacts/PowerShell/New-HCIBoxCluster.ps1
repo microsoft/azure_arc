@@ -341,7 +341,6 @@ function New-ManagementVM {
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
     Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
     $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
-    Write-Host "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
     Get-VM $Name | Set-VMProcessor -ExposeVirtualizationExtensions $true
     Get-VM $Name | Set-VMMemory -DynamicMemoryEnabled $false
@@ -351,7 +350,6 @@ function New-ManagementVM {
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
-    Write-Host "VM $Name MAC address is $vmMac"
     return $vmMac
 }
 
@@ -390,7 +388,6 @@ function New-HCINodeVM {
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
     Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
     $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
-    Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
     Add-VMNetworkAdapter -VMName $Name -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
     Add-VMNetworkAdapter -VMName $Name -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
@@ -405,7 +402,6 @@ function New-HCINodeVM {
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Access -VlanId $HCIBoxConfig.StorageBVLAN 
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
-    Write-Host "VM $Name MAC address is $vmMac"
     return $vmMac
 }
 
@@ -1623,7 +1619,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 }
 
 #######################################################################################
-# Prep virtual machines
+# Prep the virtualization environment
 #######################################################################################
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
@@ -1649,6 +1645,9 @@ New-NATSwitch -HCIBoxConfig $HCIBoxConfig
 # Configure fabric network on AzSMGMT
 Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
+#######################################################################################
+# Provision the router, domain controller, and WAC VMs and join the hosts to the domain
+#######################################################################################
 # Provision Router VM on AzSMGMT
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
@@ -1664,12 +1663,9 @@ New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
-# Create S2D Cluster
-$params = @{
-    HCIBoxConfig          = $HCIBoxConfig
-    DomainCred         = $domainCred
-    AzStackClusterNode = 'AzSHOST2'
-}
+#######################################################################################
+# Create the S2D cluster
+#######################################################################################
 New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
 # # Install and Configure Network Controller if specified
