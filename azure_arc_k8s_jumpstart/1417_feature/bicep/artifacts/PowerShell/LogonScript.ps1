@@ -401,6 +401,7 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+Start-Sleep -Seconds 30
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
 #netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
