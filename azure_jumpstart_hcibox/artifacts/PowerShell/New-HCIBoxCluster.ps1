@@ -783,13 +783,13 @@ function New-DCVM {
         Remove-Item "C:\TempMount" | Out-Null
 
         # Start Virtual Machine
-        Write-Host "Starting Virtual Machine" 
+        Write-Host "Starting Virtual Machine $VMName" 
         Start-VM -Name $VMName | Out-Null
         
         # Wait until the VM is restarted
         while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
-        Write-Host "Configuring Domain Controller VM and Installing Active Directory."
+        Write-Host "Configuring $VMName and Installing Active Directory."
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $HCIBoxConfig -ScriptBlock {
             $HCIBoxConfig = $args[0]
             $DCName = $HCIBoxConfig.DCName
@@ -799,24 +799,22 @@ function New-DCVM {
             $DomainFQDN = $HCIBoxConfig.SDNDomainFQDN
             $DomainNetBiosName = $DomainFQDN.Split(".")[0]
 
-            Write-Host "Configuring NIC Settings for Domain Controller"
+            Write-Host "Configuring NIC Settings for $VMName"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq $DCName }
             Rename-NetAdapter -name $NIC.name -newname $DCName | Out-Null 
             New-NetIPAddress -InterfaceAlias $DCName -IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
             Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools | Out-Null
 
-            Write-Host "Configuring NIC settings for DC VLAN200"
+            Write-Host "Configuring NIC settings for $VMName VLAN200"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
             Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
             New-NetIPAddress -InterfaceAlias VLAN200 -IPAddress $HCIBoxConfig.dcVLAN200IP -PrefixLength ($HCIBoxConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $HCIBoxConfig.AKSGWIP | Out-Null
 
-            Write-Host "Configuring Trusted Hosts"
+            Write-Host "Configuring Trusted Hosts on $VMName"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
-            Write-Host "Installing Active Directory Forest. This will take some time..."
-        
-            Write-Host "Installing Active Directory..." 
+            Write-Host "Installing Active Directory on $VMName. This will take some time..."
             $SecureString = ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
             Install-ADDSForest -DomainName $DomainFQDN -DomainMode 'WinThreshold' -DatabasePath "C:\Domain" -DomainNetBiosName $DomainNetBiosName -SafeModeAdministratorPassword $SecureString -InstallDns -Confirm -Force -NoRebootOnCompletion # | Out-Null
         }
@@ -904,7 +902,7 @@ function New-DCVM {
             $ds = New-object System.DirectoryServices.DirectorySearcher([ADSI]"LDAP://$ConfigContext", $filter)  
             $Template = $ds.Findone().GetDirectoryEntry() 
 
-            if ($Template -ne $null) {
+            if ($null -ne $Template) {
                 $objUser = New-Object System.Security.Principal.NTAccount("Domain Computers") 
                 $objectGuid = New-Object Guid 0e10c968-78fb-11d2-90d4-00c04f79dc55                     
                 $ADRight = [System.DirectoryServices.ActiveDirectoryRights]"ExtendedRight"                     
