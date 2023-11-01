@@ -1,3 +1,5 @@
+.create table stagging (['id']: guid, source: string, ['type']: string, data_base64: string, ['time']: datetime, specversion: real, subject: string)
+
 .create table magnemotion (Timestamp: datetime,
 Heater_Outlet_Temp: real,
 Pump1_Flow_Totalizer: real,
@@ -51,8 +53,6 @@ Humidity: real,
 VacuumAlert: boolean,
 VacuumPressure: real
 )
-
- 
 
 .create-or-alter function Expand_magnemotion_Data() {
         stagging

@@ -83,6 +83,9 @@ resource magnemotionScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-0
 resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'productionLineScript'
   parent: ft1MagnemotionDB
+  dependsOn: [
+    magnemotionScript
+  ]
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
@@ -100,6 +103,9 @@ resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
 resource tablesInit 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'tablesInit'
   parent: ft1MagnemotionDB
+  dependsOn: [
+    magnemotionScript
+  ]
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
