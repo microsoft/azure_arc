@@ -326,7 +326,6 @@ try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
     # Get the service ip address start to determine the connect address
     $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
-    Write-Host "Connection address: $connectAddress"
     $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
     if ( $null -eq $portProxyRulExists ) {
         Write-Host "Configure port proxy for ft1"
@@ -380,7 +379,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
-
+##### Add health check to continue
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
