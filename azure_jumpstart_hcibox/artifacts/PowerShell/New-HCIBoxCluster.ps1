@@ -837,9 +837,9 @@ function New-DCVM {
         while ((Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig.DCName { (Get-ADDomainController $args[0]).enabled } -ea SilentlyContinue) -ne $true) { Start-Sleep -Seconds 5 }
 
         Write-Host "Configuring User Accounts and Groups in Active Directory"
-        Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+        Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig, $adminUser -ScriptBlock {
             $HCIBoxConfig = $args[0]
-            $adminUser = $using:adminUser
+            $adminUser = $args[1]
             $SDNDomainFQDN = $HCIBoxConfig.SDNDomainFQDN
             $SecureString = ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
             Set-ADDefaultDomainPasswordPolicy -ComplexityEnabled $false -Identity $HCIBoxConfig.SDNDomainFQDN -MinPasswordLength 0
