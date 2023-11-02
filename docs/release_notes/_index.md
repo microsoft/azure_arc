@@ -11,6 +11,62 @@ weight: 6
 
 ## 2023
 
+### October 2023
+
+#### Release highlights
+
+- New scenarios: 1
+- New features: 0
+- Enhancements: 7
+- Bug fixes: 6
+- Documentation updates: 3
+
+#### Cross-scenario
+
+- [Documentation: Proposed changes in Azure Arc Documentation (grammar and wording) #2160](https://github.com/microsoft/azure_arc/issues/2160)
+
+#### Jumpstart Agora
+
+- [Enhancement: Control AKSEE schema version using config file #2140](https://github.com/microsoft/azure_arc/issues/2140)
+- [Enhancement: AKS Edge Essentials - sporadic registration issue #2191](https://github.com/microsoft/azure_arc/issues/2191)
+- [Documentation: Add guidance to update Az PowerShell module to latest version #2146](https://github.com/microsoft/azure_arc/issues/2146)
+
+#### Jumpstart ArcBox
+
+- [Bug: ArcBox deployment fails to complete. ArcBox-CAPI-VM custom script extension never finishes. #2162](https://github.com/microsoft/azure_arc/issues/2162)
+- [Documentation: ArcBox readme typos #2187](https://github.com/microsoft/azure_arc/issues/2187)
+
+
+#### Jumpstart HCIBox
+
+- [Enhancement: HCIBox host nodes still use Az CLI 32bit #2157](https://github.com/microsoft/azure_arc/issues/2157)
+- [Bug: HCIBox Resource Bridge script fails to complete due to change to custom locations cli commands #2158](https://github.com/microsoft/azure_arc/issues/2158)
+- [Bug: HCIBox fails to deploy #2178](https://github.com/microsoft/azure_arc/issues/2178)
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Using Azure Arc to deliver Extended Security Updates (ESU) for Windows Server and SQL Server 2012](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_extended_security_updates/)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Enhancement: Dynamically pull latest AKSEE schema version - Single node scenario #2152](https://github.com/microsoft/azure_arc/issues/2152)
+- [Enhancement: Dynamically pull latest AKSEE schema version - Multi-node scenario #2153](https://github.com/microsoft/azure_arc/issues/2153)
+- [Enhancement: Dynamically pull latest AKSEE schema version - Akri Single node scenario #2154](https://github.com/microsoft/azure_arc/issues/2154)
+- [Enhancement: Dynamically pull latest AKSEE schema version - Akri multi-node scenario #2155](https://github.com/microsoft/azure_arc/issues/2155)
+- [Bug: CAPI Vanilla deployment fails to complete #2170](https://github.com/microsoft/azure_arc/issues/2170)
+
+#### Azure Arc-enabled data services
+
+- [Feature: Azure Arc-enabled data services - Oct release #2147](https://github.com/microsoft/azure_arc/issues/2147)
+
+#### Azure Arc-enabled app services
+
+- [Bug: CAPI Pin down for Arc Data and App Services #2189](https://github.com/microsoft/azure_arc/issues/2189)
+
+#### Jumpstart decks
+
+- [Bug: Some of the images are referring to: Azure Sentinel - its now Microsoft Sentinel #2144](https://github.com/microsoft/azure_arc/issues/2144)
+
 ### September 2023
 
 #### Release highlights
