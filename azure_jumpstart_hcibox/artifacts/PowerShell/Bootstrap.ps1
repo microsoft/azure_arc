@@ -56,9 +56,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBox-Config.psd1")
 $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Create paths
-foreach ($path in $HCIBoxConfig.HCIBoxPaths) {
-    Write-Output "Creating path $path."
-    New-Item -Path $path -ItemType directory -Force | Out-Null
+foreach ($path in $HCIBoxConfig.HCIBoxPaths.GetEnumerator()) {
+    Write-Output "Creating path $($path.Value)"
+    New-Item -Path $path.Value -ItemType directory -Force | Out-Null
 }
 
 # Begin transcript
