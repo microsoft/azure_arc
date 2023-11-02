@@ -70,9 +70,22 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   }
 }
 
+
+resource stagingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'stagingScript'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('staging.kql')
+  }
+}
 resource magnemotionScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'magnemotionScript'
   parent: ft1MagnemotionDB
+  dependsOn: [
+    stagingScript
+  ]
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'

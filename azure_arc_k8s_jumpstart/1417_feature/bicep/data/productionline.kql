@@ -1,3 +1,4 @@
+// Create a table to store the data from the productionline topic
 .create table productionline (
 Timestamp: datetime,
 MakeupArea: string,
@@ -52,27 +53,27 @@ OEEMorningShift: real,
 OEEDayShift: real,
 OEENightShift: real)
 
-
+// Create a function to parse the data from the productionline topic
 .create-or-alter function Expand_productionline_Data() {
     stagging
     | where subject == "topic/productionline"
     | extend data = parse_json( base64_decode_tostring(data_base64) ) 
     | project 
     Timestamp = todatetime(data.data.Timestamp),
-    MakeupArea = data.data.MakeupArea,
-    Line = data.data.Line,
-    Product = data.data.Product,
-    Process = data.data.Process,
+    MakeupArea = tostring(data.data.MakeupArea),
+    Line = tostring(data.data.Line),
+    Product = tostring(data.data.Product),
+    Process = tostring(data.data.Process),
     Batch = toint(data.data.Batch),
-    CurrentShift = data.data.CurrentShift,
+    CurrentShift = tostring(data.data.CurrentShift),
     CurrentCutPerMinutes = toint(data.data.CurrentCutPerMinutes),
     TargetCutPerMinutes = toint(data.data.TargetCutPerMinutes),
     StartTime = todatetime(data.data.StartTime),
     FinishTime = todatetime(data.data.FinishTime),
     Waste = toreal(data.data.Waste),
     WasteReason = tostring(data.data.WasteReason),
-    LostTime = data.data.LostTime,
-    LostTimeReason = data.data.LostTimeReason,
+    LostTime = tostring(data.data.LostTime),
+    LostTimeReason = tostring(data.data.LostTimeReason),
     LostTimeTimeCount = toint(data.data.LostTimeTimeCount),
     ScheduledDoughs = toint(data.data.ScheduledDoughs),
     CompletedDoughs = toint(data.data.CompletedDoughs),
@@ -112,4 +113,5 @@ OEENightShift: real)
     OEENightShift = toreal(data.data.OEENightShift)
 }
 
+// Create a policy to update the productionline table
 .alter table productionline policy update @'[{"Source": "stagging", "Query": "Expand_productionline_Data()", "IsEnabled": "True"}]'

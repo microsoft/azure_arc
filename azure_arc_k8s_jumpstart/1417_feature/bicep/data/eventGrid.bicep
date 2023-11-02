@@ -36,8 +36,7 @@ param eventGridTopicSpaceName string = 'ft1topicSpace${namingGuid}'
 
 @description('The name of the EventGrid topic templates')
 param eventGridTopicTemplates array = [
-    'contoso/magnemotion'
-    'contoso/productionline'
+    '#'
 ]
 
 @description('The name of the EventGrid publisher binding name')
