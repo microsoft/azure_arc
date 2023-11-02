@@ -363,7 +363,9 @@ catch {
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
 Write-Host "`n"
-az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+#az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecli.blob.core.windows.net/drop/azure_iot_ops-0.0.5a3-py3-none-any.whl').GetResponse().ResponseUri.AbsoluteUri) -y
+
 
 
 ##############################################################
