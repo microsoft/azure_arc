@@ -823,7 +823,7 @@ function New-DCVM {
             Write-Host "Configuring Trusted Hosts on $DCName"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
-            Write-Host "Installing Active Directory on $DCName. This will take some time..."
+            Write-Host "Installing Active Directory forest on $DCName."
             $SecureString = ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
             Install-ADDSForest -DomainName $DomainFQDN -DomainMode 'WinThreshold' -DatabasePath "C:\Domain" -DomainNetBiosName $DomainNetBiosName -SafeModeAdministratorPassword $SecureString -InstallDns -Confirm -Force -NoRebootOnCompletion # | Out-Null
         }
@@ -1642,9 +1642,6 @@ Restart-VMs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
-# Not sure about this one, commenting out - This step has to be done as during the Hyper-V install as hosts reboot twice.
-# Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
-    
 # Create NAT Virtual Switch on AzSMGMT
 New-NATSwitch -HCIBoxConfig $HCIBoxConfig
 
