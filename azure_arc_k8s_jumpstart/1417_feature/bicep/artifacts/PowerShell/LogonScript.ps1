@@ -219,6 +219,7 @@ $azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal
 $subscriptionId = (Get-AzSubscription).Id
+Set-AzContext -Subscription $subscriptionId
 
 # Install PowerShell modules
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
