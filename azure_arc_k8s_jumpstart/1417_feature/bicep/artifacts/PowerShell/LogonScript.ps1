@@ -250,7 +250,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
@@ -379,7 +379,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 
 ## Adding MQTT load balancer
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
-kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
+#kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
 
 <#
 ##############################################################
