@@ -79,9 +79,7 @@
         'kubernetes-helm',
         'mqtt-explorer',
         'gh',
-        'telegraf',
         'k9s',
-        'grafana',
         'python'
     )
 
