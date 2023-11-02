@@ -3,7 +3,7 @@
   "id": "9336e3c4-726d-441b-8c61-4e83deb1ad38",
   "eTag": "145e214f-b68b-4804-805b-1ddc58b69d9c",
   "schema_version": "48",
-  "title": "AIO demo",
+  "title": "Ignite Demo",
   "autoRefresh": { "enabled": false },
   "baseQueries": [],
   "tiles": [
@@ -21,7 +21,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "magnemotion_data\n| top 1 by Timestamp desc\n| project Voltage\n| extend  Voltage=round(Voltage, 5)\n\n"
+        "text": "magnemotion\n| top 1 by Timestamp desc\n| project Voltage\n| extend  Voltage=round(Voltage, 5)\n\n"
       },
       "visualOptions": {
         "multiStat__textSize": "large",
@@ -63,7 +63,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": ["_endTime", "_startTime"],
-        "text": "magnemotion_data\n| where Timestamp < _endTime\n| make-series avg(Pump1_Flow_Totalizer) on Timestamp in range (_startTime, now(), 1m) \n\n\n"
+        "text": "magnemotion\n| where Timestamp < _endTime\n| make-series avg(Pump1_Flow_Totalizer) on Timestamp in range (_startTime, now(), 1m) \n\n\n"
       },
       "visualOptions": {
         "multipleYAxes": {
@@ -134,7 +134,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "magnemotion_data\n| top 1 by Timestamp desc\n| project Drive1_Current, Drive1_Frequency, Drive1_Voltage, Drive1_Speed, Drive2_Current, Drive2_Frequency, Drive2_Voltage, Drive2_Speed\n | evaluate narrow()\n| project  Column, Value\n|extend Value=round(todouble(Value),4)\n"
+        "text": "magnemotion\n| top 1 by Timestamp desc\n| project Drive1_Current, Drive1_Frequency, Drive1_Voltage, Drive1_Speed, Drive2_Current, Drive2_Frequency, Drive2_Voltage, Drive2_Speed\n | evaluate narrow()\n| project  Column, Value\n|extend Value=round(todouble(Value),4)\n"
       },
       "visualOptions": {
         "multiStat__textSize": "auto",
@@ -161,7 +161,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "magnemotion_data\n| top 1 by Timestamp desc\n| project Tank_Level\n| extend   Tank_Level =round(Tank_Level, 5)\n"
+        "text": "magnemotion\n| top 1 by Timestamp desc\n| project Tank_Level\n| extend   Tank_Level =round(Tank_Level, 5)\n"
       },
       "visualOptions": {
         "multiStat__textSize": "auto",
@@ -203,7 +203,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "magnemotion_data\n| top 1 by Timestamp desc\n| project Temperature\n| extend   Temperature =round(Temperature, 5)\n"
+        "text": "magnemotion\n| top 1 by Timestamp desc\n| project Temperature\n| extend   Temperature =round(Temperature, 5)\n"
       },
       "visualOptions": {
         "multiStat__textSize": "auto",
@@ -245,7 +245,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "magnemotion_data\n| top 1 by Timestamp desc\n| project Filter_Chg_Required, Cooler_ON, Fan001_On, Heater_ON\n | evaluate narrow()\n| project  Column, Value\n"
+        "text": "magnemotion\n| top 1 by Timestamp desc\n| project Filter_Chg_Required, Cooler_ON, Fan001_On, Heater_ON\n | evaluate narrow()\n| project  Column, Value\n"
       },
       "visualOptions": {
         "table__enableRenderLinks": true,
@@ -657,7 +657,7 @@
     {
       "id": "27da065d-b46f-4658-b525-556227c5c6b3",
       "name": "magnemotion",
-      "clusterUri": "{{ADX_CLUSTER_URI}}",
+      "clusterUri": "https://adx-contosoba1016.eastus.kusto.windows.net/",
       "database": "magnemotion",
       "queryResultsCacheMaxAge": 5000,
       "kind": "manual-kusto",

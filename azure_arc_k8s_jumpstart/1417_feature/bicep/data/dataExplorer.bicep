@@ -70,9 +70,22 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   }
 }
 
+
+resource stagingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'stagingScript'
+  parent: ft1MagnemotionDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('staging.kql')
+  }
+}
 resource magnemotionScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'magnemotionScript'
   parent: ft1MagnemotionDB
+  dependsOn: [
+    stagingScript
+  ]
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
@@ -104,7 +117,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   name: ft1EventHubConnectionName
   kind: 'EventHub'
   dependsOn: [
-    productionLineScript
+    magnemotionScript
   ]
   location: location
   parent: ft1MagnemotionDB
@@ -123,7 +136,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
 resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionNamePl
   dependsOn: [
-    adxEventHubConnection
+    productionLineScript
   ]
   kind: 'EventHub'
   parent: ft1MagnemotionDB
