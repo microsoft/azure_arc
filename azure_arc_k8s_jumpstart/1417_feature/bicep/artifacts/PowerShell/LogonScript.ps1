@@ -411,7 +411,7 @@ do {
     $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned..." -ForegroundColor Gray
 } while (
-    $null -ne $mqttIp
+    $null -eq $mqttIp
 )
 
 #netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
