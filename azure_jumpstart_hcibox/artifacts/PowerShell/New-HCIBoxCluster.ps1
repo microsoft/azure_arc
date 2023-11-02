@@ -518,6 +518,7 @@ function Set-DataDrives {
     foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $VMs += $node.Hostname
     }
+    Start-Sleep -Seconds 30
     foreach ($VM in $VMs) {
         Invoke-Command -VMName $VM -Credential $Credential -ScriptBlock {
             Set-Disk -Number 1 -IsOffline $false | Out-Null
