@@ -518,7 +518,6 @@ function Set-DataDrives {
     foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $VMs += $node.Hostname
     }
-    Start-Sleep -Seconds 30
     foreach ($VM in $VMs) {
         Invoke-Command -VMName $VM -Credential $Credential -ScriptBlock {
             Set-Disk -Number 1 -IsOffline $false | Out-Null
@@ -1627,6 +1626,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 #######################################################################################
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
+Start-Sleep -Seconds 60
 
 # Format and partition data drives
 Set-DataDrives -HCIBoxConfig $HCIBoxConfig -Credential $localCred
