@@ -323,12 +323,13 @@ catch {
 
 Write-Host "Configuring firewall specific to ft1"
 Write-Host "Add firewall rule for ft1 MQTT Broker"
-New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow | Out-Null
+New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
     # Get the service ip address start to determine the connect address
     $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+    Write-Host "Connection address: $connectAddress"
     $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
     if ( $null -eq $portProxyRulExists ) {
         Write-Host "Configure port proxy for ft1"
@@ -415,7 +416,7 @@ do {
     $null -eq $mqttIp
 )
 
-#netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
 
