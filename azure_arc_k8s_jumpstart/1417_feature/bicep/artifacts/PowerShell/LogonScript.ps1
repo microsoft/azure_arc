@@ -6,12 +6,9 @@ Set-PSDebug -Strict
 #####################################################################
 $Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
-#$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
-#$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls = $Ft1Config.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
-$stepCliReleasesUrl = $websiteUrls["stepCliReleases"]
 $mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
 $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 $resourceGroup = $Env:resourceGroup
