@@ -374,6 +374,8 @@ module keyVault 'data/keyVault.bicep' = {
     tenantId: spnTenantId
     akvName: akvName
     location: location
+    spnObjectId: spnObjectId
+    spnClientId: spnClientId
   }
 }
 
