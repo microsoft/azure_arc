@@ -389,23 +389,6 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 #kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
 #kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
 
-<#
-##############################################################
-# Configure E4K extension
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
-az k8s-extension create --extension-type microsoft.iotoperations.mq `
-                        --version 0.1.0-preview-rc2 `
-                        --release-namespace default `
-                        --name "E4KExtension" `
-                        --cluster-name $arcClusterName `
-                        --resource-group $resourceGroup `
-                        --cluster-type connectedClusters `
-                        --release-train dev `
-                        --scope cluster `
-                        --auto-upgrade-minor-version false
-#>
-
 ##############################################################
 # Deploy the simulator
 ##############################################################
