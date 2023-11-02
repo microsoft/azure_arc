@@ -418,13 +418,13 @@ do {
 
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
 
 ########################################################################
 # ADX Dashboards
