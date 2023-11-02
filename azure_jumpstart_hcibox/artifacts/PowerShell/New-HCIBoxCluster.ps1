@@ -1205,11 +1205,11 @@ function New-AdminCenterVM {
             $HCIBoxConfig = $args[0]
             Import-Module NetAdapter
 
-            Write-Host "Enabling Remote Access on $VMName"
+            Write-Host "Enabling Remote Access on $using:VMName"
             Enable-WindowsOptionalFeature -FeatureName RasRoutingProtocols -All -LimitAccess -Online | Out-Null
             Enable-WindowsOptionalFeature -FeatureName RemoteAccessPowerShell -All -LimitAccess -Online | Out-Null
 
-            Write-Host "Rename Network Adapter in $VMName" 
+            Write-Host "Rename Network Adapter in $using:VMName" 
             Get-NetAdapter | Rename-NetAdapter -NewName Fabric
             Write-Host "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
@@ -1221,36 +1221,36 @@ function New-AdminCenterVM {
             $NetInterface.SetGateways($HCIBoxConfig.SDNLABRoute) | Out-Null
 
             # Enable CredSSP
-            Write-Host "Configuring WSMAN Trusted Hosts on $VMName"
-            Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
-            Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
-            Enable-PSRemoting -force
-            Enable-WSManCredSSP -Role Server -Force
-            Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
-            Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
-            Enable-WSManCredSSP -Role Client -DelegateComputer $HCIBoxConfig.SDNDomainFQDN -Force
-            Enable-WSManCredSSP -Role Client -DelegateComputer "*.$($HCIBoxConfig.SDNDomainFQDN)" -Force
-            New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation -Name AllowFreshCredentialsWhenNTLMOnly -Force
-            New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Name 1 -Value * -PropertyType String -Force
+            Write-Host "Configuring WSMAN Trusted Hosts on $using:VMName"
+            Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force | Out-Null
+            Enable-WSManCredSSP -Role Client -DelegateComputer * -Force | Out-Null
+            Enable-PSRemoting -force | Out-Null
+            Enable-WSManCredSSP -Role Server -Force | Out-Null
+            Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force | Out-Null
+            Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force | Out-Null
+            Enable-WSManCredSSP -Role Client -DelegateComputer $HCIBoxConfig.SDNDomainFQDN -Force | Out-Null
+            Enable-WSManCredSSP -Role Client -DelegateComputer "*.$($HCIBoxConfig.SDNDomainFQDN)" -Force | Out-Null
+            New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation -Name AllowFreshCredentialsWhenNTLMOnly -Force | Out-Null
+            New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Name 1 -Value * -PropertyType String -Force | Out-Null
 
             $WACIP = $HCIBoxConfig.WACIP.Split("/")[0]
 
             # Install RSAT-NetworkController
             $isAvailable = Get-WindowsFeature | Where-Object { $_.Name -eq 'RSAT-NetworkController' }
             if ($isAvailable) {
-                Write-Host "Installing RSAT-NetworkController on $VMName"
+                Write-Host "Installing RSAT-NetworkController on $using:VMName"
                 Import-Module ServerManager
                 Install-WindowsFeature -Name RSAT-NetworkController -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             }
             
             # Install Windows features
-            Write-Host "Installing Hyper-V RSAT Tools on $VMName"
+            Write-Host "Installing Hyper-V RSAT Tools on $using:VMName"
             Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-            Write-Host "Installing Active Directory RSAT Tools on $VMName"
+            Write-Host "Installing Active Directory RSAT Tools on $using:VMName"
             Install-WindowsFeature -Name  RSAT-ADDS -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-            Write-Host "Installing Failover Clustering RSAT Tools on $VMName"
+            Write-Host "Installing Failover Clustering RSAT Tools on $using:VMName"
             Install-WindowsFeature -Name  RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-            Write-Host "Installing DNS Server RSAT Tools on $VMName"
+            Write-Host "Installing DNS Server RSAT Tools on $using:VMName"
             Install-WindowsFeature -Name RSAT-DNS-Server -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
             Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
@@ -1301,7 +1301,7 @@ CertificateTemplate= WebServer
             Set-Content -Value $RequestInf -Path C:\WACCert\WACCert.inf -Force | Out-Null
 
             Register-PSSessionConfiguration -Name 'Microsoft.SDNNested' -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000
-            Write-Host "Requesting and installing SSL Certificate on $VMName" 
+            Write-Host "Requesting and installing SSL Certificate on $using:VMName" 
             Invoke-Command -ComputerName $VMName -ConfigurationName 'Microsoft.SDNNested' -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
                 $HCIBoxConfig = $args[0]
                 # Get the CA Name
