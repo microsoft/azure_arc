@@ -11,10 +11,16 @@ param akvSku string = 'standard'
 param tenantId string = subscription().tenantId
 
 @description('Secret name')
-param ft1PlaceHolder string = 'azure-iot-operations'
+param ft1PlaceHolder string = 'PlaceholderSecret'
 
 @description('Secret value')
 param ft1PlaceHolderValue string = 'ft1SecretValue'
+
+@description('Unique SPN app ID')
+param spnClientId string
+
+@description('Unique SPN object ID')
+param spnObjectId string
 
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvName
@@ -24,7 +30,19 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
-    accessPolicies: []
+    accessPolicies: [
+      {
+        objectId: spnObjectId
+        tenantId: tenantId
+        applicationId: spnClientId
+        permissions: {
+          secrets: [
+            'get'
+            'list'
+          ]
+        }
+      }
+    ]
     enableSoftDelete: false
     tenantId: tenantId
   }
