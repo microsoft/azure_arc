@@ -16,12 +16,6 @@ param ft1PlaceHolder string = 'azure-iot-operations'
 @description('Secret value')
 param ft1PlaceHolderValue string = 'ft1SecretValue'
 
-@description('Unique SPN app ID')
-param spnClientId string
-
-@description('Unique SPN object ID')
-param spnObjectId string
-
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvName
   location: location
@@ -30,20 +24,7 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
-    accessPolicies: [
-      {
-        objectId: spnObjectId
-        permissions: {
-          secrets:[
-            'get'
-            'list'
-            'set'
-          ]
-        }
-        tenantId: tenantId
-        applicationId: spnClientId
-      }
-    ]
+    accessPolicies: []
     enableSoftDelete: false
     tenantId: tenantId
   }
