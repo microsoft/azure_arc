@@ -377,6 +377,10 @@ Write-Host "`n"
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
+$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 ## Adding MQTT load balancer
 #kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
 #kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
@@ -419,9 +423,6 @@ $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGrou
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
 kubectl apply -f $eventGrideBrideYaml
-
-Start-Sleep -Seconds 30
-
 
 ########################################################################
 # ADX Dashboards
@@ -524,7 +525,7 @@ Start-Process -FilePath $output -ArgumentList "/S" -Wait
 Write-Host "Installing pip packages"
 foreach ($package in $Ft1Config.PipPackagesList) {
     Write-Host "Installing $package"
-    & pip install $package --quiet 2>$null
+    & pip install -q $package
 }
 
 #############################################################
