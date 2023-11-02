@@ -1156,24 +1156,24 @@ function New-AdminCenterVM {
 
         # Create Host OS Disk
         Write-Host "Creating $VMName differencing disks"
-        New-VHD -ParentPath $BaseVHDPath -Path (($VHDPath) + ($VMName) + (".vhdx")) -Differencing | Out-Null
+        New-VHD -ParentPath $BaseVHDPath -Path (($VHDPath) + ($VMName) + '\' + $VMName + (".vhdx")) -Differencing | Out-Null
 
         # Mount VHDX
         Import-Module DISM
         Write-Host "Mounting $VMName VHD"
         New-Item -Path "C:\TempWACMount" -ItemType Directory | Out-Null
-        Mount-WindowsImage -Path "C:\TempWACMount" -Index 1 -ImagePath (($VHDPath) + ($VMName) + (".vhdx")) | Out-Null
+        Mount-WindowsImage -Path "C:\TempWACMount" -Index 1 -ImagePath (($VHDPath) + ($VMName) + '\' + $VMName + (".vhdx")) | Out-Null
 
         # Copy Source Files
         Write-Host "Copying Application and Script Source Files to $VMName"
-        Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
+        # Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
         New-Item -Path C:\TempWACMount\VHDs -ItemType Directory -Force | Out-Null
         Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force # I dont think this is needed
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force # I dont think this is needed
 
         # Create VM
         Write-Host "Provisioning the VM $VMName"
-        New-VM -Name $VMName -VHDPath (($VHDPath) + ($VMName) + (".vhdx")) -Path $VHDPath -Generation 2 | Out-Null
+        New-VM -Name $VMName -VHDPath (($VHDPath) + ($VMName) + '\' + $VMName + (".vhdx")) -Path $VHDPath -Generation 2 | Out-Null
         Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $true -StartupBytes $HCIBoxConfig.MEM_WAC -MaximumBytes $HCIBoxConfig.MEM_WAC -MinimumBytes 500MB | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
         Write-Host "Configuring $VMName networking"
