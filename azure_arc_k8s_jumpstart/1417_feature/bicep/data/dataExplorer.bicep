@@ -25,7 +25,7 @@ param ft1EventHubConnectionName string = 'magnemotion-eh-messages'
 param ft1EventHubConnectionNamePl string = 'magnemotion-eh-messagespl'
 
 @description('The name of the Azure Data Explorer Event Hub table')
-param tableName string = 'magnemotion_data'
+param tableName string = 'magnemotion'
 
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableNamePl string = 'productionline'
