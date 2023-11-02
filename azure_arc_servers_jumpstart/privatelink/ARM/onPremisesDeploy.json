@@ -279,7 +279,7 @@
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
                         "offer": "WindowsServer",
-                        "sku": "2019-datacenter-gensecond",
+                        "sku": "2022-Datacenter",
                         "version": "latest"
                     },
                     "osDisk": {
