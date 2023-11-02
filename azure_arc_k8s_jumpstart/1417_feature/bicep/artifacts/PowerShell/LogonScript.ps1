@@ -377,6 +377,10 @@ Write-Host "`n"
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
+$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 ## Adding MQTT load balancer
 #kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
 #kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
@@ -403,7 +407,14 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-$mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+do {
+    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 30
+} while (
+    $null -eq $mqttIp
+)
+
 #netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
@@ -413,9 +424,6 @@ $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGrou
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
 kubectl apply -f $eventGrideBrideYaml
-
-Start-Sleep -Seconds 30
-
 
 ########################################################################
 # ADX Dashboards
@@ -518,7 +526,7 @@ Start-Process -FilePath $output -ArgumentList "/S" -Wait
 Write-Host "Installing pip packages"
 foreach ($package in $Ft1Config.PipPackagesList) {
     Write-Host "Installing $package"
-    & pip install $package --quiet 2>$null
+    & pip install -q $package
 }
 
 #############################################################

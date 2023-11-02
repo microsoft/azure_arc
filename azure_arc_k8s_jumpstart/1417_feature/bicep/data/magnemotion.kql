@@ -1,5 +1,4 @@
-.create table stagging (['id']: guid, source: string, ['type']: string, data_base64: string, ['time']: datetime, specversion: real, subject: string)
-
+// Create table to store data from base64 to json format
 .create table magnemotion (Timestamp: datetime,
 Heater_Outlet_Temp: real,
 Pump1_Flow_Totalizer: real,
@@ -54,6 +53,7 @@ VacuumAlert: boolean,
 VacuumPressure: real
 )
 
+// Create function to decode base64 to json format
 .create-or-alter function Expand_magnemotion_Data() {
         stagging
         | where subject == "topic/magnemotion"
@@ -112,5 +112,6 @@ VacuumPressure: real
         VacuumAlert = toboolean(data.data.VacuumAlert),
         VacuumPressure = toreal(data.data.VacuumPressure)
     }
-
+ 
+ // Create policy to run function every 1 minute
 .alter table magnemotion policy update @'[{"Source": "stagging", "Query": "Expand_magnemotion_Data()", "IsEnabled": "True"}]'
