@@ -135,7 +135,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
 resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
   name: ft1EventHubConnectionNamePl
   dependsOn: [
-    magnemotionScript
+    productionLineScript
   ]
   kind: 'EventHub'
   parent: ft1MagnemotionDB
