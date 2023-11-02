@@ -385,6 +385,7 @@ $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
+Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
 #kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
 #kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
