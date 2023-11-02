@@ -473,23 +473,6 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 ##############################################################
-# Install Step Cli
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Step Cli" -ForegroundColor Gray
-$latestReleaseTag = (Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].tag_name
-$versionToDownload = $latestReleaseTag.Split("v")[1]
-$stepCliReleaseDownloadUrl = ((Invoke-WebRequest $stepCliReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "step_windows_${versionToDownload}_amd64.zip" }).browser_download_url
-$output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
-Invoke-WebRequest $stepCliReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath $Ft1ToolsDir -Force
-$stepCliPath = "$Ft1ToolsDir\step_$versionToDownload\bin\"
-$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
-$newPathVariable = $currentPathVariable + ";" + $stepCliPath
-[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
-Remove-Item -Path $output -Force
-
-
-##############################################################
 # Install MQTTUI
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gray
