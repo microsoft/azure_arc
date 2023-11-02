@@ -70,7 +70,7 @@ function New-InternalSwitch {
         $InternalAdapter | Set-DnsClientServerAddress -ServerAddresses $DNS | Out-Null
     }
     else { 
-        Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
+        Write-Host "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
     } 
 }
 
@@ -504,7 +504,7 @@ function Set-HCINodeVHDX {
     Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
 
     # Dismount VHDX
-    Write-Verbose "Dismounting VHDX File at path $path"
+    Write-Host "Dismounting VHDX File at path $path"
     Dismount-VHD $path  
 }
 
@@ -637,7 +637,7 @@ function Set-NICs {
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
                 $fqdn = $Using:HCIBoxConfig.SDNDomainFQDN
 
-                Write-Verbose "Enabling CredSSP on $env:COMPUTERNAME"
+                Write-Host "Enabling CredSSP on $env:COMPUTERNAME"
                 Enable-WSManCredSSP -Role Server -Force
                 Enable-WSManCredSSP -Role Client -DelegateComputer localhost -Force
                 Enable-WSManCredSSP -Role Client -DelegateComputer $env:COMPUTERNAME -Force
@@ -1520,18 +1520,18 @@ function Set-HostNAT {
 
     $switchExist = Get-NetAdapter | Where-Object { $_.Name -match $HCIBoxConfig.natHostVMSwitchName }
     if (!$switchExist) {
-        Write-Verbose "Creating NAT Switch: $($HCIBoxConfig.natHostVMSwitchName)"
+        Write-Host "Creating NAT Switch: $($HCIBoxConfig.natHostVMSwitchName)"
         # Create Internal VM Switch for NAT
         New-VMSwitch -Name $HCIBoxConfig.natHostVMSwitchName -SwitchType Internal | Out-Null
 
-        Write-Verbose "Applying IP Address to NAT Switch: $($HCIBoxConfig.natHostVMSwitchName)"
+        Write-Host "Applying IP Address to NAT Switch: $($HCIBoxConfig.natHostVMSwitchName)"
         # Apply IP Address to new Internal VM Switch
         $intIdx = (Get-NetAdapter | Where-Object { $_.Name -match $HCIBoxConfig.natHostVMSwitchName }).ifIndex
         $natIP = $HCIBoxConfig.natHostSubnet.Replace("0/24", "1")
         New-NetIPAddress -IPAddress $natIP -PrefixLength 24 -InterfaceIndex $intIdx | Out-Null
 
         # Create NetNAT
-        Write-Verbose "Creating new Net NAT"
+        Write-Host "Creating new Net NAT"
         New-NetNat -Name $HCIBoxConfig.natHostVMSwitchName  -InternalIPInterfaceAddressPrefix $HCIBoxConfig.natHostSubnet | Out-Null
     }
 }
@@ -1548,7 +1548,7 @@ $natSubnet = $HCIBoxConfig.natSubnet
 
 Import-Module Hyper-V
 
-$VerbosePreference = "Continue"
+$VerbosePreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"

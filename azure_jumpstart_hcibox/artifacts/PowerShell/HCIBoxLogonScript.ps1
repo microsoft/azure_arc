@@ -49,7 +49,9 @@ az provider register --namespace Microsoft.ResourceConnector --wait
 
 Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($HCIBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
 foreach ($extension in $HCIBoxConfig.VSCodeExtensions) {
+    $WarningPreference = "SilentlyContinue"
     code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.HCIBoxPaths["LogsDir"] + "\Tools.log")
+    $WarningPreference = "Continue"
 }
 
 #####################################################################
