@@ -1119,15 +1119,17 @@ function Join-HCINodesToDomain {
             }
 
             # Join hosts to domain
+            Write-Host "Joining $($node.Hostname) to domain"
             while ($DomainJoined -ne $HCIBoxConfig.SDNDomainFQDN) {
-                $job = Invoke-Command -ComputerName $node.IP -Credential $localCred -ArgumentList ($domainCred, $HCIBoxConfig.SDNDomainFQDN) -ScriptBlock {
+                $job = Invoke-Command -ComputerName $node.Hostname -Credential $localCred -ArgumentList ($domainCred, $HCIBoxConfig.SDNDomainFQDN) -ScriptBlock {
                     Add-Computer -DomainName $args[1] -Credential $args[0] 
                 } -AsJob
 
                 while ($job.JobStateInfo.State -ne "Completed") { Start-Sleep -Seconds 5 }
-                $DomainJoined = (Get-WmiObject -ComputerName $IP -Class win32_computersystem).domain
+                $DomainJoined = (Get-WmiObject -ComputerName $node.Hostname -Credential $localCred -Class win32_computersystem).domain
             }
-            Restart-Computer -ComputerName $IP -Credential $localCred -Force
+            Write-Host "Restarting $($node.Hostname)"
+            Restart-Computer -ComputerName $node.Hostname -Credential $localCred -Force
         }
     }
     catch {
