@@ -378,7 +378,7 @@ $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query 
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 
 ## Adding MQTT load balancer
-kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
+#kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
 #kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
 
 <#
@@ -421,6 +421,7 @@ Start-Sleep -Seconds 30
 # ADX Dashboards
 ########################################################################
 
+<#
 Write-Host "Importing Azure Data Explorer dashboards..."
 
 # Get the ADX/Kusto cluster info
@@ -445,6 +446,7 @@ $httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $dashboa
 if ($httpResponse.StatusCode -ne 200) {
     Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer" -ForegroundColor Red
 }
+#>
 
 ##############################################################
 # Arc-enabling the Windows server host
