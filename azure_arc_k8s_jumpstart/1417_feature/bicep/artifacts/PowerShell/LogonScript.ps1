@@ -6,12 +6,9 @@ Set-PSDebug -Strict
 #####################################################################
 $Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
-#$Ft1IconsDir                = $Ft1Config.Ft1Directories["Ft1IconDir"]
-#$Ft1AppsRepo                = $Ft1Config.Ft1Directorfies["Ft1AppsRepo"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $websiteUrls = $Ft1Config.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
-$stepCliReleasesUrl = $websiteUrls["stepCliReleases"]
 $mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
 $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 $resourceGroup = $Env:resourceGroup
@@ -221,7 +218,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell" -Foregro
 $azurePassword = ConvertTo-SecureString $spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal
-$subscriptionId = (Get-AzSubscription).Id
+Set-AzContext -Subscription $subscriptionId
 
 # Install PowerShell modules
 if ($Ft1Config.PowerShellModules.Count -ne 0) {
@@ -250,7 +247,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
@@ -323,7 +320,7 @@ catch {
 
 Write-Host "Configuring firewall specific to ft1"
 Write-Host "Add firewall rule for ft1 MQTT Broker"
-New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow | Out-Null
+New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
@@ -365,7 +362,9 @@ catch {
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
 Write-Host "`n"
-az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+#az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecli.blob.core.windows.net/drop/azure_iot_ops-0.0.5a4-py3-none-any.whl').GetResponse().ResponseUri.AbsoluteUri) -y
+
 
 
 ##############################################################
@@ -374,33 +373,20 @@ az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/a
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -ForegroundColor Gray
 Write-Host "`n"
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations; Start-Sleep -Seconds 5; Clear-Host } }
+
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
-
+##### Add health check to continue
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
+Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
-#kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
-#kubectl patch svc aio-mq-dmqtt-frontend -p '{"spec": {"type": "LoadBalancer"}}'
-
-<#
-##############################################################
-# Configure E4K extension
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing the E4K extension" -ForegroundColor Gray
-az k8s-extension create --extension-type microsoft.iotoperations.mq `
-                        --version 0.1.0-preview-rc2 `
-                        --release-namespace default `
-                        --name "E4KExtension" `
-                        --cluster-name $arcClusterName `
-                        --resource-group $resourceGroup `
-                        --cluster-type connectedClusters `
-                        --release-train dev `
-                        --scope cluster `
-                        --auto-upgrade-minor-version false
-#>
+kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 
 ##############################################################
 # Deploy the simulator
@@ -408,22 +394,22 @@ az k8s-extension create --extension-type microsoft.iotoperations.mq `
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service "mq-1883-listener" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
     $null -eq $mqttIp
 )
 
-#netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
 
 ########################################################################
 # ADX Dashboards
