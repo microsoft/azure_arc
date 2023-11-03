@@ -1,17 +1,6 @@
 ﻿# Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
 $Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
-$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
-$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
-$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
-$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
-$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-$Env:agentScript = "C:\HCIBox\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:VMPath = "C:\VMs"
 
 Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
 $starttime = Get-Date
@@ -458,7 +447,7 @@ function Set-MGMTVHDX {
     Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
     Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
     New-Item -Path ($MountedDrive + ":\") -Name "Windows Admin Center" -ItemType Directory -Force | Out-Null
-    Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\Windows Admin Center") -Recurse -Force  
+    Copy-Item -Path "$($HCIBoxConfig.HCIBoxPaths["WACDir"])\*.msi" -Destination ($MountedDrive + ":\Windows Admin Center") -Recurse -Force  
 
     # Dismount VHDX
     Write-Host "Dismounting VHDX File at path $path"
