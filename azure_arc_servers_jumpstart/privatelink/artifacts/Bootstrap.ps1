@@ -25,18 +25,36 @@ New-Item -Path "C:\" -Name "Temp" -ItemType "directory" -Force
 Start-Transcript -Path C:\Temp\LogonScript.log
 
 #Install pre-requisites
+workflow ClientTools_01
+        {
+            $chocolateyAppList = 'azure-cli,az.powershell'
+            InlineScript {
+                param (
+                    [string]$chocolateyAppList
+                )
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
+                {
+                    try{
+                        choco config get cacheLocation
+                    }catch{
+                        Write-Output "Chocolatey not detected, trying to install now"
+                        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+                    }
+                }
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){
+                    Write-Host "Chocolatey Apps Specified"
 
-Write-Output "Installing Azure PowerShell Module"
+                    $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Az -Force
-
-Write-Output "Installing Azure CLI"
-
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-Remove-Item .\AzureCLI.msi
+                    foreach ($app in $appsToInstall)
+                    {
+                        Write-Host "Installing $app"
+                        & choco install $app /y -Force| Write-Output
+                    }
+                }
+            }
+        }
+ClientTools_01 | Format-Table
 
 #Download and run Arc onboarding script
 Invoke-WebRequest ("https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1") -OutFile C:\Temp\installArcAgent.ps1
