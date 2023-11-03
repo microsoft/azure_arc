@@ -62,9 +62,7 @@ foreach ($path in $HCIBoxConfig.HCIBoxPaths.GetEnumerator()) {
 }
 
 # Begin transcript
-Start-Transcript -Path $HCIBoxConfig.HCIBoxPaths["LogsDir"]\Bootstrap.log
-
-#$ErrorActionPreference = 'SilentlyContinue'
+Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths["LogsDir"])\Bootstrap.log"
 
 #################################################################################
 ## Setup host infrastructure and apps
