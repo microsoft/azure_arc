@@ -98,7 +98,7 @@ Remove-Item .\AzureCLI.msi
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $HCIPath\wallpaper.png
-Invoke-WebRequest https://aka.ms/wacdownload -OutFile $HCIBoxConfig.HCIBoxPaths["WACDir"]\WindowsAdminCenter.msi
+Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($HCIBoxConfig.HCIBoxPaths["WACDir"])\WindowsAdminCenter.msi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Register-AzSHCI.ps1") -OutFile $HCIPath\Register-AzSHCI.ps1
