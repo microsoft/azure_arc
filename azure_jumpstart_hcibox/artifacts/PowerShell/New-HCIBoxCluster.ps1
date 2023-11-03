@@ -1255,7 +1255,7 @@ function New-AdminCenterVM {
             Write-Host "Installing DNS Server RSAT Tools on $VMName"
             Install-WindowsFeature -Name RSAT-DNS-Server -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
-            Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
+            # Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
 
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
@@ -1407,35 +1407,35 @@ CertificateTemplate= WebServer
 function New-HyperConvergedEnvironment {
     Param (
         $HCIBoxConfig,
-        [PSCredential]$localCred,
         [PSCredential]$domainCred
     )
     Invoke-Command -ComputerName $HCIBoxConfig.WACVMName -Credential $domainCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $domainCred = $using:domainCred
+        $localCred = $using:localCred
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
             Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $HCIBoxConfig -Credential $domainCred -ScriptBlock {
                 # Check if switch exists already
                 $switchCheck = Get-VMSwitch | Where-Object { $_.Name -eq $HCIBoxConfig.ClusterVSwitchName } 
                 if ($switchCheck) { 
-                    Write-Warning "Switch already exists on $env:COMPUTERNAME. Skipping this host." 
+                    Write-Host "Switch already exists on $env:COMPUTERNAME. Skipping this host." 
                 }
                 else {
                     Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName)"
                     $switchTeamMembers = @("FABRIC", "FABRIC2")
                     New-VMSwitch -Name $HCIBoxConfig.ClusterVSwitchName -AllowManagementOS $true -NetAdapterName $switchTeamMembers -EnableEmbeddedTeaming $true -MinimumBandwidthMode "Weight"
                     
-                    Write-Host "Setting IP Configuration on $switchName"
+                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName)"
                     $switchNIC = Get-Netadapter | Where-Object { $_.Name -match $HCIBoxConfig.ClusterVSwitchName }
                     New-NetIPAddress -InterfaceIndex $switchNIC.InterfaceIndex -IpAddress $AzSHOST.IP -PrefixLength 24 -AddressFamily 'IpV4' -DefaultGateway $HCIBoxConfig.BGPRouterIP_MGMT -ErrorAction 'SilentlyContinue'
 
-                    Write-Host "Setting DNS configuration on $switchName"
+                    Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName)"
                     Set-DnsClientServerAddress -InterfaceIndex $switchNIC.InterfaceIndex -ServerAddresses $HCIBoxConfig.SDNLABDNS
 
                     Write-Host "Setting VLAN ($sdnswitchVLAN) on host vNIC"
-                    Set-VMNetworkAdapterIsolation -IsolationMode 'Vlan' -DefaultIsolationID $HCIBoxConfig.mgmtVLAN -AllowUntaggedTraffic $true -VMNetworkAdapterName $switchName -ManagementOS
+                    Set-VMNetworkAdapterIsolation -IsolationMode 'Vlan' -DefaultIsolationID $HCIBoxConfig.mgmtVLAN -AllowUntaggedTraffic $true -VMNetworkAdapterName $($HCIBoxConfig.ClusterVSwitchName) -ManagementOS
 
-                    Get-VMSwitchExtension -VMSwitchName $sdnswitchName | Disable-VMSwitchExtension | Out-Null
+                    Get-VMSwitchExtension -VMSwitchName $($HCIBoxConfig.ClusterVSwitchName) | Disable-VMSwitchExtension | Out-Null
 
                     Write-Host "Configuring MTU on all adapters on $($AzSHOST.Hostname)"
                     Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
@@ -1446,9 +1446,9 @@ function New-HyperConvergedEnvironment {
         # Reboot all HCI nodes
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
             Write-Host "Rebooting HCIBox host $($AzSHOST.Hostname)"
-            Restart-Computer $AzSHOST.Hostname -Force -Confirm:$false -Credential $localCred -Protocol WSMan
+            Restart-Computer $AzSHOST.Hostname -Force -Confirm:$false -Credential $domainCred -Protocol WSMan
             Write-Host "Checking to see if $($AzSHOST.Hostname) is up and online"
-            while ((Invoke-Command -ComputerName $AzSHOST -Credential $localCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 10 }
+            while ((Invoke-Command -ComputerName $AzSHOST -Credential $domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 10 }
             Write-Host "$($AzSHOST.Hostname) is up and online"
         }
     }
@@ -1662,7 +1662,7 @@ Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainC
 New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
+New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
 #######################################################################################
 # Create the S2D cluster
