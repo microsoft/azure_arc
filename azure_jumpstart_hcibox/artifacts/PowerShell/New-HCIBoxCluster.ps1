@@ -1120,6 +1120,7 @@ function Join-HCINodesToDomain {
 
             # Join hosts to domain
             Write-Host "Joining $($node.Hostname) to domain"
+            $DomainJoined = ""
             while ($DomainJoined -ne $HCIBoxConfig.SDNDomainFQDN) {
                 $job = Invoke-Command -ComputerName $node.Hostname -Credential $localCred -ArgumentList ($domainCred, $HCIBoxConfig.SDNDomainFQDN) -ScriptBlock {
                     Add-Computer -DomainName $args[1] -Credential $args[0] 
