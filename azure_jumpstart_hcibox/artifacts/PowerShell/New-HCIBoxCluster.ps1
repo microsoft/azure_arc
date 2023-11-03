@@ -1459,7 +1459,7 @@ function New-S2DCluster {
         $HCIBoxConfig,
         [PSCredential]$domainCred
     )
-    Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[1].Hostname -Credential $domainCred -ScriptBlock {
+    Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $ClusterIP = ($HCIBoxConfig.MGMTSubnet.TrimEnd("0/24")) + "252"
         $nodes = @()
