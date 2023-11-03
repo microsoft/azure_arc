@@ -27,7 +27,6 @@
         vcLibs                  = 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx'
         windowsTerminal         = 'https://api.github.com/repos/microsoft/terminal/releases/latest'
         aksEEReleases           = 'https://api.github.com/repos/Azure/AKS-Edge/releases'
-        stepCliReleases         = 'https://api.github.com/repos/smallstep/cli/releases'
         mqttuiReleases          = 'https://api.github.com/repos/EdJoPaTo/mqttui/releases'
         mqttExplorerReleases    = 'https://api.github.com/repos/thomasnordquist/MQTT-Explorer/releases/latest'
     }

@@ -25,16 +25,16 @@ param ft1EventHubConnectionName string = 'magnemotion-eh-messages'
 param ft1EventHubConnectionNamePl string = 'magnemotion-eh-messagespl'
 
 @description('The name of the Azure Data Explorer Event Hub table')
-param tableName string = 'magnemotion_data'
+param tableName string = 'magnemotion'
 
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableNamePl string = 'productionline'
 
-@description('The name of the Azure Data Explorer Event Hub mapping rule')
-param mappingRuleName string = 'magnemotion_data_mapping'
+//@description('The name of the Azure Data Explorer Event Hub mapping rule')
+//param mappingRuleName string = 'magnemotion_data_mapping'
 
-@description('The name of the Azure Data Explorer Event Hub production Line mapping rule')
-param mappingRuleNamePl string = 'productionline_mapping'
+//@description('The name of the Azure Data Explorer Event Hub production Line mapping rule')
+//param mappingRuleNamePl string = 'productionline_mapping'
 
 
 @description('The name of the Azure Data Explorer Event Hub data format')
@@ -124,7 +124,6 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   properties: {
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupName
-    mappingRuleName: mappingRuleName
     tableName: tableName
     dataFormat: dataFormat
     eventSystemProperties: []
@@ -144,7 +143,6 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
   properties: {
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupNamePl
-    mappingRuleName: mappingRuleNamePl
     tableName: tableNamePl
     dataFormat: dataFormat
     eventSystemProperties: []

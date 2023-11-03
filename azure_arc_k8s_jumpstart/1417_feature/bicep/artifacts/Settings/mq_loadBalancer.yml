@@ -4,7 +4,10 @@ metadata:
   name: "mq-1883-listener"
   namespace: azure-iot-operations
 spec:
-    brokerRef: "broker"
-    authenticationEnabled: false
-    authorizationEnabled: false
-    port: 1883
+  brokerRef: "broker"
+  authenticationEnabled: false
+  authorizationEnabled: false
+  serviceName: "mq-1883-listener"
+  serviceType: loadBalancer
+  port: 1883
+
