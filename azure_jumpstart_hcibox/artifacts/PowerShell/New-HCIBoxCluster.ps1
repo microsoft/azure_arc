@@ -1143,9 +1143,10 @@ function New-AdminCenterVM {
         $localCred,
         $domainCred
     )
+    $VMName = $HCIBoxConfig.WACVMName
     $UnattendXML = GenerateAnswerFile -HostName $VMName -IsWACVM $true -IPAddress $HCIBoxConfig.WACIP -VMMac $HCIBoxConfig.WACMAC -HCIBoxConfig $HCIBoxConfig
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-        $VMName = "admincenter"
+        $VMName = $using:VMName
         $ParentDiskPath = "C:\VMs\Base\"
         $VHDPath = "D:\VMs\"
         $OSVHDX = "GUI.vhdx"
@@ -1268,7 +1269,7 @@ function New-AdminCenterVM {
 Signature="`$Windows NT$"
 
 [NewRequest] 
-Subject = "CN=AdminCenter.$($HCIBoxConfig.SDNDomainFQDN)"
+Subject = "CN=$($HCIBoxConfig.WACVMName).$($HCIBoxConfig.SDNDomainFQDN)"
 Exportable = True
 KeyLength = 2048                    
 KeySpec = 1                     
@@ -1286,7 +1287,7 @@ szOID_ENHANCED_KEY_USAGE = "2.5.29.37"
 szOID_PKIX_KP_SERVER_AUTH = "1.3.6.1.5.5.7.3.1" 
 szOID_PKIX_KP_CLIENT_AUTH = "1.3.6.1.5.5.7.3.2"
 [Extensions] 
-%szOID_SUBJECT_ALT_NAME2% = "{text}dns=admincenter.$($HCIBoxConfig.SDNDomainFQDN)" 
+%szOID_SUBJECT_ALT_NAME2% = "{text}dns=$($HCIBoxConfig.WACVMName).$($HCIBoxConfig.SDNDomainFQDN)" 
 %szOID_ENHANCED_KEY_USAGE% = "{text}%szOID_PKIX_KP_SERVER_AUTH%,%szOID_PKIX_KP_CLIENT_AUTH%"
 [RequestAttributes] 
 CertificateTemplate= WebServer
@@ -1324,7 +1325,7 @@ CertificateTemplate= WebServer
             $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "HCIBox Windows Admin Cert" }).Thumbprint
             Write-Host "Thumbprint: $pfxThumbPrint"
             Write-Host "WACPort: $($HCIBoxConfig.WACport)"
-            $WindowsAdminCenterGateway = "https://admincenter." + $HCIBOXConfig.SDNDomainFQDN
+            $WindowsAdminCenterGateway = "https://$($HCIBoxConfig.WACVMName)." + $HCIBOXConfig.SDNDomainFQDN
             Write-Host $WindowsAdminCenterGateway
             Write-Host "Installing and Configuring Windows Admin Center"
             $PathResolve = Resolve-Path -Path 'C:\Windows Admin Center\*.msi'
@@ -1372,8 +1373,8 @@ CertificateTemplate= WebServer
 
             # Create a shortcut for Windows Admin Center
             Write-Host "Creating Shortcut for Windows Admin Center"
-            if ($HCIBoxConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $HCIBoxConfig.SDNDomainFQDN + ":" + $HCIBoxConfig.WACport }
-            else { $TargetPath = "https://admincenter." + $HCIBoxConfig.SDNDomainFQDN }
+            if ($HCIBoxConfig.WACport -ne "443") { $TargetPath = "https://$($HCIBoxConfig.WACVMName)." + $HCIBoxConfig.SDNDomainFQDN + ":" + $HCIBoxConfig.WACport }
+            else { $TargetPath = "https://$($HCIBoxConfig.WACVMName)." + $HCIBoxConfig.SDNDomainFQDN }
             $ShortcutFile = "C:\Users\Public\Desktop\Windows Admin Center.url"
             $WScriptShell = New-Object -ComObject WScript.Shell
             $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -1410,7 +1411,7 @@ function New-HyperConvergedEnvironment {
         [PSCredential]$localCred,
         [PSCredential]$domainCred
     )
-    Invoke-Command -ComputerName AdminCenter -Credential $domainCred -ScriptBlock {
+    Invoke-Command -ComputerName $HCIBoxConfig.WACVMName -Credential $domainCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $domainCred = $using:domainCred
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
@@ -1674,7 +1675,7 @@ Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction Silently
 $wshshell = New-Object -ComObject WScript.Shell
 $lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")
 $lnk.TargetPath = "%windir%\system32\mstsc.exe"
-$lnk.Arguments = "/v:AdminCenter"
+$lnk.Arguments = "/v:$($HCIBoxConfig.WACVMName)"
 $lnk.Description = "AdminCenter link for HCIBox."
 $lnk.Save()
 
