@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mqtt-listener
-        image: contosobaacr.azurecr.io/mqtt-listener:latest
+        image: jumpstartprod.azurecr.io/mqtt-listener:latest
         env:
           - name: MQTT_BROKER
             value: "MQTTIpPlaceholder"

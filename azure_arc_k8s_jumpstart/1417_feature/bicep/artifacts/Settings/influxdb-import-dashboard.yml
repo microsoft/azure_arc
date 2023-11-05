@@ -3,7 +3,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: influxdb-import-dashboard
-  namespace: default
 spec:
   template:
     spec:
