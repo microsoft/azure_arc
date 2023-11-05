@@ -1,12 +1,65 @@
 apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: Broker
+metadata:
+  name: "my-broker"
+spec:
+  authImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-authentication
+    tag: 0.1.0-preview-rc3
+  brokerImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-pod
+    tag: 0.1.0-preview-rc3
+  healthManagerImage:
+    pullPolicy: Always
+    repository: e4kpreview.azurecr.io/dmqtt-operator
+    tag: 0.1.0-preview-rc3
+  mode: auto
+  encryptInternalTraffic: false
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
-  name: "mq-1883-listener"
+  name: "az-mqtt-non-tls-listener"
 spec:
-  brokerRef: "broker"
+  brokerRef: "my-broker"
+  serviceType: loadBalancer
   authenticationEnabled: false
   authorizationEnabled: false
-  serviceName: "mq-1883-listener"
-  serviceType: loadBalancer
   port: 1883
-
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeTopicMap
+metadata:
+  name: "my-topic-map"
+spec:
+  # Name of the MqttBridgeConnector resource to link to. Required.
+  mqttBridgeConnectorRef: "my-mqtt-bridge"
+  # A list of routes for bridging. Required.
+  routes:
+    - direction: local-to-remote
+      name: "route-to-eventgrid"
+      qos: 1
+      source: "topic/#"
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeConnector
+metadata:
+  name: "my-mqtt-bridge"
+spec:
+  image:
+    repository: e4kpreview.azurecr.io/mqttbridge
+    tag: 0.1.0-preview-rc3
+    pullPolicy: IfNotPresent
+  protocol: v5
+  bridgeInstances: 1
+  clientIdPrefix: "factory-gateway-"
+  logLevel: "debug"
+  remoteBrokerConnection:
+    endpoint: "eventGridPlaceholder:8883"
+    tls:
+      tlsEnabled: true
+    authentication:
+      systemAssignedManagedIdentity:
+        audience: https://eventgrid.azure.net
