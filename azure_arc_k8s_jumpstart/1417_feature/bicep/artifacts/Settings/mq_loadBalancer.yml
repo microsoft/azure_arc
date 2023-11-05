@@ -2,7 +2,6 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
   name: "mq-1883-listener"
-  namespace: azure-iot-operations
 spec:
   brokerRef: "broker"
   authenticationEnabled: false
