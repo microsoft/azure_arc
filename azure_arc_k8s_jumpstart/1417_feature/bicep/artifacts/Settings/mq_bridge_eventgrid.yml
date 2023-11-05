@@ -2,7 +2,6 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: Broker
 metadata:
   name: "my-broker"
-  namespace: azure-iot-operations
 spec:
   authImage:
     pullPolicy: Always
@@ -23,7 +22,6 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
   name: "az-mqtt-non-tls-listener"
-  namespace: azure-iot-operations
 spec:
   brokerRef: "my-broker"
   serviceType: loadBalancer
@@ -35,7 +33,7 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeTopicMap
 metadata:
   name: "my-topic-map"
-  namespace: azure-iot-operations # For example "azure-iot-operations"
+ # For example "azure-iot-operations"
 spec:
   # Name of the MqttBridgeConnector resource to link to. Required.
   mqttBridgeConnectorRef: "my-mqtt-bridge"
@@ -50,7 +48,7 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeConnector
 metadata:
   name: "my-mqtt-bridge"
-  namespace: azure-iot-operations # For example "azure-iot-operations"
+ # For example "azure-iot-operations"
 spec:
   image:
     repository: e4kpreview.azurecr.io/mqttbridge
