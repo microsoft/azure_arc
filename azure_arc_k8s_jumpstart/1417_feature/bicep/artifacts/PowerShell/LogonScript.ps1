@@ -247,7 +247,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
@@ -371,9 +371,6 @@ az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/a
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -ForegroundColor Gray
 Write-Host "`n"
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
@@ -384,7 +381,8 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
-kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml
+kubectl create namespace arc
+kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n arc
 
 ##############################################################
 # Deploy the simulator
@@ -400,20 +398,20 @@ $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
     $null -eq $mqttIp
 )#>
 
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress
+#netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $connectAddress | Set-Content $simulatorYaml
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $connectAddress | Set-Content $listenerYaml
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml
-kubectl apply -f $Ft1ToolsDir\influxdb.yml
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml
-kubectl apply -f $Ft1ToolsDir\mqtt-listener.yml
-kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n arc
+kubectl apply -f $Ft1ToolsDir\influxdb.yml -n arc
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n arc
+kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n arc
+kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n arc
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml
+kubectl apply -f $eventGrideBrideYaml -n arc
 
 ########################################################################
 # ADX Dashboards
