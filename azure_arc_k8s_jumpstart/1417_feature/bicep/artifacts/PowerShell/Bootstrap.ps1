@@ -130,7 +130,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_loadBalancer.yml") 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb.yml") -OutFile "$Ft1ToolsDir\influxdb.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml") -OutFile "$Ft1ToolsDir\influxdb-configmap.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$Ft1ToolsDir\influxdb-import-dashboard.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yaml") -OutFile "$Ft1ToolsDir\mqtt_listener.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$Ft1ToolsDir\mqtt_listener.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
 
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
