@@ -104,7 +104,7 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   }
 }
 
-resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-preview' = {
+/*resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-preview' = {
   name:eventGridClientName
   parent:eventGrid
   properties: {
@@ -114,7 +114,7 @@ resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-prev
       validationScheme: authValidationSchema
     }
   }
-}
+}*/
 
 resource eventGridTopicSpace 'Microsoft.EventGrid/namespaces/topicSpaces@2023-06-01-preview' = {
   name: eventGridTopicSpaceName
