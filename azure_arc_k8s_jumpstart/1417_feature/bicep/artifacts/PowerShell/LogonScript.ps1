@@ -247,7 +247,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
 Write-Host "`n"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 
 #Tag
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
@@ -362,10 +362,8 @@ catch {
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
 Write-Host "`n"
-#az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
-az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecli.blob.core.windows.net/drop/azure_iot_ops-0.0.5a4-py3-none-any.whl').GetResponse().ResponseUri.AbsoluteUri) -y
-
-
+az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+#az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecli.blob.core.windows.net/drop/azure_iot_ops-0.0.5a4-py3-none-any.whl').GetResponse().ResponseUri.AbsoluteUri) -y
 
 ##############################################################
 # Deploy FT1
@@ -373,9 +371,6 @@ az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecl
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -ForegroundColor Gray
 Write-Host "`n"
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations; Start-Sleep -Seconds 5; Clear-Host } }
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
@@ -386,6 +381,7 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
+#kubectl create namespace arc
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 
 ##############################################################
@@ -393,8 +389,9 @@ kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
+$listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
 do {
-    $mqttIp = kubectl get service "mq-1883-listener" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
@@ -403,7 +400,13 @@ do {
 
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+(Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
+
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
@@ -415,7 +418,7 @@ kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
 # ADX Dashboards
 ########################################################################
 
-<#
+
 Write-Host "Importing Azure Data Explorer dashboards..."
 
 # Get the ADX/Kusto cluster info
@@ -425,7 +428,7 @@ $adxEndPoint = $kustoCluster.Uri
 # Update the dashboards files with the new ADX cluster name and URI
 $templateBaseUrl = "https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep"
 $dashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-
+<#
 # Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
 
