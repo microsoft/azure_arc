@@ -128,6 +128,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.ym
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_loadBalancer.yml") -OutFile "$Ft1ToolsDir\mq_loadBalancer.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb.yml") -OutFile "$Ft1ToolsDir\influxdb.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb_setup.yml") -OutFile "$Ft1ToolsDir\influxdb_setup.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml") -OutFile "$Ft1ToolsDir\influxdb-configmap.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$Ft1ToolsDir\influxdb-import-dashboard.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$Ft1ToolsDir\mqtt_listener.yml"
