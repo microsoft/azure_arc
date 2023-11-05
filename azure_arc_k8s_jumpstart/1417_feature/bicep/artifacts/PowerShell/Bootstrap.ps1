@@ -128,6 +128,13 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.ym
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_loadBalancer.yml") -OutFile "$Ft1ToolsDir\mq_loadBalancer.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/influxdb.yml") -OutFile "$Ft1DataExplorer\influxdb.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/influxdb-configmap.yml") -OutFile "$Ft1DataExplorer\influxdb-configmap.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/influxdb-import-dashboard.yml") -OutFile "$Ft1DataExplorer\influxdb-import-dashboard.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/mqtt-listener.yaml") -OutFile "$Ft1DataExplorer\mqtt-listener.yaml"
+
+
+
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
