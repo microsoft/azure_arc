@@ -410,7 +410,7 @@ kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operati
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-$eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
+$eventGrideBrideYaml = "$Ft1ToolsDir\mq_loadBalancer.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
 kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
 
