@@ -381,8 +381,8 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
-kubectl create namespace arc
-kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n arc
+#kubectl create namespace arc
+kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 
 ##############################################################
 # Deploy the simulator
@@ -390,28 +390,29 @@ kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n arc
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
-<#do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+do {
+    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
     $null -eq $mqttIp
-)#>
+)
 
-#netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress
-(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $connectAddress | Set-Content $simulatorYaml
-(Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $connectAddress | Set-Content $listenerYaml
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n arc
-kubectl apply -f $Ft1ToolsDir\influxdb.yml -n arc
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n arc
-kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n arc
-kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n arc
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+(Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
+
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the E4K Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 $eventGrideBrideYaml = "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml -n arc
+kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
 
 ########################################################################
 # ADX Dashboards
