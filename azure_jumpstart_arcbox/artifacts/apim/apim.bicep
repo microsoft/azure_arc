@@ -41,14 +41,14 @@ resource apiManagementService 'Microsoft.ApiManagement/service@2023-03-01-previe
   }
 
 }
-resource apimWeatherApi 'Microsoft.ApiManagement/service/apis@2023-03-01-preview' = {
-  name: 'weatherapi'
+resource apimAdventureWorkApi 'Microsoft.ApiManagement/service/apis@2023-03-01-preview' = {
+  name: 'AdventureworkWeatherAPI'
   parent: apiManagementService
   properties: {
-    displayName: 'WeatherAPI'
+    displayName: 'AdventureworkWeatherAPI'
     apiRevision: '1'
     subscriptionRequired: true
-    path: 'weatherservice'
+    path: 'adventurework'
     protocols: [
       'http'
       'https'
@@ -66,10 +66,10 @@ resource apimWeatherApi 'Microsoft.ApiManagement/service/apis@2023-03-01-preview
 }
 resource weatherAPIService 'Microsoft.ApiManagement/service/apis/policies@2023-03-01-preview' = {
   name: 'policy'
-  parent: apimWeatherApi
+  parent: apimAdventureWorkApi
   
   properties: {
-    value: loadTextContent('weatherPolicy.xml')
+    value: loadTextContent('adventurework.xml')
   }
 }
 resource selfHostGateway 'Microsoft.ApiManagement/service/gateways@2023-03-01-preview' = {
@@ -82,7 +82,7 @@ resource selfHostGateway 'Microsoft.ApiManagement/service/gateways@2023-03-01-pr
   }
 }
 output apiManagementServiceName string = apiManagementService.name
-output gatewayKey string = selfHostGateway.listKeys().primary
+
 
 
 

@@ -1,0 +1,854 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Adventurework-WebAPI",
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/Customers": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Customers"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Customers/{id}": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "style": "simple",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            },
+                            "text/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Customers"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "style": "simple",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Customer"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Customers"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "style": "simple",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Address": {
+                "required": [
+                    "addressLine1",
+                    "city",
+                    "countryRegion",
+                    "postalCode",
+                    "stateProvince"
+                ],
+                "type": "object",
+                "properties": {
+                    "addressId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "addressLine1": {
+                        "maxLength": 60,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "addressLine2": {
+                        "maxLength": 60,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "city": {
+                        "maxLength": 30,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "stateProvince": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "countryRegion": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "maxLength": 15,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "customerAddress": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerAddress"
+                        },
+                        "nullable": true
+                    },
+                    "salesOrderHeaderBillToAddress": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SalesOrderHeader"
+                        },
+                        "nullable": true
+                    },
+                    "salesOrderHeaderShipToAddress": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SalesOrderHeader"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Customer": {
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "passwordHash",
+                    "passwordSalt"
+                ],
+                "type": "object",
+                "properties": {
+                    "customerId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nameStyle": {
+                        "type": "boolean"
+                    },
+                    "title": {
+                        "maxLength": 8,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "firstName": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "middleName": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lastName": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "suffix": {
+                        "maxLength": 10,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "companyName": {
+                        "maxLength": 128,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "salesPerson": {
+                        "maxLength": 256,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "emailAddress": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "maxLength": 25,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "passwordHash": {
+                        "maxLength": 128,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "passwordSalt": {
+                        "maxLength": 10,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "customerAddress": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CustomerAddress"
+                        },
+                        "nullable": true
+                    },
+                    "salesOrderHeader": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SalesOrderHeader"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CustomerAddress": {
+                "required": [
+                    "addressType"
+                ],
+                "type": "object",
+                "properties": {
+                    "customerId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "addressId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "addressType": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/Customer"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Product": {
+                "required": [
+                    "name",
+                    "productNumber"
+                ],
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "name": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "productNumber": {
+                        "maxLength": 25,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "color": {
+                        "maxLength": 15,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "standardCost": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "listPrice": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "size": {
+                        "maxLength": 5,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "productCategoryId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "productModelId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "sellStartDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "sellEndDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "discontinuedDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "thumbNailPhoto": {
+                        "type": "string",
+                        "format": "byte",
+                        "nullable": true
+                    },
+                    "thumbnailPhotoFileName": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "productCategory": {
+                        "$ref": "#/components/schemas/ProductCategory"
+                    },
+                    "productModel": {
+                        "$ref": "#/components/schemas/ProductModel"
+                    },
+                    "salesOrderDetail": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SalesOrderDetail"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ProductCategory": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "productCategoryId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "parentProductCategoryId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "name": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "inverseParentProductCategory": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductCategory"
+                        },
+                        "nullable": true
+                    },
+                    "parentProductCategory": {
+                        "$ref": "#/components/schemas/ProductCategory"
+                    },
+                    "product": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Product"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ProductDescription": {
+                "required": [
+                    "description"
+                ],
+                "type": "object",
+                "properties": {
+                    "productDescriptionId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "description": {
+                        "maxLength": 400,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "productModelProductDescription": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductModelProductDescription"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ProductModel": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "productModelId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "name": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "catalogDescription": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "product": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Product"
+                        },
+                        "nullable": true
+                    },
+                    "productModelProductDescription": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductModelProductDescription"
+                        },
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ProductModelProductDescription": {
+                "type": "object",
+                "properties": {
+                    "productModelId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "productDescriptionId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "culture": {
+                        "maxLength": 6,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "productDescription": {
+                        "$ref": "#/components/schemas/ProductDescription"
+                    },
+                    "productModel": {
+                        "$ref": "#/components/schemas/ProductModel"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "SalesOrderDetail": {
+                "type": "object",
+                "properties": {
+                    "salesOrderId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "salesOrderDetailId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "orderQty": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "productId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "unitPrice": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "unitPriceDiscount": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "lineTotal": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/Product"
+                    },
+                    "salesOrder": {
+                        "$ref": "#/components/schemas/SalesOrderHeader"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "SalesOrderHeader": {
+                "required": [
+                    "onlineOrderFlag",
+                    "salesOrderNumber",
+                    "shipMethod"
+                ],
+                "type": "object",
+                "properties": {
+                    "salesOrderId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "revisionNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "orderDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "shipDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "onlineOrderFlag": {
+                        "type": "boolean"
+                    },
+                    "salesOrderNumber": {
+                        "maxLength": 25,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "purchaseOrderNumber": {
+                        "maxLength": 25,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "accountNumber": {
+                        "maxLength": 15,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "customerId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "shipToAddressId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "billToAddressId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "shipMethod": {
+                        "maxLength": 50,
+                        "minLength": 0,
+                        "type": "string"
+                    },
+                    "creditCardApprovalCode": {
+                        "maxLength": 15,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "subTotal": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "taxAmt": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "freight": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "totalDue": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rowguid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "modifiedDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "billToAddress": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/Customer"
+                    },
+                    "salesOrderDetail": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SalesOrderDetail"
+                        },
+                        "nullable": true
+                    },
+                    "shipToAddress": {
+                        "$ref": "#/components/schemas/Address"
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    }
+}
