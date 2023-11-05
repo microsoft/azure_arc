@@ -379,6 +379,7 @@ $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid Data Sender" --resource-group $resourceGroup --only-show-errors
 Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
 #kubectl create namespace arc

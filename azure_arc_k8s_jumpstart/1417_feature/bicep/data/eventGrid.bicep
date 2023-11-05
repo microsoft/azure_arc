@@ -17,20 +17,6 @@ param eventGridCapacity int = 1
 @description('The name of the EventGrid client group')
 param eventGridClientGroupName string = '$all'
 
-@description('The name of the EventGrid client')
-param eventGridClientName string = 'client1'
-
-@description('The name of the EventGrid client authentication property')
-param eventGridAuthName string = 'client1-auth'
-
-@description('The EventGrid client authentication thumbprint')
-param eventGridAuthThumbprint array = [
-  '46c9ef363ec21993f8a45dbf2d14494e78e3550a8f33b673d5b3863a05ac4d5f'
-]
-
-@description('The EventGrid client authentication validation scheme')
-param authValidationSchema string = 'ThumbprintMatch'
-
 @description('The name of the EventGrid namespace')
 param eventGridTopicSpaceName string = 'ft1topicSpace${namingGuid}'
 
@@ -104,7 +90,7 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   }
 }
 
-resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-preview' = {
+/*resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-preview' = {
   name:eventGridClientName
   parent:eventGrid
   properties: {
@@ -114,7 +100,7 @@ resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-prev
       validationScheme: authValidationSchema
     }
   }
-}
+}*/
 
 resource eventGridTopicSpace 'Microsoft.EventGrid/namespaces/topicSpaces@2023-06-01-preview' = {
   name: eventGridTopicSpaceName
