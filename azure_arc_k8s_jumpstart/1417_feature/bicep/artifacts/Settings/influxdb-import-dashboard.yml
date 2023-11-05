@@ -21,7 +21,7 @@ spec:
             - --token 
             - secret-token 
             - --host 
-            - http://10.211.55.23:8086
+            - http://influxPlaceholder:8086
             - --force
             - "yes"
           volumeMounts:

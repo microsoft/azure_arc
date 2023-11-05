@@ -391,6 +391,9 @@ kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
+$influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
+$influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
+
 do {
     $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
@@ -399,9 +402,20 @@ do {
     $null -eq $mqttIp
 )
 
+do {
+    $influxIp = kubectl get service "influxdb" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 30
+} while (
+    $null -eq $influxIp
+)
+
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
+(Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
+(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations

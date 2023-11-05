@@ -20,12 +20,14 @@ spec:
         env:
           - name: MQTT_BROKER
             value: "MQTTIpPlaceholder"
+          - name: MQTT_Port
+            value: "1883"
           - name: MQTT_TOPIC1
             value: "topic/productionline"
           - name: MQTT_TOPIC2
             value: "topic/magnemotion"
           - name: INFLUX_URL
-            value: "http://10.211.55.23:8086"
+            value: "http://influxPlaceholder:8086"
           - name: INFLUX_TOKEN
             value: "secret-token"
           - name: INFLUX_ORG
