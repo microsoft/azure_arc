@@ -436,10 +436,11 @@ kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
