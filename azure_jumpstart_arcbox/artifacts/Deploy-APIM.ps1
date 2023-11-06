@@ -11,11 +11,6 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
-$ingressNamespace = "ingress-nginx"
-
-$certname = "ingress-cert"
-$certdns = "hcibox.devops.com"
-
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
 if ($host.Name -match 'ISE') {throw "Running this script in PowerShell ISE is not supported"}
@@ -32,8 +27,81 @@ Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 az config set extension.use_dynamic_install=yes_without_prompt
 $apimDeploymentOutput =  $(az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\apim\apim.bicep" --parameters "$Env:ArcBoxDir\apim\apim.bicepparam") | ConvertFrom-Json
-$gatewayKey = $apimDeploymentOutput.properties.outputs.gatewayKey.value
 $apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
+
+
+# Retrieving SQL MI connection endpoints
+$primaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
+$primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) + ",11433" 
+$sqlConnectionString = "Data Source=$($primaryEndpoint);Initial Catalog=AdventureWorks2019;Persist Security Info=True;TrustServerCertificate=true;User ID=$($Env:AZDATA_USERNAME);Password=$($Env:AZDATA_PASSWORD)"
+$base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString)
+
+
+# Build the adventurework api manifest
+$secretManifest = @"
+apiVersion: v1
+kind: Secret
+metadata:
+  name: adventurework-secrets
+type: Opaque
+data:
+  AdventureWorkConnection: $($base64ConnectionString)
+"@
+$secretManifest | kubectl apply -f -
+
+
+#Deploy AdvanetureWork API
+$adventureWorkManifest = @"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adventurework-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adventurework
+  template:
+    metadata:
+      labels:
+        app: adventurework
+    spec:
+      containers:
+      - name: adventurework
+        image: duongthaiha/adventureworkwebapi
+        env:
+        - name: AdventureWorkConnection
+          valueFrom:
+            secretKeyRef:
+              name: adventurework-secrets
+              key: AdventureWorkConnection
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adventurework-service
+spec:
+  selector:
+    app: adventurework
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+
+"@
+$adventureWorkManifest | kubectl apply -f -
+
+#Update the back end for weather api
+$advanceWorkServiceIp = (kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
+$adventureWorkBackEndPolicy = 
+(Get-Content -Path $adventureWorkBackEndPolicy) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
 
 #Get access token to the rest api
 $access_token = $(az account get-access-token -s $env:subscriptionId --query "accessToken")| ConvertFrom-Json
