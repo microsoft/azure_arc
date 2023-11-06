@@ -383,7 +383,9 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId
 az role assignment create --assignee $spnClientID --role "EventGrid Data Sender" --scope $eventGridTopicId
 
+##### Add health check to continue
 Start-Sleep -Seconds 60
+
 ## Adding MQTT load balancer
 #kubectl create namespace arc
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
@@ -393,10 +395,10 @@ kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-
+Start-Sleep -Seconds 60
 
 do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service "mq-1883-listener" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
@@ -410,8 +412,8 @@ $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
 $influxdb_setupYaml = "$Ft1ToolsDir\influxdb_setup.yml"
 $influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
 $influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
-Start-Sleep -Seconds 10
 kubectl apply -f $influxdb_setupYaml -n azure-iot-operations
+Start-Sleep -Seconds 60
 
 do {
     $influxIp = kubectl get service "influxdb" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
@@ -430,9 +432,17 @@ netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 conne
 
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)

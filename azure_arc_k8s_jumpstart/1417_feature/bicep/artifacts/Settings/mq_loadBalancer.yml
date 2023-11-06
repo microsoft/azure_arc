@@ -1,32 +1,14 @@
 apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: Broker
-metadata:
-  name: "my-broker"
-spec:
-  authImage:
-    pullPolicy: Always
-    repository: e4kpreview.azurecr.io/dmqtt-authentication
-    tag: 0.1.0-preview-rc3
-  brokerImage:
-    pullPolicy: Always
-    repository: e4kpreview.azurecr.io/dmqtt-pod
-    tag: 0.1.0-preview-rc3
-  healthManagerImage:
-    pullPolicy: Always
-    repository: e4kpreview.azurecr.io/dmqtt-operator
-    tag: 0.1.0-preview-rc3
-  mode: auto
-  encryptInternalTraffic: false
----
-apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
-  name: "az-mqtt-non-tls-listener"
+  name: "mq-1883-listener"
+  namespace: azure-iot-operations
 spec:
-  brokerRef: "my-broker"
   serviceType: loadBalancer
+  brokerRef: "broker"
   authenticationEnabled: false
   authorizationEnabled: false
+  serviceName: mq-1883-listener
   port: 1883
 ---
 apiVersion: mq.iotoperations.azure.com/v1beta1
