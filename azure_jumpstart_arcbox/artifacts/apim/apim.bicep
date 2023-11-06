@@ -64,7 +64,7 @@ resource apimAdventureWorkApi 'Microsoft.ApiManagement/service/apis@2023-03-01-p
     isCurrent: true
   }
 }
-resource weatherAPIService 'Microsoft.ApiManagement/service/apis/policies@2023-03-01-preview' = {
+resource adventureWorkAPIPolicy 'Microsoft.ApiManagement/service/apis/policies@2023-03-01-preview' = {
   name: 'policy'
   parent: apimAdventureWorkApi
   
