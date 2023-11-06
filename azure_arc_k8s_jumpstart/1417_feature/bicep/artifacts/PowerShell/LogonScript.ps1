@@ -373,7 +373,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -Foregro
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --no-tls true --mq-service-type loadBalancer
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
 ##### Add health check to continue
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
@@ -383,7 +383,9 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId
 az role assignment create --assignee $spnClientID --role "EventGrid Data Sender" --scope $eventGridTopicId
 
+##### Add health check to continue
 Start-Sleep -Seconds 60
+
 ## Adding MQTT load balancer
 #kubectl create namespace arc
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations

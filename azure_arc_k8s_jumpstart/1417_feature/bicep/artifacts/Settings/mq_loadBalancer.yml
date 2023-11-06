@@ -1,4 +1,17 @@
 apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: "mq-1883-listener"
+  namespace: azure-iot-operations
+spec:
+  serviceType: loadBalancer
+  brokerRef: "broker"
+  authenticationEnabled: false
+  authorizationEnabled: false
+  serviceName: mq-1883-listener
+  port: 1883
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeTopicMap
 metadata:
   name: "my-topic-map"
