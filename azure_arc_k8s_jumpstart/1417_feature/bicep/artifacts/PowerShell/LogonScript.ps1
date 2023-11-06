@@ -404,7 +404,9 @@ do {
 } while (
     $null -eq $mqttIp
 )
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
+
 ##############################################################
 # Deploy OT Inspector (InfluxDB)
 ##############################################################
@@ -423,7 +425,6 @@ do {
     $null -eq $influxIp
 )
 
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
@@ -433,13 +434,10 @@ netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 conne
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
-
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
-
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
-
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
 
