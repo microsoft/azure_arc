@@ -373,7 +373,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -Foregro
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --simulate-plc
 ##### Add health check to continue
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
@@ -396,7 +396,7 @@ $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 
 do {
     $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 10 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 10
 } while (
     $null -eq $mqttIp
