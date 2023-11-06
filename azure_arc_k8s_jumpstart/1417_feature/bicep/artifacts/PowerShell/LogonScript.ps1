@@ -388,15 +388,18 @@ Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
 #kubectl create namespace arc
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
+Start-Sleep -Seconds 60
 
 ##############################################################
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-Start-Sleep -Seconds 60
-
 do {
     $mqttIp = kubectl get service "mq-1883-listener" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
@@ -441,19 +444,9 @@ Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
 Start-Sleep -Seconds 30
 
-
-
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
-$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-$eventGrideBrideYaml = "$Ft1ToolsDir\mq_loadBalancer.yml"
-(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $eventGrideBrideYaml -n azure-iot-operations
-
 ########################################################################
 # ADX Dashboards
 ########################################################################
-
-
 Write-Host "Importing Azure Data Explorer dashboards..."
 
 # Get the ADX/Kusto cluster info
