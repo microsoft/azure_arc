@@ -62,6 +62,8 @@ resource apimAdventureWorkApi 'Microsoft.ApiManagement/service/apis@2023-03-01-p
       query: 'subscription-key'
     }
     isCurrent: true
+    format: 'openapi+json'
+    value: loadTextContent('adventurework.json')
   }
 }
 resource adventureWorkAPIPolicy 'Microsoft.ApiManagement/service/apis/policies@2023-03-01-preview' = {
