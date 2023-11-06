@@ -1,15 +1,4 @@
 apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: BrokerListener
-metadata:
-  name: "az-mqtt-non-tls-listener"
-spec:
-  brokerRef: "broker"
-  serviceType: loadBalancer
-  authenticationEnabled: false
-  authorizationEnabled: false
-  port: 1883
----
-apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeTopicMap
 metadata:
   name: "my-topic-map"
