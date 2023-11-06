@@ -397,7 +397,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundCo
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 
 do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service "mq-1883-listener" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 10 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 10
 } while (
