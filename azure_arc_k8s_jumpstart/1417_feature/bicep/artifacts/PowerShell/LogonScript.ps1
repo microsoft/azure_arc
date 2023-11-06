@@ -432,9 +432,17 @@ netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 conne
 
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
+Start-Sleep -Seconds 30
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
