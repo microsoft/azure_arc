@@ -63,7 +63,7 @@ The following README will guide you on how to use the provided PowerShell script
 - Get the ConnectedVMwarevSphere resource provider Id.
 
   ```shell
-  az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query '{name:displayName,objectId:objectId}'
+  az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query '{name:displayName,objectId:id}'
   ```
   
     ![Screenshot of Azure resource provider for vSphere](./img/01.png)
