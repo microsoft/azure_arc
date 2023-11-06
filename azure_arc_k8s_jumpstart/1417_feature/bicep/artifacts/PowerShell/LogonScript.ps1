@@ -392,7 +392,6 @@ Start-Sleep -Seconds 60
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 (Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
 Start-Sleep -Seconds 60
 
@@ -408,6 +407,7 @@ do {
 } while (
     $null -eq $mqttIp
 )
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
 
 ##############################################################
