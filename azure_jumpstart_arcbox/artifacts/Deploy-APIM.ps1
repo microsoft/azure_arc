@@ -103,7 +103,7 @@ spec:
 $adventureWorkManifest | kubectl apply -f -
 
 #Update the back end for weather api
-$advanceWorkServiceIp = "https://"+(kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
+$advanceWorkServiceIp = "http://"+(kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
 $adventureWorkBackEndPolicyTemplate = "$Env:ArcBoxDir\apim\adventurework_template.xml" 
 $adventureWorkBackEndPolicy = "$Env:ArcBoxDir\apim\adventurework.xml" 
 (Get-Content -Path $adventureWorkBackEndPolicyTemplate) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
