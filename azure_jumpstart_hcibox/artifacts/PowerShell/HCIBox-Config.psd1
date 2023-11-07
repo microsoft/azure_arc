@@ -4,7 +4,6 @@
     
     # HCIBox Folders
     HCIBoxPaths = @{
-        LogsDir = "C:\HCIBox\Logs"
         VMDir = "C:\HCIBox\Virtual Machines"
         IconDir = "C:\HCIBox\Icons"
         VHDDir = "C:\HCIBox\VHD"

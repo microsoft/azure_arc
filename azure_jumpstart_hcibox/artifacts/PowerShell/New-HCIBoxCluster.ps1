@@ -487,8 +487,8 @@ function Set-HCINodeVHDX {
     Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
 
     New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
-    Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
-    Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
+    Copy-Item -Path "$($HCIBoxConfig.HCIBoxPaths.VHDDir)" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
+    Copy-Item -Path "$($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
 
     # Dismount VHDX
     Write-Host "Dismounting VHDX File at path $path"
@@ -1549,11 +1549,11 @@ foreach ($path in $HCIBoxConfig.HCIBoxPaths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "Downloading HCIBox VHDs. This will take a while..."
-BITSRequest -Params @{'Uri'='https://aka.ms/AAijhe3'; 'Filename'="$env:HCIBoxVHDDir\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://aka.ms/AAij9n9'; 'Filename'="$env:HCIBoxVHDDir\GUI.vhdx"}
-BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
-Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
-Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
+BITSRequest -Params @{'Uri'='https://aka.ms/AAijhe3'; 'Filename'="$($HCIBoxConfig.HCIBoxPaths.VHDDir)\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://aka.ms/AAij9n9'; 'Filename'="$($HCIBoxConfig.HCIBoxPaths.VHDDir)\GUI.vhdx"}
+BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx.zip"}
+Expand-Archive -Path $($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx.zip -DestinationPath $($HCIBoxConfig.HCIBoxPaths.VHDDir)
+Move-Item -Path $($HCIBoxConfig.HCIBoxPaths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx -Destination $($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx
 
 # Set credentials
 $localCred = new-object -typename System.Management.Automation.PSCredential `
