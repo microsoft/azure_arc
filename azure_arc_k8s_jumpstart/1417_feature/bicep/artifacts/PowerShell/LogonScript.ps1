@@ -388,12 +388,12 @@ Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
 #kubectl create namespace arc
-
+$mqconfigfile = "$Ft1ToolsDir\mq_loadBalancer.yml"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
-(Get-Content -Path $eventGrideBrideYaml) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $eventGrideBrideYaml
-kubectl apply -f $Ft1ToolsDir\mq_loadBalancer.yml -n azure-iot-operations
-Start-Sleep -Seconds 60
+(Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+kubectl apply -f $mqconfigfile -n azure-iot-operations
+Start-Sleep -Seconds 120
 
 ##############################################################
 # Deploy the simulator
