@@ -331,6 +331,8 @@ try {
     if ( $null -eq $portProxyRulExists ) {
         Write-Host "Configure port proxy for ft1"
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
     }
     else {
         Write-Host "Port proxy rule for ft1 exists, skip configuring port proxy..."
@@ -415,15 +417,14 @@ do {
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
 )
 
-(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
-netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n $ft1Namespace
-
-
 Write-Host "Patch the broker"
 kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
 (Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
 kubectl apply -f broker.yaml -n $ft1Namespace
+
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n $ft1Namespace
 
 ##############################################################
 # Deploy OT Inspector (InfluxDB)
