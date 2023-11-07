@@ -23,6 +23,7 @@ $customLocationRPOID = $Env:customLocationRPOID
 $githubAccount = $Env:githubAccount
 $githubBranch = $Env:githubBranch
 $adxClusterName = $Env:adxClusterName
+$ft1Namespace = "azure-iot-operations"
 $aideuserConfig = $Ft1Config.AKSEEConfig["aideuserConfig"]
 $aksedgeConfig = $Ft1Config.AKSEEConfig["aksedgeConfig"]
 $aksEdgeNodes = $Ft1Config.AKSEEConfig["Nodes"]
@@ -392,12 +393,12 @@ $mqconfigfile = "$Ft1ToolsDir\mq_loadBalancer.yml"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-kubectl apply -f $mqconfigfile -n azure-iot-operations
+kubectl apply -f $mqconfigfile -n $ft1Namespace
 
 Write-Host "Patch the broker"
-kubectl get broker broker -n azure-iot-operations -o yaml | out-file broker.yaml
+kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
 (Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
-kubectl apply -f broker.yaml -n azure-iot-operations
+kubectl apply -f broker.yaml -n $ft1Namespace
 
 ##############################################################
 # Deploy the simulator
@@ -405,11 +406,11 @@ kubectl apply -f broker.yaml -n azure-iot-operations
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
 Write-Host "Patching the mq service to be of type LoadBalancer"
-kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n azure-iot-operations
+kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $ft1Namespace
 
 do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    $services = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $services = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingServices = $services.items | Where-Object {
         $_.metadata.name -match "aio-mq" -and
         $_.status.phase -notmatch "running"
@@ -422,7 +423,7 @@ do {
 
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n $ft1Namespace
 
 ##############################################################
 # Deploy OT Inspector (InfluxDB)
@@ -433,7 +434,7 @@ $influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
 $influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
 
 do {
-    $simulatorPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $simulatorPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingPods = $simulatorPod.items | Where-Object {
         $_.metadata.name -match "mqtt-simulator-deployment" -and
         $_.status.phase -notmatch "running"
@@ -444,10 +445,10 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $influxdb_setupYaml -n azure-iot-operations
+kubectl apply -f $influxdb_setupYaml -n $ft1Namespace
 
 do {
-    $influxIp = kubectl get service "influxdb" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $influxIp = kubectl get service "influxdb" -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
@@ -456,15 +457,15 @@ do {
 
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
-(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $Ft1InfluxMountPath
-(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $Ft1InfluxMountPath | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
 
-kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace
 
 do {
-    $influxPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $influxPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingPods = $influxPod.items | Where-Object {
         $_.metadata.name -match "influxdb-0" -and
         $_.status.phase -notmatch "running"
@@ -475,9 +476,9 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n $ft1Namespace
 do {
-    $listenerPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $listenerPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingPods = $listenerPod.items | Where-Object {
         $_.metadata.name -match "mqtt-listener-deployment" -and
         $_.status.phase -notmatch "running"
@@ -488,8 +489,8 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
+kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n $ft1Namespace
+kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n $ft1Namespace
 
 ########################################################################
 # ADX Dashboards
