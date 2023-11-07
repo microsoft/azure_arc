@@ -48,7 +48,7 @@ spec:
         resources:
           limits:
             memory: "1Gi"
-            cpu: 1
+            cpu: "500m"
         ports:
         - name: api
           containerPort: 9999
