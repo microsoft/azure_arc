@@ -44,7 +44,7 @@ function New-InternalSwitch {
         #Assign IP to Internal Switch
         $InternalAdapter = Get-Netadapter -Name "vEthernet ($pswitchname)"
         $IP = $HCIBoxConfig.PhysicalHostInternalIP
-        $Prefix = ($HCIBoxConfig.AzSMGMTIP.Split("/"))[1]
+        $Prefix = ($($HCIBoxConfig.MgmtHostConfig.IP).Split("/"))[1]
         $Gateway = $HCIBoxConfig.SDNLABRoute
         $DNS = $HCIBoxConfig.SDNLABDNS
         
@@ -429,7 +429,7 @@ function Set-MGMTVHDX {
 
     # Inject Answer File
     Write-Host "Injecting answer file to $path"
-    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IPAddress $HCIBoxConfig.AzSMGMTIP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IPAddress $HCIBoxConfig.MgmtHostConfig.IP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
     
     Write-Host "Mounted Disk Volume is: $MountedDrive" 
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
@@ -790,7 +790,7 @@ function New-DCVM {
             $HCIBoxConfig = $args[0]
             $DCName = $HCIBoxConfig.DCName
             $IP = $HCIBoxConfig.SDNLABDNS
-            $PrefixLength = ($HCIBoxConfig.AzSMGMTIP.split("/"))[1]
+            $PrefixLength = ($($HCIBoxConfig.MgmtHostConfig.IP).Split("/"))[1]
             $SDNLabRoute = $HCIBoxConfig.SDNLABRoute
             $DomainFQDN = $HCIBoxConfig.SDNDomainFQDN
             $DomainNetBiosName = $DomainFQDN.Split(".")[0]
@@ -974,10 +974,10 @@ function New-RouterVM {
     
         # Configure VM Networking
         Write-Host "Configuring $VMName's Networking"
-        Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName vSwitch-Fabric -DeviceNaming On
-        Add-VMNetworkAdapter -VMName $VMName -Name Provider -SwitchName vSwitch-Fabric -DeviceNaming On
-        Add-VMNetworkAdapter -VMName $VMName -Name VLAN200 -SwitchName vSwitch-Fabric -DeviceNaming On
-        Add-VMNetworkAdapter -VMName $VMName -Name SIMInternet -SwitchName vSwitch-Fabric -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name Provider -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name VLAN200 -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name SIMInternet -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName Provider -Access -VlanId $HCIBoxConfig.providerVLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN200 -Access -VlanId $HCIBoxConfig.vlan200VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName SIMInternet -Access -VlanId $HCIBoxConfig.simInternetVLAN
@@ -1167,7 +1167,7 @@ function New-AdminCenterVM {
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
         Write-Host "Configuring $VMName networking"
         Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter"
-        Add-VMNetworkAdapter -VMName $VMName -Name "Fabric" -SwitchName "vSwitch-Fabric" -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name "Fabric" -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Set-VMNetworkAdapter -VMName $VMName -StaticMacAddress $HCIBoxConfig.WACMAC # Mac address is linked to the answer file required in next step
 
         # Apply custom Unattend.xml file
