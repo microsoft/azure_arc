@@ -57,7 +57,6 @@ else {
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
-
 $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
 $output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
@@ -395,11 +394,6 @@ $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGrou
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n $ft1Namespace
 
-Write-Host "Patch the broker"
-kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
-(Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
-kubectl apply -f broker.yaml -n $ft1Namespace
-
 ##############################################################
 # Deploy the simulator
 ##############################################################
@@ -424,6 +418,12 @@ do {
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n $ft1Namespace
+
+
+Write-Host "Patch the broker"
+kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
+(Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
+kubectl apply -f broker.yaml -n $ft1Namespace
 
 ##############################################################
 # Deploy OT Inspector (InfluxDB)
