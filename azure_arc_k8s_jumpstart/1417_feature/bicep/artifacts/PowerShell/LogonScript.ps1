@@ -331,6 +331,8 @@ try {
     if ( $null -eq $portProxyRulExists ) {
         Write-Host "Configure port proxy for ft1"
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
     }
     else {
         Write-Host "Port proxy rule for ft1 exists, skip configuring port proxy..."
