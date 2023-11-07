@@ -121,7 +121,7 @@
 
         Nodes = @{
             'LinuxNode' = @{
-                'CpuCount'     = 4
+                'CpuCount'     = 6
                 'MemoryInMB'   = 16384
                 'DataSizeInGB' = 50
             }

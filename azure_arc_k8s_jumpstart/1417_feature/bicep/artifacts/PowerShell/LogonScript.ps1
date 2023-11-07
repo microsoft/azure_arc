@@ -393,19 +393,25 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" 
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n azure-iot-operations
-Start-Sleep -Seconds 120
 
 ##############################################################
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+
 do {
     $mqttIp = kubectl get service "mq-1883-listener" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
+    $services = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $matchingServices = $services.items | Where-Object {
+        $_.metadata.name -match "aio-mq" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
-    $null -eq $mqttIp
+    $null -eq $mqttIp -and $matchingServices.Count -eq 0
 )
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
@@ -417,8 +423,20 @@ $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
 $influxdb_setupYaml = "$Ft1ToolsDir\influxdb_setup.yml"
 $influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
 $influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
+
+do {
+    $simulatorPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $matchingPods = $simulatorPod.items | Where-Object {
+        $_.metadata.name -match "mqtt-simulator-deployment" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 30
+} while (
+    $null -eq $mqttIp -and $matchingPods.Count -eq 0
+)
+
 kubectl apply -f $influxdb_setupYaml -n azure-iot-operations
-Start-Sleep -Seconds 60
 
 do {
     $influxIp = kubectl get service "influxdb" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
@@ -428,7 +446,6 @@ do {
     $null -eq $influxIp
 )
 
-(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
 (Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
@@ -436,13 +453,22 @@ do {
 
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
+
+do {
+    $simulatorPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $matchingPods = $simulatorPod.items | Where-Object {
+        $_.metadata.name -match "influxdb" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 30
+} while (
+    $null -eq $mqttIp -and $matchingPods.Count -eq 0
+)
+
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
-Start-Sleep -Seconds 30
 
 ########################################################################
 # ADX Dashboards
