@@ -1036,7 +1036,7 @@ function New-RouterVM {
             Rename-NetAdapter -name $NIC.name -newname "SIMInternet" | Out-Null
             New-NetIPAddress -InterfaceAlias "SIMInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
     
-            # if NAT is selected, configure the adapter
+            # Configure NAT
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "NAT" }
             Rename-NetAdapter -name $NIC.name -newname "NAT" | Out-Null
             $Prefix = ($natSubnet.Split("/"))[1]
