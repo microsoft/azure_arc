@@ -457,7 +457,7 @@ do {
 
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
-(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $Ft1InfluxMountPath
+(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
 (Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $Ft1InfluxMountPath | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
