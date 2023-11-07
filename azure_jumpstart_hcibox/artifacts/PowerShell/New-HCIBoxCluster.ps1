@@ -1205,7 +1205,6 @@ function New-AdminCenterVM {
             Write-Host "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
 
-
             # Set Gateway
             $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -eq "Fabric" }).InterfaceIndex
             $NetInterface = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.InterfaceIndex -eq $index }     
