@@ -26,9 +26,10 @@ catch {
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 az config set extension.use_dynamic_install=yes_without_prompt
-$apimDeploymentOutput =  $(az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\apim\apim.bicep" --parameters "$Env:ArcBoxDir\apim\apim.bicepparam") | ConvertFrom-Json
-$apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
 
+#set k8s context to capi
+kubectx arcbox-capi
+kubectl get nodes
 
 # Retrieving SQL MI connection endpoints
 $primaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
@@ -36,7 +37,8 @@ $primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) 
 $sqlConnectionString = "Data Source=$($primaryEndpoint);Initial Catalog=AdventureWorks2019;Persist Security Info=True;TrustServerCertificate=true;User ID=$($Env:AZDATA_USERNAME);Password=$($Env:AZDATA_PASSWORD)"
 $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString)
 
-
+kubectx arcbox-k3s
+kubectl get nodes
 # Build the adventurework api manifest
 $secretManifest = @"
 apiVersion: v1
@@ -68,13 +70,15 @@ spec:
     spec:
       containers:
       - name: adventurework
-        image: duongthaiha/adventureworkwebapi
+        image: duongthaiha/adventureworkwebapi:1.0.1
         env:
         - name: AdventureWorkConnection
           valueFrom:
             secretKeyRef:
               name: adventurework-secrets
               key: AdventureWorkConnection
+        - name: DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE
+          value: "false"
         ports:
         - containerPort: 80
         - containerPort: 443
@@ -99,9 +103,15 @@ spec:
 $adventureWorkManifest | kubectl apply -f -
 
 #Update the back end for weather api
-$advanceWorkServiceIp = (kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
-$adventureWorkBackEndPolicy = 
-(Get-Content -Path $adventureWorkBackEndPolicy) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
+$advanceWorkServiceIp = "https://"+(kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
+$adventureWorkBackEndPolicyTemplate = "$Env:ArcBoxDir\apim\adventurework_template.xml" 
+$adventureWorkBackEndPolicy = "$Env:ArcBoxDir\apim\adventurework.xml" 
+(Get-Content -Path $adventureWorkBackEndPolicyTemplate) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
+
+#Deply API Management and the API
+$apimDeploymentOutput =  $(az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\apim\apim.bicep" --parameters "$Env:ArcBoxDir\apim\apim.bicepparam") | ConvertFrom-Json
+$apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
+
 
 #Get access token to the rest api
 $access_token = $(az account get-access-token -s $env:subscriptionId --query "accessToken")| ConvertFrom-Json
@@ -126,9 +136,10 @@ $response = Invoke-RestMethod  $generateTokenUrl -Method 'POST' -Headers $header
 ##deploy selft host gateway in kubernestes
 # Setting kubeconfig
 $clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'ArcBox')]" --output tsv
-kubectx arcbox-k3s
-kubectl get nodes
-kubectl create secret generic selfhost-token --from-literal=value="GatewayKey "+$response.value  --type=Opaque
+#kubectl delete secret selfhost-token
+$selfHostToken = "GatewayKey $($response.value)"
+kubectl create secret generic selfhost-token --from-literal=value="$($selfHostToken)"  --type=Opaque
+
 $selfHostYaml = @"
 # NOTE: Before deploying to a production environment, please review the documentation -> https://aka.ms/self-hosted-gateway-production
 ---
