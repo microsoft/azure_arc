@@ -12,6 +12,7 @@
         Ft1AppsRepo        = "C:\Ft1\AppsRepo"
         Ft1DataExplorer    = "C:\Ft1\DataExplorer"
         Ft1MonitoringDir   = "C:\Ft1\Monitoring"
+        Ft1InfluxMountPath = "C:\Ft1\InfluxDB"
     }
 
     # Required URLs
@@ -121,7 +122,7 @@
 
         Nodes = @{
             'LinuxNode' = @{
-                'CpuCount'     = 4
+                'CpuCount'     = 6
                 'MemoryInMB'   = 16384
                 'DataSizeInGB' = 50
             }
