@@ -380,8 +380,8 @@ $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --q
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
-az role assignment create --assignee $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId
-az role assignment create --assignee $spnClientID --role "EventGrid Data Sender" --scope $eventGridTopicId
+az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
+az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 
 ##### Add health check to continue
 Start-Sleep -Seconds 60
