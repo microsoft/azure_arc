@@ -56,8 +56,7 @@ else {
 # AKS EE setup
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
-#$latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
-$latestReleaseTag = "1.5.203.0"
+$latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
 $output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
