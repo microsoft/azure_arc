@@ -7,6 +7,7 @@ Set-PSDebug -Strict
 $Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
+$Ft1InfluxMountPath = $Ft1Config.ft1Directories["Ft1InfluxMountPath"]
 $websiteUrls = $Ft1Config.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
 $mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
@@ -363,7 +364,6 @@ Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
 Write-Host "`n"
 az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
-#az extension add --source ([System.Net.HttpWebRequest]::Create('https://azedgecli.blob.core.windows.net/drop/azure_iot_ops-0.0.5a4-py3-none-any.whl').GetResponse().ResponseUri.AbsoluteUri) -y
 
 ##############################################################
 # Deploy FT1
@@ -394,15 +394,21 @@ $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGrou
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n azure-iot-operations
 
+Write-Host "Patch the broker"
+kubectl get broker broker -n azure-iot-operations -o yaml | out-file broker.yaml
+(Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
+kubectl apply -f broker.yaml -n azure-iot-operations
+
 ##############################################################
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
+Write-Host "Patching the mq service to be of type LoadBalancer"
+kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n azure-iot-operations
 
 do {
-    $mqttIp = kubectl get service "mq-1883-listener" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n azure-iot-operations -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     $services = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
     $matchingServices = $services.items | Where-Object {
         $_.metadata.name -match "aio-mq" -and
@@ -411,8 +417,10 @@ do {
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
-    $null -eq $mqttIp -and $matchingServices.Count -eq 0
+    $null -eq $mqttIp -and $matchingServices.Count -ne 0
 )
+
+(Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n azure-iot-operations
 
@@ -433,7 +441,7 @@ do {
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
-    $null -eq $mqttIp -and $matchingPods.Count -eq 0
+    $matchingPods.Count -ne 0
 )
 
 kubectl apply -f $influxdb_setupYaml -n azure-iot-operations
@@ -448,25 +456,38 @@ do {
 
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
-(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $Ft1InfluxMountPath
+(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $influxIp | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n azure-iot-operations
 
 do {
-    $simulatorPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
-    $matchingPods = $simulatorPod.items | Where-Object {
-        $_.metadata.name -match "influxdb" -and
+    $influxPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $matchingPods = $influxPod.items | Where-Object {
+        $_.metadata.name -match "influxdb-0" -and
         $_.status.phase -notmatch "running"
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
-    $null -eq $mqttIp -and $matchingPods.Count -eq 0
+    $matchingPods.Count -ne 0
 )
 
 kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n azure-iot-operations
+do {
+    $listenerPod = kubectl get pods -n azure-iot-operations -o json | ConvertFrom-Json
+    $matchingPods = $listenerPod.items | Where-Object {
+        $_.metadata.name -match "mqtt-listener-deployment" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 30
+} while (
+    $matchingPods.Count -ne 0
+)
+
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n azure-iot-operations
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n azure-iot-operations
 

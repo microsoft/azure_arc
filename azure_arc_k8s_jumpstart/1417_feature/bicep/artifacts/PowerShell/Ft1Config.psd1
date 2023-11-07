@@ -12,6 +12,7 @@
         Ft1AppsRepo        = "C:\Ft1\AppsRepo"
         Ft1DataExplorer    = "C:\Ft1\DataExplorer"
         Ft1MonitoringDir   = "C:\Ft1\Monitoring"
+        Ft1InfluxMountPath = "C:\Ft1\InfluxDB"
     }
 
     # Required URLs
