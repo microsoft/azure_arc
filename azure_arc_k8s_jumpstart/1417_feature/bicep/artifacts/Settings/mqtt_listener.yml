@@ -17,6 +17,10 @@ spec:
       containers:
       - name: mqtt-listener
         image: jumpstartprod.azurecr.io/mqtt-listener:0.0.4
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         env:
           - name: MQTT_BROKER
             value: "MQTTIpPlaceholder"
