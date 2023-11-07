@@ -332,14 +332,14 @@ function New-ManagementVM {
 
     # Create VM
     # Create Nested VM
-    New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.AzSMGMTMemoryinGB -VHDPath $VHDX1.Path -SwitchName $VMSwitch -Generation 2
+    New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.AzSMGMTMemoryinGB -VHDPath $VHDX1.Path -SwitchName $VMSwitch -Generation 2 | Out-Null
     Add-VMHardDiskDrive -VMName $Name -Path $VHDX2.Path
-    Set-VM -Name $Name -ProcessorCount $HCIBoxConfig.AzSMGMTProcCount -AutomaticStartAction Start
+    Set-VM -Name $Name -ProcessorCount $HCIBoxConfig.AzSMGMTProcCount -AutomaticStartAction Start | Out-Null
 
     Get-VMNetworkAdapter -VMName $Name | Rename-VMNetworkAdapter -NewName "SDN"
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
     Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
-    $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
+    $vmMac = (((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-')
 
     Get-VM $Name | Set-VMProcessor -ExposeVirtualizationExtensions $true
     Get-VM $Name | Set-VMMemory -DynamicMemoryEnabled $false
