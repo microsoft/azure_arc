@@ -14,34 +14,41 @@ spec:
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeTopicMap
 metadata:
-  name: "my-topic-map"
+  name: my-topic-map
+  namespace: azure-iot-operations 
 spec:
-  # Name of the MqttBridgeConnector resource to link to. Required.
-  mqttBridgeConnectorRef: "my-mqtt-bridge"
-  # A list of routes for bridging. Required.
+  mqttBridgeConnectorRef: my-mqtt-bridge
   routes:
     - direction: local-to-remote
-      name: "route-to-eventgrid"
+      name: route-to-eventgrid
       qos: 1
       source: "topic/#"
 ---
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeConnector
 metadata:
-  name: "my-mqtt-bridge"
+  name: my-mqtt-bridge
+  namespace: azure-iot-operations
 spec:
-  image:
-    repository: e4kpreview.azurecr.io/mqttbridge
-    tag: 0.1.0-preview-rc3
+  image: 
+    repository: mcr.microsoft.com/azureiotoperations/mqttbridge 
+    tag: 0.1.0-preview
     pullPolicy: IfNotPresent
   protocol: v5
   bridgeInstances: 1
-  clientIdPrefix: "factory-gateway-"
-  logLevel: "debug"
+  clientIdPrefix: factory-gateway-
+  logLevel: debug
   remoteBrokerConnection:
-    endpoint: "eventGridPlaceholder:8883"
+    endpoint: eventGridPlaceholder:8883
     tls:
       tlsEnabled: true
     authentication:
       systemAssignedManagedIdentity:
         audience: https://eventgrid.azure.net
+  localBrokerConnection:
+    endpoint: aio-mq-dmqtt-frontend:8883
+    tls:
+      tlsEnabled: true
+      trustedCaCertificateConfigMap: aio-ca-trust-bundle-test-only
+    authentication:
+      kubernetes: {}
