@@ -30,6 +30,7 @@ param location string
 
 @description('The location of the Azure EventGrid namespace')
 param eventGridLocation string = 'westus2'
+param adxLocation string = 'westus2'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
@@ -361,7 +362,7 @@ module adxCluster 'data/dataExplorer.bicep' = {
   name: 'dataExplorer'
   params: {
     adxClusterName: adxClusterName
-    location: location
+    location: adxLocation
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     eventHubConsumerGroupName: eventHubConsumerGroupName
     eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
