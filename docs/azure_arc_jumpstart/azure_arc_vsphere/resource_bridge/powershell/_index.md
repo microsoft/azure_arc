@@ -106,7 +106,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`resourceGroupName`_ - the name of the Azure resource group you will create your resources in
   - _`applianceName`_ - a name for the Azure Arc resource bridge appliance, as it will be shown in Azure.
   - _`customLocationName`_ - the name of your Azure Arc custom location
-  - _`vcenterName`_ -  the name of your vCenter
+  - _`vcenterName`_ -  The name of your vCenter
   - _`vcenterFqdn`_ - your vCenter fully qualified name
   - _`vcenterUsername`_ - username to authenticate to vCenter
   - _`vcenterPassword`_ - password to authenticate to vCenter
