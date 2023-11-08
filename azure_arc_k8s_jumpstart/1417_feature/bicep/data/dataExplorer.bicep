@@ -16,22 +16,22 @@ param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 param skuTier string = 'Basic'
 
 @description('The name of the Azure Data Explorer POS database')
-param ft1DBName string = 'magnemotion'
+param ft1DBName string = 'fryer'
 
 @description('The name of the Azure Data Explorer Event Hub connection')
-param ft1EventHubConnectionName string = 'magnemotion-eh-messages'
+param ft1EventHubConnectionName string = 'fryer-eh-messages'
 
 @description('The name of the Azure Data Explorer Event Hub connection')
-param ft1EventHubConnectionNamePl string = 'magnemotion-eh-messagespl'
+param ft1EventHubConnectionNamePl string = 'fryer-eh-messagespl'
 
 @description('The name of the Azure Data Explorer Event Hub table')
-param tableName string = 'magnemotion'
+param tableName string = 'fryer'
 
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableNamePl string = 'productionline'
 
 //@description('The name of the Azure Data Explorer Event Hub mapping rule')
-//param mappingRuleName string = 'magnemotion_data_mapping'
+//param mappingRuleName string = 'fryer_data_mapping'
 
 //@description('The name of the Azure Data Explorer Event Hub production Line mapping rule')
 //param mappingRuleNamePl string = 'productionline_mapping'
@@ -73,31 +73,31 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
 
 resource stagingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'stagingScript'
-  parent: ft1MagnemotionDB
+  parent: ft1fryerDB
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
     scriptContent: loadTextContent('staging.kql')
   }
 }
-resource magnemotionScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
-  name: 'magnemotionScript'
-  parent: ft1MagnemotionDB
+resource fryerScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'fryerScript'
+  parent: ft1fryerDB
   dependsOn: [
     stagingScript
   ]
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
-    scriptContent: loadTextContent('magnemotion.kql')
+    scriptContent: loadTextContent('fryer.kql')
   }
 }
 
 resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'productionLineScript'
-  parent: ft1MagnemotionDB
+  parent: ft1fryerDB
   dependsOn: [
-    magnemotionScript
+    fryerScript
   ]
   properties: {
     continueOnErrors: false
@@ -106,7 +106,7 @@ resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-0
   }
 }
 
-resource ft1MagnemotionDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
+resource ft1fryerDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
   name: ft1DBName
   location: location
@@ -117,10 +117,10 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   name: ft1EventHubConnectionName
   kind: 'EventHub'
   dependsOn: [
-    magnemotionScript
+    fryerScript
   ]
   location: location
-  parent: ft1MagnemotionDB
+  parent: ft1fryerDB
   properties: {
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupName
@@ -138,7 +138,7 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
     productionLineScript
   ]
   kind: 'EventHub'
-  parent: ft1MagnemotionDB
+  parent: ft1fryerDB
   location: location
   properties: {
     eventHubResourceId: eventHubResourceId
