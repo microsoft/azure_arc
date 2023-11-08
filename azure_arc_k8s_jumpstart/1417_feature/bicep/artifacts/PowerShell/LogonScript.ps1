@@ -375,13 +375,22 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -Foregro
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret
-##### Add health check to continue
-$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
-$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
-$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
-$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
+az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --location eastus2euap --cluster-location $location
 
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor Gray
+$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Extension Principal ID: $extensionPrincipalID" -ForegroundColor Gray
+
+$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId" -ForegroundColor Gray
+
+$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor Gray
+
+$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic Space ID: $eventGridTopicSpaceId" -ForegroundColor Gray
+
+Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor Gray
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --scope $eventGridTopicSpaceId --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicSpaceId --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
