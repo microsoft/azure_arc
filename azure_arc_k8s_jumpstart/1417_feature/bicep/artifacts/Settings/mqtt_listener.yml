@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mqtt-listener
-        image: jumpstartprod.azurecr.io/mqtt-listener:0.0.4
+        image: jumpstartprod.azurecr.io/mqtt-listener:latest
         resources:
           limits:
             memory: "512Mi"
@@ -29,7 +29,7 @@ spec:
           - name: MQTT_TOPIC1
             value: "topic/productionline"
           - name: MQTT_TOPIC2
-            value: "topic/magnemotion"
+            value: "topic/fryer"
           - name: INFLUX_URL
             value: "http://influxPlaceholder:8086"
           - name: INFLUX_TOKEN
