@@ -33,10 +33,9 @@ function BITSRequest {
     
 function New-InternalSwitch {
     param (
-        $pswitchname, 
         $HCIBoxConfig
     )
-    
+    $pswitchname = $HCIBoxConfig.InternalSwitch
     $querySwitch = Get-VMSwitch -Name $pswitchname -ErrorAction Ignore
     if (!$querySwitch) {
         New-VMSwitch -SwitchType Internal -MinimumBandwidthMode None -Name $pswitchname | Out-Null
@@ -1576,7 +1575,7 @@ Write-Host "Verifying internet connectivity"
 Test-InternetConnect
 
 Write-Host "Creating Internal Switch"
-New-InternalSwitch -pswitchname $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+New-InternalSwitch -HCIBoxConfig $HCIBoxConfig
 
 Write-Host "Creating NAT Switch"
 Set-HostNAT -HCIBoxConfig $HCIBoxConfig

@@ -9,7 +9,7 @@ Set-PSDebug -Strict
 # Load config file
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
-Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths["LogsDir"])\HCIBoxLogonScript.log"
+Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths.LogsDir)\HCIBoxLogonScript.log"
 
 #####################################################################
 # Setup Azure CLI
@@ -50,7 +50,7 @@ az provider register --namespace Microsoft.ResourceConnector --wait
 Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($HCIBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
 foreach ($extension in $HCIBoxConfig.VSCodeExtensions) {
     $WarningPreference = "SilentlyContinue"
-    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.HCIBoxPaths["LogsDir"] + "\Tools.log")
+    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.HCIBoxPaths.LogsDir + "\Tools.log")
     $WarningPreference = "Continue"
 }
 
@@ -71,7 +71,6 @@ if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
     $vDisk | Get-Disk | New-Partition -DriveLetter $HCIBoxConfig.HostVMDriveLetter -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
-New-Item -Path "V:\" -Name "VMs" -ItemType "directory"
 
 Stop-Transcript
 
