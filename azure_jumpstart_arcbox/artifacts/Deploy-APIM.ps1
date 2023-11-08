@@ -11,8 +11,6 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
-$appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
-
 if ($host.Name -match 'ISE') {throw "Running this script in PowerShell ISE is not supported"}
 
 try {
@@ -27,19 +25,38 @@ Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 az config set extension.use_dynamic_install=yes_without_prompt
 
-#set k8s context to capi
+################################################
+# Retrive SQL Managed Instances
+################################################
 kubectx arcbox-capi
 kubectl get nodes
 
 # Retrieving SQL MI connection endpoints
+Write-Host "`n"
+Write-Host " Retrieving SQL MI connection endpoints"
+Write-Host "`n"
 $primaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
 $primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) + ",11433" 
-$sqlConnectionString = "Data Source=$($primaryEndpoint);Initial Catalog=AdventureWorks2019;Persist Security Info=True;TrustServerCertificate=true;User ID=$($Env:AZDATA_USERNAME);Password=$($Env:AZDATA_PASSWORD)"
+$sqlConnectionString = "Data Source=$($primaryEndpoint);Initial Catalog=AdventureWorks2019;User ID=$($Env:AZDATA_USERNAME);Password=$($Env:AZDATA_PASSWORD);Encrypt=False;TrustServerCertificate=True"
 $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString)
+
+################################################
+# Deploy AdventureWork API
+################################################
+#Switch kubectl context
+Write-Host "`n"
+Write-Host "Switch kubectl context to k3s"
+Write-Host "`n"
 
 kubectx arcbox-k3s
 kubectl get nodes
+
 # Build the adventurework api manifest
+Write-Host "`n"
+Write-Host " Build the adventurework api manifest"
+Write-Host "`n"
+
+kubectl delete secret adventurework-secrets
 $secretManifest = @"
 apiVersion: v1
 kind: Secret
@@ -53,6 +70,10 @@ $secretManifest | kubectl apply -f -
 
 
 #Deploy AdvanetureWork API
+Write-Host "`n"
+Write-Host "Deploy AdvanetureWork API"
+Write-Host "`n"
+
 $adventureWorkManifest = @"
 apiVersion: apps/v1
 kind: Deployment
@@ -70,7 +91,7 @@ spec:
     spec:
       containers:
       - name: adventurework
-        image: duongthaiha/adventureworkwebapi:1.0.1
+        image: duongthaiha/adventureworkwebapi:1.0.4
         env:
         - name: AdventureWorkConnection
           valueFrom:
@@ -102,21 +123,41 @@ spec:
 "@
 $adventureWorkManifest | kubectl apply -f -
 
+################################################
+# Deploy API Management and Self Host Gateway
+################################################
+
 #Update the back end for weather api
+Write-Host "`n"
+Write-Host "Update the back end for weather api"
+Write-Host "`n"
+
 $advanceWorkServiceIp = "http://"+(kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
 $adventureWorkBackEndPolicyTemplate = "$Env:ArcBoxDir\apim\adventurework_template.xml" 
 $adventureWorkBackEndPolicy = "$Env:ArcBoxDir\apim\adventurework.xml" 
 (Get-Content -Path $adventureWorkBackEndPolicyTemplate) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
 
-#Deply API Management and the API
+#Deploy API Management and the API
+Write-Host "`n"
+Write-Host "Deploy API Management and the API"
+Write-Host "`n"
+
 $apimDeploymentOutput =  $(az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\apim\apim.bicep" --parameters "$Env:ArcBoxDir\apim\apim.bicepparam") | ConvertFrom-Json
 $apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
 
 
 #Get access token to the rest api
+Write-Host "`n"
+Write-Host "Get access token to the rest api"
+Write-Host "`n"
+
 $access_token = $(az account get-access-token -s $env:subscriptionId --query "accessToken")| ConvertFrom-Json
 
 #Call Rest API to get the selft host gateway token
+Write-Host "`n"
+Write-Host "Call Rest API to get the selft host gateway token"
+Write-Host "`n"
+
 $currentDate = Get-Date
 $tokenExpire =  $currentDate.AddDays(5).ToString("yyyy-MM-ddTHH:mm:ssZ")
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -133,12 +174,20 @@ $generateTokenUrl = 'https://management.azure.com/subscriptions/'+$env:subscript
 
 $response = Invoke-RestMethod  $generateTokenUrl -Method 'POST' -Headers $headers -Body $body
 
-##deploy selft host gateway in kubernestes
-# Setting kubeconfig
-$clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'ArcBox')]" --output tsv
-#kubectl delete secret selfhost-token
+
+#Create secret for self host gateway
+Write-Host "`n"
+Write-Host "Create secret for self host gateway"
+Write-Host "`n"
+
 $selfHostToken = "GatewayKey $($response.value)"
+kubectl delete secret selfhost-token
 kubectl create secret generic selfhost-token --from-literal=value="$($selfHostToken)"  --type=Opaque
+
+#Deploy self host into k3s
+Write-Host "`n"
+Write-Host "Deploy self host into k3s"
+Write-Host "`n"
 
 $selfHostYaml = @"
 # NOTE: Before deploying to a production environment, please review the documentation -> https://aka.ms/self-hosted-gateway-production
@@ -256,15 +305,7 @@ spec:
     app: selfhost
 "@    
 $selfHostYaml | kubectl apply -f -
-# }
-# Deploy APIM and set up weather api
-# $apimDeploymentOutput = az deployment group create --resource-group $rg --template-file $Env:HCIBoxDir\artifacts\apim\apim.bicep --parameters $Env:HCIBoxDir\artifacts\apim\apim.bicepparam | ConvertFrom-Json
-# $selfhostKey = $apimDeploymentOutput.properties.outputs.gatewayKey.value
-# kubectl create secret generic selfhost-token --from-literal=value="GatewayKey ${selfhostKey}"  --type=Opaque
-# kubectl apply -f $Env:ArcBoxDir\artifacts\apim\selfhost.yaml
-
+Write-Host "`n"
+Write-Host "Complete deploy APIM and AdventureWork API"
+Write-Host "`n"
 Stop-Transcript
-# # Required for azcopy
-# $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
