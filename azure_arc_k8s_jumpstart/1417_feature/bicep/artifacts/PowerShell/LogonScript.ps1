@@ -386,13 +386,15 @@ Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId
 
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
 Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor Gray
-
-$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic Space ID: $eventGridTopicSpaceId" -ForegroundColor Gray
+#$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName)
+#$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
+#Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic Space ID: $eventGridTopicSpaceId" -ForegroundColor Gray
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor Gray
-az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --scope $eventGridTopicSpaceId --only-show-errors
-az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicSpaceId --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
+#az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --scope $eventGridTopicSpaceId --only-show-errors
+#az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicSpaceId --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 
