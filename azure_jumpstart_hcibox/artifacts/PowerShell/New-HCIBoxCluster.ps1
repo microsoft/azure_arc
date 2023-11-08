@@ -1436,6 +1436,7 @@ function New-HyperConvergedEnvironment {
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
             Write-Host "Rebooting HCIBox host $($AzSHOST.Hostname)"
             Restart-Computer $AzSHOST.Hostname -Force -Confirm:$false -Credential $domainCred -Protocol WSMan
+            Start-Sleep -Seconds 10
             Write-Host "Checking to see if $($AzSHOST.Hostname) is up and online"
             while ((Invoke-Command -ComputerName $AzSHOST.Hostname -Credential $domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 10 }
             Write-Host "$($AzSHOST.Hostname) is up and online"
