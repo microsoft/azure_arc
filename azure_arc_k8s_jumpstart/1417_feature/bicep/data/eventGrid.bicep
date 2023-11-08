@@ -78,14 +78,6 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
         ]
       }
       routeTopicResourceId: eventGridTopic.id
-      routingEnrichments: {
-        static:[
-          {
-            key: 'indicator'
-            valueType: 'String'
-          }
-        ]
-      }
     }
   }
 }
