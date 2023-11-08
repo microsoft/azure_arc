@@ -114,16 +114,16 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - _`spnClientSecret`_ - your service principal secret
   - _`spnTenantId`_ - your Azure AD tenant ID
   - _`vmTemplate`_ - the Arc appliance template name
-  - _`datacenter`_ - the vSphere datacenter where the appliance will be deployed. Make sure to include the full path, for example: '/Jumpstart - Datacenter'
-  - _`datastore`_ - the vSphere datastore name where the appliance will be deployed. For example: 'NFS'
+  - _`datacenter`_ - The vSphere datacenter where the appliance will be deployed. Make sure to include the full path, for example: '/Jumpstart - Datacenter'
+  - _`datastore`_ - The vSphere datastore name where the appliance will be deployed. For example: 'NFS'
   - _`folder`_ - the vSphere folder where the template and appliance will be deployed. Make sure to include the full path, for example: '/Jumpstart - Datacenter/VMs'
   - _`dnsServer`_ - IP of the DNS server to be used for the appliance
   - _`gateway`_ - Gateway IP address to be used for the appliance
   - _`ipAddressPrefix`_ - Network IP address range in CIDR notation to be used by the appliance
-  - _`k8sNodeIpPoolStart`_ - Starting IP address from the subnet to be used by the appliance for node pool
-  - _`k8sNodeIpPoolEnd`_ - End IP address from the subnet to be used by the appliance for node pool
+  - _`k8sNodeIpPoolStart`_ - Starting IP address from the subnet to be used by the appliance for the node pool
+  - _`k8sNodeIpPoolEnd`_ - End IP address from the subnet to be used by the appliance for the node pool
   - _`segment`_ - Name of the virtual network or segment to which the appliance VM must be connected. Use the same name as it is displayed in your vCenter, for example: 'Jumpstart VM segment - (VLAN 111)'
-  - _`resourcePool`_ - the name of the vSphere resource pool to be used by the appliance. Make sure to include the full path, for example: '/Jumpstart - Datacenter/host/Jumpstart Cluster/Resources'
+  - _`resourcePool`_ - The name of the vSphere resource pool to be used by the appliance. Make sure to include the full path, for example: '/Jumpstart - Datacenter/host/Jumpstart Cluster/Resources'
   - _`controlPlaneEndpoint`_ - IP address of the Kubernetes cluster control plane
   
   ![Screenshot environment variables](./img/02.png)
