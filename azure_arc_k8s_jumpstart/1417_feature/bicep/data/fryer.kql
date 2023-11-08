@@ -1,5 +1,5 @@
 // Create table to store data from base64 to json format
-.create table magnemotion (Timestamp: datetime,
+.create table fryer (Timestamp: datetime,
 Heater_Outlet_Temp: real,
 Pump1_Flow_Totalizer: real,
 Pump2_Flow_Totalizer: real,
@@ -54,9 +54,9 @@ VacuumPressure: real
 )
 
 // Create function to decode base64 to json format
-.create-or-alter function Expand_magnemotion_Data() {
+.create-or-alter function Expand_fryer_Data() {
         stagging
-        | where subject == "topic/magnemotion"
+        | where subject == "topic/fryer"
         | extend data = parse_json( base64_decode_tostring(data_base64) ) 
         | project 
         Timestamp = todatetime(data.data.Timestamp),
@@ -114,4 +114,4 @@ VacuumPressure: real
     }
  
  // Create policy to run function every 1 minute
-.alter table magnemotion policy update @'[{"Source": "stagging", "Query": "Expand_magnemotion_Data()", "IsEnabled": "True"}]'
+.alter table fryer policy update @'[{"Source": "stagging", "Query": "Expand_fryer_Data()", "IsEnabled": "True"}]'
