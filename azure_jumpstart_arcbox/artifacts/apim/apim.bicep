@@ -42,10 +42,10 @@ resource apiManagementService 'Microsoft.ApiManagement/service@2023-03-01-previe
 
 }
 resource apimAdventureWorkApi 'Microsoft.ApiManagement/service/apis@2023-03-01-preview' = {
-  name: 'AdventureworkWeatherAPI'
+  name: 'AdventureworkAPI'
   parent: apiManagementService
   properties: {
-    displayName: 'AdventureworkWeatherAPI'
+    displayName: 'AdventureworkAPI'
     apiRevision: '1'
     subscriptionRequired: true
     path: 'adventurework'
@@ -82,6 +82,14 @@ resource selfHostGateway 'Microsoft.ApiManagement/service/gateways@2023-03-01-pr
       name: 'HCI'
     }
   }
+}
+resource gatewayAPI 'Microsoft.ApiManagement/service/gateways/apis@2023-03-01-preview' = {
+  name: 'AdventureworkAPI'
+  dependsOn: [
+    apimAdventureWorkApi
+  ]
+  parent:selfHostGateway
+
 }
 output apiManagementServiceName string = apiManagementService.name
 
