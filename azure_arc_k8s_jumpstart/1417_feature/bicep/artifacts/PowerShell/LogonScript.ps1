@@ -391,6 +391,7 @@ Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
 #kubectl create namespace arc
 $mqconfigfile = "$Ft1ToolsDir\mq_loadBalancer.yml"
+$mqListenerService = "mq-1883-listener"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
@@ -401,11 +402,11 @@ kubectl apply -f $mqconfigfile -n $ft1Namespace
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
-Write-Host "Patching the mq service to be of type LoadBalancer"
-kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $ft1Namespace
+# Write-Host "Patching the mq service to be of type LoadBalancer"
+# kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $ft1Namespace
 
 do {
-    $mqttIp = kubectl get service "aio-mq-dmqtt-frontend" -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $mqttIp = kubectl get service $mqListenerService -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     $services = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingServices = $services.items | Where-Object {
         $_.metadata.name -match "aio-mq" -and
@@ -417,10 +418,10 @@ do {
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
 )
 
-Write-Host "Patch the broker"
+<# Write-Host "Patch the broker"
 kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
 (Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
-kubectl apply -f broker.yaml -n $ft1Namespace
+kubectl apply -f broker.yaml -n $ft1Namespace #>
 
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
