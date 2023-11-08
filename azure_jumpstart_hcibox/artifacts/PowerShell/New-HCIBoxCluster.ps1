@@ -1416,7 +1416,7 @@ function New-HyperConvergedEnvironment {
                     
                     Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     $switchNIC = Get-Netadapter | Where-Object { $_.Name -match $HCIBoxConfig.ClusterVSwitchName }
-                    New-NetIPAddress -InterfaceIndex $switchNIC.InterfaceIndex -IpAddress $AzSHOST.IP -PrefixLength 24 -AddressFamily 'IpV4' -DefaultGateway $HCIBoxConfig.BGPRouterIP_MGMT -ErrorAction 'SilentlyContinue'
+                    New-NetIPAddress -InterfaceIndex $switchNIC.InterfaceIndex -IpAddress $AzSHOST.IP.Split('/')[0] -PrefixLength 24 -AddressFamily 'IpV4' -DefaultGateway $HCIBoxConfig.BGPRouterIP_MGMT -ErrorAction 'SilentlyContinue'
 
                     Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     Set-DnsClientServerAddress -InterfaceIndex $switchNIC.InterfaceIndex -ServerAddresses $HCIBoxConfig.SDNLABDNS
