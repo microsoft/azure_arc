@@ -2,8 +2,7 @@
 param adxClusterName string
 
 @description('The location of the Azure Data Explorer cluster')
-param location string = 'westus2'
-
+param location string = resourceGroup().location
 
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
