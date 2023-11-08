@@ -56,7 +56,7 @@ spec:
           containerPort: 8086
         volumeMounts:
         - name: data
-          mountPath: mountPathPlaceHolder
+          mountPath: /root/.influxdbv2
   volumeClaimTemplates:
     - metadata:
         name: data
