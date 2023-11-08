@@ -1403,24 +1403,25 @@ function New-HyperConvergedEnvironment {
         $localCred = $using:localCred
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
             Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $HCIBoxConfig -Credential $domainCred -ScriptBlock {
+                $HCIBoxconfig = $args[0]
                 # Check if switch exists already
                 $switchCheck = Get-VMSwitch | Where-Object { $_.Name -eq $HCIBoxConfig.ClusterVSwitchName } 
                 if ($switchCheck) { 
                     Write-Host "Switch already exists on $env:COMPUTERNAME. Skipping this host." 
                 }
                 else {
-                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName)"
+                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     $switchTeamMembers = @("FABRIC", "FABRIC2")
                     New-VMSwitch -Name $HCIBoxConfig.ClusterVSwitchName -AllowManagementOS $true -NetAdapterName $switchTeamMembers -EnableEmbeddedTeaming $true -MinimumBandwidthMode "Weight"
                     
-                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName)"
+                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     $switchNIC = Get-Netadapter | Where-Object { $_.Name -match $HCIBoxConfig.ClusterVSwitchName }
                     New-NetIPAddress -InterfaceIndex $switchNIC.InterfaceIndex -IpAddress $AzSHOST.IP -PrefixLength 24 -AddressFamily 'IpV4' -DefaultGateway $HCIBoxConfig.BGPRouterIP_MGMT -ErrorAction 'SilentlyContinue'
 
-                    Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName)"
+                    Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     Set-DnsClientServerAddress -InterfaceIndex $switchNIC.InterfaceIndex -ServerAddresses $HCIBoxConfig.SDNLABDNS
 
-                    Write-Host "Setting VLAN ($sdnswitchVLAN) on host vNIC"
+                    Write-Host "Setting VLAN ($($HCIBoxConfig.mgmtVLAN)) on host vNIC on host $($AzSHOST.Hostname)"
                     Set-VMNetworkAdapterIsolation -IsolationMode 'Vlan' -DefaultIsolationID $HCIBoxConfig.mgmtVLAN -AllowUntaggedTraffic $true -VMNetworkAdapterName $($HCIBoxConfig.ClusterVSwitchName) -ManagementOS
 
                     Get-VMSwitchExtension -VMSwitchName $($HCIBoxConfig.ClusterVSwitchName) | Disable-VMSwitchExtension | Out-Null
