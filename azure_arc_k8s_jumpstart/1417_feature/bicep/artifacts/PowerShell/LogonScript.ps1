@@ -380,7 +380,7 @@ az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId 
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
-$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName)
+$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --scope $eventGridTopicSpaceId --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicSpaceId --only-show-errors
