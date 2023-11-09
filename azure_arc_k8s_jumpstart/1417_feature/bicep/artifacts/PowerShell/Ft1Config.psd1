@@ -38,6 +38,8 @@
         "Microsoft.HybridCompute",
         "Microsoft.GuestConfiguration",
         "Microsoft.HybridConnectivity",
+        "Microsoft.Symphony",
+        "Microsoft.Bluefin",
         "Microsoft.DeviceRegistry",
         "Microsoft.EventGrid",
         "Microsoft.ExtendedLocation"
