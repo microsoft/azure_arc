@@ -55,7 +55,7 @@ VacuumPressure: real
 
 // Create function to decode base64 to json format
 .create-or-alter function Expand_fryer_Data() {
-        stagging
+        donutPlant
         | where subject == "topic/fryer"
         | extend data = parse_json( base64_decode_tostring(data_base64) ) 
         | project 
@@ -114,4 +114,4 @@ VacuumPressure: real
     }
  
  // Create policy to run function every 1 minute
-.alter table fryer policy update @'[{"Source": "stagging", "Query": "Expand_fryer_Data()", "IsEnabled": "True"}]'
+.alter table fryer policy update @'[{"Source": "donutPlant", "Query": "Expand_fryer_Data()", "IsEnabled": "True"}]'
