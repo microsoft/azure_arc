@@ -616,7 +616,7 @@ function Set-NICs {
 
             # Install necessary tools to converge cluster
             Write-Host "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
-            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
+            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $Credential | Out-Null 
 
             # Enable CredSSP and MTU Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
