@@ -150,3 +150,5 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
     databaseRouting: 'Single'
   }
 }
+
+output adxEndpoint string = adxCluster.properties.uri
