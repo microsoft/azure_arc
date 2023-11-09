@@ -21,31 +21,14 @@ param ft1DBName string = 'donutPlant'
 @description('The name of the Azure Data Explorer Event Hub connection')
 param ft1EventHubConnectionName string = 'donutPlant-eh-messages'
 
-@description('The name of the Azure Data Explorer Event Hub connection')
-param ft1EventHubConnectionNamePl string = 'donutPlant-eh-messagespl'
-
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableName string = 'donutPlant'
-
-@description('The name of the Azure Data Explorer Event Hub table')
-param tableNamePl string = 'productionline'
-
-//@description('The name of the Azure Data Explorer Event Hub mapping rule')
-//param mappingRuleName string = 'donutPlant_data_mapping'
-
-//@description('The name of the Azure Data Explorer Event Hub production Line mapping rule')
-//param mappingRuleNamePl string = 'productionline_mapping'
-
 
 @description('The name of the Azure Data Explorer Event Hub data format')
 param dataFormat string = 'multijson'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx'
-
-@description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupNamePl string = 'cgadxpl'
-
 
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
@@ -122,28 +105,10 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   location: location
   parent: ft1donutPlantDB
   properties: {
+    managedIdentityResourceId: adxCluster.id
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupName
     tableName: tableName
-    dataFormat: dataFormat
-    eventSystemProperties: []
-    compression: 'None'
-    databaseRouting: 'Single'
-  }
-}
-
-resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
-  name: ft1EventHubConnectionNamePl
-  dependsOn: [
-    productionLineScript
-  ]
-  kind: 'EventHub'
-  parent: ft1donutPlantDB
-  location: location
-  properties: {
-    eventHubResourceId: eventHubResourceId
-    consumerGroup: eventHubConsumerGroupNamePl
-    tableName: tableNamePl
     dataFormat: dataFormat
     eventSystemProperties: []
     compression: 'None'
