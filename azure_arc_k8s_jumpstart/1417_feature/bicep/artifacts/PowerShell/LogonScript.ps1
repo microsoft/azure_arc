@@ -422,7 +422,7 @@ do {
     $mqttIp = kubectl get service $mqListenerService -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     $services = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
     $matchingServices = $services.items | Where-Object {
-        $_.metadata.name -match "aio-mq" -and
+        $_.metadata.name -match "aio-mq-dmqtt" -and
         $_.status.phase -notmatch "running"
     }
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 30 seconds" -ForegroundColor Gray
