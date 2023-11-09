@@ -151,7 +151,7 @@ Start-Sleep -Seconds 30
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="videoindexer"
-$version="1.0.24-preview"
+$version="1.0.28-preview"
 $namespace="video-indexer"
 $releaseTrain="preview"
 $storageClass="longhorn"
