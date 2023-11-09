@@ -615,9 +615,9 @@ function Set-NICs {
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
             Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
-            # I dont think this is necessary with HCI
-            #Write-Verbose "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
-            #Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
+            # Install necessary tools to converge cluster
+            Write-Host "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
+            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
 
             # Enable CredSSP and MTU Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
@@ -1466,7 +1466,7 @@ function New-S2DCluster {
         while (!$PerfHistory) {
             Write-Host "Waiting for Cluster Performance History volume to come online."
             Start-Sleep -Seconds 10
-            $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}
+            $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}enable
             if ($PerfHistory) {
                 Write-Host "Cluster Perfomance History volume online." 
             }            
