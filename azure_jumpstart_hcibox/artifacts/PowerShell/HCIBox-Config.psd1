@@ -82,6 +82,7 @@
     ClusterVSwitchName                   = "hciSwitch"
     ClusterName                          = "hciboxcluster"
     WACVMName                            = "AdminCenter"
+    ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
