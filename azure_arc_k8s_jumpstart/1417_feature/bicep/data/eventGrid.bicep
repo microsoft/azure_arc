@@ -82,18 +82,6 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   }
 }
 
-/*resource eventGridClient 'Microsoft.EventGrid/namespaces/clients@2023-06-01-preview' = {
-  name:eventGridClientName
-  parent:eventGrid
-  properties: {
-    authenticationName: eventGridAuthName
-    clientCertificateAuthentication: {
-      allowedThumbprints: eventGridAuthThumbprint
-      validationScheme: authValidationSchema
-    }
-  }
-}*/
-
 resource eventGridTopicSpace 'Microsoft.EventGrid/namespaces/topicSpaces@2023-06-01-preview' = {
   name: eventGridTopicSpaceName
   parent: eventGrid

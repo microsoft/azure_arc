@@ -476,7 +476,6 @@ do {
 #(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $Ft1InfluxMountPath | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
-
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace
 
 do {
