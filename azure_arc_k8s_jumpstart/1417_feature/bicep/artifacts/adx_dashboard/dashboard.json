@@ -657,7 +657,7 @@
     {
       "id": "27da065d-b46f-4658-b525-556227c5c6b3",
       "name": "fryer",
-      "clusterUri": "https://adx-contosoba1016.eastus.kusto.windows.net/",
+      "clusterUri": "{{ADX_CLUSTER_URI}}",
       "database": "fryer",
       "queryResultsCacheMaxAge": 5000,
       "kind": "manual-kusto",
