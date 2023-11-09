@@ -3,7 +3,7 @@
     # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
     
     # HCIBox Folders
-    HCIBoxPaths = @{
+    Paths = @{
         VMDir = "C:\HCIBox\Virtual Machines"
         LogsDir = "C:\HCIBox\Logs"
         IconDir = "C:\HCIBox\Icons"

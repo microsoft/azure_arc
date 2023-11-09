@@ -9,7 +9,7 @@ Set-PSDebug -Strict
 # Load config file
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
-Start-Transcript -Path "$($HCIBoxConfig.HCIBoxPaths.LogsDir)\HCIBoxLogonScript.log"
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
 
 #####################################################################
 # Setup Azure CLI
@@ -50,7 +50,7 @@ az provider register --namespace Microsoft.ResourceConnector --wait
 Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($HCIBoxConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
 foreach ($extension in $HCIBoxConfig.VSCodeExtensions) {
     $WarningPreference = "SilentlyContinue"
-    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.HCIBoxPaths.LogsDir + "\Tools.log")
+    code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($HCIBoxConfig.Paths.LogsDir + "\Tools.log")
     $WarningPreference = "Continue"
 }
 
