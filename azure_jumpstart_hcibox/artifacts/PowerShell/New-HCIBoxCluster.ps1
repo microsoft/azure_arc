@@ -616,7 +616,7 @@ function Set-NICs {
 
             # Install necessary tools to converge cluster
             Write-Host "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
-            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $Credential | Out-Null 
+            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -Credential $using:Credential | Out-Null 
 
             # Enable CredSSP and MTU Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
@@ -1485,7 +1485,8 @@ function New-S2DCluster {
 
         Write-Host "Setting allowed networks for Live Migration"
         Get-ClusterResourceType -Name "Virtual Machine" -Cluster $HCIBoxConfig.ClusterName | `
-            Set-ClusterParameter -Cluster $HCIBoxConfig.ClusterName -Name MigrationExcludeNetworks -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster $HCIBoxConfig.ClusterName | `
+            Set-ClusterParameter -Cluster $HCIBoxConfig.ClusterName -Name MigrationExcludeNetworks -Value `
+            ([String]::Join(";", (Get-ClusterNetwork -Cluster $HCIBoxConfig.ClusterName | `
             Where-Object { $_.Name -notmatch "Storage" }).ID))
 
     }
