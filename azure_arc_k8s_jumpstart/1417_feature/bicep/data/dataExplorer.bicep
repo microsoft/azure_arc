@@ -122,6 +122,7 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   location: location
   parent: ft1donutPlantDB
   properties: {
+    managedIdentityResourceId: adxCluster.id
     eventHubResourceId: eventHubResourceId
     consumerGroup: eventHubConsumerGroupName
     tableName: tableName
@@ -142,6 +143,7 @@ resource adxEventHubConnectionPl 'Microsoft.Kusto/clusters/databases/dataConnect
   location: location
   properties: {
     eventHubResourceId: eventHubResourceId
+    managedIdentityResourceId: adxCluster.id
     consumerGroup: eventHubConsumerGroupNamePl
     tableName: tableNamePl
     dataFormat: dataFormat
