@@ -27,6 +27,7 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
 
 ## Prerequisites
 
+- KeyVault delegation
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
     ```shell
