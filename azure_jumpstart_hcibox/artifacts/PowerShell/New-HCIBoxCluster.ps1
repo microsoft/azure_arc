@@ -1401,8 +1401,9 @@ function New-HyperConvergedEnvironment {
         $domainCred = $using:domainCred
         $localCred = $using:localCred
         foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
-            Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $HCIBoxConfig -Credential $domainCred -ScriptBlock {
-                $HCIBoxconfig = $args[0]
+            Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $AzSHOST, $HCIBoxConfig -Credential $domainCred -ScriptBlock {
+                $AzSHOST = $args[0]
+                $HCIBoxconfig = $args[1]
                 # Check if switch exists already
                 $switchCheck = Get-VMSwitch | Where-Object { $_.Name -eq $HCIBoxConfig.ClusterVSwitchName } 
                 if ($switchCheck) { 
@@ -1420,9 +1421,8 @@ function New-HyperConvergedEnvironment {
                     Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
                     Set-DnsClientServerAddress -InterfaceIndex $switchNIC.InterfaceIndex -ServerAddresses $HCIBoxConfig.SDNLABDNS
 
-                    Write-Host "Setting VLAN ($($HCIBoxConfig.mgmtVLAN)) on host vNIC on host $($AzSHOST.Hostname)"
+                    Write-Host "Setting vSwitch adapter VLAN $($HCIBoxConfig.mgmtVLAN) on host $($AzSHOST.Hostname)"
                     Set-VMNetworkAdapterIsolation -IsolationMode 'Vlan' -DefaultIsolationID $HCIBoxConfig.mgmtVLAN -AllowUntaggedTraffic $true -VMNetworkAdapterName $($HCIBoxConfig.ClusterVSwitchName) -ManagementOS
-
                     Get-VMSwitchExtension -VMSwitchName $($HCIBoxConfig.ClusterVSwitchName) | Disable-VMSwitchExtension | Out-Null
 
                     Write-Host "Configuring MTU on all adapters on $($AzSHOST.Hostname)"
