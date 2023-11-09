@@ -1,28 +1,17 @@
+$WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "Stop" 
+$ProgressPreference = 'SilentlyContinue'
+
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
-$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
-$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
-$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
-$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
-$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
-$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-$Env:agentScript = "C:\HCIBox\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-AKS.log
-
-# Import Configuration Module and create Azure login credentials
-Write-Header 'Importing config'
-$ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+# Import Configuration Module
+$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Deploy-AKS.log"
 
 # Generate credential objects
-Write-Header 'Creating credentials and connecting to Azure'
-$user = "jumpstart.local\administrator"
+Write-Host 'Creating credentials and connecting to Azure'
+$user = "$($HCIBoxConfig.SDNDomainFQDN)\administrator"
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password # Domain credential
 
@@ -34,30 +23,33 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes -Confirm:$fa
 Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration -Confirm:$false
 
 # Install latest versions of Nuget and PowershellGet
-Write-Header "Install latest versions of Nuget and PowershellGet"
-Invoke-Command -VMName $HCIBoxConfig.HostList -Credential $adcred -ScriptBlock {
-    Enable-PSRemoting -Force
-    $ProgressPreference = "SilentlyContinue"
-    Install-PackageProvider -Name NuGet -Force 
-    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-    Install-Module -Name PowershellGet -Force
-    $ProgressPreference = "Continue"
+Write-Host "Install latest versions of Nuget and PowershellGet"
+foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
+    Invoke-Command -VMName $AzSHOST.Hostname -Credential $adcred -ScriptBlock {
+        Enable-PSRemoting -Force
+        $ProgressPreference = "SilentlyContinue"
+        Install-PackageProvider -Name NuGet -Force 
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Install-Module -Name PowershellGet -Force
+        $ProgressPreference = "Continue"
+    }
 }
 
 # Install necessary AZ modules and initialize akshci on each node
-Write-Header "Install necessary AZ modules plus AksHCI module and initialize akshci on each node"
-
-Invoke-Command -VMName $HCIBoxConfig.HostList  -Credential $adcred -ScriptBlock {
-    Write-Host "Installing Required Modules"
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $ProgressPreference = "SilentlyContinue"
-    Install-Module -Name AksHci -Force -AcceptLicense
-    Import-Module Az.Accounts -DisableNameChecking
-    Import-Module Az.Resources -DisableNameChecking
-    Import-Module AzureAD -DisableNameChecking
-    Import-Module AksHci -DisableNameChecking
-    Initialize-AksHciNode
-    $ProgressPreference = "Continue"
+Write-Host "Install necessary AZ modules plus AKS-HCI module and initialize akshci on each node"
+foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
+    Invoke-Command -VMName $AzSHOST.Hostname  -Credential $adcred -ScriptBlock {
+        Write-Host "Installing Required Modules"
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $ProgressPreference = "SilentlyContinue"
+        Install-Module -Name AksHci -Force -AcceptLicense
+        Import-Module Az.Accounts -DisableNameChecking
+        Import-Module Az.Resources -DisableNameChecking
+        Import-Module AzureAD -DisableNameChecking
+        Import-Module AksHci -DisableNameChecking
+        Initialize-AksHciNode
+        $ProgressPreference = "Continue"
+    }
 }
 
 # Generate unique name for workload cluster
@@ -74,8 +66,8 @@ $clusterName = $HCIBoxConfig.AKSworkloadClusterName + "-" + $namingPrefix
 
 # Install AksHci - only need to perform the following on one of the nodes
 $rg = $env:resourceGroup
-Write-Header "Prepping AKS Install"
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Write-Host "Prepping AKS Install"
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock  {
     $vnet = New-AksHciNetworkSetting -name $using:HCIBoxConfig.AKSvnetname -vSwitchName $using:HCIBoxConfig.ClusterVSwitchName -k8sNodeIpPoolStart $using:HCIBoxConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:HCIBoxConfig.AKSNodeEndIP -vipPoolStart $using:HCIBoxConfig.AKSVIPStartIP -vipPoolEnd $using:HCIBoxConfig.AKSVIPEndIP -ipAddressPrefix $using:HCIBoxConfig.AKSIPPrefix -gateway $using:HCIBoxConfig.AKSGWIP -dnsServers $using:HCIBoxConfig.AKSDNSIP -vlanID $using:HCIBoxConfig.AKSVlanID        
     Set-AksHciConfig -imageDir $using:HCIBoxConfig.AKSImagedir -workingDir $using:HCIBoxConfig.AKSWorkingdir -cloudConfigLocation $using:HCIBoxConfig.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:HCIBoxConfig.AKSCloudSvcidr -controlPlaneVmSize Standard_D4s_v3
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
@@ -85,14 +77,14 @@ Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBloc
 }
 
 # Create new AKS target cluster and connect it to Azure
-Write-Header "Creating AKS target cluster"
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Write-Host "Creating AKS target cluster"
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock  {
     New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 2 -osType linux -nodeVmSize Standard_D8s_v3
     Enable-AksHciArcConnection -name $using:clusterName
 }
 
-Write-Header "Checking AKS-HCI nodes and running pods"
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Write-Host "Checking AKS-HCI nodes and running pods"
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock  {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
     kubectl get pods -A
