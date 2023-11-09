@@ -379,3 +379,4 @@ module keyVault 'data/keyVault.bicep' = {
 
 output windowsAdminUsername string = windowsAdminUsername
 output publicIP string = concat(publicIpAddress.properties.ipAddress)
+output adxEndpoint string = adxCluster.outputs.adxEndpoint
