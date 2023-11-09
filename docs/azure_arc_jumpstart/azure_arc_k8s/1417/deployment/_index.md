@@ -27,7 +27,6 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
 
 ## Prerequisites
 
-- KeyVault delegation
 - [Install or update Azure CLI to version 2.49.0 or above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
     ```shell
@@ -85,6 +84,12 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
     }
     ```
 
+    To get the service principal object id, you can run the following command
+
+    ```shell
+    az ad sp list --display-name "<Unique SP Name>" --query "[].{Name:displayName, ObjectId:id}"
+    ```
+
   - (Option 2) Create service principal using PowerShell. If necessary, follow [this documentation](https://learn.microsoft.com/powershell/azure/install-az-ps?view=azps-8.3.0) to install or update Azure PowerShell to version 10.4.0 or above.
 
     ```PowerShell
@@ -93,6 +98,7 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
     echo "SPN tenant: $($account.Context.Tenant.Id)"
+    echo "SPN object id: $($spn.Id)"
     ```
 
     For example:
@@ -102,6 +108,7 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
     $spn = New-AzADServicePrincipal -DisplayName "Jumpstartft1SPN" -Role "Owner" -Scope "/subscriptions/$($account.Context.Subscription.Id)"
     echo "SPN App id: $($spn.AppId)"
     echo "SPN secret: $($spn.PasswordCredentials.SecretText)"
+    echo "SPN object id: $($spn.Id)"
     ```
 
     Output should look similar to this:
@@ -109,6 +116,31 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
     ![Screenshot showing creating an SPN with PowerShell](./img/create_spn_powershell.png)
 
     > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.__
+
+  - Ft1 requires creating a _user_impersonation_ delegated permission on _Azure Key Vault_ for this service principal.
+
+    - Navigate to _Entra Id_ in the Azure Portal.
+
+        ![Screenshot showing searching for Entra Id in the Azure Portal](./img/entraId_search.png)
+
+    - Click on "App registrations" and search for the name of the service principal you created.
+
+        ![Screenshot showing searching for the service principal in the Entra Id Portal](./img/app_registration_search.png)
+
+    - Click on "API permissions" and add a new permission.
+
+        ![Screenshot showing adding a new API permission](./img/app_registration_add_perm.png)
+
+    - Select _Azure Key Vault_.
+
+        ![Screenshot showing adding a new API permission](./img/app_registration_key_vault.png)
+
+    - Click on "Delegated permissions" and select the "user_impersonation" permission.
+
+        ![Screenshot showing adding a new API permission](./img/app_registration_key_vault_add_perm.png)
+
+        ![Screenshot showing added API permission](./img/app_registration_key_vault_add_perm_done.png)
+
     > __NOTE: The Jumpstart scenarios are designed with as much ease of use in mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well as considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)__
 
 ## Deployment: Bicep deployment via Azure CLI
@@ -202,9 +234,9 @@ By design, ft1 does not open port 3389 on the network security group. Therefore,
 - Select My IP address from the dropdown.
 
   <img src="./img/nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
-  
+
   <br/>
-  
+
   ![Screenshot showing all inbound security rule](./img/nsg_rdp_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./img/rdp_connect.png)
