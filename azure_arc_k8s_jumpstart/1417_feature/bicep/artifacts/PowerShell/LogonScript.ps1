@@ -403,7 +403,7 @@ Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
 #kubectl create namespace arc
-$mqconfigfile = "$Ft1ToolsDir\mq_loadBalancer.yml"
+$mqconfigfile = "$Ft1ToolsDir\mq_cloudConnector.yml"
 $mqListenerService = "aio-mq-dmqtt-frontend"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
