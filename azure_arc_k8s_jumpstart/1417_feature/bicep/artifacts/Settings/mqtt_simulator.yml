@@ -25,4 +25,4 @@ spec:
             - name: MQTT_PORT
               value: "1883"
             - name: FRECUENCY
-              value: "10"
+              value: "5"
