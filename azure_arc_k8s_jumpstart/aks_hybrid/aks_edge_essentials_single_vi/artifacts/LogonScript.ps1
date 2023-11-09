@@ -131,7 +131,6 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 # Connect Arc-enabled kubernetes
 Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 
-
 #####################################################################
 ### Install ingress-nginx
 #####################################################################
@@ -151,7 +150,7 @@ Start-Sleep -Seconds 30
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="videoindexer"
-$version="1.0.28-preview"
+$version="1.0.24-preview"
 $namespace="video-indexer"
 $releaseTrain="preview"
 $storageClass="longhorn"
