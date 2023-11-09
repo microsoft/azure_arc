@@ -50,7 +50,9 @@ Voltage: real,
 Temperature: real,
 Humidity: real,
 VacuumAlert: boolean,
-VacuumPressure: real
+VacuumPressure: real,
+Oiltemperature: real,
+OiltemperatureTarget: real
 )
 
 // Create function to decode base64 to json format
@@ -110,8 +112,10 @@ VacuumPressure: real
         Temperature = toreal(data.data.Temperature),
         Humidity = toreal(data.data.Humidity),
         VacuumAlert = toboolean(data.data.VacuumAlert),
-        VacuumPressure = toreal(data.data.VacuumPressure)
+        VacuumPressure = toreal(data.data.VacuumPressure),
+        Oiltemperature = toreal(data.data.Oiltemperature),
+        OiltemperatureTarget = toreal(data.data.OiltemperatureTarget)
     }
- 
+
  // Create policy to run function every 1 minute
 .alter table fryer policy update @'[{"Source": "donutPlant", "Query": "Expand_fryer_Data()", "IsEnabled": "True"}]'
