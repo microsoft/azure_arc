@@ -6,8 +6,7 @@ Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
 $starttime = Get-Date
 
 # Import Configuration data file
-$ConfigurationDataFile = $Env:HCIBoxConfigFile
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
 #region functions
 function BITSRequest {
