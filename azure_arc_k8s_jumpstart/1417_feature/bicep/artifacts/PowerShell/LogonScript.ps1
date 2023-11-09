@@ -8,6 +8,7 @@ $Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
 $Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
 $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $Ft1InfluxMountPath = $Ft1Config.ft1Directories["Ft1InfluxMountPath"]
+$Ft1DataExplorerDir = $Ft1Config.Ft1Directories["Ft1DataExplorer"]
 $websiteUrls = $Ft1Config.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
 $mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
@@ -475,7 +476,6 @@ do {
 #(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $Ft1InfluxMountPath | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
-
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace
 
 do {
@@ -509,26 +509,18 @@ kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n $ft1Namespace
 ########################################################################
 # ADX Dashboards
 ########################################################################
-Write-Host "Importing Azure Data Explorer dashboards..."
+Write-Host "[$(Get-Date -Format t)] INFO: Creating the Azure Data Explorer dashboard..."
 
 # Get the ADX/Kusto cluster info
 $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
 $adxEndPoint = $kustoCluster.Uri
+(Get-content "$Ft1DataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint) | Set-Content "$Ft1DataExplorerDir/dashboard.json"
 
 # Update the dashboards files with the new ADX cluster name and URI
-$templateBaseUrl = "https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep"
-$dashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboard/dashboard.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint
-<#
-# Get access token to make REST API call to Azure Data Explorer Dashabord API. Replace double quotes surrounding access token
-$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/user_impersonation openid profile offline_access" --query "accessToken") -replace "`"", ""
-
-# Prepare authorization header with access token
+<#$dashboardBody = (Get-content "$Ft1DataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint)
+$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/.default openid profile offline_access" --query "accessToken") -replace "`"", ""
 $httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-
-# Make REST API call to the dashboard endpoint.
 $dashboardApi = "https://dashboards.kusto.windows.net/dashboards"
-
-# Import orders dashboard report
 $httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $dashboardBody -Headers $httpHeaders
 if ($httpResponse.StatusCode -ne 200) {
     Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer" -ForegroundColor Red
