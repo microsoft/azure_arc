@@ -1,28 +1,21 @@
+$WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "Stop" 
+$ProgressPreference = 'SilentlyContinue'
+
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
-$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
-$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
-$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
-$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
-$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
-$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
-$Env:agentScript = "C:\HCIBox\agentScript"
-$Env:ToolsDir = "C:\Tools"
-$Env:tempDir = "C:\Temp"
-$Env:VMPath = "C:\VMs"
 
 # Import Configuration Module
-$ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
-$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Uninstall-ArcResourceBridge.log"
 
-# Set AD Domain cred
-$user = "jumpstart.local\$env:adminUsername"
+# Generate credential objects
+$user = "$($HCIBoxConfig.SDNDomainFQDN)\administrator"
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
-$csv_path = "C:\ClusterStorage\S2D_vDISK1"
+$csv_path = $HCIBoxConfig.ClusterSharedVolumePath
+
 $subId = $env:subscriptionId
 $rg = $env:resourceGroup
 $spnClientId = $env:spnClientId
@@ -31,7 +24,7 @@ $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $custom_location_name = "hcibox-rb-cl"
 
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock {
     Write-Host "Removing Arc Resource Bridge."
     $WarningPreference = "SilentlyContinue"
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
