@@ -55,7 +55,7 @@ OEENightShift: real)
 
 // Create a function to parse the data from the productionline topic
 .create-or-alter function Expand_productionline_Data() {
-    stagging
+    donutPlant
     | where subject == "topic/productionline"
     | extend data = parse_json( base64_decode_tostring(data_base64) ) 
     | project 
@@ -114,4 +114,4 @@ OEENightShift: real)
 }
 
 // Create a policy to update the productionline table
-.alter table productionline policy update @'[{"Source": "stagging", "Query": "Expand_productionline_Data()", "IsEnabled": "True"}]'
+.alter table productionline policy update @'[{"Source": "donutPlant", "Query": "Expand_productionline_Data()", "IsEnabled": "True"}]'
