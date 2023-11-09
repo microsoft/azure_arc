@@ -1554,7 +1554,7 @@ BITSRequest -Params @{'Uri'='https://aka.ms/AAijhe3'; 'Filename'="$($HCIBoxConfi
 BITSRequest -Params @{'Uri'='https://aka.ms/AAij9n9'; 'Filename'="$($HCIBoxConfig.HCIBoxPaths.VHDDir)\GUI.vhdx"}
 BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx.zip"}
 Expand-Archive -Path "$($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.HCIBoxPaths.VHDDir)
-Move-Item -Path $($HCIBoxConfig.HCIBoxPaths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx -Destination $($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx
+Move-Item -Path "$($HCIBoxConfig.HCIBoxPaths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.HCIBoxPaths.VHDDir)\Ubuntu.vhdx"
 
 # Set credentials
 $localCred = new-object -typename System.Management.Automation.PSCredential `
