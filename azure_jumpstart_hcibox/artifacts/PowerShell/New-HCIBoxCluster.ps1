@@ -1475,10 +1475,10 @@ function New-S2DCluster {
                 }            
             }
 
-            Write-Host "Configuring S2D"
+        Write-Host "Configuring S2D"
         Get-PhysicalDisk | Where-Object { $_.Size -lt 127GB } | Set-PhysicalDisk -MediaType HDD | Out-Null
         Start-Sleep -Seconds 10
-        New-Volume -FriendlyName "S2D_vDISK1" -FileSystem 'CSVFS_ReFS' -StoragePoolFriendlyName "S2D on $($HCIBoxConfig.ClusterName)" -ResiliencySettingName 'Mirror' -PhysicalDiskRedundancy 1 -AllocationUnitSize 64KB
+        New-Volume -FriendlyName "S2D_vDISK1" -FileSystem 'CSVFS_ReFS' -StoragePoolFriendlyName "S2D on $($HCIBoxConfig.ClusterName)" -ResiliencySettingName 'Mirror' -PhysicalDiskRedundancy 1 -AllocationUnitSize 64KB -UseMaximumSize
         Get-StorageSubsystem clus* | Set-StorageHealthSetting -name “System.Storage.PhysicalDisk.AutoReplace.Enabled” -value “False”
         Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\spaceport\Parameters -Name HwTimeout -Value 0x00007530
         

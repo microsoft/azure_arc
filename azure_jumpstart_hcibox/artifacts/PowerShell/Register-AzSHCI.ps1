@@ -10,7 +10,7 @@ $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Register-AzSHCI.log"
 
-$user = $env:adminUsername
+$user = "$($HCIBoxConfig.SDNDomainFQDN)\$env:adminUsername"
 $password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
@@ -28,7 +28,7 @@ $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnCl
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 
 #Register the Cluster
-Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Black
+Write-Host "Registering the HCIBox Cluster" -ForegroundColor Green -BackgroundColor Black
 $armtoken = Get-AzAccessToken
 $clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
