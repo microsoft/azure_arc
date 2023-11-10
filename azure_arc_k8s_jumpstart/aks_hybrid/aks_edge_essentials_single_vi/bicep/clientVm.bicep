@@ -16,7 +16,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('Resource tag for Jumpstart Agora')
+@description('Resource tag for Jumpstart')
 param resourceTags object = {
   Project: 'Jumpstart'
 }
@@ -123,7 +123,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
           diskSizeGB: 256
           lun: 0
           createOption: 'Empty'
-          caching: 'ReadWrite'
+          caching: 'ReadOnly'
           managedDisk: {
             storageAccountType: 'Premium_LRS'
           }
@@ -132,7 +132,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
           diskSizeGB: 256
           lun: 1
           createOption: 'Empty'
-          caching: 'ReadWrite'
+          caching: 'ReadOnly'
           managedDisk: {
             storageAccountType: 'Premium_LRS'
           }
@@ -141,7 +141,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
           diskSizeGB: 256
           lun: 2
           createOption: 'Empty'
-          caching: 'ReadWrite'
+          caching: 'ReadOnly'
           managedDisk: {
             storageAccountType: 'Premium_LRS'
           }
@@ -150,7 +150,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
           diskSizeGB: 256
           lun: 3
           createOption: 'Empty'
-          caching: 'ReadWrite'
+          caching: 'ReadOnly'
           managedDisk: {
             storageAccountType: 'Premium_LRS'
           }
