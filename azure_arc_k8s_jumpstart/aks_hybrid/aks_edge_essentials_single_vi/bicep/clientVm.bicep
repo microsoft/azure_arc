@@ -146,6 +146,15 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
             storageAccountType: 'Premium_LRS'
           }
         }
+        {
+          diskSizeGB: 256
+          lun: 3
+          createOption: 'Empty'
+          caching: 'ReadWrite'
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
       ]
     }
     networkProfile: {
