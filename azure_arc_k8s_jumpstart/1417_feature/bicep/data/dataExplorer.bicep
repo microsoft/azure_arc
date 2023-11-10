@@ -116,4 +116,13 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   }
 }
 
+resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('AzureEventHubsDataReceiverRole', adxCluster.id, eventHubResourceId)
+  scope: adxCluster
+  properties: {
+    roleDefinitionId: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
+    principalId: adxCluster.identity.principalId
+  }
+}
+
 output adxEndpoint string = adxCluster.properties.uri
