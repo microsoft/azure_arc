@@ -150,7 +150,7 @@ Start-Sleep -Seconds 30
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="videoindexer"
-$version="1.0.24-preview"
+$version="1.0.28-preview"
 $namespace="video-indexer"
 $releaseTrain="preview"
 $storageClass="longhorn"
@@ -173,7 +173,6 @@ az k8s-extension create --name $extensionName `
                         --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
-                        --release-train $releaseTrain `
                         --version $version `
                         --auto-upgrade-minor-version false `
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
