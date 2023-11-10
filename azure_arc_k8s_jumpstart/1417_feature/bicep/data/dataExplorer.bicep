@@ -116,11 +116,16 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   }
 }
 
+resource AzureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
+  scope: tenant()
+}
+
 resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid('AzureEventHubsDataReceiverRole', adxCluster.id, eventHubResourceId)
   scope: adxCluster
   properties: {
-    roleDefinitionId: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
+    roleDefinitionId: AzureEventHubsDataReceiverRole.id
     principalId: adxCluster.identity.principalId
   }
 }
