@@ -1323,7 +1323,7 @@ CertificateTemplate= WebServer
 
             # Install Azure PowerShell
             Write-Host 'Installing Az PowerShell'
-            $expression = "choco install az.powershell -y"
+            $expression = "choco install az.powershell -y --limit-output"
             Invoke-Expression $expression
     
             # Create Shortcut for Hyper-V Manager
@@ -1352,7 +1352,7 @@ CertificateTemplate= WebServer
 
             # Install Kubectl
             Write-Host 'Installing kubectl'
-            $expression = "choco install kubernetes-cli -y"
+            $expression = "choco install kubernetes-cli -y --limit-output"
             Invoke-Expression $expression
 
             # Create a shortcut for Windows Admin Center
