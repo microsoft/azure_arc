@@ -460,7 +460,7 @@ function Set-HCINodeVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $HostName + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
     Write-Host "Performing offline installation of Hyper-V on $Hostname"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 5
