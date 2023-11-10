@@ -327,7 +327,7 @@ $pvcYaml = @"
       storageClassName: local-path
       resources:
         requests:
-          storage: 5Gi
+          storage: 15Gi
 "@
 
     $pvcYaml | kubectl apply -f -

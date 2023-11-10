@@ -33,6 +33,9 @@ param eventHubConsumerGroupName string = 'cgadx'
 @description('The name of the Event Hub')
 param eventHubName string
 
+@description('The name of the Event Hub Namespace')
+param eventHubNamespaceName string
+
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
 
@@ -125,7 +128,7 @@ resource azureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions
 }
 
 resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2023-01-01-preview' existing = {
-  name: eventHubName
+  name: '${eventHubNamespaceName}/${eventHubName}'
 }
 
 resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
