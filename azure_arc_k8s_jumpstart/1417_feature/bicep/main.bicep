@@ -365,6 +365,7 @@ module adxCluster 'data/dataExplorer.bicep' = {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     eventHubConsumerGroupName: eventHubConsumerGroupName
     eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
   }
 }
 
