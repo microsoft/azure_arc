@@ -470,8 +470,6 @@ function Set-HCINodeVHDX {
     Install-WindowsFeature -Vhd $path -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools | Out-Null 
     Start-Sleep -Seconds 15
 
-    $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
     Write-Host "Mounting VHDX file at $path"
     $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
     if (!$partition.DriveLetter) {
