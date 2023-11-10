@@ -1446,31 +1446,36 @@ function New-S2DCluster {
         $HCIBoxConfig,
         [PSCredential]$domainCred
     )
-    Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ScriptBlock {
-        $HCIBoxConfig = $using:HCIBoxConfig
-        $ClusterIP = ($HCIBoxConfig.MGMTSubnet.TrimEnd("0/24")) + "252"
+    Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ArgumentList $HCIBoxConfig, $domainCred -ScriptBlock {
+        $HCIBoxConfig = $args[0]
+        $domainCred = $args[1]
+
+        Import-Module FailoverClusters
+        Import-Module Storage
         $nodes = @()
         foreach ($node in $HCIBoxConfig.NodeHostConfig) {
             $nodes += $node.Hostname
         }
+        Write-Host "Creating cluster $($HCIBoxConfig.ClusterName) from nodes: $nodes"
+        Register-PSSessionConfiguration -Name Microsoft.HCIBoxS2D -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 -WarningAction SilentlyContinue | Out-Null
 
-        Import-Module FailoverClusters
-        Import-Module Storage
+        Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ArgumentList $HCIBoxConfig, $nodes -ConfigurationName Microsoft.HCIBoxS2D -ScriptBlock {
+            $HCIBoxConfig = $args[0]
+            $nodes = $args[1]
+            $ClusterIP = ($HCIBoxConfig.MGMTSubnet.TrimEnd("0/24")) + "252"
 
-        Write-Host "Creating cluster: $($HCIBoxConfig.ClusterName)"
-        New-Cluster -Name $HCIBoxConfig.ClusterName -Node $nodes -StaticAddress $ClusterIP -NoStorage -WarningAction SilentlyContinue | Out-Null
+            New-Cluster -Name $HCIBoxConfig.ClusterName -Node $nodes -StaticAddress $ClusterIP -NoStorage
+            Enable-ClusterS2D -Confirm:$false -Verbose
+            while (!$PerfHistory) {
+                Write-Host "Waiting for Cluster Performance History volume to come online."
+                Start-Sleep -Seconds 10
+                $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}
+                if ($PerfHistory) {
+                    Write-Host "Cluster Perfomance History volume online." 
+                }            
+            }
 
-        Enable-ClusterS2D -Confirm:$false -Verbose
-        while (!$PerfHistory) {
-            Write-Host "Waiting for Cluster Performance History volume to come online."
-            Start-Sleep -Seconds 10
-            $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}enable
-            if ($PerfHistory) {
-                Write-Host "Cluster Perfomance History volume online." 
-            }            
-        }
-
-        Write-Host "Configuring S2D"
+            Write-Host "Configuring S2D"
         Get-PhysicalDisk | Where-Object { $_.Size -lt 127GB } | Set-PhysicalDisk -MediaType HDD | Out-Null
         Start-Sleep -Seconds 10
         New-Volume -FriendlyName "S2D_vDISK1" -FileSystem 'CSVFS_ReFS' -StoragePoolFriendlyName "S2D on $($HCIBoxConfig.ClusterName)" -ResiliencySettingName 'Mirror' -PhysicalDiskRedundancy 1 -AllocationUnitSize 64KB
@@ -1487,7 +1492,7 @@ function New-S2DCluster {
             Set-ClusterParameter -Cluster $HCIBoxConfig.ClusterName -Name MigrationExcludeNetworks -Value `
             ([String]::Join(";", (Get-ClusterNetwork -Cluster $HCIBoxConfig.ClusterName | `
             Where-Object { $_.Name -notmatch "Storage" }).ID))
-
+        }
     }
 }
 
