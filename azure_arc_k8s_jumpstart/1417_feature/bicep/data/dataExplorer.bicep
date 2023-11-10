@@ -124,7 +124,7 @@ resource azureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions
   scope: tenant()
 }
 
-resource eventHub 'Microsoft.EventHub/namespaces@2023-01-01-preview' existing = {
+resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2023-01-01-preview' existing = {
   name: eventHubName
 }
 
