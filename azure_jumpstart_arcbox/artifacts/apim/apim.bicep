@@ -47,7 +47,7 @@ resource apimAdventureWorkApi 'Microsoft.ApiManagement/service/apis@2023-03-01-p
   properties: {
     displayName: 'AdventureworkAPI'
     apiRevision: '1'
-    subscriptionRequired: true
+    subscriptionRequired: false
     path: 'adventurework'
     protocols: [
       'http'
