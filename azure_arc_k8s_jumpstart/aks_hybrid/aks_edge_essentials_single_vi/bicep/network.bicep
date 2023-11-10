@@ -28,8 +28,6 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'JS-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
-
-
 var bastionSubnet = [
   {
     name: 'AzureBastionSubnet'
