@@ -30,6 +30,9 @@ param dataFormat string = 'multijson'
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx'
 
+@description('The name of the Event Hub')
+param eventHubName string
+
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
 
@@ -116,16 +119,20 @@ resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnectio
   }
 }
 
-resource AzureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+resource azureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
   scope: tenant()
 }
 
+resource eventHub 'Microsoft.EventHub/namespaces@2023-01-01-preview' existing = {
+  name: eventHubName
+}
+
 resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid('AzureEventHubsDataReceiverRole', adxCluster.id, eventHubResourceId)
-  scope: adxCluster
+  scope: eventHub
   properties: {
-    roleDefinitionId: AzureEventHubsDataReceiverRole.id
+    roleDefinitionId: azureEventHubsDataReceiverRole.id
     principalId: adxCluster.identity.principalId
   }
 }
