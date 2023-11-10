@@ -467,7 +467,7 @@ function Set-HCINodeVHDX {
 
     # Install necessary tools to converge cluster
     Write-Host "Installing and Configuring Failover Clustering on $Hostname"
-    Install-WindowsFeature -Vhd $path -Name  -IncludeAllSubFeature -IncludeManagementTools | Out-Null 
+    Install-WindowsFeature -Vhd $path -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools | Out-Null 
     Start-Sleep -Seconds 5
 
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
