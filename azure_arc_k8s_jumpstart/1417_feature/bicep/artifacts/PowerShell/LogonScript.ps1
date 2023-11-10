@@ -314,6 +314,24 @@ Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
     & kubectl apply -f $localPathProvisionerYaml
+
+$pvcYaml = @"
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: local-path-pvc
+      namespace: default
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 5Gi
+"@
+
+    $pvcYaml | kubectl apply -f -
+
     Write-Host "Successfully deployment the local path provisioner"
 }
 catch {
