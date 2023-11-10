@@ -309,8 +309,8 @@ function Restart-VMs {
             Restart-Computer -Force
         }
     }
-    Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.HostName)"
-    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential -ScriptBlock {
+    Write-Host "Restarting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
+    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
         Restart-Computer -Force
     }
     Start-Sleep -Seconds 30
@@ -408,7 +408,7 @@ function Set-MGMTVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.HostName) + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.Hostname) + ".vhdx") 
     Write-Host "Performing offline installation of Hyper-V on $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 20
@@ -427,7 +427,7 @@ function Set-MGMTVHDX {
 
     # Inject Answer File
     Write-Host "Injecting answer file to $path"
-    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.HostName) -IsMgmtVM $true -IPAddress $HCIBoxConfig.MgmtHostConfig.IP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
+    $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.Hostname) -IsMgmtVM $true -IPAddress $HCIBoxConfig.MgmtHostConfig.IP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
     
     Write-Host "Mounted Disk Volume is: $MountedDrive" 
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
@@ -436,7 +436,7 @@ function Set-MGMTVHDX {
     Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
 
     # Creating folder structure on AzSMGMT
-    Write-Host "Creating VMs\Base folder structure on $($HCIBoxConfig.MgmtHostConfig.HostName)"
+    Write-Host "Creating VMs\Base folder structure on $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
 
     # Injecting configs into VMs
@@ -504,7 +504,7 @@ function Set-DataDrives {
         [PSCredential]$Credential
     )
     $VMs = @()
-    $VMs += $HCIBoxConfig.MgmtHostConfig.HostName
+    $VMs += $HCIBoxConfig.MgmtHostConfig.Hostname
     foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $VMs += $node.Hostname
     }
@@ -582,7 +582,7 @@ function Set-NICs {
         [PSCredential]$Credential
     )
 
-    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.HostName -Credential $Credential -ScriptBlock {
+    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
@@ -1594,7 +1594,7 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 # Create the three nested Virtual Machines 
 ################################################################################
 # First create the Management VM (AzSMGMT)
-$mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.HostName) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
+$mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
@@ -1604,8 +1604,8 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 }
     
 # Start Virtual Machines
-Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.HostName)"
-Start-VM -Name $HCIBoxConfig.MgmtHostConfig.HostName
+Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
+Start-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     Write-Host "Starting VM: $($VM.Hostname)"
     Start-VM -Name $VM.Hostname
