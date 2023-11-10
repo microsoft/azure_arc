@@ -40,7 +40,10 @@
         "Microsoft.HybridConnectivity",
         "Microsoft.DeviceRegistry",
         "Microsoft.EventGrid",
-        "Microsoft.ExtendedLocation"
+        "Microsoft.ExtendedLocation",
+        "Microsoft.IoTOperationsOrchestrator",
+        "Microsoft.IoTOperationsMQ",
+        "Microsoft.IoTOperationsDataProcessor"
     )
 
     # Az CLI required extensions
@@ -50,7 +53,8 @@
         'eventgrid',
         'customlocation',
         'kusto',
-        'storage-preview'
+        'storage-preview',
+        'azure-iot-ops'
     )
 
     # PowerShell modules
