@@ -463,7 +463,12 @@ function Set-HCINodeVHDX {
     $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $HostName + ".vhdx") 
     Write-Host "Performing offline installation of Hyper-V on $Hostname"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
-    Start-Sleep -Seconds 20
+    Start-Sleep -Seconds 5
+
+    # Install necessary tools to converge cluster
+    Write-Host "Installing and Configuring Failover Clustering on $Hostname"
+    Install-WindowsFeature -Vhd $path -Name  -IncludeAllSubFeature -IncludeManagementTools | Out-Null 
+    Start-Sleep -Seconds 5
 
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
     $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
@@ -613,10 +618,6 @@ function Set-NICs {
             # Rename non-storage adapters
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
             Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
-
-            # Install necessary tools to converge cluster
-            Write-Host "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
-            Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -Credential $using:Credential | Out-Null 
 
             # Enable CredSSP and MTU Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
