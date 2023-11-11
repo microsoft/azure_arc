@@ -575,6 +575,39 @@ Please note it may take some time to show this status in the Azure portal, but s
 - The below screenshot shows an email alert sent by Defender for Cloud when a SQL threat is detected. By default, this email is sent to the registered contact email at the subscription level.
   ![Screenshot showing test script results](./brute-force-attack-alert.png)
 
+### Adventure Workload and Azure API Management
+
+This section guide you through deploy Adventure Work WebAPI workload on k3s cluster together with Azure API Management to bring all the control panel on Azure inline with other ARC service. 
+
+> Note: The assumption is the Arc SQL Managed Instance has been deployed. The deployment start once the SQL Managed Instance has completed.
+
+- Start deployment by powershell command.
+
+``` powershell
+  C:\ArcBox\Deploy-APIM.ps1
+```
+
+- The scrip will do the following:
+ - Deploy Adventure Web API to k3s.
+ - Set back end of the Web API to AdventureWork SQL Managed Instance.
+ - Deploy Azure API Management with self host gateway.
+ - Deploy Self-host gate way to the k3s
+ - Configure the connectively from Azure API Management, Self-host gateway and Adventure Workload
+
+- Deployment will finish show the following message
+  ![Screenshot showing Terminal screenshot show output of the deployment ](./apim_01_deploymentcomplete.png)
+
+ - Get the IP address for the selft host agent
+ 
+ ``` powershell
+ C:\ArcBox\kubectl get svc
+ ```
+ - The selfhost agent IP as below
+ ![Screenshot showing Terminal screenshot show IP of the self host agent service ](./apim_02_selfhost_ip.png)
+
+ - Adventure Workload can be tested using the IP
+![Screenshot showing Terminal screenshot show output of the deployment ](./apim_10_request.pn
+g)
 ### Included tools
 
 The following tools are including on the _ArcBox-Client_ VM.
