@@ -606,8 +606,7 @@ This section guide you through deploy Adventure Work WebAPI workload on k3s clus
  ![Screenshot showing Terminal screenshot show IP of the self host agent service ](./apim_02_selfhost_ip.png)
 
  - Adventure Workload can be tested using the IP
-![Screenshot showing Terminal screenshot show output of the deployment ](./apim_10_request.pn
-g)
+![Screenshot showing Terminal screenshot show output of the deployment ](./apim_10_request.png)
 ### Included tools
 
 The following tools are including on the _ArcBox-Client_ VM.
