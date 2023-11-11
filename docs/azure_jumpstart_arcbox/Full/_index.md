@@ -588,11 +588,11 @@ This section guide you through deploy Adventure Work WebAPI workload on k3s clus
 ```
 
 - The scrip will do the following:
- - Deploy Adventure Web API to k3s.
- - Set back end of the Web API to AdventureWork SQL Managed Instance.
- - Deploy Azure API Management with self host gateway.
- - Deploy Self-host gate way to the k3s
- - Configure the connectively from Azure API Management, Self-host gateway and Adventure Workload
+   - Deploy Adventure Web API to k3s.
+   - Set back end of the Web API to AdventureWork SQL Managed Instance.
+   - Deploy Azure API Management with self host gateway.
+   - Deploy Self-host gate way to the k3s
+   - Configure the connectively from Azure API Management, Self-host gateway and Adventure Workload
 
 - Deployment will finish show the following message
   ![Screenshot showing Terminal screenshot show output of the deployment ](./apim_01_deploymentcomplete.png)
