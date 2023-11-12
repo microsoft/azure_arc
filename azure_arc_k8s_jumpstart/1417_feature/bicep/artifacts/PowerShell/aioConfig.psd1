@@ -1,18 +1,18 @@
 @{
-    # This is the PowerShell datafile used to provide configuration information for the ft1 environment. Product keys and password are not encrypted and will be available on host during installation.
+    # This is the PowerShell datafile used to provide configuration information for the aio environment. Product keys and password are not encrypted and will be available on host during installation.
 
     # Directory paths
-    Ft1Directories           = @{
-        Ft1Dir             = "C:\Ft1"
-        Ft1LogsDir         = "C:\Ft1\Logs"
-        Ft1PowerShellDir   = "C:\Ft1\PowerShell"
-        Ft1ToolsDir        = "C:\Tools"
-        Ft1TempDir         = "C:\Temp"
-        Ft1ConfigMapDir    = "C:\Ft1\ConfigMaps"
-        Ft1AppsRepo        = "C:\Ft1\AppsRepo"
-        Ft1DataExplorer    = "C:\Ft1\DataExplorer"
-        Ft1MonitoringDir   = "C:\Ft1\Monitoring"
-        Ft1InfluxMountPath = "C:\Ft1\InfluxDB"
+    aioDirectories           = @{
+        aioDir             = "C:\aio"
+        aioLogsDir         = "C:\aio\Logs"
+        aioPowerShellDir   = "C:\aio\PowerShell"
+        aioToolsDir        = "C:\Tools"
+        aioTempDir         = "C:\Temp"
+        aioConfigMapDir    = "C:\aio\ConfigMaps"
+        aioAppsRepo        = "C:\aio\AppsRepo"
+        aioDataExplorer    = "C:\aio\DataExplorer"
+        aioMonitoringDir   = "C:\aio\Monitoring"
+        aioInfluxMountPath = "C:\aio\InfluxDB"
     }
 
     # Required URLs
@@ -153,7 +153,7 @@
 
     # Universal resource tag and resource types
     TagName                 = 'Project'
-    TagValue                = 'Jumpstart_ft1'
+    TagValue                = 'Jumpstart_aio'
     ArcServerResourceType   = 'Microsoft.HybridCompute/machines'
     ArcK8sResourceType      = 'Microsoft.Kubernetes/connectedClusters'
 

@@ -117,7 +117,7 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
 
     > __NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct secret.__
 
-  - Ft1 requires creating a _user_impersonation_ delegated permission on _Azure Key Vault_ for this service principal.
+  - Ft1 requires creating a _user_impersonation_ delegated permission on Azure Key Vault for this service principal.
 
     - Navigate to _Entra Id_ in the Azure Portal.
 
@@ -131,7 +131,7 @@ Once automation is complete, users can immediately start enjoying the ft1 experi
 
         ![Screenshot showing adding a new API permission](./img/app_registration_add_perm.png)
 
-    - Select _Azure Key Vault_.
+    - Select "Azure Key Vault".
 
         ![Screenshot showing adding a new API permission](./img/app_registration_key_vault.png)
 
