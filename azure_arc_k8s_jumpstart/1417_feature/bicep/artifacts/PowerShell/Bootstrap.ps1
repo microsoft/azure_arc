@@ -1,5 +1,6 @@
 param (
     [string]$adminUsername,
+    [string]$adminPassword,
     [string]$spnClientId,
     [string]$spnClientSecret,
     [string]$spnTenantId,
@@ -18,6 +19,7 @@ param (
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientId', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
@@ -68,15 +70,16 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 ##############################################################
 # Download configuration data file and declaring directories
 ##############################################################
-$ConfigurationDataFile = "C:\Temp\Ft1Config.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile $ConfigurationDataFile
+$ConfigurationDataFile = "C:\Temp\aioConfig.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/aioConfig.psd1") -OutFile $ConfigurationDataFile
 
-$Ft1Config = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$Ft1Directory = $Ft1Config.Ft1Directories["Ft1Dir"]
-$Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
-$Ft1DataExplorer = $Ft1Config.Ft1Directories["Ft1DataExplorer"]
-$websiteUrls = $Ft1Config.URLs
+$aioConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$aioDirectory = $aioConfig.aioDirectories["aioDir"]
+$aioToolsDir = $aioConfig.aioDirectories["aioToolsDir"]
+$aioPowerShellDir = $aioConfig.aioDirectories["aioPowerShellDir"]
+$aioDataExplorer = $aioConfig.aioDirectories["aioDataExplorer"]
+$websiteUrls = $aioConfig.URLs
+$mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 
 function BITSRequest {
     Param(
@@ -101,15 +104,15 @@ function BITSRequest {
 
 
 ##############################################################
-# Creating Ft1 paths
+# Creating aio paths
 ##############################################################
-Write-Output "Creating Ft1 paths"
-foreach ($path in $Ft1Config.Ft1Directories.values) {
+Write-Output "Creating aio paths"
+foreach ($path in $aioConfig.aioDirectories.values) {
     Write-Output "Creating path $path"
     New-Item -ItemType Directory $path -Force
 }
 
-Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.log")
+Start-Transcript -Path ($aioConfig.aioDirectories["aioLogsDir"] + "\Bootstrap.log")
 
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -121,27 +124,26 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 ##############################################################
 # Download artifacts
 ##############################################################
-[System.Environment]::SetEnvironmentVariable('Ft1ConfigPath', "$Ft1PowerShellDir\Ft1Config.psd1", [System.EnvironmentVariableTarget]::Machine)
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$Ft1PowerShellDir\LogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Ft1Config.psd1") -OutFile "$Ft1PowerShellDir\Ft1Config.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$Ft1ToolsDir\mq_bridge_eventgrid.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$Ft1ToolsDir\mqtt_simulator.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_cloudConnector.yml") -OutFile "$Ft1ToolsDir\mq_cloudConnector.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb.yml") -OutFile "$Ft1ToolsDir\influxdb.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb_setup.yml") -OutFile "$Ft1ToolsDir\influxdb_setup.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml") -OutFile "$Ft1ToolsDir\influxdb-configmap.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$Ft1ToolsDir\influxdb-import-dashboard.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$Ft1ToolsDir\mqtt_listener.yml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$Ft1DataExplorer\dashboard.json"
+[System.Environment]::SetEnvironmentVariable('aioConfigPath', "$aioPowerShellDir\aioConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/LogonScript.ps1") -OutFile "$aioPowerShellDir\LogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/aioConfig.psd1") -OutFile "$aioPowerShellDir\aioConfig.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_bridge_eventgrid.yml") -OutFile "$aioToolsDir\mq_bridge_eventgrid.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_simulator.yml") -OutFile "$aioToolsDir\mqtt_simulator.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_cloudConnector.yml") -OutFile "$aioToolsDir\mq_cloudConnector.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb.yml") -OutFile "$aioToolsDir\influxdb.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb_setup.yml") -OutFile "$aioToolsDir\influxdb_setup.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml") -OutFile "$aioToolsDir\influxdb-configmap.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$aioToolsDir\influxdb-import-dashboard.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$aioToolsDir\mqtt_listener.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_explorer_settings.json") -OutFile "$aioToolsDir\mqtt_explorer_settings.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/Bookmarks") -OutFile "$aioToolsDir\Bookmarks"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$aioDataExplorer\dashboard.json"
 
-#Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
+#Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$aioToolsDir\e4k.yml"
 
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$aioDirectory\wallpaper.png"
 
-#Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$Ft1Directory\wallpaper.png"
-
-
-BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$Ft1ToolsDir\grafana-$latestRelease.windows-amd64.msi" }
+#Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$aioDirectory\wallpaper.png"
 
 ##############################################################
 # Testing connectivity to required URLs
@@ -203,12 +205,12 @@ while (-not $success -and $retryCount -lt $maxRetries) {
         }
         catch {
             Write-Output "Chocolatey not detected, trying to install now"
-            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($Ft1Config.URLs.chocoInstallScript))
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($aioConfig.URLs.chocoInstallScript))
         }
 
         Write-Host "Chocolatey packages specified"
 
-        foreach ($app in $Ft1Config.ChocolateyPackagesList) {
+        foreach ($app in $aioConfig.ChocolateyPackagesList) {
             Write-Host "Installing $app"
             & choco install $app /y -Force | Write-Output
         }
@@ -265,7 +267,7 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 
 # Creating scheduled task for LogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Ft1PowerShellDir\LogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$aioPowerShellDir\LogonScript.ps1"
 Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
@@ -273,5 +275,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.log") | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
-$logSuppress | Set-Content ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\Bootstrap.log") -Force
+$logSuppress = Get-Content ($aioConfig.aioDirectories["aioLogsDir"] + "\Bootstrap.log") | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
+$logSuppress | Set-Content ($aioConfig.aioDirectories["aioLogsDir"] + "\Bootstrap.log") -Force

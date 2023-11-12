@@ -6,7 +6,7 @@ param location string = resourceGroup().location
 
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
-  Project: 'Jumpstart_Ft1'
+  Project: 'Jumpstart_azure_aio'
 }
 
 @description('The name of the Azure Data Explorer cluster Sku')
@@ -16,10 +16,10 @@ param skuName string = 'Dev(No SLA)_Standard_E2a_v4'
 param skuTier string = 'Basic'
 
 @description('The name of the Azure Data Explorer POS database')
-param ft1DBName string = 'donutPlant'
+param aioDBName string = 'donutPlant'
 
 @description('The name of the Azure Data Explorer Event Hub connection')
-param ft1EventHubConnectionName string = 'donutPlant-eh-messages'
+param aioEventHubConnectionName string = 'donutPlant-eh-messages'
 
 @description('The name of the Azure Data Explorer Event Hub table')
 param tableName string = 'donutPlant'
@@ -62,7 +62,7 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
 
 resource stagingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'stagingScript'
-  parent: ft1donutPlantDB
+  parent: aiodonutPlantDB
   properties: {
     continueOnErrors: false
     forceUpdateTag: 'string'
@@ -71,7 +71,7 @@ resource stagingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' =
 }
 resource donutPlantScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'donutPlantScript'
-  parent: ft1donutPlantDB
+  parent: aiodonutPlantDB
   dependsOn: [
     stagingScript
   ]
@@ -84,7 +84,7 @@ resource donutPlantScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02
 
 resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
   name: 'productionLineScript'
-  parent: ft1donutPlantDB
+  parent: aiodonutPlantDB
   dependsOn: [
     donutPlantScript
   ]
@@ -95,21 +95,21 @@ resource productionLineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-0
   }
 }
 
-resource ft1donutPlantDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
+resource aiodonutPlantDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   parent: adxCluster
-  name: ft1DBName
+  name: aioDBName
   location: location
   kind: 'ReadWrite'
 }
 
 resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
-  name: ft1EventHubConnectionName
+  name: aioEventHubConnectionName
   kind: 'EventHub'
   dependsOn: [
     donutPlantScript
   ]
   location: location
-  parent: ft1donutPlantDB
+  parent: aiodonutPlantDB
   properties: {
     managedIdentityResourceId: adxCluster.id
     eventHubResourceId: eventHubResourceId

@@ -1,5 +1,5 @@
 @description('The name of the EventGrid namespace')
-param eventGridNamespaceName string = 'Ft1Namespace'
+param eventGridNamespaceName string = 'aioNamespace'
 
 @description('The location of the Azure Data Explorer cluster')
 param location string = 'westus2'
@@ -18,12 +18,17 @@ param eventGridCapacity int = 1
 param eventGridClientGroupName string = '$all'
 
 @description('The name of the EventGrid namespace')
-param eventGridTopicSpaceName string = 'ft1topicSpace${namingGuid}'
+param eventGridTopicSpaceName string = 'aiotopicSpace${namingGuid}'
 
 @description('The name of the EventGrid topic templates')
 param eventGridTopicTemplates array = [
     '#'
 ]
+
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_azure_aio'
+}
 
 @description('The name of the EventGrid publisher binding name')
 param publisherBindingName string = 'publisherBinding'
@@ -32,13 +37,13 @@ param publisherBindingName string = 'publisherBinding'
 param subscriberBindingName string = 'subscriberBindingName'
 
 @description('The name of the EventHub topic subscription')
-param eventGridTopicSubscriptionName string = 'ft1EventHubSubscription'
+param eventGridTopicSubscriptionName string = 'aioEventHubSubscription'
 
 @description('The name of the storage topic subscription')
-param storageTopicSubscriptionName string = 'ft1StorageSubscription'
+param storageTopicSubscriptionName string = 'aioStorageSubscription'
 
 @description('The name of the EventGrid topic')
-param eventGridTopicName string = 'ft1topic${namingGuid}'
+param eventGridTopicName string = 'aiotopic${namingGuid}'
 
 @description('The name of the EventGrid topic sku')
 param eventGridTopicSku string = 'Basic'
@@ -60,6 +65,7 @@ param maximumClientSessionsPerAuthenticationName int = 100
 
 resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   name: eventGridNamespaceName
+  tags: resourceTags
   location: location
   sku: {
     name: eventGridSku
@@ -113,6 +119,7 @@ resource eventGridsubscriberBindingName 'Microsoft.EventGrid/namespaces/permissi
 resource eventGridTopic 'Microsoft.EventGrid/topics@2023-06-01-preview' = {
   name: eventGridTopicName
   location: location
+  tags: resourceTags
   sku: {
     name: eventGridTopicSku
   }
