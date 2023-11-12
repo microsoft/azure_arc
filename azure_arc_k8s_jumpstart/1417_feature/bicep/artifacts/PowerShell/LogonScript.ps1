@@ -663,6 +663,14 @@ foreach ($extension in $aioConfig.VSCodeExtensions) {
     code --install-extension $extension 2>&1 | Out-Null
 }
 
+##############################################################
+# Pinning important directories to Quick access
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Pinning important directories to Quick access" -ForegroundColor DarkGreen
+$quickAccess = new-object -com shell.application
+$quickAccess.Namespace($aioConfig.aioDirectories.aioDir).Self.InvokeVerb("pintohome")
+$quickAccess.Namespace($aioConfig.aioDirectories.aioLogsDir).Self.InvokeVerb("pintohome")
+
 # Changing to Client VM wallpaper
 $imgPath = Join-Path $aioConfig.aioDirectories["aioDir"] "wallpaper.png"
 $code = @' 
