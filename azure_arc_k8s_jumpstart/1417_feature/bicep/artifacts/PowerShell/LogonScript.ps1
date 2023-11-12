@@ -479,11 +479,6 @@ do {
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
 )
 
-<# Write-Host "Patch the broker"
-kubectl get broker broker -n $aioNamespace -o yaml | out-file broker.yaml
-(Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
-kubectl apply -f broker.yaml -n $aioNamespace #>
-
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
 kubectl apply -f $aioToolsDir\mqtt_simulator.yml -n $aioNamespace
@@ -513,8 +508,8 @@ kubectl apply -f $influxdb_setupYaml -n $aioNamespace
 
 do {
     $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 20 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 20
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 10 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 10
 } while (
     $null -eq $influxIp
 )
