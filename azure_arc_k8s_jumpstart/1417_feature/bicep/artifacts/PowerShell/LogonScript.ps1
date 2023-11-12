@@ -560,6 +560,22 @@ Copy-Item "C:\Users\$adminUsername\desktop\MQTT Explorer.lnk" -Destination "c:\u
 Copy-Item "$Ft1ToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
 
 
+##############################################################
+# Creating bookmarks
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar" -ForegroundColor DarkGreen
+$bookmarksFileName = "$ft1ToolsDir\Bookmarks"
+$edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+
+# Replace matching value in the Bookmarks file
+$content = Get-Content -Path $bookmarksFileName
+$influxGrafanaUrl = "http://$influxIp"+":8086"
+$newContent = $content -replace ("Grafana-influx-URL"), $influxGrafanaUrl
+$newContent | Set-Content -Path $bookmarksFileName
+Start-Sleep -Seconds 2
+
+Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
+
 ########################################################################
 # ADX Dashboards
 ########################################################################
