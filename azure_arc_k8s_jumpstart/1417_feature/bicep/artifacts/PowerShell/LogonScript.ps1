@@ -574,7 +574,7 @@ kubectl apply -f $aioToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
 kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor Gray
-Copy-Item "C:\Users\$adminUsername\desktop\MQTT Explorer.lnk" -Destination "c:\users\public\desktop\MQTT Explorer.lnk"
+#Copy-Item "C:\Users\$adminUsername\desktop\MQTT Explorer.lnk" -Destination "c:\users\public\desktop\MQTT Explorer.lnk"
 Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
 
 
