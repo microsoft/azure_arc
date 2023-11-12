@@ -25,6 +25,11 @@ param eventGridTopicTemplates array = [
     '#'
 ]
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_azure_aio'
+}
+
 @description('The name of the EventGrid publisher binding name')
 param publisherBindingName string = 'publisherBinding'
 
@@ -60,6 +65,7 @@ param maximumClientSessionsPerAuthenticationName int = 100
 
 resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   name: eventGridNamespaceName
+  tags: resourceTags
   location: location
   sku: {
     name: eventGridSku
@@ -113,6 +119,7 @@ resource eventGridsubscriberBindingName 'Microsoft.EventGrid/namespaces/permissi
 resource eventGridTopic 'Microsoft.EventGrid/topics@2023-06-01-preview' = {
   name: eventGridTopicName
   location: location
+  tags: resourceTags
   sku: {
     name: eventGridTopicSku
   }

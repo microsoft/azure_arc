@@ -16,9 +16,15 @@ param aioPlaceHolder string = 'azure-iot-operations'
 @description('Secret value')
 param aioPlaceHolderValue string = 'aioSecretValue'
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_azure_aio'
+}
+
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvName
   location: location
+  tags: resourceTags
   properties: {
     sku: {
       name: akvSku

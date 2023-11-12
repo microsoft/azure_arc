@@ -13,6 +13,11 @@ param eventHubTier string = 'Standard'
 @description('EventHub capacity')
 param eventHubCapacity int = 1
 
+@description('Resource tag for Jumpstart Agora')
+param resourceTags object = {
+  Project: 'Jumpstart_azure_aio'
+}
+
 @description('The location of the Azure Data Explorer cluster')
 param location string = resourceGroup().location
 
@@ -24,6 +29,7 @@ param eventHubConsumerGroupNamePl string = 'aioConsumerGroupPl'
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
+  tags: resourceTags
   location: location
   sku: {
     name: eventHubSku
