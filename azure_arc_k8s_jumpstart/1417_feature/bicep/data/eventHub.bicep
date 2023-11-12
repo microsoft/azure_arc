@@ -1,8 +1,8 @@
 @description('The name of the EventHub namespace')
-param eventHubNamespaceName string = 'ft1hubns${uniqueString(resourceGroup().id)}'
+param eventHubNamespaceName string = 'aiohubns${uniqueString(resourceGroup().id)}'
 
 @description('The name of the EventHub')
-param eventHubName string = 'ft1EventHub'
+param eventHubName string = 'aioEventHub'
 
 @description('EventHub Sku')
 param eventHubSku string = 'Standard'
@@ -17,10 +17,10 @@ param eventHubCapacity int = 1
 param location string = resourceGroup().location
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string = 'ft1ConsumerGroup'
+param eventHubConsumerGroupName string = 'aioConsumerGroup'
 
 @description('The name of the Azure Data Explorer Event Hub production line consumer group')
-param eventHubConsumerGroupNamePl string = 'ft1ConsumerGroupPl'
+param eventHubConsumerGroupNamePl string = 'aioConsumerGroupPl'
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName

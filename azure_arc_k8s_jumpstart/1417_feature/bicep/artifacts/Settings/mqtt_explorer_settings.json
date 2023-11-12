@@ -6,7 +6,7 @@
       "encryption": false,
       "host": "MQTTIpPlaceholder",
       "id": "mqtt.eclipse.org",
-      "name": "ft1",
+      "name": "aio",
       "port": 1883,
       "protocol": "mqtt",
       "subscriptions": [

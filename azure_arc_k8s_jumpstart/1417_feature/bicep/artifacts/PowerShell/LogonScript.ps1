@@ -4,12 +4,12 @@ Set-PSDebug -Strict
 #####################################################################
 # Initialize the environment
 #####################################################################
-$Ft1Config = Import-PowerShellDataFile -Path $Env:Ft1ConfigPath
-$Ft1TempDir = $Ft1Config.Ft1Directories["Ft1TempDir"]
-$Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
-$Ft1InfluxMountPath = $Ft1Config.ft1Directories["Ft1InfluxMountPath"]
-$Ft1DataExplorerDir = $Ft1Config.Ft1Directories["Ft1DataExplorer"]
-$websiteUrls = $Ft1Config.URLs
+$aioConfig = Import-PowerShellDataFile -Path $Env:aioConfigPath
+$aioTempDir = $aioConfig.aioDirectories["aioTempDir"]
+$aioToolsDir = $aioConfig.aioDirectories["aioToolsDir"]
+$aioInfluxMountPath = $aioConfig.aioDirectories["aioInfluxMountPath"]
+$aioDataExplorerDir = $aioConfig.aioDirectories["aioDataExplorer"]
+$websiteUrls = $aioConfig.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
 $mqttuiReleasesUrl = $websiteUrls["mqttuiReleases"]
 $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -26,16 +26,16 @@ $adminPassword = $Env:adminPassword
 $githubAccount = $Env:githubAccount
 $githubBranch = $Env:githubBranch
 $adxClusterName = $Env:adxClusterName
-$ft1Namespace = "azure-iot-operations"
-$aideuserConfig = $Ft1Config.AKSEEConfig["aideuserConfig"]
-$aksedgeConfig = $Ft1Config.AKSEEConfig["aksedgeConfig"]
-$aksEdgeNodes = $Ft1Config.AKSEEConfig["Nodes"]
-$aksEdgeDeployModules = $Ft1Config.AKSEEConfig["aksEdgeDeployModules"]
-$AksEdgeRemoteDeployVersion = $Ft1Config.AKSEEConfig["AksEdgeRemoteDeployVersion"]
-$clusterLogSize = $Ft1Config.AKSEEConfig["clusterLogSize"]
+$aioNamespace = "azure-iot-operations"
+$aideuserConfig = $aioConfig.AKSEEConfig["aideuserConfig"]
+$aksedgeConfig = $aioConfig.AKSEEConfig["aksedgeConfig"]
+$aksEdgeNodes = $aioConfig.AKSEEConfig["Nodes"]
+$aksEdgeDeployModules = $aioConfig.AKSEEConfig["aksEdgeDeployModules"]
+$AksEdgeRemoteDeployVersion = $aioConfig.AKSEEConfig["AksEdgeRemoteDeployVersion"]
+$clusterLogSize = $aioConfig.AKSEEConfig["clusterLogSize"]
 
 
-Start-Transcript -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\LogonScript.log")
+Start-Transcript -Path ($aioConfig.aioDirectories["aioLogsDir"] + "\LogonScript.log")
 $startTime = Get-Date
 
 New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
@@ -61,15 +61,15 @@ else {
 Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest AKS Edge Essentials release." -ForegroundColor DarkGreen
 $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
 $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
-$output = Join-Path $Ft1TempDir "$latestReleaseTag.zip"
+$output = Join-Path $aioTempDir "$latestReleaseTag.zip"
 Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath $Ft1TempDir -Force
-$AKSEEReleaseConfigFilePath = "$Ft1TempDir\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
+Expand-Archive $output -DestinationPath $aioTempDir -Force
+$AKSEEReleaseConfigFilePath = "$aioTempDir\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
 $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
 $schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
 # Clean up the downloaded release files
 Remove-Item -Path $output -Force
-Remove-Item -Path "$Ft1TempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
+Remove-Item -Path "$aioTempDir\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
 # Create AKSEE configuration files
 Write-host "[$(Get-Date -Format t)] INFO: Creating AKS Edge Essentials configuration files" -ForegroundColor DarkGreen
@@ -103,7 +103,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 # Download the AksEdgeDeploy modules from Azure/AksEdge
 $url = "https://github.com/Azure/AKS-Edge/archive/$aksEdgeDeployModules.zip"
 $zipFile = "$aksEdgeDeployModules.zip"
-$installDir = "$Ft1ToolsDir\AksEdgeScript"
+$installDir = "$aioToolsDir\AksEdgeScript"
 $workDir = "$installDir\AKS-Edge-main"
 
 if (-not (Test-Path -Path $installDir)) {
@@ -186,7 +186,7 @@ Write-Host "`n"
 # Setup Azure CLI
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI" -ForegroundColor DarkGreen
-$cliDir = New-Item -Path ($Ft1Config.Ft1Directories["Ft1LogsDir"] + "\.cli\") -Name ".ft1" -ItemType Directory
+$cliDir = New-Item -Path ($aioConfig.aioDirectories["aioLogsDir"] + "\.cli\") -Name ".aio" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
@@ -203,11 +203,11 @@ az account set --subscription $subscriptionId
 az extension add --name connectedk8s --version 1.3.17
 
 # Making extension install dynamic
-if ($Ft1Config.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($Ft1Config.AzCLIExtensions -join ', ') -ForegroundColor Gray
+if ($aioConfig.AzCLIExtensions.Count -ne 0) {
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
-    foreach ($extension in $Ft1Config.AzCLIExtensions) {
+    foreach ($extension in $aioConfig.AzCLIExtensions) {
         az extension add --name $extension --system --only-show-errors
     }
 }
@@ -225,18 +225,18 @@ Connect-AzAccount -Credential $psCred -TenantId $spnTenantId -ServicePrincipal
 Set-AzContext -Subscription $subscriptionId
 
 # Install PowerShell modules
-if ($Ft1Config.PowerShellModules.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($Ft1Config.PowerShellModules -join ', ') -ForegroundColor Gray
+if ($aioConfig.PowerShellModules.Count -ne 0) {
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($aioConfig.PowerShellModules -join ', ') -ForegroundColor Gray
     Install-PackageProvider -Name NuGet -Confirm:$false -Force
-    foreach ($module in $Ft1Config.PowerShellModules) {
+    foreach ($module in $aioConfig.PowerShellModules) {
         Install-Module -Name $module -Force -Confirm:$false
     }
 }
 
 # Register Azure providers
-if ($Ft1Config.AzureProviders.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($Ft1Config.AzureProviders -join ', ') -ForegroundColor Gray
-    foreach ($provider in $Ft1Config.AzureProviders) {
+if ($aioConfig.AzureProviders.Count -ne 0) {
+    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($aioConfig.AzureProviders -join ', ') -ForegroundColor Gray
+    foreach ($provider in $aioConfig.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
 }
@@ -257,7 +257,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 $clusterId = $(kubectl get configmap -n aksedge aksedge -o jsonpath="{.data.clustername}")
 
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0, 5).ToLower()
-$arcClusterName = "ft1-$guid"
+$arcClusterName = "aio-$guid"
 
 
 if ($env:kubernetesDistribution -eq "k8s") {
@@ -307,11 +307,11 @@ az connectedk8s enable-features --name $arcClusterName `
 
 
 ##############################################################
-# Preparing cluster for ft1
+# Preparing cluster for aio
 ##############################################################
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for ft1" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for aio" -ForegroundColor Gray
 Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
@@ -340,9 +340,9 @@ catch {
     Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
 }
 
-Write-Host "Configuring firewall specific to ft1"
-Write-Host "Add firewall rule for ft1 MQTT Broker"
-New-NetFirewallRule -DisplayName "ft1 MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+Write-Host "Configuring firewall specific to aio"
+Write-Host "Add firewall rule for aio MQTT Broker"
+New-NetFirewallRule -DisplayName "aio MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
@@ -350,17 +350,17 @@ try {
     $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
     $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
     if ( $null -eq $portProxyRulExists ) {
-        Write-Host "Configure port proxy for ft1"
+        Write-Host "Configure port proxy for aio"
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
     }
     else {
-        Write-Host "Port proxy rule for ft1 exists, skip configuring port proxy..."
+        Write-Host "Port proxy rule for aio exists, skip configuring port proxy..."
     }
 }
 catch {
-    Write-Host "Error: port proxy update for ft1 failed" -ForegroundColor Red
+    Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
 }
 
 Write-Host "Update the iptables rules"
@@ -388,10 +388,10 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI exten
 Write-Host "`n"
 #az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 ##############################################################
-# Deploy FT1
+# Deploy aio
 ##############################################################
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying aio to the cluster" -ForegroundColor Gray
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
@@ -401,7 +401,7 @@ $maxRetries = 5
 do {
     az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
     if ($? -eq $false) {
-        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying ft1 on the cluster...Retrying" -ForegroundColor DarkRed
+        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying aio on the cluster...Retrying" -ForegroundColor DarkRed
         $retryCount++
     }
 } until ($? -eq $true -or $retryCount -eq $maxRetries)
@@ -419,7 +419,7 @@ do {
 } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
 
 if ($retryCount -eq $maxRetries) {
-    Write-Host "[$(Get-Date -Format t)] ERROR: Ft1 deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+    Write-Host "[$(Get-Date -Format t)] ERROR: aio deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
     exit 1 # Exit the script
 }
 
@@ -449,24 +449,24 @@ Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
 #kubectl create namespace arc
-$mqconfigfile = "$Ft1ToolsDir\mq_cloudConnector.yml"
+$mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
 $mqListenerService = "aio-mq-dmqtt-frontend"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-kubectl apply -f $mqconfigfile -n $ft1Namespace
+kubectl apply -f $mqconfigfile -n $aioNamespace
 
 ##############################################################
 # Deploy the simulator
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
-$simulatorYaml = "$Ft1ToolsDir\mqtt_simulator.yml"
+$simulatorYaml = "$aioToolsDir\mqtt_simulator.yml"
 # Write-Host "Patching the mq service to be of type LoadBalancer"
-# kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $ft1Namespace
+# kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $aioNamespace
 
 do {
-    $mqttIp = kubectl get service $mqListenerService -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    $services = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
+    $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
     $matchingServices = $services.items | Where-Object {
         $_.metadata.name -match "aio-mq-dmqtt" -and
         $_.status.phase -notmatch "running"
@@ -478,25 +478,25 @@ do {
 )
 
 <# Write-Host "Patch the broker"
-kubectl get broker broker -n $ft1Namespace -o yaml | out-file broker.yaml
+kubectl get broker broker -n $aioNamespace -o yaml | out-file broker.yaml
 (Get-Content -Path "broker.yaml") -replace "  encryptInternalTraffic: true", "  encryptInternalTraffic: false" | Set-Content -Path "broker.yaml"
-kubectl apply -f broker.yaml -n $ft1Namespace #>
+kubectl apply -f broker.yaml -n $aioNamespace #>
 
 (Get-Content $simulatorYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simulatorYaml
 netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
-kubectl apply -f $Ft1ToolsDir\mqtt_simulator.yml -n $ft1Namespace
+kubectl apply -f $aioToolsDir\mqtt_simulator.yml -n $aioNamespace
 
 ##############################################################
 # Deploy OT Inspector (InfluxDB)
 ##############################################################
-$listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
-$influxdb_setupYaml = "$Ft1ToolsDir\influxdb_setup.yml"
-$influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
-$influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
-$mqttExplorerSettings = "$Ft1ToolsDir\mqtt_explorer_settings.json"
+$listenerYaml = "$aioToolsDir\mqtt_listener.yml"
+$influxdb_setupYaml = "$aioToolsDir\influxdb_setup.yml"
+$influxdbYaml = "$aioToolsDir\influxdb.yml"
+$influxImportYaml = "$aioToolsDir\influxdb-import-dashboard.yml"
+$mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
 
 do {
-    $simulatorPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
+    $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
     $matchingPods = $simulatorPod.items | Where-Object {
         $_.metadata.name -match "mqtt-simulator-deployment" -and
         $_.status.phase -notmatch "running"
@@ -507,10 +507,10 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $influxdb_setupYaml -n $ft1Namespace
+kubectl apply -f $influxdb_setupYaml -n $aioNamespace
 
 do {
-    $influxIp = kubectl get service "influxdb" -n $ft1Namespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
     Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
     Start-Sleep -Seconds 30
 } while (
@@ -525,10 +525,10 @@ do {
 (Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $adminUsername | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
-kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace
+kubectl apply -f $aioToolsDir\influxdb.yml -n $aioNamespace
 
 do {
-    $influxPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
+    $influxPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
     $matchingPods = $influxPod.items | Where-Object {
         $_.metadata.name -match "influxdb-0" -and
         $_.status.phase -notmatch "running"
@@ -539,9 +539,9 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $Ft1ToolsDir\mqtt_listener.yml -n $ft1Namespace
+kubectl apply -f $aioToolsDir\mqtt_listener.yml -n $aioNamespace
 do {
-    $listenerPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
+    $listenerPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
     $matchingPods = $listenerPod.items | Where-Object {
         $_.metadata.name -match "mqtt-listener-deployment" -and
         $_.status.phase -notmatch "running"
@@ -552,19 +552,19 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n $ft1Namespace
-kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n $ft1Namespace
+kubectl apply -f $aioToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
+kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor Gray
 Copy-Item "C:\Users\$adminUsername\desktop\MQTT Explorer.lnk" -Destination "c:\users\public\desktop\MQTT Explorer.lnk"
-Copy-Item "$Ft1ToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
+Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
 
 
 ##############################################################
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar" -ForegroundColor DarkGreen
-$bookmarksFileName = "$ft1ToolsDir\Bookmarks"
+$bookmarksFileName = "$aioToolsDir\Bookmarks"
 $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 
 # Replace matching value in the Bookmarks file
@@ -584,10 +584,10 @@ Write-Host "[$(Get-Date -Format t)] INFO: Creating the Azure Data Explorer dashb
 # Get the ADX/Kusto cluster info
 $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
 $adxEndPoint = $kustoCluster.Uri
-(Get-content "$Ft1DataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint) | Set-Content "$Ft1DataExplorerDir/dashboard.json"
+(Get-content "$aioDataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint) | Set-Content "$aioDataExplorerDir/dashboard.json"
 
 # Update the dashboards files with the new ADX cluster name and URI
-<#$dashboardBody = (Get-content "$Ft1DataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint)
+<#$dashboardBody = (Get-content "$aioDataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint)
 $token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/.default openid profile offline_access" --query "accessToken") -replace "`"", ""
 $httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
 $dashboardApi = "https://dashboards.kusto.windows.net/dashboards"
@@ -638,10 +638,10 @@ Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gr
 $latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip" }).browser_download_url
-$output = Join-Path $Ft1ToolsDir "$latestReleaseTag.zip"
+$output = Join-Path $aioToolsDir "$latestReleaseTag.zip"
 Invoke-WebRequest $mqttuiReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath "$Ft1ToolsDir\mqttui" -Force
-$mqttuiPath = "$Ft1ToolsDir\mqttui\"
+Expand-Archive $output -DestinationPath "$aioToolsDir\mqttui" -Force
+$mqttuiPath = "$aioToolsDir\mqttui\"
 $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
 $newPathVariable = $currentPathVariable + ";" + $mqttuiPath
 $newPathVariable
@@ -652,7 +652,7 @@ Remove-Item -Path $output -Force
 # Install pip packages
 ##############################################################
 Write-Host "Installing pip packages"
-foreach ($package in $Ft1Config.PipPackagesList) {
+foreach ($package in $aioConfig.PipPackagesList) {
     Write-Host "Installing $package"
     & pip install -q $package
 }
@@ -660,14 +660,14 @@ foreach ($package in $Ft1Config.PipPackagesList) {
 #############################################################
 # Install VSCode extensions
 #############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($Ft1Config.VSCodeExtensions -join ', ') -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($aioConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
 # Install VSCode extensions
-foreach ($extension in $Ft1Config.VSCodeExtensions) {
+foreach ($extension in $aioConfig.VSCodeExtensions) {
     code --install-extension $extension 2>&1 | Out-Null
 }
 
 # Changing to Client VM wallpaper
-$imgPath = Join-Path $Ft1Config.Ft1Directories["Ft1Dir"] "wallpaper.png"
+$imgPath = Join-Path $aioConfig.aioDirectories["aioDir"] "wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 

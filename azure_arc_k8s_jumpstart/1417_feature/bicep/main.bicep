@@ -73,7 +73,7 @@ param subnetName string = 'Subnet'
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'AKS-EE-Demo-NSG'
 param resourceTags object = {
-  Project: 'jumpstart_azure_ft1'
+  Project: 'jumpstart_azure_aio'
 }
 
 @maxLength(5)
@@ -84,28 +84,28 @@ param namingGuid string = toLower(substring(newGuid(), 0, 5))
 param windowsNode bool = false
 
 @description('Name of the storage account')
-param ft1StorageAccountName string = 'ft1stg${namingGuid}'
+param aioStorageAccountName string = 'aiostg${namingGuid}'
 
 @description('Name of the storage queue')
-param storageQueueName string = 'ft1queue'
+param storageQueueName string = 'aioqueue'
 
 @description('Name of the event hub')
-param eventHubName string = 'ft1hub${namingGuid}'
+param eventHubName string = 'aiohub${namingGuid}'
 
 @description('Name of the event hub namespace')
-param eventHubNamespaceName string = 'ft1hubns${namingGuid}'
+param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 
 @description('Name of the event grid namespace')
-param eventGridNamespaceName string = 'ft1eventgridns${namingGuid}'
+param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 
 @description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'ft1adx${namingGuid}'
+param adxClusterName string = 'aioadx${namingGuid}'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
 
 @description('The name of the Azure Key Vault')
-param akvName string = 'ft1akv${namingGuid}'
+param akvName string = 'aioakv${namingGuid}'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
@@ -328,7 +328,7 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
 module storageAccount 'storage/storageAccount.bicep' = {
   name: 'storageAccount'
   params: {
-    storageAccountName: ft1StorageAccountName
+    storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
   }
