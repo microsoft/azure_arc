@@ -469,8 +469,8 @@ do {
         $_.metadata.name -match "aio-mq-dmqtt" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 30 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 30
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 20 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 20
 } while (
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
 )
@@ -499,8 +499,8 @@ do {
         $_.metadata.name -match "mqtt-simulator-deployment" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 30
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
 )
@@ -509,8 +509,8 @@ kubectl apply -f $influxdb_setupYaml -n $aioNamespace
 
 do {
     $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 30 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 30
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 20 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 20
 } while (
     $null -eq $influxIp
 )
@@ -531,8 +531,8 @@ do {
         $_.metadata.name -match "influxdb-0" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 30
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
 )
@@ -544,8 +544,8 @@ do {
         $_.metadata.name -match "mqtt-listener-deployment" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 30 seconds" -ForegroundColor Gray
-    Start-Sleep -Seconds 30
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
 )
