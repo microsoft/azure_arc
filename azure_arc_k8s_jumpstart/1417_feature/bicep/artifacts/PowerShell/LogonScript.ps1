@@ -424,29 +424,25 @@ if ($retryCount -eq $maxRetries) {
 Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor Gray
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Extension Principal ID: $extensionPrincipalID" -ForegroundColor Gray
+Write-Host "`n"
 
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
 Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId" -ForegroundColor Gray
+Write-Host "`n"
 
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
 Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor Gray
-#$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName)
-#$eventGridTopicSpaceId = (az eventgrid namespace topic-space list --resource-group $resourceGroup --namespace-name $eventGridNamespaceName --query "[0].id" -o tsv)
-#Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic Space ID: $eventGridTopicSpaceId" -ForegroundColor Gray
+Write-Host "`n"
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor Gray
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
-#az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --scope $eventGridTopicSpaceId --only-show-errors
-#az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicSpaceId --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 
-##### Add health check to continue
 Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
-#kubectl create namespace arc
 $mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
 $mqListenerService = "aio-mq-dmqtt-frontend"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
@@ -459,8 +455,6 @@ kubectl apply -f $mqconfigfile -n $aioNamespace
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
 $simulatorYaml = "$aioToolsDir\mqtt_simulator.yml"
-# Write-Host "Patching the mq service to be of type LoadBalancer"
-# kubectl patch svc aio-mq-dmqtt-frontend -p '{\"spec\": {\"ports\": [{\"port\": 1883,\"targetPort\": 1883,\"name\": \"mqtt\"}],\"type\": \"LoadBalancer\"}}' -n $aioNamespace
 
 do {
     $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
