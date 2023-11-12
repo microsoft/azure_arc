@@ -21,6 +21,8 @@ $spnTenantId = $Env:spnTenantId
 $spnObjectId = $Env:spnObjectId
 $subscriptionId = $Env:subscriptionId
 $customLocationRPOID = $Env:customLocationRPOID
+$adminUsername = $Env:adminUsername
+$adminPassword = $Env:adminPassword
 $githubAccount = $Env:githubAccount
 $githubBranch = $Env:githubBranch
 $adxClusterName = $Env:adxClusterName
@@ -517,7 +519,8 @@ do {
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
 (Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
-#(Get-Content $influxdbYaml ) -replace 'mountPathPlaceHolder', $Ft1InfluxMountPath | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $influxIp | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace

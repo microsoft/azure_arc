@@ -92,9 +92,9 @@ spec:
             - --org
             - InfluxData
             - --password
-            - s1$mpl3p4ssw0rd
+            - influxAdminPwdPlaceHolder
             - --username
-            - admin
+            - influxAdminPlaceHolder
             - --token
             - secret-token
             - --force
