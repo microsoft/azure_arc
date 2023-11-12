@@ -72,6 +72,7 @@ param subnetName string = 'Subnet'
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'AIO-Demo-NSG'
+
 param resourceTags object = {
   Project: 'jumpstart_azure_aio'
 }

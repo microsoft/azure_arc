@@ -1,5 +1,5 @@
 @description('The name of you Virtual Machine.')
-param vmName string = 'AKS-EE-Demo'
+param vmName string = 'AIO-Demo'
 
 @description('Kubernetes distribution')
 @allowed([
@@ -35,7 +35,7 @@ param eventGridLocation string = 'westus2'
 param deployBastion bool
 
 @description('the Azure Bastion host name')
-param bastionHostName string = 'AKS-EE-Demo-Bastion'
+param bastionHostName string = 'AIO-Demo-Bastion'
 
 @description('The size of the VM')
 param vmSize string = 'Standard_D8s_v3'
@@ -65,13 +65,14 @@ param githubAccount string = 'microsoft'
 param githubBranch string = '1417-feature-br'
 
 @description('Name of the VNET')
-param virtualNetworkName string = 'AKS-EE-Demo-VNET'
+param virtualNetworkName string = 'AIO-Demo-VNET'
 
 @description('Name of the subnet in the virtual network')
 param subnetName string = 'Subnet'
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'AKS-EE-Demo-NSG'
+param networkSecurityGroupName string = 'AIO-Demo-NSG'
+
 param resourceTags object = {
   Project: 'jumpstart_azure_aio'
 }
