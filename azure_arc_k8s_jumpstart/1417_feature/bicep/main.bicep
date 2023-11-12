@@ -1,5 +1,5 @@
 @description('The name of you Virtual Machine.')
-param vmName string = 'AKS-EE-Demo'
+param vmName string = 'AIO-Demo'
 
 @description('Kubernetes distribution')
 @allowed([
@@ -35,7 +35,7 @@ param eventGridLocation string = 'westus2'
 param deployBastion bool
 
 @description('the Azure Bastion host name')
-param bastionHostName string = 'AKS-EE-Demo-Bastion'
+param bastionHostName string = 'AIO-Demo-Bastion'
 
 @description('The size of the VM')
 param vmSize string = 'Standard_D8s_v3'
@@ -65,15 +65,16 @@ param githubAccount string = 'microsoft'
 param githubBranch string = '1417-feature-br'
 
 @description('Name of the VNET')
-param virtualNetworkName string = 'AKS-EE-Demo-VNET'
+param virtualNetworkName string = 'AIO-Demo-VNET'
 
 @description('Name of the subnet in the virtual network')
 param subnetName string = 'Subnet'
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'AKS-EE-Demo-NSG'
+param networkSecurityGroupName string = 'AIO-Demo-NSG'
+
 param resourceTags object = {
-  Project: 'jumpstart_azure_ft1'
+  Project: 'jumpstart_azure_aio'
 }
 
 @maxLength(5)
@@ -84,28 +85,28 @@ param namingGuid string = toLower(substring(newGuid(), 0, 5))
 param windowsNode bool = false
 
 @description('Name of the storage account')
-param ft1StorageAccountName string = 'ft1stg${namingGuid}'
+param aioStorageAccountName string = 'aiostg${namingGuid}'
 
 @description('Name of the storage queue')
-param storageQueueName string = 'ft1queue'
+param storageQueueName string = 'aioqueue'
 
 @description('Name of the event hub')
-param eventHubName string = 'ft1hub${namingGuid}'
+param eventHubName string = 'aiohub${namingGuid}'
 
 @description('Name of the event hub namespace')
-param eventHubNamespaceName string = 'ft1hubns${namingGuid}'
+param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 
 @description('Name of the event grid namespace')
-param eventGridNamespaceName string = 'ft1eventgridns${namingGuid}'
+param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 
 @description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'ft1adx${namingGuid}'
+param adxClusterName string = 'aioadx${namingGuid}'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
 
 @description('The name of the Azure Key Vault')
-param akvName string = 'ft1akv${namingGuid}'
+param akvName string = 'aioakv${namingGuid}'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
@@ -273,7 +274,7 @@ resource Bootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' = {
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl} -customLocationRPOID ${customLocationRPOID} -spnObjectId ${spnObjectId} -gitHubAccount ${githubAccount} -githubBranch ${githubBranch} -adxClusterName ${adxClusterName} -rdpPort ${rdpPort}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${windowsAdminPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscriptionId} -resourceGroup ${resourceGroup().name} -location ${location} -kubernetesDistribution ${kubernetesDistribution} -windowsNode ${windowsNode} -templateBaseUrl ${templateBaseUrl} -customLocationRPOID ${customLocationRPOID} -spnObjectId ${spnObjectId} -gitHubAccount ${githubAccount} -githubBranch ${githubBranch} -adxClusterName ${adxClusterName} -rdpPort ${rdpPort}'
     }
   }
 }
@@ -328,7 +329,7 @@ resource bastion 'Microsoft.Network/bastionHosts@2022-07-01' = if (deployBastion
 module storageAccount 'storage/storageAccount.bicep' = {
   name: 'storageAccount'
   params: {
-    storageAccountName: ft1StorageAccountName
+    storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
   }

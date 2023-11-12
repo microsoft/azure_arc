@@ -10,7 +10,7 @@ param kind string = 'StorageV2'
 @description('Storage account sku')
 param skuName string = 'Standard_LRS'
 
-param storageQueueName string = 'ft1Queue'
+param storageQueueName string = 'aioQueue'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
