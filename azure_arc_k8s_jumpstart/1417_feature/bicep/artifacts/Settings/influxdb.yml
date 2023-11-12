@@ -14,6 +14,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: contosoba
+  namespace: azure-iot-operations
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -55,7 +56,7 @@ spec:
         - name: gui
           containerPort: 8086
         volumeMounts:
-        - name: influxdb-storage
+        - name: data
           mountPath: /var/lib/influxdb2
   volumeClaimTemplates:
     - metadata:
