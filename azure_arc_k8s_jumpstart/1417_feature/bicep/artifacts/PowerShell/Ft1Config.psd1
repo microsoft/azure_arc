@@ -80,8 +80,6 @@
         'putty.install',
         'kubernetes-helm',
         'mqtt-explorer',
-        'gh',
-        'k9s',
         'python'
     )
 
