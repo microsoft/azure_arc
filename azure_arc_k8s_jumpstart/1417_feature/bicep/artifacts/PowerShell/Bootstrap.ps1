@@ -145,9 +145,6 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 
 #Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$aioDirectory\wallpaper.png"
 
-
-BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$aioToolsDir\grafana-$latestRelease.windows-amd64.msi" }
-
 ##############################################################
 # Testing connectivity to required URLs
 ##############################################################
