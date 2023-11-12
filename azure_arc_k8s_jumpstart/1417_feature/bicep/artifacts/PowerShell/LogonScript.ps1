@@ -401,15 +401,20 @@ do {
     if ($? -eq $false) {
         Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying ft1 on the cluster...Retrying" -ForegroundColor DarkRed
         $retryCount++
-    }else{
-        $output = az iot ops check --as-object
-        $output = $output | ConvertFrom-Json
-        $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
-        if($mqServiceStatus -ne "Success"){
-            $retryCount++
-        }
     }
-} while ($mqServiceStatus -ne "Success" -or $retryCount -lt $maxRetries)
+} until ($? -eq $true -or $retryCount -eq $maxRetries)
+
+$retryCount = 0
+$maxRetries = 5
+
+do {
+    $output = az iot ops check --as-object
+    $output = $output | ConvertFrom-Json
+    $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+    if ($mqServiceStatus -ne "Success") {
+        $retryCount++
+    }
+} until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
 
 if ($retryCount -eq $maxRetries) {
     Write-Host "[$(Get-Date -Format t)] ERROR: Ft1 deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
