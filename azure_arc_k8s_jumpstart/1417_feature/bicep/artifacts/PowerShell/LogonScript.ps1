@@ -417,6 +417,7 @@ do {
     $output = $output | ConvertFrom-Json
     $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
     if ($mqServiceStatus -ne "Success") {
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
         $retryCount++
     }
 } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
