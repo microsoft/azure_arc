@@ -315,7 +315,7 @@ try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
     & kubectl apply -f $localPathProvisionerYaml
 
-$pvcYaml = @"
+    $pvcYaml = @"
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
@@ -384,7 +384,7 @@ catch {
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
 Write-Host "`n"
-az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
+#az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 ##############################################################
 # Deploy FT1
 ##############################################################
@@ -393,7 +393,33 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying ft1 to the cluster" -Foregro
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
+$retryCount = 0
+$maxRetries = 5
+
+do {
+    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
+    if ($? -eq $false) {
+        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying ft1 on the cluster...Retrying" -ForegroundColor DarkRed
+        $retryCount++
+    }
+} until ($? -eq $true -or $retryCount -eq $maxRetries)
+
+$retryCount = 0
+$maxRetries = 5
+
+do {
+    $output = az iot ops check --as-object
+    $output = $output | ConvertFrom-Json
+    $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+    if ($mqServiceStatus -ne "Success") {
+        $retryCount++
+    }
+} until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+if ($retryCount -eq $maxRetries) {
+    Write-Host "[$(Get-Date -Format t)] ERROR: Ft1 deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+    exit 1 # Exit the script
+}
 
 Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor Gray
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
