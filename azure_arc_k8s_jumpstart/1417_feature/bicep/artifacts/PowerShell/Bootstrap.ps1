@@ -136,7 +136,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") 
 
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$Ft1ToolsDir\e4k.yml"
 
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
+#Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$Ft1Directory\wallpaper.png"
+
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$Ft1Directory\wallpaper.png"
+
 
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$Ft1ToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
