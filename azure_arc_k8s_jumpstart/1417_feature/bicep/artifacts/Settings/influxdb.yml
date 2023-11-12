@@ -14,6 +14,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: contosoba
+  namespace: azure-iot-operations
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
