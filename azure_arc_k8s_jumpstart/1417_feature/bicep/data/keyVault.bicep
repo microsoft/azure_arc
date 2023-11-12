@@ -1,5 +1,5 @@
 @description('Azure Key Vault name')
-param akvName string = 'ft1-akv-01'
+param akvName string = 'aio-akv-01'
 
 @description('Azure Key Vault location')
 param location string = resourceGroup().location
@@ -11,10 +11,10 @@ param akvSku string = 'standard'
 param tenantId string = subscription().tenantId
 
 @description('Secret name')
-param ft1PlaceHolder string = 'azure-iot-operations'
+param aioPlaceHolder string = 'azure-iot-operations'
 
 @description('Secret value')
-param ft1PlaceHolderValue string = 'ft1SecretValue'
+param aioPlaceHolderValue string = 'aioSecretValue'
 
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvName
@@ -30,10 +30,10 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
-resource ft1SecretPlaceholder 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
-  name: ft1PlaceHolder
+resource aioSecretPlaceholder 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
+  name: aioPlaceHolder
   parent: akv
   properties: {
-    value: ft1PlaceHolderValue
+    value: aioPlaceHolderValue
   }
 }
