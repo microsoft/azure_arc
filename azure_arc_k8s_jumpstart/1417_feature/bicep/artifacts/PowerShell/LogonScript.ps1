@@ -586,17 +586,6 @@ $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxC
 $adxEndPoint = $kustoCluster.Uri
 (Get-content "$aioDataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint) | Set-Content "$aioDataExplorerDir/dashboard.json"
 
-# Update the dashboards files with the new ADX cluster name and URI
-<#$dashboardBody = (Get-content "$aioDataExplorerDir/dashboard.json").Replace('{{ADX_CLUSTER_URI}}', $adxEndPoint)
-$token = (az account get-access-token --scope "https://rtd-metadata.azurewebsites.net/.default openid profile offline_access" --query "accessToken") -replace "`"", ""
-$httpHeaders = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-$dashboardApi = "https://dashboards.kusto.windows.net/dashboards"
-$httpResponse = Invoke-WebRequest -Method Post -Uri $dashboardApi -Body $dashboardBody -Headers $httpHeaders
-if ($httpResponse.StatusCode -ne 200) {
-    Write-Host "ERROR: Failed import orders dashboard report into Azure Data Explorer" -ForegroundColor Red
-}
-#>
-
 ##############################################################
 # Arc-enabling the Windows server host
 ##############################################################
