@@ -7,7 +7,6 @@ Set-PSDebug -Strict
 $aioConfig = Import-PowerShellDataFile -Path $Env:aioConfigPath
 $aioTempDir = $aioConfig.aioDirectories["aioTempDir"]
 $aioToolsDir = $aioConfig.aioDirectories["aioToolsDir"]
-$aioInfluxMountPath = $aioConfig.aioDirectories["aioInfluxMountPath"]
 $aioDataExplorerDir = $aioConfig.aioDirectories["aioDataExplorer"]
 $websiteUrls = $aioConfig.URLs
 $aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
@@ -54,6 +53,25 @@ else {
     $networkplugin = "flannel"
 }
 
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools." -ForegroundColor DarkGreen
+$DevToolsInstallationJob = Invoke-Command -ScriptBlock {
+    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $versionToDownload = $latestReleaseTag.Split("v")[1]
+    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+    $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+    Start-Process -FilePath $output -ArgumentList "/S" -Wait
+} -JobName step3 -ThrottleLimit 16 -AsJob -ComputerName .
+
+Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools installation initiated in background job." -ForegroundColor Green
+
+$DevToolsInstallationJob
+
+Write-Host
 
 ##############################################################
 # AKS EE setup
