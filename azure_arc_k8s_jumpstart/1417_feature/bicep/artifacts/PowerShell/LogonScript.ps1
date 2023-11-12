@@ -308,6 +308,11 @@ az connectedk8s enable-features --name $arcClusterName `
 # Preparing cluster for aio
 ##############################################################
 
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n $aioNamespace | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
+
+
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for aio" -ForegroundColor Gray
 Write-Host "`n"
