@@ -519,8 +519,8 @@ do {
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
 (Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
-(Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $influxIp | Set-Content $influxdbYaml
-(Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $adminPassword | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $adminUsername | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
 kubectl apply -f $Ft1ToolsDir\influxdb.yml -n $ft1Namespace
