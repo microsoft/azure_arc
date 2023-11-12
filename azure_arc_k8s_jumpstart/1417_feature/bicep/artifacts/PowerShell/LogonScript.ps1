@@ -400,14 +400,18 @@ Write-Host "`n"
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
 $retryCount = 0
 $maxRetries = 5
+$aioStatus = "notDeployed"
 
 do {
     az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
     if ($? -eq $false) {
+        $aioStatus = "notDeployed"
         Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying aio on the cluster...Retrying" -ForegroundColor DarkRed
         $retryCount++
+    }else{
+        $aioStatus = "deployed"
     }
-} until ($? -eq $true -or $retryCount -eq $maxRetries)
+} until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
 
 $retryCount = 0
 $maxRetries = 5
