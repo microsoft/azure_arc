@@ -79,6 +79,7 @@ $Ft1ToolsDir = $Ft1Config.Ft1Directories["Ft1ToolsDir"]
 $Ft1PowerShellDir = $Ft1Config.Ft1Directories["Ft1PowerShellDir"]
 $Ft1DataExplorer = $Ft1Config.Ft1Directories["Ft1DataExplorer"]
 $websiteUrls = $Ft1Config.URLs
+$mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 
 function BITSRequest {
     Param(
@@ -241,6 +242,17 @@ $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
 Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
 Remove-Item .\AzureCLI.msi
+
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+$latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+$output = Join-Path $Ft1ToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+Start-Process -FilePath $output -ArgumentList "/S" -Wait
 
 # Enable VirtualMachinePlatform feature, the vm reboot will be done in DSC extension
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
