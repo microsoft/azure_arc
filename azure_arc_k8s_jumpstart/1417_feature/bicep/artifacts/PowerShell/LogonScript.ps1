@@ -493,6 +493,7 @@ $listenerYaml = "$Ft1ToolsDir\mqtt_listener.yml"
 $influxdb_setupYaml = "$Ft1ToolsDir\influxdb_setup.yml"
 $influxdbYaml = "$Ft1ToolsDir\influxdb.yml"
 $influxImportYaml = "$Ft1ToolsDir\influxdb-import-dashboard.yml"
+$mqttExplorerSettings = "$Ft1ToolsDir\mqtt_explorer_settings.json"
 
 do {
     $simulatorPod = kubectl get pods -n $ft1Namespace -o json | ConvertFrom-Json
@@ -517,6 +518,7 @@ do {
 )
 
 (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
+(Get-Content $mqttExplorerSettings ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqttExplorerSettings
 (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
 (Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
 (Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $adminPassword | Set-Content $influxdbYaml
@@ -552,6 +554,10 @@ do {
 
 kubectl apply -f $Ft1ToolsDir\influxdb-import-dashboard.yml -n $ft1Namespace
 kubectl apply -f $Ft1ToolsDir\influxdb-configmap.yml -n $ft1Namespace
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor Gray
+Copy-Item "$Ft1ToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
+
 
 ########################################################################
 # ADX Dashboards
