@@ -136,6 +136,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$aioToolsDir\influxdb-import-dashboard.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$aioToolsDir\mqtt_listener.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_explorer_settings.json") -OutFile "$aioToolsDir\mqtt_explorer_settings.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/Bookmarks") -OutFile "$aioToolsDir\Bookmarks"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$aioDataExplorer\dashboard.json"
 
 #Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$aioToolsDir\e4k.yml"
