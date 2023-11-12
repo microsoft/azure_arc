@@ -157,28 +157,8 @@
     ArcServerResourceType   = 'Microsoft.HybridCompute/machines'
     ArcK8sResourceType      = 'Microsoft.Kubernetes/connectedClusters'
 
-    # Observability variables
-    Monitoring              = @{
-        AdminUser  = "admin"
-        User       = "Contoso Operator"
-        Email      = "operator@contoso.com"
-        Namespace  = "observability"
-        ProdURL    = "http://localhost:3000"
-        Dashboards = @{
-            "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
-            "custom"      = @('freezer-monitoring','node-exporter-full','cluster-global') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
-        }
-    }
-
     # Microsoft Edge startup settings variables
     EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
     EdgeSettingValueTrue    = '00000001'
     EdgeSettingValueFalse   = '00000000'
-
-    Namespaces              = @(
-        "contoso-supermarket"
-        "observability"
-        "sensor-monitor"
-        "images-cache"
-    )
 }
