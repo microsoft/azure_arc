@@ -6,7 +6,7 @@ param location string = resourceGroup().location
 
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
-  Project: 'Jumpstart_aio'
+  Project: 'Jumpstart_azure_aio'
 }
 
 @description('The name of the Azure Data Explorer cluster Sku')
