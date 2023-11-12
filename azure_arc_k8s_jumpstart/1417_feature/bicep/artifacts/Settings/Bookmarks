@@ -5,7 +5,7 @@
          "children": [ {
             "children": [ {
                "id": "16",
-               "name": "aio - Grafana",
+               "name": "AIO - Grafana",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
