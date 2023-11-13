@@ -21,7 +21,7 @@ spec:
     repository: mcr.microsoft.com/azureiotoperations/mqttbridge
     tag: 0.1.0-preview
     pullPolicy: IfNotPresent
-  protocol: v5
+  protocol: v3
   bridgeInstances: 1
   clientIdPrefix: factory-gateway-
   logLevel: debug
