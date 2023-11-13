@@ -310,7 +310,7 @@ az connectedk8s enable-features --name $arcClusterName `
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n $using:aioNamespace | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 
 
 Write-Host "`n"
