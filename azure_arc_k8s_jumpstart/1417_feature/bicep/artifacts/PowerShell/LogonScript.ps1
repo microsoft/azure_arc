@@ -450,6 +450,10 @@ az role assignment create --assignee $extensionPrincipalId --role "EventGrid Top
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
+$eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
+az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
+
 Start-Sleep -Seconds 60
 
 ## Adding MQTT load balancer
