@@ -77,6 +77,9 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-06-01-preview' = {
   properties: {
     topicSpacesConfiguration: {
       state: 'Enabled'
+      routingIdentityInfo: {
+        type: 'SystemAssigned'
+      }
       maximumClientSessionsPerAuthenticationName: maximumClientSessionsPerAuthenticationName
       clientAuthentication: {
         alternativeAuthenticationNameSources: [
