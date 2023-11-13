@@ -2,7 +2,7 @@ apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: MqttBridgeTopicMap
 metadata:
   name: my-topic-map
-  namespace: azure-iot-operations 
+  namespace: azure-iot-operations
 spec:
   mqttBridgeConnectorRef: my-mqtt-bridge
   routes:
@@ -17,8 +17,8 @@ metadata:
   name: my-mqtt-bridge
   namespace: azure-iot-operations
 spec:
-  image: 
-    repository: mcr.microsoft.com/azureiotoperations/mqttbridge 
+  image:
+    repository: mcr.microsoft.com/azureiotoperations/mqttbridge
     tag: 0.1.0-preview
     pullPolicy: IfNotPresent
   protocol: v5
