@@ -29,7 +29,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 param location string
 
 @description('The location of the Azure EventGrid namespace')
-param eventGridLocation string = 'westus2'
+param eventGridLocation string = 'eastus2'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
