@@ -167,3 +167,19 @@ resource storageTopicSubscription 'Microsoft.EventGrid/topics/eventSubscriptions
     eventDeliverySchema: 'CloudEventSchemaV1_0'
   }
 }
+
+
+resource azureEventGridDataSenderRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  name: 'd5a91429-5739-47e2-a06b-3470a27159e7'
+  scope: tenant()
+}
+
+resource eventGridTopicRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid('azureEventGridDataSenderRole', eventGrid.id, eventGridTopic.id)
+  scope: eventGridTopic
+  properties: {
+    roleDefinitionId: azureEventGridDataSenderRole.id
+    principalId: eventGrid.identity.principalId
+  }
+}
+
