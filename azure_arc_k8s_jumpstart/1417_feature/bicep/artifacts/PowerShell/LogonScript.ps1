@@ -139,7 +139,7 @@ $aksedgeShell = (Get-ChildItem -Path "$workDir" -Filter AksEdgeShell.ps1 -Recurs
 . $aksedgeShell
 
 # Download, install and deploy AKS EE
-Write-Host "[$(Get-Date -Format t)] INFO: Step 2: Download, install and deploy AKS Edge Essentials" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Step 2: Download, install and deploy AKS Edge Essentials" -ForegroundColor DarkGray
 # invoke the workflow, the json file already stored above.
 $retval = Start-AideWorkflow -jsonFile $aidejson
 # report error via Write-Error for Intune to show proper status
@@ -168,7 +168,7 @@ if ($env:windowsNode -eq $true) {
 }
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Checking kubernetes nodes" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Checking kubernetes nodes" -ForegroundColor DarkGray
 Write-Host "`n"
 kubectl get nodes -o wide
 Write-Host "`n"
@@ -176,7 +176,7 @@ Write-Host "`n"
 # az version
 az -v
 
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring cluster log size" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring cluster log size" -ForegroundColor DarkGray
 Invoke-AksEdgeNodeCommand "sudo find /var/log -type f -exec truncate -s ${clusterLogSize} {} +"
 Write-Host "`n"
 
@@ -193,7 +193,7 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor DarkGray
 az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId
 az account set --subscription $subscriptionId
 
@@ -202,7 +202,7 @@ az extension add --name connectedk8s --version 1.3.17
 
 # Making extension install dynamic
 if ($aioConfig.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor DarkGray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $aioConfig.AzCLIExtensions) {
@@ -224,7 +224,7 @@ Set-AzContext -Subscription $subscriptionId
 
 # Install PowerShell modules
 if ($aioConfig.PowerShellModules.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($aioConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($aioConfig.PowerShellModules -join ', ') -ForegroundColor DarkGray
     Install-PackageProvider -Name NuGet -Confirm:$false -Force
     foreach ($module in $aioConfig.PowerShellModules) {
         Install-Module -Name $module -Force -Confirm:$false
@@ -233,7 +233,7 @@ if ($aioConfig.PowerShellModules.Count -ne 0) {
 
 # Register Azure providers
 if ($aioConfig.AzureProviders.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($aioConfig.AzureProviders -join ', ') -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($aioConfig.AzureProviders -join ', ') -ForegroundColor DarkGray
     foreach ($provider in $aioConfig.AzureProviders) {
         Register-AzResourceProvider -ProviderNamespace $provider
     }
@@ -246,7 +246,7 @@ Write-Host
 #####################################################################
 
 # Onboarding the cluster to Azure Arc
-Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the AKS Edge Essentials cluster to Azure Arc..." -ForegroundColor DarkGreen
 Write-Host "`n"
 
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -A | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
@@ -276,7 +276,7 @@ else {
 }
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Create Azure Monitor for containers Kubernetes extension instance" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Create Azure Monitor for containers Kubernetes extension instance" -ForegroundColor DarkGray
 Write-Host "`n"
 
 # Deploying Azure log-analytics workspace
@@ -296,7 +296,7 @@ az k8s-extension create --name "azuremonitor-containers" `
     --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Enable custom locations on the Arc-enabled cluster
-Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
 az connectedk8s enable-features --name $arcClusterName `
     --resource-group $resourceGroup `
     --features cluster-connect custom-locations `
@@ -314,7 +314,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for aio" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for aio" -ForegroundColor DarkGray
 Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
@@ -387,14 +387,14 @@ catch {
 # Install Azure edge CLI
 ##############################################################
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor DarkGray
 Write-Host "`n"
 #az extension add --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-latest').GetResponse().ResponseUri.AbsoluteUri) -y
 ##############################################################
 # Deploy aio
 ##############################################################
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying aio to the cluster" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying aio to the cluster" -ForegroundColor DarkGray
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
@@ -403,7 +403,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
+    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying aio on the cluster...Retrying" -ForegroundColor DarkRed
@@ -421,7 +421,7 @@ do {
     $output = $output | ConvertFrom-Json
     $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
     if ($mqServiceStatus -ne "Success") {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --only-show-errors
         $retryCount++
     }
 } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -431,20 +431,20 @@ if ($retryCount -eq $maxRetries) {
     exit 1 # Exit the script
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor DarkGray
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Extension Principal ID: $extensionPrincipalID" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Extension Principal ID: $extensionPrincipalID" -ForegroundColor DarkGray
 Write-Host "`n"
 
-$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv)
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId" -ForegroundColor Gray
+$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId" -ForegroundColor DarkGray
 Write-Host "`n"
 
-$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv)
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor Gray
+$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor DarkGray
 Write-Host "`n"
 
-Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
@@ -455,15 +455,15 @@ Start-Sleep -Seconds 60
 ## Adding MQTT load balancer
 $mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
 $mqListenerService = "aio-mq-dmqtt-frontend"
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor Gray
-$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv)
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n $aioNamespace
 
 ##############################################################
 # Deploy the simulator
 ##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying the simulator" -ForegroundColor DarkGray
 $simulatorYaml = "$aioToolsDir\mqtt_simulator.yml"
 
 do {
@@ -473,7 +473,7 @@ do {
         $_.metadata.name -match "aio-mq-dmqtt" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 20 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 20
 } while (
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
@@ -498,7 +498,7 @@ do {
         $_.metadata.name -match "mqtt-simulator-deployment" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
@@ -508,7 +508,7 @@ kubectl apply -f $influxdb_setupYaml -n $aioNamespace
 
 do {
     $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 10 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 10 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 10
 } while (
     $null -eq $influxIp
@@ -530,7 +530,7 @@ do {
         $_.metadata.name -match "influxdb-0" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
@@ -543,7 +543,7 @@ do {
         $_.metadata.name -match "mqtt-listener-deployment" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 20 seconds" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 20
 } while (
     $matchingPods.Count -ne 0
@@ -555,7 +555,9 @@ kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 ##############################################################
 # Install MQTT Explorer
 ##############################################################
+Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+Write-Host "`n"
 $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
@@ -563,14 +565,18 @@ $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
 Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
 Start-Process -FilePath $output -ArgumentList "/S" -Wait
 
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+Start-Sleep -Seconds 5
+Stop-Process -Name "MQTT Explorer"
 Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
-
 
 ##############################################################
 # Creating bookmarks
 ##############################################################
+Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar" -ForegroundColor DarkGreen
+Write-Host "`n"
 $bookmarksFileName = "$aioToolsDir\Bookmarks"
 $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 
@@ -597,14 +603,14 @@ $adxEndPoint = $kustoCluster.Uri
 # Arc-enabling the Windows server host
 ##############################################################
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM" -ForegroundColor DarkGray
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
 
 ## Azure Arc agent Installation
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the Azure VM to Azure Arc..." -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Onboarding the Azure VM to Azure Arc..." -ForegroundColor DarkGray
 
 # Download the package
 function download1() { $ProgressPreference = "SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi }
@@ -630,7 +636,7 @@ $clusterName = "$env:computername-$env:kubernetesDistribution"
 ##############################################################
 # Install MQTTUI
 ##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTTUI" -ForegroundColor DarkGray
 $latestReleaseTag = (Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].tag_name
 $versionToDownload = $latestReleaseTag.Split("v")[1]
 $mqttuiReleaseDownloadUrl = ((Invoke-WebRequest $mqttuiReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "mqttui-v${versionToDownload}-aarch64-pc-windows-msvc.zip" }).browser_download_url
@@ -656,7 +662,7 @@ foreach ($package in $aioConfig.PipPackagesList) {
 #############################################################
 # Install VSCode extensions
 #############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($aioConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($aioConfig.VSCodeExtensions -join ', ') -ForegroundColor DarkGray
 # Install VSCode extensions
 foreach ($extension in $aioConfig.VSCodeExtensions) {
     code --install-extension $extension 2>&1 | Out-Null
