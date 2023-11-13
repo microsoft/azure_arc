@@ -427,7 +427,7 @@ do {
 } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
 
 if ($retryCount -eq $maxRetries) {
-    Write-Host "[$(Get-Date -Format t)] ERROR: aio deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+    Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
     exit 1 # Exit the script
 }
 
