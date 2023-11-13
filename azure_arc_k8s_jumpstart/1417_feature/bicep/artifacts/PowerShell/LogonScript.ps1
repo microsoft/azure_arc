@@ -431,20 +431,11 @@ if ($retryCount -eq $maxRetries) {
     exit 1 # Exit the script
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing Event Grid Role Assignment" -ForegroundColor DarkGray
-$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Extension Principal ID: $extensionPrincipalID" -ForegroundColor DarkGray
-Write-Host "`n"
-
-$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Topic ID: $eventGridTopicId" -ForegroundColor DarkGray
-Write-Host "`n"
-
-$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
-Write-Host "[$(Get-Date -Format t)] INFO: Event Grid Namespace: $eventGridNamespaceName" -ForegroundColor DarkGray
-Write-Host "`n"
-
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
+$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
