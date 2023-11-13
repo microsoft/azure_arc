@@ -468,7 +468,7 @@ do {
         $_.metadata.name -match "aio-mq-dmqtt" -and
         $_.status.phase -notmatch "running"
     }
-    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and service Ip address be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
     Start-Sleep -Seconds 20
 } while (
     $null -eq $mqttIp -and $matchingServices.Count -ne 0
