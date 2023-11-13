@@ -115,3 +115,5 @@ OEENightShift: real)
 
 // Create a policy to update the productionline table
 .alter table productionline policy update @'[{"Source": "donutPlant", "Query": "Expand_productionline_Data()", "IsEnabled": "True"}]'
+
+.alter table productionline policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"

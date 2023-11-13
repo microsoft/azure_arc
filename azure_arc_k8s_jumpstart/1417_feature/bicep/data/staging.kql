@@ -1,2 +1,4 @@
 // create main table, in this table lands the data in base64 format
 .create table donutPlant (['id']: guid, source: string, ['type']: string, data_base64: string, ['time']: datetime, specversion: real, subject: string) 
+
+.alter table donutPlant policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"

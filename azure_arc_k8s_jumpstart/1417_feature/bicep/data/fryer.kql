@@ -119,3 +119,6 @@ OiltemperatureTarget: real
 
  // Create policy to run function every 1 minute
 .alter table fryer policy update @'[{"Source": "donutPlant", "Query": "Expand_fryer_Data()", "IsEnabled": "True"}]'
+
+.alter table fryer policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+
