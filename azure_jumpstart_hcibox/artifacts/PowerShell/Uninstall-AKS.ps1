@@ -20,13 +20,13 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 # Uninstall AksHci - only need to perform the following on one of the nodes
 $clusterName = $env:AKSClusterName
 Write-Host "Removing AKS-HCI workload cluster"
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock  {
     Disable-AksHciArcConnection -name $using:clusterName
     Remove-AksHciCluster -name $using:clusterName -Confirm:$false
 }
 
 Write-Host "Uninstalling AKS-HCI management plane"
-Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock  {
     Uninstall-AksHci -Confirm:$false
 }
 # Set env variable deployAKSHCI to true (in case the script was run manually)

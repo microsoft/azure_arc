@@ -28,9 +28,9 @@ foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
     Invoke-Command -VMName $AzSHOST.Hostname -Credential $adcred -ScriptBlock {
         Enable-PSRemoting -Force
         $ProgressPreference = "SilentlyContinue"
-        Install-PackageProvider -Name NuGet -Force 
-        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-        Install-Module -Name PowershellGet -Force
+        Install-PackageProvider -Name NuGet -Force | Out-Null
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted | Out-Null
+        Install-Module -Name PowershellGet -Force | Out-Null
         $ProgressPreference = "Continue"
     }
 }
@@ -39,7 +39,7 @@ foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
 Write-Host "Install necessary AZ modules plus AKS-HCI module and initialize akshci on each node"
 foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
     Invoke-Command -VMName $AzSHOST.Hostname  -Credential $adcred -ScriptBlock {
-        Write-Host "Installing Required Modules"
+        $WarningPreference = "SilentlyContinue"
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         $ProgressPreference = "SilentlyContinue"
         Install-Module -Name AksHci -Force -AcceptLicense
