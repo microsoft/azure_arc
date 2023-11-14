@@ -26,9 +26,6 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
-    "deployBastion": {
-      "value": false
-    },
     "customLocationRPOID": {
       "value": "${CUSTOM_LOCATION_RP_ID}"
     },
