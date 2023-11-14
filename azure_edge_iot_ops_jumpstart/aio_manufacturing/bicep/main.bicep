@@ -23,13 +23,10 @@ param windowsOSVersion string = '2022-datacenter-g2'
   'westus3'
   'eastus2'
   'westeurope'
-  'centraluseuap'
-  'eastus2euap'
+  'westus2'
+  'northeurope'
 ])
 param location string
-
-@description('The location of the Azure EventGrid namespace')
-param eventGridLocation string = 'westus2'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool
@@ -62,7 +59,7 @@ param subscriptionId string = subscription().subscriptionId
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = '1417-feature-br'
+param githubBranch string = 'main'
 
 @description('Name of the VNET')
 param virtualNetworkName string = 'AIO-Demo-VNET'
@@ -117,7 +114,7 @@ param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/1417_feature/bicep/'
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_edge_iot_ops_jumpstart/aio_manufacturing/bicep/'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var bastionSubnetName = 'AzureBastionSubnet'
@@ -354,7 +351,7 @@ module eventGrid 'data/eventGrid.bicep' = {
     queueName: storageQueueName
     storageAccountResourceId: storageAccount.outputs.storageAccountId
     namingGuid: namingGuid
-    location: eventGridLocation
+    location: location
   }
 }
 

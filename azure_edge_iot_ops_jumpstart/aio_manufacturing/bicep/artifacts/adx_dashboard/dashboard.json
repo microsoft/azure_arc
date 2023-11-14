@@ -658,7 +658,7 @@
       "id": "27da065d-b46f-4658-b525-556227c5c6b3",
       "name": "fryer",
       "clusterUri": "{{ADX_CLUSTER_URI}}",
-      "database": "fryer",
+      "database": "donutPlant",
       "queryResultsCacheMaxAge": 5000,
       "kind": "manual-kusto",
       "scopeId": "kusto"

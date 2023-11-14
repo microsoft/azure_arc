@@ -314,7 +314,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 
 
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for aio" -ForegroundColor DarkGray
+Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE cluster for AIO" -ForegroundColor DarkGray
 Write-Host "`n"
 try {
     $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
@@ -343,9 +343,9 @@ catch {
     Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
 }
 
-Write-Host "Configuring firewall specific to aio"
-Write-Host "Add firewall rule for aio MQTT Broker"
-New-NetFirewallRule -DisplayName "aio MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+Write-Host "Configuring firewall specific to AIO"
+Write-Host "Add firewall rule for AIO MQTT Broker"
+New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
 
 try {
     $deploymentInfo = Get-AksEdgeDeploymentInfo
@@ -353,13 +353,13 @@ try {
     $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
     $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
     if ( $null -eq $portProxyRulExists ) {
-        Write-Host "Configure port proxy for aio"
+        Write-Host "Configure port proxy for AIO"
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
     }
     else {
-        Write-Host "Port proxy rule for aio exists, skip configuring port proxy..."
+        Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
     }
 }
 catch {
@@ -394,7 +394,7 @@ Write-Host "`n"
 # Deploy aio
 ##############################################################
 Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying aio to the cluster" -ForegroundColor DarkGray
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the cluster" -ForegroundColor DarkGray
 Write-Host "`n"
 
 $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
@@ -406,7 +406,9 @@ do {
     az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
-        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying aio on the cluster...Retrying" -ForegroundColor DarkRed
+        Write-Host "`n"
+        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+        Write-Host "`n"
         $retryCount++
     }else{
         $aioStatus = "deployed"
@@ -435,11 +437,15 @@ Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment pro
 $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+$eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Publisher" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --resource-group $resourceGroup --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
 az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal
+az role assignment create --assignee $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --only-show-errors
+az role assignment create --assignee $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --only-show-errors
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
 $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
