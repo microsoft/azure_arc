@@ -139,11 +139,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_explorer_settings
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/Bookmarks") -OutFile "$aioToolsDir\Bookmarks"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adx_dashboard/dashboard.json") -OutFile "$aioDataExplorer\dashboard.json"
 
-#Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/e4k.yml") -OutFile "$aioToolsDir\e4k.yml"
+#Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$aioDirectory\wallpaper.png"
 
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "$aioDirectory\wallpaper.png"
-
-#Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$aioDirectory\wallpaper.png"
+Invoke-WebRequest "https://raw.githubusercontent.com/azure/arc_jumpstart_docs/canary/img/wallpaper/jumpstart_title_wallpaper_dark.png" -OutFile "$aioDirectory\wallpaper.png"
 
 ##############################################################
 # Testing connectivity to required URLs
