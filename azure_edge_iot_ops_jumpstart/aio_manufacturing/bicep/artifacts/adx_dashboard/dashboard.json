@@ -106,7 +106,7 @@
           "dataSourceId": "27da065d-b46f-4658-b525-556227c5c6b3"
         },
         "usedVariables": [],
-        "text": "print latitude=26.13263, longitude=-80.40270"
+        "text": "print latitude=47.64443, longitude=-122.13704"
       },
       "visualOptions": {
         "map__type": "bubble",
