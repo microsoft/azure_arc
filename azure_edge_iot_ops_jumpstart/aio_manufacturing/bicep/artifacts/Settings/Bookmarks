@@ -5,14 +5,14 @@
          "children": [ {
             "children": [ {
                "id": "16",
-               "name": "AIO - Grafana",
+               "name": "AIO - InfluxDB",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "Grafana-influx-URL"
             }],
             "id": "15",
-            "name": "Grafana",
+            "name": "InfluxDB",
             "source": "unknown",
             "type": "folder"
          }, {
