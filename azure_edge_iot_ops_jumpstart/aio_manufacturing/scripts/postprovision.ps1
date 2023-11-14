@@ -60,5 +60,4 @@ If ($rdpPort -ne "3389") {
         | Out-Null
 
     Set-AzNetworkSecurityGroup -NetworkSecurityGroup $nsg | Out-Null
-    # az network nsg rule create -g $resourceGroup --nsg-name Ag-NSG-Prod --name "RDC-$rdpPort" --priority 100 --source-address-prefixes * --destination-port-ranges $rdpPort --access Allow --protocol Tcp
 }
