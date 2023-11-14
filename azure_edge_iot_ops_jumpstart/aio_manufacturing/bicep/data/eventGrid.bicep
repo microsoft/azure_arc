@@ -2,7 +2,7 @@
 param eventGridNamespaceName string = 'aioNamespace'
 
 @description('The location of the Azure Data Explorer cluster')
-param location string = 'westus2'
+param location string = resourceGroup().location
 
 @maxLength(5)
 @description('Random GUID')

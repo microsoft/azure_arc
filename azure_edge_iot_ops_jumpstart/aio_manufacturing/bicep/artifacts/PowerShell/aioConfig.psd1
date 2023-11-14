@@ -3,16 +3,16 @@
 
     # Directory paths
     aioDirectories           = @{
-        aioDir             = "C:\aio"
-        aioLogsDir         = "C:\aio\Logs"
-        aioPowerShellDir   = "C:\aio\PowerShell"
+        aioDir             = "C:\AIO"
+        aioLogsDir         = "C:\AIO\Logs"
+        aioPowerShellDir   = "C:\AIO\PowerShell"
         aioToolsDir        = "C:\Tools"
         aioTempDir         = "C:\Temp"
-        aioConfigMapDir    = "C:\aio\ConfigMaps"
-        aioAppsRepo        = "C:\aio\AppsRepo"
-        aioDataExplorer    = "C:\aio\DataExplorer"
-        aioMonitoringDir   = "C:\aio\Monitoring"
-        aioInfluxMountPath = "C:\aio\InfluxDB"
+        aioConfigMapDir    = "C:\AIO\ConfigMaps"
+        aioAppsRepo        = "C:\AIO\AppsRepo"
+        aioDataExplorer    = "C:\AIO\DataExplorer"
+        aioMonitoringDir   = "C:\AIO\Monitoring"
+        aioInfluxMountPath = "C:\AIO\InfluxDB"
     }
 
     # Required URLs
