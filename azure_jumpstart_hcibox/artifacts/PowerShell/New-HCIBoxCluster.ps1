@@ -1313,7 +1313,7 @@ CertificateTemplate= WebServer
             Write-Host $WindowsAdminCenterGateway
             Write-Host "Installing and Configuring Windows Admin Center"
             $PathResolve = Resolve-Path -Path 'C:\Windows Admin Center\*.msi'
-            $arguments = "/qn /L*v C:\log.txt SME_PORT=$($HCIBoxConfig.WACport)t SME_THUMBPRINT=$pfxThumbPrint SSL_CERTIFICATE_OPTION=installed SME_URL=$WindowsAdminCenterGateway"
+            $arguments = "/qn /L*v C:\log.txt SME_PORT=$($HCIBoxConfig.WACport) SME_THUMBPRINT=$pfxThumbPrint SSL_CERTIFICATE_OPTION=installed SME_URL=$WindowsAdminCenterGateway"
             Start-Process -FilePath $PathResolve -ArgumentList $arguments -PassThru | Wait-Process
 
             # Install Chocolatey
