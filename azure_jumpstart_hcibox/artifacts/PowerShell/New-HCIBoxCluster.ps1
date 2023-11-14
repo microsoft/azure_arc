@@ -1673,7 +1673,8 @@ $lnk.Save()
 
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
-Write-Host "`nSuccessfully deployed HCIBox Azure Stack HCI cluster." -ForegroundColor Green
+Write-Host
+Write-Host "Successfully deployed HCIBox Azure Stack HCI cluster." -ForegroundColor Green
 Write-Host "Infrastructure deployment time was $($timeSpan.Hours):$($timeSpan.Minutes) (hh:mm)." -ForegroundColor Green
 
 Stop-Transcript 
