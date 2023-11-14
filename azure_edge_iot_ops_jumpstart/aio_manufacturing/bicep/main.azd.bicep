@@ -49,7 +49,7 @@ param spnTenantId string
 param subscriptionId string = subscription().subscriptionId
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
 param githubBranch string = 'main'
