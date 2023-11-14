@@ -23,8 +23,8 @@ param windowsOSVersion string = '2022-datacenter-g2'
   'westus3'
   'eastus2'
   'westeurope'
-  'centraluseuap'
-  'eastus2euap'
+  'westus2'
+  'northeurope'
 ])
 param location string
 
