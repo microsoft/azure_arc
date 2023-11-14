@@ -21,7 +21,7 @@ spec:
     repository: e4kpreview.azurecr.io/mqttbridge
     tag: 0.1.0-preview-rc6
     pullPolicy: IfNotPresent
-  protocol: v3
+  protocol: v5
   bridgeInstances: 1
   clientIdPrefix: factory-gateway-
   logLevel: debug
