@@ -13,7 +13,7 @@ if ($null -ne $env:AZURE_RESOURCE_GROUP){
 Write-Host "Importing Azure Data Explorer dashboards..."
 
 # Get the ADX/Kusto cluster info
-$kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
+$kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup
 $adxEndPoint = $kustoCluster.Uri
 
 # Update the dashboards files with the new ADX cluster name and URI
@@ -43,7 +43,7 @@ if ($httpResponse.StatusCode -ne 200){
 If ($rdpPort -ne "3389") {
 
     Write-Host "Configuring NSG Rule for RDP..."
-    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name AKS-EE-Demo-NSG
+    $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name AIO-Demo-NSG
 
     Add-AzNetworkSecurityRuleConfig `
         -NetworkSecurityGroup $nsg `
@@ -60,5 +60,4 @@ If ($rdpPort -ne "3389") {
         | Out-Null
 
     Set-AzNetworkSecurityGroup -NetworkSecurityGroup $nsg | Out-Null
-    # az network nsg rule create -g $resourceGroup --nsg-name Ag-NSG-Prod --name "RDC-$rdpPort" --priority 100 --source-address-prefixes * --destination-port-ranges $rdpPort --access Allow --protocol Tcp
 }
