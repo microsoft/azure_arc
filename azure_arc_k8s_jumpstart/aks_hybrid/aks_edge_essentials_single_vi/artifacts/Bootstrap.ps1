@@ -36,7 +36,7 @@ Start-Transcript "C:\Temp\Bootstrap.log"
 $ErrorActionPreference = "SilentlyContinue"
 
 ##############################################################
-# Change RDP Port
+# Change RDP Port 
 ##############################################################
 Write-Host "RDP port number from configuration is $rdpPort"
 if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
