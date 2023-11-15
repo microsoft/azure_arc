@@ -150,9 +150,9 @@ Start-Sleep -Seconds 30
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="videoindexer"
-$version="1.0.28-preview" # switch to blank
+#$version="1.0.28-preview" # switch to blank
 $namespace="video-indexer"
-# $releaseTrain="preview" # switch to release
+$releaseTrain="release" # switch to release
 $storageClass="longhorn"
 
 Write-Host "Create Cognitive Services on VI resource provider"
@@ -177,7 +177,7 @@ az k8s-extension create --name $extensionName `
                         --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
-                        --version $version `
+                        --release-train $releaseTrain `
                         --auto-upgrade-minor-version false `
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
