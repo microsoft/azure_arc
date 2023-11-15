@@ -655,6 +655,7 @@ Remove-Item -Path $output -Force
 # Install pip packages
 ##############################################################
 Write-Host "Installing pip packages"
+python -m pip install --upgrade pip
 foreach ($package in $aioConfig.PipPackagesList) {
     Write-Host "Installing $package"
     & pip install -q $package
