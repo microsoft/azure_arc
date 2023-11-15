@@ -15,7 +15,7 @@
         "value": "arcdemo"
       },
       "windowsAdminPassword": {
-        "value": "ArcPassword123!!"
+        "value": "<password>"
       },
       "rdpPort": {
         "value": "3389"
