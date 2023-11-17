@@ -68,7 +68,7 @@ Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
+$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 # Downloading 'installCAPI.log' log file
@@ -80,7 +80,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 # Downloading 'installK3s.log' log file
 Write-Header "Downloading K3s Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
-$sourceFile = $sourceFile + $sas
+$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
 
 Write-Header "Checking K8s Nodes"
@@ -178,7 +178,7 @@ Write-Header "Downloading Rancher K3s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
+$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
 
 # Merging kubeconfig files from CAPI and Rancher K3s
