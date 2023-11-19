@@ -81,7 +81,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   #Setup firewall rules
   if ($rdpPort -eq 3389) {
     netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-  } 
+  }
   else {
     $systemroot = get-content env:systemroot
     netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
@@ -92,7 +92,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 
 
 ##############################################################
-# Download configuration data file and declaring directories 
+# Download configuration data file and declaring directories
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile $ConfigurationDataFile
@@ -118,7 +118,7 @@ function BITSRequest {
       Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
     }
     [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
-    Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+    Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress;
   }
   Complete-BitsTransfer $download.JobId
   Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
@@ -163,7 +163,7 @@ Function Test-Url($url, $maxRetries = 3, $retryDelaySeconds = 5) {
       try {
         $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
         $statusCode = $response.StatusCode
-  
+
         if ($statusCode -eq 200) {
           Write-Host "$url is reachable."
           break  # Break out of the loop if website is reachable
@@ -175,14 +175,14 @@ Function Test-Url($url, $maxRetries = 3, $retryDelaySeconds = 5) {
       catch {
         Write-Host "An error occurred while testing the website: $url - $_"
       }
-  
+
       $retryCount++
       if ($retryCount -le $maxRetries) {
         Write-Host "Retrying in $retryDelaySeconds seconds..."
         Start-Sleep -Seconds $retryDelaySeconds
       }
     } while ($retryCount -le $maxRetries)
-  
+
     if ($retryCount -gt $maxRetries) {
       Write-Host "Exceeded maximum number of retries. Exiting..."
       exit 1  # Stop script execution if maximum retries reached
@@ -249,14 +249,14 @@ while (-not $success -and $retryCount -lt $maxRetries) {
       Write-Output "Chocolatey not detected, trying to install now"
       Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
     }
-    
+
     Write-Host "Chocolatey packages specified"
-    
+
     foreach ($app in $AgConfig.ChocolateyPackagesList) {
       Write-Host "Installing $app"
       & choco install $app /y -Force | Write-Output
     }
-      
+
     # If the command succeeds, set $success to $true to exit the loop
     $success = $true
   }
@@ -271,7 +271,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
     else {
       Write-Host "All attempts failed. Exiting..."
-      exit 1  # Stop script execution if maximum retries reached      
+      exit 1  # Stop script execution if maximum retries reached
     }
   }
 }
@@ -319,7 +319,7 @@ If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
 }
 New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgConfig.EdgeSettingValueTrue -PropertyType DWORD -Force
 
-# Disable Microsoft Edge "Personalize your web experience" prompt 
+# Disable Microsoft Edge "Personalize your web experience" prompt
 $Name = 'PersonalizationReportingEnabled'
 # Create the key if it does not exist
 If (-NOT (Test-Path $AgConfig.EdgeSettingRegistryPath)) {
@@ -366,5 +366,5 @@ Stop-Transcript
 ##############################################################
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content "$AgDirectory\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content "$AgDirectory\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content "$AgDirectory\Bootstrap.log" -Force

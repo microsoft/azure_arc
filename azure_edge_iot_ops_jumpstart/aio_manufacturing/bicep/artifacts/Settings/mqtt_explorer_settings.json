@@ -1,0 +1,19 @@
+{
+  "ConnectionManager_connections": {
+    "mqtt.eclipse.org": {
+      "certValidation": false,
+      "clientId": "mqtt-explorer-640c948e",
+      "encryption": false,
+      "host": "MQTTIpPlaceholder",
+      "id": "mqtt.eclipse.org",
+      "name": "AIO",
+      "port": 1883,
+      "protocol": "mqtt",
+      "subscriptions": [
+        "#",
+        "$SYS/#"
+      ],
+      "type": "mqtt"
+    }
+  }
+}

@@ -92,14 +92,14 @@ Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
+$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-capi"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 # Downloading 'installCAPI.log' log file
 Write-Header "Downloading CAPI Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
-$sourceFile = $sourceFile + $sas
+$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
 #VNet peering with CAPI vnet
@@ -192,7 +192,7 @@ foreach ($cluster in $clusters) {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.24.0 `
+            --version 1.25.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
         Write-Host "`n"

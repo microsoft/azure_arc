@@ -36,7 +36,9 @@
                 "name": "[parameters('storageAccountType')]"
             },
             "kind": "StorageV2",
-            "properties": {}
+            "properties": {
+                "supportsHttpsTrafficOnly": true
+            }
         }
     ],
     "outputs": {

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "envName": {
+      "value": "${AZURE_ENV_NAME}"
+    },
+    "kubernetesDistribution": {
+      "value": "k3s"
+    },
+    "windowsAdminUsername": {
+      "value": "${JS_WINDOWS_ADMIN_USERNAME}"
+    },
+    "spnClientId": {
+      "value": "${SPN_CLIENT_ID}"
+    },
+    "spnObjectId": {
+      "value": "${SPN_OBJECT_ID}"
+    },
+    "spnClientSecret": {
+      "value": "${SPN_CLIENT_SECRET}"
+    },
+    "spnTenantId": {
+      "value": "${SPN_TENANT_ID}"
+    },
+    "location": {
+      "value": "${AZURE_LOCATION}"
+    },
+    "customLocationRPOID": {
+      "value": "${CUSTOM_LOCATION_RP_ID}"
+    },
+    "rdpPort": {
+      "value": "${JS_RDP_PORT}"
+    }
+  }
+}

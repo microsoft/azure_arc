@@ -101,7 +101,7 @@
             }
         },
         "adminPassword": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "SSH key or password for the Azure Arc-enabled virtual Machine. SSH key is recommended for Linux."
             }
@@ -163,7 +163,7 @@
             }
         },
         "sharedKey": {
-            "type": "string",
+            "type": "securestring",
             "defaultValue": "ArcPa$$w0rd",
             "metadata": {
                 "description": "Shared secret key for the vNET-to-vNET connection between Virtual Network Gateways."
@@ -176,7 +176,7 @@
             }
         },
         "password": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Unique SPN password"
             }
@@ -189,7 +189,7 @@
         }
     },
     "variables": {
-        
+
     },
     "resources": [
         {
@@ -414,7 +414,7 @@
                             "type": "string"
                         },
                         "sharedKey": {
-                            "type": "string"
+                            "type": "securestring"
                         }
                     },
                     "resources": [
@@ -471,10 +471,10 @@
                     },
                     "PLscope": {
                         "value": "[reference('AzureDeployment').outputs.PLscope.value]"
-                    }, 
+                    },
                     "privateEndpoints_name": {
                         "value": "[parameters('privateEndpoints_name')]"
-                    }, 
+                    },
                     "adminUsername": {
                         "value": "[parameters('adminUsername')]"
                     }
@@ -494,7 +494,7 @@
                         "type": "string"
                     },
                     "password": {
-                        "type": "string"
+                        "type": "securestring"
                     },
                     "tenantId": {
                         "type": "string"
@@ -510,7 +510,7 @@
                     }
                     },
                     "variables": {
-                        
+
                     },
                     "resources": [
                         {

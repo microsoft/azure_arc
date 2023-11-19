@@ -9,7 +9,7 @@ spec:
         kubernetes.io/os: linux
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.24.0_2023-10-10
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.25.0_2023-11-14
         imagePullPolicy: IfNotPresent
         args: ["-uninstall"]
         command: ["/opt/bootstrapper/bin/bootstrapper"]
