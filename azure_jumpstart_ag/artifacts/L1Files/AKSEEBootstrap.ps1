@@ -71,6 +71,7 @@ foreach ($url in $websiteUrls) {
 
 ##############################################################
 # Deploying AKS Edge Essentials clusters
+
 ##############################################################
 Write-Host "INFO: Configuring L1 VM with AKS Edge Essentials." -ForegroundColor Gray
 # Force time sync
