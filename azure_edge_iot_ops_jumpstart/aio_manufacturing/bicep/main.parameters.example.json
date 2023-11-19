@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "kubernetesDistribution": {
+      "value": "k3s"
+    },
+    "windowsAdminUsername": {
+      "value": "arcdemo"
+    },
+    "windowsAdminPassword": {
+      "value": "ArcPassword123!!"
+    },
+    "spnClientId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "spnObjectId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "spnClientSecret": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "spnTenantId": {
+      "value": "XXXXX-XXXXX-XXXXX"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "deployBastion": {
+      "value": false
+    }
+  }
+}

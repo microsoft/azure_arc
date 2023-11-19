@@ -5,9 +5,9 @@ param (
     [string]$resourceGroup,
     [string]$subscriptionId,
     [string]$Location,
-    [string]$PEname, 
+    [string]$PEname,
     [string]$adminUsername,
-    [string]$PLscope 
+    [string]$PLscope
 
 )
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
@@ -41,17 +41,17 @@ workflow ClientTools_01
                         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                     }
                 }
-                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                    Write-Host "Chocolatey Apps Specified"  
-                    
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){
+                    Write-Host "Chocolatey Apps Specified"
+
                     $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-                
+
                     foreach ($app in $appsToInstall)
                     {
                         Write-Host "Installing $app"
                         & choco install $app /y -Force| Write-Output
                     }
-                }                        
+                }
             }
         }
 ClientTools_01 | Format-Table
@@ -89,5 +89,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\LogonScript.log -Force | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\LogonScript.log -Force | Where { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content C:\Temp\LogonScript.log -Force
