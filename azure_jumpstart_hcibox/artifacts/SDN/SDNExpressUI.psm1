@@ -420,7 +420,7 @@ function SDNExpressUI {
             </StackPanel>
             <TextBlock  Margin="179.149,0,0,74.328" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <Run Text="For additional help and guidance, refer to the "/>
-                <Hyperlink Name="uri1" NavigateUri="https://docs.microsoft.com/en-us/windows-server/networking/sdn/plan/plan-software-defined-networking">Plan SDN topic on docs.microsoft.com.</Hyperlink>
+                <Hyperlink Name="uri1" NavigateUri="https://learn.microsoft.com/windows-server/networking/sdn/plan/plan-software-defined-networking">Plan SDN topic on docs.microsoft.com.</Hyperlink>
             </TextBlock>
             <Button Name="btnBack1" Content="Back" Margin="0,0,168.868,10" HorizontalAlignment="Right" Width="153.868" Height="34.328" VerticalAlignment="Bottom"/>
             <Button Name="btnNext1" Content="Next" Margin="0,0,10,10" HorizontalAlignment="Right" Width="153.868" Height="34.328" VerticalAlignment="Bottom"/>

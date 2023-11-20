@@ -1,5 +1,5 @@
 # --------------------------------------------------------------
-#  Copyright © Microsoft Corporation.  All Rights Reserved.
+#  Copyright ï¿½ Microsoft Corporation.  All Rights Reserved.
 #  Microsoft Corporation (or based on where you live, one of its affiliates) licenses this sample code for your internal testing purposes only.
 #  Microsoft provides the following sample code AS IS without warranty of any kind. The sample code arenot supported under any Microsoft standard support program or services.
 #  Microsoft further disclaims all implied warranties including, without limitation, any implied warranties of merchantability or of fitness for a particular purpose.
@@ -118,7 +118,7 @@ Function AddCertToLocalMachineStore($certFullPath, $storeName, $securePassword) 
     }
     else 
     {
-        # https://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509keystorageflags(v=vs.110).aspx
+        # https://msdn.microsoft.com/library/system.security.cryptography.x509certificates.x509keystorageflags(v=vs.110).aspx
         $certificate.import($certFullPath, $securePassword, "MachineKeySet,PersistKeySet")
     }
     
