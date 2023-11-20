@@ -19,7 +19,7 @@ $unattended = $false
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
-# For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
+# For more information, see https://learn.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
 #
 # For security purposes, passwords should be stored in encrypted files as secure strings
 #

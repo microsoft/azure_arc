@@ -22,12 +22,12 @@ SHELL ["pwsh", "-command"]
 RUN $url = "https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest";$latestVersion = (Invoke-WebRequest -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value;$downloadUrl = "https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/$latestVersion/posh-linux-amd64.tar.gz";wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/$latestVersion/posh-linux-amd64 -O /usr/local/bin/oh-my-posh
 RUN chmod +x /usr/local/bin/oh-my-posh
 
-# Install Azure Developer CLI (https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/)
+# Install Azure Developer CLI (https://learn.microsoft.com/azure/developer/azure-developer-cli/)
 RUN curl -fsSL https://aka.ms/install-azd.sh | bash
 
 # Switch to non-root user:
 WORKDIR /home/vscode
 USER vscode
 
-# Install Azure PowerShell modules (https://docs.microsoft.com/en-us/powershell/azure/install-az-ps)
+# Install Azure PowerShell modules (https://learn.microsoft.com/powershell/azure/install-az-ps)
 RUN Install-Module -Name Az -Force
