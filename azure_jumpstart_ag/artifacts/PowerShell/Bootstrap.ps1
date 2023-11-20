@@ -219,7 +219,8 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks") -OutFile "$AgToolsDir\Bookmarks"
-Invoke-WebRequest "https://raw.githubusercontent.com/$githubAccount/azure_arc/$githubBranch/img/jumpstart_ag.png" -OutFile $AgDirectory\wallpaper.png
+Invoke-WebRequest "https://raw.githubusercontent.com/$githubAccount/arc_jumpstart_docs/$githubBranch/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
+
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-global.json") -OutFile "$AgMonitoringDir\grafana-cluster-global.json"

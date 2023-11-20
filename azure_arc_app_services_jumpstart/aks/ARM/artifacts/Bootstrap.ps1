@@ -71,7 +71,7 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading global Jumpstart artifacts
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1
 if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {

@@ -1,8 +1,0 @@
-azure/azure-cli
-kubernetes/kubernetes
-kubernetes-sigs/cluster-api
-kubernetes-sigs/cluster-api-provider-azure
-kubernetes-sigs/azuredisk-csi-driver
-k3s-io/k3s
-azure/osm-azure
-openservicemesh/osm

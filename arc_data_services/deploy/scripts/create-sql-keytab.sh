@@ -11,7 +11,7 @@
 #     $ sudo apt-get install krb5-user
 #
 #  2) The tool 'adutil' should be pre-installed if using --use-adutil flag.
-#     Installation instructions: https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-ad-auth-adutil-introduction?view=sql-server-ver15&tabs=ubuntu
+#     Installation instructions: https://learn.microsoft.com/sql/linux/sql-server-linux-ad-auth-adutil-introduction?view=sql-server-ver15&tabs=ubuntu
 #
 #  3) User must kinit with an AD user when using --use-adutil flag.
 #
