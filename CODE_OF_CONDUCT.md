@@ -1,1 +1,1 @@
-./docs/code_of_conduct/_index.md
+https://aka.ms/JumpstartCOC

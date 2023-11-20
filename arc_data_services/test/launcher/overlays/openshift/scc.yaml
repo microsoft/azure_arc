@@ -1,5 +1,5 @@
 # For Azure Arc Connected Cluster
-# https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli#prerequisites
+# https://learn.microsoft.com/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli#prerequisites
 # TODO: Remove this once Connected Cluster removes SCC for fluentbit for node polling
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
