@@ -182,7 +182,7 @@
             "show_icon": false,
             "source": "unknown",
             "type": "url",
-            "url": "https://azurearcjumpstart.io/"
+            "url": "https://aka.ms/ArcJumpstart/"
          }, {
             "id": "24",
             "name": "Azure Portal",

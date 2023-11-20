@@ -22,7 +22,7 @@ $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
-# For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
+# For more information, see https://learn.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
 #
 # For security purposes, passwords should be stored in encrypted files as secure strings
 #
@@ -185,7 +185,7 @@ function Install-PowershellModule() {
         if ([version]$version -lt [version]"6.2.4") {
             Write-Warning -Category NotInstalled -Message ("Could not install Az module: Powershell $version does not support having both the AzureRM and Az modules installed. " +
                 "If you need to keep AzureRM available on your system, install the Az module for PowerShell 6.2.4 or later. " +
-                "For more information, see: https://docs.microsoft.com/en-us/powershell/azure/migrate-from-azurerm-to-az")
+                "For more information, see: https://learn.microsoft.com/powershell/azure/migrate-from-azurerm-to-az")
             return
         }
 

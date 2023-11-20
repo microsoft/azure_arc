@@ -31,7 +31,7 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 
-# https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.1#erroractionpreference
+# https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.1#erroractionpreference
 # Show errors, but to continue nonetheless
 $ErrorActionPreference = 'Continue'
 
@@ -61,7 +61,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/inference.zip") -OutFile "C:\Te
 Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp\1.Get_WS.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/3.Create_MNIST_Dataset.py") -OutFile "C:\Temp\3.Create_MNIST_Dataset.py"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png" # Wallpaper is shared from main
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png" # Wallpaper is shared from main
 
 # Unzip training and inference payloads
 Expand-Archive -LiteralPath "C:\Temp\train.zip" -DestinationPath "C:\Temp"
