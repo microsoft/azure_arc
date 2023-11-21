@@ -1529,6 +1529,72 @@ function Set-HostNAT {
     }
 }
 
+function PrepHCIDeploy {
+    param (
+        $HCIBoxConfig,
+        [PSCredential]$localCred,
+        [PSCredential]$domainCred
+    )
+    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
+        $HCIBoxConfig = $using:HCIBoxConfig
+        $localCred = $using:localcred
+        $domainCred = $using:domainCred
+        Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+            $HCIBoxConfig = $args[0]
+            $domainCredNoDomain = new-object -typename System.Management.Automation.PSCredential `
+                -argumentlist ("HCIBoxDeployUser"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
+            
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            Install-Module AsHciADArtifactsPreCreationTool -Repository PSGallery -Force -Confirm:$false
+            $domainName = $HCIBoxConfig.SDNDomainFQDN.Split('.')
+            $ouName = "OU=oudocs2"
+            foreach ($name in $domainName) {
+                $ouName += ",DC=$name"
+            }
+            $nodes = @()
+            foreach ($node in $HCIBoxConfig.NodeHostConfig) {
+                $nodes += $node.Hostname.ToString()
+            }
+            Add-KdsRootKey -EffectiveTime ((Get-Date).AddHours(-10))
+            $deploymentPrefix = "oudocs"
+            New-HciAdObjectsPreCreation -Deploy -AzureStackLCMUserCredential $domainCredNoDomain -AsHciOUName $ouName -AsHciPhysicalNodeList $nodes -DomainFQDN $HCIBoxConfig.SDNDomainFQDN -AsHciClusterName $HCIBoxConfig.ClusterName -AsHciDeploymentPrefix $deploymentPrefix
+        }
+    }
+    
+    foreach ($node in $HCIBoxConfig.NodeHostConfig) {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $env:spnClientID, $env:spnClientSecret, $env:resourceGroup -ScriptBlock {
+            $subId = $args[0]
+            $tenantId = $args[1]
+            $clientId = $args[2]
+            $clientSecret = $args[3]
+            $resourceGroup = $args[4]
+    
+            # Prep nodes for Azure Arc onboarding
+            winrm quickconfig -quiet
+            netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
+    
+            # Register PSGallery as a trusted repo
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            Register-PSRepository -Default -Name PSGallery -InstallationPolicy Trusted
+            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    
+            #Install Arc registration script from PSGallery 
+            Install-Module AzsHCI.ARCinstaller
+    
+            #Install required PowerShell modules in your node for registration
+            Install-Module Az.Accounts -Force
+            Install-Module Az.ConnectedMachine -Force
+            Install-Module Az.Resources -Force
+            $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
+            Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
+            $armtoken = Get-AzAccessToken
+    
+            #Invoke the registration script. For this preview release, only eastus region is supported.
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
+        }
+    }
+}
+
 #endregion
    
 #region Main
@@ -1553,7 +1619,7 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 }
 
 # Download HCIBox VHDs
-Write-Host "Downloading HCIBox VHDs. This will take a while..."
+Write-Host "[Build cluster - Step 1/X] Downloading HCIBox VHDs. This will take a while..." -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnn1dd'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnnebv'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
 BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
@@ -1568,6 +1634,7 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\Administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Enable PSRemoting
+Write-Host "[Build cluster - Step 2/X] Preparing Azure VM virtualization host..." -ForegroundColor Green
 Write-Host "Enabling PS Remoting on client..."
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
@@ -1575,7 +1642,7 @@ Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 ###############################################################################
 # Configure Hyper-V host
 ###############################################################################
-Write-Host "Verifying internet connectivity"
+Write-Host "Checking internet connectivity"
 Test-InternetConnect
 
 Write-Host "Creating Internal Switch"
@@ -1597,16 +1664,19 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 # Create the three nested Virtual Machines 
 ################################################################################
 # First create the Management VM (AzSMGMT)
+Write-Host "[Build cluster - Step 3/X] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
+Write-Host "[Build cluster - Step 4/X] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
     Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
     
 # Start Virtual Machines
+Write-Host "[Build cluster - Step 5/X] Starting VMs..." -ForegroundColor Green
 Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
 Start-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
