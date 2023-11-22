@@ -131,7 +131,7 @@
         }
       },
       "servicePrincipalClientSecret": {
-        "type": "string",
+        "type": "securestring",
         "metadata": {
           "description": "Azure service principal password"
         }
@@ -272,6 +272,9 @@
                     },
                     "bastionSubnetIpPrefix": {
                         "value": "[variables('bastionSubnetIpPrefix')]"
+                    },
+                    "ubuntuOSVersion": {
+                        "value": "[parameters('ubuntuOSVersion')]"
                     }
                     },
                 "template": {
@@ -297,7 +300,7 @@
                             "type": "string"
                         },
                         "servicePrincipalClientSecret": {
-                            "type": "string"
+                            "type": "securestring"
                         },
                         "resourceGroup": {
                             "type": "string"
@@ -318,6 +321,10 @@
                             "type": "bool"
                         },
                         "bastionSubnetIpPrefix": 
+                        {
+                            "type": "string"
+                        },
+                        "ubuntuOSVersion": 
                         {
                             "type": "string"
                         }
