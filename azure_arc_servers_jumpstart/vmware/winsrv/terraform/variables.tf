@@ -23,6 +23,7 @@ variable "vsphere_user" {
 }
 
 variable "vsphere_password" {
+  sensitive   = true
 }
 
 variable "vsphere_server" {
@@ -109,4 +110,5 @@ variable "admin_user" {
 }
 
 variable "admin_password" {
+  sensitive   = true
 }

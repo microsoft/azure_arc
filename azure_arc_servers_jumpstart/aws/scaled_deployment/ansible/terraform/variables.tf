@@ -16,6 +16,7 @@ variable "admin_username" {
 
 variable "admin_password" {
   default = "arcdemo123!!"
+  sensitive   = true
 }
 
 variable "azure_location" {
@@ -37,6 +38,7 @@ variable "client_id" {
 }
 
 variable "client_secret" {
+  sensitive   = true
 }
 
 variable "tenant_id" {
