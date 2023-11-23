@@ -4,7 +4,6 @@ $ArcBoxLogsDir = "$ArcBoxDir\Logs"
 Start-Transcript -Path $ArcBoxLogsDir\MonitorWorkbookLogonScript.log
 
 # Required for CLI commands
-az account set -s $Env:subscriptionId
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Configure mgmtMonitorWorkbook.json template with subscription ID and resource group values
