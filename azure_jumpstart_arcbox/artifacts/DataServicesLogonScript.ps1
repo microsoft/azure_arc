@@ -22,6 +22,7 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
+az account set -s $env:subscriptionId
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
