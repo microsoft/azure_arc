@@ -169,7 +169,7 @@ azd env set JS_RDP_PORT $JS_RDP_PORT
 ########################################################################
 # Get custom locations RP Id
 ########################################################################
-$customLocationRPOID=(Get-AzADServicePrincipal -DisplayName 'Custom Locations RP')[0].Id
+$customLocationRPOID=(Get-AzADServicePrincipal -DisplayName 'Custom Locations RP').Id
 
 # Set environment variables
 azd env set CUSTOM_LOCATION_RP_ID $customLocationRPOID
