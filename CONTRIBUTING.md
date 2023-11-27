@@ -1,1 +1,1 @@
-./docs/contributing/_index.md
+https://aka.ms/JumpstartContribution
