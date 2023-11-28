@@ -110,6 +110,13 @@
         "metadata": {
           "description": "Name of the Network Security Group for the Arc-enabled server subnet"
         }
+      },
+        "ubuntuOSVersion": {
+        "type": "string",
+        "defaultValue": "22_04-lts-gen2",
+        "metadata": {
+          "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+        }
       }
     },
     "variables": {
