@@ -35,6 +35,9 @@
       "vmNSG": {
         "value": "Arc-Client-NSG"
       },
+      "ubuntuOSVersion": {
+        "value": "22_04-lts-gen2"
+      },
       "subscriptionID": {
         "value": "xxxxx-xxxxxx-xxxxx-xxxx"
       },
@@ -55,9 +58,6 @@
       },
       "bastionHostName": {
         "value": "Arc-Proxy-Demo-Bastion"
-      },
-      "ubuntuOSVersion": {
-        "value": "22_04-lts-gen2"
       }
     }
   }
