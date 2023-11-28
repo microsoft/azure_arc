@@ -111,7 +111,7 @@
           "description": "Name of the Network Security Group for the Arc-enabled server subnet"
         }
       },
-        "ubuntuOSVersion": {
+      "ubuntuOSVersion": {
         "type": "string",
         "defaultValue": "22_04-lts-gen2",
         "metadata": {
