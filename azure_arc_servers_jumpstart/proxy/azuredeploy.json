@@ -125,7 +125,7 @@
         }
       },
       "servicePrincipalClient": {
-        "type": "string",
+        "type": "securestring",
         "metadata": {
           "description": "Azure service principal name"
         }
@@ -297,7 +297,7 @@
                             "type": "string"
                         },
                         "servicePrincipalClientSecret": {
-                            "type": "string"
+                            "type": "securestring"
                         },
                         "resourceGroup": {
                             "type": "string"
