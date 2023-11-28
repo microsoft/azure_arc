@@ -55,6 +55,9 @@
       },
       "bastionHostName": {
         "value": "Arc-Proxy-Demo-Bastion"
+      },
+      "ubuntuOSVersion": {
+        "value": "22_04-lts-gen2"
       }
     }
   }
