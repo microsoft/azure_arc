@@ -85,7 +85,7 @@
       },
       "ProxysubnetName": {
         "type": "string",
-        "defaultValue": "proxy-ubnet",
+        "defaultValue": "proxy-subnet",
         "metadata": {
           "description": "Name of the subnet in the virtual network for the proxy server"
         }
