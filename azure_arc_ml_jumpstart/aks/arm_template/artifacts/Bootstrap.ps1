@@ -100,9 +100,9 @@ workflow ClientTools_01
 
                             ##########################################################################
                             # Python Installation
-                            choco install python --version=3.6.7 /y -Force
-                            New-Item -path alias:python -value 'C:\Python36\python.exe'
-                            New-Item -path alias:pip -value 'C:\Python36\Scripts\pip.exe'
+                            choco install python --version=3.11.6 /y -Force
+                            New-Item -path alias:python -value 'C:\Python311\python.exe'
+                            New-Item -path alias:pip -value 'C:\Python311\Scripts\pip.exe'
 
                             # Installing Azure ML Python SDK
                             python -m pip install --upgrade pip
@@ -141,7 +141,7 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 
 # Creating scheduled task for AzureMLLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AzureMLLogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AzureMLLogonScript.ps1' -WorkingDirectory 'C:\Temp'
 Register-ScheduledTask -TaskName "AzureMLLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
