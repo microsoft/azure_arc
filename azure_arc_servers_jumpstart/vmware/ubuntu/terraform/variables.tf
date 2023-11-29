@@ -13,6 +13,7 @@ variable "client_id" {
 }
 
 variable "client_secret" {
+  sensitive = true
 }
 
 variable "tenant_id" {
@@ -23,6 +24,7 @@ variable "vsphere_user" {
 }
 
 variable "vsphere_password" {
+  sensitive = true
 }
 
 variable "vsphere_server" {
@@ -114,4 +116,5 @@ variable "vm_dns" {
 variable "admin_user" {
 }
 variable "admin_password" {
+  sensitive = true
 }
