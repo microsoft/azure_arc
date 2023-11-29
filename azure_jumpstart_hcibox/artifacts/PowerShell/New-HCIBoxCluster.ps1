@@ -1719,7 +1719,7 @@ New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Join hosts to domain
-Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
+#Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Admincenter VM
 New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
