@@ -78,24 +78,6 @@ Stop-Transcript
 Write-Header "Deploying HCI cluster"
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
-# Register HCI cluster
-if ($env:registerCluster -eq $true) {
-    Write-Header "Registering HCI cluster"
-    & "$Env:HCIBoxDir\Register-AzSHCI.ps1"
-}
-
-# deploy AKS
-if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true)) {
-    Write-Header "Deploying AKS"
-    & "$Env:HCIBoxDir\Deploy-AKS.ps1"
-}
-
-# Deploy Arc Resource Bridge
-if (($env:registerCluster -eq $true) -and ($env:deployResourceBridge -eq $true)) {
-    Write-Header "Deploying Arc Resource Bridge"
-    & "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
-}
-
 Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
 # Changing to Jumpstart ArcBox wallpaper

@@ -1529,7 +1529,7 @@ function Set-HostNAT {
     }
 }
 
-function PrepHCIDeploy {
+function Set-HCIDeployPrereqs {
     param (
         $HCIBoxConfig,
         [PSCredential]$localCred,
