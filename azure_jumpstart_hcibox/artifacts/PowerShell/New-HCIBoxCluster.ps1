@@ -1542,12 +1542,12 @@ function PrepHCIDeploy {
         Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
             $HCIBoxConfig = $args[0]
             $domainCredNoDomain = new-object -typename System.Management.Automation.PSCredential `
-                -argumentlist ("HCIBoxDeployUser"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
+                -argumentlist ($HCIBoxConfig.LCMDeployUsername), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
             
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Install-Module AsHciADArtifactsPreCreationTool -Repository PSGallery -Force -Confirm:$false
             $domainName = $HCIBoxConfig.SDNDomainFQDN.Split('.')
-            $ouName = "OU=oudocs2"
+            $ouName = "OU=$($HCIBoxConfig.LCMADOUName)"
             foreach ($name in $domainName) {
                 $ouName += ",DC=$name"
             }
@@ -1556,7 +1556,7 @@ function PrepHCIDeploy {
                 $nodes += $node.Hostname.ToString()
             }
             Add-KdsRootKey -EffectiveTime ((Get-Date).AddHours(-10))
-            $deploymentPrefix = "oudocs"
+            $deploymentPrefix = $HCIBoxConfig.LCMDeploymentPrefix
             New-HciAdObjectsPreCreation -Deploy -AzureStackLCMUserCredential $domainCredNoDomain -AsHciOUName $ouName -AsHciPhysicalNodeList $nodes -DomainFQDN $HCIBoxConfig.SDNDomainFQDN -AsHciClusterName $HCIBoxConfig.ClusterName -AsHciDeploymentPrefix $deploymentPrefix
         }
     }
@@ -1575,11 +1575,11 @@ function PrepHCIDeploy {
     
             # Register PSGallery as a trusted repo
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-            Register-PSRepository -Default -Name PSGallery -InstallationPolicy Trusted
+            Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
             Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     
             #Install Arc registration script from PSGallery 
-            Install-Module AzsHCI.ARCinstaller
+            Install-Module AzsHCI.ARCinstaller -Force
     
             #Install required PowerShell modules in your node for registration
             Install-Module Az.Accounts -Force
@@ -1590,7 +1590,7 @@ function PrepHCIDeploy {
             $armtoken = Get-AzAccessToken
     
             #Invoke the registration script. For this preview release, only eastus region is supported.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
         }
     }
 }
@@ -1728,9 +1728,10 @@ New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred 
 New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
 #######################################################################################
-# Create the S2D cluster
+# Prepare the cluster for deployment
 #######################################################################################
-New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+# New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Cluster complete. Finish up and add RDP Link to Desktop to WAC machine.
 Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue

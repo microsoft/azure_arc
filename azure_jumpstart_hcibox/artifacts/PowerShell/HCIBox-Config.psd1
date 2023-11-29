@@ -83,6 +83,9 @@
     ClusterName                          = "hciboxcluster"
     WACVMName                            = "AdminCenter"
     ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
+    LCMDeployUsername                    = "HCIBoxDeployUser"
+    LCMADOUName                          = "hcioudocs"
+    LCMDeploymentPrefix                  = "hcibox"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
@@ -207,4 +210,6 @@
     rbDHCPExclusionStart                 = "192.168.200.200"
     rbDHCPExclusionEnd                   = "192.168.200.209"
     dcVLAN200IP                          = "192.168.200.205"
+    rbSubnetMask                         = "255.255.255.0"
+    rbDNSIP                              = "192.168.1.254"
 }

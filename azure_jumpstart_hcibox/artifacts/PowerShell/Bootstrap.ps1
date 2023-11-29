@@ -3,6 +3,7 @@ param (
     [string]$adminPassword,
     [string]$spnClientId,
     [string]$spnClientSecret,
+    [string]$spnProviderId,
     [string]$spnTenantId,
     [string]$subscriptionId,
     [string]$resourceGroup,
@@ -21,6 +22,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnProviderId', $spnProviderId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
@@ -108,9 +110,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-AKS.ps1") 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-ArcResourceBridge.ps1") -OutFile $HCIPath\Deploy-ArcResourceBridge.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-ResourceBridge.ps1") -OutFile $HCIPath\Uninstall-ResourceBridge.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-GitOps.ps1") -OutFile $HCIPath\Deploy-GitOps.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Cloud-Cluster-Deploy.ps1") -OutFile $HCIPath\Cloud-Cluster-Deploy.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/GetServiceAccountBearerToken.ps1") -OutFile $HCIPath\GetServiceAccountBearerToken.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $HCIBoxConfig.Paths["LogsDir"]\LogInstructions.txt
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $HCIPath\jumpstart-user-secret.yaml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $HCIPath\hci.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $HCIPath\hci.parameters.json
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
