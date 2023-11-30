@@ -5,6 +5,9 @@
     "apiVersion": {
       "value": "2023-08-01-preview"
     },
+    "clusterName": {
+      "value": "clusterName-staging"
+    },
     "arcNodeResourceIds": {
       "value": arcNodeResourceIds-staging
     },

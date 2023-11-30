@@ -15,6 +15,7 @@ $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnCl
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 
 # Install some modules
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Az.Resources -Force
 Install-Module Az.ConnectedMachine -Force
 Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
@@ -77,6 +78,7 @@ $diagnosticsStorageName = "hciboxdiagsa$guid"
 
 # Replace placeholder values in ARM template with real values
 $hciParams = "$env:HCIBoxDir\hci.parameters.json"
+(Get-Content -Path $hciParams) -replace 'clusterName-staging', $HCIBoxConfig.ClusterName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'arcNodeResourceIds-staging', $arcNodeResourceIds | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'localAdminSecretValue-staging', $LocalUser | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'domainAdminSecretValue-staging', $AzureStackLCM | Set-Content -Path $hciParams

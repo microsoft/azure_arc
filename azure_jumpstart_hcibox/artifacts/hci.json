@@ -342,16 +342,6 @@
             }
         },
         "physicalNodesSettings": {
-            "defaultValue": [
-                {
-                    "name": "node1",
-                    "ipv4Address": "100.69.32.64"
-                },
-                {
-                    "name": "node2",
-                    "ipv4Address": "100.69.32.65"
-                }
-            ],
             "type": "array",
             "metadata": {
                 "description": "The physical nodes settings for deploying a hci cluster"
