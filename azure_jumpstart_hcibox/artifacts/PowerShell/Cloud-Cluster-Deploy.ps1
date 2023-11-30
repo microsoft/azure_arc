@@ -85,11 +85,11 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'domainFqdn-staging', $($HCIBoxConfig.SDNDomainFQDN) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'namingPrefix-staging', $($HCIBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'adouPath-staging', $ouPath | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'subnetMask-staging', $($HCIBoxConfig.rbSubnetMask) | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'defaultGateway-staging', $HCIBoxConfig.AKSGWIP | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'startingIp-staging', $HCIBoxConfig.AKSNodeStartIP | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'endingIp-staging', $HCIBoxConfig.AKSNodeEndIP | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'dnsServers-staging', $dns | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'subnetMask-staging', "255.255.255.0" | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'defaultGateway-staging', "192.168.1.1" | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'startingIp-staging', "192.168.1.100" | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'endingIp-staging', "192.168.1.100" | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'dnsServers-staging', "192.168.1.254" | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'keyVaultName-staging', $keyVaultName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'secretsLocation-staging', $secretsLocation | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
