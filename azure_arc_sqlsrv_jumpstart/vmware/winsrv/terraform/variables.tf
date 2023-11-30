@@ -22,6 +22,7 @@ variable "servicePrincipalAppId" {
 variable "servicePrincipalSecret" {
   description = "Azure service principal App Password"
   type        = string
+  sensitive   = true
 }
 
 variable "servicePrincipalTenantId" {
@@ -73,6 +74,7 @@ variable "ipv4_submask" {
 variable "vsphere_folder" {
   description = "VMware vSphere Folder Name" // Use the following format for nested folders: "Folder1/Folder2/Folder3"
   type        = string
+  sensitive   = true
 }
 
 variable "vsphere_vm_template_name" {
@@ -109,4 +111,5 @@ variable "admin_user" {
 variable "admin_password" {
   description = "Guest OS Admin Password"
   type        = string
+  sensitive   = true
 }
