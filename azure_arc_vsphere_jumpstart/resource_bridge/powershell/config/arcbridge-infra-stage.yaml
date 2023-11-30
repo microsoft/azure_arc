@@ -1,9 +1,9 @@
 vsphereprovider:
-  appliancevm:
-    vmtemplate: vmTemplate-stage
   datacenter: datacenter-stage
   datastore: datastore-stage
+  disksizegib: 25
   folder: folder-stage
+  memorymib: 16384
   network:
     dnsservers:
     - dnsServer-stage
@@ -12,4 +12,5 @@ vsphereprovider:
     k8snodeippoolend: nodeIpPoolEnd-stage
     k8snodeippoolstart: nodeIpPoolStart-stage
     segment: VmNetwork-stage
+  numcpus: 4
   resourcepool: resourcePool-stage
