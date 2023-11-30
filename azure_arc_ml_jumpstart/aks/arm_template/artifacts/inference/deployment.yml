@@ -1,0 +1,29 @@
+name: blue
+type: kubernetes
+endpoint_name: sklearn-mnist
+app_insights_enabled: true
+model: 
+  path: ./model/sklearn_mnist_model.pkl
+code_configuration:
+  code: ./script/
+  scoring_script: score.py
+instance_type: defaultinstancetype
+environment:
+  image: mcr.microsoft.com/azureml/openmpi3.1.2-ubuntu18.04:latest
+  conda_file: ./model/conda.yml
+request_settings:
+  request_timeout_ms: 3000
+  max_queue_wait_ms: 3000
+resources:
+  requests:
+    cpu: "0.1"
+    memory: "0.1Gi"
+  limits:
+    cpu: "0.2"
+    memory: "0.2Gi"
+scale_settings:
+  type: target_utilization
+  min_instances: 1
+  max_instances: 3
+  polling_interval: 10
+  target_utilization_percentage: 70
