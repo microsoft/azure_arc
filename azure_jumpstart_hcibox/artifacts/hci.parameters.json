@@ -132,12 +132,14 @@
         {
           "name": "StorageNetwork1",
           "networkAdapterName": "StorageA",
-          "vlanId": "711"
+          "vlanId": "storageNicAVLAN-staging",
+          "StorageAdapterIPInfo": storageNetworkA-staging            
         },
         {
           "name": "StorageNetwork2",
           "networkAdapterName": "StorageB",
-          "vlanId": "712"
+          "vlanId": "storageNicBVLAN-staging",
+          "StorageAdapterIPInfo": storageNetworkB-staging
         }
       ]
     },

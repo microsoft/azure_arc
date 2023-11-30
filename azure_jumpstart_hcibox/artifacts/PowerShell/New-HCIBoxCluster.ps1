@@ -592,8 +592,8 @@ function Set-NICs {
         Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
             $HCIBoxConfig = $using:HCIBoxConfig
             # Create IP Address of Storage Adapters
-            $storageAIP = $HCIBoxConfig.StorageASubnet.Replace("0/24", $using:int)
-            $storageBIP = $HCIBoxConfig.StorageBSubnet.Replace("0/24", $using:int)
+            $storageAIP = $VM.StorageAIP
+            $storageBIP = $VM.StorageBIP
 
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }

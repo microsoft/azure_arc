@@ -59,12 +59,16 @@
 
     NodeHostConfig = @(
         @{
-            Hostname = "AzSHOST1"
-            IP       = "192.168.1.12/24"
+            Hostname    = "AzSHOST1"
+            IP          = "192.168.1.12/24"
+            StorageAIP  = "192.168.98.10"
+            StorageBIP  = "192.168.99.10"
         },
         @{
-            Hostname = "AzSHOST2"
-            IP       = "192.168.1.13/24"
+            Hostname    = "AzSHOST2"
+            IP          = "192.168.1.13/24"
+            StorageAIP  = "192.168.99.11"
+            StorageBIP  = "192.168.99.11"
         }
     )
     
@@ -151,8 +155,8 @@
     vlan200VLAN                          = 200
     mgmtVLAN                             = 0
     simInternetVLAN                      = 131
-    StorageAVLAN                         = 20
-    StorageBVLAN                         = 21
+    StorageAVLAN                         = 711
+    StorageBVLAN                         = 712
 
     # Subnets
     MGMTSubnet                           = "192.168.1.0/24"
@@ -161,8 +165,8 @@
     VLAN200Subnet                        = "192.168.200.0/24"
     VLAN200VMNetworkSubnet               = "192.168.44.0/24"
     simInternetSubnet                    = "131.127.0.0/24"
-    storageAsubnet                       = "192.168.98.0/24"
-    storageBsubnet                       = "192.168.99.0/24"
+    storageAsubnet                       = "255.255.255.0"
+    storageBsubnet                       = "255.255.255.0"
 
     # Gateway Target IPs
     GRETARGETIP_BE                       = "192.168.233.100/24"

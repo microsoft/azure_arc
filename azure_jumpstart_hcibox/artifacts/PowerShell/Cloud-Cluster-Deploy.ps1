@@ -63,15 +63,23 @@ $secretsLocation = "https://$keyVaultName.vault.azure.net"
 
 # Set physical nodes
 $physicalNodesSettings = "[ "
+$storageAIPs = "[ "
+$storageBIPs = "[ "
 $count = 0
 foreach ($node in $HCIBoxConfig.NodeHostConfig) {
     if ($count -gt 0) {
         $physicalNodesSettings += ", "
+        $storageAIPs += ", "
+        $storageBIPs += ", "
     }
     $physicalNodesSettings += "{ ""name"": ""$($node.Hostname)"", ""ipv4Address"": ""$($node.IP.Split("/")[0])"" }"
+    $storageAIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageAIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageAsubnet)"" }"
+    $storageBIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageBIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageBsubnet)"" }"
     $count = $count + 1
 }
 $physicalNodesSettings += " ]"
+$storageAIPs += " ]"
+$storageBIPs += " ]"
 
 # Create diagnostics storage account name
 $diagnosticsStorageName = "hciboxdiagsa$guid"
@@ -97,4 +105,7 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $hciParams
-
+(Get-Content -Path $hciParams) -replace 'storageNetworkA-staging', $storageAIPs | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'storageNetworkB-staging', $storageBIPs | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'storageNicAVLAN-staging', $HCIBoxConfig.StorageAVLAN | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'storageNicBVLAN-staging', $HCIBoxConfig.StorageBVLAN | Set-Content -Path $hciParams
