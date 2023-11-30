@@ -213,5 +213,5 @@
     rbSubnetMask                         = "255.255.255.0"
     rbDNSIP                              = "192.168.1.254"
     clusterIpRangeStart                  = "192.168.1.100"
-    clusterIpRangeEnd                    = "192.168.1.200"
+    clusterIpRangeEnd                    = "192.168.1.199"
 }
