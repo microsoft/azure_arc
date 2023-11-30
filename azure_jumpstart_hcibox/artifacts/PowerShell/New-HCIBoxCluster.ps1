@@ -589,8 +589,9 @@ function Set-NICs {
     foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
         $int++
         Write-Host "Setting NICs on VM $($VM.Hostname)"
-        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ScriptBlock {
-            $HCIBoxConfig = $using:HCIBoxConfig
+        Invoke-Command -VMName $VM.Hostname -Credential $Credential -ArgumentList $HCIBoxConfig, $VM -ScriptBlock {
+            $HCIBoxConfig = $args[0]
+            $VM = $args[1]
             # Create IP Address of Storage Adapters
             $storageAIP = $VM.StorageAIP
             $storageBIP = $VM.StorageBIP
