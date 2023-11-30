@@ -67,7 +67,7 @@
         @{
             Hostname    = "AzSHOST2"
             IP          = "192.168.1.13/24"
-            StorageAIP  = "192.168.99.11"
+            StorageAIP  = "192.168.98.11"
             StorageBIP  = "192.168.99.11"
         }
     )
