@@ -398,7 +398,8 @@ If ($InferenceStatus -eq "Successful"){
    # Method 1: One-line invoke model
    Write-Host "Method 1: Calling deployed model using az ml endpoint" -ForegroundColor Yellow
    Write-Host "The sample request represents the following numeral:" -ForegroundColor White
-   az ml online-endpoint invoke -n $name -r $RequestFile
+   $sampleNumeral = az ml online-endpoint invoke -n $name -r $RequestFile
+   Write-Host $sampleNumeral
 
    # Method 2: Call using PowerShell Invoke-RestMethod (for demonstration)
    Write-Host "Method 2: Calling deployed model using PowerShell Direct REST API call" -ForegroundColor Yellow
@@ -421,7 +422,8 @@ If ($InferenceStatus -eq "Successful"){
 
    Write-Host "The sample request represents the following numeral:" -ForegroundColor White
    $response = Invoke-RestMethod $scoring_uri -Method 'POST' -Headers $headers -Body $body
-   $response | ConvertTo-Json
+   $inferedNumeral = $response | ConvertTo-Json
+   Write-Host $inferedNumeral
 }
 else
 {
@@ -457,6 +459,9 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 Stop-Process -Id $kubectlWatchShell.Id
+
+# Kill chicl kubectl processes
+Get-Process -Name kubectl | Stop-Process -Force
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 if ($null -ne (Get-ScheduledTask -TaskName "AzureMLLogonScript" -ErrorAction SilentlyContinue)) {
