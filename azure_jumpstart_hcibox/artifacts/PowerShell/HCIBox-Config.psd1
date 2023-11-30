@@ -77,7 +77,6 @@
 
     # VM Configuration
     NestedVMMemoryinGB                   = 105GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
-    NestedVMProcCount                    = 20
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     AzSMGMTProcCount                     = 20
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode.
@@ -119,10 +118,7 @@
     # AzSMGMT Management VM's Memory Settings
     MEM_DC                               = 2GB                                     # Memory provided for the Domain Controller VM
     MEM_BGP                              = 2GB                                     # Memory provided for the BGP-ToR-Router
-    MEM_Console                          = 3GB                                     # Memory provided for the Windows 10 Console VM
     MEM_WAC                              = 10GB                                    # Memory provided for the Windows Admin Center VM
-    MEM_GRE                              = 2GB                                     # Memory provided for the gre-target VM
-    MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
     # Cluster S2D Storage Disk Size (per disk)
     S2D_Disk_Size                        = 170GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
@@ -138,7 +134,6 @@
 
     # Management IPs for Console and Domain Controller
     DCIP                                 = "192.168.1.254/24"
-    CONSOLEIP                            = "192.168.1.10/24"
     WACIP                                = "192.168.1.9/24"
     WACMAC                               = "10155D010B00"
 
