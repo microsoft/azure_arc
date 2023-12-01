@@ -21,8 +21,8 @@ Install-Module Az.ConnectedMachine -Force
 Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
 
 # Add necessary role assignments 
-New-AzRoleAssignment -ApplicationId $env:spnClientId -RoleDefinitionName "Key Vault Administrator" -ResourceGroup $env:resourceGroup
-New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction SilentlyContinue
+New-AzRoleAssignment -ApplicationId $env:spnClientId -RoleDefinitionName "Key Vault Administrator" -ResourceGroup $env:resourceGroup -ErrorAction Continue
+New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
 $arcNodeResourceIds = "["
