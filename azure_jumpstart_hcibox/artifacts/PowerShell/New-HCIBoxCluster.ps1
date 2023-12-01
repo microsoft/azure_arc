@@ -593,8 +593,8 @@ function Set-NICs {
             $HCIBoxConfig = $args[0]
             $VM = $args[1]
             # Create IP Address of Storage Adapters
-            $storageAIP = $VM.StorageAIP
-            $storageBIP = $VM.StorageBIP
+            #$storageAIP = $VM.StorageAIP
+            #$storageBIP = $VM.StorageBIP
 
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
@@ -602,10 +602,10 @@ function Set-NICs {
                 Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue        
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
-            foreach ($storageNIC in $storageNICs) {
-                If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }  
-                If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }  
-            }
+            #foreach ($storageNIC in $storageNICs) {
+             #   If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }  
+            #    If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }  
+            #}
 
             # Enable WinRM
             Write-Host "Enabling Windows Remoting in $env:COMPUTERNAME"
