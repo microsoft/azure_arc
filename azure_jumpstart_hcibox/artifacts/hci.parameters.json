@@ -121,7 +121,7 @@
           "overrideAdapterProperty": true,
           "adapterPropertyOverrides": {
             "jumboPacket": "9014",
-            "networkDirect": "Enabled",
+            "networkDirect": "Disabled",
             "networkDirectTechnology": "iWARP"
           }
         }
@@ -132,14 +132,12 @@
         {
           "name": "StorageNetwork1",
           "networkAdapterName": "StorageA",
-          "vlanId": "storageNicAVLAN-staging",
-          "StorageAdapterIPInfo": storageNetworkA-staging            
+          "vlanId": "storageNicAVLAN-staging"        
         },
         {
           "name": "StorageNetwork2",
           "networkAdapterName": "StorageB",
-          "vlanId": "storageNicBVLAN-staging",
-          "StorageAdapterIPInfo": storageNetworkB-staging
+          "vlanId": "storageNicBVLAN-staging"
         }
       ]
     },

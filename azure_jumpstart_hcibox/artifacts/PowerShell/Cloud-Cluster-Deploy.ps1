@@ -21,14 +21,18 @@ Install-Module Az.ConnectedMachine -Force
 Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
 
 # Add necessary role assignments 
+$ErrorActionPreference = "Continue"
 New-AzRoleAssignment -ApplicationId $env:spnClientId -RoleDefinitionName "Key Vault Administrator" -ResourceGroup $env:resourceGroup -ErrorAction Continue
 New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue
+$ErrorActionPreference = "Stop"
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
 $arcNodeResourceIds = "["
 $count = 0
 foreach ($machine in $arcNodes) {
+    $ErrorActionPreference = "Continue"
     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
+    $ErrorActionPreference = "Stop"
     if ($count -gt 0) {
         $arcNodeResourceIds += ", "
     }
@@ -73,8 +77,8 @@ foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $storageBIPs += ", "
     }
     $physicalNodesSettings += "{ ""name"": ""$($node.Hostname)"", ""ipv4Address"": ""$($node.IP.Split("/")[0])"" }"
-    $storageAIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageAIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageAsubnet)"" }"
-    $storageBIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageBIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageBsubnet)"" }"
+   # $storageAIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageAIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageAsubnet)"" }"
+   # $storageBIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageBIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageBsubnet)"" }"
     $count = $count + 1
 }
 $physicalNodesSettings += " ]"
@@ -105,7 +109,7 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'storageNetworkA-staging', $storageAIPs | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'storageNetworkB-staging', $storageBIPs | Set-Content -Path $hciParams
+#(Get-Content -Path $hciParams) -replace 'storageNetworkA-staging', $storageAIPs | Set-Content -Path $hciParams
+#(Get-Content -Path $hciParams) -replace 'storageNetworkB-staging', $storageBIPs | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicAVLAN-staging', $HCIBoxConfig.StorageAVLAN | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicBVLAN-staging', $HCIBoxConfig.StorageBVLAN | Set-Content -Path $hciParams
