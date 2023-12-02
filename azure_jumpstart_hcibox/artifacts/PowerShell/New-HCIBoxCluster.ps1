@@ -1545,7 +1545,7 @@ function Set-HCIDeployPrereqs {
             $domainCredNoDomain = new-object -typename System.Management.Automation.PSCredential `
                 -argumentlist ($HCIBoxConfig.LCMDeployUsername), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
             
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser
             Install-Module AsHciADArtifactsPreCreationTool -Repository PSGallery -Force -Confirm:$false
             $domainName = $HCIBoxConfig.SDNDomainFQDN.Split('.')
             $ouName = "OU=$($HCIBoxConfig.LCMADOUName)"
