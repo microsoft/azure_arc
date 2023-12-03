@@ -39,4 +39,5 @@ variable "client_id" {
 
 variable "client_secret" {
   description = "The Client Secret for the Service Principal to use for this AKS Managed Kubernetes Cluster"
+  sensitive = true
 }
