@@ -1591,7 +1591,7 @@ function Set-HCIDeployPrereqs {
             $armtoken = Get-AzAccessToken
     
             #Invoke the registration script. For this preview release, only eastus region is supported.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region westeurope -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
         }
     }
 }
