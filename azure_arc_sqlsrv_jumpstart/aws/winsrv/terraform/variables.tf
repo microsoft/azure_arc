@@ -58,7 +58,6 @@ variable "subId" {
 variable "servicePrincipalAppId" {
   description = "Azure service principal App ID"
   type        = string
-  sensitive   = true
 }
 
 variable "servicePrincipalSecret" {

@@ -74,7 +74,6 @@ variable "ipv4_submask" {
 variable "vsphere_folder" {
   description = "VMware vSphere Folder Name" // Use the following format for nested folders: "Folder1/Folder2/Folder3"
   type        = string
-  sensitive   = true
 }
 
 variable "vsphere_vm_template_name" {
