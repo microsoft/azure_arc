@@ -38,6 +38,7 @@ variable "vsphere_user" {
 variable "vsphere_password" {
   description = "VMware vSphere vCenter Password"
   type        = string
+  sensitive   = true
 }
 
 variable "vsphere_server" {
