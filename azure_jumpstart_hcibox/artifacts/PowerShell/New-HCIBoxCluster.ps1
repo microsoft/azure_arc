@@ -154,7 +154,7 @@ function GenerateAnswerFile {
 <PlainText>true</PlainText>
 </AdministratorPassword>
 </UserAccounts>
-<TimeZone>Pacific Standard Time</TimeZone>
+<TimeZone>UTC</TimeZone>
 <OOBE>
 <HideEULAPage>true</HideEULAPage>
 <SkipUserOOBE>true</SkipUserOOBE>
