@@ -97,14 +97,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "zaidmohd"
+            "defaultValue": "microsoft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "k8s-securestring"
+            "defaultValue": "main"
         },
         "virtualNetworkName": {
             "type": "string",
