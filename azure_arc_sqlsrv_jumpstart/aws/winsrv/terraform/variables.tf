@@ -63,6 +63,7 @@ variable "servicePrincipalAppId" {
 variable "servicePrincipalSecret" {
   description = "Azure service principal App Password"
   type        = string
+  sensitive   = true
 }
 
 variable "servicePrincipalTenantId" {
@@ -78,4 +79,5 @@ variable "admin_user" {
 variable "admin_password" {
   description = "Guest OS Admin Password"
   type        = string
+  sensitive   = true
 }
