@@ -41,7 +41,7 @@ $sqlConnectionString = "Data Source=$($primaryEndpoint);Initial Catalog=Adventur
 $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString)
 
 ################################################
-# Deploy AdventureWork API
+# Deploy AdventureWorks API
 ################################################
 #Switch kubectl context
 Write-Host "`n"
@@ -51,7 +51,7 @@ Write-Host "`n"
 kubectx arcbox-k3s
 kubectl get nodes
 
-# Build the adventurework api manifest
+# Build the AdventureWorks API manifest
 Write-Host "`n"
 Write-Host " Build the AdventureWorks API manifest"
 Write-Host "`n"
@@ -71,7 +71,7 @@ $secretManifest | kubectl apply -f -
 
 #Deploy AdvanetureWork API
 Write-Host "`n"
-Write-Host "Deploy AdvanetureWork API"
+Write-Host "Deploy AdvanetureWorks API"
 Write-Host "`n"
 
 $adventureWorkManifest = @"
@@ -124,12 +124,12 @@ spec:
 $adventureWorkManifest | kubectl apply -f -
 
 ################################################
-# Deploy API Management and Self Host Gateway
+# Deploy API Management and self-hosted gateway
 ################################################
 
-#Update the back end for weather api
+#Update the back end for weather API
 Write-Host "`n"
-Write-Host "Update the back end for weather api"
+Write-Host "Update the back end for weather API"
 Write-Host "`n"
 
 $advanceWorkServiceIp = "http://"+(kubectl get svc adventurework-service -o json | ConvertFrom-Json).spec.clusterIPs
@@ -146,16 +146,16 @@ $apimDeploymentOutput =  $(az deployment group create --resource-group $Env:reso
 $apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
 
 
-#Get access token to the rest api
+#Get access token to the REST API
 Write-Host "`n"
-Write-Host "Get access token to the rest api"
+Write-Host "Get access token to the REST API"
 Write-Host "`n"
 
 $access_token = $(az account get-access-token -s $env:subscriptionId --query "accessToken")| ConvertFrom-Json
 
-#Call Rest API to get the selft host gateway token
+#Call REST API to get the self-hosted gateway token
 Write-Host "`n"
-Write-Host "Call Rest API to get the selft host gateway token"
+Write-Host "Call REST API to get the self-hosted gateway token"
 Write-Host "`n"
 
 $currentDate = Get-Date
@@ -175,9 +175,9 @@ $generateTokenUrl = 'https://management.azure.com/subscriptions/'+$env:subscript
 $response = Invoke-RestMethod  $generateTokenUrl -Method 'POST' -Headers $headers -Body $body
 
 
-#Create secret for self host gateway
+#Create a secret for self-hosted gateway
 Write-Host "`n"
-Write-Host "Create secret for self host gateway"
+Write-Host "Create a secret for self-hosted gateway"
 Write-Host "`n"
 
 $selfHostToken = "GatewayKey $($response.value)"
@@ -186,7 +186,7 @@ kubectl create secret generic selfhost-token --from-literal=value="$($selfHostTo
 
 #Deploy self host agent into k3s
 Write-Host "`n"
-Write-Host "Deploy self host into k3s"
+Write-Host "Deploy self-hosted gateway into k3s"
 Write-Host "`n"
 
 $selfHostYaml = @"
@@ -306,6 +306,6 @@ spec:
 "@    
 $selfHostYaml | kubectl apply -f -
 Write-Host "`n"
-Write-Host "Complete deploy APIM and AdventureWork API"
+Write-Host "Complete deploy APIM and AdventureWorks API"
 Write-Host "`n"
 Stop-Transcript
