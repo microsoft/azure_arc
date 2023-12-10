@@ -53,7 +53,7 @@ kubectl get nodes
 
 # Build the adventurework api manifest
 Write-Host "`n"
-Write-Host " Build the adventurework api manifest"
+Write-Host " Build the AdventureWorks API manifest"
 Write-Host "`n"
 
 kubectl delete secret adventurework-secrets
