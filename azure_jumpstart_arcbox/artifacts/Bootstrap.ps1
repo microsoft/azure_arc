@@ -332,24 +332,26 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
 
 Write-Header "Configuring Logon Scripts"
 
+$ScheduledTaskExecutable = "pwsh.exe"
+
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "Full") {
     # Creating scheduled task for DataServicesLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
@@ -373,7 +375,7 @@ if ($flavor -eq "DataOps") {
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
     $Trigger = New-ScheduledTaskTrigger -AtStartup
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 
@@ -393,7 +395,7 @@ if ($flavor -eq "DataOps") {
 
     # Clean up Bootstrap.log
     Stop-Transcript
-    $logSuppress = Get-Content $bootstrapLogFile | Where-Object { $_ -notmatch "Host Application: pwsh.exe" }
+    $logSuppress = Get-Content $bootstrapLogFile | Where-Object { $_ -notmatch "Host Application: $ScheduledTaskExecutable" }
     $logSuppress | Set-Content $bootstrapLogFile -Force
 
     # Restart computer
@@ -403,7 +405,7 @@ else {
 
     # Creating scheduled task for MonitorWorkbookLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
     Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
     # Disabling Windows Server Manager Scheduled Task
@@ -420,6 +422,6 @@ else {
     # Clean up Bootstrap.log
     Write-Host "Clean up Bootstrap.log"
     Stop-Transcript
-    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: pwsh.exe" }
+    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: $ScheduledTaskExecutable" }
     $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
 }
