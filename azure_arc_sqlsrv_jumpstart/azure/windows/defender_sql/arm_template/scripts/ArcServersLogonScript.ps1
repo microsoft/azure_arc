@@ -122,7 +122,7 @@ if ($inernalSwitch.Name -ne $switchName) {
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VM
 $nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
+$nestedWindowsPassword = "JS123!!"
 
 # Create Windows credential object
 $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
@@ -133,7 +133,7 @@ $Env:AZCOPY_BUFFER_GB=4
 
 # Other ArcJS flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$vhdImageToDownload = "ArcBox-SQL.vhdx"
+$vhdImageToDownload = "JSSQL19Base.vhdx"
 if ($Env:sqlServerEdition -eq "Standard"){
     $vhdImageToDownload = "JSSQLStd19Base.vhdx"
 }
