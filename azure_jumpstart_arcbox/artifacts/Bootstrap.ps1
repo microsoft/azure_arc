@@ -108,9 +108,15 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHom
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
-# Installing Posh-SSH PowerShell Module
+# Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Posh-SSH -Force
+
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+$modules = @("Az", "Az.ConnectedMachine", "Posh-SSH", "Pester")
+
+foreach ($module in $modules) {
+    Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+}
 
 # Installing DHCP service
 Write-Output "Installing DHCP service"
