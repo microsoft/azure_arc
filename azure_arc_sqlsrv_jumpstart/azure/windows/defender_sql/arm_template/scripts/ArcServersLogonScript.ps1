@@ -7,11 +7,8 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
 # VHD storage details
-#$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-#$sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
-
-$sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/preprod"
-$sas = "?sp=rl&st=2023-12-11T17:25:36Z&se=2024-12-12T01:25:36Z&spr=https&sv=2022-11-02&sr=c&sig=5y1eX8W3AmhxJqsSDE4oFgPL7hVYnIbE%2BRuRW5YC0YE%3D"
+$sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/prod"
+$sas = "?si=JS-RL&spr=https&sv=2022-11-02&sr=c&sig=fIIeEliw5nG78oR6TBCvM70VMz9WXhpF41wdDoOlE8U%3D"
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
