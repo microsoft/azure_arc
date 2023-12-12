@@ -183,7 +183,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
   name: 'Bootstrap'
   location: location
   tags: {
-    displayName: 'config-choco'
+    displayName: 'config-bootstrap'
   }
   properties: {
     publisher: 'Microsoft.Compute'

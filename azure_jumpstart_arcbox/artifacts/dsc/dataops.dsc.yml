@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kubectl
+      directives:
+        description: Install kubectl
+        allowPrerelease: true
+      settings:
+        id: Kubernetes.kubectl
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kubectx
+      directives:
+        description: Install kubectx
+        allowPrerelease: true
+      settings:
+        id: ahmetb.kubectx
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: DotNetSDK7
+      directives:
+        description: Install Microsoft DotNet SDK 7
+        allowPrerelease: true
+      settings:
+        id: Microsoft.DotNet.SDK.7
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: SQLServerManagementStudio
+      directives:
+        description: Install Microsoft SQL Server Management Studio
+        allowPrerelease: true
+      settings:
+        id: Microsoft.SQLServerManagementStudio
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.Azure.DataCLI
+      directives:
+        description: Install Microsoft Azure Data CLI
+        allowPrerelease: true
+      settings:
+        id: Microsoft.Azure.DataCLI
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.AzureDataStudio
+      directives:
+        description: Install Microsoft Azure Data Studio
+        allowPrerelease: true
+      settings:
+        id: Microsoft.AzureDataStudio
+        source: winget
+  configurationVersion: 0.2.0

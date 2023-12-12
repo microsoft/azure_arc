@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: git
+      directives:
+        description: Install Git
+        allowPrerelease: true
+      settings:
+        id: Git.Git
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: vscode
+      directives:
+        description: Install Visual Studio Code
+        allowPrerelease: true
+      settings:
+        id: Microsoft.VisualStudioCode
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: AzureCLI
+      directives:
+        description: Install Azure CLI
+        allowPrerelease: true
+      settings:
+        id: Microsoft.AzureCLI
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: PowerShell7
+      directives:
+        description: Install PowerShell 7
+        allowPrerelease: true
+      settings:
+        id: Microsoft.PowerShell
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kubectl
+      directives:
+        description: Install kubectl
+        allowPrerelease: true
+      settings:
+        id: Kubernetes.kubectl
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: edge
+      directives:
+        description: Install Microsoft Edge
+        allowPrerelease: true
+      settings:
+        id: Microsoft.Edge
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: azcopy
+      directives:
+        description: Install azcopy
+        allowPrerelease: true
+      settings:
+        id: Microsoft.Azure.AZCopy.10
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: DotNetSDK7
+      directives:
+        description: Install Microsoft DotNet SDK 7
+        allowPrerelease: true
+      settings:
+        id: Microsoft.DotNet.SDK.7
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: helm
+      directives:
+        description: Install Helm
+        allowPrerelease: true
+      settings:
+        id: Helm.Helm
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.Sysinternals.BGInfo
+      directives:
+        description: Install Sysinternals BGInfo
+        allowPrerelease: true
+      settings:
+        id: Microsoft.Sysinternals.BGInfo
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: OpenSSL
+      directives:
+        description: Install OpenSSL
+        allowPrerelease: true
+      settings:
+        id: FireDaemon.OpenSSL
+        source: winget
+    - resource: PSDscResources/WindowsFeature
+      id: Hyper-V
+      directives:
+        description: Install Hyper-V
+      settings:
+        Name: Hyper-V
+        Ensure: Present
+    - resource: HyperVDsc/VMHost
+      id: VMHost
+      directives:
+        description: Configure VM Host settings
+      settings:
+        IsSingleInstance: Yes
+        EnableEnhancedSessionMode: True
+  configurationVersion: 0.2.0

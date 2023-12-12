@@ -73,6 +73,7 @@ param (
 # Creating ArcBox path
 Write-Output "Creating ArcBox path"
 $Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxDscDir = "$Env:ArcBoxDir\DSC"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxKVDir = "$Env:ArcBoxDir\KeyVault"
@@ -84,6 +85,7 @@ $Env:tempDir = "C:\Temp"
 $Env:ArcBoxDataOpsDir = "$Env:ArcBoxDir\DataOps"
 
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxDscDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxKVDir -ItemType directory -Force
@@ -135,34 +137,6 @@ Remove-Item .\PowerShell7.msi
 
 Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
 
-Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnet-sdk,setdefaultbrowser,zoomit,openssl.light'
-
-try {
-    choco config get cacheLocation
-}
-catch {
-    Write-Output "Chocolatey not detected, trying to install now"
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-Write-Host "Chocolatey Apps Specified"
-
-$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-
-foreach ($app in $appsToInstall) {
-    Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
-
-}
-
-Write-Header "Installing Azure CLI (64-bit not available via Chocolatey)"
-
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-Remove-Item .\AzureCLI.msi
-
 Write-Header "Fetching GitHub Artifacts"
 
 # All flavors
@@ -172,6 +146,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.parameters.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:ArcBoxDir\DeploymentStatus.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/common.dsc.yml") -OutFile $Env:ArcBoxDscDir\common.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/dataops.dsc.yml") -OutFile $Env:ArcBoxDscDir\dataops.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/devops.dsc.yml") -OutFile $Env:ArcBoxDscDir\devops.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/itpro.dsc.yml") -OutFile $Env:ArcBoxDscDir\itpro.dsc.yml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/WinGet.ps1") -OutFile $Env:ArcBoxDir\WinGet.ps1
 Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:ArcBoxDir\GHActionDeploy.ps1"
 Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:ArcBoxDir\OpenSSHDeploy.ps1"
@@ -228,8 +206,6 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsLogonScript.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterClientVMADJoin.ps1") -OutFile $Env:ArcBoxDir\RunAfterClientVMADJoin.ps1
-    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile $Env:ArcBoxDir\azuredatastudio.zip
-    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:ArcBoxDir\AZDataCLI.msi
     Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:ArcBoxDir\settingsTemplate.json
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMIADAuth.ps1") -OutFile $Env:ArcBoxDir\DeploySQLMIADAuth.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:ArcBoxDir\dataController.json
@@ -252,8 +228,6 @@ if ($flavor -eq "DataOps") {
 # Full
 if ($flavor -eq "Full") {
     Write-Host "Fetching Artifacts for Full Flavor"
-    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile $Env:ArcBoxDir\azuredatastudio.zip
-    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:ArcBoxDir\AZDataCLI.msi
     Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:ArcBoxDir\settingsTemplate.json
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile $Env:ArcBoxDir\DeployPostgreSQL.ps1
@@ -268,7 +242,6 @@ if ($flavor -eq "Full") {
     Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStressNet6.zip" -OutFile $Env:ArcBoxDir\SqlQueryStress.zip
 }
 
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 # Disable Microsoft Edge sidebar
@@ -290,12 +263,6 @@ If (-NOT (Test-Path $RegistryPath)) {
   New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
-
-if ($flavor -eq "Full" -Or $flavor -eq "DataOps") {
-    Write-Header "Installing Azure Data Studio"
-    Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-    Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /quiet"
-}
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
