@@ -7,8 +7,11 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
 # VHD storage details
-$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+#$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
+#$sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+
+$sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/preprod"
+$sas = "?sp=rl&st=2023-12-11T17:25:36Z&se=2024-12-12T01:25:36Z&spr=https&sv=2022-11-02&sr=c&sig=5y1eX8W3AmhxJqsSDE4oFgPL7hVYnIbE%2BRuRW5YC0YE%3D"
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
@@ -130,9 +133,18 @@ $Env:AZCOPY_BUFFER_GB=4
 
 # Other ArcJS flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+$vhdImageToDownload = "ArcBox-SQL.vhdx"
+if ($Env:sqlServerEdition -eq "Standard"){
+    $vhdImageToDownload = "JSSQLStd19Base.vhdx"
+}
+elseif ($Env:sqlServerEdition -eq "Enterprise"){
+    $vhdImageToDownload = "JSSQLEnt19Base.vhdx"
+}
+
 $SQLvmvhdPath = "$Env:ArcJSVMDir\JS-Win-SQL-01.vhdx"
 if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
-    azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
+    $vhdImageUrl = "$sourceFolder/$vhdImageToDownload$sas"
+    azcopy cp $vhdImageUrl $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
 }
 
 # Create the nested VMs

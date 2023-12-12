@@ -81,6 +81,15 @@
                 "description": "Tenant id of the service principal"
             }
         },
+        "sqlServerEdition": {
+        "type": "string",
+        "defaultValue": "Developer",
+        "allowedValues": [
+            "Developer",
+            "Standard",
+            "Enterprise"
+            ]
+        },        
         "workspaceName": {
             "type": "string",
             "metadata": {
@@ -226,7 +235,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'azure/windows/defender_sql/arm_template/scripts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -githubUser ', parameters('githubUser'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -sqlServerEdition ', parameters('sqlServerEdition'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -githubUser ', parameters('githubUser'))]"
                 }
             }
         }

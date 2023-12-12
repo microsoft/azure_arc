@@ -20,6 +20,15 @@
         "description": "Azure AD tenant id for your service principal"
       }
     },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Developer",
+      "allowedValues": [
+        "Developer",
+        "Standard",
+        "Enterprise"
+      ]
+    },
     "windowsAdminUsername": {
       "type": "string",
       "metadata": {
@@ -101,6 +110,9 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
+          },
+          "sqlServerEdition": {
+            "value": "[parameters('sqlServerEdition')]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
