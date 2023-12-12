@@ -121,6 +121,20 @@ if ($flavor -eq "DataOps") {
 }
 
 # Installing tools
+
+Write-Header "Installing PowerShell 7"
+
+$ProgressPreference = 'SilentlyContinue'
+$url = "https://github.com/PowerShell/PowerShell/releases/latest"
+$latestVersion = (Invoke-WebRequest -UseBasicParsing -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
+$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/$latestVersion/PowerShell-$($latestVersion.Substring(1,5))-win-x64.msi"
+Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -OutFile .\PowerShell7.msi
+msiexec.exe /package PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1
+Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1'
+Remove-Item .\PowerShell7.msi
+
+Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
+
 Write-Header "Installing Chocolatey Apps"
 $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnet-sdk,setdefaultbrowser,zoomit,openssl.light'
 
@@ -321,21 +335,21 @@ Write-Header "Configuring Logon Scripts"
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "Full") {
     # Creating scheduled task for DataServicesLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
@@ -359,7 +373,7 @@ if ($flavor -eq "DataOps") {
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
     $Trigger = New-ScheduledTaskTrigger -AtStartup
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 
@@ -379,7 +393,7 @@ if ($flavor -eq "DataOps") {
 
     # Clean up Bootstrap.log
     Stop-Transcript
-    $logSuppress = Get-Content $bootstrapLogFile | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
+    $logSuppress = Get-Content $bootstrapLogFile | Where-Object { $_ -notmatch "Host Application: pwsh.exe" }
     $logSuppress | Set-Content $bootstrapLogFile -Force
 
     # Restart computer
@@ -389,7 +403,7 @@ else {
 
     # Creating scheduled task for MonitorWorkbookLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
+    $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
     Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
     # Disabling Windows Server Manager Scheduled Task
@@ -406,6 +420,6 @@ else {
     # Clean up Bootstrap.log
     Write-Host "Clean up Bootstrap.log"
     Stop-Transcript
-    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
+    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: pwsh.exe" }
     $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
 }
