@@ -11,10 +11,10 @@ spec:
       - name: your-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.25.0_2023-11-14
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.26.0_2023-12-12
         imagePullPolicy: Always
         command: ["/opt/bootstrapper/bin/bootstrapper"]
-        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.25.0_2023-11-14", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
+        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.26.0_2023-12-12", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
         resources:
           limits:
             cpu: 200m
