@@ -91,7 +91,7 @@ spec:
     spec:
       containers:
       - name: adventurework
-        image: duongthaiha/adventureworkwebapi:1.0.4
+        image: jumpstartprod.azurecr.io/adventureworkwebapi:1.0.4
         env:
         - name: AdventureWorkConnection
           valueFrom:
