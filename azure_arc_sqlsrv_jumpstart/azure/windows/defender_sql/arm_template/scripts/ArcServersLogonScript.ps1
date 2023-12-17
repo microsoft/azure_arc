@@ -65,7 +65,7 @@ else {
 
 
 #Install SQLAdvancedThreatProtection solution
-az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
+#az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
@@ -204,14 +204,15 @@ $remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
 Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
-# Creating Hyper-V Manager desktop shortcut
-Write-Header "Creating Hyper-V Shortcut"
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
 # Install Log Analytics extension to support Defender for SQL threat simulation
-$workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
-$workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
-az connectedmachine extension create --machine-name $JSWinSQLVMName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring"
+#$workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
+#$workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
+
+# az connectedmachine extension create --machine-name $JSWinSQLVMName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring"
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation --wait
+
+# Install AdvancedThreatProtection extension
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name "AzureDefenderForSQL-SQLATP" --publisher "Microsoft.Azure.AzureDefenderForSQL" --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation --wait
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
@@ -220,6 +221,9 @@ Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\SqlAdvancedThreatProtecti
 Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
+# Creating Hyper-V Manager desktop shortcut
+Write-Header "Creating Hyper-V Shortcut"
+Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 # Changing to Client VM wallpaper
 $imgPath="$Env:TempDir\wallpaper.png"
