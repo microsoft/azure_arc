@@ -72,7 +72,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+$chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnet-sdk,setdefaultbrowser,zoomit'
 
 try {
     choco config get cacheLocation
@@ -91,6 +91,14 @@ foreach ($app in $appsToInstall)
     Write-Host "Installing $app"
     & choco install $app /y -Force | Write-Output
 }
+
+Write-Header "Installing Azure CLI (64-bit not available via Chocolatey)"
+
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
+
 
 Write-Header "Fetching GitHub Artifacts"
 
