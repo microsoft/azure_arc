@@ -216,6 +216,7 @@ az connectedmachine extension create --machine-name $JSWinSQLVMName --name "Micr
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
 $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$agentScript\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
 
