@@ -51,7 +51,7 @@ az extension add --name connectedmachine --yes --only-show-errors
 
 # Enable defender for cloud
 Write-Header "Enabling defender for cloud for SQL Server"
-$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
+$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $$env:subscriptionId | ConvertFrom-Json)
 if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
