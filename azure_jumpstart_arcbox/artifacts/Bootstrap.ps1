@@ -316,18 +316,23 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
 }
 
 if ($flavor -eq "Full") {
     # Creating scheduled task for DataServicesLogonScript.ps1
+
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
 }
 
 if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
+
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
 }
 
 if ($flavor -eq "DataOps") {
@@ -349,6 +354,7 @@ if ($flavor -eq "DataOps") {
     # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
+
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
@@ -378,6 +384,7 @@ if ($flavor -eq "DataOps") {
 else {
 
     # Creating scheduled task for MonitorWorkbookLogonScript.ps1
+
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
     Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
