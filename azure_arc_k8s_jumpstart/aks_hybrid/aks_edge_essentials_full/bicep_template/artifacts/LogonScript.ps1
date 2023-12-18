@@ -19,6 +19,8 @@ $hypervVMUser = "Administrator"
 $hypervVMPassword = "JS123!!"
 $kubernetesDistribution = $env:kubernetesDistribution
 $aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
+$L1VMMemoryStartupInMB = $env:L1VMMemoryStartupInMB
+$AKSEEMemoryInMB = $env:AKSEEMemoryInMB
 
 Write-Header "Executing LogonScript.ps1"
 
@@ -178,7 +180,7 @@ foreach ($site in $SiteConfig.GetEnumerator()) {
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
-            -MemoryStartupBytes 24GB `
+            -MemoryStartupBytes ($L1VMMemoryStartupInMB * 1024 * 1024) `
             -BootDevice VHD `
             -VHDPath $vhd.Path `
             -Generation 2 `
@@ -339,6 +341,7 @@ Invoke-Command -VMName "Node1" -Credential $Credentials -ScriptBlock {
         "TenantId-null"               = $using:spnTenantId
         "ClientId-null"               = $using:spnClientId
         "ClientSecret-null"           = $using:spnClientSecret
+        "MemoryInMB-null"             = $AKSEEMemoryInMB
     }
 
     ###################################################
