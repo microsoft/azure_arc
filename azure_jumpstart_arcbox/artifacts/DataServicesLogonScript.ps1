@@ -113,7 +113,7 @@ Do {
 Write-Host "Bootstrapper pod is ready!"
 Write-Host "`n"
 
-# Configuring Azure Arc Custom Location on the cluster 
+# Configuring Azure Arc Custom Location on the cluster
 Write-Header "Configuring Azure Arc Custom Location"
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
@@ -213,22 +213,22 @@ $Favorite.Save()
 Stop-Process -Id $kubectlMonShell.Id
 
 # Changing to Jumpstart ArcBox wallpaper
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+$code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+    public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+            public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
             }
         }
-    } 
+    }
 '@
 
-$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
+$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
 if(-not $ArcServersLogonScript) {
     Write-Header "Changing Wallpaper"

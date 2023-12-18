@@ -327,7 +327,7 @@
                 "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "tags": {
-                "displayName": "config-choco"
+                "displayName": "config-bootstrap"
             },
             "properties": {
                 "publisher": "Microsoft.Compute",

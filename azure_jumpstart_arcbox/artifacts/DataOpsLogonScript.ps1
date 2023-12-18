@@ -183,7 +183,7 @@ foreach ($cluster in $clusters) {
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
-        
+
         az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
@@ -320,22 +320,22 @@ Stop-Process -Id $kubectlMonShellAKS.Id
 Stop-Process -Id $kubectlMonShellAKSDr.Id
 
 # Changing to Jumpstart ArcBox wallpaper
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+$code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+    public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+            public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
             }
         }
-    } 
+    }
 '@
 
-$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
+$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
 if (-not $ArcServersLogonScript) {
     Write-Header "Changing Wallpaper"
@@ -354,7 +354,7 @@ Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command { 
+Invoke-Expression 'cmd /c start Powershell -Command {
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5

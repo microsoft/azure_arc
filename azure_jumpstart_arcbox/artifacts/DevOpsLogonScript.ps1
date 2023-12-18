@@ -131,7 +131,7 @@ foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc',
 Write-Header "Adding Bookstore Namespaces to OSM"
 osm namespace add bookstore bookbuyer bookwarehouse
 
-# To be able to discover the endpoints of this service, we need OSM controller to monitor the corresponding namespace. 
+# To be able to discover the endpoints of this service, we need OSM controller to monitor the corresponding namespace.
 # However, Nginx must NOT be injected with an Envoy sidecar to function properly.
 osm namespace add "$ingressNamespace" --mesh-name "$osmMeshName" --disable-sidecar-injection
 
@@ -299,34 +299,34 @@ $shortcut.Save()
 $shortcutLocation = "$Env:Public\Desktop\CAPI Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "powershell.exe"
+$shortcut.TargetPath = "pwsh.exe"
 $shortcut.Arguments =  "-ExecutionPolicy Bypass -File $Env:ArcBoxDir\BookStoreLaunch.ps1"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 7
 $shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+$code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+     public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+         public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
          }
     }
- } 
+ }
 '@
 
-$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
+$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
 if(-not $ArcServersLogonScript) {
     Write-Header "Changing Wallpaper"
     $imgPath="$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code 
+    Add-Type $code
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
 
@@ -340,7 +340,7 @@ Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command { 
+Invoke-Expression 'cmd /c start Powershell -Command {
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
