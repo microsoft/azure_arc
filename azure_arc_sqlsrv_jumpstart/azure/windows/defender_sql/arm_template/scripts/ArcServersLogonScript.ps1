@@ -51,7 +51,7 @@ az extension add --name connectedmachine --yes --only-show-errors
 
 # Enable defender for cloud
 Write-Header "Enabling defender for cloud for SQL Server"
-$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $$env:subscriptionId | ConvertFrom-Json)
+$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $env:subscriptionId | ConvertFrom-Json)
 if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
@@ -62,10 +62,6 @@ if ($currentsqlplan.pricingTier -eq "Free") {
 else {
     Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
 }
-
-
-#Install SQLAdvancedThreatProtection solution
-#az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
@@ -204,15 +200,11 @@ $remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
 Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
-# Install Log Analytics extension to support Defender for SQL threat simulation
-#$workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
-#$workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
-
-# az connectedmachine extension create --machine-name $JSWinSQLVMName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring"
-az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation --wait
+# Install Azure Monitor Agent extension
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation
 
 # Install AdvancedThreatProtection extension
-az connectedmachine extension create --machine-name $JSWinSQLVMName --name "AzureDefenderForSQL-SQLATP" --publisher "Microsoft.Azure.AzureDefenderForSQL" --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation --wait
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name "AzureDefenderForSQL-SQLATP" --publisher "Microsoft.Azure.AzureDefenderForSQL" --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
