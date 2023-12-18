@@ -1,6 +1,6 @@
 # Execute sql commands to generate defender for cloud alerts
 Write-Host "Executing Defender for SQL threat simulation script."
-$moduleFile = 'SqlAdvancedThreatProtectionShell.psm1'
+$moduleFile = ".\SqlAdvancedThreatProtectionShell.psm1"
 if ($true -ne [System.IO.File]::Exists($moduleFile))
 {
     Write-Host "Module file $moduleFile not installed. Try running script mannually later. Search for PowerShell module file 'SqlAdvancedThreatProtectionShell.psm1' in one of the '$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\' sub folders to re-run this test script."
