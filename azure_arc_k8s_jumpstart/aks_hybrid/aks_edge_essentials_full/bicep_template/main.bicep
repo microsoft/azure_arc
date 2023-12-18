@@ -43,8 +43,8 @@ param subnetNameCloud string = 'AKS-EE-Full-Subnet'
 param kubernetesDistribution string
 
 @allowed([
-  'Standard_E16s_v5',
-  'Standard_E20s_v5',
+  'Standard_E16s_v5'
+  'Standard_E20s_v5'
   'Standard_E32s_v5'
 ])
 param clientVmSize string = 'Standard_E16s_v5' 
