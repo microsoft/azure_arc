@@ -105,7 +105,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_E32s_v5'
+      vmSize: '${clientVmSize}'
     }
     storageProfile: {
       osDisk: {
@@ -159,7 +159,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -templateBaseUrl ${templateBaseUrl} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -kubernetesDistribution ${kubernetesDistribution}' -L1VMMemoryStartupInMB ${L1VMMemoryStartupInMB} -AKSEEMemoryInMB ${AKSEEMemoryInMB}
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -templateBaseUrl ${templateBaseUrl} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -kubernetesDistribution ${kubernetesDistribution} -L1VMMemoryStartupInMB ${L1VMMemoryStartupInMB} -AKSEEMemoryInMB ${AKSEEMemoryInMB}'
     }
   }
 }
