@@ -61,14 +61,14 @@
         @{
             Hostname    = "AzSHOST1"
             IP          = "192.168.1.12/24"
-            StorageAIP  = "192.168.98.10"
-            StorageBIP  = "192.168.99.10"
+            StorageAIP  = "10.71.1.10"
+            StorageBIP  = "10.71.2.10"
         },
         @{
             Hostname    = "AzSHOST2"
             IP          = "192.168.1.13/24"
-            StorageAIP  = "192.168.98.11"
-            StorageBIP  = "192.168.99.11"
+            StorageAIP  = "10.71.1.11"
+            StorageBIP  = "10.71.2.11"
         }
     )
     
