@@ -180,7 +180,7 @@ foreach ($site in $SiteConfig.GetEnumerator()) {
         # Create a new virtual machine and attach the existing virtual hard disk
         Write-Host "INFO: Creating and configuring $($site.Name) virtual machine." -ForegroundColor Gray
         New-VM -Name $site.Name `
-            -MemoryStartupBytes ($L1VMMemoryStartupInMB * 1024 * 1024) `
+            -MemoryStartupBytes  (([uint64]($L1VMMemoryStartupInMB))*1024*1024) `
             -BootDevice VHD `
             -VHDPath $vhd.Path `
             -Generation 2 `
