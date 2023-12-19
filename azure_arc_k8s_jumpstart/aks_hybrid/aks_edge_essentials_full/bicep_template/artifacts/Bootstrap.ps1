@@ -59,7 +59,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/ma
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,microsoft-edge,azcopy10,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,microsoft-edge,azcopy10,kubernetes-helm,k9s'
             #Run commands in parallel.
             Parallel 
                 {
