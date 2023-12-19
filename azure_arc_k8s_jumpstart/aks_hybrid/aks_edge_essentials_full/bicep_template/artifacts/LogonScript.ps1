@@ -341,7 +341,7 @@ Invoke-Command -VMName "Node1" -Credential $Credentials -ScriptBlock {
         "TenantId-null"               = $using:spnTenantId
         "ClientId-null"               = $using:spnClientId
         "ClientSecret-null"           = $using:spnClientSecret
-        "MemoryInMB-null"             = $AKSEEMemoryInMB
+        "MemoryInMB-null"             = $using:$AKSEEMemoryInMB
     }
 
     ###################################################
