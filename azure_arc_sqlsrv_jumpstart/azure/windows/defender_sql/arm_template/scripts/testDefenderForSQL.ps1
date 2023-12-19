@@ -4,7 +4,7 @@ param (
 )
 Write-Host "Executing Defender for SQL threat simulation script."
 Write-Host "Current working directory: $pwd"
-$moduleFile = workingDir + "\SqlAdvancedThreatProtectionShell.psm1"
+$moduleFile = $workingDir + "\SqlAdvancedThreatProtectionShell.psm1"
 
 if ($true -ne [System.IO.File]::Exists($moduleFile))
 {
