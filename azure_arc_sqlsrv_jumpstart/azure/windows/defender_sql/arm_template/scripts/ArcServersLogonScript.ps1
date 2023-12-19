@@ -2,7 +2,7 @@ $Env:ArcJSDir = "C:\Jumpstart"
 $Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 $Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
 $Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
-$agentScript = "$Env:ArcJSDir\agentScript"
+$agentScriptDir = "$Env:ArcJSDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
@@ -196,22 +196,22 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
-$remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+$remoteScriptFileFile = "$agentScriptDir\installArcAgentSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScriptDir\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
 # Install Azure Monitor Agent extension
 az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation
 
 # Install AdvancedThreatProtection extension
-az connectedmachine extension create --machine-name $JSWinSQLVMName --name "AzureDefenderForSQL-SQLATP" --publisher "Microsoft.Azure.AzureDefenderForSQL" --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureDefenderForSQLATP --publisher Microsoft.Azure.AzureDefenderForSQL --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-$remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$agentScript\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
+$remoteScriptFileFile = "$agentScriptDir\testDefenderForSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$agentScriptDir\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
 Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile -workingDir $using:agentScriptDir} -Credential $winCreds
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
