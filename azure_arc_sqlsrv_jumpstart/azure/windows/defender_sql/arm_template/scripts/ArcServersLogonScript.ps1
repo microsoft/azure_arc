@@ -201,10 +201,14 @@ Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScriptDir\installArcAgentSQLSP.ps
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
 
 # Install Azure Monitor Agent extension
+Write-Host "Installing Azure Monitor Agent extension"
 az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation
+Write-Host "Azure Monitor Agent extension installation completed"
 
 # Install AdvancedThreatProtection extension
+Write-Host "Installing AdvancedThreatProtection extension"
 az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureDefenderForSQLATP --publisher Microsoft.Azure.AzureDefenderForSQL --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
+Write-Host "AdvancedThreatProtection extension installation completed"
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
