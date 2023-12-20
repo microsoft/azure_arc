@@ -43,7 +43,7 @@ $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString
 ################################################
 # Deploy AdventureWorks API
 ################################################
-#Switch kubectl context
+# Switch kubectl context
 Write-Host "`n"
 Write-Host "Switch kubectl context to k3s"
 Write-Host "`n"
@@ -58,8 +58,8 @@ Write-Host "`n"
 
 kubectl delete secret adventurework-secrets
 
-$adventureWorkSecretTemplate = "$Env:ArcBoxDir\apim\adventurework_secret_template.xml" 
-$adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework.xml" 
+$adventureWorkSecretTemplate = "$Env:ArcBoxDir\apim\adventurework_secret_template.yaml" 
+$adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework.yaml" 
 (Get-Content -Path $adventureWorkSecretTemplate) -replace 'AdventureWorkConnectionPlaceHolder',$base64ConnectionString | Set-Content -Path $adventureWorkSecret
 kubectl apply -f $adventureWorkSecret
 
@@ -80,8 +80,8 @@ Write-Host "`n"
 Write-Host "Deploy AdvanetureWorks API"
 Write-Host "`n"
 
-kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_deployment.xml" 
-kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_service.xml" 
+kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_deployment.yaml" 
+kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_service.yaml" 
 
 
 ################################################
@@ -153,8 +153,8 @@ Write-Host "`n"
 Write-Host "`n"
 Write-Host "Build self-hosted gateway config map and deploy to K3s"
 Write-Host "`n"
-$selfhostedGatewayConfigMapTemplate = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap_template.xml" 
-$selfhostedGatewayConfigMap = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap.xml" 
+$selfhostedGatewayConfigMapTemplate = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap_template.yaml" 
+$selfhostedGatewayConfigMap = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap.yaml" 
 (Get-Content -Path $selfhostedGatewayConfigMapTemplate) -replace 'APIMNAMEHOLDER',$apimName | Set-Content -Path $selfhostedGatewayConfigMap
 kubectl apply -f $selfhostedGatewayConfigMap
 
@@ -162,8 +162,8 @@ kubectl apply -f $selfhostedGatewayConfigMap
 Write-Host "`n"
 Write-Host "Deploy self-hosted gateway deployement and service to K3s"
 Write-Host "`n"
-kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_deployment.xml"
-kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_service.xml"
+kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_deployment.yaml"
+kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_service.yaml"
 
 
 # Write log for completion
