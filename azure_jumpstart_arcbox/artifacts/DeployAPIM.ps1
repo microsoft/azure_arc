@@ -59,7 +59,7 @@ Write-Host "`n"
 kubectl delete secret adventurework-secrets
 
 $adventureWorkSecretTemplate = "$Env:ArcBoxDir\apim\adventurework_secret_template.yaml" 
-$adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework.yaml" 
+$adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework_secret.yaml" 
 (Get-Content -Path $adventureWorkSecretTemplate) -replace 'AdventureWorkConnectionPlaceHolder',$base64ConnectionString | Set-Content -Path $adventureWorkSecret
 kubectl apply -f $adventureWorkSecret
 
