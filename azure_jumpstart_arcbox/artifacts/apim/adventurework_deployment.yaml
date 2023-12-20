@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adventurework-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adventurework
+  template:
+    metadata:
+      labels:
+        app: adventurework
+    spec:
+      containers:
+      - name: adventurework
+        image: jumpstartprod.azurecr.io/adventureworkwebapi:1.0.4
+        env:
+        - name: AdventureWorkConnection
+          valueFrom:
+            secretKeyRef:
+              name: adventurework-secrets
+              key: AdventureWorkConnection
+        - name: DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE
+          value: "false"
+        ports:
+        - containerPort: 80
+        - containerPort: 443
