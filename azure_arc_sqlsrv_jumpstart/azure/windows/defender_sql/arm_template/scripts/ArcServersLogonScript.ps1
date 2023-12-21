@@ -35,6 +35,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
+az config set extension.use_dynamic_install=yes_without_prompt
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Register Azure providers
@@ -48,20 +49,34 @@ az provider register --namespace Microsoft.OperationsManagement --wait
 #Install az extions
 az extension add --name log-analytics-solution --yes --only-show-errors
 az extension add --name connectedmachine --yes --only-show-errors
+az extension add --name monitor-control-service --yes --only-show-errors
 
 # Enable defender for cloud
 Write-Header "Enabling defender for cloud for SQL Server"
+$laWorkspaceId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+$sqlDefenderDcrWorkspace = $laWorkspaceId
+
 $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $env:subscriptionId | ConvertFrom-Json)
 if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
 
     # Set defender for cloud log analytics workspace
     Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-    az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+    az security workspace-setting create -n default --target-workspace $laWorkspaceId
+
+    #Install SQLAdvancedThreatProtection solution
+    az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 }
 else {
     Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+
+    #Install SQLAdvancedThreatProtection solution
+    $defaultWorksspaceId = (az security workspace-setting show --name default --query workspaceId) | ConvertFrom-Json
+    $sqlDefenderDcrWorkspace = $defaultWorksspaceId
+    $defaultWs = (az monitor log-analytics workspace show --ids $defaultWorksspaceId) | ConvertFrom-Json
+    az monitor log-analytics solution create --resource-group $defaultWs.resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $defaultWs.name --only-show-errors
 }
+
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
@@ -209,6 +224,21 @@ Write-Host "Azure Monitor Agent extension installation completed"
 Write-Host "Installing AdvancedThreatProtection extension"
 az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureDefenderForSQLATP --publisher Microsoft.Azure.AzureDefenderForSQL --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
 Write-Host "AdvancedThreatProtection extension installation completed"
+
+# Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
+$sqlDefenderDcrFile = "$Env:ArcJSDir\defendersqldcrtemplate.json"
+(Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $sqlDefenderDcrWorkspace | Set-Content -Path $sqlDefenderDcrFile
+
+# Create data collection rules for Defender for SQL
+Write-Host "Creating Azure Monitor data collection rule"
+$dcrName = "Jumpstart-DefenderForSQL-DCR"
+az monitor data-collection rule create --resource-group $resourceGroup --location $env:azureLocation --name $dcrName --rule-file $sqlDefenderDcrFile
+
+# Associate DCR with Azure Arc-enabled Server resource
+Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server"
+$dcrRuleId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.Insights/dataCollectionRules/$dcrName"
+$azConnectedMachineId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.HybridCompute/machines/$JSWinSQLVMName"
+az monitor data-collection rule association create --name "$JSWinSQLVMName-DefenderForSQL-DCR-Association" --rule-id $dcrRuleId --resource $azConnectedMachineId
 
 # Test Defender for SQL
 Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
