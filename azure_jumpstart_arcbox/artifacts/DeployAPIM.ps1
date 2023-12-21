@@ -63,7 +63,7 @@ $adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework_secret.yaml"
 (Get-Content -Path $adventureWorkSecretTemplate) -replace 'AdventureWorkConnectionPlaceHolder',$base64ConnectionString | Set-Content -Path $adventureWorkSecret
 kubectl apply -f $adventureWorkSecret
 
-# Deploy AdvanetureWork API
+# Deploy AdventureWorks API
 Write-Host "`n"
 Write-Host "Deploy AdvanetureWorks API"
 Write-Host "`n"
