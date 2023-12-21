@@ -31,7 +31,7 @@ jobs:
         ACR_NAME: ${{ secrets.ACR_NAME }}
         namespace: "canary"
       run: |
-        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password=${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
         LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
         echo $LATEST_TAG
         echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
@@ -42,7 +42,7 @@ jobs:
         ACR_NAME: ${{ secrets.ACR_NAME }}
         namespace: "production"
       run: |
-        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password ${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
+        az login --service-principal --username ${{ secrets.SPN_CLIENT_ID }} --password=${{ secrets.SPN_CLIENT_SECRET }} --tenant ${{ secrets.SPN_TENANT_ID }}
         PROD_LATEST_TAG=$(az acr repository show-tags --name $ACR_NAME --repository $namespace/contoso-supermarket/pos --orderby time_desc --top 1 --output tsv)
         echo $PROD_LATEST_TAG
         echo "latest_tag=$PROD_LATEST_TAG" >> $GITHUB_OUTPUT

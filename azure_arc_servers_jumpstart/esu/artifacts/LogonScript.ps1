@@ -125,7 +125,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
     # Required for CLI commands
     Write-Host "Az CLI Login"
-    az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+    az login --service-principal --username $Env:spnClientId --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
     # Register Azure providers
     Write-Host "Registering Providers"

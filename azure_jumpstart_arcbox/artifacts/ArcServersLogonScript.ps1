@@ -124,7 +124,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
-    az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+    az login --service-principal --username $spnClientId --password=$spnClientSecret --tenant $spnTenantId
 
     # Register Azure providers
     Write-Header "Registering Providers"

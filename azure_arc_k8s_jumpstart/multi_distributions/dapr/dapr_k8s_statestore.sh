@@ -13,7 +13,7 @@ export redisVMSize='c0' # Do not change!
 export redisName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1) # Do not change!
 
 echo "Login to Az CLI using the service principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8s-extension' extension..."
 az extension show --name "k8s-extension" &> extension_output

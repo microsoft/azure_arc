@@ -12,7 +12,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId 
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 # Login as service principal
-az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+az login --service-principal --username $env:spnClientId --password=$Env:spnClientSecret --tenant $env:spnTenantId
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
