@@ -45,7 +45,7 @@ $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString
 ################################################
 # Switch kubectl context
 Write-Host "`n"
-Write-Host "Switch kubectl context to k3s"
+Write-Host "Switch kubectl context to K3s"
 Write-Host "`n"
 
 kubectx arcbox-k3s
@@ -137,7 +137,7 @@ Write-Host "`n"
 Write-Host "Deploy self-hosted gateway into K3s"
 Write-Host "`n"
 
-# Build self-hosted gateway config map and deploy to K3ss
+# Build self-hosted gateway config map and deploy to K3s
 Write-Host "`n"
 Write-Host "Build self-hosted gateway config map and deploy to K3s"
 Write-Host "`n"
