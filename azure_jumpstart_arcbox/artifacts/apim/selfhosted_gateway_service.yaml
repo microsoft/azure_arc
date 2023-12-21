@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: selfhost-live-traffic
+  labels:
+    app: selfhost
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: 8081
+  selector:
+    app: selfhost
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: selfhost-instance-discovery
+  labels:
+    app: selfhost
+  annotations:
+    azure.apim.kubernetes.io/notes: "Headless service being used for instance discovery of self-hosted gateway"
+spec:
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  - name: rate-limit-discovery
+    port: 4290
+    targetPort: rate-limit-dc
+    protocol: UDP
+  - name: discovery-heartbeat
+    port: 4291
+    targetPort: dc-heartbeat
+    protocol: UDP
+  selector:
+    app: selfhost
