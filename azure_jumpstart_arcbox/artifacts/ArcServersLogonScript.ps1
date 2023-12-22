@@ -493,30 +493,10 @@ Write-Host "Creating deployment logs bundle"
 }'
 
 # Changing to Jumpstart ArcBox wallpaper
-# Changing to Client VM wallpaper
-$imgPath = "$Env:ArcBoxDir\wallpaper.png"
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
 
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+Write-Header "Changing wallpaper"
 
-        public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-        }
-    }
-}
-'@
-
-# Set wallpaper image based on the ArcBox Flavor deployed
-$DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
-if (-not $DataServicesLogonScript) {
-    Write-Header "Changing Wallpaper"
-    $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code
-    [Win32.Wallpaper]::SetWallpaper($imgPath)
-}
+$wallpaperPath = "$Env:ArcBoxDir\wallpaper.jpg"
+Set-JSDesktopBackground -ImagePath $wallpaperPath
 
 Stop-Transcript
