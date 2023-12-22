@@ -112,16 +112,6 @@ if ($Env:flavor -ne "DevOps") {
     Write-Host "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-    # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
-    Write-Header "Blocking IMDS"
-    Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
-    Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-    Stop-Service WindowsAzureGuestAgent -Force -Verbose
-
-    if (!(Get-NetFirewallRule -Name BlockAzureIMDS -ErrorAction SilentlyContinue).Enabled) {
-        New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-    }
-
     $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory -Force
     if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
         $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
