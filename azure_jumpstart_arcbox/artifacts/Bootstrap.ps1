@@ -31,7 +31,6 @@ param (
     [string]$rdpPort,
     [string]$sshPort,
     [string]$vmAutologon
-    }
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
