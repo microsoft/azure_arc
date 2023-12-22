@@ -496,7 +496,7 @@ Write-Host "Creating deployment logs bundle"
 
 Write-Header "Changing wallpaper"
 
-$wallpaperPath = "$Env:ArcBoxDir\wallpaper.jpg"
+$wallpaperPath = "$Env:ArcBoxDir\wallpaper.png"
 Set-JSDesktopBackground -ImagePath $wallpaperPath
 
 Stop-Transcript
