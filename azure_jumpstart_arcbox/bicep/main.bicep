@@ -21,6 +21,9 @@ param windowsAdminUsername string
 @secure()
 param windowsAdminPassword string
 
+@description('Enable automatic logon into ArcBox Virtual Machine')
+param vmAutologon bool = false
+
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
@@ -117,6 +120,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     capiArcDataClusterName : capiArcDataClusterName
     aksArcClusterName : aksArcDataClusterName
     aksdrArcClusterName : aksDrArcDataClusterName
+    vmAutologon: vmAutologon
   }
   dependsOn: [
     updateVNetDNSServers

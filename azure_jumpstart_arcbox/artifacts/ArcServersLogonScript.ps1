@@ -17,7 +17,7 @@ $resourceGroup = $env:resourceGroup
 $vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
 $sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
-# Archive exising log file and crate new one
+# Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
     $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
@@ -25,6 +25,20 @@ if ([System.IO.File]::Exists($logFilePath)) {
 }
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
+
+# Remove registry keys that are used to automatically logon the user (only used for first-time setup)
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+$keys = @("AutoAdminLogon", "DefaultUserName", "DefaultPassword")
+
+foreach ($key in $keys) {
+    try {
+        $property = Get-ItemProperty -Path $registryPath -Name $key -ErrorAction Stop
+        Remove-ItemProperty -Path $registryPath -Name $key
+        Write-Host "Removed registry key that are used to automatically logon the user: $key"
+    } catch {
+        Write-Verbose "Key $key does not exist."
+    }
+}
 
 ################################################
 # Setup Hyper-V server before deploying VMs for each flavor

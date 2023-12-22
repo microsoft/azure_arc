@@ -29,7 +29,9 @@ param (
     [string]$templateBaseUrl,
     [string]$flavor,
     [string]$rdpPort,
-    [string]$sshPort
+    [string]$sshPort,
+    [string]$vmAutologon
+    }
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -99,6 +101,16 @@ New-Item -Path $Env:ArcBoxDataOpsDir -ItemType directory -Force
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
+
+if ([bool]$vmAutologon){
+
+    Write-Host "Configuring VM Autologon"
+
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+
+}
 
 # Copy PowerShell Profile and Reload
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
