@@ -24,6 +24,9 @@ param windowsAdminPassword string
 @description('Enable automatic logon into ArcBox Virtual Machine')
 param vmAutologon bool = false
 
+@description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
+param rdpPort string = '3389'
+
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
@@ -121,6 +124,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksArcClusterName : aksArcDataClusterName
     aksdrArcClusterName : aksDrArcDataClusterName
     vmAutologon: vmAutologon
+    rdpPort: rdpPort
   }
   dependsOn: [
     updateVNetDNSServers
