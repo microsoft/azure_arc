@@ -43,9 +43,9 @@ $base64ConnectionString = [Convert]::ToBase64String([char[]]$sqlConnectionString
 ################################################
 # Deploy AdventureWorks API
 ################################################
-#Switch kubectl context
+# Switch kubectl context
 Write-Host "`n"
-Write-Host "Switch kubectl context to k3s"
+Write-Host "Switch kubectl context to K3s"
 Write-Host "`n"
 
 kubectx arcbox-k3s
@@ -57,77 +57,26 @@ Write-Host " Build the AdventureWorks API manifest"
 Write-Host "`n"
 
 kubectl delete secret adventurework-secrets
-$secretManifest = @"
-apiVersion: v1
-kind: Secret
-metadata:
-  name: adventurework-secrets
-type: Opaque
-data:
-  AdventureWorkConnection: $($base64ConnectionString)
-"@
-$secretManifest | kubectl apply -f -
 
+$adventureWorkSecretTemplate = "$Env:ArcBoxDir\apim\adventurework_secret_template.yaml" 
+$adventureWorkSecret = "$Env:ArcBoxDir\apim\adventurework_secret.yaml" 
+(Get-Content -Path $adventureWorkSecretTemplate) -replace 'AdventureWorkConnectionPlaceHolder',$base64ConnectionString | Set-Content -Path $adventureWorkSecret
+kubectl apply -f $adventureWorkSecret
 
-#Deploy AdvanetureWork API
+# Deploy AdventureWorks API
 Write-Host "`n"
 Write-Host "Deploy AdvanetureWorks API"
 Write-Host "`n"
 
-$adventureWorkManifest = @"
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: adventurework-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: adventurework
-  template:
-    metadata:
-      labels:
-        app: adventurework
-    spec:
-      containers:
-      - name: adventurework
-        image: jumpstartprod.azurecr.io/adventureworkwebapi:1.0.4
-        env:
-        - name: AdventureWorkConnection
-          valueFrom:
-            secretKeyRef:
-              name: adventurework-secrets
-              key: AdventureWorkConnection
-        - name: DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE
-          value: "false"
-        ports:
-        - containerPort: 80
-        - containerPort: 443
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: adventurework-service
-spec:
-  selector:
-    app: adventurework
-  type: ClusterIP
-  ports:
-  - name: http
-    port: 80
-    targetPort: 80
-  - name: https
-    port: 443
-    targetPort: 443
+kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_deployment.yaml" 
+kubectl apply -f "$Env:ArcBoxDir\apim\adventurework_service.yaml" 
 
-"@
-$adventureWorkManifest | kubectl apply -f -
 
 ################################################
 # Deploy API Management and self-hosted gateway
 ################################################
 
-#Update the back end for weather API
+# Update the back end for weather API
 Write-Host "`n"
 Write-Host "Update the back end for weather API"
 Write-Host "`n"
@@ -137,7 +86,7 @@ $adventureWorkBackEndPolicyTemplate = "$Env:ArcBoxDir\apim\adventurework_templat
 $adventureWorkBackEndPolicy = "$Env:ArcBoxDir\apim\adventurework.xml" 
 (Get-Content -Path $adventureWorkBackEndPolicyTemplate) -replace 'IPPlaceHolder',$advanceWorkServiceIp | Set-Content -Path $adventureWorkBackEndPolicy
 
-#Deploy API Management and the API
+# Deploy API Management and the API
 Write-Host "`n"
 Write-Host "Deploy API Management and the API"
 Write-Host "`n"
@@ -146,14 +95,14 @@ $apimDeploymentOutput =  $(az deployment group create --resource-group $Env:reso
 $apimName = $apimDeploymentOutput.properties.outputs.apiManagementServiceName.value
 
 
-#Get access token to the REST API
+# Get access token to the REST API
 Write-Host "`n"
 Write-Host "Get access token to the REST API"
 Write-Host "`n"
 
 $access_token = $(az account get-access-token -s $env:subscriptionId --query "accessToken")| ConvertFrom-Json
 
-#Call REST API to get the self-hosted gateway token
+# Call REST API to get the self-hosted gateway token
 Write-Host "`n"
 Write-Host "Call REST API to get the self-hosted gateway token"
 Write-Host "`n"
@@ -171,11 +120,10 @@ $body = @"
 }
 "@
 $generateTokenUrl = 'https://management.azure.com/subscriptions/'+$env:subscriptionId+'/resourceGroups/'+$env:resourceGroup+'/providers/Microsoft.ApiManagement/service/'+$apimName+'/gateways/selfhost/generateToken?api-version=2022-08-01'
-
 $response = Invoke-RestMethod  $generateTokenUrl -Method 'POST' -Headers $headers -Body $body
 
 
-#Create a secret for self-hosted gateway
+# Create a secret for self-hosted gateway
 Write-Host "`n"
 Write-Host "Create a secret for self-hosted gateway"
 Write-Host "`n"
@@ -184,127 +132,29 @@ $selfHostToken = "GatewayKey $($response.value)"
 kubectl delete secret selfhost-token
 kubectl create secret generic selfhost-token --from-literal=value="$($selfHostToken)"  --type=Opaque
 
-#Deploy self host agent into k3s
+# Deploy self host agent into K3s
 Write-Host "`n"
-Write-Host "Deploy self-hosted gateway into k3s"
+Write-Host "Deploy self-hosted gateway into K3s"
 Write-Host "`n"
 
-$selfHostYaml = @"
-# NOTE: Before deploying to a production environment, please review the documentation -> https://aka.ms/self-hosted-gateway-production
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: selfhost-env
-  labels:
-    app: selfhost
-data:
-  config.service.endpoint: "$($apimName).configuration.azure-api.net"
-  neighborhood.host: "selfhost-instance-discovery"
-  runtime.deployment.artifact.source: "Azure Portal"
-  runtime.deployment.mechanism: "YAML"
-  runtime.deployment.orchestrator.type: "Kubernetes"
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: selfhost
-  labels:
-    app: selfhost
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: selfhost
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 25%
-  template:
-    metadata:
-      labels:
-        app: selfhost
-    spec:
-      terminationGracePeriodSeconds: 60
-      containers:
-      - name: selfhost
-        image: mcr.microsoft.com/azure-api-management/gateway:v2
-        ports:
-        - name: http
-          containerPort: 8080
-        - name: https
-          containerPort: 8081
-          # Container port used for rate limiting to discover instances
-        - name: rate-limit-dc
-          protocol: UDP
-          containerPort: 4290
-          # Container port used for instances to send heartbeats to each other
-        - name: dc-heartbeat
-          protocol: UDP
-          containerPort: 4291
-        readinessProbe:
-          httpGet:
-            path: /status-0123456789abcdef
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 0
-          periodSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
-        env:
-        - name: config.service.auth
-          valueFrom:
-            secretKeyRef:
-              name: selfhost-token
-              key: value
-        envFrom:
-        - configMapRef:
-            name: selfhost-env
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: selfhost-live-traffic
-  labels:
-    app: selfhost
-spec:
-  type: LoadBalancer
-  externalTrafficPolicy: Local
-  ports:
-  - name: http
-    port: 80
-    targetPort: 8080
-  - name: https
-    port: 443
-    targetPort: 8081
-  selector:
-    app: selfhost
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: selfhost-instance-discovery
-  labels:
-    app: selfhost
-  annotations:
-    azure.apim.kubernetes.io/notes: "Headless service being used for instance discovery of self-hosted gateway"
-spec:
-  clusterIP: None
-  type: ClusterIP
-  ports:
-  - name: rate-limit-discovery
-    port: 4290
-    targetPort: rate-limit-dc
-    protocol: UDP
-  - name: discovery-heartbeat
-    port: 4291
-    targetPort: dc-heartbeat
-    protocol: UDP
-  selector:
-    app: selfhost
-"@    
-$selfHostYaml | kubectl apply -f -
+# Build self-hosted gateway config map and deploy to K3s
+Write-Host "`n"
+Write-Host "Build self-hosted gateway config map and deploy to K3s"
+Write-Host "`n"
+$selfhostedGatewayConfigMapTemplate = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap_template.yaml" 
+$selfhostedGatewayConfigMap = "$Env:ArcBoxDir\apim\selfhosted_gateway_configmap.yaml" 
+(Get-Content -Path $selfhostedGatewayConfigMapTemplate) -replace 'APIMNAMEHOLDER',$apimName | Set-Content -Path $selfhostedGatewayConfigMap
+kubectl apply -f $selfhostedGatewayConfigMap
+
+# Deploy self-hosted gateway deployement and service to K3s
+Write-Host "`n"
+Write-Host "Deploy self-hosted gateway deployement and service to K3s"
+Write-Host "`n"
+kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_deployment.yaml"
+kubectl apply -f "$Env:ArcBoxDir\apim\selfhosted_gateway_service.yaml"
+
+
+# Write log for completion
 Write-Host "`n"
 Write-Host "Complete deploy APIM and AdventureWorks API"
 Write-Host "`n"
