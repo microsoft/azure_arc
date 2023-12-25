@@ -17,7 +17,7 @@ $resourceGroup = $env:resourceGroup
 $vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
 $sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
 
-# Archive exising log file and crate new one
+# Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
     $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
@@ -25,6 +25,20 @@ if ([System.IO.File]::Exists($logFilePath)) {
 }
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
+
+# Remove registry keys that are used to automatically logon the user (only used for first-time setup)
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+$keys = @("AutoAdminLogon", "DefaultUserName", "DefaultPassword")
+
+foreach ($key in $keys) {
+    try {
+        $property = Get-ItemProperty -Path $registryPath -Name $key -ErrorAction Stop
+        Remove-ItemProperty -Path $registryPath -Name $key
+        Write-Host "Removed registry key that are used to automatically logon the user: $key"
+    } catch {
+        Write-Verbose "Key $key does not exist."
+    }
+}
 
 ################################################
 # Setup Hyper-V server before deploying VMs for each flavor
@@ -97,16 +111,6 @@ if ($Env:flavor -ne "DevOps") {
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-    # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
-    Write-Header "Blocking IMDS"
-    Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
-    Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-    Stop-Service WindowsAzureGuestAgent -Force -Verbose
-
-    if (!(Get-NetFirewallRule -Name BlockAzureIMDS -ErrorAction SilentlyContinue).Enabled) {
-        New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-    }
 
     $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory -Force
     if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -479,30 +483,10 @@ Write-Host "Creating deployment logs bundle"
 }'
 
 # Changing to Jumpstart ArcBox wallpaper
-# Changing to Client VM wallpaper
-$imgPath = "$Env:ArcBoxDir\wallpaper.png"
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
 
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+Write-Header "Changing wallpaper"
 
-        public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-        }
-    }
-}
-'@
-
-# Set wallpaper image based on the ArcBox Flavor deployed
-$DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
-if (-not $DataServicesLogonScript) {
-    Write-Header "Changing Wallpaper"
-    $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code
-    [Win32.Wallpaper]::SetWallpaper($imgPath)
-}
+$wallpaperPath = "$Env:ArcBoxDir\wallpaper.png"
+Set-JSDesktopBackground -ImagePath $wallpaperPath
 
 Stop-Transcript

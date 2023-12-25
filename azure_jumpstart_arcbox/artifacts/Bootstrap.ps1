@@ -29,7 +29,8 @@ param (
     [string]$templateBaseUrl,
     [string]$flavor,
     [string]$rdpPort,
-    [string]$sshPort
+    [string]$sshPort,
+    [string]$vmAutologon
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -100,6 +101,16 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
+if ([bool]$vmAutologon){
+
+    Write-Host "Configuring VM Autologon"
+
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+
+}
+
 # Copy PowerShell Profile and Reload
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
@@ -112,7 +123,7 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
-$modules = @("Az", "Az.ConnectedMachine", "Posh-SSH", "Pester")
+$modules = @("Az", "Az.ConnectedMachine", "Azure.Arc.Jumpstart.Common", "Posh-SSH", "Pester")
 
 foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
