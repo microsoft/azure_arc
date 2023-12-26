@@ -19,6 +19,7 @@ variable "admin_username" {
 
 variable "admin_password" {
   default = "arcPassword123!!"
+  sensitive = true
 }
 variable "instance_type" {
   default = "n1-standard-1"
@@ -42,6 +43,7 @@ variable "client_id" {
 }
 
 variable "client_secret" {
+  sensitive = true
 }
 
 variable "tenant_id" {

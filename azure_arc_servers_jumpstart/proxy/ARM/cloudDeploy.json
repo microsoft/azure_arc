@@ -85,7 +85,7 @@
       },
       "ProxysubnetName": {
         "type": "string",
-        "defaultValue": "proxy-ubnet",
+        "defaultValue": "proxy-subnet",
         "metadata": {
           "description": "Name of the subnet in the virtual network for the proxy server"
         }
@@ -109,6 +109,13 @@
         "defaultValue": "Arc-Client-NSG",
         "metadata": {
           "description": "Name of the Network Security Group for the Arc-enabled server subnet"
+        }
+      },
+      "ubuntuOSVersion": {
+        "type": "string",
+        "defaultValue": "22_04-lts-gen2",
+        "metadata": {
+          "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
         }
       }
     },

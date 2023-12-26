@@ -22,6 +22,7 @@ variable "servicePrincipalAppId" {
 variable "servicePrincipalSecret" {
   description = "Azure service principal App Password"
   type        = string
+  sensitive   = true
 }
 
 variable "servicePrincipalTenantId" {
@@ -37,6 +38,7 @@ variable "vsphere_user" {
 variable "vsphere_password" {
   description = "VMware vSphere vCenter Password"
   type        = string
+  sensitive   = true
 }
 
 variable "vsphere_server" {
@@ -109,4 +111,5 @@ variable "admin_user" {
 variable "admin_password" {
   description = "Guest OS Admin Password"
   type        = string
+  sensitive   = true
 }

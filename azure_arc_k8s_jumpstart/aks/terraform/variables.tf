@@ -20,7 +20,7 @@ variable "location" {
 
 variable "kubernetes_version" {
   description = "Kubernetes version deployed"
-  default     = "1.27.1"
+  default     = "1.27.7"
 }
 
 variable "node_count" {
@@ -39,4 +39,5 @@ variable "client_id" {
 
 variable "client_secret" {
   description = "The Client Secret for the Service Principal to use for this AKS Managed Kubernetes Cluster"
+  sensitive = true
 }

@@ -55,6 +55,9 @@
       },
       "bastionHostName": {
         "value": "<Azure Bastion Host name>"
+      },
+      "ubuntuOSVersion": {
+        "value": "<Ubuntu OS version>"
       }
     }
   }

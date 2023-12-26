@@ -1,7 +1,11 @@
 Start-Transcript -Path C:\Temp\AzureMLLogonScript.log
 
+# Change directory to C:\Temp to avoid failures to run ohter scripts in this folder.
+cd C:\Temp
+
 # Deployment environment variables
 $connectedClusterName = "Arc-AML-AKS"
+[System.Environment]::SetEnvironmentVariable('AML_COMPUTE_CLUSTER_NAME', $connectedClusterName, [System.EnvironmentVariableTarget]::Machine)
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -30,6 +34,15 @@ Write-Host "`n"
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
+# Remove latest version to install specific connectedk8s version
+$k8s = (az extension list --query "[?name=='connectedk8s']" | ConvertFrom-Json).name
+if ($k8s -eq "connectedk8s") {
+   az extension remove --name connectedk8s
+}
+
+# Following version is most stable version to make this scenario work
+az extension add --name connectedk8s --version 1.3.17
+
 Write-Host "`n"
 az config set extension.use_dynamic_install=yes_without_prompt
 
@@ -140,10 +153,12 @@ az ml -h
 # Set AML workspace defaults
 $random = ((New-Guid).Guid).Split('-')[0]
 $ws = "arcaml-$random-ws" # AML workspace name
+[System.Environment]::SetEnvironmentVariable('mlworkspace', $ws, [System.EnvironmentVariableTarget]::Machine)
+
 az configure --defaults workspace=$ws group=$env:resourceGroup
 
 # Create Azure ML workspace
-az ml workspace create -g $env:resourceGroup
+az ml workspace create -g $env:resourceGroup --name $ws
 
 ########################################################################################################
 # Functions
@@ -159,7 +174,7 @@ function Install-aml-extension {
                            --cluster-name $connectedClusterName `
                            --resource-group $env:resourceGroup `
                            --scope cluster `
-                           --configuration-settings enableTraining=True enableInference=True allowInsecureConnections=True inferenceLoadBalancerHA=False # This is since our K8s is 1 node
+                           --configuration-settings enableTraining=True enableInference=True allowInsecureConnections=True inferenceLoadBalancerHA=False inferenceRouterServiceType=LoadBalancer # This is since our K8s is 1 node
    return 1
 }
 
@@ -208,23 +223,14 @@ Write-Host "Installing amlarc-compute K8s extension was successful." -Foreground
 # Get Arc Cluster Resource ID
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 
-# Replace staging values in Python Script
-# 1.Get_WS.py
-$Script = "C:\Temp\1.Get_WS.py"
-(Get-Content -Path $Script) -replace 'subscription_id-stage',$env:subscriptionId | Set-Content -Path $Script
-(Get-Content -Path $Script) -replace 'resource_group-stage',$env:resourceGroup | Set-Content -Path $Script
-(Get-Content -Path $Script) -replace 'workspace_name-stage',$ws | Set-Content -Path $Script
-
-# 2.Attach_Arc.py
-$Script = "C:\Temp\2.Attach_Arc.py"
-(Get-Content -Path $Script) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $Script
-(Get-Content -Path $Script) -replace 'connectedClusterId-stage',$connectedClusterId | Set-Content -Path $Script
+# This environment variable is usd by 2.Attach_Arc.py script
+[System.Environment]::SetEnvironmentVariable('connectedClusterId', $connectedClusterId, [System.EnvironmentVariableTarget]::Machine)
 
 # Set Azure ML default Workspace info
-python "C:\Temp\1.Get_WS.py"
+python "C:\Temp\1.Get_WS.py" -w $ws
 
 # Attach Arc Cluster to Azure ML Workspace
-python "C:\Temp\2.Attach_Arc.py"
+python "C:\Temp\2.Attach_Arc.py" -c $connectedClusterId
 
 #################
 # Training Model
@@ -257,7 +263,7 @@ $JobFile = "C:\Temp\train\job.yml"
 (Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
 # Create MNIST Dataset and register against Workspace
-python "C:\Temp\3.Create_MNIST_Dataset.py"
+python "C:\Temp\3.Create_MNIST_Dataset.py" -w $ws
 
 # Function to Train model with AML CLI
 function SubmitTrainingJob {
@@ -302,7 +308,7 @@ $TrainingStatus = "Unsuccessful"
 If ($response.Jobstatus -eq "Completed"){
    Write-Host "Job completed." -ForegroundColor Green
    # Download job artifacts, including pkl model
-   az ml job download -n $RunId --outputs --download-path "C:\Temp"
+   az ml job download -n $RunId --download-path "C:\Temp\$RunId"
    # Set flag for successful training
    $TrainingStatus = "Successful"
 }
@@ -346,13 +352,13 @@ Write-Host """
                                    
 """
 # Replace staging values
-$JobFile = "C:\Temp\inference\endpoint.yml"
-(Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
+$endPointFile = "C:\Temp\inference\endpoint.yml"
+(Get-Content -Path $endPointFile) -replace 'connectedClusterName-stage', $connectedClusterName | Set-Content -Path $endPointFile
 
 # Proceed with inference deployment only if training was successful
 If ($TrainingStatus -eq "Successful"){
    Write-Host "Copying trained model pkl to deployment folder..." -ForegroundColor White
-   Copy-Item "C:\Temp\$RunId\outputs\*.pkl" -Destination "C:\Temp\inference\model"
+   Copy-Item "C:\Temp\$RunId\artifacts\outputs\*.pkl" -Destination "C:\Temp\inference\model"
 
    # Deploy unique inference endpoint
    $random = ((New-Guid).Guid).Split('-')[0]
@@ -360,14 +366,23 @@ If ($TrainingStatus -eq "Successful"){
 
    # Synchronous call (blocking) - 5-10 minutes
    Write-Host "Creating model deployment on your K8s cluster, takes 5-10 minutes..." -ForegroundColor White
-   az ml endpoint create -n $name -f $JobFile
+   az ml online-endpoint create -n $name -f $endPointFile
 
-   # Flag for Inference Status - if Pod is up
-   $InferenceStatus = if(kubectl get pods -l ml.azure.com/deployment-name=blue -n default | Select-String "Running" -Quiet){"Successful"}Else{"Unsuccessful"}
-   Write-Host "Inference Status: $InferenceStatus" -ForegroundColor White
+   # Verify if endpoint created successfully
+   $endPointStatus = ((az ml online-endpoint show --name $name) | ConvertFrom-Json).provisioning_state
+   if ($endPointStatus -eq "Succeeded") {
+        az ml online-deployment create --name blue --endpoint $name -f "C:\Temp\inference\deployment.yml" --all-traffic
 
+       # Flag for Inference Status - if Pod is up
+       $InferenceStatus = if(kubectl get pods -l ml.azure.com/deployment-name=blue -n default | Select-String "Running" -Quiet){"Successful"}Else{"Unsuccessful"}
+       Write-Host "Inference Status: $InferenceStatus" -ForegroundColor White
+   }
+   else 
+   {
+        Write-Host "Inference Status: $InferenceStatus" -ForegroundColor White
+   }
 }
-else
+else 
 {
     Write-Host "Training was not successful - Inference skipped."
 }
@@ -383,16 +398,17 @@ If ($InferenceStatus -eq "Successful"){
    # Method 1: One-line invoke model
    Write-Host "Method 1: Calling deployed model using az ml endpoint" -ForegroundColor Yellow
    Write-Host "The sample request represents the following numeral:" -ForegroundColor White
-   az ml endpoint invoke -n $name -r $RequestFile
+   $sampleNumeral = az ml online-endpoint invoke -n $name -r $RequestFile
+   Write-Host $sampleNumeral
 
    # Method 2: Call using PowerShell Invoke-RestMethod (for demonstration)
    Write-Host "Method 2: Calling deployed model using PowerShell Direct REST API call" -ForegroundColor Yellow
    # Get OAuth token
-   $token = $(az ml endpoint get-credentials --name $name `
+   $token = $(az ml online-endpoint get-credentials --name $name `
                                              --resource-group $env:resourceGroup `
                                              --workspace-name $ws | ConvertFrom-Json).accessToken
    # Get scoring URL
-   $scoring_uri = $(az ml endpoint show --name $name `
+   $scoring_uri = $(az ml online-endpoint show --name $name `
                                         --resource-group $env:resourceGroup `
                                         --workspace-name $ws | ConvertFrom-Json).scoring_uri
 
@@ -406,7 +422,8 @@ If ($InferenceStatus -eq "Successful"){
 
    Write-Host "The sample request represents the following numeral:" -ForegroundColor White
    $response = Invoke-RestMethod $scoring_uri -Method 'POST' -Headers $headers -Body $body
-   $response | ConvertTo-Json
+   $inferedNumeral = $response | ConvertTo-Json
+   Write-Host $inferedNumeral
 }
 else
 {
@@ -443,9 +460,14 @@ $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 Stop-Process -Id $kubectlMonShell.Id
 Stop-Process -Id $kubectlWatchShell.Id
 
+# Kill chicl kubectl processes
+Get-Process -Name kubectl | Stop-Process -Force
+
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
-Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
-Start-Sleep -Seconds 5
+if ($null -ne (Get-ScheduledTask -TaskName "AzureMLLogonScript" -ErrorAction SilentlyContinue)) {
+   Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
+   Start-Sleep -Seconds 5
+}
 
 Stop-Process -Name powershell -Force
 Stop-Transcript
