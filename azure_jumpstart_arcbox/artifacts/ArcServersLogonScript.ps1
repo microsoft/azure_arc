@@ -489,4 +489,19 @@ Write-Header "Changing wallpaper"
 $wallpaperPath = "$Env:ArcBoxDir\wallpaper.png"
 Set-JSDesktopBackground -ImagePath $wallpaperPath
 
+Write-Header "Running tests to verify infrastructure"
+
+Invoke-Pester -Path "$Env:ArcBoxTestsDir\common.tests.ps1" -Output Detailed
+
+switch ($env:flavor) {
+    'DevOps' { Invoke-Pester -Path "$Env:ArcBoxTestsDir\devops.tests.ps1" -Output Detailed }
+    'DataOps' { Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed }
+    'ITPro' { Invoke-Pester -Path "$Env:ArcBoxTestsDir\itpro.tests.ps1" -Output Detailed }
+    'Full' {
+        Invoke-Pester -Path "$Env:ArcBoxTestsDir\devops.tests.ps1" -Output Detailed
+        Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed
+        Invoke-Pester -Path "$Env:ArcBoxTestsDir\itpro.tests.ps1" -Output Detailed
+    }
+}
+
 Stop-Transcript
