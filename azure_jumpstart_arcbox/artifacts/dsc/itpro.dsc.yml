@@ -6,7 +6,6 @@ properties:
       id: terraform
       directives:
         description: Install Terraform
-        allowPrerelease: true
       settings:
         id: Hashicorp.Terraform
         source: winget
