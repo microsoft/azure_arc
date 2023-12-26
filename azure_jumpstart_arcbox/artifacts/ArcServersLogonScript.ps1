@@ -483,12 +483,14 @@ Write-Host "Creating deployment logs bundle"
 7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
 
-# Changing to Jumpstart ArcBox wallpaper
+#Changing to Jumpstart ArcBox wallpaper
 
 Write-Header "Changing wallpaper"
 
-$wallpaperPath = "$Env:ArcBoxDir\wallpaper.png"
-Set-JSDesktopBackground -ImagePath $wallpaperPath
+# bmp file is required for BGInfo
+Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
+
+Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
 
 Write-Header "Running tests to verify infrastructure"
 
@@ -535,6 +537,6 @@ Write-Header "Adding deployment test results to wallpaper using BGInfo"
 Set-Content 'C:\Windows\Temp\arcbox-tests-succeeded.txt' $tests_passed
 Set-Content 'C:\Windows\Temp\arcbox-tests-failed.txt' $tests_failed
 
-bginfo $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
+bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
 Stop-Transcript
