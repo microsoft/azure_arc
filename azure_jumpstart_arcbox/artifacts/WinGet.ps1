@@ -9,6 +9,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
 
 # Install DSC resources required for ArcBox
+Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
 
 # Install WinGet CLI
