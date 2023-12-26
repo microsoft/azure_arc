@@ -12,7 +12,7 @@
 RootModule = 'Azure.Arc.Jumpstart.Common.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.3'
+ModuleVersion = '0.0.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
