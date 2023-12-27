@@ -144,9 +144,10 @@ if ($Env:flavor -ne "DevOps") {
 
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
-    az extension add --name ssh --yes --only-show-errors
-    az extension add --name log-analytics-solution --yes --only-show-errors
-    az extension add --name connectedmachine --yes --only-show-errors
+    @("ssh","log-analytics-solution","connectedmachine") |
+    ForEach-Object -Parallel {
+        az extension add --name $PSItem --yes --only-show-errors
+    }
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
@@ -154,10 +155,9 @@ if ($Env:flavor -ne "DevOps") {
 
     # Register Azure providers
     Write-Header "Registering Providers"
-    az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
-    az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
-    az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
-    az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
+    @("Microsoft.HybridCompute","Microsoft.HybridConnectivity","Microsoft.GuestConfiguration","Microsoft.AzureArcData") | ForEach-Object -Parallel {
+        az provider register --namespace $PSItem --wait --only-show-errors
+    }
 
     # Enable defender for cloud for SQL Server
     # Verify existing plan and update accordingly
@@ -240,14 +240,6 @@ if ($Env:flavor -ne "DevOps") {
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-
-    # Configure SSH on the nested Windows VMs
-    Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock {
-        # Allow SSH via Azure Arc agent
-        azcmagent config set incomingconnections.ports 22
-    } -Credential $winCreds
-
 
     # Install Log Analytics extension to support Defender for SQL
     $mmaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='MicrosoftMonitoringAgent']" | ConvertFrom-Json
@@ -466,8 +458,19 @@ if ($Env:flavor -ne "DevOps") {
 
         # Onboarding the nested VMs as Azure Arc-enabled servers
         Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+        $Win2k19vmName,$Win2k22vmName | ForEach-Object -Parallel {
+
+            $nestedVMArcBoxDir = $Using:nestedVMArcBoxDir
+            $spnClientId  =  $Using:spnClientId
+            $spnClientSecret  =  $Using:spnClientSecret
+            $spnTenantId  =  $Using:spnTenantId
+            $subscriptionId  =  $Using:subscriptionId
+            $resourceGroup  =  $Using:resourceGroup
+            $azureLocation  =  $Using:azureLocation
+
+            Invoke-Command -VMName $PSItem -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $using:winCreds
+
+         }
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
@@ -478,12 +481,31 @@ if ($Env:flavor -ne "DevOps") {
         $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-        # Configure SSH on the nested Windows VMs
-        Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
-            # Allow SSH via Azure Arc agent
-            azcmagent config set incomingconnections.ports 22
-        } -Credential $winCreds
+    }
+
+    Write-Header "Enabling SSH access to Arc-enabled servers"
+    $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
+    $VMs | ForEach-Object -Parallel {
+
+        $vm = $PSItem
+        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
+
+        $connectedMachineEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15").Content | ConvertFrom-Json
+
+        if (-not ($connectedMachineEndpoint.properties | Where-Object { $_.type -eq "default" -and $_.provisioningState -eq "Succeeded" })) {
+            Write-Output "Creating default endpoint for $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method put -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15" -Payload '{"properties": {"type": "default"}}'
+        }
+        $connectedMachineSshEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default/serviceconfigurations/SSH?api-version=2023-03-15").Content | ConvertFrom-Json
+
+        if (-not ($connectedMachineSshEndpoint.properties | Where-Object { $_.serviceName -eq "SSH" -and $_.provisioningState -eq "Succeeded" })) {
+            Write-Output "Enabling SSH on $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method put -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default/serviceconfigurations/SSH?api-version=2023-03-15" -Payload '{"properties": {"serviceName": "SSH", "port": 22}}'
+        }
+        else {
+            Write-Output "SSH already enabled on $($connectedMachine.Name)"
+        }
+
     }
 
     # Removing the LogonScript Scheduled Task so it won't run on next reboot
