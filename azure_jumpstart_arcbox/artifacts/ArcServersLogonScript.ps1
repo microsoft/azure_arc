@@ -144,6 +144,9 @@ if ($Env:flavor -ne "DevOps") {
 
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
+
+    az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+
     @("ssh","log-analytics-solution","connectedmachine") |
     ForEach-Object -Parallel {
         az extension add --name $PSItem --yes --only-show-errors
