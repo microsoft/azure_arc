@@ -49,6 +49,19 @@ $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
+# Configure Windows Terminal as the default terminal application
+$registryPath = "HKCU:\Console\%%Startup"
+
+if (Test-Path $registryPath) {
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+} else {
+    New-Item -Path $registryPath -Force | Out-Null
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+}
+
+
 ################################################
 # Setup Hyper-V server before deploying VMs for each flavor
 ################################################
