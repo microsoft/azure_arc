@@ -79,14 +79,6 @@ properties:
       settings:
         id: FireDaemon.OpenSSL
         source: winget
-    - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: Microsoft.WindowsTerminal
-      directives:
-        description: Install Microsoft Windows Terminal
-      settings:
-        id: Microsoft.WindowsTerminal
-        version: "1.18.3181.0"
-        source: winget
     - resource: DSCR_Font/cFont
       id: CascadiaMono
       directives:

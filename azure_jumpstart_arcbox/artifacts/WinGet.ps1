@@ -17,6 +17,11 @@ $null = Repair-WinGetPackageManager -AllUsers
 
 Write-Header 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
+
+# Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
+& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
+
+# Apply WinGet Configuration files
 & $winget configure --file C:\ArcBox\DSC\common.dsc.yml --accept-configuration-agreements --disable-interactivity
 
 switch ($env:flavor) {
