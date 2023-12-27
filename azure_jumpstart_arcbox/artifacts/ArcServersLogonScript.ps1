@@ -490,6 +490,11 @@ if ($Env:flavor -ne "DevOps") {
     $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
     $VMs | ForEach-Object -Parallel {
 
+        $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+        $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
+
+        $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
+
         $vm = $PSItem
         $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
 
