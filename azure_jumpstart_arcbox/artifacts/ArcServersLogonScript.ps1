@@ -156,6 +156,9 @@ if ($Env:flavor -ne "DevOps") {
     Write-Header "Az CLI Login"
     az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
+    Write-Header "Az PowerShell Login"
+    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+
     # Register Azure providers
     Write-Header "Registering Providers"
     @("Microsoft.HybridCompute","Microsoft.HybridConnectivity","Microsoft.GuestConfiguration","Microsoft.AzureArcData") | ForEach-Object -Parallel {
