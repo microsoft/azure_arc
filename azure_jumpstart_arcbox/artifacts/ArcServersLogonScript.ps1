@@ -20,7 +20,7 @@ $sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
-if ([System.IO.File]::Exists($logFilePath)) {
+if (Test-Path $logFilePath) {
     $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
     Rename-Item -Path $logFilePath -NewName $archivefile -Force
 }
@@ -144,20 +144,26 @@ if ($Env:flavor -ne "DevOps") {
 
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
-    az extension add --name ssh --yes --only-show-errors
-    az extension add --name log-analytics-solution --yes --only-show-errors
-    az extension add --name connectedmachine --yes --only-show-errors
+
+    az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+
+    @("ssh","log-analytics-solution","connectedmachine") |
+    ForEach-Object -Parallel {
+        az extension add --name $PSItem --yes --only-show-errors
+    }
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
     az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
+    Write-Header "Az PowerShell Login"
+    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+
     # Register Azure providers
     Write-Header "Registering Providers"
-    az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
-    az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
-    az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
-    az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
+    @("Microsoft.HybridCompute","Microsoft.HybridConnectivity","Microsoft.GuestConfiguration","Microsoft.AzureArcData") | ForEach-Object -Parallel {
+        az provider register --namespace $PSItem --wait --only-show-errors
+    }
 
     # Enable defender for cloud for SQL Server
     # Verify existing plan and update accordingly
@@ -193,7 +199,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Host "Fetching SQL VM"
 
     # Verify if VHD files already downloaded especially when re-running this script
-    if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
+    if (!(Test-Path $SQLvmvhdPath)) {
         <# Action when all if and elseif conditions are false #>
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
@@ -241,14 +247,6 @@ if ($Env:flavor -ne "DevOps") {
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
-    # Configure SSH on the nested Windows VMs
-    Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock {
-        # Allow SSH via Azure Arc agent
-        azcmagent config set incomingconnections.ports 22
-    } -Credential $winCreds
-
-
     # Install Log Analytics extension to support Defender for SQL
     $mmaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='MicrosoftMonitoringAgent']" | ConvertFrom-Json
     if ($mmaExtension.Count -le 0) {
@@ -265,8 +263,8 @@ if ($Env:flavor -ne "DevOps") {
     $retryCount = 0
     do {
         Start-Sleep(60)
-        $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
-        if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
+        $amaExtension = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'AzureMonitorWindowsAgent'}
+        if ($amaExtension.StatusCode -eq 0) {
             Write-Host "Azure Monitoring Agent extension installation complete."
             break
         }
@@ -281,16 +279,16 @@ if ($Env:flavor -ne "DevOps") {
     } while ($retryCount -le 5)
 
     # Enable Best practices assessment
-    if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
+    if ($amaExtension.StatusCode -eq 0) {
 
         # Create custom log analytics table for SQL assessment
         az monitor log-analytics workspace table create --resource-group $resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime --only-show-errors
 
         # Verify if Arc-enabled server and SQL server extensions are installed
-        $ArcServer = az connectedmachine show --name $SQLvmName --resource-group $resourceGroup
-        if ($null -ne $ArcServer) {
-            $sqlExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='WindowsAgent.SqlServer']" | ConvertFrom-Json
-            if ($null -ne $sqlExtension) {
+        $ArcServer = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup
+        if ($ArcServer) {
+            $sqlExtension = $ArcServer | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'WindowsAgent.SqlServer'}
+            if ($sqlExtension) {
                 # SQL server extension is installed and ready to run SQL BPA
                 Write-Host "SQL server extension is installed and ready to run SQL BPA."
             }
@@ -370,7 +368,7 @@ if ($Env:flavor -ne "DevOps") {
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
-        if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))) {
+        if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             if ($Env:flavor -eq "Full") {
@@ -466,8 +464,19 @@ if ($Env:flavor -ne "DevOps") {
 
         # Onboarding the nested VMs as Azure Arc-enabled servers
         Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+        $Win2k19vmName,$Win2k22vmName | ForEach-Object -Parallel {
+
+            $nestedVMArcBoxDir = $Using:nestedVMArcBoxDir
+            $spnClientId  =  $Using:spnClientId
+            $spnClientSecret  =  $Using:spnClientSecret
+            $spnTenantId  =  $Using:spnTenantId
+            $subscriptionId  =  $Using:subscriptionId
+            $resourceGroup  =  $Using:resourceGroup
+            $azureLocation  =  $Using:azureLocation
+
+            Invoke-Command -VMName $PSItem -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $using:winCreds
+
+         }
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
@@ -478,12 +487,36 @@ if ($Env:flavor -ne "DevOps") {
         $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-        # Configure SSH on the nested Windows VMs
-        Write-Output "Configuring SSH via Azure Arc agent on the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName, $Win2k22vmName -ScriptBlock {
-            # Allow SSH via Azure Arc agent
-            azcmagent config set incomingconnections.ports 22
-        } -Credential $winCreds
+    }
+
+    Write-Header "Enabling SSH access to Arc-enabled servers"
+    $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
+    $VMs | ForEach-Object -Parallel {
+
+        $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+        $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
+
+        $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process -WarningAction SilentlyContinue
+
+        $vm = $PSItem
+        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
+
+        $connectedMachineEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15").Content | ConvertFrom-Json
+
+        if (-not ($connectedMachineEndpoint.properties | Where-Object { $_.type -eq "default" -and $_.provisioningState -eq "Succeeded" })) {
+            Write-Output "Creating default endpoint for $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method put -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15" -Payload '{"properties": {"type": "default"}}'
+        }
+        $connectedMachineSshEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default/serviceconfigurations/SSH?api-version=2023-03-15").Content | ConvertFrom-Json
+
+        if (-not ($connectedMachineSshEndpoint.properties | Where-Object { $_.serviceName -eq "SSH" -and $_.provisioningState -eq "Succeeded" })) {
+            Write-Output "Enabling SSH on $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method put -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default/serviceconfigurations/SSH?api-version=2023-03-15" -Payload '{"properties": {"serviceName": "SSH", "port": 22}}'
+        }
+        else {
+            Write-Output "SSH already enabled on $($connectedMachine.Name)"
+        }
+
     }
 
     # Removing the LogonScript Scheduled Task so it won't run on next reboot
@@ -492,17 +525,6 @@ if ($Env:flavor -ne "DevOps") {
         Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
     }
 }
-
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command {
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-Start-Sleep -Seconds 5
-Write-Host "`n"
-Write-Host "Creating deployment logs bundle"
-7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
-}'
 
 #Changing to Jumpstart ArcBox wallpaper
 
@@ -555,9 +577,19 @@ Write-Output "Tests failed: $tests_failed"
 
 Write-Header "Adding deployment test results to wallpaper using BGInfo"
 
-Set-Content 'C:\Windows\Temp\arcbox-tests-succeeded.txt' $tests_passed
-Set-Content 'C:\Windows\Temp\arcbox-tests-failed.txt' $tests_failed
+Set-Content "$Env:windir\TEMP\arcbox-tests-succeeded.txt" $tests_passed
+Set-Content "$Env:windir\TEMP\arcbox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
+
+Write-Header "Creating deployment logs bundle"
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+#required to avoid "file is being used by another process" error when compressing the logs
+Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
 
 Stop-Transcript
