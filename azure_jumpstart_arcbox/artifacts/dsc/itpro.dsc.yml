@@ -9,5 +9,26 @@ properties:
       settings:
         id: Hashicorp.Terraform
         source: winget
-
+    - resource: PSDscResources/WindowsFeature
+      id: Hyper-V
+      directives:
+        description: Install Hyper-V
+      settings:
+        Name: Hyper-V
+        Ensure: Present
+    - resource: HyperVDsc/VMHost
+      id: VMHost
+      directives:
+        description: Configure VM Host settings
+      settings:
+        IsSingleInstance: Yes
+        EnableEnhancedSessionMode: True
+    - resource: HyperVDsc/VMSwitch
+      id: VMSwitch
+      directives:
+        description: Configure VM Switch
+      settings:
+        Name: InternalNATSwitch
+        Ensure: Present
+        Type: Internal
   configurationVersion: 0.2.0

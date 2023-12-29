@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+  resources:
+    - resource: HyperVDsc/VMHyperV
+      id: ArcBox-SQL
+      directives:
+        description: Configure VM ArcBox-SQL
+      settings:
+        Name: ArcBox-SQL
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-SQL.vhdx
+        ProcessorCount: 2
+        StartupMemory: '12GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: C:\ArcBox\Virtual Machines\ArcBox-SQL
+        EnableGuestService: true
+        SecureBoot: true
+  configurationVersion: 0.2.0
