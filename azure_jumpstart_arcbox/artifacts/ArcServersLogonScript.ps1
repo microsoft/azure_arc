@@ -525,14 +525,13 @@ if ($Env:flavor -ne "DevOps") {
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command {
+
 $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
 Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
 Start-Sleep -Seconds 5
 Write-Host "`n"
 Write-Host "Creating deployment logs bundle"
-7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
-}'
+Compress-Archive -Path "$Env:ArcBoxLogsDir\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip"
 
 #Changing to Jumpstart ArcBox wallpaper
 
@@ -585,8 +584,8 @@ Write-Output "Tests failed: $tests_failed"
 
 Write-Header "Adding deployment test results to wallpaper using BGInfo"
 
-Set-Content 'C:\Windows\Temp\arcbox-tests-succeeded.txt' $tests_passed
-Set-Content 'C:\Windows\Temp\arcbox-tests-failed.txt' $tests_failed
+Set-Content "$Env:TEMP\arcbox-tests-succeeded.txt" $tests_passed
+Set-Content "$Env:TEMP\arcbox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
