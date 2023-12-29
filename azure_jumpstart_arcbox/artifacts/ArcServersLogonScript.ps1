@@ -523,16 +523,6 @@ if ($Env:flavor -ne "DevOps") {
     }
 }
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Header "Uploading Log Bundle"
-
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-Start-Sleep -Seconds 5
-Write-Host "`n"
-Write-Host "Creating deployment logs bundle"
-Compress-Archive -Path "$Env:ArcBoxLogsDir\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip"
-
 #Changing to Jumpstart ArcBox wallpaper
 
 Write-Header "Changing wallpaper"
@@ -588,5 +578,10 @@ Set-Content "$Env:TEMP\arcbox-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:TEMP\arcbox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
+
+Write-Header "Creating deployment logs bundle"
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+Compress-Archive -Path "$Env:ArcBoxLogsDir\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip"
 
 Stop-Transcript
