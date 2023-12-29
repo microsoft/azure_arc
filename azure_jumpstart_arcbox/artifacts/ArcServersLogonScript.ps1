@@ -260,8 +260,8 @@ if ($Env:flavor -ne "DevOps") {
     $retryCount = 0
     do {
         Start-Sleep(60)
-        $amaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='AzureMonitorWindowsAgent']" | ConvertFrom-Json
-        if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
+        $amaExtension = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'AzureMonitorWindowsAgent'}
+        if ($amaExtension.StatusCode -eq 0) {
             Write-Host "Azure Monitoring Agent extension installation complete."
             break
         }
@@ -276,16 +276,16 @@ if ($Env:flavor -ne "DevOps") {
     } while ($retryCount -le 5)
 
     # Enable Best practices assessment
-    if ($amaExtension[0].properties.instanceView.status.code -eq 0) {
+    if ($amaExtension.StatusCode -eq 0) {
 
         # Create custom log analytics table for SQL assessment
         az monitor log-analytics workspace table create --resource-group $resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime --only-show-errors
 
         # Verify if Arc-enabled server and SQL server extensions are installed
-        $ArcServer = az connectedmachine show --name $SQLvmName --resource-group $resourceGroup
-        if ($null -ne $ArcServer) {
-            $sqlExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='WindowsAgent.SqlServer']" | ConvertFrom-Json
-            if ($null -ne $sqlExtension) {
+        $ArcServer = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup
+        if ($ArcServer) {
+            $sqlExtension = $ArcServer | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'WindowsAgent.SqlServer'}
+            if ($sqlExtension) {
                 # SQL server extension is installed and ready to run SQL BPA
                 Write-Host "SQL server extension is installed and ready to run SQL BPA."
             }
@@ -493,7 +493,7 @@ if ($Env:flavor -ne "DevOps") {
         $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
         $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
-        $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
+        $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process -WarningAction SilentlyContinue
 
         $vm = $PSItem
         $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
