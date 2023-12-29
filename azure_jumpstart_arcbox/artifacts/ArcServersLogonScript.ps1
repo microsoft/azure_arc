@@ -365,7 +365,7 @@ if ($Env:flavor -ne "DevOps") {
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
-        if (!(Test-Path $win2k19vmvhdPath -and Test-Path $Win2k22vmvhdPath -and Test-Path $Ubuntu01vmvhdPath -and Test-Path $Ubuntu02vmvhdPath)) {
+        if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             if ($Env:flavor -eq "Full") {
