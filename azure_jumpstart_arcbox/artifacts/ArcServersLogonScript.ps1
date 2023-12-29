@@ -20,7 +20,7 @@ $sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
-if ([System.IO.File]::Exists($logFilePath)) {
+if (Test-Path $logFilePath) {
     $archivefile = "$Env:ArcBoxLogsDir\ArcServersLogonScript-" + (Get-Date -Format "yyyyMMddHHmmss")
     Rename-Item -Path $logFilePath -NewName $archivefile -Force
 }
@@ -196,7 +196,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Host "Fetching SQL VM"
 
     # Verify if VHD files already downloaded especially when re-running this script
-    if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
+    if (!(Test-Path $SQLvmvhdPath)) {
         <# Action when all if and elseif conditions are false #>
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
