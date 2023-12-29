@@ -574,8 +574,8 @@ Write-Output "Tests failed: $tests_failed"
 
 Write-Header "Adding deployment test results to wallpaper using BGInfo"
 
-Set-Content "$Env:TEMP\arcbox-tests-succeeded.txt" $tests_passed
-Set-Content "$Env:TEMP\arcbox-tests-failed.txt" $tests_failed
+Set-Content "$Env:windir\TEMP\arcbox-tests-succeeded.txt" $tests_passed
+Set-Content "$Env:windir\TEMP\arcbox-tests-failed.txt" $tests_failed
 
 bginfo.exe $Env:ArcBoxTestsDir\arcbox-bginfo.bgi /timer:0 /NOLICPROMPT
 
