@@ -14,7 +14,7 @@ properties:
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines\ArcBox-SQL
+        Path: C:\ArcBox\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
   configurationVersion: 0.2.0

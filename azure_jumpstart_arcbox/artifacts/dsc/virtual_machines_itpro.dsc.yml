@@ -15,7 +15,7 @@ properties:
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines\ArcBox-Win2K19
+        Path: C:\ArcBox\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
     - resource: HyperVDsc/VMHyperV
@@ -31,7 +31,7 @@ properties:
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines\ArcBox-Win2K22
+        Path: C:\ArcBox\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
     - resource: HyperVDsc/VMHyperV
@@ -47,7 +47,7 @@ properties:
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-01
+        Path: C:\ArcBox\Virtual Machines
         EnableGuestService: true
         SecureBoot: false
     - resource: HyperVDsc/VMHyperV
@@ -63,7 +63,7 @@ properties:
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-02
+        Path: C:\ArcBox\Virtual Machines
         EnableGuestService: true
         SecureBoot: false
   configurationVersion: 0.2.0
