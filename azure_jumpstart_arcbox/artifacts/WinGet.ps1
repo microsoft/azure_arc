@@ -11,6 +11,7 @@ Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLice
 # Install DSC resources required for ArcBox
 Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
+Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
 # Install WinGet CLI
 $null = Repair-WinGetPackageManager -AllUsers

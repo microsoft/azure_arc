@@ -100,4 +100,21 @@ properties:
       settings:
         IsSingleInstance: Yes
         EnableEnhancedSessionMode: True
+    - resource: HyperVDsc/VMSwitch
+      id: VMSwitch
+      directives:
+        description: Configure VM Switch
+      settings:
+        Name: InternalNATSwitch
+        Ensure: Present
+        Type: Internal
+    - resource: NetworkingDsc/IPAddress
+      id: IPAddress.VMSwitch
+      directives:
+        description: Configure VM Switch vNIC IP Address
+      settings:
+        InterfaceAlias: 'vEthernet (InternalNATSwitch)'
+        IPAddress: '10.10.1.1/24'
+        AddressFamily: IPv4
+        KeepExistingAddress: false
   configurationVersion: 0.2.0

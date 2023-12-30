@@ -102,11 +102,6 @@ if ($Env:flavor -ne "DevOps") {
         New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
     }
 
-    # Create an internal network (gateway first)
-    $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
-    Write-Host "Creating Gateway"
-    New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
-
     Write-Host "Creating VM Credentials"
     # Hard-coded username and password for the nested VMs
     $nestedWindowsUsername = "Administrator"
@@ -199,7 +194,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Header "Create Hyper-V VMs"
 
     # Create the nested SQL VMs
-    winget configure --file C:\ArcBox\DSC\sql_virtual_machines.dsc.yml --accept-configuration-agreements --disable-interactivity
+    winget configure --file C:\ArcBox\DSC\virtual_machines_sql.dsc.yml --accept-configuration-agreements --disable-interactivity
 
     # We always want the VMs to start with the host and shut down cleanly with the host
     Write-Host "Set VM Auto Start/Stop"
@@ -359,7 +354,7 @@ if ($Env:flavor -ne "DevOps") {
 
         # Create the nested VMs if not already created
         Write-Header "Create Hyper-V VMs"
-        winget configure --file C:\ArcBox\DSC\itpro_virtual_machines.dsc.yml --accept-configuration-agreements --disable-interactivity
+        winget configure --file C:\ArcBox\DSC\virtual_machines_itpro.dsc.yml --accept-configuration-agreements --disable-interactivity
 
         Write-Header "Creating VM Credentials"
         # Hard-coded username and password for the nested VMs
