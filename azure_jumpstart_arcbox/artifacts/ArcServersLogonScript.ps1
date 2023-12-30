@@ -196,10 +196,6 @@ if ($Env:flavor -ne "DevOps") {
     # Create the nested SQL VMs
     winget configure --file C:\ArcBox\DSC\virtual_machines_sql.dsc.yml --accept-configuration-agreements --disable-interactivity
 
-    # We always want the VMs to start with the host and shut down cleanly with the host
-    Write-Host "Set VM Auto Start/Stop"
-    Set-VM -Name $SQLvmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-
     # Restarting Windows VM Network Adapters
     Write-Host "Restarting Network Adapters"
     Start-Sleep -Seconds 20
