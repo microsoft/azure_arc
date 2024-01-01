@@ -157,6 +157,8 @@ if ($Env:flavor -ne "DevOps") {
     az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
     Write-Header "Az PowerShell Login"
+    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
     Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
 
     # Register Azure providers
