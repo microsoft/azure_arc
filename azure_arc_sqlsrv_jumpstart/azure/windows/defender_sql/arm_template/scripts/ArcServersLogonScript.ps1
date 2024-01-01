@@ -52,31 +52,19 @@ az extension add --name connectedmachine --yes --only-show-errors
 az extension add --name monitor-control-service --yes --only-show-errors
 
 # Enable defender for cloud
-Write-Header "Enabling defender for cloud for SQL Server"
+Write-Header "Enabling defender for cloud for SQL Server at the subscription level"
 $laWorkspaceId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
-$sqlDefenderDcrWorkspace = $laWorkspaceId
 
 $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $env:subscriptionId | ConvertFrom-Json)
 if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
-
-    # Set defender for cloud log analytics workspace
-    Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-    az security workspace-setting create -n default --target-workspace $laWorkspaceId
-
-    #Install SQLAdvancedThreatProtection solution
-    az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 }
 else {
-    Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
-
-    #Install SQLAdvancedThreatProtection solution
-    $defaultWorksspaceId = (az security workspace-setting show --name default --query workspaceId) | ConvertFrom-Json
-    $sqlDefenderDcrWorkspace = $defaultWorksspaceId
-    $defaultWs = (az monitor log-analytics workspace show --ids $defaultWorksspaceId) | ConvertFrom-Json
-    az monitor log-analytics solution create --resource-group $defaultWs.resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $defaultWs.name --only-show-errors
+    Write-Host "Current Defender for SQL plan at the subscription level is: $($currentsqlplan.pricingTier)"
 }
 
+#Install SQLAdvancedThreatProtection solution
+az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
@@ -227,7 +215,7 @@ Write-Host "AdvancedThreatProtection extension installation completed"
 
 # Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
 $sqlDefenderDcrFile = "$Env:ArcJSDir\defendersqldcrtemplate.json"
-(Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $sqlDefenderDcrWorkspace | Set-Content -Path $sqlDefenderDcrFile
+(Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $laWorkspaceId | Set-Content -Path $sqlDefenderDcrFile
 
 # Create data collection rules for Defender for SQL
 Write-Host "Creating Azure Monitor data collection rule"
