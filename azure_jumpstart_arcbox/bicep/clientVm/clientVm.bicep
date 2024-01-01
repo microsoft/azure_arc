@@ -39,7 +39,7 @@ param spnTenantId string
 param azdataUsername string = 'arcdemo'
 
 @secure()
-param azdataPassword string = 'ArcPassword123!!'
+param azdataPassword string
 param acceptEula string = 'yes'
 param registryUsername string = 'registryUser'
 
@@ -114,7 +114,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : null
         }
       }
     ]

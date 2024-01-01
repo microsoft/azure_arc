@@ -80,7 +80,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion== false  ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion== false  ? PublicIPNoBastion : null
         }
       }
     ]
