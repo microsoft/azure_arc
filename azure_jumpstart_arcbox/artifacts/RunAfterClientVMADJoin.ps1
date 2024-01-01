@@ -45,7 +45,7 @@ Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -Acti
 Write-Host "Registered scheduled task 'ArcServersLogonScript' to run at user logon."
 
 #Disable local account
-$account=(Get-LocalGroupMember -Group "Administrators" | where {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
+$account=(Get-LocalGroupMember -Group "Administrators" | Where-Object {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
 net user $account /active:no
 
 # Delete schedule task
