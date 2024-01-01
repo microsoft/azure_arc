@@ -180,10 +180,11 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
     (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
     (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
 
+    Write-Host "Deploying Azure Arc AD connector for $sqlMIName"
     az deployment group create --resource-group $Env:resourceGroup --name $sqlInstance.instanceName --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
     Write-Host "`n"
     Do {
-        Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
+        Write-Host "Waiting for AD connector deployment for $sqlMIName. Hold tight, this might take a few minutes...(30s sleeping loop)"
         Start-Sleep -Seconds 30
         $adcStatus = $(if (kubectl get adc adarc -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($adcStatus -eq "Nope")
@@ -196,7 +197,7 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
 
     # Deploying Azure Arc SQL Managed Instance
 
-    Write-Host "Deploying Azure Arc SQL Managed Instance"
+    Write-Host "Deploying the $sqlMIName Azure Arc SQL Managed Instance"
     $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstance.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
     $customLocationId = $(az customlocation show --name $sqlInstance.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
 
@@ -263,7 +264,7 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
         Start-Sleep -Seconds 45
         $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
-    Write-Host "Azure Arc SQL Managed Instance is ready!"
+    Write-Host "$sqlMIName Azure Arc SQL Managed Instance is ready!"
     Write-Host "`n"
 
     Remove-Item "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json" -Force

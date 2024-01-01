@@ -147,10 +147,12 @@ Start-Sleep -Seconds 10
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     $cluster = $_
+    $clusterName = $cluster.clusterName
     if ($cluster.context -ne 'capi') {
-        Write-Host "Checking K8s Nodes"
+        Write-Host "Checking K8s Nodes on $clusterName"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
+        Write-Host "Onboarding $clusterName as an Azure Arc-enabled Kubernetes cluster"
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
@@ -161,8 +163,8 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
-        Write-Host "Enabling Container Insights cluster extension"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        Write-Host "Enabling Container Insights cluster extension on $clusterName"
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
     }
 }
@@ -180,11 +182,14 @@ Write-Header "Deploying Azure Arc Data Controller"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     $cluster = $_
     $context = $cluster.context
+    $clusterName = $cluster.clusterName
     Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
+    Write-Host "Deploying arc data services on $clusterName"
+    Write-Host "`n"
     az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
-            --cluster-name $cluster.clusterName `
+            --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --auto-upgrade false `
             --scope cluster `
@@ -230,6 +235,8 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
+            Write-Host "Deploying arc data controller on $clusterName"
+            Write-Host "`n"
             az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
             Write-Host "`n"
 
@@ -238,7 +245,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
                 Start-Sleep -Seconds 45
                 $dcStatus = $(if (kubectl get datacontroller -n arc --kubeconfig $cluster.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
             } while ($dcStatus -eq "Nope")
-            Write-Host "Azure Arc data controller is ready!"
+            Write-Host "Azure Arc data controller is ready on $clusterName!"
             Write-Host "`n"
             Remove-Item "$Env:ArcBoxDir\dataController-$context-stage.parameters.json" -Force
             Stop-Transcript
