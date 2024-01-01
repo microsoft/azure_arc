@@ -6,7 +6,6 @@ properties:
       id: git
       directives:
         description: Install Git
-        allowPrerelease: true
       settings:
         id: Git.Git
         source: winget
@@ -14,7 +13,6 @@ properties:
       id: vscode
       directives:
         description: Install Visual Studio Code
-        allowPrerelease: true
       settings:
         id: Microsoft.VisualStudioCode
         source: winget
@@ -22,7 +20,6 @@ properties:
       id: AzureCLI
       directives:
         description: Install Azure CLI
-        allowPrerelease: true
       settings:
         id: Microsoft.AzureCLI
         source: winget
@@ -30,7 +27,6 @@ properties:
       id: PowerShell7
       directives:
         description: Install PowerShell 7
-        allowPrerelease: true
       settings:
         id: Microsoft.PowerShell
         source: winget
@@ -38,7 +34,6 @@ properties:
       id: kubectl
       directives:
         description: Install kubectl
-        allowPrerelease: true
       settings:
         id: Kubernetes.kubectl
         source: winget
@@ -46,7 +41,6 @@ properties:
       id: edge
       directives:
         description: Install Microsoft Edge
-        allowPrerelease: true
       settings:
         id: Microsoft.Edge
         source: winget
@@ -54,7 +48,6 @@ properties:
       id: azcopy
       directives:
         description: Install azcopy
-        allowPrerelease: true
       settings:
         id: Microsoft.Azure.AZCopy.10
         source: winget
@@ -62,7 +55,6 @@ properties:
       id: DotNetSDK7
       directives:
         description: Install Microsoft DotNet SDK 7
-        allowPrerelease: true
       settings:
         id: Microsoft.DotNet.SDK.7
         source: winget
@@ -70,7 +62,6 @@ properties:
       id: helm
       directives:
         description: Install Helm
-        allowPrerelease: true
       settings:
         id: Helm.Helm
         source: winget
@@ -78,7 +69,6 @@ properties:
       id: Microsoft.Sysinternals.BGInfo
       directives:
         description: Install Sysinternals BGInfo
-        allowPrerelease: true
       settings:
         id: Microsoft.Sysinternals.BGInfo
         source: winget
@@ -86,10 +76,16 @@ properties:
       id: OpenSSL
       directives:
         description: Install OpenSSL
-        allowPrerelease: true
       settings:
         id: FireDaemon.OpenSSL
         source: winget
+    - resource: DSCR_Font/cFont
+      id: CascadiaMono
+      directives:
+        description: Install font CascadiaMono
+      settings:
+        FontName: Cascadia Mono
+        FontFile: C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.18.3181.0_x64__8wekyb3d8bbwe\CascadiaMono.ttf
     - resource: PSDscResources/WindowsFeature
       id: Hyper-V
       directives:
