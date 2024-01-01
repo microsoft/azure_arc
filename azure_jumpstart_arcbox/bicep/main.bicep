@@ -128,6 +128,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksdrArcClusterName : aksDrArcDataClusterName
     vmAutologon: vmAutologon
     rdpPort: rdpPort
+    addsDomainName: addsDomainName
   }
   dependsOn: [
     updateVNetDNSServers
