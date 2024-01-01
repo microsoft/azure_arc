@@ -376,10 +376,9 @@ if ($flavor -eq "DataOps") {
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
-
     Write-Host "`n"
     Write-Host "Joining client VM to domain"
-    Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
+    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
     # Disabling Windows Server Manager Scheduled Task
