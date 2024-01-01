@@ -6,7 +6,6 @@ properties:
       id: kubectl
       directives:
         description: Install kubectl
-        allowPrerelease: true
       settings:
         id: Kubernetes.kubectl
         source: winget
@@ -14,7 +13,6 @@ properties:
       id: kubectx
       directives:
         description: Install kubectx
-        allowPrerelease: true
       settings:
         id: ahmetb.kubectx
         source: winget
@@ -22,7 +20,6 @@ properties:
       id: DotNetSDK7
       directives:
         description: Install Microsoft DotNet SDK 7
-        allowPrerelease: true
       settings:
         id: Microsoft.DotNet.SDK.7
         source: winget
@@ -30,7 +27,6 @@ properties:
       id: helm
       directives:
         description: Install Helm
-        allowPrerelease: true
       settings:
         id: Helm.Helm
         source: winget
