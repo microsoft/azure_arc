@@ -326,11 +326,6 @@ Write-Header "Configuring Logon Scripts"
 
 $ScheduledTaskExecutable = "pwsh.exe"
 
-# Creating scheduled task for WinGet.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
-Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
@@ -378,6 +373,12 @@ if ($flavor -eq "DataOps") {
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
     Write-Host "`n"
+
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
     Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
