@@ -102,25 +102,6 @@ if ($Env:flavor -ne "DevOps") {
         New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
     }
 
-    # Create an internal switch with NAT
-    Write-Host "Creating Internal vSwitch"
-    $switchName = 'InternalNATSwitch'
-
-    # Verify if internal switch is already created, if not create a new switch
-    $inernalSwitch = Get-VMSwitch
-    if ($inernalSwitch.Name -ne $switchName) {
-        New-VMSwitch -Name $switchName -SwitchType Internal
-        $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
-
-        # Create an internal network (gateway first)
-        Write-Host "Creating Gateway"
-        New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
-
-        # Enable Enhanced Session Mode on Host
-        Write-Host "Enabling Enhanced Session Mode"
-        Set-VMHost -EnableEnhancedSessionMode $true
-    }
-
     Write-Host "Creating VM Credentials"
     # Hard-coded username and password for the nested VMs
     $nestedWindowsUsername = "Administrator"
@@ -212,26 +193,8 @@ if ($Env:flavor -ne "DevOps") {
     # Create the nested VMs if not already created
     Write-Header "Create Hyper-V VMs"
 
-    # Create the nested SQL VM
-    Write-Host "Create SQL VM"
-    if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne "Running") {
-        Remove-VM -Name $SQLvmName -Force -ErrorAction SilentlyContinue
-        New-VM -Name $SQLvmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $SQLvmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-        Set-VMProcessor -VMName $SQLvmName -Count 2
-        Set-VM -Name $SQLvmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-    }
-
-    # We always want the VMs to start with the host and shut down cleanly with the host
-    Write-Host "Set VM Auto Start/Stop"
-    Set-VM -Name $SQLvmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-
-    Write-Host "Enabling Guest Integration Service"
-    Get-VM -Name $SQLvmName | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-VMIntegrationService -Verbose
-
-    # Start all the VMs
-    Write-Host "Starting SQL VM"
-    Start-VM -Name $SQLvmName
-
+    # Create the nested SQL VMs
+    winget configure --file C:\ArcBox\DSC\virtual_machines_sql.dsc.yml --accept-configuration-agreements --disable-interactivity
 
     # Restarting Windows VM Network Adapters
     Write-Host "Restarting Network Adapters"
@@ -387,47 +350,7 @@ if ($Env:flavor -ne "DevOps") {
 
         # Create the nested VMs if not already created
         Write-Header "Create Hyper-V VMs"
-
-        # Check if VM already exists
-        if ((Get-VM -Name $Win2k19vmName -ErrorAction SilentlyContinue).State -ne "Running") {
-            Remove-VM -Name $Win2k19vmName -Force -ErrorAction SilentlyContinue
-            New-VM -Name $Win2k19vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $win2k19vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-            Set-VMProcessor -VMName $Win2k19vmName -Count 2
-            Set-VM -Name $Win2k19vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-        }
-
-        if ((Get-VM -Name $Win2k22vmName -ErrorAction SilentlyContinue).State -ne "Running") {
-            Remove-VM -Name $Win2k22vmName -Force -ErrorAction SilentlyContinue
-            New-VM -Name $Win2k22vmName -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath $Win2k22vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-            Set-VMProcessor -VMName $Win2k22vmName -Count 2
-            Set-VM -Name $Win2k22vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-        }
-
-        if ((Get-VM -Name $Ubuntu01vmName -ErrorAction SilentlyContinue).State -ne "Running") {
-            Remove-VM -Name $Ubuntu01vmName -Force -ErrorAction SilentlyContinue
-            New-VM -Name $Ubuntu01vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu01vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-            Set-VMFirmware -VMName $Ubuntu01vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-            Set-VMProcessor -VMName $Ubuntu01vmName -Count 1
-            Set-VM -Name $Ubuntu01vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-        }
-
-        if ((Get-VM -Name $Ubuntu02vmName -ErrorAction SilentlyContinue).State -ne "Running") {
-            Remove-VM -Name $Ubuntu02vmName -Force -ErrorAction SilentlyContinue
-            New-VM -Name $Ubuntu02vmName -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath $Ubuntu02vmvhdPath -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-            Set-VMFirmware -VMName $Ubuntu02vmName -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-            Set-VMProcessor -VMName $Ubuntu02vmName -Count 1
-            Set-VM -Name $Ubuntu02vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
-        }
-
-        Write-Header "Enabling Guest Integration Service"
-        Get-VM | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-VMIntegrationService -Verbose
-
-        # Start all the VMs
-        Write-Header "Starting VMs"\
-        Start-VM -Name $Win2k19vmName
-        Start-VM -Name $Win2k22vmName
-        Start-VM -Name $Ubuntu01vmName
-        Start-VM -Name $Ubuntu02vmName
+        winget configure --file C:\ArcBox\DSC\virtual_machines_itpro.dsc.yml --accept-configuration-agreements --disable-interactivity
 
         Write-Header "Creating VM Credentials"
         # Hard-coded username and password for the nested VMs
