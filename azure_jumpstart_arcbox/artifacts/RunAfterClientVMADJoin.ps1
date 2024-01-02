@@ -33,16 +33,19 @@ $WorkbookAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:Ar
 $nestedSQLAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\ArcServersLogonScript.ps1"
 
 # Register schedule task under local account
-Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'DataOpsLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "DataOpsLogonScript" -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
+Get-ScheduledTask "DataOpsLogonScript" | Start-ScheduledTask
+Write-Host "Registered scheduled task 'DataOpsLogonScript'."
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
+Get-ScheduledTask "MonitorWorkbookLogonScript" | Start-ScheduledTask
+Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript'."
 
 # Creating scheduled task for ArcServersLogonScript.ps1
-Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'ArcServersLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "ArcServersLogonScript" -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
+Get-ScheduledTask "ArcServersLogonScript" | Start-ScheduledTask
+Write-Host "Registered scheduled task 'ArcServersLogonScript'."
 
 #Disable local account
 $account=(Get-LocalGroupMember -Group "Administrators" | Where-Object {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
