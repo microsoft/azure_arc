@@ -363,7 +363,6 @@ if ($flavor -eq "DataOps") {
     # Joining ClientVM to AD DS domain
     $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
-    $winGetLogonUser = "${netbiosname}\${adminUsername}"
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
             UserName = "${netbiosname}\${adminUsername}"
@@ -387,7 +386,7 @@ if ($flavor -eq "DataOps") {
     # Creating scheduled task for WinGet.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
-    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $winGetLogonUser  -Action $Action -RunLevel "Highest" -Force
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
     Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
