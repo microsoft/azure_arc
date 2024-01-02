@@ -63,6 +63,10 @@ else {
     Write-Host "Current Defender for SQL plan at the subscription level is: $($currentsqlplan.pricingTier)"
 }
 
+# Set defender for cloud log analytics workspace
+Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+az security workspace-setting create -n default --target-workspace $laWorkspaceId
+
 #Install SQLAdvancedThreatProtection solution
 az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
