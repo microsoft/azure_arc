@@ -104,7 +104,7 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-if ([bool]$vmAutologon){
+if ([bool]$vmAutologon) {
 
     Write-Host "Configuring VM Autologon"
 
@@ -273,28 +273,27 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 
 # Disable Microsoft Edge sidebar
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HubsSidebarEnabled'
-$Value        = '00000000'
+$Name = 'HubsSidebarEnabled'
+$Value = '00000000'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
+    New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Disable Microsoft Edge first-run Welcome screen
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HideFirstRunExperience'
-$Value        = '00000001'
+$Name = 'HideFirstRunExperience'
+$Value = '00000001'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
+    New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
-if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
-{
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
     Write-Host "Configuring RDP port number to $rdpPort"
     $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
     $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
@@ -303,22 +302,19 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     # RDP port
     $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
     Write-Host "Current RDP PortNumber: $portNumber"
-    if (!($portNumber -eq $rdpPort))
-    {
-      Write-Host Setting RDP PortNumber to $rdpPort
-      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
-      Restart-Service TermService -force
+    if (!($portNumber -eq $rdpPort)) {
+        Write-Host Setting RDP PortNumber to $rdpPort
+        Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+        Restart-Service TermService -force
     }
 
     #Setup firewall rules
-    if ($rdpPort -eq 3389)
-    {
-      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    if ($rdpPort -eq 3389) {
+        netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
     }
-    else
-    {
-      $systemroot = get-content env:systemroot
-      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    else {
+        $systemroot = get-content env:systemroot
+        netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
     }
 
     Write-Host "RDP port configuration complete."
@@ -328,7 +324,12 @@ Write-Header "Configuring Logon Scripts"
 
 $ScheduledTaskExecutable = "pwsh.exe"
 
+
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
@@ -336,16 +337,22 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
 }
 
 if ($flavor -eq "Full") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for DataServicesLogonScript.ps1
-
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 }
 
 if ($flavor -eq "DevOps") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for DevOpsLogonScript.ps1
-
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
