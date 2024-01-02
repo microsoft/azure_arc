@@ -37,9 +37,10 @@ switch ($env:flavor) {
 }
 
 # Start remaining logon scripts
-if($env:flavor -eq 'DataOps') {
+if ($env:flavor -eq 'DataOps') {
     Get-ScheduledTask RunAfterClientVMADJoin | Start-ScheduledTask
-}else{
+}
+else {
     Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 }
 
