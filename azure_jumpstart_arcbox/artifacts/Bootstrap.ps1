@@ -363,7 +363,7 @@ if ($flavor -eq "DataOps") {
     # Joining ClientVM to AD DS domain
     $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
-    $winGetLogonUser = "$netbiosname\$adminUsername"
+    $winGetLogonUser = "${netbiosname}\${adminUsername}"
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
             UserName = "${netbiosname}\${adminUsername}"
