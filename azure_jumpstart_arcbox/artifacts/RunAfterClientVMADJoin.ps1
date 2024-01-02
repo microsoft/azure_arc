@@ -34,18 +34,18 @@ $nestedSQLAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:A
 
 # Register schedule task under local account
 Register-ScheduledTask -TaskName "DataOpsLogonScript" -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
-Get-ScheduledTask "DataOpsLogonScript" | Start-ScheduledTask
 Write-Host "Registered scheduled task 'DataOpsLogonScript'."
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
-Get-ScheduledTask "MonitorWorkbookLogonScript" | Start-ScheduledTask
 Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript'."
 
 # Creating scheduled task for ArcServersLogonScript.ps1
 Register-ScheduledTask -TaskName "ArcServersLogonScript" -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
-Get-ScheduledTask "ArcServersLogonScript" | Start-ScheduledTask
 Write-Host "Registered scheduled task 'ArcServersLogonScript'."
+
+# Starting logon scripts
+Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 
 #Disable local account
 $account=(Get-LocalGroupMember -Group "Administrators" | Where-Object {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
