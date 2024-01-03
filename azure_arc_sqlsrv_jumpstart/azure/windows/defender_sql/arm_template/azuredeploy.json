@@ -86,7 +86,7 @@
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2022-09-01",
       "name": "clientVmDeployment",
       "dependsOn": ["mgmtArtifactsAndPolicyDeployment"],
       "properties": {
@@ -131,7 +131,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2022-09-01",
       "name": "mgmtArtifactsAndPolicyDeployment",
       "properties": {
         "mode": "Incremental",

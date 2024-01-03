@@ -112,7 +112,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2023-04-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -129,7 +129,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2023-04-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -259,7 +259,7 @@
     },
     {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2021-12-01-preview",
+      "apiVersion": "2022-10-01",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -342,7 +342,7 @@
     },
     {
       "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2021-06-22",
+      "apiVersion": "2022-08-08",
       "name": "[variables('automationAccountName')]",
       "location": "[variables('automationAccountLocation')]",
       "dependsOn": [
@@ -369,7 +369,7 @@
     },
     {
       "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2023-04-01",
       "name": "[variables('bastionPublicIpAddressName')]",
       "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
@@ -387,7 +387,7 @@
       "condition": "[parameters('deployBastion')]",
       "name": "[variables('bastionName')]",
       "location": "[parameters('location')]",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-11-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
