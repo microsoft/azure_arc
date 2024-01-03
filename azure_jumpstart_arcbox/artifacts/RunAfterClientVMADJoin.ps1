@@ -44,9 +44,6 @@ Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript'."
 Register-ScheduledTask -TaskName "ArcServersLogonScript" -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
 Write-Host "Registered scheduled task 'ArcServersLogonScript'."
 
-# Starting logon scripts
-Get-ScheduledTask *LogonScript* | Start-ScheduledTask
-
 #Disable local account
 $account=(Get-LocalGroupMember -Group "Administrators" | Where-Object {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
 net user $account /active:no

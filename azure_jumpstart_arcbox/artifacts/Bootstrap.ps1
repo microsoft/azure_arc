@@ -363,6 +363,7 @@ if ($flavor -eq "DataOps") {
     # Joining ClientVM to AD DS domain
     $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
+    $domainUserName = "${netbiosname}\${adminUsername}"
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
             UserName = "${netbiosname}\${adminUsername}"
@@ -374,19 +375,17 @@ if ($flavor -eq "DataOps") {
             Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
         })
 
-    # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
-
-    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
-    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -User SYSTEM -Action $Action -RunLevel "Highest" -Force
+    $Trigger = New-ScheduledTaskTrigger -AtStartup
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
+    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
-    Write-Host "`n"
 
     # Creating scheduled task for WinGet.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
-    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $domainUserName -Action $Action -RunLevel "Highest" -Force
 
     Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
