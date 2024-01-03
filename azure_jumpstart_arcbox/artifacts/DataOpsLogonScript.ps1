@@ -145,14 +145,11 @@ kubectx capi="arcbox-capi"
 Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
-$clusters | Foreach-Object -ThrottleLimit 1 -Parallel {
-    $cluster = $_
-    $clusterName = $cluster.clusterName
+foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Host "Checking K8s Nodes on $clusterName"
+        Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        Write-Host "Onboarding $clusterName as an Azure Arc-enabled Kubernetes cluster"
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
@@ -163,8 +160,8 @@ $clusters | Foreach-Object -ThrottleLimit 1 -Parallel {
 
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
-        Write-Host "Enabling Container Insights cluster extension on $clusterName"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        Write-Host "Enabling Container Insights cluster extension"
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
     }
 }
