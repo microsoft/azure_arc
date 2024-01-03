@@ -70,6 +70,9 @@ az security workspace-setting create -n default --target-workspace $laWorkspaceI
 #Install SQLAdvancedThreatProtection solution
 az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
+#Install SQLVulnerabilityAssessment solution
+az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName --only-show-errors
+
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
