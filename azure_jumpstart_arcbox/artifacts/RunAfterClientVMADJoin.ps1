@@ -26,8 +26,12 @@ Write-Host "===================================================="
 # Create login session with domain credentials
 $cimsession = New-CimSession -Credential $adminCredential
 
-# Creating scheduled task for DataServicesLogonScript.ps1
-#$Trigger = New-ScheduledTaskTrigger -AtLogOn -User $adminuser
+# Creating scheduled task for WinGet.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\WinGet.ps1
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -CimSession $cimsession -Action $Action -RunLevel "Highest" -Force
+
+# Creating scheduled task for DataOpsLogonScript.ps1
 $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\DataOpsLogonScript.ps1"
 $WorkbookAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1"
 $nestedSQLAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\ArcServersLogonScript.ps1"

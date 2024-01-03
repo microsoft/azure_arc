@@ -382,11 +382,6 @@ if ($flavor -eq "DataOps") {
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 
-    # Creating scheduled task for WinGet.ps1
-    $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
-    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $domainUserName -Action $Action -RunLevel "Highest" -Force
-
     Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
