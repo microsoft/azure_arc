@@ -145,7 +145,7 @@ kubectx capi="arcbox-capi"
 Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
-$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
+$clusters | Foreach-Object -ThrottleLimit 1 -Parallel {
     $cluster = $_
     $clusterName = $cluster.clusterName
     if ($cluster.context -ne 'capi') {
