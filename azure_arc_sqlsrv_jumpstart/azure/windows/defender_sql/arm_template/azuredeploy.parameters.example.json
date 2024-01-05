@@ -17,6 +17,9 @@
         "spnTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
         },
+        "sqlServerEdition": {
+            "value": "Developer"
+        },        
         "logAnalyticsWorkspaceName": {
             "value": "arcdefendersql-la"
         },
