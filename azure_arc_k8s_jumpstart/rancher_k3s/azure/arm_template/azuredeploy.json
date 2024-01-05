@@ -29,7 +29,7 @@
             }
         },
         "password": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Unique SPN password"
             }
