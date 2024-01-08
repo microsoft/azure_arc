@@ -17,6 +17,9 @@
         "spnTenantId": {
             "value": "<Azure tenant ID>"
         },
+        "sqlServerEdition": {
+            "value": "<Developer|Standard|Enterprise>. Default is Developer edition."
+        },         
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },

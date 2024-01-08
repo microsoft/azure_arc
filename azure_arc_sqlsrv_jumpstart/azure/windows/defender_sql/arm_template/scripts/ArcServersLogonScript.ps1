@@ -2,13 +2,13 @@ $Env:ArcJSDir = "C:\Jumpstart"
 $Env:ArcJSLogsDir = "$Env:ArcJSDir\Logs"
 $Env:ArcJSVMDir = "$Env:ArcJSDir\VirtualMachines"
 $Env:ArcJSIconDir = "$Env:ArcJSDir\Icons"
-$agentScript = "$Env:ArcJSDir\agentScript"
+$agentScriptDir = "$Env:ArcJSDir\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
 # VHD storage details
-$sourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+$sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/prod"
+$sas = "?si=JS-RL&spr=https&sv=2022-11-02&sr=c&sig=fIIeEliw5nG78oR6TBCvM70VMz9WXhpF41wdDoOlE8U%3D"
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
@@ -49,24 +49,29 @@ az provider register --namespace Microsoft.OperationsManagement --wait
 #Install az extions
 az extension add --name log-analytics-solution --yes --only-show-errors
 az extension add --name connectedmachine --yes --only-show-errors
+az extension add --name monitor-control-service --yes --only-show-errors
 
 # Enable defender for cloud
-Write-Header "Enabling defender for cloud for SQL Server"
-$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
+Write-Header "Enabling defender for cloud for SQL Server at the subscription level"
+$laWorkspaceId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
+
+$currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $env:subscriptionId | ConvertFrom-Json)
 if ($currentsqlplan.pricingTier -eq "Free") {
     az security pricing create -n SqlServerVirtualMachines --tier 'standard'
-
-    # Set defender for cloud log analytics workspace
-    Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-    az security workspace-setting create -n default --target-workspace "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$env:workspaceName"
 }
 else {
-    Write-Host "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
+    Write-Host "Current Defender for SQL plan at the subscription level is: $($currentsqlplan.pricingTier)"
 }
 
+# Set defender for cloud log analytics workspace
+Write-Host "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
+az security workspace-setting create -n default --target-workspace $laWorkspaceId
 
 #Install SQLAdvancedThreatProtection solution
-az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors --no-wait
+az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
+
+#Install SQLVulnerabilityAssessment solution
+az monitor log-analytics solution create --resource-group $env:resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName --only-show-errors
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Header "Configuring DHCP Service"
@@ -120,7 +125,7 @@ if ($inernalSwitch.Name -ne $switchName) {
 Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VM
 $nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
+$nestedWindowsPassword = "JS123!!"
 
 # Create Windows credential object
 $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
@@ -131,9 +136,18 @@ $Env:AZCOPY_BUFFER_GB=4
 
 # Other ArcJS flavors does not have an azcopy network throughput capping
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+$vhdImageToDownload = "JSSQL19Base.vhdx"
+if ($Env:sqlServerEdition -eq "Standard"){
+    $vhdImageToDownload = "JSSQLStd19Base.vhdx"
+}
+elseif ($Env:sqlServerEdition -eq "Enterprise"){
+    $vhdImageToDownload = "JSSQLEnt19Base.vhdx"
+}
+
 $SQLvmvhdPath = "$Env:ArcJSVMDir\JS-Win-SQL-01.vhdx"
 if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
-    azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
+    $vhdImageUrl = "$sourceFolder/$vhdImageToDownload$sas"
+    azcopy cp $vhdImageUrl $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
 }
 
 # Create the nested VMs
@@ -192,25 +206,45 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
-$remoteScriptFileFile = "$agentScript\installArcAgentSQL.ps1"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScript\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
+$remoteScriptFileFile = "$agentScriptDir\installArcAgentSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$agentScriptDir\installArcAgentSQLSP.ps1" -DestinationPath "$nestedVMArcJSDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host -Force
 Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:nestedVMArcJSDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation} -Credential $winCreds
+
+# Install Azure Monitor Agent extension
+Write-Host "Installing Azure Monitor Agent extension"
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $env:azureLocation
+Write-Host "Azure Monitor Agent extension installation completed"
+
+# Install AdvancedThreatProtection extension
+Write-Host "Installing AdvancedThreatProtection extension"
+az connectedmachine extension create --machine-name $JSWinSQLVMName --name AzureDefenderForSQLATP --publisher Microsoft.Azure.AzureDefenderForSQL --type "AdvancedThreatProtection.Windows" --resource-group $resourceGroup --location $env:azureLocation
+Write-Host "AdvancedThreatProtection extension installation completed"
+
+# Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
+$sqlDefenderDcrFile = "$Env:ArcJSDir\defendersqldcrtemplate.json"
+(Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $laWorkspaceId | Set-Content -Path $sqlDefenderDcrFile
+
+# Create data collection rules for Defender for SQL
+Write-Host "Creating Azure Monitor data collection rule"
+$dcrName = "Jumpstart-DefenderForSQL-DCR"
+az monitor data-collection rule create --resource-group $resourceGroup --location $env:azureLocation --name $dcrName --rule-file $sqlDefenderDcrFile
+
+# Associate DCR with Azure Arc-enabled Server resource
+Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server"
+$dcrRuleId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.Insights/dataCollectionRules/$dcrName"
+$azConnectedMachineId = "/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.HybridCompute/machines/$JSWinSQLVMName"
+az monitor data-collection rule association create --name "$JSWinSQLVMName-DefenderForSQL-DCR-Association" --rule-id $dcrRuleId --resource $azConnectedMachineId
+
+# Test Defender for SQL
+Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+$remoteScriptFileFile = "$agentScriptDir\testDefenderForSQL.ps1"
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$agentScriptDir\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
+Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
+Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile -workingDir $using:agentScriptDir} -Credential $winCreds
 
 # Creating Hyper-V Manager desktop shortcut
 Write-Header "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-# Install Log Analytics extension to support Defender for SQL threat simulation
-$workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
-$workspaceKey = (az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "primarySharedKey" -o tsv)
-az connectedmachine extension create --machine-name $JSWinSQLVMName --name "MicrosoftMonitoringAgent" --settings "{'workspaceId':'$workspaceID'}" --protected-settings "{'workspaceKey':'$workspaceKey'}" --resource-group $resourceGroup --type-handler-version "1.0.18067.0" --type "MicrosoftMonitoringAgent" --publisher "Microsoft.EnterpriseCloud.Monitoring"
-
-# Test Defender for SQL
-Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
-$remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
-Copy-VMFile $JSWinSQLVMName -SourcePath "$Env:ArcJSDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
-Invoke-Command -VMName $JSWinSQLVMName -ScriptBlock { powershell -File $Using:remoteScriptFileFile} -Credential $winCreds
-
 
 # Changing to Client VM wallpaper
 $imgPath="$Env:TempDir\wallpaper.png"
