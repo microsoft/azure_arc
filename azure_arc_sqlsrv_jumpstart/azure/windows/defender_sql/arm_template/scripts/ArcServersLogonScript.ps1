@@ -35,6 +35,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
+az config set extension.use_dynamic_install=yes_without_prompt
 az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Register Azure providers
