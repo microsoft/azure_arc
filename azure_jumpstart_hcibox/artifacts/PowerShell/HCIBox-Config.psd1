@@ -83,7 +83,7 @@
     FabricSwitch                         = "vSwitch-Fabric"
     FabricNIC                            = "FABRIC"
     ClusterVSwitchName                   = "hciSwitch"
-    ClusterName                          = "hciboxcluster"
+    ClusterName                          = "hciboxcluster2024"
     WACVMName                            = "AdminCenter"
     ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
     LCMDeployUsername                    = "HCIBoxDeployUser"
