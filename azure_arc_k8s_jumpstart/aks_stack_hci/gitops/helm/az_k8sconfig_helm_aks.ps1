@@ -11,7 +11,7 @@ $subscriptionId ='<Your subscription ID>'
 
 # Login to Azure & get AKS on HCI credentials
 Write-Host "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 az account set --subscription $subscriptionId
 
 #Configure Extension install

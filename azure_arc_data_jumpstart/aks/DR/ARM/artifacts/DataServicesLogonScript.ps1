@@ -13,7 +13,7 @@ $secondaryDcName= "jumpstart-secondary-dc"
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Login as service principal
-az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientId --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt

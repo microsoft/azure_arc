@@ -12,7 +12,7 @@ export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
 # Logging in to Azure using service principal
 echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 echo "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"

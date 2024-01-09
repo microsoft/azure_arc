@@ -12,7 +12,7 @@ Write-Output  "Downloading the Azure Monitor onboarding script"
 Invoke-WebRequest https://aka.ms/enable-monitoring-powershell-script -OutFile enable-monitoring.ps1
 
 Write-Output "Onboarding the Azure Arc-enabled Kubernetes cluster to Azure Monitor for containers"
-az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
+az login --service-principal --username $env:appId --password=$env:password --tenant $env:tenantId
 
 if(!(Test-Path -path "$env:userprofile/.kube"))  
 { 
