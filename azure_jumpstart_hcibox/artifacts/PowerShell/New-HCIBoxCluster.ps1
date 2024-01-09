@@ -1395,7 +1395,7 @@ function New-HyperConvergedEnvironment {
         $HCIBoxConfig,
         [PSCredential]$domainCred
     )
-    Invoke-Command -ComputerName $HCIBoxConfig.WACVMName -Credential $domainCred -ScriptBlock {
+    Invoke-Command -ComputerName $HCIBoxConfig.DCName -Credential $domainCred -ScriptBlock {
         $HCIBoxConfig = $using:HCIBoxConfig
         $domainCred = $using:domainCred
         $localCred = $using:localCred
