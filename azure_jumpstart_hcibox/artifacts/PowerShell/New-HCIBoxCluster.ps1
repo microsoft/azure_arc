@@ -1726,8 +1726,8 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 #Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Admincenter VM
-Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM..." -ForegroundColor Green
-New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
+Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM... (skipping step)" -ForegroundColor Green
+#New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 Write-Host "[Build cluster - Step 10/12] Configuring HCI node networking..." -ForegroundColor Green
