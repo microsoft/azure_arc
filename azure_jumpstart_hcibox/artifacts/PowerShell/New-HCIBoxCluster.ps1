@@ -1055,7 +1055,7 @@ function New-RouterVM {
     
             # Adding a BGP Router to the VM
             Write-Host "Creating BGP Router on $env:COMPUTERNAME"
-            Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $HCIBoxConfig.BGPRouterASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
+            #Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $HCIBoxConfig.BGPRouterASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
 
             # Configure BGP Peers - commented during refactor for 23h2
             # if ($HCIBoxConfig.ConfigureBGPpeering -and $HCIBoxConfig.ProvisionNC) {
