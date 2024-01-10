@@ -2,23 +2,93 @@
 
     # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
     
-    # Version 1.0.0
+    # HCIBox Folders
+    Paths = @{
+        VMDir = "C:\HCIBox\Virtual Machines"
+        LogsDir = "C:\HCIBox\Logs"
+        IconDir = "C:\HCIBox\Icons"
+        VHDDir = "C:\HCIBox\VHD"
+        SDNDir = "C:\HCIBox\SDN"
+        KVDir = "C:\HCIBox\KeyVault"
+        WACDir = "C:\HCIBox\Windows Admin Center"
+        AgentScriptDir = "C:\HCIBox\agentScript"
+        ToolsDir = "C:\Tools"
+        TempDir = "C:\Temp"
+        VMPath = "C:\VMs"
+    }
 
-    # HCI host names
-    HostList                             = "AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
+    ChocolateyPackagesList = @(
+        'az.powershell',
+        'kubernetes-cli',
+        'vcredist140',
+        'microsoft-edge',
+        'azcopy10',
+        'vscode',
+        'git',
+        '7zip',
+        'kubectx',
+        'terraform',
+        'putty.install',
+        'kubernetes-helm',
+        'dotnet-sdk',
+        'setdefaultbrowser',
+        'zoomit',
+        'azure-data-studio'
+    )
 
-    # VHDX Paths 
-    guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
-    azsHCIVHDXPath                       = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
+    # VSCode extensions
+    VSCodeExtensions        = @(
+        'ms-vscode-remote.remote-containers',
+        'ms-vscode-remote.remote-wsl',
+        'ms-vscode.powershell',
+        'redhat.vscode-yaml',
+        'ZainChen.json',
+        'esbenp.prettier-vscode',
+        'ms-kubernetes-tools.vscode-kubernetes-tools'
+    )
+
+    HostVMDriveLetter = "V"
+    HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
+    guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
+    azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
+    
+    MgmtHostConfig = @{
+        Hostname = "AzSMGMT"
+        IP       = "192.168.1.11/24"
+    }
+
+    NodeHostConfig = @(
+        @{
+            Hostname    = "AzSHOST1"
+            IP          = "192.168.1.12/24"
+            StorageAIP  = "10.71.1.10"
+            StorageBIP  = "10.71.2.10"
+        },
+        @{
+            Hostname    = "AzSHOST2"
+            IP          = "192.168.1.13/24"
+            StorageAIP  = "10.71.1.11"
+            StorageBIP  = "10.71.2.11"
+        }
+    )
     
     # SDN Lab Admin Password
     SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
 
     # VM Configuration
-    HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
     NestedVMMemoryinGB                   = 105GB                                 # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     AzSMGMTMemoryinGB                    = 28GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
-    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.
+    AzSMGMTProcCount                     = 20
+    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode.
+    FabricSwitch                         = "vSwitch-Fabric"
+    FabricNIC                            = "FABRIC"
+    ClusterVSwitchName                   = "hciSwitch"
+    ClusterName                          = "hciboxcluster6"
+    WACVMName                            = "AdminCenter"
+    ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
+    LCMDeployUsername                    = "HCIBoxDeployUser"
+    LCMADOUName                          = "hcioudocs"
+    LCMDeploymentPrefix                  = "hcibox"
 
     # ProductKeys
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
@@ -48,19 +118,10 @@
     # AzSMGMT Management VM's Memory Settings
     MEM_DC                               = 2GB                                     # Memory provided for the Domain Controller VM
     MEM_BGP                              = 2GB                                     # Memory provided for the BGP-ToR-Router
-    MEM_Console                          = 3GB                                     # Memory provided for the Windows 10 Console VM
     MEM_WAC                              = 10GB                                    # Memory provided for the Windows Admin Center VM
-    MEM_GRE                              = 2GB                                     # Memory provided for the gre-target VM
-    MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
     # Cluster S2D Storage Disk Size (per disk)
     S2D_Disk_Size                        = 170GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
-
-    # SDN Host IPs
-    AzSMGMTIP                            = "192.168.1.11/24"
-    AzSHOST1IP                           = "192.168.1.12/24"
-    AzSHOST2IP                           = "192.168.1.13/24"
-    AzSHOST3IP                           = "192.168.1.14/24"
 
     # Physical Host Internal IP
     PhysicalHostInternalIP               = "192.168.1.20"                          # IP Address assigned to Internal Switch vNIC in a Single Host Configuration
@@ -73,10 +134,11 @@
 
     # Management IPs for Console and Domain Controller
     DCIP                                 = "192.168.1.254/24"
-    CONSOLEIP                            = "192.168.1.10/24"
     WACIP                                = "192.168.1.9/24"
+    WACMAC                               = "10155D010B00"
 
     # BGP Router Config
+    BGPRouterName                        = "bgp-router"
     BGPRouterIP_MGMT                     = "192.168.1.1/24"
     BGPRouterIP_ProviderNetwork          = "172.16.0.1/24"
     BGPRouterIP_VLAN200                  = "192.168.200.1/24"
@@ -88,27 +150,15 @@
     vlan200VLAN                          = 200
     mgmtVLAN                             = 0
     simInternetVLAN                      = 131
-    StorageAVLAN                         = 20
-    StorageBVLAN                         = 21
+    StorageAVLAN                         = 711
+    StorageBVLAN                         = 712
 
     # Subnets
     MGMTSubnet                           = "192.168.1.0/24"
-    GRESubnet                            = "50.50.50.0/24"
-    ProviderSubnet                       = "172.16.0.0/24"
-    VLAN200Subnet                        = "192.168.200.0/24"
-    VLAN200VMNetworkSubnet               = "192.168.44.0/24"
-    simInternetSubnet                    = "131.127.0.0/24"
-    storageAsubnet                       = "192.168.98.0/24"
-    storageBsubnet                       = "192.168.99.0/24"
-
-    # Gateway Target IPs
-    GRETARGETIP_BE                       = "192.168.233.100/24"
-    GRETARGETIP_FE                       = "131.127.0.35/24"
-    IPSECTARGETIP_BE                     = "192.168.111.100/24"
-    IPSECTARGETIP_FE                     = "131.127.0.30/24"
+    storageAsubnet                       = "255.255.255.0"
+    storageBsubnet                       = "255.255.255.0"
 
     # VIP Subnets
-    PrivateVIPSubnet                     = "30.30.30.0/24" 
     PublicVIPSubnet                      = "40.40.40.0/24"
 
     # SDN ASN
@@ -118,13 +168,9 @@
     # Windows Admin Center HTTPS Port
     WACport                              = 443
 
-    # SDDCInstall
-    SDDCInstall                          = $true
-
     # AKS and Resource bridge variables
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
-    AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"
     AKSNodeEndIP                         = "192.168.200.100"
     AKSVIPStartIP                        = "192.168.200.125"
@@ -148,4 +194,8 @@
     rbDHCPExclusionStart                 = "192.168.200.200"
     rbDHCPExclusionEnd                   = "192.168.200.209"
     dcVLAN200IP                          = "192.168.200.205"
+    rbSubnetMask                         = "255.255.255.0"
+    rbDNSIP                              = "192.168.1.254"
+    clusterIpRangeStart                  = "192.168.1.100"
+    clusterIpRangeEnd                    = "192.168.1.199"
 }

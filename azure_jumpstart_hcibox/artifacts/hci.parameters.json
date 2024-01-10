@@ -1,0 +1,154 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiVersion": {
+      "value": "2023-08-01-preview"
+    },
+    "clusterName": {
+      "value": "clusterName-staging"
+    },
+    "arcNodeResourceIds": {
+      "value": arcNodeResourceIds-staging
+    },
+    "localAdminSecretValue": {
+      "value": "localAdminSecretValue-staging"
+    },
+    "domainAdminSecretValue": {
+      "value": "domainAdminSecretValue-staging"
+    },
+    "arbDeploymentSpnValue": {
+      "value": "arbDeploymentSpnValue-staging"
+    },
+    "storageWitnessValue": {
+      "value": "storageWitnessValue-staging"
+    },
+    "domainFqdn": {
+      "value": "domainFqdn-staging"
+    },
+    "namingPrefix": {
+      "value": "namingPrefix-staging"
+    },
+    "keyVaultName": {
+      "value": "keyVaultName-staging"
+    },
+    "ClusterWitnessStorageAccountName": {
+      "value": "ClusterWitnessStorageAccountName-staging"
+    },
+    "diagnosticStorageAccountName": {
+      "value": "diagnosticStorageAccountName-staging"
+    },
+    "adouPath": {
+      "value": "adouPath-staging"
+    },
+    "secretsLocation": {
+      "value": "secretsLocation-staging"
+    },
+    "subnetMask": {
+      "value": "subnetMask-staging"
+    },
+    "defaultGateway": {
+      "value": "defaultGateway-staging"
+    },
+    "startingIPAddress": {
+      "value": "startingIp-staging"
+    },
+    "endingIPAddress": {
+      "value": "endingIp-staging"
+    },
+    "dnsServers": {
+      "value": dnsServers-staging
+    },
+    "physicalNodesSettings": {
+      "value": physicalNodesSettings-staging
+    },
+    "storageConnectivitySwitchless": {
+      "value": false
+    },
+    "networkingPattern": {
+      "value": "convergedManagementCompute"
+    },
+    "intentList": {
+      "value": [
+        {
+          "name": "HCI",
+          "trafficType": [
+            "Management",
+            "Compute"
+          ],
+          "adapter": [
+            "FABRIC",
+            "FABRIC2"
+          ],
+          "overrideVirtualSwitchConfiguration": false,
+          "virtualSwitchConfigurationOverrides": {
+            "enableIov": "",
+            "loadBalancingAlgorithm": ""
+          },
+          "overrideQosPolicy": false,
+          "qosPolicyOverrides": {
+            "priorityValue8021Action_Cluster": "7",
+            "priorityValue8021Action_SMB": "3",
+            "bandwidthPercentage_SMB": "50"
+          },
+          "overrideAdapterProperty": true,
+          "adapterPropertyOverrides": {
+            "jumboPacket": "9014",
+            "networkDirect": "Disabled",
+            "networkDirectTechnology": "RoCEv2"
+          }
+        },
+        {
+          "name": "Storage",
+          "trafficType": [
+            "Storage"
+          ],
+          "adapter": [
+            "StorageA",
+            "StorageB"
+          ],
+          "overrideVirtualSwitchConfiguration": false,
+          "virtualSwitchConfigurationOverrides": {
+            "enableIov": "",
+            "loadBalancingAlgorithm": ""
+          },
+          "overrideQosPolicy": false,
+          "qosPolicyOverrides": {
+            "priorityValue8021Action_Cluster": "7",
+            "priorityValue8021Action_SMB": "3",
+            "bandwidthPercentage_SMB": "50"
+          },
+          "overrideAdapterProperty": true,
+          "adapterPropertyOverrides": {
+            "jumboPacket": "9014",
+            "networkDirect": "Disabled",
+            "networkDirectTechnology": "iWARP"
+          }
+        }
+      ]
+    },
+    "storageNetworkList": {
+      "value": [
+        {
+          "name": "StorageNetwork1",
+          "networkAdapterName": "StorageA",
+          "vlanId": "storageNicAVLAN-staging"        
+        },
+        {
+          "name": "StorageNetwork2",
+          "networkAdapterName": "StorageB",
+          "vlanId": "storageNicBVLAN-staging"
+        }
+      ]
+    },
+    "networkingType": {
+      "value": "switchlessMultiServerDeployment"
+    },
+    "customLocation": {
+      "value": "Jumpstart"
+    },
+    "deploymentMode": {
+      "value": "Validate"
+    }
+  }
+}
