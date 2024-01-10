@@ -13,7 +13,7 @@ export namespace='hello-arc'
 
 # Logging in to Azure using service principal
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create GitOps config for App Deployment
 echo "Creating GitOps config for deploying the Hello-Arc App"

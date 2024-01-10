@@ -32,7 +32,7 @@
       "type": "string"
     },
     "adminUserPassword" : {
-      "type": "string"
+      "type": "securestring"
     }
   },
   "variables": {

@@ -13,7 +13,7 @@ export namespace='hello-arc'
 
 # Getting AKS credentials
 echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
 # Create a namespace for your app & ingress resources

@@ -1,0 +1,42 @@
+{
+  "properties": {
+    "description": "Data collection rule for Azure Defender for SQL. Deleting this rule will break the detection of Azure Defender for SQL.",
+    "dataSources": {
+      "extensions": [
+        {
+          "streams": [
+            "Microsoft-DefenderForSqlAlerts",
+            "Microsoft-DefenderForSqlLogins",
+            "Microsoft-DefenderForSqlTelemetry",
+            "Microsoft-SqlAtpStatus-DefenderForSql"
+          ],
+          "extensionName": "AdvancedThreatProtection",
+          "extensionSettings": {
+            "enableCollectionOfSqlQueriesForSecurityReserch": "true"
+          },
+          "name": "AdvancedThreatProtection"
+        }
+      ]
+    },
+    "destinations": {
+      "logAnalytics": [
+        {
+          "workspaceResourceId": "{LOGANLYTICS_WORKSPACEID}",
+          "name": "LogAnalyticsDest"
+        }
+      ]
+    },
+    "dataFlows": [
+      {
+        "streams": [
+          "Microsoft-DefenderForSqlAlerts",
+          "Microsoft-DefenderForSqlLogins",
+          "Microsoft-DefenderForSqlTelemetry"
+        ],
+        "destinations": [
+          "LogAnalyticsDest"
+        ]
+      }
+    ]
+  }
+}

@@ -12,7 +12,7 @@ $subscriptionId ='<Your subscription ID>'
 
 # Connect to Azure
 Write-Host "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenant
+az login --service-principal --username $appId --password=$password --tenant $tenant
 az account set --subscription $subscriptionId
 
 #Configure Extension install

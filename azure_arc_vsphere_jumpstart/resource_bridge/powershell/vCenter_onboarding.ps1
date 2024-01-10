@@ -214,7 +214,7 @@ try {
 
     log "Logging into azure"
 
-    az login --service-principal -u $spnClientId -p $spnClientSecret --tenant $spnTenantId
+    az login --service-principal -u $spnClientId -p=$spnClientSecret --tenant $spnTenantId
 
     az account set -s $subscriptionId
     if ($LASTEXITCODE) {

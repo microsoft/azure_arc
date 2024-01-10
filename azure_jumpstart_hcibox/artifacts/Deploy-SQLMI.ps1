@@ -127,7 +127,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     [System.Environment]::SetEnvironmentVariable('Path', $env:Path + ";C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin", [System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine")
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
-    az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
+    az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
     az extension add --name arcdata --system --only-show-errors
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     Write-Host "Installing the Arc Data extension"

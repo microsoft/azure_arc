@@ -197,7 +197,7 @@ Write-Host "`n"
 az -v
 
 # Login as service principal
-az login --service-principal --username $Env:appId --password $Env:password --tenant $Env:tenantId
+az login --service-principal --username $Env:appId --password=$Env:password --tenant $Env:tenantId
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 

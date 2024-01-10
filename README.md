@@ -1,24 +1,50 @@
-# Azure Arc Jumpstart documentation
+# Azure Arc Jumpstart source code
 
-If you are looking to explore the Jumpstart documentation, please go to the documentation website:
+Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.
 
-https://azurearcjumpstart.io
+<p align="center">
+  <img src="https://github.com/Azure/arc_jumpstart_docs/raw/main/img/logo/jumpstart.png" alt="Arc Jumpstart logo" width="320">
+</p>
 
-This repository contains the markdown files which generate the above website. See below for guidance on running with a local environment to contribute to the docs.
+**Note:** This repository does not contain the source code for the documentation of the Arc Jumpstart which can be found in another [dedicated repository](https://github.com/Azure/arc_jumpstart_docs).
 
-> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code. Jumpstart scenarios, ArcBox, HCIBox, and Agora are all intended for evaluation, training and demo purposes only and are not supported for production use cases.**
+## What you'll find here
 
-## Want to help and contribute?
+- **Automation Source Code:** Arc Jumpstart automation scripts and tools utilized in our scenarios and solutions.
+- **Supportive Documents and Files:** Additional resources used across the [Arc Jumpstart](https://aka.ms/ArcJumpstart) website, aiding in various contexts and providing supplemental information.
 
-Before making your first contribution, make sure to review the [contributing](https://azurearcjumpstart.io/contributing/) section in the docs.
+## How to Utilize this repository
 
-* Found a bug?! Use the [Bug Report](https://github.com/microsoft/azure_arc/issues/new?assignees=&labels=bug&template=bug_report.md&title=) issue template to let us know.
+This source code repository is designed with contributors in mind and works in tandem with the [our documentation repository](https://github.com/Azure/arc_jumpstart_docs). While it's not mandatory, it's highly likely that contributors will need to clone both repositories to effectively contribute to Arc Jumpstart.
 
-* To ask for a Jumpstart scenario, create one yourself or submit an Azure Arc core product feature request, use the [Feature Request](https://github.com/microsoft/azure_arc/issues/new?assignees=&labels=&template=feature_request.md&title=) issue template.
+Before you start, we recommend familiarizing yourself with our comprehensive [contribution guidelines](https://aka.ms/JumpstartContribution). These guidelines outline the standards and practices we follow, ensuring consistency and quality across our documentation.
+
+If you're unsure about your future contribution, don't hesitate to start a [GitHub discussion](https://aka.ms/JumpstartDiscussions). This is a great place to ask questions, share ideas, or get feedback on potential contributions. Our community is here to help and we welcome all levels of experience.
+
+Happy contributing!
+
+## Cloning the repositories
+
+To contribute, you'll likely need to clone both this repository and the [documentation repository](https://github.com/Azure/arc_jumpstart_docs). Use the following commands:
+
+```bash
+git clone https://github.com/microsoft/azure_arc.git
+git clone https://github.com/Azure/arc_jumpstart_docs.git
+```
+
+As we continuously improve and expand Arc Jumpstart, we recommend keeping your local clones of the repositories up-to-date. You can do this by pulling the latest changes from the main branch:
+
+```bash
+git pull origin main
+```
+
+## Contribution and feedback
+
+We value your input! If you have suggestions, feedback, or valuable insights to share, feel free to open an issue. Your contributions help us improve the documentation for the entire community.
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+the rights to use your contribution. For details, visit the [Microsoft Contributor License Agreements website](https://cla.opensource.microsoft.com).
 
 When you submit a pull request, a CLA bot will automatically determine whether you need to provide
 a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
@@ -28,23 +54,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## Jumpstart Roadmap
+## Trademarks
 
-Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/legal/intellectualproperty/trademarks/usage/general).
 
-## Legal Notices
-
-Microsoft and any contributors grant you a license to the Microsoft documentation and other content
-in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
-see the [LICENSE](LICENSE) file, and grant you a license to any code in the repository under the [MIT License](https://opensource.org/licenses/MIT), see the
-[LICENSE-CODE](LICENSE-CODE) file.
-
-Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation
-may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries.
-The licenses for this project do not grant you rights to use any Microsoft names, logos, or trademarks.
-Microsoft's general trademark guidelines can be found at http://go.microsoft.com/fwlink/?LinkID=254653.
-
-Privacy information can be found at https://privacy.microsoft.com/
-
-Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
-or trademarks, whether by implication, estoppel or otherwise.
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
+Any use of third-party trademarks or logos are subject to those third-party's policies.

@@ -194,7 +194,7 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor DarkGray
-az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId
+az login --service-principal --username $spnClientID --password=$spnClientSecret --tenant $spnTenantId
 az account set --subscription $subscriptionId
 
 # Installing Azure CLI extensions

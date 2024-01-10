@@ -4,17 +4,6 @@ metadata:
   name: storefront
 
 ---
-
-apiVersion: v1
-kind: Secret
-metadata:
-  namespace: storefront
-  name: tigera-pull-secret
-data:
-  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJkR2xuWlhKaEszUnBaMlZ5WVY5cGJuUmxjbTVoYkRwWVNVcFhTRlZTV0VRd1Z6VkNWVVZDTTA1Q1ZqWTRTRU5FUVZSR1NsTTJNRTFOUTFaWFMwSTNNVU5YVjFjeVdWRkpUMGxPU1ZkRFEwRlFXamsyTUZoSSIsCiAgICAgICJlbWFpbCI6ICIiCiAgICB9CiAgfQp9
-type: kubernetes.io/dockerconfigjson
-
----
 apiVersion:  apps/v1
 kind: Deployment
 metadata:
@@ -33,8 +22,6 @@ spec:
         app: backend
         fw-zone: restricted
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       containers:
       - name: mock-logging
         image: quay.io/tigera/peira:v0.2.3
@@ -89,8 +76,6 @@ data:
        namespace: storefront
        name: backend
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       logLevel: debug
       enableProbe: true
       listenPort: 80
@@ -119,8 +104,6 @@ spec:
         app: frontend
         fw-zone: dmz
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       containers:
       - name: mock-microservice1
         image: quay.io/tigera/peira:v0.2.3
@@ -191,8 +174,6 @@ data:
        namespace: storefront
        name: frontend
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       logLevel: debug
       enableProbe: false
       listenPort: 80
@@ -226,8 +207,6 @@ spec:
         app: microservice1
         fw-zone: trusted
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       containers:
       - name: mock-microservice2
         image: quay.io/tigera/peira:v0.2.3
@@ -300,8 +279,6 @@ data:
        namespace: storefront
        name: microservice1
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       logLevel: debug
       enableProbe: true
       listenPort: 80
@@ -335,8 +312,6 @@ spec:
         app: microservice2
         fw-zone: trusted
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       containers:
       - name: mock-twilio
         image: busybox
@@ -413,8 +388,6 @@ data:
        namespace: storefront
        name: microservice2
     spec:
-      imagePullSecrets:
-      - name: tigera-pull-secret
       logLevel: debug
       enableProbe: true
       listenPort: 80
