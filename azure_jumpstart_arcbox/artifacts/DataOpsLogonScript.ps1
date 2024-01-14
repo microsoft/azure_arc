@@ -164,8 +164,6 @@ foreach ($cluster in $clusters) {
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-        #Write-Host "Enabling Defender for Containers on AKS clusters"
-        #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
 
@@ -179,16 +177,17 @@ $kubectlMonShellAKS = Start-Process -PassThru PowerShell { $host.ui.RawUI.Window
 $kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
 
 Write-Header "Deploying Azure Arc Data Controller"
-foreach ($cluster in $clusters) {
-    Start-Job -Name arcbox -ScriptBlock {
-        $cluster = $using:cluster
-        $context = $cluster.context
-        Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
-
-        az k8s-extension create --name arc-data-services `
+$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
+    $cluster = $_
+    $context = $cluster.context
+    $clusterName = $cluster.clusterName
+    Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
+    Write-Host "Deploying arc data services on $clusterName"
+    Write-Host "`n"
+    az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
-            --cluster-name $cluster.clusterName `
+            --cluster-name $clusterName `
             --resource-group $Env:resourceGroup `
             --auto-upgrade false `
             --scope cluster `
@@ -196,68 +195,59 @@ foreach ($cluster in $clusters) {
             --version 1.25.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
-        Write-Host "`n"
+            Write-Host "`n"
 
-        Do {
-            Write-Host "Waiting for bootstrapper pod, hold tight..."
+            Do {
+                Write-Host "Waiting for bootstrapper pod, hold tight..."
+                Start-Sleep -Seconds 20
+                $podStatus = $(if (kubectl get pods -n arc --kubeconfig $cluster.kubeConfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
+            } while ($podStatus -eq "Nope")
+            Write-Host "Bootstrapper pod is ready!"
+
+            $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            Start-Sleep -Seconds 10
+            az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+
             Start-Sleep -Seconds 20
-            $podStatus = $(if (kubectl get pods -n arc --kubeconfig $cluster.kubeConfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($podStatus -eq "Nope")
-        Write-Host "Bootstrapper pod is ready!"
 
-        $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-        $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-        Start-Sleep -Seconds 10
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+            # Deploying the Azure Arc Data Controller
 
-        Start-Sleep -Seconds 20
+            $context = $cluster.context
+            $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+            $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+            $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+            Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
 
-        # Deploying the Azure Arc Data Controller
+            $dataControllerParams = "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
 
-        $context = $cluster.context
-        $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
-        $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-        $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
-        Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $cluster.dataController | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $Env:spnClientId | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $Env:spnTenantId | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $Env:spnClientSecret | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
-        $dataControllerParams = "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            Write-Host "Deploying arc data controller on $clusterName"
+            Write-Host "`n"
+            az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            Write-Host "`n"
 
-    (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $cluster.dataController | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $Env:spnClientId | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $Env:spnTenantId | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $Env:spnClientSecret | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
-    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
-
-        az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
-        Write-Host "`n"
-
-        Do {
-            Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
-            Start-Sleep -Seconds 45
-            $dcStatus = $(if (kubectl get datacontroller -n arc --kubeconfig $cluster.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($dcStatus -eq "Nope")
-        Write-Host "Azure Arc data controller is ready!"
-        Write-Host "`n"
-        Remove-Item "$Env:ArcBoxDir\dataController-$context-stage.parameters.json" -Force
-
-        Stop-Transcript
-    }
-
-}
-
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 5
-}
-
-Get-Job -name arcbox | Remove-Job
-write-host "Successfully deployed Azure Arc Data Controllers"
+            Do {
+                Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+                Start-Sleep -Seconds 45
+                $dcStatus = $(if (kubectl get datacontroller -n arc --kubeconfig $cluster.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+            } while ($dcStatus -eq "Nope")
+            Write-Host "Azure Arc data controller is ready on $clusterName!"
+            Write-Host "`n"
+            Remove-Item "$Env:ArcBoxDir\dataController-$context-stage.parameters.json" -Force
+            Stop-Transcript
+        }
 
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services

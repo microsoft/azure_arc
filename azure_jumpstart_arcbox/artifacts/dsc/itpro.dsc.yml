@@ -9,5 +9,4 @@ properties:
       settings:
         id: Hashicorp.Terraform
         source: winget
-
   configurationVersion: 0.2.0

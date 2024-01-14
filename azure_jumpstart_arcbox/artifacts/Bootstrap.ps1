@@ -30,7 +30,8 @@ param (
     [string]$flavor,
     [string]$rdpPort,
     [string]$sshPort,
-    [string]$vmAutologon
+    [string]$vmAutologon,
+    [string]$addsDomainName
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -65,7 +66,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('addsDomainName', "jumpstart.local", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('addsDomainName', $addsDomainName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksArcClusterName', $aksArcClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksdrArcClusterName', $aksdrArcClusterName, [System.EnvironmentVariableTarget]::Machine)
 
@@ -103,7 +104,7 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-if ([bool]$vmAutologon){
+if ([bool]$vmAutologon) {
 
     Write-Host "Configuring VM Autologon"
 
@@ -165,9 +166,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:ArcBoxDir\DeploymentStatus.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/common.dsc.yml") -OutFile $Env:ArcBoxDscDir\common.dsc.yml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/dataops.dsc.yml") -OutFile $Env:ArcBoxDscDir\dataops.dsc.yml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/devops.dsc.yml") -OutFile $Env:ArcBoxDscDir\devops.dsc.yml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/itpro.dsc.yml") -OutFile $Env:ArcBoxDscDir\itpro.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/virtual_machines_sql.dsc.yml") -OutFile $Env:ArcBoxDscDir\virtual_machines_sql.dsc.yml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/arcbox-bginfo.bgi") -OutFile $Env:ArcBoxTestsDir\arcbox-bginfo.bgi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/common.tests.ps1") -OutFile $Env:ArcBoxTestsDir\common.tests.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/WinGet.ps1") -OutFile $Env:ArcBoxDir\WinGet.ps1
@@ -204,6 +203,8 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/itpro.tests.ps1") -OutFile $Env:ArcBoxTestsDir\itpro.tests.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/itpro.dsc.yml") -OutFile $Env:ArcBoxDscDir\itpro.dsc.yml
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/virtual_machines_itpro.dsc.yml") -OutFile $Env:ArcBoxDscDir\virtual_machines_itpro.dsc.yml
 }
 
 # DevOps
@@ -220,6 +221,7 @@ if ($flavor -eq "DevOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:ArcBoxIconDir\arc.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/devops.tests.ps1") -OutFile $Env:ArcBoxTestsDir\devops.tests.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/devops.dsc.yml") -OutFile $Env:ArcBoxDscDir\devops.dsc.yml
 }
 
 # DataOps
@@ -246,6 +248,7 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQLSP.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/testDefenderForSQL.ps1") -OutFile $Env:ArcBoxDir\testDefenderForSQL.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/dataops.tests.ps1") -OutFile $Env:ArcBoxTestsDir\dataops.tests.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/dsc/dataops.dsc.yml") -OutFile $Env:ArcBoxDscDir\dataops.dsc.yml
 }
 
 # Full
@@ -269,28 +272,27 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 
 # Disable Microsoft Edge sidebar
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HubsSidebarEnabled'
-$Value        = '00000000'
+$Name = 'HubsSidebarEnabled'
+$Value = '00000000'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
+    New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Disable Microsoft Edge first-run Welcome screen
 $RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
-$Name         = 'HideFirstRunExperience'
-$Value        = '00000001'
+$Name = 'HideFirstRunExperience'
+$Value = '00000001'
 # Create the key if it does not exist
 If (-NOT (Test-Path $RegistryPath)) {
-  New-Item -Path $RegistryPath -Force | Out-Null
+    New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
 # Change RDP Port
 Write-Host "RDP port number from configuration is $rdpPort"
-if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
-{
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
     Write-Host "Configuring RDP port number to $rdpPort"
     $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
     $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
@@ -299,22 +301,19 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     # RDP port
     $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
     Write-Host "Current RDP PortNumber: $portNumber"
-    if (!($portNumber -eq $rdpPort))
-    {
-      Write-Host Setting RDP PortNumber to $rdpPort
-      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
-      Restart-Service TermService -force
+    if (!($portNumber -eq $rdpPort)) {
+        Write-Host Setting RDP PortNumber to $rdpPort
+        Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+        Restart-Service TermService -force
     }
 
     #Setup firewall rules
-    if ($rdpPort -eq 3389)
-    {
-      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+    if ($rdpPort -eq 3389) {
+        netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
     }
-    else
-    {
-      $systemroot = get-content env:systemroot
-      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+    else {
+        $systemroot = get-content env:systemroot
+        netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
     }
 
     Write-Host "RDP port configuration complete."
@@ -324,12 +323,12 @@ Write-Header "Configuring Logon Scripts"
 
 $ScheduledTaskExecutable = "pwsh.exe"
 
-# Creating scheduled task for WinGet.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
-Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
@@ -337,16 +336,22 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
 }
 
 if ($flavor -eq "Full") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for DataServicesLogonScript.ps1
-
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 }
 
 if ($flavor -eq "DevOps") {
+    # Creating scheduled task for WinGet.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\WinGet.ps1
+    Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     # Creating scheduled task for DevOpsLogonScript.ps1
-
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
@@ -368,17 +373,15 @@ if ($flavor -eq "DataOps") {
             Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
         })
 
-    # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
-
-    $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
-    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -User SYSTEM -Action $Action -RunLevel "Highest" -Force
+    $Trigger = New-ScheduledTaskTrigger -AtStartup
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
+    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 
-    Write-Host "`n"
     Write-Host "Joining client VM to domain"
-    Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
+    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
     # Disabling Windows Server Manager Scheduled Task

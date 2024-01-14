@@ -54,16 +54,14 @@ param kubernetesVersion string = '1.26.6'
 
 var serviceCidr_primary = '10.20.64.0/19'
 var dnsServiceIP_primary = '10.20.64.10'
-var dockerBridgeCidr_primary = '172.17.0.1/16'
 var serviceCidr_secondary = '172.20.64.0/19'
 var dnsServiceIP_secondary = '172.20.64.10'
-var dockerBridgeCidr_secondary = '192.168.0.1/16'
 var virtualNetworkName = 'ArcBox-VNet'
 var aksSubnetName = 'ArcBox-AKS-Subnet'
 var drVirtualNetworkName = 'ArcBox-DR-VNet'
 var drSubnetName = 'ArcBox-DR-Subnet'
 
-resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   location: location
   name: aksClusterName
   identity: {
@@ -97,7 +95,6 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_primary
       dnsServiceIP: dnsServiceIP_primary
-      dockerBridgeCidr: dockerBridgeCidr_primary
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
@@ -116,7 +113,7 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
   }
 }
 
-resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   location: location
   name: drClusterName
   identity: {
@@ -150,7 +147,6 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2022
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_secondary
       dnsServiceIP: dnsServiceIP_secondary
-      dockerBridgeCidr: dockerBridgeCidr_secondary
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername

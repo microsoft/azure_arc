@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+
+  resources:
+    - resource: HyperVDsc/VMHyperV
+      id: ArcBox-Win2K19
+      directives:
+        description: Configure VM ArcBox-Win2K19
+      settings:
+        Name: ArcBox-Win2K19
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Win2K19.vhdx
+        ProcessorCount: 2
+        StartupMemory: '12GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: C:\ArcBox\Virtual Machines
+        EnableGuestService: true
+        SecureBoot: true
+    - resource: HyperVDsc/VMHyperV
+      id: ArcBox-Win2K22
+      directives:
+        description: Configure VM ArcBox-Win2K22
+      settings:
+        Name: ArcBox-Win2K22
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Win2K22.vhdx
+        ProcessorCount: 2
+        StartupMemory: '12GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: C:\ArcBox\Virtual Machines
+        EnableGuestService: true
+        SecureBoot: true
+    - resource: HyperVDsc/VMHyperV
+      id: ArcBox-Ubuntu-01
+      directives:
+        description: Configure VM ArcBox-Ubuntu-01
+      settings:
+        Name: ArcBox-Ubuntu-01
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-01.vhdx
+        ProcessorCount: 2
+        StartupMemory: '4GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: C:\ArcBox\Virtual Machines
+        EnableGuestService: true
+        SecureBoot: false
+    - resource: HyperVDsc/VMHyperV
+      id: ArcBox-Ubuntu-02
+      directives:
+        description: Configure VM ArcBox-Ubuntu-02
+      settings:
+        Name: ArcBox-Ubuntu-02
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-02.vhdx
+        ProcessorCount: 2
+        StartupMemory: '4GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: C:\ArcBox\Virtual Machines
+        EnableGuestService: true
+        SecureBoot: false
+  configurationVersion: 0.2.0
