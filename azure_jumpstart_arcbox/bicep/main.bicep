@@ -43,7 +43,7 @@ param flavor string = 'Full'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'arcbox_3.0'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -57,9 +57,11 @@ param addsDomainName string = 'jumpstart.local'
 @description('Random GUID for cluster names')
 param guid string = substring(newGuid(),0,4)
 
+@description('Azure location to deploy all resources')
+param location string = resourceGroup().location
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
-var location = resourceGroup().location
 var capiArcDataClusterName = 'ArcBox-CAPI-Data-${guid}'
 var k3sArcDataClusterName = 'ArcBox-K3s-${guid}'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
@@ -108,6 +110,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
+    azdataPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -125,6 +128,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     aksdrArcClusterName : aksDrArcDataClusterName
     vmAutologon: vmAutologon
     rdpPort: rdpPort
+    addsDomainName: addsDomainName
   }
   dependsOn: [
     updateVNetDNSServers

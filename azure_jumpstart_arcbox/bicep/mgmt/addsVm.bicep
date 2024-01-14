@@ -11,7 +11,7 @@ param windowsAdminUsername string = 'arcdemo'
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string = 'ArcPassword123!!'
+param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
 param windowsOSVersion string = '2022-datacenter-g2'
@@ -54,7 +54,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
           }
           privateIPAllocationMethod: 'Static'
           privateIPAddress: addsPrivateIPAddress
-          publicIPAddress: ((!deployBastion) ? PublicIPNoBastion : json('null'))
+          publicIPAddress: ((!deployBastion) ? PublicIPNoBastion : null)
         }
       }
     ]
@@ -127,7 +127,7 @@ resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03
     type: 'CustomScriptExtension'
     typeHandlerVersion: '1.10'
     autoUpgradeMinorVersion: true
-    settings: {
+    protectedSettings: {
       fileUris: [
         uri(templateBaseUrl, 'artifacts/SetupADDS.ps1')
       ]
