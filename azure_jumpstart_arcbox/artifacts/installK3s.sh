@@ -79,7 +79,6 @@ echo ""
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
-sudo -u $adminUsername az account set -s $subscriptionId
 
 az -v
 echo ""
