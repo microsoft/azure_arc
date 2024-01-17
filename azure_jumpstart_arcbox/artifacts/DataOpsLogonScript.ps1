@@ -181,6 +181,9 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     $cluster = $_
     $context = $cluster.context
     $clusterName = $cluster.clusterName
+    $customLocation = $cluster.customLocation
+    $dataController = $cluster.dataController
+
     Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
     Write-Host "Deploying arc data services on $clusterName"
     Write-Host "`n"
@@ -204,17 +207,17 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             } while ($podStatus -eq "Nope")
             Write-Host "Bootstrapper pod is ready!"
 
-            $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-            $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             Start-Sleep -Seconds 10
-            az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
 
             Start-Sleep -Seconds 20
 
             # Deploying the Azure Arc Data Controller
 
             $context = $cluster.context
-            $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+            $customLocationId = $(az customlocation show --name $customLocation --resource-group $Env:resourceGroup --query id -o tsv)
             $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
             $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
             Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
@@ -235,7 +238,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             Write-Host "Deploying arc data controller on $clusterName"
             Write-Host "`n"
-            az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            az deployment group create --resource-group $Env:resourceGroup --name $dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
             Write-Host "`n"
 
             Do {
