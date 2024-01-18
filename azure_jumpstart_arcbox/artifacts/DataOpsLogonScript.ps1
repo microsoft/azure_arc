@@ -354,7 +354,7 @@ Invoke-Pester -Path "$Env:ArcBoxTestsDir\common.tests.ps1" -Output Detailed -Pas
 $tests_passed = $tests_common.Passed.Count
 $tests_failed = $tests_common.Failed.Count
 
-Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed -Output Detailed -PassThru -OutVariable tests_dataops
+Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed -PassThru -OutVariable tests_dataops
 $tests_passed = $tests_passed + $tests_dataops.Passed.Count
 $tests_failed = $tests_failed +  $tests_dataops.Failed.Count
 
