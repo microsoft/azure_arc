@@ -8,7 +8,6 @@ variable "AWS_SECRET_ACCESS_KEY" {
   description = "Your AWS Secret Key"
   type        = string
   sensitive   = true
-  sensitive   = true
 }
 
 variable "AWS_REGION" {
