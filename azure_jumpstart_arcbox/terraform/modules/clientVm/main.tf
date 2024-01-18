@@ -160,6 +160,7 @@ variable "registry_password" {
   type        = string
   description = "Registry password"
   default     = "registrySecret"
+  sensitive   = true
 }
 
 variable "data_controller_name" {
