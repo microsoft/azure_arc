@@ -50,7 +50,18 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deploying to $(ResourceGroupName)"
-          New-AzResourceGroupDeployment -Name ArcBox -ResourceGroupName $(ResourceGroupName) -TemplateFile scenarios/arcbox/main.bicep -TemplateParameterFile scenarios/arcbox/arcbox-demo.parameters.json
+           -TemplateParameterFile scenarios/arcbox/arcbox-demo.parameters.json
+          New-AzResourceGroupDeployment -Name ArcBox `
+          -ResourceGroupName $(ResourceGroupName) `
+          -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
+          -TemplateParameterFile "azure_jumpstart_arcbox/artifacts/integration_tests/arcbox_itpro.parameters.json" `
+          -TemplateParameterObject @{
+              spnClientId = $env:spnClientId
+              spnClientSecret = $env:spnClientId
+              spnTenantId = $env:spnClientId
+              windowsAdminPassword = $env:spnClientId
+          }
+
 
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM'
