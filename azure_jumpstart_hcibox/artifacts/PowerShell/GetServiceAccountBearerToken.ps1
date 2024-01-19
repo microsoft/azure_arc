@@ -16,15 +16,15 @@ $Env:VMPath = "C:\VMs"
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
 $ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects
 $user = "jumpstart.local\administrator"
-$password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
+$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password # Domain credential
 $clusterName = $env:AKSClusterName
-Copy-VMFile -Name $SDNConfig.HostList[0] -SourcePath $env:HCIBoxDir\jumpstart-user-secret.yaml -DestinationPath C:\AksHci\jumpstart-user-secret.yaml -FileSource Host -Force
-$TOKEN = Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Copy-VMFile -Name $HCIBoxConfig.HostList[0] -SourcePath $env:HCIBoxDir\jumpstart-user-secret.yaml -DestinationPath C:\AksHci\jumpstart-user-secret.yaml -FileSource Host -Force
+$TOKEN = Invoke-Command -VMName $HCIBoxConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl create serviceaccount jumpstart-user
     kubectl create clusterrolebinding jumpstart-user-binding --clusterrole cluster-admin --serviceaccount default:jumpstart-user

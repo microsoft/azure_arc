@@ -11,6 +11,9 @@
         "spnTenantId": {
             "value": "<your service principal tenant id>"
         },
+        "spnProviderId": {
+            "value": "<your Microsoft.AzureStackHCI resource provider object id"
+        },
         "windowsAdminUsername": {
             "value": "arcdemo"
         },
