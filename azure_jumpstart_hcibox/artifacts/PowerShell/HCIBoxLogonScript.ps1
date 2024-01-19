@@ -77,7 +77,7 @@ Stop-Transcript
 # Build HCI cluster
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
-& "$Env:HCIBoxDir\Cloud-Cluster-Deploy.ps1"
+& "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
 
 Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
