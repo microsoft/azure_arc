@@ -11,7 +11,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientId 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Login as service principal
-az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientId --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -146,7 +146,7 @@ az k8s-extension create --name arc-data-services `
                         --resource-group $Env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
-                        --version 1.25.0 `
+                        --version 1.26.0 `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper
 

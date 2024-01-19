@@ -135,7 +135,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
-    az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+    az login --service-principal --username $spnClientId --password=$spnClientSecret --tenant $spnTenantId
 
     Write-Header "Az PowerShell Login"
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force

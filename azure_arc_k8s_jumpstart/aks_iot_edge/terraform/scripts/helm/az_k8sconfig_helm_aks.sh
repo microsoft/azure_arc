@@ -10,7 +10,7 @@ export arcClusterName='<The name of your k8s cluster as it will be shown in Azur
 
 # Getting AKS credentials
 echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 

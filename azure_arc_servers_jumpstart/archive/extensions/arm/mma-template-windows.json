@@ -13,7 +13,7 @@
             "type": "string"
         },
         "workspaceKey": {
-            "type": "string"
+            "type": "securestring"
         }
     },
     "resources": [

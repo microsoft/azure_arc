@@ -13,7 +13,7 @@ export namespace='hello-arc'
 
 # Login to Azure using the service principal name
 echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
 # Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster

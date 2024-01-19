@@ -21,7 +21,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create a namespace for your app & ingress resources
 kubectl create ns $namespace

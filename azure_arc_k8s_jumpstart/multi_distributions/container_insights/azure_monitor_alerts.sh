@@ -28,7 +28,7 @@ sudo -u $USER az extension add --name k8s-extension
 echo ""
 
 echo "Login to Az CLI using the service principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 echo ""
 
 echo "Create the Log Analytics Workspace"
