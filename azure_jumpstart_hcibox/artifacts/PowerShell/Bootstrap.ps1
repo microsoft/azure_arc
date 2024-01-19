@@ -103,12 +103,9 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($HCIBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Register-AzSHCI.ps1") -OutFile $HCIPath\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKS.ps1") -OutFile $HCIPath\Deploy-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-SQLMI.ps1") -OutFile $HCIPath\Deploy-SQLMI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-AKS.ps1") -OutFile $HCIPath\Uninstall-AKS.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-ArcResourceBridge.ps1") -OutFile $HCIPath\Deploy-ArcResourceBridge.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-ResourceBridge.ps1") -OutFile $HCIPath\Uninstall-ResourceBridge.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMManagement.ps1") -OutFile $HCIPath\Deploy-ArcResourceBridge.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-GitOps.ps1") -OutFile $HCIPath\Deploy-GitOps.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Cloud-Cluster-Deploy.ps1") -OutFile $HCIPath\Cloud-Cluster-Deploy.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/GetServiceAccountBearerToken.ps1") -OutFile $HCIPath\GetServiceAccountBearerToken.ps1
