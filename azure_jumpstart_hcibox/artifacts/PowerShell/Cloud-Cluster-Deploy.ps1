@@ -14,6 +14,11 @@ Write-Host 'Creating credentials and connecting to Azure'
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 
+# Check that extensions are finished installing on HCI nodes
+# foreach ($node in $HCIBoxConfig.NodeHostConfig) {
+
+# }
+
 # Install some modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Az.Resources -Force
@@ -113,3 +118,4 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 #(Get-Content -Path $hciParams) -replace 'storageNetworkB-staging', $storageBIPs | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicAVLAN-staging', $HCIBoxConfig.StorageAVLAN | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicBVLAN-staging', $HCIBoxConfig.StorageBVLAN | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'customLocation-staging', $HCIBoxConfig.rbCustomLocationName | Set-Content -Path $hciParams

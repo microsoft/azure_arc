@@ -104,7 +104,7 @@ Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($HCIBoxConfig.Paths["WA
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Register-AzSHCI.ps1") -OutFile $HCIPath\Register-AzSHCI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-AKS.ps1") -OutFile $HCIPath\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKS.ps1") -OutFile $HCIPath\Deploy-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-SQLMI.ps1") -OutFile $HCIPath\Deploy-SQLMI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Uninstall-AKS.ps1") -OutFile $HCIPath\Uninstall-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Deploy-ArcResourceBridge.ps1") -OutFile $HCIPath\Deploy-ArcResourceBridge.ps1

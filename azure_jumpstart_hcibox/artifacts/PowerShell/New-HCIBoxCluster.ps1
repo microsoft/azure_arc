@@ -383,7 +383,7 @@ function New-HCINodeVM {
     Set-VM -Name $Name -ProcessorCount 20 -AutomaticStartAction Start
     Get-VMNetworkAdapter -VMName $Name | Rename-VMNetworkAdapter -NewName "SDN"
     Get-VMNetworkAdapter -VMName $Name | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
-    Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
+    # Add-VMNetworkAdapter -VMName $Name -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
     $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $Name).MacAddress) -replace '..(?!$)', '$&-'
 
     Add-VMNetworkAdapter -VMName $Name -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
@@ -394,9 +394,9 @@ function New-HCINodeVM {
     Get-VM $Name | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
 
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
-    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
-    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageA -Access -VlanId $HCIBoxConfig.StorageAVLAN 
-    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Access -VlanId $HCIBoxConfig.StorageBVLAN 
+    # Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageA -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-800
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-800 
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
     return $vmMac
@@ -582,7 +582,7 @@ function Set-NICs {
 
     Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $Credential -ScriptBlock {
         Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
-        Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
+        # Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
     }
 
     $int = 9
@@ -616,7 +616,7 @@ function Set-NICs {
 
             # Rename non-storage adapters
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
-            Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
+            # Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
             # Enable CredSSP and MTU Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
@@ -652,8 +652,8 @@ function Set-FabricNetwork {
         $ErrorActionPreference = "Stop"
 
         # Disable Fabric2 Network Adapter
-        Write-Host "Disabling Fabric2 Adapter"
-        Get-NetAdapter FABRIC2 | Disable-NetAdapter -Confirm:$false | Out-Null
+        # Write-Host "Disabling Fabric2 Adapter"
+        # Get-NetAdapter FABRIC2 | Disable-NetAdapter -Confirm:$false | Out-Null
         
         # Enable WinRM on AzSMGMT
         Write-Host "Enabling PSRemoting on $env:COMPUTERNAME"
@@ -718,9 +718,9 @@ function Set-FabricNetwork {
         New-NetRoute -DestinationPrefix $HCIBoxConfig.PublicVIPSubnet -NextHop $provGW -InterfaceAlias PROVIDER | Out-Null
 
         # Remove Gateway from Fabric NIC
-        #Write-Host "Removing Gateway from Fabric NIC" 
-        #$index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
-        #Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
+        Write-Host "Removing Gateway from Fabric NIC" 
+        $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
+        Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
     }
 }
 
@@ -1054,8 +1054,8 @@ function New-RouterVM {
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
     
             # Adding a BGP Router to the VM
-            Write-Host "Creating BGP Router on $env:COMPUTERNAME"
-            #Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $HCIBoxConfig.BGPRouterASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
+            # Write-Host "Creating BGP Router on $env:COMPUTERNAME"
+            # Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $HCIBoxConfig.BGPRouterASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
 
             # Configure BGP Peers - commented during refactor for 23h2
             # if ($HCIBoxConfig.ConfigureBGPpeering -and $HCIBoxConfig.ProvisionNC) {
@@ -1622,7 +1622,27 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/12] Downloading HCIBox VHDs. This will take a while..." -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnn1dd'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/AZSHCI.sha256?sp=r&st=2024-01-16T15:09:53Z&se=2027-01-16T23:09:53Z&spr=https&sv=2022-11-02&sr=b&sig=fM6nSGOUHIB90egY95Oc02NfXxFmh8fPK0bnibjAdQU%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+$checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
+$hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
+if ($checksum.Hash -eq $hash) {
+    Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
+}
+else {
+    Write-Error "AZSCHI.vhdx is corrupt. Abortig..."
+    throw 
+}
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnnebv'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/gui.sha256?sp=r&st=2024-01-16T15:10:38Z&se=2027-01-16T23:10:38Z&spr=https&sv=2022-11-02&sr=b&sig=yeWvM%2FEvDcVfrJOk%2FacJublzc%2FXjYWibpzDNQl40CvA%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
+$checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"
+$hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256"
+if ($checksum.Hash -eq $hash) {
+    Write-Host "GUI.vhdx has valid checksum. Continuing..."
+}
+else {
+    Write-Error "GUI.vhdx is corrupt. Aborting..."
+    throw 
+}
 BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
 Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
 Move-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx"
@@ -1696,7 +1716,7 @@ Start-Sleep -Seconds 60
 # Format and partition data drives
 Set-DataDrives -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
-# Set-SDNserver needs to be looked at - not sure this is necessary for 23h2
+# Configure networking
 Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
     
 # Restart Machines
@@ -1730,8 +1750,8 @@ Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway se
 #New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-Write-Host "[Build cluster - Step 10/12] Configuring HCI node networking..." -ForegroundColor Green
-New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+# Write-Host "[Build cluster - Step 10/12] Configuring HCI node networking..." -ForegroundColor Green
+# New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
 #######################################################################################
 # Prepare the cluster for deployment

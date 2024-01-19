@@ -83,7 +83,7 @@
     FabricSwitch                         = "vSwitch-Fabric"
     FabricNIC                            = "FABRIC"
     ClusterVSwitchName                   = "hciSwitch"
-    ClusterName                          = "hciboxcluster6"
+    ClusterName                          = "hciboxcluster"
     WACVMName                            = "AdminCenter"
     ClusterSharedVolumePath              = "C:\ClusterStorage\S2D_vDISK1"
     LCMDeployUsername                    = "HCIBoxDeployUser"
@@ -137,7 +137,7 @@
     WACIP                                = "192.168.1.9/24"
     WACMAC                               = "10155D010B00"
 
-    # BGP Router Config
+    # Router Config
     BGPRouterName                        = "bgp-router"
     BGPRouterIP_MGMT                     = "192.168.1.1/24"
     BGPRouterIP_ProviderNetwork          = "172.16.0.1/24"

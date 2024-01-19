@@ -77,8 +77,7 @@
             "Compute"
           ],
           "adapter": [
-            "FABRIC",
-            "FABRIC2"
+            "FABRIC"
           ],
           "overrideVirtualSwitchConfiguration": false,
           "virtualSwitchConfigurationOverrides": {
@@ -145,7 +144,7 @@
       "value": "switchlessMultiServerDeployment"
     },
     "customLocation": {
-      "value": "Jumpstart"
+      "value": "customLocation-staging"
     },
     "deploymentMode": {
       "value": "Validate"

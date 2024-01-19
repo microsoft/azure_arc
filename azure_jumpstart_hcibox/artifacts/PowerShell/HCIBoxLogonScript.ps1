@@ -75,8 +75,9 @@ elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
 Stop-Transcript
 
 # Build HCI cluster
-Write-Header "Deploying HCI cluster"
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
+
+& "$Env:HCIBoxDir\Cloud-Cluster-Deploy.ps1"
 
 Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
