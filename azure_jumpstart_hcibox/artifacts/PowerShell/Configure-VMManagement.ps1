@@ -7,7 +7,7 @@ $Env:HCIBoxDir = "C:\HCIBox"
 
 # Import Configuration Module
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
-Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Deploy-ArcResourceBridge.log"
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Configure-VMManagement.log"
 
 #$csv_path = $HCIBoxConfig.ClusterSharedVolumePath
 
@@ -43,8 +43,9 @@ az stack-hci-vm image create --subscription $env:subscriptionId --resource-group
 # Create logical networks
 $switchName='"ConvergedSwitch(hci)"'
 $lnetName = "myhci-lnet-static"
-$addressPrefixes = "192.168.10.0/24"
+$addressPrefixes = "192.168.200.0/24"
 $gateway = "192.168.1.1"
 $dnsServers = "192.168.1.254"
+$vlanid = "200"
 
-az stack-hci-vm network lnet create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "Static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers
+az stack-hci-vm network lnet create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "Static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers -vlanid $vlanid

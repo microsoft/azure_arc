@@ -7,7 +7,7 @@ $Env:HCIBoxDir = "C:\HCIBox"
 
 # Import Configuration Module
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
-Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Cloud-Cluster-Deploy.log"
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Generate-ARM-Template.log"
 
 # Connect to Azure
 Write-Host 'Creating credentials and connecting to Azure'

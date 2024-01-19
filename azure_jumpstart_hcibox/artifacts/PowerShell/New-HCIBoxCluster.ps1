@@ -1594,6 +1594,12 @@ function Set-HCIDeployPrereqs {
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
         }
     }
+    # Workaround for incomplete BITS transfer of LCM files
+    Start-Sleep -Seconds 60
+    Invoke-Command -VMName $HCIBoxconfig.NodeHostConfig[0].Hostname {
+        Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
+        Restart-Computer -Force
+    }       
 }
 
 #endregion
