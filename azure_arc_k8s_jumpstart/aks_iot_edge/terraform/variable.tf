@@ -280,6 +280,7 @@ variable "rbac_aad_server_app_secret" {
   type        = string
   description = "(Optional) The Server Secret of an Azure Active Directory Application. Changing this forces a new resource to be created."
   default     = null
+  sensitive   = true
 }
 
 variable "rbac_aad_tenant_id" {
@@ -422,6 +423,7 @@ variable "user-name-vm" {
 variable "user-password-vm" {
   description = "(Required) Password of Virtual Machine"
   default="Password1234!"
+  sensitive = true
 }
 
 variable "password_authentication-vm" {

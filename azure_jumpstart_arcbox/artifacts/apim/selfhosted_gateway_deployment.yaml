@@ -1,0 +1,57 @@
+# NOTE: Before deploying to a production environment, please review the documentation -> https://aka.ms/self-hosted-gateway-production
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selfhost
+  labels:
+    app: selfhost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selfhost
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 25%
+  template:
+    metadata:
+      labels:
+        app: selfhost
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: selfhost
+        image: mcr.microsoft.com/azure-api-management/gateway:v2
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8081
+          # Container port used for rate limiting to discover instances
+        - name: rate-limit-dc
+          protocol: UDP
+          containerPort: 4290
+          # Container port used for instances to send heartbeats to each other
+        - name: dc-heartbeat
+          protocol: UDP
+          containerPort: 4291
+        readinessProbe:
+          httpGet:
+            path: /status-0123456789abcdef
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        env:
+        - name: config.service.auth
+          valueFrom:
+            secretKeyRef:
+              name: selfhost-token
+              key: value
+        envFrom:
+        - configMapRef:
+            name: selfhost-env

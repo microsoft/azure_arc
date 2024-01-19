@@ -194,7 +194,7 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor DarkGray
-az login --service-principal --username $spnClientID --password $spnClientSecret --tenant $spnTenantId
+az login --service-principal --username $spnClientID --password=$spnClientSecret --tenant $spnTenantId
 az account set --subscription $subscriptionId
 
 # Installing Azure CLI extensions
@@ -402,7 +402,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"

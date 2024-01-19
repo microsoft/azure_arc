@@ -88,7 +88,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $WarningPreference = "SilentlyContinue"
     [System.Environment]::SetEnvironmentVariable('Path', [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\",[System.EnvironmentVariableTarget]::Machine)
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
-    az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
+    az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
     az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --only-show-errors
     az arcappliance prepare hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --only-show-errors

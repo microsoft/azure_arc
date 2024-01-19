@@ -60,7 +60,7 @@ if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden)
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
@@ -218,7 +218,7 @@ Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $argu
 Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
 Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-Start-Sleep -Seconds 10
+Start-Sleep -Seconds 15
 Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
 # Cleanup
 Remove-Item $downloadDir -Recurse -Force

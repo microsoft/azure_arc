@@ -46,7 +46,7 @@ fi
 echo ""
 
 echo "Log in to Azure using service principal"
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
+az login --service-principal --username $servicePrincipalAppId --password=$servicePrincipalSecret --tenant $servicePrincipalTenantId
 
 echo "Registering Azure Arc providers"
 az provider register --namespace Microsoft.Kubernetes --wait

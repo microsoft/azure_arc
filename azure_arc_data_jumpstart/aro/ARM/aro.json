@@ -24,7 +24,7 @@
       "type": "string"
     },
     "spnClientSecret": {
-      "type": "string"
+      "type": "securestring"
     },
     "masterNodesSubnet": {
       "type": "string",

@@ -36,6 +36,7 @@ variable "admin_username" {
 variable "admin_password" {
   description = "GKE cluster administrator password"
   type        = string
+  sensitive = true
   default     = "ArcDemo1234567!!"
 }
 
@@ -48,6 +49,7 @@ variable "windows_username" {
 variable "windows_password" {
   description = "Windows Server Client compute instance VM administrator password"
   type        = string
+  sensitive = true
   default     = "Passw0rd123!!"
 }
 
@@ -58,6 +60,7 @@ variable "AZDATA_USERNAME" {
 
 variable "AZDATA_PASSWORD" {
   description = "Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)"
+  sensitive = true
   type        = string
 }
 
@@ -94,6 +97,7 @@ variable "SPN_CLIENT_ID" {
 
 variable "SPN_CLIENT_SECRET" {
   description = "Your Azure service principal password"
+  sensitive = true
   type        = string
 }
 

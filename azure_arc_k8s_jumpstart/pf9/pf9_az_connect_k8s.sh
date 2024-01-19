@@ -26,7 +26,7 @@ echo "Creating the Resource Group"
 az group create -l $azureRegion -n $resourceGroup
 
 echo "Log in to Azure using service principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 echo "Connecting the cluster to Azure Arc"
 az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

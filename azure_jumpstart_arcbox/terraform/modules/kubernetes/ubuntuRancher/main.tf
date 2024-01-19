@@ -34,6 +34,7 @@ variable "admin_username" {
 variable "admin_ssh_key" {
   type        = string
   description = "SSH Key for the Linux VM's."
+  sensitive   = true
 }
 
 variable "virtual_network_name" {
@@ -64,6 +65,7 @@ variable "spn_client_id" {
 variable "spn_client_secret" {
   type        = string
   description = "Arc Service Principal client secret."
+  sensitive   = true
 }
 
 variable "spn_tenant_id" {
