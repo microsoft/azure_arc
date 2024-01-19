@@ -1488,11 +1488,15 @@ function Set-HCIDeployPrereqs {
         }
     }
     # Workaround for incomplete BITS transfer of LCM files
-    Start-Sleep -Seconds 60
-    Invoke-Command -VMName $HCIBoxconfig.NodeHostConfig[0].Hostname {
-        Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
-        Restart-Computer -Force
-    }       
+    Start-Sleep -Seconds 15
+    foreach ($node in $HCIBoxConfig.NodeHostConfig) {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
+            Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
+        }
+        Start-Sleep -Seconds 3
+        Restart-VM -Name $node.Hostname -Force
+    }
+    Start-Sleep -Seconds 60 
 }
 
 #endregion
