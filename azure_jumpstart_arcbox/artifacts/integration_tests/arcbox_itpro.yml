@@ -57,9 +57,9 @@ stages:
           -TemplateParameterFile "azure_jumpstart_arcbox/artifacts/integration_tests/arcbox_itpro.parameters.json" `
           -TemplateParameterObject @{
               spnClientId = $env:spnClientId
-              spnClientSecret = $env:spnClientId
-              spnTenantId = $env:spnClientId
-              windowsAdminPassword = $env:spnClientId
+              spnClientSecret = $env:spnClientSecret
+              spnTenantId = $env:spnTenantId
+              windowsAdminPassword = $env:windowsAdminPassword
           }
 
 
