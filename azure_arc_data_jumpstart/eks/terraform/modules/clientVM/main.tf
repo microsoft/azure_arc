@@ -1,6 +1,7 @@
 variable "awsAccessKeyId" {
   type = string
   description = "AWS Access key id"
+  sensitive   = true
 }
 
 variable "awsSecretAccessKey" {
