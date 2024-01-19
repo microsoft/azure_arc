@@ -913,32 +913,32 @@ function New-DCVM {
             CMD.exe /c "certutil -SetCATemplates +WebServer"
         }
 
-        Write-Host "Configuring DHCP scope on DHCP server."
-        # Set up DHCP scope for Arc resource bridge
-        Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
-            $HCIBoxConfig = $args[0]
+        # Write-Host "Configuring DHCP scope on DHCP server."
+        # # Set up DHCP scope for Arc resource bridge
+        # Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+        #     $HCIBoxConfig = $args[0]
 
-            # Install DHCP feature
-            Install-WindowsFeature DHCP -IncludeManagementTools
-            CMD.exe /c "netsh dhcp add securitygroups"
-            Restart-Service dhcpserver
+        #     # Install DHCP feature
+        #     Install-WindowsFeature DHCP -IncludeManagementTools
+        #     CMD.exe /c "netsh dhcp add securitygroups"
+        #     Restart-Service dhcpserver
 
-            # Allow DHCP in domain
-            $dnsName = $HCIBoxConfig.DCName
-            $fqdnsName = $HCIBoxConfig.DCName + "." + $HCIBoxConfig.SDNDomainFQDN
-            Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $HCIBoxConfig.dcVLAN200IP
-            Get-DHCPServerInDC
+        #     # Allow DHCP in domain
+        #     $dnsName = $HCIBoxConfig.DCName
+        #     $fqdnsName = $HCIBoxConfig.DCName + "." + $HCIBoxConfig.SDNDomainFQDN
+        #     Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $HCIBoxConfig.dcVLAN200IP
+        #     Get-DHCPServerInDC
 
-            # Bind DHCP only to VLAN200 NIC
-            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
-            Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
+        #     # Bind DHCP only to VLAN200 NIC
+        #     Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
+        #     Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
 
-            # Add DHCP scope for Resource bridge VMs
-            Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $HCIBoxConfig.rbVipStart -EndRange $HCIBoxConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
-            $scope = Get-DhcpServerv4Scope
-            Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $HCIBoxConfig.rbDHCPExclusionStart -EndRange $HCIBoxConfig.rbDHCPExclusionEnd
-            Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $HCIBoxConfig.SDNLABDNS -Router $HCIBoxConfig.BGPRouterIP_VLAN200.Trim("/24")
-        }
+        #     # Add DHCP scope for Resource bridge VMs
+        #     Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $HCIBoxConfig.rbVipStart -EndRange $HCIBoxConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+        #     $scope = Get-DhcpServerv4Scope
+        #     Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $HCIBoxConfig.rbDHCPExclusionStart -EndRange $HCIBoxConfig.rbDHCPExclusionEnd
+        #     Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $HCIBoxConfig.SDNLABDNS -Router $HCIBoxConfig.BGPRouterIP_VLAN200.Trim("/24")
+        # }
     }
 }
 

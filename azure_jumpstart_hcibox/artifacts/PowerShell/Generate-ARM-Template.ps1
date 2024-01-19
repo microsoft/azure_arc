@@ -63,7 +63,7 @@ foreach ($name in $domainName) {
 }
 
 # Build DNS value
-$dns = "[""" + $HCIBoxConfig.rbDNSIP + """]"
+$dns = "[""" + $HCIBoxConfig.vmDNS + """]"
 
 # Create keyvault name
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()

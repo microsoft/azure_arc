@@ -25,7 +25,6 @@ $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $location = "eastus"
-$cloudServiceIP = $HCIBoxConfig.AKSCloudSvcidr.Substring(0, $HCIBoxConfig.AKSCloudSvcidr.IndexOf('/'))
 $customLocName="Jumpstart"
 
 # Copy gallery VHDs to hosts
@@ -43,9 +42,9 @@ az stack-hci-vm image create --subscription $env:subscriptionId --resource-group
 # Create logical networks
 $switchName='"ConvergedSwitch(hci)"'
 $lnetName = "myhci-lnet-static"
-$addressPrefixes = "192.168.200.0/24"
-$gateway = "192.168.1.1"
-$dnsServers = "192.168.1.254"
-$vlanid = "200"
+$addressPrefixes = $HCIBoxConfig.vmIpPrefix
+$gateway = $HCIBoxConfig.vmGateway
+$dnsServers = $HCIBoxConfig.vmDNS
+$vlanid = $HCIBoxConfig.vmVLAN
 
 az stack-hci-vm network lnet create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "Static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers -vlanid $vlanid

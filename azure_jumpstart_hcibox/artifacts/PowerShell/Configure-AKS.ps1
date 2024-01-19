@@ -22,9 +22,8 @@ Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].HostName -ArgumentL
     $tenantId = $args[2]
     $subId = $args[3]
     $clustervnetname = $args[4]
-    $vlanid = "200"
     Connect-AzAccount -ServicePrincipal -Subscription $subId -Tenant $tenantId -Credential $azureAppCred
-    New-ArcHciVirtualNetwork -name $clustervnetname -vswitchname "ConvergedSwitch(hci)" -ipaddressprefix "192.168.200.0/24" -gateway $HCIBoxConfig.SDNLABRoute -dnsservers $HCIBoxConfig.SDNLABDNS -vippoolstart "192.168.200.150" -vippoolend "192.168.200.200" -k8snodeippoolstart "192.168.200.201" -k8snodeippoolend "192.168.200.249" -vlanID $vlanid
+    New-ArcHciVirtualNetwork -name $clustervnetname -vswitchname "ConvergedSwitch(hci)" -ipaddressprefix $HCIBoxConfig.AKSIPPrefix -gateway $HCIBoxConfig.AKSGWIP -dnsservers $HCIBoxConfig.AKSDNSIP -vippoolstart $HCIBoxConfig.AKSVIPStartIP -vippoolend $HCIBoxConfig.AKSVIPEndIP -k8snodeippoolstart $HCIBoxConfig.AKSNodeStartIP -k8snodeippoolend $HCIBoxConfig.AKSNodeEndIP -vlanID $HCIBoxConfig.AKSVLAN
 }
 
 az login --service-principal --username $env:spnClientID --password=$env:spnClientSecret --tenant $env:spnTenantId
