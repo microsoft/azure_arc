@@ -1390,113 +1390,6 @@ CertificateTemplate= WebServer
     }
 }
 
-function New-HyperConvergedEnvironment {
-    Param (
-        $HCIBoxConfig,
-        [PSCredential]$domainCred
-    )
-    Invoke-Command -ComputerName $HCIBoxConfig.DCName -Credential $domainCred -ScriptBlock {
-        $HCIBoxConfig = $using:HCIBoxConfig
-        $domainCred = $using:domainCred
-        $localCred = $using:localCred
-        foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
-            Invoke-Command -ComputerName $AzSHOST.Hostname -ArgumentList $AzSHOST, $HCIBoxConfig -Credential $domainCred -ScriptBlock {
-                $AzSHOST = $args[0]
-                $HCIBoxconfig = $args[1]
-                # Check if switch exists already
-                $switchCheck = Get-VMSwitch | Where-Object { $_.Name -eq $HCIBoxConfig.ClusterVSwitchName } 
-                if ($switchCheck) { 
-                    Write-Host "Switch already exists on $env:COMPUTERNAME. Skipping this host." 
-                }
-                else {
-                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
-                    $switchTeamMembers = @("FABRIC", "FABRIC2")
-                    New-VMSwitch -Name $HCIBoxConfig.ClusterVSwitchName -AllowManagementOS $true -NetAdapterName $switchTeamMembers -EnableEmbeddedTeaming $true -MinimumBandwidthMode "Weight"
-                    
-                    Write-Host "Setting IP Configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
-                    $switchNIC = Get-Netadapter | Where-Object { $_.Name -match $HCIBoxConfig.ClusterVSwitchName }
-                    New-NetIPAddress -InterfaceIndex $switchNIC.InterfaceIndex -IpAddress $AzSHOST.IP.Split('/')[0] -PrefixLength 24 -AddressFamily 'IpV4' -DefaultGateway $HCIBoxConfig.BGPRouterIP_MGMT -ErrorAction 'SilentlyContinue'
-
-                    Write-Host "Setting DNS configuration on $($HCIBoxConfig.ClusterVSwitchName) on host $($AzSHOST.Hostname)"
-                    Set-DnsClientServerAddress -InterfaceIndex $switchNIC.InterfaceIndex -ServerAddresses $HCIBoxConfig.SDNLABDNS
-
-                    Write-Host "Setting vSwitch adapter VLAN $($HCIBoxConfig.mgmtVLAN) on host $($AzSHOST.Hostname)"
-                    Set-VMNetworkAdapterIsolation -IsolationMode 'Vlan' -DefaultIsolationID $HCIBoxConfig.mgmtVLAN -AllowUntaggedTraffic $true -VMNetworkAdapterName $($HCIBoxConfig.ClusterVSwitchName) -ManagementOS
-                    Get-VMSwitchExtension -VMSwitchName $($HCIBoxConfig.ClusterVSwitchName) | Disable-VMSwitchExtension | Out-Null
-
-                    Write-Host "Configuring MTU on all adapters on $($AzSHOST.Hostname)"
-                    Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-                }         
-            }
-            Start-Sleep -Seconds 60
-        }
-        # Reboot all HCI nodes
-        foreach ($AzSHOST in $HCIBoxConfig.NodeHostConfig) {
-            Write-Host "Rebooting HCIBox host $($AzSHOST.Hostname)"
-            Restart-Computer $AzSHOST.Hostname -Force -Confirm:$false -Credential $domainCred -Protocol WSMan
-            Start-Sleep -Seconds 10
-            Write-Host "Checking to see if $($AzSHOST.Hostname) is up and online"
-            while ((Invoke-Command -ComputerName $AzSHOST.Hostname -Credential $domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 10 }
-            Write-Host "$($AzSHOST.Hostname) is up and online"
-        }
-    }
-}
-
-function New-S2DCluster {
-    param (
-        $HCIBoxConfig,
-        [PSCredential]$domainCred
-    )
-    Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ArgumentList $HCIBoxConfig, $domainCred -ScriptBlock {
-        $HCIBoxConfig = $args[0]
-        $domainCred = $args[1]
-
-        Import-Module FailoverClusters
-        Import-Module Storage
-        $nodes = @()
-        foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-            $nodes += $node.Hostname
-        }
-        Write-Host "Creating cluster $($HCIBoxConfig.ClusterName) from nodes: $nodes"
-        Register-PSSessionConfiguration -Name Microsoft.HCIBoxS2D -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 -WarningAction SilentlyContinue | Out-Null
-
-        Invoke-Command -ComputerName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred -ArgumentList $HCIBoxConfig, $nodes -ConfigurationName Microsoft.HCIBoxS2D -ScriptBlock {
-            $HCIBoxConfig = $args[0]
-            $nodes = $args[1]
-            $ClusterIP = ($HCIBoxConfig.MGMTSubnet.TrimEnd("0/24")) + "252"
-
-            New-Cluster -Name $HCIBoxConfig.ClusterName -Node $nodes -StaticAddress $ClusterIP -NoStorage
-            Enable-ClusterS2D -Confirm:$false -Verbose
-            while (!$PerfHistory) {
-                Write-Host "Waiting for Cluster Performance History volume to come online."
-                Start-Sleep -Seconds 10
-                $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}
-                if ($PerfHistory) {
-                    Write-Host "Cluster Perfomance History volume online." 
-                }            
-            }
-
-        Write-Host "Configuring S2D"
-        Get-PhysicalDisk | Where-Object { $_.Size -lt 127GB } | Set-PhysicalDisk -MediaType HDD | Out-Null
-        Start-Sleep -Seconds 10
-        New-Volume -FriendlyName "S2D_vDISK1" -FileSystem 'CSVFS_ReFS' -StoragePoolFriendlyName "S2D on $($HCIBoxConfig.ClusterName)" -ResiliencySettingName 'Mirror' -PhysicalDiskRedundancy 1 -AllocationUnitSize 64KB -UseMaximumSize
-        Get-StorageSubsystem clus* | Set-StorageHealthSetting -name “System.Storage.PhysicalDisk.AutoReplace.Enabled” -value “False”
-        Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\spaceport\Parameters -Name HwTimeout -Value 0x00007530
-        
-        Write-Host "Renaming Storage network adapters"
-        (Get-Cluster -Name $HCIBoxConfig.ClusterName | Get-ClusterNetwork | Where-Object { $_.Address -eq ($HCIBoxConfig.storageAsubnet.Replace('/24', '')) }).Name = 'StorageA'
-        (Get-Cluster -Name $HCIBoxConfig.ClusterName | Get-ClusterNetwork | Where-Object { $_.Address -eq ($HCIBoxConfig.storageBsubnet.Replace('/24', '')) }).Name = 'StorageB'
-        (Get-Cluster -Name $HCIBoxConfig.ClusterName | Get-ClusterNetwork | Where-Object { $_.Address -eq ($HCIBoxConfig.MGMTSubnet.Replace('/24', '')) }).Name = 'Public'
-
-        Write-Host "Setting allowed networks for Live Migration"
-        Get-ClusterResourceType -Name "Virtual Machine" -Cluster $HCIBoxConfig.ClusterName | `
-            Set-ClusterParameter -Cluster $HCIBoxConfig.ClusterName -Name MigrationExcludeNetworks -Value `
-            ([String]::Join(";", (Get-ClusterNetwork -Cluster $HCIBoxConfig.ClusterName | `
-            Where-Object { $_.Name -notmatch "Storage" }).ID))
-        }
-    }
-}
-
 function Test-InternetConnect {
     $testIP = $HCIBoxConfig.natDNS
     $ErrorActionPreference = "Stop"  
@@ -1626,7 +1519,7 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 }
 
 # Download HCIBox VHDs
-Write-Host "[Build cluster - Step 1/12] Downloading HCIBox VHDs. This will take a while..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs. This will take a while..." -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnn1dd'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/AZSHCI.sha256?sp=r&st=2024-01-16T15:09:53Z&se=2027-01-16T23:09:53Z&spr=https&sv=2022-11-02&sr=b&sig=fM6nSGOUHIB90egY95Oc02NfXxFmh8fPK0bnibjAdQU%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
@@ -1661,7 +1554,7 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\Administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Enable PSRemoting
-Write-Host "[Build cluster - Step 2/12] Preparing Azure VM virtualization host..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 2/10] Preparing Azure VM virtualization host..." -ForegroundColor Green
 Write-Host "Enabling PS Remoting on client..."
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
@@ -1691,19 +1584,19 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 # Create the three nested Virtual Machines 
 ################################################################################
 # First create the Management VM (AzSMGMT)
-Write-Host "[Build cluster - Step 3/12] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 3/10] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
-Write-Host "[Build cluster - Step 4/12] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 4/10] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
     Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
     
 # Start Virtual Machines
-Write-Host "[Build cluster - Step 5/12] Starting VMs..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 5/10] Starting VMs..." -ForegroundColor Green
 Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
 Start-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
@@ -1714,7 +1607,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 #######################################################################################
 # Prep the virtualization environment
 #######################################################################################
-Write-Host "[Build cluster - Step 6/12] Configuring host environment..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 6/10] Configuring host networking and storage..." -ForegroundColor Green
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 Start-Sleep -Seconds 60
@@ -1741,33 +1634,26 @@ Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
 #######################################################################################
 # Provision Router VM on AzSMGMT
-Write-Host "[Build cluster - Step 7/12] Build BGP router VM..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 7/10] Build BGP router VM..." -ForegroundColor Green
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
 # Provision Domain controller VM on AzSMGMT
-Write-Host "[Build cluster - Step 8/12] Building Domain Controller VM..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 8/10] Building Domain Controller VM..." -ForegroundColor Green
 New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
-# Join hosts to domain
-#Join-HCINodesToDomain -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
-
 # Provision Admincenter VM
-Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM... (skipping step)" -ForegroundColor Green
+# Write-Host "[Build cluster - Step 9/12] Building Windows Admin Center gateway server VM... (skipping step)" -ForegroundColor Green
 #New-AdminCenterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
-
-# Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-# Write-Host "[Build cluster - Step 10/12] Configuring HCI node networking..." -ForegroundColor Green
-# New-HyperConvergedEnvironment -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
 
 #######################################################################################
 # Prepare the cluster for deployment
 #######################################################################################
 # New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
-Write-Host "[Build cluster - Step 11/12] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 9/10] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Cluster complete. Finish up and add RDP Link to Desktop to WAC machine.
-Write-Host "[Build cluster - Step 12/12] Tidying up..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 10/10] Tidying up..." -ForegroundColor Green
 Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
 $wshshell = New-Object -ComObject WScript.Shell
 $lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")

@@ -25,15 +25,6 @@
         },
         "deployBastion": {
             "value": false
-        },
-        "registerCluster": {
-            "value": true
-        },
-        "deployResourceBridge": {
-            "value": true
-        },
-        "deployAKSHCI": {
-            "value": true
         }
     }
 }

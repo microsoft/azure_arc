@@ -24,16 +24,7 @@
             "value": "${JS_RDP_PORT}"
         },
         "deployBastion": {
-            "value": false
-        },
-        "registerCluster": {
-            "value": true
-        },
-        "deployResourceBridge": {
-            "value": true
-        },
-        "deployAKSHCI": {
-            "value": true
+            "value": "${JS_DEPLOY_BASTION}"
         }
     }
 }
