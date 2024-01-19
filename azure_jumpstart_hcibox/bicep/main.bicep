@@ -80,9 +80,6 @@ module hostDeployment 'host/host.bicep' = {
     templateBaseUrl: templateBaseUrl
     subnetId: networkDeployment.outputs.subnetId
     deployBastion: deployBastion
-    registerCluster: registerCluster
-    deployAKSHCI: deployAKSHCI
-    deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
     rdpPort: rdpPort
