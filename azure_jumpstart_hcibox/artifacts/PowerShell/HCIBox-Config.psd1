@@ -169,6 +169,8 @@
     WACport                              = 443
 
     # AKS and Resource bridge variables
+    storagePathName                      = "vms"
+    storagePath                          = "C:\ClusterStorage\VMs"
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
     AKSNodeStartIP                       = "192.168.200.201"
