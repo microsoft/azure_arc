@@ -763,7 +763,7 @@ function New-DCVM {
 
         # Add NIC for VLAN200 for DHCP server
         Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming "On"
-        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $HCIBoxConfig.AKSVlanID
+        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $HCIBoxConfig.AKSVLAN
 
         # Inject Answer File
         Write-Host "Mounting and injecting answer file into the $VMName VM."        
