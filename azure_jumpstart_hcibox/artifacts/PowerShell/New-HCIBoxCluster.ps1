@@ -1562,6 +1562,7 @@ Write-Host "[Build cluster - Step 2/10] Preparing Azure VM virtualization host..
 Write-Host "Enabling PS Remoting on client..."
 Enable-PSRemoting
 Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
+Enable-WSManCredSSP -Role Client -DelegateComputer "*.$($HCIBoxConfig.SDNDomainFQDN)" -Force
 
 ###############################################################################
 # Configure Hyper-V host

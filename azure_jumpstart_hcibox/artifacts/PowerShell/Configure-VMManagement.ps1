@@ -25,7 +25,7 @@ $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $location = "eastus"
-$customLocName="Jumpstart"
+$customLocName = $HCIBoxConfig.rbCustomLocationName
 
 # Copy gallery VHDs to hosts
 # Invoke-Command -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $adcred -ScriptBlock {
@@ -36,15 +36,17 @@ $customLocName="Jumpstart"
 
 # Create VM images
 az login --service-principal --username $env:spnClientID --password=$env:spnClientSecret --tenant $env:spnTenantId
+az config set extension.use_dynamic_install=yes_without_prompt
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $customLocName --query id -o tsv)
-az stack-hci-vm image create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name "Windows Server 2022 Datacenter: Azure Edition Core - Gen2" --os-type "windows" --offer "windowsserver" --publisher "microsoftwindowsserver" --sku "2022-datacenter-azure-edition" --version "20348.2227.240104" # --storage-path-id $storagepathid
+az stack-hci-vm image create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name "WinServer2022" --os-type "windows" --offer "windowsserver" --publisher "microsoftwindowsserver" --sku "2022-datacenter-azure-edition" --version "20348.2227.240104" # --storage-path-id $storagepathid
 
 # Create logical networks
 $switchName='"ConvergedSwitch(hci)"'
-$lnetName = "myhci-lnet-static"
+$lnetName = "hcibox-vm-lnet-static"
 $addressPrefixes = $HCIBoxConfig.vmIpPrefix
 $gateway = $HCIBoxConfig.vmGateway
 $dnsServers = $HCIBoxConfig.vmDNS
 $vlanid = $HCIBoxConfig.vmVLAN
+
 
 az stack-hci-vm network lnet create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "Static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers -vlanid $vlanid
