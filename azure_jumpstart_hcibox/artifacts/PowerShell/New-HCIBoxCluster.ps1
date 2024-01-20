@@ -1561,7 +1561,7 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
 Write-Host "[Build cluster - Step 2/10] Preparing Azure VM virtualization host..." -ForegroundColor Green
 Write-Host "Enabling PS Remoting on client..."
 Enable-PSRemoting
-Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
+set-item WSMan:localhost\client\trustedhosts -value * -Force
 Enable-WSManCredSSP -Role Client -DelegateComputer "*.$($HCIBoxConfig.SDNDomainFQDN)" -Force
 
 ###############################################################################
