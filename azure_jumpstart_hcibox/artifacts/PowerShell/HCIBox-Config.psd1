@@ -138,7 +138,7 @@
     WACMAC                               = "10155D010B00"
 
     # Router Config
-    BGPRouterName                        = "bgp-router"
+    BGPRouterName                        = "vm-router"
     BGPRouterIP_MGMT                     = "192.168.1.1/24"
     BGPRouterIP_ProviderNetwork          = "172.16.0.1/24"
     BGPRouterIP_VLAN200                  = "192.168.200.1/24"

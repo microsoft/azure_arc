@@ -1087,42 +1087,6 @@ function New-RouterVM {
     }
 }
 
-function Join-HCINodesToDomain {
-    Param (
-        $HCIBoxConfig,
-        [PSCredential]$localCred,
-        [PSCredential]$domainCred
-    )
-    try {
-        foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-            # Test connectivity to hosts
-            $test = Test-Connection $($node.IP).Split("/")[0]
-            while (!$test) {
-                Write-Host "Unable to contact $($node.Hostname) at $($node.IP)." -ForegroundColor Red
-                Start-Sleep -Seconds 2
-                $test = Test-Connection $($node.IP).Split("/")[0]
-            }
-
-            # Join hosts to domain
-            Write-Host "Joining $($node.Hostname) to domain"
-            $DomainJoined = ""
-            while ($DomainJoined -ne $HCIBoxConfig.SDNDomainFQDN) {
-                $job = Invoke-Command -ComputerName $node.Hostname -Credential $localCred -ArgumentList ($domainCred, $HCIBoxConfig.SDNDomainFQDN) -ScriptBlock {
-                    Add-Computer -DomainName $args[1] -Credential $args[0] 
-                } -AsJob
-
-                while ($job.JobStateInfo.State -ne "Completed") { Start-Sleep -Seconds 5 }
-                $DomainJoined = (Get-WmiObject -ComputerName $node.Hostname -Credential $localCred -Class win32_computersystem).domain
-            }
-            Write-Host "Restarting $($node.Hostname)"
-            Restart-Computer -ComputerName $node.Hostname -Credential $localCred -Force
-        }
-    }
-    catch {
-        throw $_
-    }
-}
-
 function New-AdminCenterVM {
     Param (
         $HCIBoxConfig,
@@ -1488,15 +1452,17 @@ function Set-HCIDeployPrereqs {
         }
     }
     # Workaround for incomplete BITS transfer of LCM files
-    Start-Sleep -Seconds 15
-    foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-        Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
-            Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
-        }
-        Start-Sleep -Seconds 3
-        Restart-VM -Name $node.Hostname -Force
-    }
-    Start-Sleep -Seconds 60 
+    # Start-Sleep -Seconds 15
+    # az extension add --name connectedmachine
+    # az connectedmachine 
+    # foreach ($node in $HCIBoxConfig.NodeHostConfig) {
+    #     Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
+    #         Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
+    #     }
+    #     Start-Sleep -Seconds 3
+    #     Restart-VM -Name $node.Hostname -Force
+    # }
+    # Start-Sleep -Seconds 60 
 }
 
 #endregion
@@ -1639,7 +1605,7 @@ Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
 #######################################################################################
 # Provision Router VM on AzSMGMT
-Write-Host "[Build cluster - Step 7/10] Build BGP router VM..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 7/10] Build router VM..." -ForegroundColor Green
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
 # Provision Domain controller VM on AzSMGMT
@@ -1659,18 +1625,11 @@ Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCr
 
 # Cluster complete. Finish up and add RDP Link to Desktop to WAC machine.
 Write-Host "[Build cluster - Step 10/10] Tidying up..." -ForegroundColor Green
-Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
-$wshshell = New-Object -ComObject WScript.Shell
-$lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")
-$lnk.TargetPath = "%windir%\system32\mstsc.exe"
-$lnk.Arguments = "/v:$($HCIBoxConfig.WACVMName)"
-$lnk.Description = "AdminCenter link for HCIBox."
-$lnk.Save()
 
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 Write-Host
-Write-Host "Successfully deployed HCIBox Azure Stack HCI cluster." -ForegroundColor Green
+Write-Host "Successfully deployed HCIBox infrastructure." -ForegroundColor Green
 Write-Host "Infrastructure deployment time was $($timeSpan.Hours):$($timeSpan.Minutes) (hh:mm)." -ForegroundColor Green
 
 Stop-Transcript 
