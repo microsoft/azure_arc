@@ -164,9 +164,10 @@ if ($promptOutput -notlike 'y') {
 azd env set JS_RDP_PORT $JS_RDP_PORT
 
 # Attempt to retrieve provider id for Microsoft.AzureStackHCI
+Write-Host "Attempting to retrieve Microsoft.AzureStackHCI provider id..."
 $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI") | ConvertFrom-Json
 if ($null -ne $spnProviderId.id) {
-    azd env set SPN_CLIENT_ID -- $($spnProviderId.id)
+    azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
 }
 
 ########################################################################
