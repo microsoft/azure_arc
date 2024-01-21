@@ -1446,23 +1446,18 @@ function Set-HCIDeployPrereqs {
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = Get-AzAccessToken
+
+            # Workaround for BITS transfer issue
+            Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
+            Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
     
             #Invoke the registration script. For this preview release, only eastus region is supported.
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
+            
+            Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
+            Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
     }
-    # Workaround for incomplete BITS transfer of LCM files
-    # Start-Sleep -Seconds 15
-    # az extension add --name connectedmachine
-    # az connectedmachine 
-    # foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-    #     Invoke-Command -VMName $node.Hostname -Credential $localCred -ScriptBlock {
-    #         Remove-Item -Path "C:\DeploymentPackage" -Recurse -Force
-    #     }
-    #     Start-Sleep -Seconds 3
-    #     Restart-VM -Name $node.Hostname -Force
-    # }
-    # Start-Sleep -Seconds 60 
 }
 
 #endregion
