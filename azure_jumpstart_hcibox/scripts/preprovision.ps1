@@ -163,6 +163,11 @@ if ($promptOutput -notlike 'y') {
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
 
+# Attempt to retrieve provider id for Microsoft.AzureStackHCI
+$spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI") | ConvertFrom-Json
+if ($null -ne $spnProviderId.id) {
+    azd env set SPN_CLIENT_ID -- $($spnProviderId.id)
+}
 
 ########################################################################
 # Create Azure Service Principal
