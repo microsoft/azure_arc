@@ -169,15 +169,16 @@
     WACport                              = 443
 
     # AKS and Resource bridge variables
+    rbCustomLocationName                 = "jumpstart"
     storagePathName                      = "vms"
     storagePath                          = "C:\ClusterStorage\VMs"
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
-    AKSNodeStartIP                       = "192.168.200.10"
-    AKSNodeEndIP                         = "192.168.200.59"
-    AKSVIPStartIP                        = "192.168.200.60"
-    AKSVIPEndIP                          = "192.168.200.126"
-    AKSIPPrefix                          = "192.168.200.0/25"
+    AKSNodeStartIP                       = "192.168.200.100"
+    AKSNodeEndIP                         = "192.168.200.159"
+    AKSVIPStartIP                        = "192.168.200.160"
+    AKSVIPEndIP                          = "192.168.200.226"
+    AKSIPPrefix                          = "192.168.200.0/24"
     AKSGWIP                              = "192.168.200.1"
     AKSDNSIP                             = "192.168.1.254"
     AKSVLAN                              = "200"
@@ -190,7 +191,7 @@
     clusterIpRangeStart                  = "192.168.1.100"
     clusterIpRangeEnd                    = "192.168.1.199"
     vmGateway                            = "192.168.200.1"
-    vmIpPrefix                           = "192.168.200.128/26"
+    vmIpPrefix                           = "192.168.200.0/26"
     vmDNS                                = "192.168.1.254"
     vmVLAN                               = "200"
 }

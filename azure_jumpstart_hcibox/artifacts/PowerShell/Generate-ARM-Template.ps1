@@ -32,19 +32,13 @@ New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Con
 $ErrorActionPreference = "Stop"
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
-$arcNodeResourceIds = "["
-$count = 0
+$arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
+
 foreach ($machine in $arcNodes) {
     $ErrorActionPreference = "Continue"
     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
     $ErrorActionPreference = "Stop"
-    if ($count -gt 0) {
-        $arcNodeResourceIds += ", "
-    }
-    $arcNodeResourceIds += """" + $machine.id + """"
-    $count = $count + 1
 }
-$arcNodeResourceIds += "]"
 
 # Get storage account key and convert to base 64
 $saKeys = Get-AzStorageAccountKey -ResourceGroupName $env:resourceGroup -Name $env:stagingStorageAccountName
@@ -82,8 +76,6 @@ foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $storageBIPs += ", "
     }
     $physicalNodesSettings += "{ ""name"": ""$($node.Hostname)"", ""ipv4Address"": ""$($node.IP.Split("/")[0])"" }"
-   # $storageAIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageAIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageAsubnet)"" }"
-   # $storageBIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageBIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageBsubnet)"" }"
     $count = $count + 1
 }
 $physicalNodesSettings += " ]"
@@ -114,8 +106,6 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $hciParams
-#(Get-Content -Path $hciParams) -replace 'storageNetworkA-staging', $storageAIPs | Set-Content -Path $hciParams
-#(Get-Content -Path $hciParams) -replace 'storageNetworkB-staging', $storageBIPs | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicAVLAN-staging', $HCIBoxConfig.StorageAVLAN | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageNicBVLAN-staging', $HCIBoxConfig.StorageBVLAN | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'customLocation-staging', $HCIBoxConfig.rbCustomLocationName | Set-Content -Path $hciParams
