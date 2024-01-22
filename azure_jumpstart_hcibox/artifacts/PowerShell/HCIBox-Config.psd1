@@ -169,6 +169,7 @@
     WACport                              = 443
 
     # AKS and Resource bridge variables
+    rbCustomLocationName                 = "jumpstart"
     storagePathName                      = "vms"
     storagePath                          = "C:\ClusterStorage\VMs"
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
