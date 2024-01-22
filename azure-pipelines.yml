@@ -11,6 +11,10 @@ parameters:
   displayName: 'Resource Group Name'
   type: string
   default: 'arcbox-itpro-integration-tests'
+- name: AzureSubscription
+  displayName: 'Azure Subscription'
+  type: string
+  default: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
 
 variables:
 - group: integration-tests
@@ -33,10 +37,20 @@ stages:
       inputs:
        version: 0.24.24
 
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: Set-Content -Path secrets.txt -Value $spnClientId.SecretValueText
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        artifactName: 'secrets'
+        path: '$(System.DefaultWorkingDirectory)/secrets.txt'
+
     - task: AzurePowerShell@5
       displayName: 'Deploy resource group'
       inputs:
-        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
@@ -47,7 +61,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Deploy Bicep template'
       inputs:
-        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
@@ -75,7 +89,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Upload Pester test-results from ArcBox VM'
       inputs:
-        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
@@ -84,7 +98,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Download Pester test-results from storage account to pipeline agent'
       inputs:
-        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
@@ -108,7 +122,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Delete resource group'
       inputs:
-        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        azureSubscription: ${{parameters.AzureSubscription}}
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
