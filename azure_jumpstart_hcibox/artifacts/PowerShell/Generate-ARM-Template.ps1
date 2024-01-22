@@ -32,19 +32,13 @@ New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Con
 $ErrorActionPreference = "Stop"
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
-$arcNodeResourceIds = "["
-$count = 0
+$arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
+
 foreach ($machine in $arcNodes) {
     $ErrorActionPreference = "Continue"
     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
     $ErrorActionPreference = "Stop"
-    if ($count -gt 0) {
-        $arcNodeResourceIds += ", "
-    }
-    $arcNodeResourceIds += """" + $machine.id + """"
-    $count = $count + 1
 }
-$arcNodeResourceIds += "]"
 
 # Get storage account key and convert to base 64
 $saKeys = Get-AzStorageAccountKey -ResourceGroupName $env:resourceGroup -Name $env:stagingStorageAccountName
