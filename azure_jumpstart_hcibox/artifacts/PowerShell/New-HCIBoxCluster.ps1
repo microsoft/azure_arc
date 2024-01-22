@@ -1484,7 +1484,7 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 }
 
 # Download HCIBox VHDs
-Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs. This will take a while..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs. This will may take some time..." -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnn1dd'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/AZSHCI.sha256?sp=r&st=2024-01-16T15:09:53Z&se=2027-01-16T23:09:53Z&spr=https&sv=2022-11-02&sr=b&sig=fM6nSGOUHIB90egY95Oc02NfXxFmh8fPK0bnibjAdQU%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
@@ -1493,7 +1493,7 @@ if ($checksum.Hash -eq $hash) {
     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
 }
 else {
-    Write-Error "AZSCHI.vhdx is corrupt. Abortig..."
+    Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw 
 }
 BITSRequest -Params @{'Uri'='https://aka.ms/AAnnebv'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
@@ -1504,7 +1504,7 @@ if ($checksum.Hash -eq $hash) {
     Write-Host "GUI.vhdx has valid checksum. Continuing..."
 }
 else {
-    Write-Error "GUI.vhdx is corrupt. Aborting..."
+    Write-Error "GUI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw 
 }
 BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
