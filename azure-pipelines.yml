@@ -40,9 +40,9 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Outputting and testing variable access"
-          Write-Host "Value for spnClientId is $(spnClientId)"
           Write-Host "All environment values:"
           dir env:
+          Write-Host "Value for spnClientId is $($env:spnClientId)"
           throw "Stopping, just testing variable access"
 
 
