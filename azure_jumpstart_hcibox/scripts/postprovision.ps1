@@ -31,7 +31,7 @@ If ($rdpPort -ne "3389") {
 
 
 # Client VM IP address
-$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "HCIBox-Client-PIP").IpAddress
+$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "HCIBox-Client-PIP" -ErrorAction SilentlyContinue).IpAddress | Out-Null
 if ($null -ne $ip) {
     Write-Host "You can now connect to the client VM using the following command: " -NoNewline
     Write-Host "mstsc /v:$($ip):$($rdpPort)" -ForegroundColor Green -BackgroundColor Black
