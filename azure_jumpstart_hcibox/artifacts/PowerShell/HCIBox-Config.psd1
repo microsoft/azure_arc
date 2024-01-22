@@ -191,7 +191,7 @@
     clusterIpRangeStart                  = "192.168.1.100"
     clusterIpRangeEnd                    = "192.168.1.199"
     vmGateway                            = "192.168.200.1"
-    vmIpPrefix                           = "192.168.200.0/26"
+    vmIpPrefix                           = "192.168.200.0/24"
     vmDNS                                = "192.168.1.254"
     vmVLAN                               = "200"
 }
