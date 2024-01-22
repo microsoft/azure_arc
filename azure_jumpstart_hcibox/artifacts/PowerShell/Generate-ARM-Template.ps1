@@ -76,8 +76,6 @@ foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         $storageBIPs += ", "
     }
     $physicalNodesSettings += "{ ""name"": ""$($node.Hostname)"", ""ipv4Address"": ""$($node.IP.Split("/")[0])"" }"
-   # $storageAIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageAIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageAsubnet)"" }"
-   # $storageBIPs += "{ ""PhysicalNode"": ""$($node.Hostname)"", ""IPv4Address"": ""$($node.StorageBIP)"", ""SubnetMask"": ""$($HCIBoxConfig.storageBsubnet)"" }"
     $count = $count + 1
 }
 $physicalNodesSettings += " ]"
