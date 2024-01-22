@@ -17,7 +17,7 @@ parameters:
   default: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
 
 variables:
-- group: integration-tests
+- group: 'integration-tests'
 - name: ResourceGroupName
   value: ${{parameters.ResourceGroupName}}
 
@@ -36,16 +36,12 @@ stages:
       displayName: 'Install Bicep'
       inputs:
        version: 0.24.24
-
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: Set-Content -Path secrets.txt -Value $spnClientId.SecretValueText
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        artifactName: 'secrets'
-        path: '$(System.DefaultWorkingDirectory)/secrets.txt'
+        script: |
+        Write-Host "Secret 1: $(spnClientId)"
+        Write-Host "Secret 2: $(spnClientSecret)"
 
     - task: AzurePowerShell@5
       displayName: 'Deploy resource group'
