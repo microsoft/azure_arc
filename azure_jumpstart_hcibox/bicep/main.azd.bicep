@@ -26,7 +26,7 @@ param windowsAdminUsername string
 param windowsAdminPassword string
 
 @description('Name for your log analytics workspace')
-param logAnalyticsWorkspaceName string = 'HCIBox-Workspace'
+param logAnalyticsWorkspaceName string = 'HCIBox-Workspace1'
 
 @description('Public DNS to use for the domain')
 param natDNS string = '8.8.8.8'
