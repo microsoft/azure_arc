@@ -51,7 +51,6 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deploying to $(ResourceGroupName)"
-           -TemplateParameterFile scenarios/arcbox/arcbox-demo.parameters.json
           New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $(ResourceGroupName) `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
