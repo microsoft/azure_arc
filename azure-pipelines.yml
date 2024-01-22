@@ -13,7 +13,7 @@ parameters:
   default: 'arcbox-itpro-integration-tests'
 
 variables:
-  ResourceGroupName: ${{parameters.ResourceGroupName}}
+  -group: 'integration-tests'
 
 stages:
 - stage: 'ArcBox_deployment'
