@@ -33,6 +33,20 @@ stages:
        version: 0.24.24
 
     - task: AzurePowerShell@5
+      displayName: 'Output variable values'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Outputting and testing variable access"
+          Write-Host "Value for spnClientId is $(spnClientId)"
+          Write-Host "All environment values:"
+          dir env:
+          throw "Stopping, just testing variable access"
+
+
+    - task: AzurePowerShell@5
       displayName: 'Deploy resource group'
       inputs:
         azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
