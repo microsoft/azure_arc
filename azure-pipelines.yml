@@ -57,9 +57,9 @@ stages:
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
           -TemplateParameterFile "azure_jumpstart_arcbox/artifacts/integration_tests/arcbox_itpro.parameters.json" `
           -TemplateParameterObject @{ `
-              spnClientId = $env:spnClientId `
-              spnClientSecret = $env:spnClientSecret `
-              spnTenantId = $env:spnTenantId `
+              spnClientId = $env:spnClientId ; `
+              spnClientSecret = $env:spnClientSecret ; `
+              spnTenantId = $env:spnTenantId ; `
               windowsAdminPassword = $env:windowsAdminPassword `
           }
 
