@@ -1205,7 +1205,6 @@ function New-AdminCenterVM {
             Write-Host "Installing DNS Server RSAT Tools on $VMName"
             Install-WindowsFeature -Name RSAT-DNS-Server -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
-            # Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
 
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
