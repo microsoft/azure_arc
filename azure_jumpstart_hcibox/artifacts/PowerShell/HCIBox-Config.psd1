@@ -141,12 +141,14 @@
     BGPRouterName                        = "vm-router"
     BGPRouterIP_MGMT                     = "192.168.1.1/24"
     BGPRouterIP_ProviderNetwork          = "172.16.0.1/24"
+    BGPRouterIP_VLAN110                  = "10.10.0.1/24"
     BGPRouterIP_VLAN200                  = "192.168.200.1/24"
     BGPRouterIP_SimulatedInternet        = "131.127.0.1/24"
     BGPRouterASN                         = "65534"
 
     # VLANs
     providerVLAN                         = 12
+    vlan110VLAN                          = 110
     vlan200VLAN                          = 200
     mgmtVLAN                             = 0
     simInternetVLAN                      = 131
@@ -170,18 +172,16 @@
 
     # AKS and Resource bridge variables
     rbCustomLocationName                 = "jumpstart"
-    storagePathName                      = "vms"
-    storagePath                          = "C:\ClusterStorage\VMs"
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
-    AKSNodeStartIP                       = "192.168.200.100"
-    AKSNodeEndIP                         = "192.168.200.159"
-    AKSVIPStartIP                        = "192.168.200.160"
-    AKSVIPEndIP                          = "192.168.200.226"
-    AKSIPPrefix                          = "192.168.200.0/24"
-    AKSGWIP                              = "192.168.200.1"
+    AKSNodeStartIP                       = "10.10.0.101"
+    AKSNodeEndIP                         = "10.10.0.199"
+    AKSVIPStartIP                        = "10.10.0.10"
+    AKSVIPEndIP                          = "10.10.0.100"
+    AKSIPPrefix                          = "10.10.0.0/24"
+    AKSGWIP                              = "10.10.0.1"
     AKSDNSIP                             = "192.168.1.254"
-    AKSVLAN                              = "200"
+    AKSVLAN                              = "110"
     # rbVipStart                           = "192.168.200.200"
     # rbVipEnd                             = "192.168.200.249"
     # rbDHCPExclusionStart                 = "192.168.200.200"
@@ -191,7 +191,7 @@
     clusterIpRangeStart                  = "192.168.1.100"
     clusterIpRangeEnd                    = "192.168.1.199"
     vmGateway                            = "192.168.200.1"
-    vmIpPrefix                           = "192.168.200.0/26"
+    vmIpPrefix                           = "192.168.200.0/24"
     vmDNS                                = "192.168.1.254"
     vmVLAN                               = "200"
 }
