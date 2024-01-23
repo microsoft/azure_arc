@@ -13,6 +13,45 @@ $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnC
 
 $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
 
+Write-Output "Wait for Azure CLI to become available (installed by WinGet)"
+
+# Starting time
+$startTime = Get-Date
+
+# Duration to wait (60 minutes)
+$duration = New-TimeSpan -Minutes 60
+
+do {
+    # Check if the path exists
+    $exists = Test-Path "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
+
+    # Break if the path exists
+    if ($exists) {
+        Write-Host "File found."
+        break
+    }
+
+    # Wait for a short period before rechecking to avoid constant CPU usage
+    Start-Sleep -Seconds 30
+
+} while ((Get-Date) -lt $startTime.Add($duration))
+
+if (-not $exists) {
+    Write-Host "File not found within the 60-minute time frame."
+}
+
+# Get the current path
+$currentPath = $env:Path
+
+# Path to be added
+$newPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
+
+# Add the new path to the current session's Path environment variable
+$env:Path = $currentPath + ";" + $newPath
+
+Write-Output "Az CLI Login"
+az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:spnTenantId
+
 $ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
