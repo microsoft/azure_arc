@@ -11,7 +11,7 @@ export tenantId='<Your Azure tenant ID>'
 
 # Logging in to Azure using service principal
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster"

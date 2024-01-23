@@ -1,0 +1,37 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmName": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      },
+      "fileUris": {
+        "type": "array"
+      },
+      "commandToExecute": {
+        "type": "securestring"
+      }
+    },
+    "resources": [
+      {
+        "name": "[concat(parameters('vmName'),'/CustomScript')]",
+        "type": "Microsoft.HybridCompute/machines/extensions",
+        "location": "[parameters('location')]",
+        "apiVersion": "2019-08-02-preview",
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "autoUpgradeMinorVersion": true,
+          "settings": {},
+          "protectedSettings": {
+            "commandToExecute": "[parameters('commandToExecute')]",
+            "fileUris": "[parameters('fileUris')]"
+          }
+        }
+      }
+    ]
+  }
+  

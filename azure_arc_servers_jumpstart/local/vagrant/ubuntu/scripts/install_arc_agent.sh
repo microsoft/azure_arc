@@ -7,7 +7,7 @@ source /tmp/vars.sh
 
 # Installing Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 # Creating cleanup script for 'vagrant destory'

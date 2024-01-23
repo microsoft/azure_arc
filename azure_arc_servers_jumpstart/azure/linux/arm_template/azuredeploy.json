@@ -114,7 +114,7 @@
       }
     },
     "servicePrincipalClientSecret": {
-      "type": "string",
+      "type": "securestring",
       "metadata": {
         "description": "Azure service principal password"
       }

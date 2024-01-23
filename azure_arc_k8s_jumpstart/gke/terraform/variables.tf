@@ -23,6 +23,7 @@ variable "servicePrincipalAppId" {
 variable "servicePrincipalSecret" {
   description = "Azure service principal App Password"
   type        = string
+  sensitive   = true
 }
 
 variable "servicePrincipalTenantId" {
@@ -61,6 +62,7 @@ variable "admin_username" {
 variable "admin_password" {
   description = "GKE control plane administrator username"
   type        = string
+  sensitive   = true
 }
 
 variable "gke_cluster_node_count" {

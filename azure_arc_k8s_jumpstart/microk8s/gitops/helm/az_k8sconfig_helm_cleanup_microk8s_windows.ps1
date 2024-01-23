@@ -8,7 +8,7 @@ $resourceGroup="<Your resource group name>"
 $arcClusterName="<Your Arc cluster name>"
 
 Write-Output "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 Write-Output "Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster"
 az k8s-configuration flux delete --name config-helloarc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y

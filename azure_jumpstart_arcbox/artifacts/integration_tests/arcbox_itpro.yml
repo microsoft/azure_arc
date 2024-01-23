@@ -1,0 +1,107 @@
+trigger:
+  branches:
+    include:
+      - arcbox_3.0
+  paths:
+    include:
+      - azure_jumpstart_arcbox/*
+
+parameters:
+- name: ResourceGroupName
+  displayName: 'Resource Group Name'
+  type: string
+  default: 'arcbox-itpro-integration-tests'
+
+variables:
+  ResourceGroupName: ${{parameters.ResourceGroupName}}
+
+stages:
+- stage: 'ArcBox_deployment'
+  jobs:
+  - job: Deploy
+    timeoutInMinutes: 235 # 5 minutes before the ACA self-hosted runner in order for the runner to gracefully shutdown
+    pool:
+      #name: arc-jumpstart-container-apps-pool
+      vmImage: 'ubuntu-latest'
+    continueOnError: 'true'
+    steps:
+
+    - task: BicepInstall@0
+      displayName: 'Install Bicep'
+      inputs:
+       version: 0.24.24
+
+    - task: AzurePowerShell@5
+      displayName: 'Deploy resource group'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Running deployment from machine $(hostname) and public IP $(irm ifconfig.me/ip)"
+          $RGname = "$(ResourceGroupName)"
+          New-AzResourceGroup -Name $RGname -Location "eastus"
+
+    - task: AzurePowerShell@5
+      displayName: 'Deploy Bicep template'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Deploying to $(ResourceGroupName)"
+           -TemplateParameterFile scenarios/arcbox/arcbox-demo.parameters.json
+          New-AzResourceGroupDeployment -Name ArcBox `
+          -ResourceGroupName $(ResourceGroupName) `
+          -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
+          -TemplateParameterFile "azure_jumpstart_arcbox/artifacts/integration_tests/arcbox_itpro.parameters.json" `
+          -TemplateParameterObject @{
+              spnClientId = $env:spnClientId
+              spnClientSecret = $env:spnClientSecret
+              spnTenantId = $env:spnTenantId
+              windowsAdminPassword = $env:windowsAdminPassword
+          }
+
+
+    - task: AzurePowerShell@5
+      displayName: 'Upload Pester test-results from ArcBox VM'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: FilePath
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
+        ScriptArguments: -ResourceGroupName $(ResourceGroupName)
+
+    - task: AzurePowerShell@5
+      displayName: 'Download Pester test-results from storage account to pipeline agent'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: FilePath
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Get-PesterResult.ps1'
+        ScriptArguments: -ResourceGroupName $(ResourceGroupName)
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFormat: NUnit
+        testResultsFiles: '$(System.DefaultWorkingDirectory)/testresults/*.xml'
+
+- stage: destroy
+  displayName: 'ArcBox_teardown'
+  #condition: succeeded('deploy')
+  jobs:
+  - deployment:
+    displayName: "Get approval"
+    environment: 'teardown_approval'
+  - job: Delete
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Delete resource group'
+      inputs:
+        azureSubscription: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        Inline: |
+          Write-Host "Deleting resource group $(ResourceGroupName)"
+          Remove-AzResourceGroup -Name $(ResourceGroupName) -Force

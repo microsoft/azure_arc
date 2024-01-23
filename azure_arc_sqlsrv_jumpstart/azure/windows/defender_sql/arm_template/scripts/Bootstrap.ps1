@@ -7,6 +7,7 @@ param (
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$azureLocation,
+    [string]$sqlServerEdition,
     [string]$workspaceName,
     [string]$githubUser,
     [string]$templateBaseUrl,
@@ -25,6 +26,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('sqlServerEdition', $sqlServerEdition,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
@@ -70,7 +72,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+$chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnet-sdk,setdefaultbrowser,zoomit'
 
 try {
     choco config get cacheLocation
@@ -90,6 +92,14 @@ foreach ($app in $appsToInstall)
     & choco install $app /y -Force | Write-Output
 }
 
+Write-Header "Installing Azure CLI (64-bit not available via Chocolatey)"
+
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
+
+
 Write-Header "Fetching GitHub Artifacts"
 
 Write-Host "Fetching Artifacts for All Flavors"
@@ -101,6 +111,8 @@ Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/s
 Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/scripts/installArcAgent.ps1") -OutFile "$Env:agentScript\installArcAgent.ps1"
 Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/icons/arcsql.ico") -OutFile $Env:ArcJSIconDir\arcsql.ico
 Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/scripts/testDefenderForSQL.ps1") -OutFile $Env:ArcJSDir\testDefenderForSQL.ps1
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/scripts/SqlAdvancedThreatProtectionShell.psm1") -OutFile $Env:ArcJSDir\SqlAdvancedThreatProtectionShell.psm1
+Invoke-WebRequest ($templateBaseUrl + "azure/windows/defender_sql/arm_template/defendersqldcrtemplate.json") -OutFile $Env:ArcJSDir\defendersqldcrtemplate.json
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "$Env:tempDir\wallpaper.png"
 
 Write-Header "Configuring Logon Scripts"
