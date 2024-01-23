@@ -808,11 +808,6 @@ function New-DCVM {
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
             Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools | Out-Null
 
-            Write-Host "Configuring NIC settings for $DCName VLAN200"
-            $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
-            Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
-            New-NetIPAddress -InterfaceAlias VLAN200 -IPAddress $HCIBoxConfig.dcVLAN200IP -PrefixLength ($HCIBoxConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $HCIBoxConfig.AKSGWIP | Out-Null
-
             Write-Host "Configuring Trusted Hosts on $DCName"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
@@ -938,6 +933,11 @@ function Set-DHCPServerOnDC {
     # Set up DHCP scope for Arc resource bridge
     Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
         $HCIBoxConfig = $args[0]
+        
+        Write-Host "Configuring NIC settings for $DCName VLAN200"
+        $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
+        Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
+        New-NetIPAddress -InterfaceAlias VLAN200 -IPAddress $HCIBoxConfig.dcVLAN200IP -PrefixLength ($HCIBoxConfig.AKSIPPrefix.split("/"))[1] -DefaultGateway $HCIBoxConfig.AKSGWIP | Out-Null
 
         # Install DHCP feature
         Install-WindowsFeature DHCP -IncludeManagementTools
