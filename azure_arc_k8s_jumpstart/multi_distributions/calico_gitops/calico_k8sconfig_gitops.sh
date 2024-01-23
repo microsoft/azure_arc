@@ -30,7 +30,7 @@ az extension add --name k8s-configuration
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create a k8s-configuration
 echo "Create Cluster-level k8s configuration for deploying Global network set and policy"

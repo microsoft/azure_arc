@@ -19,11 +19,13 @@ variable "key_name" {
 variable "AWS_ACCESS_KEY_ID" {
   description = "Your AWS Access Key ID"
   type        = string
+  sensitive = true
 }
 
 variable "AWS_SECRET_ACCESS_KEY" {
   description = "Your AWS Secret Key"
   type        = string
+  sensitive   = true
 }
 
 variable "hostname" {

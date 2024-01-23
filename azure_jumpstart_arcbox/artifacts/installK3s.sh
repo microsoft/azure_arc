@@ -77,7 +77,7 @@ sudo -u $adminUsername az extension add --name k8s-extension
 
 echo ""
 echo "Log in to Azure"
-sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password=$SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 az -v
 echo ""
 

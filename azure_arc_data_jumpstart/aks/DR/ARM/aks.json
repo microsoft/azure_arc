@@ -56,14 +56,14 @@
       }
     },
     "linuxAdminUsername": {
-      "type": "string",
+      "type": "securestring",
       "defaultValue": "arcdemo",
       "metadata": {
         "description": "User name for the Linux Virtual Machines"
       }
     },
     "sshRSAPublicKey": {
-      "type": "string",
+      "type": "securestring",
       "metadata": {
         "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
       }

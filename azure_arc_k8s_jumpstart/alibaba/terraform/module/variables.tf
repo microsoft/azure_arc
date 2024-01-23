@@ -114,6 +114,7 @@ variable "ecs_password" {
   description = "The password of worker nodes."
   type        = string
   default     = "Abc12345"
+  sensitive   = true
 }
 
 variable "worker_number" {

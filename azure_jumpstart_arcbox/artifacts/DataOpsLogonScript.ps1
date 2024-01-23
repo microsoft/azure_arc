@@ -32,7 +32,7 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Register Azure providers
 Write-Header "Registering Providers"
@@ -191,7 +191,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.25.0 `
+            --version 1.26.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"

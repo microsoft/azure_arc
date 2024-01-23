@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Login as service principal
-az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientId --password=$Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"

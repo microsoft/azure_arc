@@ -54,7 +54,7 @@ fi
 echo ""
 
 echo "Login to Az CLI using the service principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 echo "Create Azure Defender Kubernetes extension instance"
 az k8s-extension create --name $k8sExtensionName --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type microsoft.azuredefender.kubernetes

@@ -10,7 +10,7 @@ $connectedClusterName = "Arc-AML-AKS"
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Login as service principal
-az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+az login --service-principal --username $env:spnClientId --password=$Env:spnClientSecret --tenant $env:spnTenantId
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
