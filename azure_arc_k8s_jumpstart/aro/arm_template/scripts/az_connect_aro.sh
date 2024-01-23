@@ -17,7 +17,7 @@ echo ""
 
 # Getting ARO cluster credentials
 echo "Log in to Azure with Service Principle & Getting ARO credentials (kubeconfig)"
-az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+az login --service-principal --username $AZURE_CLIENT_ID --password=$AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 echo ""
 kubcepass=$(az aro list-credentials --name $AZURE_ARC_CLUSTER_RESOURCE_NAME -g $AZURE_RESOURCE_GROUP --query kubeadminPassword -o tsv)
 echo ""

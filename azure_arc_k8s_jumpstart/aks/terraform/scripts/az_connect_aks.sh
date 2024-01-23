@@ -11,7 +11,7 @@ export arcClusterName='<The name of your k8s cluster as it will be shown in Azur
 
 # Log in to Azure
 echo "Log in to Azure with Service Principle"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Registering Azure Arc providers
 echo "Registering Azure Arc providers"

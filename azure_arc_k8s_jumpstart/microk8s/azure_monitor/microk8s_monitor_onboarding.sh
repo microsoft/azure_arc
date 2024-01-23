@@ -14,7 +14,7 @@ echo "Downloading the Azure Monitor onboarding script"
 curl -o enable-monitoring.sh -L https://aka.ms/enable-monitoring-bash-script
 
 echo "Onboarding the Azure Arc-enabled Kubernetes cluster to Azure Monitor for containers"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 mkdir -p ~/.kube
 microk8s config > ~/.kube/config
 export azureArcClusterResourceId=$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id -o tsv)

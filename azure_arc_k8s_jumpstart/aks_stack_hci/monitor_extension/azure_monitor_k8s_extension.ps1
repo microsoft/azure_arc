@@ -26,7 +26,7 @@ az extension add --name "k8s-extension"
 az extension update --name "k8s-extension"
 
 # Login to Az CLI using the service principal
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create monitor k8s extension instance
 az k8s-extension create --name $k8sExtensionName --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-ty

@@ -1,22 +1,10 @@
 # Execute sql commands to generate defender for cloud alerts
+param (
+    [string]$workingDir = "C:\Jumpstart\agentScript"
+)
 Write-Host "Executing Defender for SQL threat simulation script."
-$attempts = 0
-
-while ($attempts -le 5)
-{
-    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse -ErrorAction SilentlyContinue).FullName
-    $attempts = $attempts + 1
-    if ($true -eq [System.IO.File]::Exists($moduleFile))
-    {
-        Write-Host "Found module file $moduleFile installed."
-        break
-    }
-    else 
-    {
-        Write-Host "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
-        Start-Sleep(60) # Wait for agent to isntall all modules
-    }
-}
+Write-Host "Current working directory: $pwd"
+$moduleFile = $workingDir + "\SqlAdvancedThreatProtectionShell.psm1"
 
 if ($true -ne [System.IO.File]::Exists($moduleFile))
 {
@@ -29,7 +17,7 @@ Import-Module $moduleFile
 Get-Command -Module SqlAdvancedThreatProtectionShell
 
 Write-Host "Executing SQL injection"
-$saPasswordEncrypted = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
+$saPasswordEncrypted = ConvertTo-SecureString -String "JS123!!" -AsPlainText -Force
 Test-SqlAtpInjection -UserName sa -Password $saPasswordEncrypted # High risk
 Start-Sleep(30) # Wait between tests
 

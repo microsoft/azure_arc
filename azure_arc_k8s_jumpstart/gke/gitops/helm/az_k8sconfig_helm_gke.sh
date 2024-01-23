@@ -36,7 +36,7 @@ echo ""
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 # Create GitOps config for NGINX Ingress Controller
 echo "Creating GitOps config for NGINX Ingress Controller"

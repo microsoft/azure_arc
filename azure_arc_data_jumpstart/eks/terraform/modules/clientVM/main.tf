@@ -1,11 +1,13 @@
 variable "awsAccessKeyId" {
   type = string
   description = "AWS Access key id"
+  sensitive   = true
 }
 
 variable "awsSecretAccessKey" {
   type = string
   description = "AWS Access Secret"
+  sensitive = true
 }
 
 variable "awsDefaultRegion" {
@@ -25,6 +27,7 @@ variable "spnClientId" {
 variable "spnClientSecret" {
   type        = string
   description = "Client secret of the service principal"
+  sensitive = true
 }
 
 variable "spnAuthority" {

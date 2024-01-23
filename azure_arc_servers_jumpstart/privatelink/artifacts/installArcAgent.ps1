@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\ArcInstallScript.log
 
 # Azure Login 
 
-az login --service-principal -u $Env:appId -p $Env:password --tenant $Env:tenantId
+az login --service-principal -u $Env:appId -p=$Env:password --tenant $Env:tenantId
 az account set -s $Env:SubscriptionId
 
 # Configure hosts file for Private link endpoints resolution

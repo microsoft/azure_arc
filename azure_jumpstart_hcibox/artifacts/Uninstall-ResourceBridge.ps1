@@ -34,7 +34,7 @@ $custom_location_name = "hcibox-rb-cl"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Write-Host "Removing Arc Resource Bridge."
     $WarningPreference = "SilentlyContinue"
-    az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
+    az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
 
     az azurestackhci virtualnetwork delete --subscription $using:subId --resource-group $using:rg --name "vlan200" --yes
     az azurestackhci galleryimage delete --subscription $using:subId --resource-group $using:rg --name "ubuntu20"

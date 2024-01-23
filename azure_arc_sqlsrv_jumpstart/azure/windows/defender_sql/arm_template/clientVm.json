@@ -81,6 +81,15 @@
                 "description": "Tenant id of the service principal"
             }
         },
+        "sqlServerEdition": {
+        "type": "string",
+        "defaultValue": "Developer",
+        "allowedValues": [
+            "Developer",
+            "Standard",
+            "Enterprise"
+            ]
+        },        
         "workspaceName": {
             "type": "string",
             "metadata": {
@@ -121,7 +130,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2023-04-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -144,7 +153,7 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2023-04-01",
             "name": "[variables('publicIpAddressName')]",
             "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('location')]",
@@ -160,7 +169,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2022-03-01",
+            "apiVersion": "2023-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
@@ -209,7 +218,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/Bootstrap')]",
-            "apiVersion": "2022-03-01",
+            "apiVersion": "2023-03-01",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
@@ -226,7 +235,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'azure/windows/defender_sql/arm_template/scripts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -githubUser ', parameters('githubUser'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -sqlServerEdition ', parameters('sqlServerEdition'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -githubUser ', parameters('githubUser'))]"
                 }
             }
         }

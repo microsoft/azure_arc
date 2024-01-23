@@ -72,7 +72,7 @@ Write-Host "I am deploying Azure Log Analytics workspace and installing the MMA 
 $servicePrincipalAppId = "${servicePrincipalAppId}"
 $servicePrincipalTenantId = "${servicePrincipalTenantId}"
 $servicePrincipalSecret = "${servicePrincipalSecret}"
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
+az login --service-principal --username $servicePrincipalAppId --password=$servicePrincipalSecret --tenant $servicePrincipalTenantId
 
 # Set Log Analytics Workspace Environment Variables
 $resourceGroup = "${resourceGroup}"

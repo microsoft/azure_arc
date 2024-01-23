@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: selfhost-env
+  labels:
+    app: selfhost
+data:
+  config.service.endpoint: "APIMNAMEHOLDER.configuration.azure-api.net"
+  neighborhood.host: "selfhost-instance-discovery"
+  runtime.deployment.artifact.source: "Azure Portal"
+  runtime.deployment.mechanism: "YAML"
+  runtime.deployment.orchestrator.type: "Kubernetes"
