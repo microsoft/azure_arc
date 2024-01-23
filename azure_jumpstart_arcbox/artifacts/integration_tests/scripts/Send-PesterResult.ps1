@@ -8,6 +8,11 @@ $logFilePath = "C:\ArcBox\Logs\ArcServersLogonScript.log"
 
 Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
 
+$spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
+
+$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
+
 $ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
@@ -37,10 +42,6 @@ do {
     Start-Sleep -Seconds 60
 } while ((Get-Date) -lt $endTime)
 
-$spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-
-$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
 
 $ctx = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -UseConnectedAccount
 
