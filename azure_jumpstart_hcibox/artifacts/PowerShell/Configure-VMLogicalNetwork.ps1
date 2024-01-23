@@ -9,11 +9,6 @@ $Env:HCIBoxDir = "C:\HCIBox"
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Configure-VMManagement.log"
 
-# Generate credential objects
-$user = "$($HCIBoxConfig.SDNDomainFQDN)\administrator"
-$password = ConvertTo-SecureString -String $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force
-$adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
-
 # Install AZ Resource Bridge and prerequisites
 Write-Host "Now Preparing to configure guest VM management"
 
@@ -36,5 +31,5 @@ $addressPrefixes = $HCIBoxConfig.vmIpPrefix
 $gateway = $HCIBoxConfig.vmGateway
 $dnsServers = $HCIBoxConfig.vmDNS
 $vlanid = $HCIBoxConfig.vmVLAN
-Start-Sleep -Seconds 10
+
 az stack-hci-vm network lnet create --subscription $env:subscriptionId --resource-group $env:resourceGroup --custom-location $customLocationID --location $location --name $lnetName --vm-switch-name $switchName --ip-allocation-method "static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid

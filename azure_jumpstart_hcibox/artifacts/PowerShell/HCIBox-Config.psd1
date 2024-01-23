@@ -170,16 +170,14 @@
 
     # AKS and Resource bridge variables
     rbCustomLocationName                 = "jumpstart"
-    storagePathName                      = "vms"
-    storagePath                          = "C:\ClusterStorage\VMs"
     AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
-    AKSNodeStartIP                       = "192.168.200.100"
-    AKSNodeEndIP                         = "192.168.200.159"
-    AKSVIPStartIP                        = "192.168.200.160"
-    AKSVIPEndIP                          = "192.168.200.226"
-    AKSIPPrefix                          = "192.168.200.0/24"
-    AKSGWIP                              = "192.168.200.1"
+    AKSNodeStartIP                       = "10.10.0.101"
+    AKSNodeEndIP                         = "10.10.0.199"
+    AKSVIPStartIP                        = "10.10.0.10"
+    AKSVIPEndIP                          = "10.10.0.100"
+    AKSIPPrefix                          = "10.10.0.0/24"
+    AKSGWIP                              = "10.10.0.1"
     AKSDNSIP                             = "192.168.1.254"
     AKSVLAN                              = "200"
     # rbVipStart                           = "192.168.200.200"
