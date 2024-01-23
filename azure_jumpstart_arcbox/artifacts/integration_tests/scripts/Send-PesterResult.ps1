@@ -6,6 +6,14 @@ $timeout = New-TimeSpan -Minutes 180
 $endTime = (Get-Date).Add($timeout)
 $logFilePath = "C:\ArcBox\Logs\ArcServersLogonScript.log"
 
+Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
+
+$ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
+
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
+
+$null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+
 Write-Output "Waiting for PowerShell transcript end in $logFilePath"
 
 do {
@@ -33,8 +41,6 @@ $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
 $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
-
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
 $ctx = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -UseConnectedAccount
 
