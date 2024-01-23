@@ -45,11 +45,11 @@ properties:
         id: Microsoft.AzureDataStudio
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: ShiningLight.OpenSSL.Light
+      id: FireDaemon.OpenSSL
       directives:
-        description: Install OpenSSL light
+        description: Install OpenSSL
       settings:
-        id: ShiningLight.OpenSSL.Light
+        id: FireDaemon.OpenSSL
         source: winget
 
   configurationVersion: 0.2.0
