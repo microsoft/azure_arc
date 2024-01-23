@@ -38,7 +38,7 @@ As we continuously improve and expand Arc Jumpstart, we recommend keeping your l
 git pull origin main
 ```
 
-If you're looking to reduce the time and size it takes to clone this repository, you can use partial clones. By default, when you clone athis repository, you get all of the files and their associated metadata, including blobs and diff history. However, if you don't need all of this information, you can use the following command to clone the repository without the blobs:
+You can use partial clones if you want to reduce the time and size it takes to clone this repository. By default, when you clone this repository, you get all the files and their associated metadata, including blobs and diff history. However, if you don't need all of this information, you can use the following command to clone the repository without the blobs:
 
 ```bash
 git clone --filter=blob:none https://github.com/microsoft/azure_arc
