@@ -562,12 +562,17 @@ function New-NATSwitch {
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.providerVLAN | Out-Null    
-    
+   
+    #Create VLAN 110 NIC in order for NAT to work from L3 Connections
+    Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN110 -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
+    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN110 | Set-VMNetworkAdapter -MacAddressSpoofing On
+    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN110 | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.vlan110VLAN | Out-Null
+
     #Create VLAN 200 NIC in order for NAT to work from L3 Connections
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.vlan200VLAN | Out-Null    
-    
+
     #Create Simulated Internet NIC in order for NAT to work from L3 Connections
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet | Set-VMNetworkAdapter -MacAddressSpoofing On
@@ -674,9 +679,11 @@ function Set-FabricNetwork {
         $natIP = ($HCIBoxConfig.natSubnet.TrimEnd("0./$Prefix")) + (".1")
         $provIP = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24") + "254"
         $vlan200IP = $HCIBoxConfig.BGPRouterIP_VLAN200.TrimEnd("1/24") + "250"
+        $vlan110IP = $HCIBoxConfig.BGPRouterIP_VLAN110.TrimEnd("1/24") + "250"
         $provGW = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.TrimEnd("/24")
         $provpfx = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.Split("/")[1]
-        $vlanpfx = $HCIBoxConfig.BGPRouterIP_VLAN200.Split("/")[1]
+        $vlan200pfx = $HCIBoxConfig.BGPRouterIP_VLAN200.Split("/")[1]
+        $vlan110pfx = $HCIBoxConfig.BGPRouterIP_VLAN110.Split("/")[1]
         $simInternetIP = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.TrimEnd("1/24") + "254"
         $simInternetPFX = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[1]
         New-VMSwitch -SwitchName NAT -SwitchType Internal -MinimumBandwidthMode None | Out-Null
@@ -691,7 +698,12 @@ function Set-FabricNetwork {
         Write-Host "Configuring VLAN200 NIC on $env:COMPUTERNAME"
         $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
         Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
-        New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $vlan200IP -PrefixLength $vlanpfx | Out-Null
+        New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $vlan200IP -PrefixLength $vlan200pfx | Out-Null
+
+        Write-Host "Configuring VLAN110 NIC on $env:COMPUTERNAME"
+        $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN110" }
+        Rename-NetAdapter -name $NIC.name -newname "VLAN110" | Out-Null
+        New-NetIPAddress -InterfaceAlias "VLAN110" -IPAddress $vlan110IP -PrefixLength $vlan110pfx | Out-Null
 
         Write-Host "Configuring simulatedInternet NIC on $env:COMPUTERNAME"
         $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "simInternet" }
@@ -760,10 +772,6 @@ function New-DCVM {
         Write-Host "Configuring $VMName's settings"
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
-
-        # Add NIC for VLAN200 for DHCP server
-        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming "On"
-        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $HCIBoxConfig.AKSVLAN
 
         # Inject Answer File
         Write-Host "Mounting and injecting answer file into the $VMName VM."        
@@ -912,33 +920,45 @@ function New-DCVM {
             #Issue Certificate Template
             CMD.exe /c "certutil -SetCATemplates +WebServer"
         }
+    }
+}
 
-        # Write-Host "Configuring DHCP scope on DHCP server."
-        # # Set up DHCP scope for Arc resource bridge
-        # Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
-        #     $HCIBoxConfig = $args[0]
+function Set-DHCPServerOnDC {
+    Param (
+        $HCIBoxConfig,
+        [PSCredential]$domainCred,
+        [PSCredential]$localCred
+    )
+    Invoke-Command -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Credential $localCred -ScriptBlock {
+        # Add NIC for VLAN200 for DHCP server (for use with Arc-enabled VMs)
+        Add-VMNetworkAdapter -VMName $VMName -Name "VLAN200" -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming "On"
+        Get-VMNetworkAdapter -VMName $VMName -Name "VLAN200" | Set-VMNetworkAdapterVLAN -Access -VlanId $HCIBoxConfig.AKSVLAN
+    }
+    Write-Host "Configuring DHCP scope on DHCP server."
+    # Set up DHCP scope for Arc resource bridge
+    Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
+        $HCIBoxConfig = $args[0]
 
-        #     # Install DHCP feature
-        #     Install-WindowsFeature DHCP -IncludeManagementTools
-        #     CMD.exe /c "netsh dhcp add securitygroups"
-        #     Restart-Service dhcpserver
+        # Install DHCP feature
+        Install-WindowsFeature DHCP -IncludeManagementTools
+        CMD.exe /c "netsh dhcp add securitygroups"
+        Restart-Service dhcpserver
 
-        #     # Allow DHCP in domain
-        #     $dnsName = $HCIBoxConfig.DCName
-        #     $fqdnsName = $HCIBoxConfig.DCName + "." + $HCIBoxConfig.SDNDomainFQDN
-        #     Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $HCIBoxConfig.dcVLAN200IP
-        #     Get-DHCPServerInDC
+        # Allow DHCP in domain
+        $dnsName = $HCIBoxConfig.DCName
+        $fqdnsName = $HCIBoxConfig.DCName + "." + $HCIBoxConfig.SDNDomainFQDN
+        Add-DhcpServerInDC -DnsName $fqdnsName -IPAddress $HCIBoxConfig.dcVLAN200IP
+        Get-DHCPServerInDC
 
-        #     # Bind DHCP only to VLAN200 NIC
-        #     Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
-        #     Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
+        # Bind DHCP only to VLAN200 NIC
+        Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias $dnsName -BindingState $false
+        Set-DhcpServerv4Binding -ComputerName $dnsName -InterfaceAlias VLAN200 -BindingState $true
 
-        #     # Add DHCP scope for Resource bridge VMs
-        #     Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $HCIBoxConfig.rbVipStart -EndRange $HCIBoxConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
-        #     $scope = Get-DhcpServerv4Scope
-        #     Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $HCIBoxConfig.rbDHCPExclusionStart -EndRange $HCIBoxConfig.rbDHCPExclusionEnd
-        #     Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $HCIBoxConfig.SDNLABDNS -Router $HCIBoxConfig.BGPRouterIP_VLAN200.Trim("/24")
-        # }
+        # Add DHCP scope for Resource bridge VMs
+        Add-DhcpServerv4Scope -name "ResourceBridge" -StartRange $HCIBoxConfig.rbVipStart -EndRange $HCIBoxConfig.rbVipEnd -SubnetMask 255.255.255.0 -State Active
+        $scope = Get-DhcpServerv4Scope
+        Add-DhcpServerv4ExclusionRange -ScopeID $scope.ScopeID.IPAddressToString -StartRange $HCIBoxConfig.rbDHCPExclusionStart -EndRange $HCIBoxConfig.rbDHCPExclusionEnd
+        Set-DhcpServerv4OptionValue -ComputerName $dnsName -ScopeId $scope.ScopeID.IPAddressToString -DnsServer $HCIBoxConfig.SDNLABDNS -Router $HCIBoxConfig.BGPRouterIP_VLAN200.Trim("/24")
     }
 }
 
@@ -974,9 +994,11 @@ function New-RouterVM {
         Write-Host "Configuring $VMName's Networking"
         Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Add-VMNetworkAdapter -VMName $VMName -Name Provider -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
+        Add-VMNetworkAdapter -VMName $VMName -Name VLAN110 -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Add-VMNetworkAdapter -VMName $VMName -Name VLAN200 -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Add-VMNetworkAdapter -VMName $VMName -Name SIMInternet -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName Provider -Access -VlanId $HCIBoxConfig.providerVLAN
+        Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN110 -Access -VlanId $HCIBoxConfig.vlan110VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN200 -Access -VlanId $HCIBoxConfig.vlan200VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName SIMInternet -Access -VlanId $HCIBoxConfig.simInternetVLAN
         Add-VMNetworkAdapter -VMName $VMName -Name NAT -SwitchName NAT -DeviceNaming On   
@@ -1015,6 +1037,8 @@ function New-RouterVM {
             $PNVPFX = $HCIBoxConfig.BGPRouterIP_ProviderNetwork.Split("/")[1]
             $VLANIP = $HCIBoxConfig.BGPRouterIP_VLAN200.Split("/")[0]
             $VLANPFX = $HCIBoxConfig.BGPRouterIP_VLAN200.Split("/")[1]
+            $VLAN110IP = $HCIBoxConfig.BGPRouterIP_VLAN110.Split("/")[0]
+            $VLAN110PFX = $HCIBoxConfig.BGPRouterIP_VLAN110.Split("/")[1]
             $simInternetIP = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[0]
             $simInternetPFX = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[1]
     
@@ -1024,12 +1048,19 @@ function New-RouterVM {
             Rename-NetAdapter -name $NIC.name -newname "Mgmt" | Out-Null
             New-NetIPAddress -InterfaceAlias "Mgmt" -IPAddress $MGMTIP -PrefixLength $MGMTPFX | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias “Mgmt” -ServerAddresses $DNS | Out-Null
+            
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "PROVIDER" }
             Rename-NetAdapter -name $NIC.name -newname "PROVIDER" | Out-Null
             New-NetIPAddress -InterfaceAlias "PROVIDER" -IPAddress $PNVIP -PrefixLength $PNVPFX | Out-Null
+            
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
             Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
             New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $VLANIP -PrefixLength $VLANPFX | Out-Null
+            
+            $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN110" }
+            Rename-NetAdapter -name $NIC.name -newname "VLAN110" | Out-Null
+            New-NetIPAddress -InterfaceAlias "VLAN110" -IPAddress $VLAN110IP -PrefixLength $VLAN110PFX | Out-Null
+            
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "SIMInternet" }
             Rename-NetAdapter -name $NIC.name -newname "SIMInternet" | Out-Null
             New-NetIPAddress -InterfaceAlias "SIMInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
