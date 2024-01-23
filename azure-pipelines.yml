@@ -117,4 +117,4 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deleting resource group $(ResourceGroupName)"
-          Remove-AzResourceGroup -Name $(ResourceGroupName) -Force
+          Remove-AzResourceGroup -Name $(ResourceGroupName) -Force -WhatIf
