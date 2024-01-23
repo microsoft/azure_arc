@@ -51,12 +51,16 @@ $env:Path = $currentPath + ";" + $newPath
 
 Write-Output "Az CLI Login"
 az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:spnTenantId
+az account set -s $env:subscriptionId
 
 $ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
 $null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+
+Write-Output "Wait for eventual consistencty after RBAC assignment"
+Start-Sleep 120
 
 Write-Output "Waiting for PowerShell transcript end in $logFilePath"
 
