@@ -27,8 +27,8 @@ stages:
   - job: Deploy
     timeoutInMinutes: 235 # 5 minutes before the ACA self-hosted runner in order for the runner to gracefully shutdown
     pool:
-      #name: arc-jumpstart-container-apps-pool
-      vmImage: 'ubuntu-latest'
+      name: arc-jumpstart-container-apps-pool
+      #vmImage: 'ubuntu-latest'
     continueOnError: 'true'
     steps:
 
