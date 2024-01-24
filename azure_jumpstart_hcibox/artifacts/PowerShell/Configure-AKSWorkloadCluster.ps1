@@ -7,7 +7,10 @@ $Env:HCIBoxDir = "C:\HCIBox"
 
 # Import Configuration Module
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
-Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Configure-AKS.log"
+Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Configure-AKSWorkloadCluster.log"
+
+$domainCred = new-object -typename System.Management.Automation.PSCredential `
+    -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\Administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Generate credential objects
 Write-Host 'Creating credentials and connecting to Azure'
@@ -16,7 +19,7 @@ $tenantId = $env:spnTenantId
 $subId = $env:subscriptionId
 $clustervnetname = "aksvnet1"
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
-Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].HostName).jumpstart.local" -Authentication CredSSP -ArgumentList $HCIBoxConfig, $azureAppCred, $tenantId, $subId, $clustervnetname -Credential $domainCred -ScriptBlock {
+Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Authentication CredSSP -ArgumentList $HCIBoxConfig, $azureAppCred, $tenantId, $subId, $clustervnetname -Credential $domainCred -ScriptBlock {
     $HCIBoxConfig = $args[0]
     $azureAppCred = $args[1]
     $tenantId = $args[2]
@@ -27,6 +30,8 @@ Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].HostName).jumpst
 }
 
 az login --service-principal --username $env:spnClientID --password=$env:spnClientSecret --tenant $env:spnTenantId
+az extension add --name customlocation
+az extension add --name akshybrid
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $HCIBoxConfig.rbCustomLocationName --query id -o tsv)
 az akshybrid vnet create -n $HCIBoxConfig.AKSvnetname -g $env:resourceGroup --custom-location $customlocationID --moc-vnet-name $clustervnetname
 $vnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.HybridContainerService/virtualNetworks/$($HCIBoxConfig.AKSvnetname)"
