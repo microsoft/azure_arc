@@ -6,7 +6,7 @@ param(
 Write-Host "Starting VM Run Command to wait for deployment and retrieve Pester test results from ArcBox-Client in resource group $ResourceGroupName"
 
 $Location = (Get-AzVM -ResourceGroupName $ResourceGroupName).Location
-Set-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName ArcBox-Client -RunCommandName RetrievePesterResults -Location $Location -SourceScriptUri "https://gist.githubusercontent.com/janegilring/0df14b6b45cde9ebc3060aad995ce173/raw/337a867488b532ccfaece62b5c805d3a31d44c2b/Send-PesterResult.ps1" -AsyncExecution
+Set-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName ArcBox-Client -RunCommandName RetrievePesterResults -Location $Location -SourceScriptUri "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_3.0/azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Send-PesterResult.ps1" -AsyncExecution
 
 do {
     $job = Get-AzVMRunCommand -ResourceGroupName $ResourceGroupName -VMName ArcBox-Client -RunCommandName RetrievePesterResults -Expand InstanceView
