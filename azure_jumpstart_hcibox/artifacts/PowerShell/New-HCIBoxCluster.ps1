@@ -489,7 +489,7 @@ function Set-HCINodeVHDX {
 
     New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
     Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
-    Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
+    # Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
 
     # Dismount VHDX
     Write-Host "Dismounting VHDX File at path $path"
@@ -1537,9 +1537,9 @@ else {
     Write-Error "GUI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw 
 }
-BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
-Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
-Move-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx"
+# BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
+# Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
+# Move-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx"
 
 # Set credentials
 $localCred = new-object -typename System.Management.Automation.PSCredential `
