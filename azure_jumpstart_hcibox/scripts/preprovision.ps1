@@ -173,30 +173,33 @@ if ($null -ne $spnProviderId.id) {
 ########################################################################
 # Create Azure Service Principal
 ########################################################################
-Write-Host "Creating Azure Service Principal..."
-
-$user = (Get-AzContext).Account.Id.split("@")[0]
-$uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
-try {
-    $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
+Write-Host "Checking for existing stored Azure service principal..."
+if ($null -ne $env:SPN_CLIENT_ID) {
+    Write-Host "Re-using existing service principal..."
+} else {
+    Write-Host "Attempting to create new service principal..."
+    $user = (Get-AzContext).Account.Id.split("@")[0]
+    $uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
+    try {
+        $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
+        $SPN_CLIENT_ID = $spn.AppId
+        $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
+        $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
+        # Set environment variables
+        azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
+        azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
+        azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
+    }
+    catch {
+        If ($error[0].ToString() -match "Forbidden"){
+            Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
+        }
+        elseif ($error[0].ToString() -match "credentials") {
+            Throw "Please run Connect-AzAccount to sign in and run 'azd up' again."
+        }
+        else {
+            Throw "An error occurred creating the service principal. Please try again."
+        }
+    }
+    
 }
-catch {
-    If ($error[0].ToString() -match "Forbidden"){
-        Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
-    }
-    elseif ($error[0].ToString() -match "credentials") {
-        Throw "Please run Connect-AzAccount to sign in and run 'azd up' again."
-    }
-    else {
-        Throw "An error occurred creating the service principal. Please try again."
-    }
-} 
-
-$SPN_CLIENT_ID = $spn.AppId
-$SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
-$SPN_TENANT_ID = (Get-AzContext).Tenant.Id
-
-# Set environment variables
-azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
-azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
-azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
