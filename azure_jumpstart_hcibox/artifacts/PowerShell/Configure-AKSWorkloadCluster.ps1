@@ -2,6 +2,9 @@ $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 $ProgressPreference = 'SilentlyContinue'
 
+# Set aadgroupID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster.
+#aadgroupID="xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"
+
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
 
@@ -35,6 +38,5 @@ az extension add --name akshybrid
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $HCIBoxConfig.rbCustomLocationName --query id -o tsv)
 az akshybrid vnet create -n $HCIBoxConfig.AKSvnetname -g $env:resourceGroup --custom-location $customlocationID --moc-vnet-name $clustervnetname
 $vnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.HybridContainerService/virtualNetworks/$($HCIBoxConfig.AKSvnetname)"
-$aadgroupID="97d70ef2-db1e-413c-84f5-3159fbf34693"
 az akshybrid create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $vnetId --aad-admin-group-object-ids $aadgroupID --generate-ssh-keys --load-balancer-count 1
 Stop-Transcript
