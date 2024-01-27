@@ -1,3 +1,6 @@
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
+
 Invoke-Pester -Path "$Env:ArcBoxTestsDir\common.tests.ps1" -Output Detailed -PassThru -OutVariable tests_common
 $tests_passed = $tests_common.Passed.Count
 $tests_failed = $tests_common.Failed.Count
