@@ -1,5 +1,9 @@
 Start-Transcript -Path C:\ArcBox\logs\Get-PesterResult.log -Force
 
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
+
 Write-Output "Get-PesterResult.ps1 started in $(hostname.exe) as user $(whoami.exe) at $(Get-Date)"
 
 $timeout = New-TimeSpan -Minutes 180
