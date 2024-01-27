@@ -23,6 +23,10 @@ parameters:
   displayName: 'githubBranch'
   type: string
   default: 'arcbox_3.0'
+- name: flavor
+  displayName: 'flavor'
+  type: string
+  default: 'ITPro'
 
 variables:
 - group: 'integration-tests'
@@ -32,6 +36,8 @@ variables:
   value: ${{parameters.githubAccount}}
 - name: githubBranch
   value: ${{parameters.githubBranch}}
+- name: flavor
+  value: ${{parameters.flavor}}
 
 stages:
 - stage: 'ArcBox_deployment'
@@ -70,6 +76,7 @@ stages:
           Write-Host "Deploying to $(ResourceGroupName)"
           $githubAccount = "$(githubAccount)"
           $githubBranch = "$(githubBranch)"
+          $flavor = "$(flavor)"
           if ($githubAccount -ne "microsoft") {
             Write-Host "Checking out $githubAccount/$githubBranch"
             git remote add upstream https://github.com/$($githubAccount)/azure_arc.git
@@ -87,7 +94,7 @@ stages:
               windowsAdminPassword = "$(windowsAdminPassword)" ; `
               sshRSAPublicKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCsdlSaF10Uw0fFysiIV0VYeJGE1CaV0ZjZcakcKgafiqZ04sAzf7KnoIjPVyx6LXoDTKGtv1e5eFjRZA7Z0Bu+a3JqY252/yr/B2R3Mu5qZHbKFncpVEXn7sUmYk4rDG5vToFxbhpKX5EGyvM1M0quoUv3Uv9reBsSDdjk7n7oA2Q+89rj4nfRuTEMQRwvNBaLeNRSlWuzPq4EkpwxSWRzIC2auC5K0rxGiTMPTXMOQ3l0DvzKRoEsygHA4c3uw0PTntSlgSSTgtGdQfuX63hAD4QPTVfeQdsW5+Nq3clr+6SHgeGdwHhKjUVTF+E2olfSYtuV4CqPW8dZdDBOZg7pXLMSVumZVKCZiUV6uBJkvLBRMzMiFsfXOVrgyThMqq+8y4tg/V3l/3S8z5Lngy4WoCAQMHQ1SloPmy9s4QnbjCFEQx/cIq9H+Uw6HAYhdQFh/w/tuIP+KIqOpMOrltZuaoqx3AOOL3BPXJMbv3opiZxCEZQFf68n+Zn6uRc9u1EENA9s1DrjG1j/CHWzbX/t63Ig/xQLgKLu9T+evua3dcWsYc3j1Gvk8R+ioXV7x0/fi6twrhSQxBIIL0D2Pxm8TBfJ3mVXk0kYGGq1mBsoxAzjoBhcbdwUMXHbAksj4/UuuAK5VfH278hlXo/BHSgDLZ98fdS63nq7rIr6qWmBrQ==" ; `
               logAnalyticsWorkspaceName = "arcbox-la" ; `
-              flavor = "ITPro" ; `
+              flavor = $flavor ; `
               deployBastion = $false ; `
               githubAccount = $githubAccount ; `
               githubBranch = $githubBranch ; `
