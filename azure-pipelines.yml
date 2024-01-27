@@ -15,11 +15,23 @@ parameters:
   displayName: 'Azure Subscription'
   type: string
   default: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+- name: githubAccount
+  displayName: 'githubAccount'
+  type: string
+  default: 'microsoft'
+- name: githubBranch
+  displayName: 'githubBranch'
+  type: string
+  default: 'arcbox_3.0'
 
 variables:
 - group: 'integration-tests'
 - name: ResourceGroupName
   value: ${{parameters.ResourceGroupName}}
+- name: githubAccount
+  value: ${{parameters.githubAccount}}
+- name: githubBranch
+  value: ${{parameters.githubBranch}}
 
 stages:
 - stage: 'ArcBox_deployment'
@@ -56,6 +68,14 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deploying to $(ResourceGroupName)"
+          $githubAccount = $(githubAccount)
+          $githubBranch = $(githubBranch)
+          if ($githubAccount -ne "microsoft") {
+            Write-Host "Checking out $githubAccount/$githubBranch"
+            git remote add upstream git@github.com:$($githubAccount)/azure_arc.git
+            git fetch upstream
+            git checkout -b $githubBranch upstream/$githubBranch
+          }
           New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $(ResourceGroupName) `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
@@ -69,8 +89,8 @@ stages:
               logAnalyticsWorkspaceName = "arcbox-la" ; `
               flavor = "ITPro" ; `
               deployBastion = $false ; `
-              githubAccount = "microsoft" ; `
-              githubBranch = "arcbox_3.0" ; `
+              githubAccount = $githubAccount ; `
+              githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
               rdpPort = "3389" `
           }
