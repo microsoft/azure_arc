@@ -68,8 +68,8 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deploying to $(ResourceGroupName)"
-          $githubAccount = $(githubAccount)
-          $githubBranch = $(githubBranch)
+          $githubAccount = "$(githubAccount)"
+          $githubBranch = "$(githubBranch)"
           if ($githubAccount -ne "microsoft") {
             Write-Host "Checking out $githubAccount/$githubBranch"
             git remote add upstream git@github.com:$($githubAccount)/azure_arc.git
