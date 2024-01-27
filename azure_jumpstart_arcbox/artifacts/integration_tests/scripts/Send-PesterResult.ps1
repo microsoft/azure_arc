@@ -4,7 +4,22 @@ Write-Output "Get-PesterResult.ps1 started in $(hostname.exe) as user $(whoami.e
 
 $timeout = New-TimeSpan -Minutes 180
 $endTime = (Get-Date).Add($timeout)
-$logFilePath = "C:\ArcBox\Logs\ArcServersLogonScript.log"
+
+
+switch ($env:flavor) {
+    'DevOps' {
+        $logFilePath = "$Env:ArcBoxLogsDir\DevOpsLogonScript.log"
+}
+    'DataOps' {
+        $logFilePath = "$Env:ArcBoxLogsDir\DataOpsLogonScript.log"
+    }
+    'ITPro' {
+        $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
+    }
+    'default' {
+        throw "Unknown flavor $env:flavor"
+    }
+}
 
 Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
 

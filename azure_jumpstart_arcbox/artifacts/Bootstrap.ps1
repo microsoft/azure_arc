@@ -132,6 +132,9 @@ foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 }
 
+# Temporary workaround for Posh-SSH module due to: https://github.com/darkoperator/Posh-SSH/issues/558
+Install-PSResource -Name Posh-SSH -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
+
 # Installing DHCP service
 Write-Output "Installing DHCP service"
 Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
