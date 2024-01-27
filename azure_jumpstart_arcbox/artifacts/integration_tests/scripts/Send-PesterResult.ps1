@@ -2,7 +2,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
-Start-Transcript -Path "$Env:ArcBoxLogsDir\Get-PesterResult.log" -Force
+Start-Transcript -Path "$Env:ArcBoxLogsDir\Get-PesterResult_$($PID).log" -Force
 
 Write-Output "Get-PesterResult.ps1 started in $(hostname.exe) as user $(whoami.exe) at $(Get-Date)"
 
@@ -76,10 +76,19 @@ $ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output 
 
 $StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
-$null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+if (Get-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id) {
 
-Write-Output "Wait for eventual consistencty after RBAC assignment"
-Start-Sleep 120
+    Write-Output "Role assignment already exists"
+
+} else {
+
+    Write-Output "Role assignment does not yet exist"
+    $null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+
+    Write-Output "Wait for eventual consistency after RBAC assignment"
+    Start-Sleep 120
+
+}
 
 Write-Output "Waiting for PowerShell transcript end in $logFilePath"
 
