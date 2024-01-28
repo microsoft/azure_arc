@@ -15,11 +15,29 @@ parameters:
   displayName: 'Azure Subscription'
   type: string
   default: 'Azure Arc Jumpstart Develop(98a19988-5c3d-4824-a685-f5cf12ae5c19)'
+- name: githubAccount
+  displayName: 'githubAccount'
+  type: string
+  default: 'microsoft'
+- name: githubBranch
+  displayName: 'githubBranch'
+  type: string
+  default: 'arcbox_3.0'
+- name: flavor
+  displayName: 'flavor'
+  type: string
+  default: 'ITPro'
 
 variables:
 - group: 'integration-tests'
 - name: ResourceGroupName
   value: ${{parameters.ResourceGroupName}}
+- name: githubAccount
+  value: ${{parameters.githubAccount}}
+- name: githubBranch
+  value: ${{parameters.githubBranch}}
+- name: flavor
+  value: ${{parameters.flavor}}
 
 stages:
 - stage: 'ArcBox_deployment'
@@ -56,6 +74,15 @@ stages:
         azurePowerShellVersion: 'LatestVersion'
         Inline: |
           Write-Host "Deploying to $(ResourceGroupName)"
+          $githubAccount = "$(githubAccount)"
+          $githubBranch = "$(githubBranch)"
+          $flavor = "$(flavor)"
+          if ($githubAccount -ne "microsoft") {
+            Write-Host "Checking out $githubAccount/$githubBranch"
+            git remote add upstream https://github.com/$($githubAccount)/azure_arc.git
+            git fetch upstream
+            git checkout -b $githubBranch upstream/$githubBranch
+          }
           New-AzResourceGroupDeployment -Name ArcBox `
           -ResourceGroupName $(ResourceGroupName) `
           -TemplateFile azure_jumpstart_arcbox/bicep/main.bicep `
@@ -67,10 +94,10 @@ stages:
               windowsAdminPassword = "$(windowsAdminPassword)" ; `
               sshRSAPublicKey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCsdlSaF10Uw0fFysiIV0VYeJGE1CaV0ZjZcakcKgafiqZ04sAzf7KnoIjPVyx6LXoDTKGtv1e5eFjRZA7Z0Bu+a3JqY252/yr/B2R3Mu5qZHbKFncpVEXn7sUmYk4rDG5vToFxbhpKX5EGyvM1M0quoUv3Uv9reBsSDdjk7n7oA2Q+89rj4nfRuTEMQRwvNBaLeNRSlWuzPq4EkpwxSWRzIC2auC5K0rxGiTMPTXMOQ3l0DvzKRoEsygHA4c3uw0PTntSlgSSTgtGdQfuX63hAD4QPTVfeQdsW5+Nq3clr+6SHgeGdwHhKjUVTF+E2olfSYtuV4CqPW8dZdDBOZg7pXLMSVumZVKCZiUV6uBJkvLBRMzMiFsfXOVrgyThMqq+8y4tg/V3l/3S8z5Lngy4WoCAQMHQ1SloPmy9s4QnbjCFEQx/cIq9H+Uw6HAYhdQFh/w/tuIP+KIqOpMOrltZuaoqx3AOOL3BPXJMbv3opiZxCEZQFf68n+Zn6uRc9u1EENA9s1DrjG1j/CHWzbX/t63Ig/xQLgKLu9T+evua3dcWsYc3j1Gvk8R+ioXV7x0/fi6twrhSQxBIIL0D2Pxm8TBfJ3mVXk0kYGGq1mBsoxAzjoBhcbdwUMXHbAksj4/UuuAK5VfH278hlXo/BHSgDLZ98fdS63nq7rIr6qWmBrQ==" ; `
               logAnalyticsWorkspaceName = "arcbox-la" ; `
-              flavor = "ITPro" ; `
+              flavor = $flavor ; `
               deployBastion = $false ; `
-              githubAccount = "microsoft" ; `
-              githubBranch = "arcbox_3.0" ; `
+              githubAccount = $githubAccount ; `
+              githubBranch = $githubBranch ; `
               vmAutologon = $true ; `
               rdpPort = "3389" `
           }
@@ -83,7 +110,7 @@ stages:
         ScriptType: FilePath
         azurePowerShellVersion: 'LatestVersion'
         ScriptPath: 'azure_jumpstart_arcbox/artifacts/integration_tests/scripts/Wait-ArcBoxDeployment.ps1'
-        ScriptArguments: -ResourceGroupName $(ResourceGroupName)
+        ScriptArguments: -ResourceGroupName $(ResourceGroupName) -githubAccount $(githubAccount) -githubBranch $(githubBranch)
 
     - task: AzurePowerShell@5
       displayName: 'Download Pester test-results from storage account to pipeline agent'
