@@ -1,10 +1,85 @@
-Start-Transcript -Path C:\ArcBox\logs\Get-PesterResult.log -Force
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
+
+Start-Transcript -Path "$Env:ArcBoxLogsDir\Get-PesterResult.log" -Force
 
 Write-Output "Get-PesterResult.ps1 started in $(hostname.exe) as user $(whoami.exe) at $(Get-Date)"
 
 $timeout = New-TimeSpan -Minutes 180
 $endTime = (Get-Date).Add($timeout)
-$logFilePath = "C:\ArcBox\Logs\ArcServersLogonScript.log"
+
+
+switch ($env:flavor) {
+    'DevOps' {
+        $logFilePath = "$Env:ArcBoxLogsDir\DevOpsLogonScript.log"
+}
+    'DataOps' {
+        $logFilePath = "$Env:ArcBoxLogsDir\DataOpsLogonScript.log"
+    }
+    'ITPro' {
+        $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
+    }
+    'default' {
+        throw "Unknown flavor $env:flavor"
+    }
+}
+
+Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:spnClientId for allowing upload of Pester test results to Azure Storage"
+
+$spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
+
+$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
+
+Write-Output "Wait for Azure CLI to become available (installed by WinGet)"
+
+# Starting time
+$startTime = Get-Date
+
+# Duration to wait (60 minutes)
+$duration = New-TimeSpan -Minutes 60
+
+do {
+    # Check if the path exists
+    $exists = Test-Path "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
+
+    # Break if the path exists
+    if ($exists) {
+        Write-Host "File found."
+        break
+    }
+
+    # Wait for a short period before rechecking to avoid constant CPU usage
+    Start-Sleep -Seconds 30
+
+} while ((Get-Date) -lt $startTime.Add($duration))
+
+if (-not $exists) {
+    Write-Host "File not found within the 60-minute time frame."
+}
+
+# Get the current path
+$currentPath = $env:Path
+
+# Path to be added
+$newPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
+
+# Add the new path to the current session's Path environment variable
+$env:Path = $currentPath + ";" + $newPath
+
+Write-Output "Az CLI Login"
+az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:spnTenantId
+az account set -s $env:subscriptionId
+
+$ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json
+
+$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
+
+$null = New-AzRoleAssignment -ObjectId $ClientObjectId.id -RoleDefinitionName "Storage Blob Data Contributor" -Scope $StorageAccount.Id
+
+Write-Output "Wait for eventual consistencty after RBAC assignment"
+Start-Sleep 120
 
 Write-Output "Waiting for PowerShell transcript end in $logFilePath"
 
@@ -29,12 +104,6 @@ do {
     Start-Sleep -Seconds 60
 } while ((Get-Date) -lt $endTime)
 
-$spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-
-$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
-
-$StorageAccount = Get-AzStorageAccount -ResourceGroupName $env:resourceGroup
 
 $ctx = New-AzStorageContext -StorageAccountName $StorageAccount.StorageAccountName -UseConnectedAccount
 
