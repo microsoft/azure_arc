@@ -273,6 +273,13 @@ foreach($cluster in $clusters){
 }
 
 Write-Header "Deploying App"
+
+# Add OpenSSL to path environment variable
+$openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$newPathVariable = $currentPathVariable + ";" + $openSSL
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
 
