@@ -12,9 +12,9 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsAppScript.log
 
 # Add OpenSSL to path environment variable
 $openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
-$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Process)
 $newPathVariable = $currentPathVariable + ";" + $openSSL
-[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Process)
 
 Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
