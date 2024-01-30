@@ -2,6 +2,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
 $clusters = @(
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
@@ -273,12 +274,6 @@ foreach($cluster in $clusters){
 }
 
 Write-Header "Deploying App"
-
-# Add OpenSSL to path environment variable
-$openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
-$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine)
-$newPathVariable = $currentPathVariable + ";" + $openSSL
-[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Machine)
 
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"

@@ -9,11 +9,13 @@ BeforeDiscovery {
     $customLocations = @("${capiArcDataClusterName}-cl", "${aksArcClusterName}-cl", "${aksdrArcClusterName}-cl")
     $dataControllers = @("${capiArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
     $sqlMiInstances = @("capi-sql", "aks-sql", "aks-dr-sql")
+    $drPartners = @("capi-sql", "aks-dr-sql")
 
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
     $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
     $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    az config set extension.use_dynamic_install=yes_without_prompt
 }
 
 Describe "<cluster>" -ForEach $clusters {
@@ -49,25 +51,39 @@ Describe "<dataController>" -ForEach $dataControllers {
         $dataController = $_
     }
     It "Data Controller exists" {
-        $dataControllerObject = az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}"
-        $dataControllerObject.Name | Should -Not -BeNullOrEmpty
+        $dataControllerObject = $(az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}")
+        ($dataControllerObject | ConvertFrom-Json).Name | Should -Not -BeNullOrEmpty
     }
     It "Data Controller is connected" {
-        $dataControllerObject = az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}"
-        $dataControllerObject.State | Should -Be "Ready"
+        $dataControllerObject = $(az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}")
+        ($dataControllerObject | ConvertFrom-Json).State | Should -Be "Ready"
     }
 }
 
-Describe "<sqlIMiInstance>" -ForEach $sqlMiInstances {
+Describe "<sqlInstance>" -ForEach $sqlMiInstances {
     BeforeAll {
-        $sqlMiInstance = $_
+        $sqlInstance = $_
     }
     It "SQL Managed Instance exists" {
-        $sqlMiInstanceObject = az sql mi-arc show --resource-group $env:resourceGroup --name $sqlMiInstance --query "{name:name,state:properties.status}"
-        $sqlMiInstanceObject.Name | Should -Not -BeNullOrEmpty
+        $sqlMiInstanceObject = $(az sql mi-arc show --resource-group $env:resourceGroup --name $sqlInstance --query "{name:name,state:properties.k8SRaw.status.state}")
+        ($sqlMiInstanceObject| ConvertFrom-Json).Name | Should -Not -BeNullOrEmpty
     }
     It "SQL Managed Instance is connected" {
-        $sqlMiInstanceObject = az sql mi-arc show --resource-group $env:resourceGroup --name $sqlMiInstance --query "{name:name,state:properties.status}"
-        $sqlMiInstanceObject.State | Should -Be "Ready"
+        $sqlMiInstanceObject = $(az sql mi-arc show --resource-group $env:resourceGroup --name $sqlInstance --query "{name:name,state:properties.k8SRaw.status.state}")
+        ($sqlMiInstanceObject| ConvertFrom-Json).State | Should -Be "Ready"
+    }
+}
+
+Describe "<drPartner>" -ForEach $drPartners{
+    BeforeAll {
+        $drPartner = $_
+    }
+    It "DR configuration exists" {
+        $drConfig = $(az sql instance-failover-group-arc list --resource-group $env:resourceGroup --mi $drPartner)
+        $drConfig | Should -Not -Be "Found 0 failover group(s)."
+    }
+    It "DR configuration is healthy" {
+        $drConfig = $(az sql mi-arc show --resource-group $env:resourceGroup --name $drPartner --query "{name:name,state:properties.k8SRaw.status.highAvailability.healthState}")
+        ($drConfig| ConvertFrom-Json).state | Should -Be "Ok"
     }
 }
