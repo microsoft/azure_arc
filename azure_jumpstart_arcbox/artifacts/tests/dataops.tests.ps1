@@ -8,7 +8,7 @@ BeforeDiscovery {
     $clusters = @($capiArcDataClusterName, $aksArcClusterName, $aksdrArcClusterName)
     $customLocations = @("${capiArcDataClusterName}-cl", "${aksArcClusterName}-cl", "${aksdrArcClusterName}-cl")
     $dataControllers = @("${capiArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
-    $sqlInstances = @("capi-sql", "aks-sql", "aks-dr-sql")
+    $sqlMiInstances = @("capi-sql", "aks-sql", "aks-dr-sql")
 
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
     $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
@@ -44,19 +44,30 @@ Describe "<customLocation>" -ForEach $customLocations {
     }
 }
 
-<#
-Describe "<dataController>" -ForEach $dataController {
+Describe "<dataController>" -ForEach $dataControllers {
     BeforeAll {
         $dataController = $_
     }
     It "Data Controller exists" {
-        az arcdata dc list --resource-group sb-arcbox --query "[].{name:name,state:properties.k8SRaw.status.state}"
-        $dataControllerObject = Get-AzDataController -Name $dataController -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
-        $dataControllerObject | Should -Not -BeNullOrEmpty
+        $dataControllerObject = az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}"
+        $dataControllerObject.Name | Should -Not -BeNullOrEmpty
     }
     It "Data Controller is connected" {
-        $dataControllerObject = Get-AzDataController -Name $dataController -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
-        $dataControllerObject.ProvisioningState | Should -Be "Succeeded"
+        $dataControllerObject = az arcdata dc status show --resource-group $env:resourceGroup --name $dataController --query "{name:name,state:properties.k8SRaw.status.state}"
+        $dataControllerObject.State | Should -Be "Ready"
     }
 }
-#>
+
+Describe "<sqlIMiInstance>" -ForEach $sqlMiInstances {
+    BeforeAll {
+        $sqlMiInstance = $_
+    }
+    It "SQL Managed Instance exists" {
+        $sqlMiInstanceObject = az sql mi-arc show --resource-group $env:resourceGroup --name $sqlMiInstance --query "{name:name,state:properties.status}"
+        $sqlMiInstanceObject.Name | Should -Not -BeNullOrEmpty
+    }
+    It "SQL Managed Instance is connected" {
+        $sqlMiInstanceObject = az sql mi-arc show --resource-group $env:resourceGroup --name $sqlMiInstance --query "{name:name,state:properties.status}"
+        $sqlMiInstanceObject.State | Should -Be "Ready"
+    }
+}
