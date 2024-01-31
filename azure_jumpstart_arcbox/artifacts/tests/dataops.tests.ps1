@@ -10,6 +10,7 @@ BeforeDiscovery {
     $dataControllers = @("${capiArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
     $sqlMiInstances = @("capi-sql", "aks-sql", "aks-dr-sql")
     $drPartners = @("capi-sql", "aks-dr-sql")
+    $VMs = @("ArcBox-SQL")
 
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
     $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
@@ -85,5 +86,27 @@ Describe "<drPartner>" -ForEach $drPartners{
     It "DR configuration is healthy" {
         $drConfig = $(az sql mi-arc show --resource-group $env:resourceGroup --name $drPartner --query "{name:name,state:properties.k8SRaw.status.highAvailability.healthState}")
         ($drConfig| ConvertFrom-Json).state | Should -Be "Ok"
+    }
+}
+
+Describe "<vm>" -ForEach $VMs {
+    BeforeAll {
+        $vm = $_
+    }
+    It "VM exists" {
+        $vmobject = Get-VM -Name $vm
+        $vmobject | Should -Not -BeNullOrEmpty
+    }
+    It "VM is running" {
+        $vmobject = Get-VM -Name $vm
+        $vmobject.State | Should -Be "Running"
+    }
+    It "Azure Arc Connected Machine exists" {
+        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
+        $connectedMachine | Should -Not -BeNullOrEmpty
+    }
+    It "Azure Arc Connected Machine is connected" {
+        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
+        $connectedMachine.Status | Should -Be "Connected"
     }
 }
