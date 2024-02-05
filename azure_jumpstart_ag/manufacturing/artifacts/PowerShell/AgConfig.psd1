@@ -215,6 +215,7 @@
 
     Namespaces              = @(
         "contoso-manufacturing"
+        "azure-iot-operations"
         "observability"
         "images-cache"
     )
