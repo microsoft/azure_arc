@@ -24,9 +24,6 @@ param windowsAdminUsername string
 @secure()
 param windowsAdminPassword string
 
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
@@ -34,7 +31,7 @@ param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'ag_manufacturing'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -178,6 +175,14 @@ module keyVault 'data/keyVault.bicep' = {
   params: {
     tenantId: spnTenantId
     akvName: akvName
+    location: location
+  }
+}
+
+module acr 'kubernetes/acr.bicep' = {
+  name: 'acr'
+  params: {
+    acrName: acrName
     location: location
   }
 }

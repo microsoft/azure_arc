@@ -1165,6 +1165,7 @@ if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
 #####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
+<#
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
 kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
@@ -1174,10 +1175,11 @@ helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
     --create-namespace `
     --namespace $AgConfig.nginx.Namespace `
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-
+#>
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
+<#
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
 
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
@@ -1389,7 +1391,7 @@ while ($(Get-Job -Name gitops).State -eq 'Running') {
 Get-Job -name gitops | Remove-Job
 Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
 Write-Host
-
+#>
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
