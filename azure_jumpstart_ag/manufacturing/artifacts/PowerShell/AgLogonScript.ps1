@@ -17,6 +17,7 @@ $githubBranch       = $Env:githubBranch
 $githubUser         = $Env:githubUser
 $githubPat          = $Env:GITHUB_TOKEN
 $resourceGroup      = $Env:resourceGroup
+$subscription       = $Env:subscriptionId
 $azureLocation      = $Env:azureLocation
 $spnClientId        = $Env:spnClientId
 $spnClientSecret    = $Env:spnClientSecret
@@ -32,7 +33,7 @@ $adminPassword      = $Env:adminPassword
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $aioNamespace       = "azure-iot-operations"
 $workflowStatus     = ""
-$aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
+$aksEEReleasesUrl   = $websiteUrls["aksEEReleases"]
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -60,6 +61,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+az account set -s $subscription | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
 
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
@@ -790,9 +792,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -Foregr
 Write-Host "`n"
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
-    $arcClusterName = $cluster.Value.ArcClusterName
-    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-
+    $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
     $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
     $retryCount = 0
     $maxRetries = 5
