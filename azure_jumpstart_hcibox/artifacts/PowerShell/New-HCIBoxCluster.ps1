@@ -136,7 +136,7 @@ function GenerateAnswerFile {
 <Identification>
 <Credentials>
 <Domain>$($HCIBoxConfig.SDNDomainFQDN)</Domain>
-<Password><Value>$encodedPassword</value><PlainText>false</PlainText></Password>
+<Password>$($HCIBoxConfig.SDNAdminPassword)</Password>
 <Username>Administrator</Username>
 </Credentials>
 <JoinDomain>$($HCIBoxConfig.SDNDomainFQDN)</JoinDomain>
