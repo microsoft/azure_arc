@@ -712,16 +712,11 @@ Write-Host
 ##############################################################
 
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    $hostname = hostname
     $ProgressPreference = "SilentlyContinue"
     ###########################################
     # Preparing environment folders structure
     ###########################################
     Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
-    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-    $logsFolder = "$deploymentFolder\Logs"
-    $kubeFolder = "$Env:USERPROFILE\.kube"
-
     try {
         $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
         & kubectl apply -f $localPathProvisionerYaml
@@ -788,6 +783,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 
 } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
+#############################################################
+# Deploying AIO on the clusters
+#############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
 Write-Host "`n"
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -988,236 +986,6 @@ if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
 
 }
 
-#####################################################################
-# Deploying nginx on AKS cluster
-#####################################################################
-<#
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
-kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-
-helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
-    --create-namespace `
-    --namespace $AgConfig.nginx.Namespace `
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-#>
-#####################################################################
-# Configuring applications on the clusters using GitOps
-#####################################################################
-<#
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
-
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-# Cleaning up images-cache namespace on all clusters
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name images-cache-cleanup -ScriptBlock {
-        $cluster = $using:cluster
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-        kubectl delete namespace "images-cache" --context $clusterName
-    }
-}
-
-#  TODO - this looks app-specific so should perhaps be moved to the app loop
-while ($workflowStatus.status -ne "completed") {
-    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-    Start-Sleep -Seconds 10
-    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-}
-
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name gitops -ScriptBlock {
-
-        Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
-            # Force TLS 1.2 for connections to prevent TLS/SSL errors
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-            $response = Invoke-RestMethod -Uri $githubApiUrl
-            $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-            $fileUrls | ForEach-Object {
-                $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-                $outputFile = Join-Path $folderPath $fileName
-                Invoke-RestMethod -Uri $_ -OutFile $outputFile
-            }
-
-            If (-not $excludeFolders) {
-                $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
-                    $folderName = $_.name
-                    $path = Join-Path $folderPath $folderName
-                    New-Item $path -ItemType Directory -Force -ErrorAction Continue
-                    Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
-                }
-            }
-        }
-
-        $AgConfig       = $using:AgConfig
-        $cluster        = $using:cluster
-        $site           = $cluster.Value
-        $siteName       = $site.FriendlyName.ToLower()
-        $namingGuid     = $using:namingGuid
-        $resourceGroup  = $using:resourceGroup
-        $appClonedRepo  = $using:appClonedRepo
-        $appsRepo       = $using:appsRepo
-
-        $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
-            $app         = $_
-            $store       = $cluster.value.Branch.ToLower()
-            $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-            $branch      = $cluster.value.Branch.ToLower()
-            $configName  = $app.value.GitOpsConfigName.ToLower()
-            $clusterType = $cluster.value.Type
-            $namespace   = $app.value.Namespace
-            $appName     = $app.Value.KustomizationName
-            $appPath     = $app.Value.KustomizationPath
-            $retryCount  = 0
-            $maxRetries  = 2
-
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-            if ($clusterType -eq "AKS") {
-                $type = "managedClusters"
-                $clusterName = $cluster.value.ArcClusterName
-            }
-            else {
-                $type = "connectedClusters"
-            }
-            if ($branch -eq "main") {
-                $store = "dev"
-            }
-
-            # Wait for Kubernetes API server to become available
-            $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
-            $apiServerAddress = $apiServer -replace '.*https://| .*$'
-            $apiServerFqdn    = ($apiServerAddress -split ":")[0]
-            $apiServerPort    = ($apiServerAddress -split ":")[1]
-
-            do {
-                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-                if ($result.TcpTestSucceeded) {
-                    break
-                }
-                else {
-                    Start-Sleep -Seconds 5
-                }
-            } while ($true)
-            If ($app.Value.ConfigMaps){
-                # download the config files
-                foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
-                    $repoPath     = $configMap.value.RepoPath
-                    $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
-                    $iotHubName   = $Env:iotHubHostName.replace(".azure-devices.net", "")
-                    $gitHubUser   = $Env:gitHubUser
-                    $githubBranch = $Env:githubBranch
-
-                    New-Item -Path $configPath -ItemType Directory -Force | Out-Null
-
-                    $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
-                    Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
-
-                    # replace the IoT Hub name and the SAS Tokens with the deployment specific values
-                    # this is a one-off for the broker, but needs to be generalized if/when another app needs it
-                    If ($configMap.Name -eq "mqtt-broker-config"){
-                        $configFile = "$configPath\mosquitto.conf"
-                        $update     = (Get-Content $configFile -Raw)
-                        $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
-
-                        foreach ($device in $site.IoTDevices) {
-                            $deviceId = "$device-$($site.FriendlyName)"
-                            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-                            $update = $update -replace "Chicago", $site.FriendlyName
-                            $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
-                        }
-
-                        $update | Set-Content $configFile
-                    }
-
-                    # create the namespace if needed
-                    If (-not (kubectl get namespace $namespace --context $siteName)){
-                        kubectl create namespace $namespace --context $siteName
-                    }
-                    # create the configmap
-                    kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
-                }
-            }
-
-            az k8s-configuration flux create `
-                --cluster-name $clusterName `
-                --resource-group $resourceGroup `
-                --name $configName `
-                --cluster-type $type `
-                --url $appClonedRepo `
-                --branch $branch `
-                --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
-                --timeout 10m `
-                --namespace $namespace `
-                --only-show-errors `
-                2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-            do {
-                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                if ($configStatus.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                }
-                else {
-                    if ($configStatus.ComplianceState -ne "Non-compliant") {
-                        Start-Sleep -Seconds 20
-                    }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        Start-Sleep -Seconds 20
-                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                        if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                            $retryCount++
-                            Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            az k8s-configuration flux delete `
-                            --resource-group $resourceGroup `
-                            --cluster-name $clusterName `
-                            --cluster-type $type `
-                            --name $configName `
-                            --force `
-                            --yes `
-                            --only-show-errors `
-                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                            Start-Sleep -Seconds 10
-                            Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                            az k8s-configuration flux create `
-                            --cluster-name $clusterName `
-                            --resource-group $resourceGroup `
-                            --name $configName `
-                            --cluster-type $type `
-                            --url $appClonedRepo `
-                            --branch $branch `
-                            --sync-interval 5s `
-                            --kustomization name=$appName path=$appPath/$store prune=true `
-                            --timeout 30m `
-                            --namespace $namespace `
-                            --only-show-errors `
-                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        }
-                    }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
-                        Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        break
-                    }
-                }
-            } until ($configStatus.ComplianceState -eq "Compliant")
-        }
-    }
-}
-
-while ($(Get-Job -Name gitops).State -eq 'Running') {
-    #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-    Receive-Job -Name gitops -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 60
-}
-
-Get-Job -name gitops | Remove-Job
-Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
-Write-Host
-#>
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
