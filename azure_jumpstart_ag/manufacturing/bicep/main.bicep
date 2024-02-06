@@ -8,6 +8,9 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
+@description('Azure service principal Object Id')
+param spnObjectId string
+
 @description('Location for all resources')
 param location string = resourceGroup().location
 
@@ -122,6 +125,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
+    spnObjectId: spnObjectId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl

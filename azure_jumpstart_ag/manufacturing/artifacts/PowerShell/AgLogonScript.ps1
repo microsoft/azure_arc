@@ -22,6 +22,7 @@ $azureLocation      = $Env:azureLocation
 $spnClientId        = $Env:spnClientId
 $spnClientSecret    = $Env:spnClientSecret
 $spnTenantId        = $Env:spnTenantId
+$spnObjectId        = $Env:spnObjectId
 $adminUsername      = $Env:adminUsername
 $acrName            = $Env:acrName.ToLower()
 $templateBaseUrl    = $Env:templateBaseUrl
@@ -797,7 +798,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $aioStatus = "notDeployed"
 
     do {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
         if ($? -eq $false) {
             $aioStatus = "notDeployed"
             Write-Host "`n"
@@ -817,7 +818,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $output = $output | ConvertFrom-Json
         $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
         if ($mqServiceStatus -ne "Success") {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
             $retryCount++
         }
     } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
