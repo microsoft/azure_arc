@@ -22,7 +22,8 @@ jobs:
       deployments: read
       packages: none
       pull-requests: write
-      security-events: write
+      issues: write 
+      security-events: read
     steps:
       - uses: actions/checkout@v1
       - uses: EddieHubCommunity/gh-action-community/src/welcome@main
