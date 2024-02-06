@@ -32,6 +32,7 @@ $adminPassword      = $Env:adminPassword
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $aioNamespace       = "azure-iot-operations"
 $workflowStatus     = ""
+$aksEEReleasesUrl = $websiteUrls["aksEEReleases"]
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -229,284 +230,6 @@ $DevToolsInstallationJob
 
 Write-Host
 
-#####################################################################
-# Configure Jumpstart Agora Apps repository
-#####################################################################
-<#
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
-Set-Location $AgAppsRepo
-Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
-$retryCount = 0
-$maxRetries = 5
-do {
-    $forkExists = $false
-    try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo"
-        if ($response) {
-            write-host "INFO: Fork exists....Proceeding" -ForegroundColor Gray
-            $forkExists = $true
-        }
-    }
-    catch {
-        if ($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: $githubUser/$appsRepo Fork doesn't exist, please fork https://github.com/microsoft/jumpstart-agora-apps to proceed (attempt $retryCount/$maxRetries) . . . waiting 60 seconds" -ForegroundColor Red
-            $retryCount++
-            $forkExists = $false
-            start-sleep -Seconds 60
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, $githubUser/$appsRepo Fork doesn't exist. Exiting." -ForegroundColor Red
-            exit
-        }
-    }
-} until ($forkExists -eq $true)
-
-Write-Host "INFO: Checking if the GitHub access token is valid." -ForegroundColor Gray
-do {
-    $response = gh auth status 2>&1
-    if ($response -match "authentication failed") {
-        write-host "ERROR: The GitHub Personal access token is not valid" -ForegroundColor Red
-        Write-Host "INFO: Please try to re-generate the personal access token and provide it here (https://aka.ms/AgoraPreReqs): "
-        do {
-            $githubPAT = Read-Host "GitHub personal access token"
-        } while ($githubPAT -eq "")
-    }
-} until (
-    $response -notmatch "authentication failed"
-)
-
-Write-Host "INFO: The GitHub Personal access token is valid. Proceeding." -ForegroundColor DarkGreen
-$Env:GITHUB_TOKEN = $githubPAT.Trim()
-[System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT.Trim(), [System.EnvironmentVariableTarget]::Machine)
-
-Write-Host "INFO: Checking if the personal access token is assigned on the $githubUser/$appsRepo Fork" -ForegroundColor Gray
-$headers = @{
-    Authorization  = "token $githubPat"
-    "Content-Type" = "application/json"
-}
-$retryCount = 0
-$maxRetries = 5
-$uri = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/actions/secrets"
-do {
-    try {
-        $response=Invoke-RestMethod -Uri $uri -Method Get -Headers $headers
-        Write-Host "INFO: Personal access token is assigned on $githubUser/$appsRepo fork" -ForegroundColor DarkGreen
-        $PatAssigned = $true
-    }
-    catch {
-        if ($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: Personal access token is not assigned on $githubUser/$appsRepo fork. Please assign the personal access token to your fork (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries).....waiting 60 seconds" -ForegroundColor Red
-            $PatAssigned = $false
-            $retryCount++
-            start-sleep -Seconds 60
-        }
-        else{
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token is not assigned to $githubUser/$appsRepo. Exiting." -ForegroundColor Red
-            exit
-        }
-    }
-} until ($PatAssigned -eq $true)
-
-
-Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
-git clone "https://$githubPat@github.com/$githubUser/$appsRepo.git" "$AgAppsRepo\$appsRepo"
-Set-Location "$AgAppsRepo\$appsRepo"
-
-Write-Host "INFO: Verifying 'Administration' permissions" -ForegroundColor Gray
-$retryCount = 0
-$maxRetries = 5
-
-$body = @{
-    required_status_checks        = $null
-    enforce_admins                = $false
-    required_pull_request_reviews = @{
-        required_approving_review_count = 0
-    }
-    dismiss_stale_reviews         = $true
-    restrictions                  = $null
-} | ConvertTo-Json
-
-do {
-    try {
-        $response = Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/main/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
-    }
-    catch {
-        if ($retryCount -lt $maxRetries) {
-            Write-Host "ERROR: The GitHub Personal access token doesn't seem to have 'Administration' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
-            $retryCount++
-            start-sleep -Seconds 60
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Administration' write permissions assigned. Exiting." -ForegroundColor Red
-            exit
-        }
-    }
-} until ($response)
-Write-Host "INFO: 'Administration' write permissions verified" -ForegroundColor DarkGreen
-
-
-Write-Host "INFO: Checking if there are existing branch protection policies" -ForegroundColor Gray
-$protectedBranches = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches?protected=true" -Method GET -Headers $headers
-foreach ($branch in $protectedBranches) {
-    $branchName = $branch.name
-    $deleteProtectionUrl = "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branchName/protection"
-    Invoke-RestMethod -Uri $deleteProtectionUrl -Headers $headers -Method Delete
-    Write-Host "INFO: Deleted protection policy for branch: $branchName" -ForegroundColor Gray
-}
-
-Write-Host "INFO: Pulling latests changes to GitHub repository" -ForegroundColor Gray
-git config --global user.email "dev@agora.com"
-git config --global user.name "Agora Dev"
-git remote add upstream "$appUpstreamRepo.git"
-git fetch upstream
-git checkout main
-git reset --hard upstream/main
-git push origin main -f
-git pull
-git remote remove upstream
-git remote add upstream "$appClonedRepo.git"
-
-Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
-New-Item -ItemType Directory ".github/workflows" -Force
-$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
-$response = Invoke-RestMethod -Uri $githubApiUrl
-$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-$fileUrls | ForEach-Object {
-    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-    $outputFile = Join-Path "$AgAppsRepo\$appsRepo\.github\workflows" $fileName
-    Invoke-RestMethod -Uri $_ -OutFile $outputFile
-}
-git add .
-git commit -m "Pushing GitHub Actions to apps fork"
-git push
-Start-Sleep -Seconds 20
-
-Write-Host "INFO: Verifying 'Secrets' permissions" -ForegroundColor Gray
-$retryCount = 0
-$maxRetries = 5
-do {
-    $response = gh secret set "test" -b "test" 2>&1
-    if ($response -match "error") {
-        if ($retryCount -eq $maxRetries) {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Secrets' write permissions assigned. Exiting." -ForegroundColor Red
-            exit
-        }
-        else {
-            $retryCount++
-            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Secrets' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
-            Start-Sleep -Seconds 60
-        }
-    }
-} while ($response -match "error" -or $retryCount -ge $maxRetries)
-gh secret delete test
-Write-Host "INFO: 'Secrets' write permissions verified" -ForegroundColor DarkGreen
-
-Write-Host "INFO: Verifying 'Actions' permissions" -ForegroundColor Gray
-$retryCount = 0
-$maxRetries = 5
-do {
-    $response = gh workflow enable update-files.yml 2>&1
-    if ($response -match "failed") {
-        if ($retryCount -eq $maxRetries) {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Retry limit reached, the personal access token doesn't have 'Actions' write permissions assigned. Exiting." -ForegroundColor Red
-            exit
-        }
-        else {
-            $retryCount++
-            write-host "ERROR: The GitHub Personal access token doesn't seem to have 'Actions' write permissions, please assign the right permissions (https://aka.ms/AgoraPreReqs) (attempt $retryCount/$maxRetries)...waiting 60 seconds" -ForegroundColor Red
-            Start-Sleep -Seconds 60
-        }
-    }
-} while ($response -match "failed" -or $retryCount -ge $maxRetries)
-Write-Host "INFO: 'Actions' write permissions verified" -ForegroundColor DarkGreen
-
-write-host "INFO: Creating GitHub secrets" -ForegroundColor Gray
-Write-Host "INFO: Getting Cosmos DB access key" -ForegroundColor Gray
-Write-Host "INFO: Adding GitHub secrets to apps fork" -ForegroundColor Gray
-gh api -X PUT "/repos/$githubUser/$appsRepo/actions/permissions/workflow" -F can_approve_pull_request_reviews=true
-gh repo set-default "$githubUser/$appsRepo"
-gh secret set "SPN_CLIENT_ID" -b $spnClientID
-gh secret set "SPN_CLIENT_SECRET" -b $spnClientSecret
-gh secret set "ACR_NAME" -b $acrName
-gh secret set "PAT_GITHUB" -b $githubPat
-gh secret set "COSMOS_DB_ENDPOINT" -b $cosmosDBEndpoint
-gh secret set "SPN_TENANT_ID" -b $spnTenantId
-
-Write-Host "INFO: Updating ACR name and Cosmos DB endpoint in all branches" -ForegroundColor Gray
-gh workflow run update-files.yml
-while ($workflowStatus.status -ne "completed") {
-    Write-Host "INFO: Waiting for update-files workflow to complete" -ForegroundColor Gray
-    Start-Sleep -Seconds 10
-    $workflowStatus = (gh run list --workflow=update-files.yml --json status) | ConvertFrom-Json
-}
-Write-Host "INFO: Starting Contoso supermarket pos application v1.0 image build" -ForegroundColor Gray
-gh workflow run pos-app-initial-images-build.yml
-
-Write-Host "INFO: Creating GitHub branches to $appsRepo fork" -ForegroundColor Gray
-$branches = $AgConfig.GitBranches
-foreach ($branch in $branches) {
-    try {
-        $response = Invoke-RestMethod -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch"
-        if ($response) {
-            if ($branch -ne "main") {
-                Write-Host "INFO: branch $branch already exists! Deleting and recreating the branch" -ForegroundColor Gray
-                git push origin --delete $branch
-                git branch -d $branch
-                git fetch origin
-                git checkout main
-                git pull origin main
-                git checkout -b $branch main
-                git pull origin main
-                git push --set-upstream origin $branch
-            }
-        }
-    }
-    catch {
-        Write-Host "INFO: Creating $branch branch" -ForegroundColor Gray
-        git fetch origin
-        git checkout main
-        git pull origin main
-        git checkout -b $branch main
-        git pull origin main
-        git push --set-upstream origin $branch
-    }
-}
-Write-Host "INFO: Cleaning up any other branches" -ForegroundColor Gray
-$existingBranches = gh api "repos/$githubUser/$appsRepo/branches" | ConvertFrom-Json
-$branches = $AgConfig.GitBranches
-foreach ($branch in $existingBranches) {
-    if ($branches -notcontains $branch.name){
-        $branchToDelete = $branch.name
-        git push origin --delete $branchToDelete
-    }
-}
-
-Write-Host "INFO: Switching to main branch" -ForegroundColor Gray
-git checkout main
-
-Write-Host "INFO: Adding branch protection policies for all branches" -ForegroundColor Gray
-foreach ($branch in $branches) {
-    Write-Host "INFO: Adding branch protection policies for $branch branch" -ForegroundColor Gray
-    $headers = @{
-        "Authorization" = "Bearer $githubPat"
-        "Accept"        = "application/vnd.github+json"
-    }
-    $body = @{
-        required_status_checks        = $null
-        enforce_admins                = $false
-        required_pull_request_reviews = @{
-            required_approving_review_count = 0
-        }
-        dismiss_stale_reviews         = $true
-        restrictions                  = $null
-    } | ConvertTo-Json
-
-    Invoke-WebRequest -Uri "$gitHubAPIBaseUri/repos/$githubUser/$appsRepo/branches/$branch/protection" -Method Put -Headers $headers -Body $body -ContentType "application/json"
-}
-Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
-Write-Host
-
-#>
 
 #####################################################################
 # Configure L1 virtualization infrastructure
@@ -875,201 +598,6 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     }
 }
 
-##############################################################
-# Preparing clusters for aio
-##############################################################
-Write-Host "`n"
-Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
-Write-Host "`n"
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    $arcClusterName = $cluster.Value.ArcClusterName
-    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-    try {
-        $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
-        & kubectl apply -f $localPathProvisionerYaml
-        $pvcYaml = @"
-        apiVersion: v1
-        kind: PersistentVolumeClaim
-        metadata:
-          name: local-path-pvc
-          namespace: default
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          storageClassName: local-path
-          resources:
-            requests:
-              storage: 15Gi
-"@
-    
-        $pvcYaml | kubectl apply -f -
-    
-        Write-Host "Successfully deployment the local path provisioner"
-    }
-    catch {
-        Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
-    }
-    
-    Write-Host "Configuring firewall specific to AIO"
-    Write-Host "Add firewall rule for AIO MQTT Broker"
-    New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
-    
-    try {
-        $deploymentInfo = Get-AksEdgeDeploymentInfo
-        # Get the service ip address start to determine the connect address
-        $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
-        $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
-        if ( $null -eq $portProxyRulExists ) {
-            Write-Host "Configure port proxy for AIO"
-            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
-            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
-            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
-        }
-        else {
-            Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
-        }
-    }
-    catch {
-        Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
-    }
-    
-    Write-Host "Update the iptables rules"
-    try {
-        $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
-        if ( $null -eq $iptableRulesExist ) {
-            Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
-            Write-Host "Updated runtime iptable rules for node exporter"
-            Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
-            Write-Host "Persisted iptable rules for node exporter"
-        }
-        else {
-            Write-Host "iptable rule exists, skip configuring iptable rules..."
-        }
-    }
-    catch {
-        Write-Host "Error: iptable rule update failed" -ForegroundColor Red
-    }
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the cluster" -ForegroundColor DarkGray
-Write-Host "`n"
-
-$keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
-$retryCount = 0
-$maxRetries = 5
-$aioStatus = "notDeployed"
-
-do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
-    if ($? -eq $false) {
-        $aioStatus = "notDeployed"
-        Write-Host "`n"
-        Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
-        Write-Host "`n"
-        $retryCount++
-    }else{
-        $aioStatus = "deployed"
-    }
-} until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
-
-$retryCount = 0
-$maxRetries = 5
-
-do {
-    $output = az iot ops check --as-object
-    $output = $output | ConvertFrom-Json
-    $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
-    if ($mqServiceStatus -ne "Success") {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
-        $retryCount++
-    }
-} until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
-
-if ($retryCount -eq $maxRetries) {
-    Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
-    exit 1 # Exit the script
-}
-
-Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
-$eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
-$eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
-$eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
-
-az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-
-
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
-$eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
-az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
-
-Start-Sleep -Seconds 60
-
-## Adding MQTT load balancer
-$mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
-$mqListenerService = "aio-mq-dmqtt-frontend"
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
-$eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-(Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-kubectl apply -f $mqconfigfile -n $aioNamespace
-}
-
-
-#####################################################################
-# Create secrets for GitHub actions
-#####################################################################
-<#Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
-$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
-    foreach ($namespace in $AgConfig.Namespaces) {
-        if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
-            kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
-    }
-}
-Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
-Write-Host
-#>
-
-#####################################################################
-# Cache contoso-supermarket images on all clusters
-#####################################################################
-<#
-Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
-while ($workflowStatus.status -ne "completed") {
-    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-    Start-Sleep -Seconds 10
-    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-}
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $branch = $cluster.Name.ToLower()
-    $context = $cluster.Name.ToLower()
-    $applicationName = "contoso-supermarket"
-    $imageTag = "v1.0"
-    $imagePullSecret = "acr-secret"
-    $namespace = "images-cache"
-    if ($branch -eq "chicago") {
-        $branch = "canary"
-    }
-    if ($branch -eq "seattle") {
-        $branch = "production"
-    }
-    Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-}
-#>
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
@@ -1176,6 +704,159 @@ foreach ($arcResourceType in $arcResourceTypes) {
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
 
+
+##############################################################
+# Preparing clusters for aio
+##############################################################
+
+Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+    $hostname = hostname
+    $ProgressPreference = "SilentlyContinue"
+    ###########################################
+    # Preparing environment folders structure
+    ###########################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+    $logsFolder = "$deploymentFolder\Logs"
+    $kubeFolder = "$Env:USERPROFILE\.kube"
+
+    try {
+        $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+        & kubectl apply -f $localPathProvisionerYaml
+        $pvcYaml = @"
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: local-path-pvc
+          namespace: default
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: local-path
+          resources:
+            requests:
+              storage: 15Gi
+"@
+    
+        $pvcYaml | kubectl apply -f -
+    
+        Write-Host "Successfully deployment the local path provisioner"
+    }
+    catch {
+        Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
+    }
+
+    Write-Host "Configuring firewall specific to AIO"
+    Write-Host "Add firewall rule for AIO MQTT Broker"
+    New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+    try {
+        $deploymentInfo = Get-AksEdgeDeploymentInfo
+        # Get the service ip address start to determine the connect address
+        $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+        $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
+        if ( $null -eq $portProxyRulExists ) {
+            Write-Host "Configure port proxy for AIO"
+            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
+        }
+        else {
+            Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
+        }
+    }
+    catch {
+        Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
+    }
+    Write-Host "Update the iptables rules"
+    try {
+        $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
+        if ( $null -eq $iptableRulesExist ) {
+            Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
+            Write-Host "Updated runtime iptable rules for node exporter"
+            Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
+            Write-Host "Persisted iptable rules for node exporter"
+        }
+        else {
+            Write-Host "iptable rule exists, skip configuring iptable rules..."
+        }
+    }
+    catch {
+        Write-Host "Error: iptable rule update failed" -ForegroundColor Red
+    }
+
+} | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+
+Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+Write-Host "`n"
+foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    $arcClusterName = $cluster.Value.ArcClusterName
+    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+    $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
+    $retryCount = 0
+    $maxRetries = 5
+    $aioStatus = "notDeployed"
+
+    do {
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+        if ($? -eq $false) {
+            $aioStatus = "notDeployed"
+            Write-Host "`n"
+            Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+            Write-Host "`n"
+            $retryCount++
+        }else{
+            $aioStatus = "deployed"
+        }
+    } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+    $retryCount = 0
+    $maxRetries = 5
+
+    do {
+        $output = az iot ops check --as-object
+        $output = $output | ConvertFrom-Json
+        $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+        if ($mqServiceStatus -ne "Success") {
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            $retryCount++
+        }
+    } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+    if ($retryCount -eq $maxRetries) {
+        Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+        exit 1 # Exit the script
+    }
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
+    $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+    $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+    $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+    $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+
+    az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+    az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+    az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+    az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+    az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+    az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
+    $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
+    az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
+
+    Start-Sleep -Seconds 60
+
+    ## Adding MQTT load balancer
+    $mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
+    $mqListenerService = "aio-mq-dmqtt-frontend"
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+    $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
+    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+    kubectl apply -f $mqconfigfile -n $aioNamespace
+}
 
 #####################################################################
 # Installing flux extension on clusters
