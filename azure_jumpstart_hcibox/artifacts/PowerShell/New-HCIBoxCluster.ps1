@@ -81,7 +81,7 @@ function GenerateAnswerFile {
     )
 
     $formattedMAC = Get-FormattedWACMAC -HCIBoxConfig $HCIBoxConfig
-    $encodedPassword = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($($HCIBoxConfig.SDNAdminPassword)))
+    $encodedPassword = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($($HCIBoxConfig.SDNAdminPassword) + "AdministratorPassword"))
     $wacAnswerXML = @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -151,7 +151,8 @@ function GenerateAnswerFile {
 <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <UserAccounts>
 <AdministratorPassword>
-<Value>$encodedPassword</value><PlainText>false</PlainText>
+<PlainText>false</PlainText>
+<Value>$encodedPassword</Value>
 </AdministratorPassword>
 </UserAccounts>
 <TimeZone>UTC</TimeZone>
@@ -283,7 +284,8 @@ $components</settings>
 </OOBE>
 <UserAccounts>
 <AdministratorPassword>
-<Value>$encodedPassword</value><PlainText>false</PlainText>
+<PlainText>false</PlainText>
+<Value>$encodedPassword</Value>
 </AdministratorPassword>
 </UserAccounts>
 </component>
@@ -1536,9 +1538,9 @@ else {
     Write-Error "GUI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw 
 }
-# BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
-# Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
-# Move-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx"
+BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
+Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
+Move-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\livecd.ubuntu-desktop-hyperv.vhdx" -Destination "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx"
 
 # Set credentials
 $localCred = new-object -typename System.Management.Automation.PSCredential `
