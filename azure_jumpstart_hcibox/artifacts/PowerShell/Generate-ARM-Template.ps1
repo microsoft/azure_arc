@@ -14,15 +14,10 @@ Write-Host 'Creating credentials and connecting to Azure'
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 
-# Check that extensions are finished installing on HCI nodes
-# foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-
-# }
-
 # Install some modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Az.Resources -Force
-Install-Module Az.ConnectedMachine -Force
+Install-Module -Name Az.Resources -AllowClobber -Force
+Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
 Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
 
 # Add necessary role assignments 

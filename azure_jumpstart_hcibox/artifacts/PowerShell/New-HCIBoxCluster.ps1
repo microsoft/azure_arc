@@ -81,6 +81,7 @@ function GenerateAnswerFile {
     )
 
     $formattedMAC = Get-FormattedWACMAC -HCIBoxConfig $HCIBoxConfig
+    $encodedPassword = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($($HCIBoxConfig.SDNAdminPassword) + "AdministratorPassword"))
     $wacAnswerXML = @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -150,8 +151,8 @@ function GenerateAnswerFile {
 <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <UserAccounts>
 <AdministratorPassword>
-<Value>$($HCIBoxConfig.SDNAdminPassword)</Value>
-<PlainText>true</PlainText>
+<PlainText>false</PlainText>
+<Value>$encodedPassword</Value>
 </AdministratorPassword>
 </UserAccounts>
 <TimeZone>UTC</TimeZone>
@@ -283,8 +284,8 @@ $components</settings>
 </OOBE>
 <UserAccounts>
 <AdministratorPassword>
-<Value>$($HCIBoxConfig.SDNAdminPassword)</Value>
-<PlainText>true</PlainText>
+<PlainText>false</PlainText>
+<Value>$encodedPassword</Value>
 </AdministratorPassword>
 </UserAccounts>
 </component>

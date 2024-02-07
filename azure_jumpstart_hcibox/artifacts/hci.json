@@ -463,7 +463,7 @@
             "identity": {
                 "type": "SystemAssigned"
             },
-            "location": "[parameters('location')]",
+            "location": "eastus",
             "properties": {
             }
         },
