@@ -177,14 +177,14 @@ az k8s-extension create --name $extensionName `
                         --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
-                        --release-train $releaseTrain `
-                        --auto-upgrade-minor-version false `
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
+                        --config-protected-settings "ocr.endpointUri=$($csResourcesData.ocrCognitiveServicesEndpoint)" `
+                        --config-protected-settings "ocr.secret=$($csResourcesData.ocrCognitiveServicesPrimaryKey)" `
+                        --config "videoindxer.endpointUri=https://$ipAddress" `
                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
-                        --config "frontend.endpointUri=https://$ipAddress" `
                         --config "storage.storageClass=$storageClass" `
                         --config "storage.accessMode=ReadWriteMany"
 
