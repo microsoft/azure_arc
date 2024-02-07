@@ -433,6 +433,7 @@ Invoke-Command -VMName "Node2" -Credential $Credentials -ScriptBlock {
             "DnsServer-null"              = $SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
             "Ethernet-Null"               = $AdapterName
             "Ip4Address-null"             = $SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
+            "MemoryInMB-null"             = $using:AKSEEMemoryInMB
         }
     } else {
         $replacementParams = @{
@@ -447,6 +448,7 @@ Invoke-Command -VMName "Node2" -Credential $Credentials -ScriptBlock {
             "DnsServer-null"              = $SiteConfig[$env:COMPUTERNAME].DNSClientServerAddress
             "Ethernet-Null"               = $AdapterName
             "Ip4Address-null"             = $SiteConfig[$env:COMPUTERNAME].LinuxNodeIp4Address
+            "MemoryInMB-null"             = $using:AKSEEMemoryInMB
         }
     }
 
