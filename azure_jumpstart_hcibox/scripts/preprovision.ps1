@@ -7,7 +7,7 @@ Write-Host "Connecting to Azure..."
 # Install Azure module if not already installed
 if (-not (Get-Command -Name Get-AzContext)) {
     Write-Host "Installing Azure module..."
-    Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force -ErrorAction Stop
+    Install-Module -Name Az -AllowClobber -Scope CurrentUser -ErrorAction Stop
 }
 
 # If not signed in, run the Connect-AzAccount cmdlet
