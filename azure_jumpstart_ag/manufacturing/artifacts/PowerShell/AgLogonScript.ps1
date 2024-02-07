@@ -9,13 +9,10 @@ Set-PSDebug -Strict
 $AgConfig           = Import-PowerShellDataFile -Path $Env:AgConfigPath
 $AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
-$AgAppsRepo         = $AgConfig.AgDirectories["AgAppsRepo"]
-$configMapDir       = $agConfig.AgDirectories["AgConfigMapDir"]
 $websiteUrls        = $AgConfig.URLs
 $githubAccount      = $Env:githubAccount
 $githubBranch       = $Env:githubBranch
 $githubUser         = $Env:githubUser
-$githubPat          = $Env:GITHUB_TOKEN
 $resourceGroup      = $Env:resourceGroup
 $subscription       = $Env:subscriptionId
 $azureLocation      = $Env:azureLocation
@@ -27,14 +24,9 @@ $adminUsername      = $Env:adminUsername
 $acrName            = $Env:acrName.ToLower()
 $templateBaseUrl    = $Env:templateBaseUrl
 $appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
-$appUpstreamRepo    = "https://github.com/microsoft/jumpstart-agora-apps"
 $namingGuid         = $Env:namingGuid
-$appsRepo           = "jumpstart-agora-apps"
 $adminPassword      = $Env:adminPassword
-$gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $aioNamespace       = "azure-iot-operations"
-$workflowStatus     = ""
-$aksEEReleasesUrl   = $websiteUrls["aksEEReleases"]
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -791,6 +783,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -Foregr
 Write-Host "`n"
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
+    kubectx $clusterName
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
     $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
     $retryCount = 0
