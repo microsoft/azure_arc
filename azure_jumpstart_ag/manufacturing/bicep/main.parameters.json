@@ -11,13 +11,13 @@
     "spnTenantId": {
       "value": ""
     },
+    "spnObjectId": {
+      "value": ""
+    },
     "windowsAdminUsername": {
       "value": ""
     },
     "windowsAdminPassword": {
-      "value": ""
-    },
-    "sshRSAPublicKey": {
       "value": ""
     },
     "deployBastion": {
