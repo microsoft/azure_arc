@@ -56,6 +56,9 @@ param storageAccountName string
 @description('The login server name of the Azure Container Registry')
 param acrName string
 
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string
+
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
@@ -186,7 +189,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnObjectId ${spnObjectId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -namingGuid ${namingGuid}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnObjectId ${spnObjectId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName}'
     }
   }
 }

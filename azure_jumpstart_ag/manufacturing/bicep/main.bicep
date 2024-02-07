@@ -69,7 +69,7 @@ param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 @description('Name of the event grid namespace')
 param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 
-param akvName string = 'aioakv${namingGuid}'
+param akvName string = 'agakv${namingGuid}'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
@@ -80,6 +80,8 @@ param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string = 'agadx${namingGuid}'
 
 @minLength(5)
 @maxLength(50)
@@ -139,6 +141,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     acrName: acrName
     rdpPort: rdpPort
     namingGuid: namingGuid
+    adxClusterName: adxClusterName
   }
 }
 
@@ -188,6 +191,17 @@ module acr 'kubernetes/acr.bicep' = {
   params: {
     acrName: acrName
     location: location
+  }
+}
+
+module adx 'data/dataExplorer.bicep' = {
+  name: 'adx'
+  params: {
+    adxClusterName: adxClusterName
+    location: location
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
   }
 }
 
