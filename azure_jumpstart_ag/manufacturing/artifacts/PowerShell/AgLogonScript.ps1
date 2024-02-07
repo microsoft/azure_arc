@@ -19,6 +19,7 @@ $azureLocation       = $Env:azureLocation
 $spnClientId         = $Env:spnClientId
 $spnClientSecret     = $Env:spnClientSecret
 $spnTenantId         = $Env:spnTenantId
+$spnObjectId         = $Env:spnObjectId
 $adminUsername       = $Env:adminUsername
 $customLocationRPOID = $Env:customLocationRPOID
 $acrName             = $Env:acrName.ToLower()
@@ -855,12 +856,104 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     Start-Sleep -Seconds 60
 
     ## Adding MQTT load balancer
-    $mqconfigfile = "$aioToolsDir\mq_cloudConnector.yml"
+    $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
     $mqListenerService = "aio-mq-dmqtt-frontend"
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
     $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
     (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
     kubectl apply -f $mqconfigfile -n $aioNamespace
+
+
+##############################################################
+# Get MQ IP address
+##############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
+
+do {
+    $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+    $matchingServices = $services.items | Where-Object {
+        $_.metadata.name -match "aio-mq-dmqtt" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 20
+} while (
+    $null -eq $mqttIp -and $matchingServices.Count -ne 0
+)
+
+Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
+    netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
+}
+
+##############################################################
+# Deploy OT Inspector (InfluxDB)
+##############################################################
+$listenerYaml = "$AgToolsDir\mqtt_listener.yml"
+$influxdb_setupYaml = "$AgToolsDir\influxdb_setup.yml"
+$influxdbYaml = "$AgToolsDir\influxdb.yml"
+$influxImportYaml = "$AgToolsDir\influxdb-import-dashboard.yml"
+$mqttExplorerSettings = "$AgToolsDir\mqtt_explorer_settings.json"
+
+do {
+    $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+    $matchingPods = $simulatorPod.items | Where-Object {
+        $_.metadata.name -match "mqtt-simulator-deployment" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 20
+} while (
+    $matchingPods.Count -ne 0
+)
+
+kubectl apply -f $influxdb_setupYaml -n $aioNamespace
+
+do {
+    $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 10 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 10
+} while (
+    $null -eq $influxIp
+)
+
+(Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
+(Get-Content $mqttExplorerSettings ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqttExplorerSettings
+(Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
+(Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $adminPassword | Set-Content $influxdbYaml
+(Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $adminUsername | Set-Content $influxdbYaml
+(Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
+
+kubectl apply -f $aioToolsDir\influxdb.yml -n $aioNamespace
+
+do {
+    $influxPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+    $matchingPods = $influxPod.items | Where-Object {
+        $_.metadata.name -match "influxdb-0" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 20
+} while (
+    $matchingPods.Count -ne 0
+)
+
+kubectl apply -f $aioToolsDir\mqtt_listener.yml -n $aioNamespace
+do {
+    $listenerPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+    $matchingPods = $listenerPod.items | Where-Object {
+        $_.metadata.name -match "mqtt-listener-deployment" -and
+        $_.status.phase -notmatch "running"
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 20
+} while (
+    $matchingPods.Count -ne 0
+)
+
+kubectl apply -f $aioToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
+kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 }
 
 #####################################################################

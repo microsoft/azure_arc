@@ -4,6 +4,7 @@ param (
   [string]$spnClientId,
   [string]$spnClientSecret,
   [string]$spnTenantId,
+  [string]$spnObjectId,
   [string]$spnAuthority,
   [string]$subscriptionId,
   [string]$resourceGroup,
@@ -28,6 +29,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnObjectId', $spnObjectId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
@@ -217,6 +219,14 @@ Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/ma
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-global.json") -OutFile "$AgMonitoringDir\grafana-cluster-global.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
+
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb_setup.yml") -OutFile "$AgToolsDir\influxdb_setup.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Settings/mqtt_listener.yml") -OutFile "$AgToolsDir\mqtt_listener.yml"
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
