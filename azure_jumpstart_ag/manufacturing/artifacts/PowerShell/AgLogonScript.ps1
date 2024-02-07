@@ -28,6 +28,7 @@ $appClonedRepo       = "https://github.com/$githubUser/jumpstart-agora-apps"
 $namingGuid          = $Env:namingGuid
 $adminPassword       = $Env:adminPassword
 $aioNamespace        = "azure-iot-operations"
+$mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -925,7 +926,7 @@ do {
 (Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $adminUsername | Set-Content $influxdbYaml
 (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
 
-kubectl apply -f $aioToolsDir\influxdb.yml -n $aioNamespace
+kubectl apply -f $AgToolsDir\influxdb.yml -n $aioNamespace
 
 do {
     $influxPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
@@ -939,7 +940,7 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $aioToolsDir\mqtt_listener.yml -n $aioNamespace
+kubectl apply -f $AgToolsDir\mqtt_listener.yml -n $aioNamespace
 do {
     $listenerPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
     $matchingPods = $listenerPod.items | Where-Object {
@@ -952,9 +953,29 @@ do {
     $matchingPods.Count -ne 0
 )
 
-kubectl apply -f $aioToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
-kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
+kubectl apply -f $AgToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
+kubectl apply -f $AgToolsDir\influxdb-configmap.yml -n $aioNamespace
 }
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+Write-Host "`n"
+$latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+$output = Join-Path $AgToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+Start-Sleep -Seconds 5
+Stop-Process -Name "MQTT Explorer"
+Copy-Item "$AgToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
+
 
 #####################################################################
 # Installing flux extension on clusters
