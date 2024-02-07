@@ -12,14 +12,14 @@ if (-not (Get-Command -Name Get-AzContext)) {
 
 # If not signed in, run the Connect-AzAccount cmdlet
 if (-not (Get-AzContext)) {
-    Write-Host "Logging in to Azure..."
+    Write-Host "Logging in to Azure with subscription id $env:AZURE_SUBSCRIPTION_ID"
     If (-not (Connect-AzAccount -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop)){
         Throw "Unable to login to Azure. Please check your credentials and try again."
     }
 }
 $tenantId = (Get-AzContext).tenant.id
-# Write-Host "Setting Azure context..."
-$context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -Tenant $tenantId -ErrorAction Stop
+Write-Host "Setting Azure context with subscription id $env:AZURE_SUBSCRIPTION_ID and tenant id $tenantId..."
+$context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop
 
 # Write-Host "Setting az subscription..."
 az account set --subscription $env:AZURE_SUBSCRIPTION_ID
@@ -165,7 +165,7 @@ azd env set JS_RDP_PORT $JS_RDP_PORT
 
 # Attempt to retrieve provider id for Microsoft.AzureStackHCI
 Write-Host "Attempting to retrieve Microsoft.AzureStackHCI provider id..."
-$spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI") | ConvertFrom-Json
+$spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json
 if ($null -ne $spnProviderId.id) {
     azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
 }
@@ -177,7 +177,7 @@ Write-Host "Checking for existing stored Azure service principal..."
 if ($null -ne $env:SPN_CLIENT_ID) {
     Write-Host "Re-using existing service principal..."
 } else {
-    Write-Host "Attempting to create new service principal..."
+    Write-Host "Attempting to create new service principal with scope /subscriptions/$($env:AZURE_SUBSCRIPTION_ID)..."
     $user = (Get-AzContext).Account.Id.split("@")[0]
     $uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
     try {
@@ -191,14 +191,12 @@ if ($null -ne $env:SPN_CLIENT_ID) {
         azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
     }
     catch {
+        
         If ($error[0].ToString() -match "Forbidden"){
             Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
         }
-        elseif ($error[0].ToString() -match "credentials") {
-            Throw "Please run Connect-AzAccount to sign in and run 'azd up' again."
-        }
         else {
-            Throw "An error occurred creating the service principal. Please try again."
+            Throw "An error occurred creating the service principal. Error:" + $error[0].ToString()
         }
     }
     
