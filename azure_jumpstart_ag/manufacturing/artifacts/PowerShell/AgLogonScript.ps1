@@ -780,6 +780,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 #############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
 Write-Host "`n"
+az extension add --upgrade --source ([System.Net.HttpWebRequest]::Create('https://aka.ms/aziotopscli-edge').GetResponse().ResponseUri.AbsoluteUri) -y
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     kubectx $clusterName

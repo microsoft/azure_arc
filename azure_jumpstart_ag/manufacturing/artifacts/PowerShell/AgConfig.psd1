@@ -57,8 +57,7 @@
         'eventgrid',
         'customlocation',
         'kusto',
-        'storage-preview',
-        'azure-iot-ops'
+        'storage-preview'
     )
 
     # PowerShell modules
