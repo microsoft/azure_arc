@@ -73,9 +73,6 @@ Start-Transcript -Path "$($HCIBoxConfig.Paths["LogsDir"])\Bootstrap.log"
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
-# Installing Posh-SSH PowerShell Module
-# Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
 try {
@@ -210,5 +207,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content $($HCIBoxConfig.Paths["LogsDir"])\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $($HCIBoxConfig.Paths["LogsDir"])\Bootstrap.log -Force
+$logSuppress = Get-Content $($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log -Force

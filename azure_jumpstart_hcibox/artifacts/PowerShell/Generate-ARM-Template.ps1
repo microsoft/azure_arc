@@ -16,8 +16,8 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 
 # Install some modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Az.Resources -Force
-Install-Module Az.ConnectedMachine -Force
+Install-Module -Name Az.Resources -AllowClobber -Force
+Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
 Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
 
 # Add necessary role assignments 
