@@ -13,6 +13,9 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
+@description('Azure AD object id for your Microsoft.AzureStackHCI resource provider')
+param spnProviderId string
+
 @description('Username for Windows account')
 param windowsAdminUsername string
 
@@ -24,15 +27,6 @@ param windowsAdminPassword string
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'HCIBox-Workspace'
-
-@description('Option to disable automatic cluster registration. Setting this to false will also disable deploying AKS and Resource bridge')
-param registerCluster bool = true
-
-@description('Option to deploy AKS-HCI with HCIBox')
-param deployAKSHCI bool = true
-
-@description('Option to deploy Resource Bridge with HCIBox')
-param deployResourceBridge bool = true
 
 @description('Public DNS to use for the domain')
 param natDNS string = '8.8.8.8'
@@ -97,14 +91,12 @@ module hostDeployment 'host/host.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
+    spnProviderId: spnProviderId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
     subnetId: networkDeployment.outputs.subnetId
     deployBastion: deployBastion
-    registerCluster: registerCluster
-    deployAKSHCI: deployAKSHCI
-    deployResourceBridge: deployResourceBridge
     natDNS: natDNS
     location: location
     rdpPort: rdpPort
