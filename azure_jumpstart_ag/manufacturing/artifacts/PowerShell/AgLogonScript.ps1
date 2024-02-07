@@ -6,26 +6,27 @@ Set-PSDebug -Strict
 #####################################################################
 # Initialize the environment
 #####################################################################
-$AgConfig           = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
-$websiteUrls        = $AgConfig.URLs
-$githubAccount      = $Env:githubAccount
-$githubBranch       = $Env:githubBranch
-$githubUser         = $Env:githubUser
-$resourceGroup      = $Env:resourceGroup
-$subscription       = $Env:subscriptionId
-$azureLocation      = $Env:azureLocation
-$spnClientId        = $Env:spnClientId
-$spnClientSecret    = $Env:spnClientSecret
-$spnTenantId        = $Env:spnTenantId
-$adminUsername      = $Env:adminUsername
-$acrName            = $Env:acrName.ToLower()
-$templateBaseUrl    = $Env:templateBaseUrl
-$appClonedRepo      = "https://github.com/$githubUser/jumpstart-agora-apps"
-$namingGuid         = $Env:namingGuid
-$adminPassword      = $Env:adminPassword
-$aioNamespace       = "azure-iot-operations"
+$AgConfig            = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir          = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir          = $AgConfig.AgDirectories["AgIconDir"]
+$websiteUrls         = $AgConfig.URLs
+$githubAccount       = $Env:githubAccount
+$githubBranch        = $Env:githubBranch
+$githubUser          = $Env:githubUser
+$resourceGroup       = $Env:resourceGroup
+$subscription        = $Env:subscriptionId
+$azureLocation       = $Env:azureLocation
+$spnClientId         = $Env:spnClientId
+$spnClientSecret     = $Env:spnClientSecret
+$spnTenantId         = $Env:spnTenantId
+$adminUsername       = $Env:adminUsername
+$customLocationRPOID = $Env:customLocationRPOID
+$acrName             = $Env:acrName.ToLower()
+$templateBaseUrl     = $Env:templateBaseUrl
+$appClonedRepo       = "https://github.com/$githubUser/jumpstart-agora-apps"
+$namingGuid          = $Env:namingGuid
+$adminPassword       = $Env:adminPassword
+$aioNamespace        = "azure-iot-operations"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -789,6 +790,15 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $retryCount = 0
     $maxRetries = 5
     $aioStatus = "notDeployed"
+
+    # Enable custom locations on the Arc-enabled cluster
+    Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+    az connectedk8s enable-features --name $arcClusterName `
+        --resource-group $resourceGroup `
+        --features cluster-connect custom-locations `
+        --custom-locations-oid $customLocationRPOID `
+        --only-show-errors
+
 
     do {
         az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors

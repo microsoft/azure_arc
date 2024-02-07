@@ -80,6 +80,9 @@ param aioStorageAccountName string = 'aiostg${namingGuid}'
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
+@description('The custom location RPO ID')
+param customLocationRPOID string
+
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -138,6 +141,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     rdpPort: rdpPort
     namingGuid: namingGuid
     adxClusterName: adxClusterName
+    customLocationRPOID: customLocationRPOID
   }
 }
 

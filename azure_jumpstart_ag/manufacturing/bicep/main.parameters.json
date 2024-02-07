@@ -28,6 +28,9 @@
     },
     "githubUser": {
       "value": ""
+    },
+    "customLocationRPOID": {
+      "value": ""
     }
   }
 }

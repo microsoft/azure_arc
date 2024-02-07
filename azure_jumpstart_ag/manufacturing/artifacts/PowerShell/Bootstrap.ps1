@@ -17,7 +17,8 @@ param (
   [string]$githubAccount,
   [string]$githubBranch,
   [string]$githubPAT,
-  [string]$namingGuid
+  [string]$namingGuid,
+  [string]$customLocationRPOID
 )
 
 ##############################################################
@@ -46,6 +47,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
+
 
 $ErrorActionPreference = 'Continue'
 
