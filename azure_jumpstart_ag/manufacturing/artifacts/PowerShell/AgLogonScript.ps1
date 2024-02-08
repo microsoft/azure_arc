@@ -786,11 +786,12 @@ Write-Host "`n"
 
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
+    $kvIndex = 0
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
     Write-Host "`n"
     kubectx $clusterName
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
-    $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
+    $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
     $secretName = $clusterName+"-aio"
     $retryCount = 0
     $maxRetries = 5
@@ -806,7 +807,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
 
     do {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
         if ($? -eq $false) {
             $aioStatus = "notDeployed"
             Write-Host "`n"
@@ -863,6 +864,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
     (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
     kubectl apply -f $mqconfigfile -n $aioNamespace
+    $kvIndex++
 }
 
 ##############################################################

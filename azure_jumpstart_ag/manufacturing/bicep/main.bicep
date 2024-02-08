@@ -69,7 +69,11 @@ param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 @description('Name of the event grid namespace')
 param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 
-param akvName string = 'agakv${namingGuid}'
+@description('The name of the Key Vault for site 1')
+param akvNameSite1 string = 'agakv1${namingGuid}'
+
+@description('The name of the Key Vault for site 2')
+param akvNameSite2 string = 'agakv2${namingGuid}'
 
 @description('The name of the Azure Data Explorer Event Hub consumer group')
 param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
@@ -185,7 +189,8 @@ module keyVault 'data/keyVault.bicep' = {
   name: 'keyVaultDeployment'
   params: {
     tenantId: spnTenantId
-    akvName: akvName
+    akvNameSite1: akvNameSite1
+    akvNameSite2: akvNameSite2
     location: location
   }
 }
