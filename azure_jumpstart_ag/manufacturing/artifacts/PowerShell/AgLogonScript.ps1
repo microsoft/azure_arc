@@ -783,10 +783,9 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
 #############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
 Write-Host "`n"
-
+$kvIndex = 0
 foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
-    $kvIndex = 0
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
     Write-Host "`n"
     kubectx $clusterName
