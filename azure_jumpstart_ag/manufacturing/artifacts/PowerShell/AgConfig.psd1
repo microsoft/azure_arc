@@ -59,7 +59,7 @@
         'customlocation',
         'kusto',
         'storage-preview'
-        #'azure-iot-ops'
+        'azure-iot-ops'
     )
 
     # PowerShell modules
