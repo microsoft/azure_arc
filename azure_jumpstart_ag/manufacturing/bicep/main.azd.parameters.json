@@ -20,9 +20,6 @@
     "windowsAdminUsername": {
       "value": "${JS_WINDOWS_ADMIN_USERNAME}"
     },
-    "sshRSAPublicKey": {
-      "value": "${JS_SSH_RSA_PUBLIC_KEY}"
-    },
     "deployBastion": {
       "value": false
     },
@@ -34,6 +31,9 @@
     },
     "githubPAT": {
       "value": "${JS_GITHUB_PAT}"
+    },
+    "customLocationRPOID": {
+      "value": "${CUSTOM_LOCATION_RPO_ID}"
     }
   }
 }

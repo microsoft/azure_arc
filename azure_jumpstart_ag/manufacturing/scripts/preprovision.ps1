@@ -167,6 +167,14 @@ if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection 
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
 
+########################################################################
+# Get custom locations RP Id
+########################################################################
+$customLocationRPOID=(Get-AzADServicePrincipal -DisplayName 'Custom Locations RP').Id
+
+# Set environment variables
+azd env set CUSTOM_LOCATION_RP_ID $customLocationRPOID
+
 
 ########################################################################
 # GitHub User
@@ -194,27 +202,6 @@ if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$def
 
 # set the env variable
 azd env set JS_GITHUB_PAT -- $JS_GITHUB_PAT
-
-
-########################################################################
-# Create SSH RSA Public Key
-########################################################################
-Write-Host "Creating SSH RSA Public Key..."
-$file = "js_rsa"
-remove-item $file, "$file.pub" -Force -ea 0 
-
-# Generate the SSH key pair
-ssh-keygen -q -t rsa -b 4096 -f $file -N '""' 
-
-# Get the public key
-$JS_SSH_RSA_PUBLIC_KEY = get-content "$file.pub"
-
-# Escape the backslashes 
-$JS_SSH_RSA_PUBLIC_KEY = $JS_SSH_RSA_PUBLIC_KEY.Replace("\", "\\")
-
-# set the env variable
-azd env set JS_SSH_RSA_PUBLIC_KEY -- $JS_SSH_RSA_PUBLIC_KEY
-
 
 ########################################################################
 # Create Azure Service Principal

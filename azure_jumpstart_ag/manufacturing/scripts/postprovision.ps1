@@ -3,11 +3,6 @@ if ($null -ne $env:AZURE_RESOURCE_GROUP){
     $adxClusterName = $env:ADX_CLUSTER_NAME
     Select-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID | out-null
     $rdpPort = $env:JS_RDP_PORT
-} else {
-    # This section is for testing only
-    $resourceGroup  = "charris-js-ag-43-rg"
-    $adxClusterName = "agadx2827a"
-    Get-AzSubscription -SubscriptionName "Azure Arc Jumpstart Subscription" | Select-AzSubscription
 }
 
 ########################################################################
@@ -21,7 +16,7 @@ $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxC
 $adxEndPoint = $kustoCluster.Uri
 
 # Update the dashboards files with the new ADX cluster name and URI
-$templateBaseUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_ag"
+$templateBaseUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/ag_manufacturing/azure_jumpstart_ag/manufacturing/"
 $ordersDashboardBody     = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
 $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
 
