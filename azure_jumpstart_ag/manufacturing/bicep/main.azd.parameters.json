@@ -29,11 +29,8 @@
     "githubUser": {
       "value": "${JS_GITHUB_USER}"
     },
-    "githubPAT": {
-      "value": "${JS_GITHUB_PAT}"
-    },
     "customLocationRPOID": {
-      "value": "${CUSTOM_LOCATION_RPO_ID}"
+      "value": "${CUSTOM_LOCATION_RP_ID}"
     }
   }
 }

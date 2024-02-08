@@ -23,9 +23,6 @@
     "deployBastion": {
       "value": false
     },
-    "githubPAT": {
-      "value": ""
-    },
     "githubUser": {
       "value": ""
     },

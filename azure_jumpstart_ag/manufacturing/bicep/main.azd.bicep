@@ -43,10 +43,10 @@ param deployBastion bool = false
 @minLength(1)
 param githubUser string
 
-@description('GitHub Personal access token for the user account')
-@minLength(1)
-@secure()
-param githubPAT string
+//@description('GitHub Personal access token for the user account')
+//@minLength(1)
+//@secure()
+//param githubPAT string
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
@@ -138,7 +138,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubAccount: githubAccount
     githubBranch: githubBranch
     githubUser: githubUser
-    githubPAT: githubPAT
+    //githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
     acrName: acrName
