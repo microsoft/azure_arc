@@ -791,6 +791,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     kubectx $clusterName
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
     $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[0].id" -o tsv)
+    $secretName = $clusterName+"-aio"
     $retryCount = 0
     $maxRetries = 5
     $aioStatus = "notDeployed"
@@ -805,7 +806,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 
 
     do {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
         if ($? -eq $false) {
             $aioStatus = "notDeployed"
             Write-Host "`n"
@@ -825,7 +826,7 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $output = $output | ConvertFrom-Json
         $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
         if ($mqServiceStatus -ne "Success") {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
             $retryCount++
         }
     } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
