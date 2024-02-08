@@ -189,20 +189,6 @@ if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS
 # set the env variable
 azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
 
-
-########################################################################
-# GitHub Personal Access Token
-########################################################################
-$JS_GITHUB_PAT = $env:JS_GITHUB_PAT
-
-$defaultPAT = ""
-If ($JS_GITHUB_PAT) { $defaultPAT = " [$JS_GITHUB_PAT]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub Personal Access Token (PAT)$defaultPAT") { $JS_GITHUB_PAT = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_PAT -- $JS_GITHUB_PAT
-
 ########################################################################
 # Create Azure Service Principal
 ########################################################################
