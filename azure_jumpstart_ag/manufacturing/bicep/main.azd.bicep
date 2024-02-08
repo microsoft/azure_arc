@@ -8,6 +8,9 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
+//@description('Azure service principal object id')
+//param spnObjectId string
+
 @description('Location for all resources')
 param location string = resourceGroup().location
 
@@ -80,6 +83,9 @@ param aioStorageAccountName string = 'aiostg${namingGuid}'
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
+@description('The custom location RPO ID')
+param customLocationRPOID string
+
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -123,6 +129,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
+    //spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -138,11 +145,12 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     rdpPort: rdpPort
     namingGuid: namingGuid
     adxClusterName: adxClusterName
+    customLocationRPOID: customLocationRPOID
   }
 }
 
 module eventHub 'data/eventHub.bicep' = {
-  name: 'eventHub'
+  name: 'eventHubDeployment'
   params: {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
@@ -153,7 +161,7 @@ module eventHub 'data/eventHub.bicep' = {
 }
 
 module storageAccount 'storage/storageAccount.bicep' = {
-  name: 'storageAccount'
+  name: 'aioStorageAccountDeployment'
   params: {
     storageAccountName: aioStorageAccountName
     location: location
@@ -162,7 +170,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
 }
 
 module eventGrid 'data/eventGrid.bicep' = {
-  name: 'eventGrid'
+  name: 'eventGridDeployment'
   params: {
     eventGridNamespaceName: eventGridNamespaceName
     eventHubResourceId: eventHub.outputs.eventHubResourceId
@@ -174,7 +182,7 @@ module eventGrid 'data/eventGrid.bicep' = {
 }
 
 module keyVault 'data/keyVault.bicep' = {
-  name: 'keyVault'
+  name: 'keyVaultDeployment'
   params: {
     tenantId: spnTenantId
     akvName: akvName
@@ -183,7 +191,7 @@ module keyVault 'data/keyVault.bicep' = {
 }
 
 module acr 'kubernetes/acr.bicep' = {
-  name: 'acr'
+  name: 'acrDeployment'
   params: {
     acrName: acrName
     location: location
@@ -191,7 +199,7 @@ module acr 'kubernetes/acr.bicep' = {
 }
 
 module adx 'data/dataExplorer.bicep' = {
-  name: 'adx'
+  name: 'adxDeployment'
   params: {
     adxClusterName: adxClusterName
     location: location
@@ -200,3 +208,4 @@ module adx 'data/dataExplorer.bicep' = {
     eventHubNamespaceName: eventHubNamespaceName
   }
 }
+
