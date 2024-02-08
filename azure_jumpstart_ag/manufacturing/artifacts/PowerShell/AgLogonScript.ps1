@@ -910,7 +910,7 @@ Copy-Item "$AgToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFI
 #####################################################################
 # Installing flux extension on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
+<#Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
 
 $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
 $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
@@ -1036,7 +1036,7 @@ if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
     throw "One or more Flux-extension deployments failed - aborting"
 
 }
-
+#>
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
