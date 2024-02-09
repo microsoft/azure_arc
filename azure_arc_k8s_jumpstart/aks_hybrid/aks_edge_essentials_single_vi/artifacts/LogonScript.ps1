@@ -150,7 +150,7 @@ Start-Sleep -Seconds 30
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
 $extensionName="video-indexer"
-#$version="1.0.28-preview" # switch to blank
+$version="1.0.41" # switch to blank
 $namespace="video-indexer"
 $releaseTrain="release" # switch to release
 $storageClass="longhorn"
@@ -182,13 +182,15 @@ az k8s-extension create --name $extensionName `
                         --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
+                        --version $version `
+                        --auto-upgrade-minor-version false
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
                         --config-protected-settings "ocr.endpointUri=$($csResourcesData.ocrCognitiveServicesEndpoint)" `
                         --config-protected-settings "ocr.secret=$($csResourcesData.ocrCognitiveServicesPrimaryKey)" `
-                        --config "videoindxer.endpointUri=https://$ipAddress" `
+                        --config "frontend.endpointUri=https://$ipAddress" `
                         --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
                         --config "storage.storageClass=$storageClass" `
                         --config "storage.accessMode=ReadWriteMany"
