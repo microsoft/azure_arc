@@ -136,6 +136,7 @@ Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 #####################################################################
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
+Start-Sleep -Seconds 5
 helm install ingress-nginx ingress-nginx/ingress-nginx
 
 #####################################################################
