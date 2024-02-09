@@ -183,7 +183,7 @@ az k8s-extension create --name $extensionName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
                         --version $version `
-                        --auto-upgrade-minor-version false
+                        --auto-upgrade-minor-version false `
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
