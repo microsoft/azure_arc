@@ -136,6 +136,7 @@ Connect-AksEdgeArc -JsonConfigFilePath $tempDir\aksedge-config.json
 #####################################################################
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
+Start-Sleep -Seconds 5
 helm install ingress-nginx ingress-nginx/ingress-nginx
 
 #####################################################################
@@ -149,19 +150,24 @@ Start-Sleep -Seconds 30
 ### Video Indexer setup
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
-$extensionName="videoindexer"
-#$version="1.0.28-preview" # switch to blank
+$extensionName="video-indexer"
+$version="1.0.41" # switch to blank
 $namespace="video-indexer"
 $releaseTrain="release" # switch to release
 $storageClass="longhorn"
 
 Write-Host "Create Cognitive Services on VI resource provider"
 $createResourceUri = "https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/CreateExtensionDependencies?api-version=${viApiVersion}"
+
 $result = $(az rest --method post --uri $createResourceUri) | ConvertFrom-Json
 
-Write-Host "Retrieving Cognitive Service Credentials..."
+
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
-$csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
+while ($null -eq $csResourcesData) {
+    Write-Host "Retrieving Cognitive Service Credentials..."
+    $csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
+    Start-Sleep -Seconds 10
+}
 Write-Host
 
 Write-Host "Getting VM public IP address..."
@@ -177,14 +183,16 @@ az k8s-extension create --name $extensionName `
                         --cluster-name $clusterName `
                         --resource-group $Env:resourceGroup `
                         --cluster-type connectedClusters `
-                        --release-train $releaseTrain `
+                        --version $version `
                         --auto-upgrade-minor-version false `
                         --config-protected-settings "speech.endpointUri=$($csResourcesData.speechCognitiveServicesEndpoint)" `
                         --config-protected-settings "speech.secret=$($csResourcesData.speechCognitiveServicesPrimaryKey)" `
                         --config-protected-settings "translate.endpointUri=$($csResourcesData.translatorCognitiveServicesEndpoint)" `
                         --config-protected-settings "translate.secret=$($csResourcesData.translatorCognitiveServicesPrimaryKey)" `
-                        --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
+                        --config-protected-settings "ocr.endpointUri=$($csResourcesData.ocrCognitiveServicesEndpoint)" `
+                        --config-protected-settings "ocr.secret=$($csResourcesData.ocrCognitiveServicesPrimaryKey)" `
                         --config "frontend.endpointUri=https://$ipAddress" `
+                        --config "videoIndexer.accountId=${Env:videoIndexerAccountId}" `
                         --config "storage.storageClass=$storageClass" `
                         --config "storage.accessMode=ReadWriteMany"
 
@@ -195,7 +203,7 @@ New-NetFirewallRule -DisplayName "Allow Inbound Port 443" -Direction Inbound -Lo
 
 Write-Host "Adding port forward for VI frontend..."
 Start-Sleep -Seconds 20
-$ing = kubectl get ing videoindexer-vi-arc -n $namespace -o json | ConvertFrom-Json
+$ing = kubectl get ing video-indexer-vi-arc -n $namespace -o json | ConvertFrom-Json
 $ingIp = $ing.status.loadBalancer.ingress.ip
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=$ingIp connectport=80
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=443 connectaddress=$ingIp connectport=443
