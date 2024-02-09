@@ -202,7 +202,7 @@ New-NetFirewallRule -DisplayName "Allow Inbound Port 443" -Direction Inbound -Lo
 
 Write-Host "Adding port forward for VI frontend..."
 Start-Sleep -Seconds 20
-$ing = kubectl get ing videoindexer-vi-arc -n $namespace -o json | ConvertFrom-Json
+$ing = kubectl get ing video-indexer-vi-arc -n $namespace -o json | ConvertFrom-Json
 $ingIp = $ing.status.loadBalancer.ingress.ip
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=80 connectaddress=$ingIp connectport=80
 netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=443 connectaddress=$ingIp connectport=443
