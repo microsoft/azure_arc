@@ -149,7 +149,7 @@ Start-Sleep -Seconds 30
 ### Video Indexer setup
 #####################################################################
 $viApiVersion="2023-06-02-preview" 
-$extensionName="videoindexer"
+$extensionName="video-indexer"
 #$version="1.0.28-preview" # switch to blank
 $namespace="video-indexer"
 $releaseTrain="release" # switch to release
@@ -157,11 +157,16 @@ $storageClass="longhorn"
 
 Write-Host "Create Cognitive Services on VI resource provider"
 $createResourceUri = "https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/CreateExtensionDependencies?api-version=${viApiVersion}"
+
 $result = $(az rest --method post --uri $createResourceUri) | ConvertFrom-Json
 
-Write-Host "Retrieving Cognitive Service Credentials..."
+
 $getSecretsUri="https://management.azure.com/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}/providers/Microsoft.VideoIndexer/accounts/${env:videoIndexerAccountName}/ListExtensionDependenciesData?api-version=$viApiVersion"
-$csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
+while ($null -eq $csResourcesData) {
+    Write-Host "Retrieving Cognitive Service Credentials..."
+    $csResourcesData=$(az rest --method post --uri $getSecretsUri) | ConvertFrom-Json
+    Start-Sleep -Seconds 10
+}
 Write-Host
 
 Write-Host "Getting VM public IP address..."
