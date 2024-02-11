@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 # Set aadgroupID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster.
-#aadgroupID="xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"
+#$aadgroupID="xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"

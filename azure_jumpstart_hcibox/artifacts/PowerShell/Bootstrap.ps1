@@ -149,13 +149,10 @@ Register-ScheduledTask -TaskName "HCIBoxLogonScript" -Trigger $Trigger -User $ad
 # Disable Edge 'First Run' Setup
 Write-Host "Configuring Microsoft Edge."
 $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
 $firstRunRegistryName  = 'HideFirstRunExperience'
 $firstRunRegistryValue = '0x00000001'
 $savePasswordRegistryName = 'PasswordManagerEnabled'
 $savePasswordRegistryValue = '0x00000000'
-$autoArrangeRegistryName = 'FFlags'
-$autoArrangeRegistryValue = '1075839525'
 
 if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
     New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
@@ -163,7 +160,6 @@ if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
 
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
-Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 # Change RDP Port
 Write-Host "Updating RDP Port - RDP port number from configuration is $rdpPort"
@@ -207,5 +203,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content $($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log -Force
+$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" -Force
