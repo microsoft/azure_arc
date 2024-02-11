@@ -2,6 +2,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
 $clusters = @(
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
@@ -32,7 +33,8 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az account set -s $Env:subscriptionId
 
 # Register Azure providers
 Write-Header "Registering Providers"
@@ -180,6 +182,9 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     $cluster = $_
     $context = $cluster.context
     $clusterName = $cluster.clusterName
+    $customLocation = $cluster.customLocation
+    $dataController = $cluster.dataController
+
     Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
     Write-Host "Deploying arc data services on $clusterName"
     Write-Host "`n"
@@ -191,7 +196,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.26.0 `
+            --version 1.25.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"
@@ -203,17 +208,17 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             } while ($podStatus -eq "Nope")
             Write-Host "Bootstrapper pod is ready!"
 
-            $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-            $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            $connectedClusterId = az connectedk8s show --name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
+            $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $clusterName --resource-group $Env:resourceGroup --query id -o tsv
             Start-Sleep -Seconds 10
-            az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
 
             Start-Sleep -Seconds 20
 
             # Deploying the Azure Arc Data Controller
 
             $context = $cluster.context
-            $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+            $customLocationId = $(az customlocation show --name $customLocation --resource-group $Env:resourceGroup --query id -o tsv)
             $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
             $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
             Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
@@ -234,7 +239,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             Write-Host "Deploying arc data controller on $clusterName"
             Write-Host "`n"
-            az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            az deployment group create --resource-group $Env:resourceGroup --name $dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
             Write-Host "`n"
 
             Do {
@@ -260,13 +265,16 @@ $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --nam
 $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
 foreach($cluster in $clusters){
-    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
+    $clusterName = $cluster.clusterName
+    $dataController = $cluster.dataController
+    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
     az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
+    az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+    az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-logs true
 }
 
 Write-Header "Deploying App"
+
 # Deploy App
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
 
@@ -341,6 +349,10 @@ if ($null -ne (Get-ScheduledTask -TaskName "DataOpsLogonScript" -ErrorAction Sil
 }
 
 Start-Sleep -Seconds 5
+
+Write-Header "Running tests to verify infrastructure"
+
+& "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"

@@ -10,6 +10,12 @@ $sqlInstance = "capi"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsAppScript.log
 
+# Add OpenSSL to path environment variable
+$openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
+$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Process)
+$newPathVariable = $currentPathVariable + ";" + $openSSL
+[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Process)
+
 Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String $password -Force -AsPlainText
@@ -17,7 +23,7 @@ Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath
 Import-PfxCertificate -FilePath "$Env:TempDir\$CName.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
 openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -nocerts -out "$Env:TempDir\$CName.key" -password pass:$password -passout pass:$password
-openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password 
+openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password
 openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
 
 Write-Header "Creating Ingress Controller"
