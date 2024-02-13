@@ -68,7 +68,7 @@ echo "Create Kubeadm Cluster Master Node..."
 
 # Set Kubeadm deployment environment variables
 export KUBEADM_VERSION="1.25.5" # Do not change!
-export AZURE_DISK_CSI_VERSION="1.26.0" # Do not change!
+export AZURE_DISK_CSI_VERSION="1.27.0" # Do not change!
 
 sudo apt update
 sudo apt -y install curl apt-transport-https </dev/null
