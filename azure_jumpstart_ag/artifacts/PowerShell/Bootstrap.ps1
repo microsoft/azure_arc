@@ -220,7 +220,7 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 # Download artifacts
 ##############################################################
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgPowerShellDir\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
-Copy-Item $ConfigurationDataFile $AgPowerShellDir -Force
+Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 
 if($industry -eq "retail"){
