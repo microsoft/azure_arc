@@ -225,7 +225,7 @@ Copy-Item $ConfigurationDataFile $AgPowerShellDir -Force
 
 if($industry -eq "retail"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile "$AgPowerShellDir\AgConfig.psd1"
+  #Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile "$AgPowerShellDir\AgConfig.psd1"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
   Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
   Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
