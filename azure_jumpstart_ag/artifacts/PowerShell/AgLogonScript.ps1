@@ -369,7 +369,7 @@ git remote add upstream "$appClonedRepo.git"
 
 Write-Host "INFO: Creating GitHub workflows" -ForegroundColor Gray
 New-Item -ItemType Directory ".github/workflows" -Force
-$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/retail/artifacts/workflows?ref=$githubBranch"
+$githubApiUrl = "$gitHubAPIBaseUri/repos/$githubAccount/azure_arc/contents/azure_jumpstart_ag/artifacts/workflows?ref=$githubBranch"
 $response = Invoke-RestMethod -Uri $githubApiUrl
 $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
 $fileUrls | ForEach-Object {
@@ -789,7 +789,7 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Fetching required GitHub artifacts from Jumpstart repository
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
     $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/retail/artifacts/L1Files?ref=$using:githubBranch"
+    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
     $response = Invoke-RestMethod -Uri $githubApiUrl
     $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
     $fileUrls | ForEach-Object {
