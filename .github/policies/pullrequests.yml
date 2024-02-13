@@ -1,0 +1,133 @@
+name:  Housekeeping - PRs management
+description: Azure Arc Jumpstart management of PRs using GitHub Policies
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: needs author feedback
+      - noActivitySince:
+          days: 7
+      - isNotLabeledWith:
+          label: no recent activity
+      actions:
+      - addLabel:
+          label: no recent activity
+      - addReply:
+          reply: This pull request has been automatically marked as stale because it was marked as requiring author feedback but has not had any activity for **7 days**. It will be closed if no further activity occurs **within 7 days of this comment**. Thank you ${issueAuthor} for your contributions to this project!
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isOpen
+      - isPullRequest
+      - hasLabel:
+          label: no recent activity
+      - noActivitySince:
+          days: 14
+      actions:
+      - addReply:
+          reply: Because of no activity for over **14 days**, we're closing this pull request. Please open a new issue report if more support is required. Thank you for your support ${issueAuthor}!
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isOpen
+      - isPullRequest
+      - hasLabel:
+          label: investigate
+      - noActivitySince:
+          days: 3
+      actions:
+      - addReply:
+          reply: "${assignees}\nGentle ping that this issue needs attention. "
+    eventResponderTasks:
+    - if:
+      - payloadType: Pull_Request
+      - isAction:
+          action: Opened
+      then:
+      - addReply:
+          reply: 'Hi ${issueAuthor}! Thank you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
+      description: 
+    - if:
+      - payloadType: Pull_Request_Review
+      - isAction:
+          action: Submitted
+      - isReviewState:
+          reviewState: Changes_requested
+      then:
+      - addLabel:
+          label: needs author feedback
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - isActivitySender:
+          issueAuthor: True
+      - not:
+          isAction:
+            action: Closed
+      - or:
+        - hasLabel:
+            label: needs author feedback
+        - hasLabel:
+            label: no recent activity
+      then:
+      - removeLabel:
+          label: needs author feedback
+      - removeLabel:
+          label: no recent activity
+      - addLabel:
+          label: review
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - isAction:
+          action: Null
+      - isOpen
+      then:
+      - addLabel:
+          label: review
+      description: 
+    - if:
+      - payloadType: Pull_Request_Review
+      - isAction:
+          action: Submitted
+      - isOpen
+      then:
+      - removeLabel:
+          label: review
+      - removeLabel:
+          label: no recent activity
+      description: 
+    - if:
+      - payloadType: Pull_Request_Review
+      - isActivitySender:
+          issueAuthor: True 
+      - or:
+        - hasLabel:
+            label: needs author feedback
+        - hasLabel:
+            label: no recent activity
+      then:
+      - removeLabel:
+          label: needs author feedback
+      - removeLabel:
+          label: no recent activity
+      - addLabel:
+          label: review
+      description: 
+onFailure: 
+onSuccess: 
