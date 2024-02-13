@@ -1516,8 +1516,8 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs. This will may take some time..." -ForegroundColor Green
-BITSRequest -Params @{'Uri'='https://aka.ms/AAnn1dd'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/AZSHCI.sha256?sp=r&st=2024-01-16T15:09:53Z&se=2027-01-16T23:09:53Z&spr=https&sv=2022-11-02&sr=b&sig=fM6nSGOUHIB90egY95Oc02NfXxFmh8fPK0bnibjAdQU%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI23h2v2.vhdx?sp=r&st=2024-02-13T18:52:49Z&se=2027-02-14T02:52:49Z&spr=https&sv=2022-11-02&sr=b&sig=605POEbwhhJJmmV%2BIran%2B4DmQpOXqtkwADeU6ojXncM%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI23h2v2.sha256?sp=r&st=2024-02-13T18:54:44Z&se=2027-02-14T02:54:44Z&spr=https&sv=2022-11-02&sr=b&sig=FHHLgiaxYCZx5UbTIipJtYUIEsQ4dTFQM4%2BZMMLIjmM%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
