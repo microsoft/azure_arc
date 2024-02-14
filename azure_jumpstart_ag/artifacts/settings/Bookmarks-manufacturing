@@ -1,0 +1,129 @@
+{
+   "checksum": "d77f9db622cff666aa1ae0f899c3b4ec",
+   "roots": {
+      "bookmark_bar": {
+         "children": [{
+            "children": [ {
+               "id": "16",
+               "name": "Grafana Dev",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Grafana-Dev-URL"
+            }, {
+               "id": "17",
+               "name": "Grafana Staging",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Grafana-Staging-URL"
+            }, {
+               "id": "18",
+               "name": "Grafana Prod",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "http://localhost:3000/"
+            } ],
+            "id": "15",
+            "name": "Grafana",
+            "source": "unknown",
+            "type": "folder"
+         }, {
+            "children": [ {
+               "id": "30",
+               "name": "Prometheus Dev",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Prometheus-Dev-URL"
+            }, {
+               "id": "31",
+               "name": "Prometheus Staging",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Prometheus-Staging-URL"
+            }, {
+               "id": "32",
+               "name": "Prometheus Canary - Chicago",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Prometheus-Chicago-URL"
+            }, {
+               "id": "33",
+               "name": "Prometheus Prod - Seattle",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Prometheus-Seattle-URL"
+            } ],
+            "id": "29",
+            "name": "Prometheus",
+            "source": "unknown",
+            "type": "folder"
+         }, {
+            "children": [ {
+               "id": "20",
+               "name": "Agora Apps Repo - Microsoft",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "https://github.com/microsoft/jumpstart-agora-apps"
+            }, {
+               "id": "21",
+               "name": "Agora-Apps-Repo-Your-Fork",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Agora-Apps-Repo-Clone-URL"
+            } ],
+            "id": "19",
+            "name": "GitHub",
+            "source": "unknown",
+            "type": "folder"
+         }, {
+            "id": "22",
+            "name": "ADX Dashboards",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://dataexplorer.azure.com/dashboards/"
+         }, {
+            "id": "23",
+            "name": "Azure Arc Jumpstart",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://aka.ms/ArcJumpstart/"
+         }, {
+            "id": "24",
+            "name": "Azure Portal",
+            "show_icon": false,
+            "source": "unknown",
+            "type": "url",
+            "url": "https://portal.azure.com/"
+         } ],
+         "id": "1",
+         "name": "Favorites bar",
+         "source": "unknown",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "id": "25",
+         "name": "Other favorites",
+         "source": "unknown",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "id": "26",
+         "name": "Mobile favorites",
+         "source": "unknown",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}

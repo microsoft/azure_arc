@@ -21,7 +21,7 @@ $azureLocation      = $Env:azureLocation
 $spnClientId        = $Env:spnClientId
 $spnClientSecret    = $Env:spnClientSecret
 $spnTenantId        = $Env:spnTenantId
-$subscriptionId     = $env:subscriptionId
+$subscriptionId     = $Env:subscriptionId
 $adminUsername      = $Env:adminUsername
 $acrName            = $Env:acrName.ToLower()
 $cosmosDBName       = $Env:cosmosDBName
@@ -35,6 +35,7 @@ $appsRepo           = "jumpstart-agora-apps"
 $adminPassword      = $Env:adminPassword
 $gitHubAPIBaseUri   = $websiteUrls["githubAPI"]
 $workflowStatus     = ""
+$industry           = $Env:industry
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -236,7 +237,8 @@ Write-Host
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
+if($industry -eq "retail"){
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
 Set-Location $AgAppsRepo
 Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
 $retryCount = 0
@@ -508,84 +510,89 @@ foreach ($branch in $branches) {
 }
 Write-Host "INFO: GitHub repo configuration complete!" -ForegroundColor Green
 Write-Host
+}
+
 
 #####################################################################
 # Azure IoT Hub resources preparation
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
-if ($githubUser -ne "microsoft") {
-    $iotHubHostName = $Env:iotHubHostName
-    $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
-    $sites = $AgConfig.SiteConfig.Values
-    Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
-    foreach ($site in $sites) {
-        foreach ($device in $site.IoTDevices) {
-            $deviceId = "$device-$($site.FriendlyName)"
-            Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
+    if ($githubUser -ne "microsoft") {
+        $iotHubHostName = $Env:iotHubHostName
+        $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
+        $sites = $AgConfig.SiteConfig.Values
+        Write-Host "[$(Get-Date -Format t)] INFO: Create an Azure IoT device for each site" -ForegroundColor Gray
+        foreach ($site in $sites) {
+            foreach ($device in $site.IoTDevices) {
+                $deviceId = "$device-$($site.FriendlyName)"
+                Add-AzIotHubDevice -ResourceGroupName $resourceGroup -IotHubName $iotHubName -DeviceId $deviceId -EdgeEnabled | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\IoT.log")
+            }
         }
-    }
-    Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
-    Write-Host
-}
-else {
-    Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
-}
-
-### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
-$adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
-$dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
-$kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
-if ($null -ne $kustoCluster) {
-    $adxEndPoint = $kustoCluster.Uri
-    if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
-        $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-        Set-Content -Path "$adxDashBoardsDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
-        $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-        Set-Content -Path "$adxDashBoardsDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+        Write-Host "[$(Get-Date -Format t)] INFO: Azure IoT Hub configuration complete!" -ForegroundColor Green
+        Write-Host
     }
     else {
-        Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
+        Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
     }
+    
+    ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+    $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
+    $dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
+    $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
+    if ($null -ne $kustoCluster) {
+        $adxEndPoint = $kustoCluster.Uri
+        if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
+            $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+            $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-iotsensor-payload.json" -Value $iotSensorsDashboardBody -Force -ErrorAction Ignore
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
+        }
+    }
+    
+    # Download DataEmulator.zip into Agora folder and unzip
+    $emulatorPath = "$dataEmulatorDir\DataEmulator.zip"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/DataEmulator.zip" -OutFile $emulatorPath
+    
+    # Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
+    if (Test-Path -Path $emulatorPath) {
+        Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
+    }
+    
+    # Download products.json and stores.json file to use in Data Emulator
+    $productsJsonPath = "$dataEmulatorDir\products.json"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/products.json" -OutFile $productsJsonPath
+    if (!(Test-Path -Path $productsJsonPath)) {
+        Write-Host "Unabled to download products.json file. Please download manually from GitHub into the data_emulator folder."
+    }
+    
+    $storesJsonPath = "$dataEmulatorDir\stores.json"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/stores.json" -OutFile $storesJsonPath
+    if (!(Test-Path -Path $storesJsonPath)) {
+        Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
+    }
+    
+    # Download icon file
+    $iconPath = "$AgIconsDir\emulator.ico"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
+    if (!(Test-Path -Path $iconPath)) {
+        Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
+    }
+    
+    # Create desktop shortcut
+    $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
+    $shortcut.IconLocation = "$iconPath, 0"
+    $shortcut.WindowStyle = 7
+    $shortcut.Save()
+    
+    
 }
-
-# Download DataEmulator.zip into Agora folder and unzip
-$emulatorPath = "$dataEmulatorDir\DataEmulator.zip"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/DataEmulator.zip" -OutFile $emulatorPath
-
-# Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
-if (Test-Path -Path $emulatorPath) {
-    Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
-}
-
-# Download products.json and stores.json file to use in Data Emulator
-$productsJsonPath = "$dataEmulatorDir\products.json"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/products.json" -OutFile $productsJsonPath
-if (!(Test-Path -Path $productsJsonPath)) {
-    Write-Host "Unabled to download products.json file. Please download manually from GitHub into the data_emulator folder."
-}
-
-$storesJsonPath = "$dataEmulatorDir\stores.json"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/stores.json" -OutFile $storesJsonPath
-if (!(Test-Path -Path $storesJsonPath)) {
-    Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
-}
-
-# Download icon file
-$iconPath = "$AgIconsDir\emulator.ico"
-Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
-if (!(Test-Path -Path $iconPath)) {
-    Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
-}
-
-# Create desktop shortcut
-$shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "$dataEmulatorDir\DataEmulator.exe"
-$shortcut.IconLocation = "$iconPath, 0"
-$shortcut.WindowStyle = 7
-$shortcut.Save()
-
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
@@ -924,12 +931,15 @@ Write-Host
 #####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+if($industry -eq "retail"){
+    az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 
-# Attach ACR to staging cluster
-Write-Host "[$(Get-Date -Format t)] INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
-az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+    # Attach ACR to staging cluster
+    Write-Host "[$(Get-Date -Format t)] INFO: Attaching Azure Container Registry to AKS staging cluster." -ForegroundColor Gray
+    az aks update -n $Env:aksStagingClusterName -g $Env:resourceGroup --attach-acr $acrName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+
+}
 
 #####################################################################
 # Creating Kubernetes namespaces on clusters
@@ -966,50 +976,54 @@ foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
 #####################################################################
 # Create secrets for GitHub actions
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
-$cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
-    foreach ($namespace in $AgConfig.Namespaces) {
-        if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
-            kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-            kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
+    $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets on $clusterName" -ForegroundColor Gray
+        foreach ($namespace in $AgConfig.Namespaces) {
+            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache"){
+                kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                kubectl create secret generic postgrespw --from-literal=POSTGRES_PASSWORD='Agora123!!' --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                kubectl create secret generic cosmoskey --from-literal=COSMOS_KEY=$cosmosDBKey --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                kubectl create secret generic github-token --from-literal=token=$githubPat --namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+            }
         }
     }
+    Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
+    Write-Host
 }
-Write-Host "[$(Get-Date -Format t)] INFO: Cluster secrets configuration complete." -ForegroundColor Green
-Write-Host
 
 #####################################################################
 # Cache contoso-supermarket images on all clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
-while ($workflowStatus.status -ne "completed") {
-    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-    Start-Sleep -Seconds 10
-    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-}
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $branch = $cluster.Name.ToLower()
-    $context = $cluster.Name.ToLower()
-    $applicationName = "contoso-supermarket"
-    $imageTag = "v1.0"
-    $imagePullSecret = "acr-secret"
-    $namespace = "images-cache"
-    if ($branch -eq "chicago") {
-        $branch = "canary"
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
+    while ($workflowStatus.status -ne "completed") {
+        Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+        Start-Sleep -Seconds 10
+        $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
     }
-    if ($branch -eq "seattle") {
-        $branch = "production"
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $branch = $cluster.Name.ToLower()
+        $context = $cluster.Name.ToLower()
+        $applicationName = "contoso-supermarket"
+        $imageTag = "v1.0"
+        $imagePullSecret = "acr-secret"
+        $namespace = "images-cache"
+        if ($branch -eq "chicago") {
+            $branch = "canary"
+        }
+        if ($branch -eq "seattle") {
+            $branch = "production"
+        }
+        Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
+        Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
     }
-    Save-K8sImage -applicationName $applicationName -imageName "contosoai" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "pos-cloudsync" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-backend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
-    Save-K8sImage -applicationName $applicationName -imageName "queue-monitoring-frontend" -imageTag $imageTag -namespace $namespace -imagePullSecret $imagePullSecret -branch $branch -acrName $acrName -context $context
 }
 
 #####################################################################
@@ -1122,360 +1136,365 @@ Write-Host
 #####################################################################
 # Installing flux extension on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
 
-$resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
-$resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
-
-$jobs = @()
-
-foreach ($resource in $resources) {
-
-    $resourceName = $resource.Name
-    $resourceType = $resource.Type
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
-
-        $job = Start-Job -Name $resourceName -ScriptBlock {
-            param($resourceName, $resourceType)
-
-            $retryCount = 10
-            $retryDelaySeconds = 60
-
-            switch ($resourceType)
-            {
-                'Microsoft.Kubernetes/connectedClusters' {$ClusterType = 'ConnectedClusters'}
-                'Microsoft.ContainerService/managedClusters' {$ClusterType = 'ManagedClusters'}
-            }
-
-            if($clusterType -eq 'ConnectedClusters'){
-                # Check if cluster is connected to Azure Arc control plane
-                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-
-                if (-not ($ConnectivityStatus -eq 'Connected')) {
-
-                for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-
-
+    $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
+    $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+    
+    $jobs = @()
+    
+    foreach ($resource in $resources) {
+    
+        $resourceName = $resource.Name
+        $resourceType = $resource.Type
+    
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
+    
+            $job = Start-Job -Name $resourceName -ScriptBlock {
+                param($resourceName, $resourceType)
+    
+                $retryCount = 10
+                $retryDelaySeconds = 60
+    
+                switch ($resourceType)
+                {
+                    'Microsoft.Kubernetes/connectedClusters' {$ClusterType = 'ConnectedClusters'}
+                    'Microsoft.ContainerService/managedClusters' {$ClusterType = 'ManagedClusters'}
+                }
+    
+                if($clusterType -eq 'ConnectedClusters'){
+                    # Check if cluster is connected to Azure Arc control plane
                     $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-
-                    # Check the condition
-                    if ($ConnectivityStatus -eq 'Connected') {
-                        # Condition is true, break out of the loop
-                        break
+    
+                    if (-not ($ConnectivityStatus -eq 'Connected')) {
+    
+                    for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
+    
+    
+                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
+    
+                        # Check the condition
+                        if ($ConnectivityStatus -eq 'Connected') {
+                            # Condition is true, break out of the loop
+                            break
+                        }
+    
+                        # Wait for a specific duration before re-evaluating the condition
+                        Start-Sleep -Seconds $retryDelaySeconds
+    
+    
+                            if ($attempt -lt $retryCount) {
+                                Write-Host "Retrying in $retryDelaySeconds seconds..."
+                                Start-Sleep -Seconds $retryDelaySeconds
+                            }
+                            else {
+                            $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
+                                break # Max retry attempts reached, exit the loop
+                            }
+    
+                        }
                     }
-
-                    # Wait for a specific duration before re-evaluating the condition
-                    Start-Sleep -Seconds $retryDelaySeconds
-
-
+                }
+    
+                $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+                $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
+    
+                if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
+    
+                for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
+    
+                    try {
+    
+                        if ($extension) {
+    
+                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
+    
+                         }
+    
+                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
+    
+                        break # Command succeeded, exit the loop
+                    }
+    
+                    catch {
+                        Write-Warning "An error occurred: $($_.Exception.Message)"
+    
                         if ($attempt -lt $retryCount) {
                             Write-Host "Retrying in $retryDelaySeconds seconds..."
                             Start-Sleep -Seconds $retryDelaySeconds
                         }
                         else {
-                        $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
+                            Write-Error "Failed to execute the command after $retryCount attempts."
+                            $ProvisioningState = $($_.Exception.Message)
                             break # Max retry attempts reached, exit the loop
                         }
-
-                    }
-                }
-            }
-
-            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
-            $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
-
-            if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
-
-            for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-
-                try {
-
-                    if ($extension) {
-
-                        az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
-
+    
                      }
-
-                    az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
-
-                    break # Command succeeded, exit the loop
+    
+                  }
+    
                 }
-
-                catch {
-                    Write-Warning "An error occurred: $($_.Exception.Message)"
-
-                    if ($attempt -lt $retryCount) {
-                        Write-Host "Retrying in $retryDelaySeconds seconds..."
-                        Start-Sleep -Seconds $retryDelaySeconds
-                    }
-                    else {
-                        Write-Error "Failed to execute the command after $retryCount attempts."
-                        $ProvisioningState = $($_.Exception.Message)
-                        break # Max retry attempts reached, exit the loop
-                    }
-
-                 }
-
-              }
-
-            }
-
-            $ProvisioningState = $extension.ProvisioningState
-
-            [PSCustomObject]@{
-                ResourceName = $resourceName
-                ResourceType = $resourceType
-                ProvisioningState = $ProvisioningState
-            }
-
-        } -ArgumentList $resourceName, $resourceType
-
-        $jobs += $job
-}
-
-# Wait for all jobs to complete
-$FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
-
-$jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
-
-# Clean up jobs
-$jobs | Remove-Job
-
-# Abort if Flux-extension fails on any cluster
-if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
-
-    throw "One or more Flux-extension deployments failed - aborting"
-
+    
+                $ProvisioningState = $extension.ProvisioningState
+    
+                [PSCustomObject]@{
+                    ResourceName = $resourceName
+                    ResourceType = $resourceType
+                    ProvisioningState = $ProvisioningState
+                }
+    
+            } -ArgumentList $resourceName, $resourceType
+    
+            $jobs += $job
+    }
+    
+    # Wait for all jobs to complete
+    $FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
+    
+    $jobs | Format-Table Name,PSBeginTime,PSEndTime -AutoSize
+    
+    # Clean up jobs
+    $jobs | Remove-Job
+    
+    # Abort if Flux-extension fails on any cluster
+    if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
+    
+        throw "One or more Flux-extension deployments failed - aborting"
+    
+    }
+    
 }
 
 #####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
-kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
+    kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+    helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+    helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 
-helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
-    --create-namespace `
-    --namespace $AgConfig.nginx.Namespace `
-    --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
-
+    helm install $AgConfig.nginx.ReleaseName $AgConfig.nginx.ChartName `
+        --create-namespace `
+        --namespace $AgConfig.nginx.Namespace `
+        --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
+}
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
-
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
-# Cleaning up images-cache namespace on all clusters
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name images-cache-cleanup -ScriptBlock {
-        $cluster = $using:cluster
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-        kubectl delete namespace "images-cache" --context $clusterName
-    }
-}
-
-#  TODO - this looks app-specific so should perhaps be moved to the app loop
-while ($workflowStatus.status -ne "completed") {
-    Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-    Start-Sleep -Seconds 10
-    $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-}
-
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Start-Job -Name gitops -ScriptBlock {
-
-        Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
-            # Force TLS 1.2 for connections to prevent TLS/SSL errors
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-            $response = Invoke-RestMethod -Uri $githubApiUrl
-            $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-            $fileUrls | ForEach-Object {
-                $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-                $outputFile = Join-Path $folderPath $fileName
-                Invoke-RestMethod -Uri $_ -OutFile $outputFile
-            }
-
-            If (-not $excludeFolders) {
-                $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
-                    $folderName = $_.name
-                    $path = Join-Path $folderPath $folderName
-                    New-Item $path -ItemType Directory -Force -ErrorAction Continue
-                    Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
-                }
-            }
+if($industry -eq "retail"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    # Cleaning up images-cache namespace on all clusters
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Start-Job -Name images-cache-cleanup -ScriptBlock {
+            $cluster = $using:cluster
+            $clusterName = $cluster.Name.ToLower()
+            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
+            kubectl delete namespace "images-cache" --context $clusterName
         }
+    }
 
-        $AgConfig       = $using:AgConfig
-        $cluster        = $using:cluster
-        $site           = $cluster.Value
-        $siteName       = $site.FriendlyName.ToLower()
-        $namingGuid     = $using:namingGuid
-        $resourceGroup  = $using:resourceGroup
-        $appClonedRepo  = $using:appClonedRepo
-        $appsRepo       = $using:appsRepo
+    #  TODO - this looks app-specific so should perhaps be moved to the app loop
+    while ($workflowStatus.status -ne "completed") {
+        Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+        Start-Sleep -Seconds 10
+        $workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+    }
 
-        $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
-            $app         = $_
-            $store       = $cluster.value.Branch.ToLower()
-            $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
-            $branch      = $cluster.value.Branch.ToLower()
-            $configName  = $app.value.GitOpsConfigName.ToLower()
-            $clusterType = $cluster.value.Type
-            $namespace   = $app.value.Namespace
-            $appName     = $app.Value.KustomizationName
-            $appPath     = $app.Value.KustomizationPath
-            $retryCount  = 0
-            $maxRetries  = 2
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        Start-Job -Name gitops -ScriptBlock {
 
-            Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-            if ($clusterType -eq "AKS") {
-                $type = "managedClusters"
-                $clusterName = $cluster.value.ArcClusterName
+            Function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
+                # Force TLS 1.2 for connections to prevent TLS/SSL errors
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+                $response = Invoke-RestMethod -Uri $githubApiUrl
+                $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+                $fileUrls | ForEach-Object {
+                    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+                    $outputFile = Join-Path $folderPath $fileName
+                    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+                }
+
+                If (-not $excludeFolders) {
+                    $response | Where-Object { $_.type -eq "dir" } | ForEach-Object {
+                        $folderName = $_.name
+                        $path = Join-Path $folderPath $folderName
+                        New-Item $path -ItemType Directory -Force -ErrorAction Continue
+                        Get-GitHubFiles -githubApiUrl $_.url -folderPath $path
+                    }
+                }
             }
-            else {
-                $type = "connectedClusters"
-            }
-            if ($branch -eq "main") {
-                $store = "dev"
-            }
 
-            # Wait for Kubernetes API server to become available
-            $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
-            $apiServerAddress = $apiServer -replace '.*https://| .*$'
-            $apiServerFqdn    = ($apiServerAddress -split ":")[0]
-            $apiServerPort    = ($apiServerAddress -split ":")[1]
+            $AgConfig       = $using:AgConfig
+            $cluster        = $using:cluster
+            $site           = $cluster.Value
+            $siteName       = $site.FriendlyName.ToLower()
+            $namingGuid     = $using:namingGuid
+            $resourceGroup  = $using:resourceGroup
+            $appClonedRepo  = $using:appClonedRepo
+            $appsRepo       = $using:appsRepo
 
-            do {
-                $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-                if ($result.TcpTestSucceeded) {
-                    break
+            $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
+                $app         = $_
+                $store       = $cluster.value.Branch.ToLower()
+                $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
+                $branch      = $cluster.value.Branch.ToLower()
+                $configName  = $app.value.GitOpsConfigName.ToLower()
+                $clusterType = $cluster.value.Type
+                $namespace   = $app.value.Namespace
+                $appName     = $app.Value.KustomizationName
+                $appPath     = $app.Value.KustomizationPath
+                $retryCount  = 0
+                $maxRetries  = 2
+
+                Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
+                if ($clusterType -eq "AKS") {
+                    $type = "managedClusters"
+                    $clusterName = $cluster.value.ArcClusterName
                 }
                 else {
-                    Start-Sleep -Seconds 5
+                    $type = "connectedClusters"
                 }
-            } while ($true)
-            If ($app.Value.ConfigMaps){
-                # download the config files
-                foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
-                    $repoPath     = $configMap.value.RepoPath
-                    $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
-                    $iotHubName   = $Env:iotHubHostName.replace(".azure-devices.net", "")
-                    $gitHubUser   = $Env:gitHubUser
-                    $githubBranch = $Env:githubBranch
-
-                    New-Item -Path $configPath -ItemType Directory -Force | Out-Null
-
-                    $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
-                    Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
-
-                    # replace the IoT Hub name and the SAS Tokens with the deployment specific values
-                    # this is a one-off for the broker, but needs to be generalized if/when another app needs it
-                    If ($configMap.Name -eq "mqtt-broker-config"){
-                        $configFile = "$configPath\mosquitto.conf"
-                        $update     = (Get-Content $configFile -Raw)
-                        $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
-
-                        foreach ($device in $site.IoTDevices) {
-                            $deviceId = "$device-$($site.FriendlyName)"
-                            $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-                            $update = $update -replace "Chicago", $site.FriendlyName
-                            $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
-                        }
-
-                        $update | Set-Content $configFile
-                    }
-
-                    # create the namespace if needed
-                    If (-not (kubectl get namespace $namespace --context $siteName)){
-                        kubectl create namespace $namespace --context $siteName
-                    }
-                    # create the configmap
-                    kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
+                if ($branch -eq "main") {
+                    $store = "dev"
                 }
-            }
 
-            az k8s-configuration flux create `
-                --cluster-name $clusterName `
-                --resource-group $resourceGroup `
-                --name $configName `
-                --cluster-type $type `
-                --url $appClonedRepo `
-                --branch $branch `
-                --sync-interval 5s `
-                --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
-                --timeout 10m `
-                --namespace $namespace `
-                --only-show-errors `
-                2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                # Wait for Kubernetes API server to become available
+                $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
+                $apiServerAddress = $apiServer -replace '.*https://| .*$'
+                $apiServerFqdn    = ($apiServerAddress -split ":")[0]
+                $apiServerPort    = ($apiServerAddress -split ":")[1]
 
-            do {
-                $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                if ($configStatus.ComplianceState -eq "Compliant") {
-                    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                }
-                else {
-                    if ($configStatus.ComplianceState -ne "Non-compliant") {
-                        Start-Sleep -Seconds 20
-                    }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                        Start-Sleep -Seconds 20
-                        $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
-                        if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
-                            $retryCount++
-                            Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                            az k8s-configuration flux delete `
-                            --resource-group $resourceGroup `
-                            --cluster-name $clusterName `
-                            --cluster-type $type `
-                            --name $configName `
-                            --force `
-                            --yes `
-                            --only-show-errors `
-                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                            Start-Sleep -Seconds 10
-                            Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-
-                            az k8s-configuration flux create `
-                            --cluster-name $clusterName `
-                            --resource-group $resourceGroup `
-                            --name $configName `
-                            --cluster-type $type `
-                            --url $appClonedRepo `
-                            --branch $branch `
-                            --sync-interval 5s `
-                            --kustomization name=$appName path=$appPath/$store prune=true `
-                            --timeout 30m `
-                            --namespace $namespace `
-                            --only-show-errors `
-                            2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
-                        }
-                    }
-                    elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
-                        Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                do {
+                    $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+                    if ($result.TcpTestSucceeded) {
                         break
                     }
+                    else {
+                        Start-Sleep -Seconds 5
+                    }
+                } while ($true)
+                If ($app.Value.ConfigMaps){
+                    # download the config files
+                    foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()){
+                        $repoPath     = $configMap.value.RepoPath
+                        $configPath   = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
+                        $iotHubName   = $Env:iotHubHostName.replace(".azure-devices.net", "")
+                        $gitHubUser   = $Env:gitHubUser
+                        $githubBranch = $Env:githubBranch
+
+                        New-Item -Path $configPath -ItemType Directory -Force | Out-Null
+
+                        $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
+                        Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
+
+                        # replace the IoT Hub name and the SAS Tokens with the deployment specific values
+                        # this is a one-off for the broker, but needs to be generalized if/when another app needs it
+                        If ($configMap.Name -eq "mqtt-broker-config"){
+                            $configFile = "$configPath\mosquitto.conf"
+                            $update     = (Get-Content $configFile -Raw)
+                            $update     = $update -replace "Ag-IotHub-\w*", $iotHubName
+
+                            foreach ($device in $site.IoTDevices) {
+                                $deviceId = "$device-$($site.FriendlyName)"
+                                $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
+                                $update = $update -replace "Chicago", $site.FriendlyName
+                                $update = $update -replace "SharedAccessSignature.*$($device).*",$deviceSASToken
+                            }
+
+                            $update | Set-Content $configFile
+                        }
+
+                        # create the namespace if needed
+                        If (-not (kubectl get namespace $namespace --context $siteName)){
+                            kubectl create namespace $namespace --context $siteName
+                        }
+                        # create the configmap
+                        kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
+                    }
                 }
-            } until ($configStatus.ComplianceState -eq "Compliant")
+
+                az k8s-configuration flux create `
+                    --cluster-name $clusterName `
+                    --resource-group $resourceGroup `
+                    --name $configName `
+                    --cluster-type $type `
+                    --url $appClonedRepo `
+                    --branch $branch `
+                    --sync-interval 5s `
+                    --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+                    --timeout 10m `
+                    --namespace $namespace `
+                    --only-show-errors `
+                    2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                do {
+                    $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
+                    if ($configStatus.ComplianceState -eq "Compliant") {
+                        Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration $configName is ready on $clusterName" -ForegroundColor DarkGreen | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                    }
+                    else {
+                        if ($configStatus.ComplianceState -ne "Non-compliant") {
+                            Start-Sleep -Seconds 20
+                        }
+                        elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                            Start-Sleep -Seconds 20
+                            $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $clusterName --cluster-type $type --resource-group $resourceGroup -o json 2>$null) | convertFrom-JSON
+                            if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                                $retryCount++
+                                Write-Host "[$(Get-Date -Format t)] INFO: Attempting to re-install $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                                Write-Host "[$(Get-Date -Format t)] INFO: Deleting $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                                az k8s-configuration flux delete `
+                                --resource-group $resourceGroup `
+                                --cluster-name $clusterName `
+                                --cluster-type $type `
+                                --name $configName `
+                                --force `
+                                --yes `
+                                --only-show-errors `
+                                2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                                Start-Sleep -Seconds 10
+                                Write-Host "[$(Get-Date -Format t)] INFO: Re-creating $configName on $clusterName" -ForegroundColor Gray | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+
+                                az k8s-configuration flux create `
+                                --cluster-name $clusterName `
+                                --resource-group $resourceGroup `
+                                --name $configName `
+                                --cluster-type $type `
+                                --url $appClonedRepo `
+                                --branch $branch `
+                                --sync-interval 5s `
+                                --kustomization name=$appName path=$appPath/$store prune=true `
+                                --timeout 30m `
+                                --namespace $namespace `
+                                --only-show-errors `
+                                2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            }
+                        }
+                        elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
+                            Write-Host "[$(Get-Date -Format t)] ERROR: GitOps configuration $configName has failed on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\GitOps-$clusterName.log")
+                            break
+                        }
+                    }
+                } until ($configStatus.ComplianceState -eq "Compliant")
+            }
         }
     }
-}
 
-while ($(Get-Job -Name gitops).State -eq 'Running') {
-    #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-    Receive-Job -Name gitops -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 60
-}
+    while ($(Get-Job -Name gitops).State -eq 'Running') {
+        #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+        Receive-Job -Name gitops -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 60
+    }
 
-Get-Job -name gitops | Remove-Job
-Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
-Write-Host
+    Get-Job -name gitops | Remove-Job
+    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+    Write-Host
+}
 
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
