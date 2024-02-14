@@ -21,6 +21,7 @@ $azureLocation      = $Env:azureLocation
 $spnClientId        = $Env:spnClientId
 $spnClientSecret    = $Env:spnClientSecret
 $spnTenantId        = $Env:spnTenantId
+$subscriptionId     = $env:subscriptionId
 $adminUsername      = $Env:adminUsername
 $acrName            = $Env:acrName.ToLower()
 $cosmosDBName       = $Env:cosmosDBName
@@ -61,6 +62,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
 az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+az account set -s $subscriptionId
 
 # Making extension install dynamic
 if ($AgConfig.AzCLIExtensions.Count -ne 0) {
@@ -82,7 +84,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/1
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-$subscriptionId = (Get-AzSubscription).Id
+Set-AzContext -SubscriptionId $subscriptionId
 
 # Install PowerShell modules
 if ($AgConfig.PowerShellModules.Count -ne 0) {
