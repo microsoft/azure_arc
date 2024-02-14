@@ -1142,221 +1142,6 @@ foreach ($arcResourceType in $arcResourceTypes) {
 Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
 Write-Host
 
-
-##############################################################
-# Preparing clusters for aio
-##############################################################
-if ($industry -eq "manufacturing") {
-    Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-        $ProgressPreference = "SilentlyContinue"
-        ###########################################
-        # Preparing environment folders structure
-        ###########################################
-        Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
-        try {
-            $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
-            & kubectl apply -f $localPathProvisionerYaml
-            $pvcYaml = @"
-            apiVersion: v1
-            kind: PersistentVolumeClaim
-            metadata:
-              name: local-path-pvc
-              namespace: default
-            spec:
-              accessModes:
-                - ReadWriteOnce
-              storageClassName: local-path
-              resources:
-                requests:
-                  storage: 15Gi
-"@
-        
-            $pvcYaml | kubectl apply -f -
-        
-            Write-Host "Successfully deployment the local path provisioner"
-        }
-        catch {
-            Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
-        }
-    
-        Write-Host "Configuring firewall specific to AIO"
-        Write-Host "Add firewall rule for AIO MQTT Broker"
-        New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
-        try {
-            $deploymentInfo = Get-AksEdgeDeploymentInfo
-            # Get the service ip address start to determine the connect address
-            $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
-            $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
-            if ( $null -eq $portProxyRulExists ) {
-                Write-Host "Configure port proxy for AIO"
-                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
-                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
-                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
-            }
-            else {
-                Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
-            }
-        }
-        catch {
-            Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
-        }
-        Write-Host "Update the iptables rules"
-        try {
-            $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
-            if ( $null -eq $iptableRulesExist ) {
-                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
-                Write-Host "Updated runtime iptable rules for node exporter"
-                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
-                Write-Host "Persisted iptable rules for node exporter"
-            }
-            else {
-                Write-Host "iptable rule exists, skip configuring iptable rules..."
-            }
-        }
-        catch {
-            Write-Host "Error: iptable rule update failed" -ForegroundColor Red
-        }
-    
-    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-}
-
-
-#############################################################
-# Deploying AIO on the clusters
-#############################################################
-if ($industry -eq "manufacturing") {
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
-    Write-Host "`n"
-    $kvIndex = 0
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
-        Write-Host "`n"
-        kubectx $clusterName
-        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
-        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
-        $secretName = $clusterName + "-aio"
-        $retryCount = 0
-        $maxRetries = 5
-        $aioStatus = "notDeployed"
-
-        # Enable custom locations on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
-        az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --only-show-errors
-
-
-        do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
-            if ($? -eq $false) {
-                $aioStatus = "notDeployed"
-                Write-Host "`n"
-                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
-                Write-Host "`n"
-                $retryCount++
-            }
-            else {
-                $aioStatus = "deployed"
-            }
-        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
-
-        $retryCount = 0
-        $maxRetries = 5
-
-        do {
-            $output = az iot ops check --as-object
-            $output = $output | ConvertFrom-Json
-            $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
-            if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
-                $retryCount++
-            }
-        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
-
-        if ($retryCount -eq $maxRetries) {
-            Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
-            exit 1 # Exit the script
-        }
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-        $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
-        $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
-        $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
-        $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
-
-        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-        #az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
-        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
-        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
-        $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
-        az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
-
-        Start-Sleep -Seconds 60
-
-        ## Adding MQTT load balancer
-        $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
-        $mqListenerService = "aio-mq-dmqtt-frontend"
-        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
-        $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-        kubectl apply -f $mqconfigfile -n $aioNamespace
-        $kvIndex++
-    }
-}
-
-##############################################################
-# Get MQ IP address
-##############################################################
-if ($industry -eq "manufacturing") {
-    Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
-
-    do {
-        $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-        $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -match "aio-mq-dmqtt" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $null -eq $mqttIp -and $matchingServices.Count -ne 0
-    )
-
-    Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
-        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
-    }
-}
-
-##############################################################
-# Install MQTT Explorer
-##############################################################
-if ($industry -eq "manufacturing") {
-    Write-Host "`n"
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
-    Write-Host "`n"
-    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
-    $versionToDownload = $latestReleaseTag.Split("v")[1]
-    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
-    $output = Join-Path $AgToolsDir "mqtt-explorer-$latestReleaseTag.exe"
-    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
-    Start-Process -FilePath $output -ArgumentList "/S" -Wait
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
-    Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
-    Start-Sleep -Seconds 5
-    Stop-Process -Name "MQTT Explorer"
-    Copy-Item "$AgToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
-}
-
 #####################################################################
 # Installing flux extension on clusters
 #####################################################################
@@ -1717,6 +1502,219 @@ if ($industry -eq "retail") {
     Get-Job -name gitops | Remove-Job
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
+}
+
+##############################################################
+# Preparing clusters for aio
+##############################################################
+if ($industry -eq "manufacturing") {
+    Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+        $ProgressPreference = "SilentlyContinue"
+        ###########################################
+        # Preparing environment folders structure
+        ###########################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+        try {
+            $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+            & kubectl apply -f $localPathProvisionerYaml
+            $pvcYaml = @"
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: local-path-pvc
+              namespace: default
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: local-path
+              resources:
+                requests:
+                  storage: 15Gi
+"@
+
+            $pvcYaml | kubectl apply -f -
+
+            Write-Host "Successfully deployment the local path provisioner"
+        }
+        catch {
+            Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
+        }
+
+        Write-Host "Configuring firewall specific to AIO"
+        Write-Host "Add firewall rule for AIO MQTT Broker"
+        New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+        try {
+            $deploymentInfo = Get-AksEdgeDeploymentInfo
+            # Get the service ip address start to determine the connect address
+            $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+            $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
+            if ( $null -eq $portProxyRulExists ) {
+                Write-Host "Configure port proxy for AIO"
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+                netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
+            }
+            else {
+                Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
+            }
+        }
+        catch {
+            Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
+        }
+        Write-Host "Update the iptables rules"
+        try {
+            $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
+            if ( $null -eq $iptableRulesExist ) {
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
+                Write-Host "Updated runtime iptable rules for node exporter"
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
+                Write-Host "Persisted iptable rules for node exporter"
+            }
+            else {
+                Write-Host "iptable rule exists, skip configuring iptable rules..."
+            }
+        }
+        catch {
+            Write-Host "Error: iptable rule update failed" -ForegroundColor Red
+        }
+    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+}
+
+
+#############################################################
+# Deploying AIO on the clusters
+#############################################################
+if ($industry -eq "manufacturing") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $kvIndex = 0
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+        $secretName = $clusterName + "-aio"
+        $retryCount = 0
+        $maxRetries = 5
+        $aioStatus = "notDeployed"
+
+        # Enable custom locations on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az connectedk8s enable-features --name $arcClusterName `
+            --resource-group $resourceGroup `
+            --features cluster-connect custom-locations `
+            --custom-locations-oid $customLocationRPOID `
+            --only-show-errors
+
+
+        do {
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+        $retryCount = 0
+        $maxRetries = 5
+
+        do {
+            $output = az iot ops check --as-object
+            $output = $output | ConvertFrom-Json
+            $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+            if ($mqServiceStatus -ne "Success") {
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
+                $retryCount++
+            }
+        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+            exit 1 # Exit the script
+        }
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
+        $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+        $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+        $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+        $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        #az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
+        $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
+        az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
+
+        Start-Sleep -Seconds 60
+
+        ## Adding MQTT load balancer
+        $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
+        $mqListenerService = "aio-mq-dmqtt-frontend"
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+        $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
+    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+        kubectl apply -f $mqconfigfile -n $aioNamespace
+        $kvIndex++
+    }
+}
+
+##############################################################
+# Get MQ IP address
+##############################################################
+if ($industry -eq "manufacturing") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
+
+    do {
+        $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+        $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -match "aio-mq-dmqtt" -and
+            $_.status.phase -notmatch "running"
+        }
+        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+        Start-Sleep -Seconds 20
+    } while (
+        $null -eq $mqttIp -and $matchingServices.Count -ne 0
+    )
+
+    Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
+    }
+}
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+if ($industry -eq "manufacturing") {
+    Write-Host "`n"
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+    Write-Host "`n"
+    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $versionToDownload = $latestReleaseTag.Split("v")[1]
+    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+    $output = Join-Path $AgToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+    Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+    Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+    Start-Sleep -Seconds 5
+    Stop-Process -Name "MQTT Explorer"
+    Copy-Item "$AgToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
 }
 
 #####################################################################
