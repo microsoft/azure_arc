@@ -1516,8 +1516,8 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs" -ForegroundColor Green
-BITSRequest -Params @{'Uri'='https://jumpstartcdn.azureedge.net/hcibox23h2/HCI23h2v2.vhdx'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI23h2v2.sha256'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
@@ -1527,8 +1527,8 @@ else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw 
 }
-BITSRequest -Params @{'Uri'='https://aka.ms/AAnnebv'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
-BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/gui.sha256?sp=r&st=2024-01-16T15:10:38Z&se=2027-01-16T23:10:38Z&spr=https&sv=2022-11-02&sr=b&sig=yeWvM%2FEvDcVfrJOk%2FacJublzc%2FXjYWibpzDNQl40CvA%3D'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
+BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
+BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256"
 if ($checksum.Hash -eq $hash) {
