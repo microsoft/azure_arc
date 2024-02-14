@@ -1515,7 +1515,7 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 }
 
 # Download HCIBox VHDs
-Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs. This will may take some time..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs" -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://jumpstartcdn.azureedge.net/hcibox23h2/HCI23h2v2.vhdx'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI23h2v2.sha256'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
