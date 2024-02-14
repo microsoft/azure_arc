@@ -98,6 +98,9 @@ param acrName string = 'agacr${namingGuid}'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
+@description('The agora industry to be deployed')
+param industry string = 'retail'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -150,6 +153,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     namingGuid: namingGuid
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
+    industry: industry
   }
 }
 

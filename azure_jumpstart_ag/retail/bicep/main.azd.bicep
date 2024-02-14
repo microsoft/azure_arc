@@ -77,6 +77,9 @@ param adxClusterName string = 'agadx${namingGuid}'
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string = 'Orders'
 
+@description('The agora industry to be deployed')
+param industry string = 'retail'
+
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -165,6 +168,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     rdpPort: rdpPort
     adxClusterName: adxClusterName
     namingGuid: namingGuid
+    industry: industry
   }
 }
 
