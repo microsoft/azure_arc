@@ -92,8 +92,7 @@ Write-Host
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-Set-AzContext -SubscriptionId $subscriptionId
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
 
 # Install PowerShell modules
 if ($AgConfig.PowerShellModules.Count -ne 0) {
@@ -543,7 +542,7 @@ if ($industry -eq "retail") {
     else {
         Write-Host "[$(Get-Date -Format t)] ERROR: You have to fork the jumpstart-agora-apps repository!" -ForegroundColor Red
     }
-    
+
     ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
     $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
     $dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
@@ -560,36 +559,36 @@ if ($industry -eq "retail") {
             Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
         }
     }
-    
+
     # Download DataEmulator.zip into Agora folder and unzip
     $emulatorPath = "$dataEmulatorDir\DataEmulator.zip"
     Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/DataEmulator.zip" -OutFile $emulatorPath
-    
+
     # Unzip DataEmulator.zip to copy DataEmulator exe and config file to generate sample data for dashboards
     if (Test-Path -Path $emulatorPath) {
         Expand-Archive -Path "$emulatorPath" -DestinationPath "$dataEmulatorDir" -ErrorAction SilentlyContinue -Force
     }
-    
+
     # Download products.json and stores.json file to use in Data Emulator
     $productsJsonPath = "$dataEmulatorDir\products.json"
     Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/products.json" -OutFile $productsJsonPath
     if (!(Test-Path -Path $productsJsonPath)) {
         Write-Host "Unabled to download products.json file. Please download manually from GitHub into the data_emulator folder."
     }
-    
+
     $storesJsonPath = "$dataEmulatorDir\stores.json"
     Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/stores.json" -OutFile $storesJsonPath
     if (!(Test-Path -Path $storesJsonPath)) {
         Write-Host "Unabled to download stores.json file. Please download manually from GitHub into the data_emulator folder."
     }
-    
+
     # Download icon file
     $iconPath = "$AgIconsDir\emulator.ico"
     Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
     if (!(Test-Path -Path $iconPath)) {
         Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
     }
-    
+
     # Create desktop shortcut
     $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
     $wScriptShell = New-Object -ComObject WScript.Shell
@@ -598,8 +597,8 @@ if ($industry -eq "retail") {
     $shortcut.IconLocation = "$iconPath, 0"
     $shortcut.WindowStyle = 7
     $shortcut.Save()
-    
-    
+
+
 }
 #####################################################################
 # Configure L1 virtualization infrastructure
@@ -761,7 +760,6 @@ Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     }
 } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
 
-$subscriptionId = (Get-AzSubscription).Id
 Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
     # Start logging
     $hostname = hostname
@@ -1090,7 +1088,7 @@ foreach ($VM in $VMNames) {
         # Connect servers to Arc
         $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
         $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
-        Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal
+        Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
         Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
         Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
 
@@ -1259,19 +1257,19 @@ if ($industry -eq "retail") {
 
     # Wait for all jobs to complete
     $FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
-    
+
     $jobs | Format-Table Name, PSBeginTime, PSEndTime -AutoSize
-    
+
     # Clean up jobs
     $jobs | Remove-Job
-    
+
     # Abort if Flux-extension fails on any cluster
     if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
-    
+
         throw "One or more Flux-extension deployments failed - aborting"
-    
+
     }
-    
+
 }
 
 #####################################################################
