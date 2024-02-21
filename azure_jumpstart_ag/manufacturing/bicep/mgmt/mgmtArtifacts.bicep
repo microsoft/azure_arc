@@ -12,6 +12,9 @@ param resourceTags object = {
 @description('SKU, leave default pergb2018')
 param sku string = 'pergb2018'
 
+@description('Suffix of Data Collection Rule for VM Insights: MSVMI-PerfandDa-"suffix"')
+param VMIDCRName string = 'Agora'
+
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
@@ -47,6 +50,15 @@ module policyDeploymentRGScope './policyAzureArcRGScope.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
-    logAnalyticsWorkspaceId: workspace.id
+    VMInsightsDCRId: VMI_DCR_Deployment.outputs.id
+  }
+}
+
+module VMI_DCR_Deployment './VMInsightsDCR.bicep' = {
+  name: 'VMI-DCR-Deployment-${uniqueString(VMIDCRName)}'
+  params: {
+    DcrName: VMIDCRName
+    WorkspaceLocation: location
+    WorkspaceResourceId: workspace.id
   }
 }

@@ -1,8 +1,8 @@
 @description('Location of your Azure resources')
 param azureLocation string
 
-@description('Name of your log analytics workspace')
-param logAnalyticsWorkspaceId string
+@description('Resource ID of Data Collection Rule for VM Insights')
+param VMInsightsDCRId string
 
 var policies = [
   {
@@ -15,8 +15,8 @@ var policies = [
     ]
     scope: resourceGroup().id
     parameters: {
-      logAnalyticsWorkspace: {
-        value: logAnalyticsWorkspaceId
+      dcrResourceId: {
+        value: VMInsightsDCRId
       }
       enableProcessesAndDependencies: {
         value: true
