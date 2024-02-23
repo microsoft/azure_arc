@@ -4,20 +4,20 @@
 param envName string
 
 @description('Azure service principal client id')
-param spnClientId string
+param spnClientId string = 'null'
 
 @description('Azure service principal client secret')
 @secure()
-param spnClientSecret string
+param spnClientSecret string = 'null'
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
+param spnTenantId string = 'null'
 
 @description('Azure AD object id for your Microsoft.AzureStackHCI resource provider')
-param spnProviderId string
+param spnProviderId string ='null'
 
 @description('Username for Windows account')
-param windowsAdminUsername string
+param windowsAdminUsername string = 'arcdemo'
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
@@ -41,11 +41,11 @@ param githubBranch string = 'main'
 param deployBastion bool = false
 
 @description('Location to deploy resources')
-@allowed(['eastus', 'eastus2', 'westus2', 'northeurope'])
+@allowed(['eastus', 'northeurope'])
 param location string
 
 @description('Override default RDP port using this parameter. Default is 3389.')
-param rdpPort string
+param rdpPort string = '3389'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
