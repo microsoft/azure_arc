@@ -4,4 +4,4 @@ metadata:
   name: arc
 spec:
   docker:
-    imageTag: v1.26.0_2023-12-12
+    imageTag: v1.27.0_2024-02-13
