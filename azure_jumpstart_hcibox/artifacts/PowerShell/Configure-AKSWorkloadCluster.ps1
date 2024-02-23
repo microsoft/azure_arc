@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 # Set aadgroupID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster.
-$aadgroupID="ad623a-4615-c8a7-db62-198c98af9"
+#$aadgroupID="xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx"
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
@@ -17,36 +17,26 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
 
 # Generate credential objects
 Write-Host 'Creating credentials and connecting to Azure'
+$clientId = $env:spnClientId
+$tenantId = $env:spnTenantId
 $subId = $env:subscriptionId
-$rg = $env:resourceGroup
-$spnClientId = $env:spnClientId
-$spnSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
-$location = "eastus"
-$lnetName = "hcibox-aks-lnet-vlan110"
-$customLocName = $HCIBoxConfig.rbCustomLocationName
-Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Credential $domainCred -Authentication CredSSP -ArgumentList $HCIBoxConfig -ScriptBlock {
+$clustervnetname = "aksvnet1"
+$azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
+Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Authentication CredSSP -ArgumentList $HCIBoxConfig, $azureAppCred, $tenantId, $subId, $clustervnetname -Credential $domainCred -ScriptBlock {
     $HCIBoxConfig = $args[0]
-    az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
-    az config set extension.use_dynamic_install=yes_without_prompt | Out-Null
-    az extension add --name customlocation
-    az extension add --name stack-hci-vm
-    $customLocationID=(az customlocation show --resource-group $using:rg --name $using:customLocName --query id -o tsv)
-    $switchName='"ConvergedSwitch(hci)"'
-    
-    $addressPrefixes = $HCIBoxConfig.AKSIPPrefix
-    $gateway = $HCIBoxConfig.AKSGWIP
-    $dnsServers = $HCIBoxConfig.AKSDNSIP
-    $vlanid = $HCIBoxConfig.AKSVLAN
-
-    az stack-hci-vm network lnet create --subscription $using:subId --resource-group $using:rg --custom-location $customLocationID --location $using:location --name $using:lnetName --vm-switch-name $switchName --ip-allocation-method "static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
+    $azureAppCred = $args[1]
+    $tenantId = $args[2]
+    $subId = $args[3]
+    $clustervnetname = $args[4]
+    Connect-AzAccount -ServicePrincipal -Subscription $subId -Tenant $tenantId -Credential $azureAppCred
+    New-ArcHciVirtualNetwork -name $clustervnetname -vswitchname "ConvergedSwitch(hci)" -ipaddressprefix $HCIBoxConfig.AKSIPPrefix -gateway $HCIBoxConfig.AKSGWIP -dnsservers $HCIBoxConfig.AKSDNSIP -vippoolstart $HCIBoxConfig.AKSVIPStartIP -vippoolend $HCIBoxConfig.AKSVIPEndIP -k8snodeippoolstart $HCIBoxConfig.AKSNodeStartIP -k8snodeippoolend $HCIBoxConfig.AKSNodeEndIP -vlanID $HCIBoxConfig.AKSVLAN
 }
 
 az login --service-principal --username $env:spnClientID --password=$env:spnClientSecret --tenant $env:spnTenantId
 az extension add --name customlocation
-az extension add -n aksarc --upgrade
+az extension add --name akshybrid
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $HCIBoxConfig.rbCustomLocationName --query id -o tsv)
-$lnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.AzureStackHCI/logicalnetworks/$lnetName"
-az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $aadgroupID --generate-ssh-keys --load-balancer-count 1  --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP
-
+az akshybrid vnet create -n $HCIBoxConfig.AKSvnetname -g $env:resourceGroup --custom-location $customlocationID --moc-vnet-name $clustervnetname
+$vnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.HybridContainerService/virtualNetworks/$($HCIBoxConfig.AKSvnetname)"
+az akshybrid create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $vnetId --aad-admin-group-object-ids $aadgroupID --generate-ssh-keys --load-balancer-count 1
 Stop-Transcript
