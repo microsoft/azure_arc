@@ -1516,8 +1516,8 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs" -ForegroundColor Green
-BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI2402.vhdx'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://jsvhds.blob.core.windows.net/hcibox23h2/HCI2402.sha256'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
