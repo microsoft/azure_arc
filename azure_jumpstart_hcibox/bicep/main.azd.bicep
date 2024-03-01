@@ -41,7 +41,7 @@ param githubBranch string = '2402'
 param deployBastion bool = false
 
 @description('Location to deploy resources')
-@allowed(['eastus', 'northeurope'])
+@allowed(['eastus', 'westeurope', 'australiaeast'])
 param location string
 
 @description('Override default RDP port using this parameter. Default is 3389.')
