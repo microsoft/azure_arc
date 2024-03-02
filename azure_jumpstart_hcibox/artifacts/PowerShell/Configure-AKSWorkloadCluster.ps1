@@ -2,8 +2,8 @@ $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 $ProgressPreference = 'SilentlyContinue'
 
-# Set entraGroupID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster. 
-$entraGroupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Change this value to your Entra group id 
+# Set groupObjectID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster. 
+$groupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Change this value to your Microsoft Entra group id 
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
@@ -49,6 +49,6 @@ az extension add --name customlocation
 az extension add -n aksarc --upgrade
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $HCIBoxConfig.rbCustomLocationName --query id -o tsv)
 $lnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.AzureStackHCI/logicalnetworks/$lnetName"
-az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $entraGroupObjectID --generate-ssh-keys --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP
+az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP
 
 Stop-Transcript
