@@ -2,8 +2,8 @@ $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 $ProgressPreference = 'SilentlyContinue'
 
-# Set groupObjectID to the object ID of the Microsoft Entra group that will be granted access to the AKS workload cluster. 
-#$groupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Uncomment this line and change the value to your Microsoft Entra group id 
+# Set groupObjectID to the object ID of the Microsoft Entra ID group that will be granted access to the AKS workload cluster. 
+#$groupObjectID="aaaaaaa-bbbb-cccc-db62-fffssfff" # Uncomment this line and change the value to your Microsoft Entra ID group id 
 
 # Set paths
 $Env:HCIBoxDir = "C:\HCIBox"
