@@ -1450,12 +1450,13 @@ function Set-HCIDeployPrereqs {
     }
     
     foreach ($node in $HCIBoxConfig.NodeHostConfig) {
-        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $env:spnClientID, $env:spnClientSecret, $env:resourceGroup -ScriptBlock {
+        Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $env:spnClientID, $env:spnClientSecret, $env:resourceGroup, $env:azureLocation -ScriptBlock {
             $subId = $args[0]
             $tenantId = $args[1]
             $clientId = $args[2]
             $clientSecret = $args[3]
             $resourceGroup = $args[4]
+            $location = $args[5]
     
             # Prep nodes for Azure Arc onboarding
             winrm quickconfig -quiet
@@ -1482,7 +1483,7 @@ function Set-HCIDeployPrereqs {
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
     
             #Invoke the registration script.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $env:azureLocation -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
             
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
