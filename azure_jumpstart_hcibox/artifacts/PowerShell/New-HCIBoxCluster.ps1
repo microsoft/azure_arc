@@ -1481,8 +1481,8 @@ function Set-HCIDeployPrereqs {
             Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
     
-            #Invoke the registration script. For this release, only eastus region is supported.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region eastus -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
+            #Invoke the registration script.
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $env:azureLocation -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
             
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
