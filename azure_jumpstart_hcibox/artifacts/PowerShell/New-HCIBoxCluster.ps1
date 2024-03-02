@@ -1445,8 +1445,7 @@ function Set-HCIDeployPrereqs {
                 $nodes += $node.Hostname.ToString()
             }
             Add-KdsRootKey -EffectiveTime ((Get-Date).AddHours(-10))
-            $deploymentPrefix = $HCIBoxConfig.LCMDeploymentPrefix
-            New-HciAdObjectsPreCreation -Deploy -AzureStackLCMUserCredential $domainCredNoDomain -AsHciOUName $ouName -AsHciPhysicalNodeList $nodes -DomainFQDN $HCIBoxConfig.SDNDomainFQDN -AsHciClusterName $HCIBoxConfig.ClusterName -AsHciDeploymentPrefix $deploymentPrefix
+            New-HciAdObjectsPreCreation -AzureStackLCMUserCredential $domainCredNoDomain -AsHciOUName $ouName
         }
     }
     
