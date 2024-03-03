@@ -15,4 +15,4 @@ Run locally
     ```bash
     python .\main.py
     ```
-1. Open the browser and navigate to the Flask URL -> Generally this is the http://localhost:5000
+1. Open the browser and navigate to the Flask URL -> Generally this is the http://localhost:8000
