@@ -51,6 +51,6 @@ az extension add --name customlocation
 az extension add -n aksarc --upgrade
 $customLocationID=(az customlocation show --resource-group $env:resourceGroup --name $HCIBoxConfig.rbCustomLocationName --query id -o tsv)
 $lnetId="/subscriptions/$subId/resourceGroups/$env:resourceGroup/providers/Microsoft.AzureStackHCI/logicalnetworks/$lnetName"
-az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP
+az aksarc create -n $HCIBoxConfig.AKSworkloadClusterName -g $env:resourceGroup --custom-location $customlocationID --vnet-ids $lnetId --aad-admin-group-object-ids $groupObjectID --generate-ssh-keys --control-plane-ip $HCIBoxConfig.AKSControlPlaneIP
 
 Stop-Transcript
