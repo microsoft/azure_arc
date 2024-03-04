@@ -26,6 +26,7 @@ $location = "eastus"
 $lnetName = "hcibox-aks-lnet-vlan110"
 $customLocName = $HCIBoxConfig.rbCustomLocationName
 $WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"
 Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCIBoxConfig.SDNDomainFQDN)" -Credential $domainCred -Authentication CredSSP -ArgumentList $HCIBoxConfig -ScriptBlock {
     $HCIBoxConfig = $args[0]
     az login --service-principal --username $using:spnClientID --password=$using:spnSecret --tenant $using:spnTenantId
@@ -43,6 +44,7 @@ Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCI
     az stack-hci-vm network lnet create --subscription $using:subId --resource-group $using:rg --custom-location $customLocationID --location $using:location --name $using:lnetName --vm-switch-name $switchName --ip-allocation-method "static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
 }
 $WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "Continue"
 
 az login --service-principal --username $env:spnClientID --password=$env:spnClientSecret --tenant $env:spnTenantId
 az extension add --name customlocation
