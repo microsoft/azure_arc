@@ -1504,6 +1504,7 @@ if ($industry -eq "retail") {
 # Preparing clusters for aio
 ##############################################################
 if ($industry -eq "manufacturing") {
+    $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -2098,6 +2099,9 @@ namespace Win32{
 '@
 Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
 
 Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
