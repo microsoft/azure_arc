@@ -27,6 +27,7 @@ $templateBaseUrl = $Env:templateBaseUrl
 $adxClusterName = $Env:adxClusterName
 $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
+$customLocationRPOID = $Env:customLocationRPOID
 
 if ($industry -eq "retail") {
     $githubPat = $Env:GITHUB_TOKEN

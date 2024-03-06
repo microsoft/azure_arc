@@ -23,7 +23,8 @@ param (
   [string]$githubPAT,
   [string]$adxClusterName,
   [string]$namingGuid,
-  [string]$industry
+  [string]$industry,
+  [string]$customLocationRPOID
 )
 
 ##############################################################
@@ -58,7 +59,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
-
+[System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
