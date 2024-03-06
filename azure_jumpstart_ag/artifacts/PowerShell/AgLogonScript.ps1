@@ -1143,132 +1143,129 @@ Write-Host
 #####################################################################
 # Installing flux extension on clusters
 #####################################################################
-if ($industry -eq "retail") {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
+Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on clusters (Step 11/17)" -ForegroundColor DarkGreen
 
-    $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
-    $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+$resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
+$resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
-    $jobs = @()
+$jobs = @()
 
-    foreach ($resource in $resources) {
+foreach ($resource in $resources) {
 
-        $resourceName = $resource.Name
-        $resourceType = $resource.Type
+    $resourceName = $resource.Name
+    $resourceType = $resource.Type
 
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing flux extension on $resourceName" -ForegroundColor Gray
 
-        $job = Start-Job -Name $resourceName -ScriptBlock {
-            param($resourceName, $resourceType)
+    $job = Start-Job -Name $resourceName -ScriptBlock {
+        param($resourceName, $resourceType)
 
-            $retryCount = 10
-            $retryDelaySeconds = 60
+        $retryCount = 10
+        $retryDelaySeconds = 60
 
-            switch ($resourceType) {
-                'Microsoft.Kubernetes/connectedClusters' { $ClusterType = 'ConnectedClusters' }
-                'Microsoft.ContainerService/managedClusters' { $ClusterType = 'ManagedClusters' }
-            }
+        switch ($resourceType) {
+            'Microsoft.Kubernetes/connectedClusters' { $ClusterType = 'ConnectedClusters' }
+            'Microsoft.ContainerService/managedClusters' { $ClusterType = 'ManagedClusters' }
+        }
 
-            if ($clusterType -eq 'ConnectedClusters') {
-                # Check if cluster is connected to Azure Arc control plane
-                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
+        if ($clusterType -eq 'ConnectedClusters') {
+            # Check if cluster is connected to Azure Arc control plane
+            $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
-                if (-not ($ConnectivityStatus -eq 'Connected')) {
-
-                    for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-
-
-                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-
-                        # Check the condition
-                        if ($ConnectivityStatus -eq 'Connected') {
-                            # Condition is true, break out of the loop
-                            break
-                        }
-
-                        # Wait for a specific duration before re-evaluating the condition
-                        Start-Sleep -Seconds $retryDelaySeconds
-
-
-                        if ($attempt -lt $retryCount) {
-                            Write-Host "Retrying in $retryDelaySeconds seconds..."
-                            Start-Sleep -Seconds $retryDelaySeconds
-                        }
-                        else {
-                            $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
-                            break # Max retry attempts reached, exit the loop
-                        }
-
-                    }
-                }
-            }
-
-            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
-            $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
-
-            if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
+            if (-not ($ConnectivityStatus -eq 'Connected')) {
 
                 for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
 
-                    try {
 
-                        if ($extension) {
+                    $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
-                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
-
-                        }
-
-                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
-
-                        break # Command succeeded, exit the loop
+                    # Check the condition
+                    if ($ConnectivityStatus -eq 'Connected') {
+                        # Condition is true, break out of the loop
+                        break
                     }
 
-                    catch {
-                        Write-Warning "An error occurred: $($_.Exception.Message)"
+                    # Wait for a specific duration before re-evaluating the condition
+                    Start-Sleep -Seconds $retryDelaySeconds
 
-                        if ($attempt -lt $retryCount) {
-                            Write-Host "Retrying in $retryDelaySeconds seconds..."
-                            Start-Sleep -Seconds $retryDelaySeconds
-                        }
-                        else {
-                            Write-Error "Failed to execute the command after $retryCount attempts."
-                            $ProvisioningState = $($_.Exception.Message)
-                            break # Max retry attempts reached, exit the loop
-                        }
 
+                    if ($attempt -lt $retryCount) {
+                        Write-Host "Retrying in $retryDelaySeconds seconds..."
+                        Start-Sleep -Seconds $retryDelaySeconds
+                    }
+                    else {
+                        $ProvisioningState = "Timed out after $($retryDelaySeconds * $retryCount) seconds while waiting for cluster to become connected to Azure Arc control plane. Current status: $ConnectivityStatus"
+                        break # Max retry attempts reached, exit the loop
+                    }
+
+                }
+            }
+        }
+
+        $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+        $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
+
+        if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
+
+            for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
+
+                try {
+
+                    if ($extension) {
+
+                        az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
+
+                    }
+
+                    az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
+
+                    break # Command succeeded, exit the loop
+                }
+
+                catch {
+                    Write-Warning "An error occurred: $($_.Exception.Message)"
+
+                    if ($attempt -lt $retryCount) {
+                        Write-Host "Retrying in $retryDelaySeconds seconds..."
+                        Start-Sleep -Seconds $retryDelaySeconds
+                    }
+                    else {
+                        Write-Error "Failed to execute the command after $retryCount attempts."
+                        $ProvisioningState = $($_.Exception.Message)
+                        break # Max retry attempts reached, exit the loop
                     }
 
                 }
 
             }
 
-            $ProvisioningState = $extension.ProvisioningState
+        }
 
-            [PSCustomObject]@{
-                ResourceName      = $resourceName
-                ResourceType      = $resourceType
-                ProvisioningState = $ProvisioningState
-            }
+        $ProvisioningState = $extension.ProvisioningState
 
-        } -ArgumentList $resourceName, $resourceType
+        [PSCustomObject]@{
+            ResourceName      = $resourceName
+            ResourceType      = $resourceType
+            ProvisioningState = $ProvisioningState
+        }
 
-        $jobs += $job
-    }
+    } -ArgumentList $resourceName, $resourceType
 
-    # Wait for all jobs to complete
-    $FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
+    $jobs += $job
+}
 
-    $jobs | Format-Table Name, PSBeginTime, PSEndTime -AutoSize
+# Wait for all jobs to complete
+$FluxExtensionJobs = $jobs | Wait-Job | Receive-Job -Keep
 
-    # Clean up jobs
-    $jobs | Remove-Job
+$jobs | Format-Table Name, PSBeginTime, PSEndTime -AutoSize
 
-    # Abort if Flux-extension fails on any cluster
-    if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
+# Clean up jobs
+$jobs | Remove-Job
 
-        throw "One or more Flux-extension deployments failed - aborting"
+# Abort if Flux-extension fails on any cluster
+if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
 
-    }
+    throw "One or more Flux-extension deployments failed - aborting"
 
 }
 
