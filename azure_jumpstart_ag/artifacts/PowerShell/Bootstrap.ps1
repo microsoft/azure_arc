@@ -224,6 +224,7 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfigureApps.ps1") -OutFile "$AgPowerShellDir\AgConfigureApps.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
@@ -241,6 +242,10 @@ elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-setup.yml") -OutFile "$AgToolsDir\influxdb-setup.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
