@@ -230,7 +230,7 @@
         }
         ContosoBakeries_rtspSimulator = @{
             GitOpsConfigName = "config-rtspSimulator"
-            KustomizationName = "decode"
+            KustomizationName = "rtspSimulator"
             KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/rtspSimulator"
             Namespace = "contoso-bakeries"
             Order = 2
