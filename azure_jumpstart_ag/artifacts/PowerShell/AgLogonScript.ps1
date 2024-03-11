@@ -2172,6 +2172,7 @@ $adxClusterName = $Env:adxClusterName
 $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
+$aioNamespace = "azure-iot-operations"
 
 if ($industry -eq "retail") {
     $githubPat = $Env:GITHUB_TOKEN
@@ -2306,7 +2307,8 @@ if ($industry -eq "retail") {
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 if ($industry -eq "manufacturing") {
     Deploy-AIO
-    Deploy-ManufacturingConfigs
+    #Deploy-InfluxDb
+    #Deploy-ManufacturingConfigs
 }
 
 ##############################################################
