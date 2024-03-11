@@ -224,7 +224,6 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfigureApps.ps1") -OutFile "$AgPowerShellDir\AgConfigureApps.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
