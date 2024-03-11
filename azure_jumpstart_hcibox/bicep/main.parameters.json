@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "spnClientId": {
-            "value": "7a86c1eb-de1f-466d-96d7-67aaa380f4d1"
+            "value": ""
         },
         "spnClientSecret": {
-            "value": "BOZ8Q~l59NVmiu0zNZFkpRlrjS.O4aCfYU~a_bO7"
+            "value": ""
         },
         "spnTenantId": {
-            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+            "value": ""
         },
         "spnProviderId": {
-            "value": "f57be460-ae5d-444a-9317-bbfa416ab4b9"
+            "value": ""
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
