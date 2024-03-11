@@ -2173,15 +2173,14 @@ $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
 $aioNamespace = "azure-iot-operations"
-
+$appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+$appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+$appsRepo = "jumpstart-agora-apps"
 if ($industry -eq "retail") {
     $githubPat = $Env:GITHUB_TOKEN
     $acrName = $Env:acrName.ToLower()
     $cosmosDBName = $Env:cosmosDBName
     $cosmosDBEndpoint = $Env:cosmosDBEndpoint
-    $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-    $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
-    $appsRepo = "jumpstart-agora-apps"
     $gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $workflowStatus = ""
 }
