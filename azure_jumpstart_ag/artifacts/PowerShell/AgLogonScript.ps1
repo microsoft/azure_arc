@@ -30,8 +30,6 @@ function Deploy-AzCLI {
 }
 
 function Deploy-AzPowerShell {
-    $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-    $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
 
     # Install PowerShell modules
@@ -529,8 +527,6 @@ function Deploy-AzureIOTHub {
 
 function Deploy-VirtualizationInfrastructure {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
-    $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
-    $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
     # Turn the .kube folder to a shared folder where all Kubernetes kubeconfig files will be copied to
     $kubeFolder = "$Env:USERPROFILE\.kube"
@@ -949,7 +945,7 @@ function Deploy-AzArcK8s {
             }
         }
     }
-
+    $VMnames = (Get-VM).Name
     foreach ($VM in $VMNames) {
         $secret = $Env:spnClientSecret
         $clientId = $Env:spnClientId
@@ -2192,6 +2188,10 @@ elseif ($industry -eq "manufacturing") {
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
 }
 
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+$password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+$Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -2316,98 +2316,4 @@ if ($industry -eq "manufacturing") {
     Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
 
     do {
-        $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-        $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -match "aio-mq-dmqtt" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $null -eq $mqttIp -and $matchingServices.Count -ne 0
-    )
-
-    Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
-        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
-    }
-}
-
-#####################################################################
-# Deploy Kubernetes Prometheus Stack for Observability
-#####################################################################
-Deploy-Prometheus
-
-##############################################################
-# Creating bookmarks
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-Deploy-Bookmarks
-
-##############################################################
-# Cleanup
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs (Step 17/17)" -ForegroundColor DarkGreen
-# Creating Hyper-V Manager desktop shortcut
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-if($industry -eq "retail"){
-    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
-    while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-        Receive-Job -Name images-cache-cleanup -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 60
-    }
-    Get-Job -name images-cache-cleanup | Remove-Job
-}
-
-
-# Removing the LogonScript Scheduled Task
-Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
-Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
-
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Host "[$(Get-Date -Format t)] INFO: Uploading Log Bundle." -ForegroundColor Gray
-$Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-Invoke-Expression 'cmd /c start Powershell -Command {
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-Start-Sleep -Seconds 5
-Write-Host "`n"
-Write-Host "Creating deployment logs bundle"
-7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
-}'
-
-Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
-$imgPath = $AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
-
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-
-        public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-        }
-    }
-}
-'@
-Add-Type $code
-[Win32.Wallpaper]::SetWallpaper($imgPath)
-
-# Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
-
-Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-
-$endTime = Get-Date
-$timeSpan = New-TimeSpan -Start $starttime -End $endtime
-Write-Host
-Write-Host "[$(Get-Date -Format t)] INFO: Deployment is complete. Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes. Enjoy the Agora experience!" -ForegroundColor Green
-Write-Host
-
-Stop-Transcript
+        $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalan
