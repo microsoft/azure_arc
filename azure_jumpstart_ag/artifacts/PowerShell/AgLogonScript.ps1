@@ -1,252 +1,184 @@
 # Script runtime environment: Level-0 Azure virtual machine ("Client VM")
 
-$ProgressPreference = "SilentlyContinue"
-Set-PSDebug -Strict
+#region functions
+function Deploy-AzCLI {
+    $cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
 
-#####################################################################
-# Initialize the environment
-#####################################################################
-$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
-$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-$configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
-$industry = $Env:industry
-$websiteUrls = $AgConfig.URLs
-$githubAccount = $Env:githubAccount
-$githubBranch = $Env:githubBranch
-$githubUser = $Env:githubUser
-$resourceGroup = $Env:resourceGroup
-$azureLocation = $Env:azureLocation
-$spnClientId = $Env:spnClientId
-$spnClientSecret = $Env:spnClientSecret
-$spnTenantId = $Env:spnTenantId
-$subscriptionId = $Env:subscriptionId
-$adminUsername = $Env:adminUsername
-$templateBaseUrl = $Env:templateBaseUrl
-$adxClusterName = $Env:adxClusterName
-$namingGuid = $Env:namingGuid
-$adminPassword = $Env:adminPassword
-$customLocationRPOID = $Env:customLocationRPOID
-
-if ($industry -eq "retail") {
-    $githubPat = $Env:GITHUB_TOKEN
-    $acrName = $Env:acrName.ToLower()
-    $cosmosDBName = $Env:cosmosDBName
-    $cosmosDBEndpoint = $Env:cosmosDBEndpoint
-    $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-    $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
-    $appsRepo = "jumpstart-agora-apps"
-    $gitHubAPIBaseUri = $websiteUrls["githubAPI"]
-    $workflowStatus = ""
-}
-elseif ($industry -eq "manufacturing") {
-    $aioNamespace = "azure-iot-operations"
-    $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
+        $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
+        $folder.Attributes += [System.IO.FileAttributes]::Hidden
+    }
+    
+    $Env:AZURE_CONFIG_DIR = $cliDir.FullName
+    
+    Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
+    az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+    az account set -s $subscriptionId
+    
+    # Making extension install dynamic
+    if ($AgConfig.AzCLIExtensions.Count -ne 0) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+        az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+        # Installing Azure CLI extensions
+        foreach ($extension in $AgConfig.AzCLIExtensions) {
+            az extension add --name $extension --system --only-show-errors
+        }
+    }
+    
+    Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
+    Write-Host
 }
 
+function Deploy-AzPowerShell {
+    $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+    $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+    Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
 
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
-Write-Header "Executing Jumpstart Agora automation scripts"
-$startTime = Get-Date
+    # Install PowerShell modules
+    if ($AgConfig.PowerShellModules.Count -ne 0) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+        foreach ($module in $AgConfig.PowerShellModules) {
+            Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+        }
+    }
 
-# Disable Windows firewall
-Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
-
-# Force TLS 1.2 for connections to prevent TLS/SSL errors
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-
-#####################################################################
-# Setup Azure CLI
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
-$cliDir = New-Item -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\.cli\") -Name ".Ag" -ItemType Directory
-
-if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
-    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
-    $folder.Attributes += [System.IO.FileAttributes]::Hidden
+    # Register Azure providers
+    if ($AgConfig.AzureProviders.Count -ne 0) {
+        Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
+        foreach ($provider in $AgConfig.AzureProviders) {
+            Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+        }
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
+    Write-Host
 }
 
-$Env:AZURE_CONFIG_DIR = $cliDir.FullName
+function Deploy-WindowsTools {
+    $DevToolsInstallationJob = Invoke-Command -ScriptBlock {
+        $AgConfig = $using:AgConfig
+        $websiteUrls = $using:websiteUrls
+        $AgToolsDir = $using:AgToolsDir
+        $adminUsername = $using:adminUsername
 
-Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
-az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
-az account set -s $subscriptionId
 
-# Making extension install dynamic
-if ($AgConfig.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
-    az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
-    # Installing Azure CLI extensions
-    foreach ($extension in $AgConfig.AzCLIExtensions) {
-        az extension add --name $extension --system --only-show-errors
-    }
+        If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
+        $downloadDir = "C:\WinTerminal"
+        $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+        $WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
+        $windowsTerminalPath = "$downloadDir\WindowsTerminal"
+        $filenamePattern = "*PreinstallKit.zip"
+        $terminalDownloadUri = ((Invoke-RestMethod -Method GET -Uri $websiteUrls["windowsTerminal"]).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
+
+        # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+        Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
+
+        $ProgressPreference = 'SilentlyContinue'
+
+        Invoke-WebRequest -Uri $websiteUrls["vcLibs"] -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+        Invoke-WebRequest -Uri $terminalDownloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        $ProgressPreference = 'Continue'
+
+        # Extract Windows Terminal PreinstallKit
+        Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
+        Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        # Install WSL latest kernel update
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
+        msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
+        Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        # Install the Windows Terminal prereqs
+        foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
+            Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+        }
+
+        # Install Windows Terminal
+        foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
+            Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+        }
+
+        # Configure Windows Terminal
+        Set-Location $Env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
+
+        # Launch Windows Terminal for default settings.json to be created
+        $action = New-ScheduledTaskAction -Execute $((Get-Command wt.exe).Source)
+        $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(1)
+        $null = Register-ScheduledTask -Action $action -Trigger $trigger -TaskName WindowsTerminalInit
+
+        # Give process time to initiate and create settings file
+        Start-Sleep 10
+
+        # Stop Windows Terminal process
+        Get-Process WindowsTerminal | Stop-Process
+
+        Unregister-ScheduledTask -TaskName WindowsTerminalInit -Confirm:$false
+
+        $settings = Get-Content .\settings.json | ConvertFrom-Json
+        $settings.profiles.defaults.elevate
+
+        # Configure the default profile setting "Run this profile as Administrator" to "true"
+        $settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
+
+        $settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
+
+        # Install Ubuntu
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
+        Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        # Setting WSL environment variables
+        $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
+        [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
+
+        # Initializing the wsl ubuntu app without requiring user input
+        $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
+        Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+
+        # Create Windows Terminal shortcut
+        $WshShell = New-Object -comObject WScript.Shell
+        $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+        $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+        $Shortcut.TargetPath = $WinTerminalPath
+        $shortcut.WindowStyle = 3
+        $shortcut.Save()
+
+        #############################################################
+        # Install VSCode extensions
+        #############################################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
+        # Install VSCode extensions
+        foreach ($extension in $AgConfig.VSCodeExtensions) {
+            code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
+        }
+
+        #############################################################
+        # Install Docker Desktop
+        #############################################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
+        # Download and Install Docker Desktop
+        $arguments = 'install --quiet --accept-license'
+        Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
+        Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
+        Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
+        Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+        Start-Sleep -Seconds 15
+        Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
+        # Cleanup
+        Remove-Item $downloadDir -Recurse -Force
+
+    } -JobName step3 -ThrottleLimit 16 -AsJob -ComputerName .
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools installation initiated in background job." -ForegroundColor Green
+
+    $DevToolsInstallationJob
+
+    Write-Host
 }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
-Write-Host
-
-#####################################################################
-# Setup Azure PowerShell and register providers
-#####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-
-# Install PowerShell modules
-if ($AgConfig.PowerShellModules.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
-    foreach ($module in $AgConfig.PowerShellModules) {
-        Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-    }
-}
-
-# Register Azure providers
-if ($AgConfig.AzureProviders.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
-    foreach ($provider in $AgConfig.AzureProviders) {
-        Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-    }
-}
-Write-Host "[$(Get-Date -Format t)] INFO: Azure PowerShell configuration and resource provider registration complete!" -ForegroundColor Green
-Write-Host
-
-#############################################################
-# Install Windows Terminal, WSL2, and Ubuntu
-#############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 3/17)" -ForegroundColor DarkGreen
-
-$DevToolsInstallationJob = Invoke-Command -ScriptBlock {
-
-    $AgConfig = $using:AgConfig
-    $websiteUrls = $using:websiteUrls
-    $AgToolsDir = $using:AgToolsDir
-    $adminUsername = $using:adminUsername
-
-
-    If ($PSVersionTable.PSVersion.Major -ge 7) { Write-Error "This script needs be run by version of PowerShell prior to 7.0" }
-    $downloadDir = "C:\WinTerminal"
-    $frameworkPkgPath = "$downloadDir\Microsoft.VCLibs.x64.14.00.Desktop.appx"
-    $WindowsTerminalKitPath = "$downloadDir\Microsoft.WindowsTerminal.PreinstallKit.zip"
-    $windowsTerminalPath = "$downloadDir\WindowsTerminal"
-    $filenamePattern = "*PreinstallKit.zip"
-    $terminalDownloadUri = ((Invoke-RestMethod -Method GET -Uri $websiteUrls["windowsTerminal"]).assets | Where-Object name -like $filenamePattern ).browser_download_url | Select-Object -First 1
-
-    # Download C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-    Write-Host "[$(Get-Date -Format t)] INFO: Downloading binaries." -ForegroundColor Gray
-
-    $ProgressPreference = 'SilentlyContinue'
-
-    Invoke-WebRequest -Uri $websiteUrls["vcLibs"] -OutFile ( New-Item -Path $frameworkPkgPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    Invoke-WebRequest -Uri $terminalDownloadUri -OutFile ( New-Item -Path $windowsTerminalKitPath -Force ) | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    $ProgressPreference = 'Continue'
-
-    # Extract Windows Terminal PreinstallKit
-    Write-Host "[$(Get-Date -Format t)] INFO: Expanding Windows Terminal PreinstallKit." -ForegroundColor Gray
-    Expand-Archive $WindowsTerminalKitPath $windowsTerminalPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    # Install WSL latest kernel update
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing WSL." -ForegroundColor Gray
-    msiexec /i "$AgToolsDir\wsl_update_x64.msi" /qn | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    # Install C++ Runtime framework packages for Desktop Bridge and Windows Terminal latest release
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Windows Terminal" -ForegroundColor Gray
-    Add-AppxPackage -Path $frameworkPkgPath | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    # Install the Windows Terminal prereqs
-    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *x64*.appx) {
-        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    }
-
-    # Install Windows Terminal
-    foreach ($file in Get-ChildItem $windowsTerminalPath -Filter *.msixbundle) {
-        Add-AppxPackage -Path $file.FullName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    }
-
-    # Configure Windows Terminal
-    Set-Location $Env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState
-
-    # Launch Windows Terminal for default settings.json to be created
-    $action = New-ScheduledTaskAction -Execute $((Get-Command wt.exe).Source)
-    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(1)
-    $null = Register-ScheduledTask -Action $action -Trigger $trigger -TaskName WindowsTerminalInit
-
-    # Give process time to initiate and create settings file
-    Start-Sleep 10
-
-    # Stop Windows Terminal process
-    Get-Process WindowsTerminal | Stop-Process
-
-    Unregister-ScheduledTask -TaskName WindowsTerminalInit -Confirm:$false
-
-    $settings = Get-Content .\settings.json | ConvertFrom-Json
-    $settings.profiles.defaults.elevate
-
-    # Configure the default profile setting "Run this profile as Administrator" to "true"
-    $settings.profiles.defaults | Add-Member -Name elevate -MemberType NoteProperty -Value $true -Force
-
-    $settings | ConvertTo-Json -Depth 8 | Set-Content .\settings.json
-
-    # Install Ubuntu
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Ubuntu" -ForegroundColor Gray
-    Add-AppxPackage -Path "$AgToolsDir\Ubuntu.appx" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    # Setting WSL environment variables
-    $userenv = [System.Environment]::GetEnvironmentVariable("Path", "User")
-    [System.Environment]::SetEnvironmentVariable("PATH", $userenv + ";C:\Users\$adminUsername\Ubuntu", "User")
-
-    # Initializing the wsl ubuntu app without requiring user input
-    $ubuntu_path = "c:/users/$adminUsername/AppData/Local/Microsoft/WindowsApps/ubuntu"
-    Invoke-Expression -Command "$ubuntu_path install --root" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-
-    # Create Windows Terminal shortcut
-    $WshShell = New-Object -comObject WScript.Shell
-    $WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
-    $Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
-    $Shortcut.TargetPath = $WinTerminalPath
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
-
-    #############################################################
-    # Install VSCode extensions
-    #############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing VSCode extensions: " + ($AgConfig.VSCodeExtensions -join ', ') -ForegroundColor Gray
-    # Install VSCode extensions
-    foreach ($extension in $AgConfig.VSCodeExtensions) {
-        code --install-extension $extension 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Tools.log")
-    }
-
-    #############################################################
-    # Install Docker Desktop
-    #############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Docker Desktop." -ForegroundColor DarkGreen
-    # Download and Install Docker Desktop
-    $arguments = 'install --quiet --accept-license'
-    Start-Process "$AgToolsDir\DockerDesktopInstaller.exe" -Wait -ArgumentList $arguments
-    Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
-    Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
-    Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-    Start-Sleep -Seconds 15
-    Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
-    # Cleanup
-    Remove-Item $downloadDir -Recurse -Force
-
-} -JobName step3 -ThrottleLimit 16 -AsJob -ComputerName .
-
-Write-Host "[$(Get-Date -Format t)] INFO: Dev Tools installation initiated in background job." -ForegroundColor Green
-
-$DevToolsInstallationJob
-
-Write-Host
-
-#####################################################################
-# Configure Jumpstart Agora Apps repository
-#####################################################################
-if ($industry -eq "retail") {
-    Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
+function SetupRetailRepo {
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
     $retryCount = 0
@@ -520,12 +452,7 @@ if ($industry -eq "retail") {
     Write-Host
 }
 
-
-#####################################################################
-# Azure IoT Hub resources preparation
-#####################################################################
-if ($industry -eq "retail") {
-    Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
+function Deploy-AzureIOTHub {
     if ($githubUser -ne "microsoft") {
         $iotHubHostName = $Env:iotHubHostName
         $iotHubName = $iotHubHostName.replace(".azure-devices.net", "")
@@ -598,9 +525,271 @@ if ($industry -eq "retail") {
     $shortcut.IconLocation = "$iconPath, 0"
     $shortcut.WindowStyle = 7
     $shortcut.Save()
-
-
 }
+
+function Deploy-VirtualizationInfrastructure {
+    foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
+        if ($site.Value.Type -eq "AKSEE") {
+            Write-Host "[$(Get-Date -Format t)] INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
+            $ErrorActionPreference = "SilentlyContinue"
+            Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
+                $site = $using:site
+                (gwmi win32_computersystem).Rename($site.Name)
+            } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+            $ErrorActionPreference = "Continue"
+            Stop-VM -Name $site.Name -Force -Confirm:$false
+            Start-VM -Name $site.Name
+        }
+    }
+    
+    foreach ($VM in $VMNames) {
+        $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+        while ($VMStatus.PrimaryStatusDescription -ne "OK") {
+            $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
+            write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
+            Start-Sleep -Seconds 5
+        }
+    }
+    
+    Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
+    $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
+    $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
+    $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
+    $AKSEESchemaVersions = @()
+    
+    for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
+        $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
+        $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
+        $output = Join-Path $AgToolsDir "$releaseTag.zip"
+        Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+        Expand-Archive $output -DestinationPath $AgToolsDir -Force
+        $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
+        $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+        $schemaVersion = $jsonContent.SchemaVersion
+        $AKSEESchemaVersions += $schemaVersion
+        # Clean up the downloaded release files
+        Remove-Item -Path $output -Force
+        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+    }
+    
+    Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+        $hostname = hostname
+        $ProgressPreference = "SilentlyContinue"
+        ###########################################
+        # Preparing environment folders structure
+        ###########################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
+        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+        $logsFolder = "$deploymentFolder\Logs"
+        $kubeFolder = "$Env:USERPROFILE\.kube"
+    
+        # Set up an array of folders
+        $folders = @($logsFolder, $kubeFolder)
+    
+        # Loop through each folder and create it
+        foreach ($Folder in $folders) {
+            New-Item -ItemType Directory $Folder -Force
+        }
+    } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+    
+    Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+        # Start logging
+        $hostname = hostname
+        $ProgressPreference = "SilentlyContinue"
+        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+        $logsFolder = "$deploymentFolder\Logs"
+        Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
+        $AgConfig = $using:AgConfig
+        $AgToolsDir = $using:AgToolsDir
+        $websiteUrls = $using:websiteUrls
+    
+        ##########################################
+        # Deploying AKS Edge Essentials clusters
+        ##########################################
+        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
+        $logsFolder = "$deploymentFolder\Logs"
+    
+        # Assigning network adapter IP address
+        $NetIPAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].NetIPAddress
+        $DefaultGateway = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
+        $PrefixLength = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
+        $DNSClientServerAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring networking interface on $hostname with IP address $NetIPAddress." -ForegroundColor Gray
+        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+        $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
+        New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex | Out-Null
+        Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress | Out-Null
+    
+        ###########################################
+        # Validating internet connectivity
+        ###########################################
+        $timeElapsed = 0
+        do {
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for internet connection to be healthy on $hostname." -ForegroundColor Gray
+            Start-Sleep -Seconds 5
+            $timeElapsed = $timeElapsed + 10
+        } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
+    
+        # Fetching latest AKS Edge Essentials msi file
+        Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
+        Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEK3s.msi
+    
+        # Fetching required GitHub artifacts from Jumpstart repository
+        Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
+        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+        $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
+        $response = Invoke-RestMethod -Uri $githubApiUrl
+        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+        $fileUrls | ForEach-Object {
+            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+            $outputFile = Join-Path $deploymentFolder $fileName
+            Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        }
+    
+        ###############################################################################
+        # Setting up replacement parameters for AKS Edge Essentials config json file
+        ###############################################################################
+        Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
+        $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
+        $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+        $namingGuid = $using:namingGuid
+        $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
+    
+        # Fetch schemaVersion release from the AgConfig file
+        $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
+        if ($AKSEESchemaVersionUseLatest) {
+            $SchemaVersion = $using:AKSEESchemaVersions[0]
+        }
+        else {
+            $SchemaVersion = $using:AKSEESchemaVersions[1]
+        }
+    
+        $replacementParams = @{
+            "SchemaVersion-null"          = $SchemaVersion
+            "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeStart
+            "1000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeSize
+            "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ControlPlaneEndpointIp
+            "Ip4GatewayAddress-null"      = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
+            "2000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
+            "DnsServer-null"              = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
+            "Ethernet-Null"               = $AdapterName
+            "Ip4Address-null"             = $AgConfig.SiteConfig[$Env:COMPUTERNAME].LinuxNodeIp4Address
+            "ClusterName-null"            = $arcClusterName
+            "Location-null"               = $using:azureLocation
+            "ResourceGroupName-null"      = $using:resourceGroup
+            "SubscriptionId-null"         = $using:subscriptionId
+            "TenantId-null"               = $using:spnTenantId
+            "ClientId-null"               = $using:spnClientId
+            "ClientSecret-null"           = $using:spnClientSecret
+        }
+    
+        ###################################################
+        # Preparing AKS Edge Essentials config json file
+        ###################################################
+        $content = Get-Content $AKSEEConfigFilePath
+        foreach ($key in $replacementParams.Keys) {
+            $content = $content -replace $key, $replacementParams[$key]
+        }
+        Set-Content "$deploymentFolder\Config.json" -Value $content
+    }
+    Write-Host "[$(Get-Date -Format t)] INFO: Initial L1 virtualization infrastructure configuration complete." -ForegroundColor Green
+    Write-Host
+}
+#endregion
+
+$ProgressPreference = "SilentlyContinue"
+Set-PSDebug -Strict
+
+#####################################################################
+# Initialize the environment
+#####################################################################
+$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
+$configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
+$industry = $Env:industry
+$websiteUrls = $AgConfig.URLs
+$githubAccount = $Env:githubAccount
+$githubBranch = $Env:githubBranch
+$githubUser = $Env:githubUser
+$resourceGroup = $Env:resourceGroup
+$azureLocation = $Env:azureLocation
+$spnClientId = $Env:spnClientId
+$spnClientSecret = $Env:spnClientSecret
+$spnTenantId = $Env:spnTenantId
+$subscriptionId = $Env:subscriptionId
+$adminUsername = $Env:adminUsername
+$templateBaseUrl = $Env:templateBaseUrl
+$adxClusterName = $Env:adxClusterName
+$namingGuid = $Env:namingGuid
+$adminPassword = $Env:adminPassword
+$customLocationRPOID = $Env:customLocationRPOID
+
+if ($industry -eq "retail") {
+    $githubPat = $Env:GITHUB_TOKEN
+    $acrName = $Env:acrName.ToLower()
+    $cosmosDBName = $Env:cosmosDBName
+    $cosmosDBEndpoint = $Env:cosmosDBEndpoint
+    $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+    $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+    $appsRepo = "jumpstart-agora-apps"
+    $gitHubAPIBaseUri = $websiteUrls["githubAPI"]
+    $workflowStatus = ""
+}
+elseif ($industry -eq "manufacturing") {
+    $aioNamespace = "azure-iot-operations"
+    $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+}
+
+
+Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
+Write-Header "Executing Jumpstart Agora automation scripts"
+$startTime = Get-Date
+
+# Disable Windows firewall
+Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
+
+# Force TLS 1.2 for connections to prevent TLS/SSL errors
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+
+#####################################################################
+# Setup Azure CLI
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
+Deploy-AzCLI
+
+#####################################################################
+# Setup Azure PowerShell and register providers
+#####################################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure PowerShell (Step 2/17)" -ForegroundColor DarkGreen
+Deploy-AzPowerShell
+
+#############################################################
+# Install Windows Terminal, WSL2, and Ubuntu
+#############################################################
+Write-Host "[$(Get-Date -Format t)] INFO: Installing dev tools (Step 3/17)" -ForegroundColor DarkGreen
+Deploy-WindowsTools
+
+
+#####################################################################
+# Configure Jumpstart Agora Apps repository
+#####################################################################
+if ($industry -eq "retail") {
+    Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
+    SetupRetailRepo
+}
+
+
+#####################################################################
+# Azure IoT Hub resources preparation
+#####################################################################
+if ($industry -eq "retail") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
+    Deploy-AzureIoTHub
+}
+
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
@@ -697,172 +886,7 @@ foreach ($VM in $VMNames) {
 ########################################################################
 # Prepare L1 nested virtual machines for AKS Edge Essentials bootstrap
 ########################################################################
-foreach ($site in $AgConfig.SiteConfig.GetEnumerator()) {
-    if ($site.Value.Type -eq "AKSEE") {
-        Write-Host "[$(Get-Date -Format t)] INFO: Renaming computer name of $($site.Name)" -ForegroundColor Gray
-        $ErrorActionPreference = "SilentlyContinue"
-        Invoke-Command -VMName $site.Name -Credential $Credentials -ScriptBlock {
-            $site = $using:site
-            (gwmi win32_computersystem).Rename($site.Name)
-        } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-        $ErrorActionPreference = "Continue"
-        Stop-VM -Name $site.Name -Force -Confirm:$false
-        Start-VM -Name $site.Name
-    }
-}
-
-foreach ($VM in $VMNames) {
-    $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-    while ($VMStatus.PrimaryStatusDescription -ne "OK") {
-        $VMStatus = Get-VMIntegrationService -VMName $VM -Name Heartbeat
-        write-host "[$(Get-Date -Format t)] INFO: Waiting for $VM to finish booting." -ForegroundColor Gray
-        Start-Sleep -Seconds 5
-    }
-}
-
-Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
-$latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
-$beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
-$AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
-$AKSEESchemaVersions = @()
-
-for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
-    $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
-    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
-    $output = Join-Path $AgToolsDir "$releaseTag.zip"
-    Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-    Expand-Archive $output -DestinationPath $AgToolsDir -Force
-    $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
-    $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-    $schemaVersion = $jsonContent.SchemaVersion
-    $AKSEESchemaVersions += $schemaVersion
-    # Clean up the downloaded release files
-    Remove-Item -Path $output -Force
-    Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
-}
-
-Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    $hostname = hostname
-    $ProgressPreference = "SilentlyContinue"
-    ###########################################
-    # Preparing environment folders structure
-    ###########################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Preparing folder structure on $hostname." -ForegroundColor Gray
-    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-    $logsFolder = "$deploymentFolder\Logs"
-    $kubeFolder = "$Env:USERPROFILE\.kube"
-
-    # Set up an array of folders
-    $folders = @($logsFolder, $kubeFolder)
-
-    # Loop through each folder and create it
-    foreach ($Folder in $folders) {
-        New-Item -ItemType Directory $Folder -Force
-    }
-} | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
-
-Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
-    # Start logging
-    $hostname = hostname
-    $ProgressPreference = "SilentlyContinue"
-    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-    $logsFolder = "$deploymentFolder\Logs"
-    Start-Transcript -Path $logsFolder\AKSEEBootstrap.log
-    $AgConfig = $using:AgConfig
-    $AgToolsDir = $using:AgToolsDir
-    $websiteUrls = $using:websiteUrls
-
-    ##########################################
-    # Deploying AKS Edge Essentials clusters
-    ##########################################
-    $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-    $logsFolder = "$deploymentFolder\Logs"
-
-    # Assigning network adapter IP address
-    $NetIPAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].NetIPAddress
-    $DefaultGateway = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
-    $PrefixLength = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
-    $DNSClientServerAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring networking interface on $hostname with IP address $NetIPAddress." -ForegroundColor Gray
-    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-    $ifIndex = (Get-NetAdapter -Name $AdapterName).ifIndex
-    New-NetIPAddress -IPAddress $NetIPAddress -DefaultGateway $DefaultGateway -PrefixLength $PrefixLength -InterfaceIndex $ifIndex | Out-Null
-    Set-DNSClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses $DNSClientServerAddress | Out-Null
-
-    ###########################################
-    # Validating internet connectivity
-    ###########################################
-    $timeElapsed = 0
-    do {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for internet connection to be healthy on $hostname." -ForegroundColor Gray
-        Start-Sleep -Seconds 5
-        $timeElapsed = $timeElapsed + 10
-    } until ((Test-Connection bing.com -Count 1 -ErrorAction SilentlyContinue) -or ($timeElapsed -eq 60))
-
-    # Fetching latest AKS Edge Essentials msi file
-    Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
-    Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEK3s.msi
-
-    # Fetching required GitHub artifacts from Jumpstart repository
-    Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
-    $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $githubApiUrl = "https://api.github.com/repos/$using:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$using:githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-        $outputFile = Join-Path $deploymentFolder $fileName
-        Invoke-RestMethod -Uri $_ -OutFile $outputFile
-    }
-
-    ###############################################################################
-    # Setting up replacement parameters for AKS Edge Essentials config json file
-    ###############################################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
-    $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
-    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-    $namingGuid = $using:namingGuid
-    $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
-
-    # Fetch schemaVersion release from the AgConfig file
-    $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
-    if ($AKSEESchemaVersionUseLatest) {
-        $SchemaVersion = $using:AKSEESchemaVersions[0]
-    }
-    else {
-        $SchemaVersion = $using:AKSEESchemaVersions[1]
-    }
-
-    $replacementParams = @{
-        "SchemaVersion-null"          = $SchemaVersion
-        "ServiceIPRangeStart-null"    = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeStart
-        "1000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ServiceIPRangeSize
-        "ControlPlaneEndpointIp-null" = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ControlPlaneEndpointIp
-        "Ip4GatewayAddress-null"      = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DefaultGateway
-        "2000"                        = $AgConfig.SiteConfig[$Env:COMPUTERNAME].PrefixLength
-        "DnsServer-null"              = $AgConfig.SiteConfig[$Env:COMPUTERNAME].DNSClientServerAddress
-        "Ethernet-Null"               = $AdapterName
-        "Ip4Address-null"             = $AgConfig.SiteConfig[$Env:COMPUTERNAME].LinuxNodeIp4Address
-        "ClusterName-null"            = $arcClusterName
-        "Location-null"               = $using:azureLocation
-        "ResourceGroupName-null"      = $using:resourceGroup
-        "SubscriptionId-null"         = $using:subscriptionId
-        "TenantId-null"               = $using:spnTenantId
-        "ClientId-null"               = $using:spnClientId
-        "ClientSecret-null"           = $using:spnClientSecret
-    }
-
-    ###################################################
-    # Preparing AKS Edge Essentials config json file
-    ###################################################
-    $content = Get-Content $AKSEEConfigFilePath
-    foreach ($key in $replacementParams.Keys) {
-        $content = $content -replace $key, $replacementParams[$key]
-    }
-    Set-Content "$deploymentFolder\Config.json" -Value $content
-}
-Write-Host "[$(Get-Date -Format t)] INFO: Initial L1 virtualization infrastructure configuration complete." -ForegroundColor Green
-Write-Host
+Deploy-VirtualizationInfrastructure 
 
 Write-Host "[$(Get-Date -Format t)] INFO: Installing AKS Edge Essentials (Step 7/17)" -ForegroundColor DarkGreen
 foreach ($VMName in $VMNames) {
