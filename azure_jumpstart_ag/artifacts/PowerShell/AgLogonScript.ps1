@@ -1154,7 +1154,6 @@ function Deploy-K8sImagesCache {
         }
     }
 }
-
 function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
     # Force TLS 1.2 for connections to prevent TLS/SSL errors
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -1176,7 +1175,6 @@ function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
         }
     }
 }
-
 function Deploy-RetailConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
     # Cleaning up images-cache namespace on all clusters
@@ -1818,6 +1816,335 @@ function Deploy-AIO {
     }
 }
 
+function Deploy-Prometheus {
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
+    $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
+    $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
+    $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+
+    # Set Prod Grafana API endpoint
+    $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
+
+    # Installing Grafana
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 14/17)" -ForegroundColor DarkGreen
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
+    $latestRelease = (Invoke-WebRequest -Uri $websiteUrls["grafana"] | ConvertFrom-Json).tag_name.replace('v', '')
+    Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Update Prometheus Helm charts
+    helm repo add prometheus-community $websiteUrls["prometheus"] | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Update Grafana Icons
+    Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+    Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+    (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
+    }
+
+    # Reset Grafana UI
+    Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
+    (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
+    }
+
+    # Reset Grafana Password
+    $Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
+    grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+    # Get Grafana Admin credentials
+    $adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
+    $adminEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($adminCredentials))
+
+    $adminHeaders = @{
+        "Authorization" = ("Basic " + $adminEncodedcredentials)
+        "Content-Type"  = "application/json"
+    }
+
+    # Get Contoso User credentials
+    $userCredentials = $adminUsername + ':' + $adminPassword
+    $userEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($userCredentials))
+
+    $userHeaders = @{
+        "Authorization" = ("Basic " + $userEncodedcredentials)
+        "Content-Type"  = "application/json"
+    }
+
+    # Download dashboards
+    foreach ($dashboard in $observabilityDashboards.'grafana.com') {
+        $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
+        $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
+        $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
+        Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
+    }
+
+    $observabilityDashboardstoImport = @()
+    $observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
+    $observabilityDashboardstoImport += $observabilityDashboards.'custom'
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
+    # Add Contoso Operator User
+    $grafanaUserBody = @{
+        name     = $AgConfig.Monitoring["User"] # Display Name
+        email    = $AgConfig.Monitoring["Email"]
+        login    = $adminUsername
+        password = $adminPassword
+    } | ConvertTo-Json
+
+    # Make HTTP request to the API to create user
+    $retryCount = 10
+    $retryDelay = 30
+    do {
+        try {
+            Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+            $retryCount = 0
+        }
+        catch {
+            $retryCount--
+            if ($retryCount -gt 0) {
+                Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                Start-Sleep -Seconds $retryDelay
+            }
+        }
+    } while ($retryCount -gt 0)
+
+    # Deploying Kube Prometheus Stack for stores
+    $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+        # Wait for Kubernetes API server to become available
+        $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+        $apiServerAddress = $apiServer -replace '.*https://| .*$'
+        $apiServerFqdn = ($apiServerAddress -split ":")[0]
+        $apiServerPort = ($apiServerAddress -split ":")[1]
+
+        do {
+            $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
+            if ($result.TcpTestSucceeded) {
+                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
+                break
+            }
+            else {
+                Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
+                Start-Sleep -Seconds 10
+            }
+        } while ($true)
+
+        # Install Prometheus Operator
+        $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
+        helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+        Do {
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
+            Start-Sleep -Seconds 45
+            $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($monitorIP -eq "Nope" )
+        # Get Load Balancer IP
+        $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+        if ($_.Value.IsProduction) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
+            # Request body with information about the data source to add
+            $grafanaDSBody = @{
+                name      = $_.Value.FriendlyName.ToLower()
+                type      = 'prometheus'
+                url       = ("http://" + $monitorLBIP + ":9090")
+                access    = 'proxy'
+                basicAuth = $false
+                isDefault = $true
+            } | ConvertTo-Json
+
+            # Make HTTP request to the API
+            Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
+
+        # Add Contoso Operator User
+        if (!$_.Value.IsProduction) {
+            Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
+            $grafanaUserBody = @{
+                name     = $AgConfig.Monitoring["User"] # Display Name
+                email    = $AgConfig.Monitoring["Email"]
+                login    = $adminUsername
+                password = $adminPassword
+            } | ConvertTo-Json
+
+            # Make HTTP request to the API to create user
+            $retryCount = 10
+            $retryDelay = 30
+
+            do {
+                try {
+                    Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+                    $retryCount = 0
+                }
+                catch {
+                    $retryCount--
+                    if ($retryCount -gt 0) {
+                        Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                        Start-Sleep -Seconds $retryDelay
+                    }
+                }
+            } while ($retryCount -gt 0)
+        }
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
+        # Add dashboards
+        foreach ($dashboard in $observabilityDashboardstoImport) {
+            $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
+            # Replace the datasource
+            $replacementParams = @{
+                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+            }
+            $content = Get-Content $grafanaDBPath
+            foreach ($key in $replacementParams.Keys) {
+                $content = $content -replace $key, $replacementParams[$key]
+            }
+            # Set dashboard JSON
+            $dashboardObject = $content | ConvertFrom-Json
+            # Best practice is to generate a random UID, such as a GUID
+            $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+            # Need to set this to null to let Grafana generate a new ID
+            $dashboardObject.id = $null
+            # Set dashboard title
+            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+            # Request body with dashboard to add
+            $grafanaDBBody = @{
+                dashboard = $dashboardObject
+                overwrite = $true
+            } | ConvertTo-Json -Depth 8
+
+            if ($_.Value.IsProduction) {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+                $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
+            }
+            else {
+                # Set Grafana Dashboard endpoint
+                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+                $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
+            }
+
+            # Make HTTP request to the API
+            $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
+
+            Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+        }
+
+    }
+    Write-Host
+}
+
+function Deploy-Bookmarks {
+    $bookmarksFileName = "$AgToolsDir\Bookmarks"
+    $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+        $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
+
+        # Matching url: pos - customer
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 5000 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':5000'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: pos - manager
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 81 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':81'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: prometheus-grafana
+        if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
+            $matchingServices = $services.items | Where-Object {
+                $_.metadata.name -eq 'prometheus-grafana'
+            }
+            $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
+
+            foreach ($grafanaIp in $grafanaIps) {
+                $output = "http://$grafanaIp"
+                $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+                # Replace matching value in the Bookmarks file
+                $content = Get-Content -Path $bookmarksFileName
+                $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
+                $newContent | Set-Content -Path $bookmarksFileName
+
+                Start-Sleep -Seconds 2
+            }
+        }
+
+        # Matching url: prometheus
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 9090 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($prometheusIp in $prometheusIps) {
+            $output = "http://$prometheusIp" + ':9090'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+    }
+
+    # Matching url: Agora apps forked repo
+    $output = $appClonedRepo
+    $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+    # Replace matching value in the Bookmarks file
+    $content = Get-Content -Path $bookmarksFileName
+    $newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
+    $newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
+    $newContent | Set-Content -Path $bookmarksFileName
+
+    Start-Sleep -Seconds 2
+
+    Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
+
+    ##############################################################
+    # Pinning important directories to Quick access
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Pinning important directories to Quick access (Step 16/17)" -ForegroundColor DarkGreen
+    $quickAccess = new-object -com shell.application
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+}
 #endregion
 
 $ProgressPreference = "SilentlyContinue"
@@ -1978,8 +2305,8 @@ if ($industry -eq "retail") {
 }
 
 if ($industry -eq "manufacturing") {
-    Deploy-ManufacturingConfigs
     Deploy-AIO
+    Deploy-ManufacturingConfigs
 }
 
 ##############################################################
@@ -2006,340 +2333,16 @@ if ($industry -eq "manufacturing") {
     }
 }
 
-
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-$AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
-$observabilityNamespace = $AgConfig.Monitoring["Namespace"]
-$observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
-$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
-
-# Set Prod Grafana API endpoint
-$grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
-
-# Installing Grafana
-Write-Host "[$(Get-Date -Format t)] INFO: Installing and Configuring Observability components (Step 14/17)" -ForegroundColor DarkGreen
-Write-Host "[$(Get-Date -Format t)] INFO: Installing Grafana." -ForegroundColor Gray
-$latestRelease = (Invoke-WebRequest -Uri $websiteUrls["grafana"] | ConvertFrom-Json).tag_name.replace('v', '')
-Start-Process msiexec.exe -Wait -ArgumentList "/I $AgToolsDir\grafana-$latestRelease.windows-amd64.msi /quiet" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Update Prometheus Helm charts
-helm repo add prometheus-community $websiteUrls["prometheus"] | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Update Grafana Icons
-Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
-Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
-
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
-(Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
-}
-
-# Reset Grafana UI
-Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
-(Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
-}
-
-# Reset Grafana Password
-$Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-# Get Grafana Admin credentials
-$adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
-$adminEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($adminCredentials))
-
-$adminHeaders = @{
-    "Authorization" = ("Basic " + $adminEncodedcredentials)
-    "Content-Type"  = "application/json"
-}
-
-# Get Contoso User credentials
-$userCredentials = $adminUsername + ':' + $adminPassword
-$userEncodedcredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($userCredentials))
-
-$userHeaders = @{
-    "Authorization" = ("Basic " + $userEncodedcredentials)
-    "Content-Type"  = "application/json"
-}
-
-# Download dashboards
-foreach ($dashboard in $observabilityDashboards.'grafana.com') {
-    $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
-    $dashboardmetadata = Invoke-RestMethod -Uri https://grafana.com/api/dashboards/$dashboard/revisions
-    $dashboardversion = $dashboardmetadata.items | Sort-Object revision | Select-Object -Last 1 | Select-Object -ExpandProperty revision
-    Invoke-WebRequest https://grafana.com/api/dashboards/$dashboard/revisions/$dashboardversion/download -OutFile $grafanaDBPath
-}
-
-$observabilityDashboardstoImport = @()
-$observabilityDashboardstoImport += $observabilityDashboards.'grafana.com'
-$observabilityDashboardstoImport += $observabilityDashboards.'custom'
-
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Prod Grafana User" -ForegroundColor Gray
-# Add Contoso Operator User
-$grafanaUserBody = @{
-    name     = $AgConfig.Monitoring["User"] # Display Name
-    email    = $AgConfig.Monitoring["Email"]
-    login    = $adminUsername
-    password = $adminPassword
-} | ConvertTo-Json
-
-# Make HTTP request to the API to create user
-$retryCount = 10
-$retryDelay = 30
-do {
-    try {
-        Invoke-RestMethod -Method Post -Uri "$($AgConfig.Monitoring["ProdURL"])/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        $retryCount = 0
-    }
-    catch {
-        $retryCount--
-        if ($retryCount -gt 0) {
-            Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
-            Start-Sleep -Seconds $retryDelay
-        }
-    }
-} while ($retryCount -gt 0)
-
-# Deploying Kube Prometheus Stack for stores
-$AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-    kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    # Wait for Kubernetes API server to become available
-    $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
-    $apiServerAddress = $apiServer -replace '.*https://| .*$'
-    $apiServerFqdn = ($apiServerAddress -split ":")[0]
-    $apiServerPort = ($apiServerAddress -split ":")[1]
-
-    do {
-        $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-        if ($result.TcpTestSucceeded) {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is available" -ForegroundColor Gray
-            break
-        }
-        else {
-            Write-Host "[$(Get-Date -Format t)] INFO: Kubernetes API server $apiServer is not yet available. Retrying in 10 seconds..." -ForegroundColor Gray
-            Start-Sleep -Seconds 10
-        }
-    } while ($true)
-
-    # Install Prometheus Operator
-    $helmSetValue = $_.Value.HelmSetValue -replace 'adminPasswordPlaceholder', $adminPassword
-    helm install prometheus prometheus-community/kube-prometheus-stack --set $helmSetValue --namespace $observabilityNamespace --create-namespace --values "$AgMonitoringDir\$($_.Value.HelmValuesFile)" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    Do {
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for $($_.Value.FriendlyName) monitoring service to provision.." -ForegroundColor Gray
-        Start-Sleep -Seconds 45
-        $monitorIP = $(if (kubectl get $_.Value.HelmService --namespace $observabilityNamespace --output=jsonpath='{.status.loadBalancer}' | Select-String "ingress" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($monitorIP -eq "Nope" )
-    # Get Load Balancer IP
-    $monitorLBIP = kubectl --namespace $observabilityNamespace get $_.Value.HelmService --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
-
-    if ($_.Value.IsProduction) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Add $($_.Value.FriendlyName) Data Source to Grafana"
-        # Request body with information about the data source to add
-        $grafanaDSBody = @{
-            name      = $_.Value.FriendlyName.ToLower()
-            type      = 'prometheus'
-            url       = ("http://" + $monitorLBIP + ":9090")
-            access    = 'proxy'
-            basicAuth = $false
-            isDefault = $true
-        } | ConvertTo-Json
-
-        # Make HTTP request to the API
-        Invoke-RestMethod -Method Post -Uri $grafanaDS -Headers $adminHeaders -Body $grafanaDSBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-    }
-
-    # Add Contoso Operator User
-    if (!$_.Value.IsProduction) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Creating $($_.Value.FriendlyName) Grafana User" -ForegroundColor Gray
-        $grafanaUserBody = @{
-            name     = $AgConfig.Monitoring["User"] # Display Name
-            email    = $AgConfig.Monitoring["Email"]
-            login    = $adminUsername
-            password = $adminPassword
-        } | ConvertTo-Json
-
-        # Make HTTP request to the API to create user
-        $retryCount = 10
-        $retryDelay = 30
-
-        do {
-            try {
-                Invoke-RestMethod -Method Post -Uri "http://$monitorLBIP/api/admin/users" -Headers $adminHeaders -Body $grafanaUserBody | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-                $retryCount = 0
-            }
-            catch {
-                $retryCount--
-                if ($retryCount -gt 0) {
-                    Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
-                    Start-Sleep -Seconds $retryDelay
-                }
-            }
-        } while ($retryCount -gt 0)
-    }
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-    # Add dashboards
-    foreach ($dashboard in $observabilityDashboardstoImport) {
-        $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
-        # Replace the datasource
-        $replacementParams = @{
-            "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
-        }
-        $content = Get-Content $grafanaDBPath
-        foreach ($key in $replacementParams.Keys) {
-            $content = $content -replace $key, $replacementParams[$key]
-        }
-        # Set dashboard JSON
-        $dashboardObject = $content | ConvertFrom-Json
-        # Best practice is to generate a random UID, such as a GUID
-        $dashboardObject.uid = [guid]::NewGuid().ToString()
-
-        # Need to set this to null to let Grafana generate a new ID
-        $dashboardObject.id = $null
-        # Set dashboard title
-        $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
-        # Request body with dashboard to add
-        $grafanaDBBody = @{
-            dashboard = $dashboardObject
-            overwrite = $true
-        } | ConvertTo-Json -Depth 8
-
-        if ($_.Value.IsProduction) {
-            # Set Grafana Dashboard endpoint
-            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
-        }
-        else {
-            # Set Grafana Dashboard endpoint
-            $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
-            $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
-        }
-
-        # Make HTTP request to the API
-        $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
-
-        Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
-    }
-
-}
-Write-Host
+Deploy-Prometheus
 
 ##############################################################
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-$bookmarksFileName = "$AgToolsDir\Bookmarks"
-$edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
-
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-    $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
-
-    # Matching url: pos - customer
-    $matchingServices = $services.items | Where-Object {
-        $_.spec.ports.port -contains 5000 -and
-        $_.spec.type -eq "LoadBalancer"
-    }
-    $posIps = $matchingServices.status.loadBalancer.ingress.ip
-
-    foreach ($posIp in $posIps) {
-        $output = "http://$posIp" + ':5000'
-        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-        # Replace matching value in the Bookmarks file
-        $content = Get-Content -Path $bookmarksFileName
-        $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
-        $newContent | Set-Content -Path $bookmarksFileName
-
-        Start-Sleep -Seconds 2
-    }
-
-    # Matching url: pos - manager
-    $matchingServices = $services.items | Where-Object {
-        $_.spec.ports.port -contains 81 -and
-        $_.spec.type -eq "LoadBalancer"
-    }
-    $posIps = $matchingServices.status.loadBalancer.ingress.ip
-
-    foreach ($posIp in $posIps) {
-        $output = "http://$posIp" + ':81'
-        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-        # Replace matching value in the Bookmarks file
-        $content = Get-Content -Path $bookmarksFileName
-        $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
-        $newContent | Set-Content -Path $bookmarksFileName
-
-        Start-Sleep -Seconds 2
-    }
-
-    # Matching url: prometheus-grafana
-    if ($cluster.Name -eq "Staging" -or $cluster.Name -eq "Dev") {
-        $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -eq 'prometheus-grafana'
-        }
-        $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
-
-        foreach ($grafanaIp in $grafanaIps) {
-            $output = "http://$grafanaIp"
-            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-            # Replace matching value in the Bookmarks file
-            $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
-            $newContent | Set-Content -Path $bookmarksFileName
-
-            Start-Sleep -Seconds 2
-        }
-    }
-
-    # Matching url: prometheus
-    $matchingServices = $services.items | Where-Object {
-        $_.spec.ports.port -contains 9090 -and
-        $_.spec.type -eq "LoadBalancer"
-    }
-    $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
-
-    foreach ($prometheusIp in $prometheusIps) {
-        $output = "http://$prometheusIp" + ':9090'
-        $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-        # Replace matching value in the Bookmarks file
-        $content = Get-Content -Path $bookmarksFileName
-        $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
-        $newContent | Set-Content -Path $bookmarksFileName
-
-        Start-Sleep -Seconds 2
-    }
-}
-
-# Matching url: Agora apps forked repo
-$output = $appClonedRepo
-$output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-# Replace matching value in the Bookmarks file
-$content = Get-Content -Path $bookmarksFileName
-$newContent = $content -replace "Agora-Apps-Repo-Clone-URL", $output
-$newContent = $newContent -replace "Agora-Apps-Repo-Your-Fork", "Agora Apps Repo - $githubUser"
-$newContent | Set-Content -Path $bookmarksFileName
-
-Start-Sleep -Seconds 2
-
-Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
-
-##############################################################
-# Pinning important directories to Quick access
-##############################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Pinning important directories to Quick access (Step 16/17)" -ForegroundColor DarkGreen
-$quickAccess = new-object -com shell.application
-$quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
-$quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
-
+Deploy-Bookmarks
 
 ##############################################################
 # Cleanup
