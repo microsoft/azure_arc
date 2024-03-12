@@ -23,7 +23,8 @@ param (
   [string]$githubPAT,
   [string]$adxClusterName,
   [string]$namingGuid,
-  [string]$industry
+  [string]$industry,
+  [string]$customLocationRPOID
 )
 
 ##############################################################
@@ -58,7 +59,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
-
+[System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -228,17 +229,18 @@ Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/ma
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-global.json") -OutFile "$AgMonitoringDir\grafana-cluster-global.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
 
 if($industry -eq "retail"){
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 }
 elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
