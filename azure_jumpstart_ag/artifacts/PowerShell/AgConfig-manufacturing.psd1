@@ -220,6 +220,46 @@
         "images-cache"
     )
 
+    AppConfig = @{
+        ContosoBakeries_decode = @{
+            GitOpsConfigName = "config-decode"
+            KustomizationName = "decode"
+            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/decode"
+            Namespace = "contoso-bakeries"
+            Order = 1
+        }
+        ContosoBakeries_rtspSimulator = @{
+            GitOpsConfigName = "config-rtspSimulator"
+            KustomizationName = "rtspSimulator"
+            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/rtspSimulator"
+            Namespace = "contoso-bakeries"
+            Order = 2
+        }
+
+        # SensorMonitor = @{
+        #     GitOpsConfigName  = "config-sensormonitor"
+        #     KustomizationName = "sensor-monitor"
+        #     KustomizationPath = "./contoso_supermarket/operations/freezer_monitoring/release"
+        #     Namespace         = "sensor-monitor"
+        #     AppPath           = "freezer_monitoring"
+        #     ConfigMaps = @{
+        #         "mqtt-broker-config" = @{
+        #             ContainerName = "mqtt-broker"
+        #             RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-broker/mosquitto.conf"
+        #         }
+        #         "mqtt-simulator-config" = @{
+        #             ContainerName = "mqtt-simulator"
+        #             RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt-simulator/config/settings.json"
+        #         }
+        #         "mqtt2prom-config" = @{
+        #             ContainerName = "mqtt2prom"
+        #             RepoPath      = "contents/contoso_supermarket/developer/freezer_monitoring/src/mqtt2prom/config.yaml"
+        #         }
+        #     }
+        #     Order = 7
+        # }
+    }
+
     # Microsoft Edge startup settings variables
     EdgeSettingRegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Edge'
     EdgeSettingValueTrue    = '00000001'

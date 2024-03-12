@@ -1,12 +1,12 @@
 @description('Azure service principal client id')
-param spnClientId string
+param spnClientId string = ''
 
 @description('Azure service principal client secret')
 @secure()
-param spnClientSecret string
+param spnClientSecret string = ''
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
+param spnTenantId string = ''
 
 //@description('Azure service principal object id')
 //param spnObjectId string
@@ -19,13 +19,13 @@ param location string = resourceGroup().location
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Username for Windows account')
-param windowsAdminUsername string
+param windowsAdminUsername string = 'arcdemo'
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string = 'ArcPassword123!!'
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
@@ -99,7 +99,7 @@ param acrName string = 'agacr${namingGuid}'
 param rdpPort string = '3389'
 
 @description('The agora industry to be deployed')
-param industry string = 'retail'
+param industry string = 'manufacturing'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
