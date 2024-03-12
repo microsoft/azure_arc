@@ -2307,6 +2307,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 if ($industry -eq "manufacturing") {
     Deploy-AIO
     #Deploy-InfluxDb
+    #Deploy-ESA
     #Deploy-ManufacturingConfigs
 }
 
