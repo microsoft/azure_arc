@@ -4,7 +4,7 @@
   "DeploymentType": "ScalableCluster",
   "Init": {
     "ServiceIPRangeStart": "ServiceIPRangeStart-null",
-    "ServiceIPRangeSize": 1000
+    "ServiceIPRangeSize": 15
   },
   "Arc": {
     "ClusterName": "ClusterName-null",
@@ -37,9 +37,9 @@
         "Mtu": 0
       },
       "LinuxNode": {
-        "CpuCount": 4,
-        "MemoryInMB": 24576,
-        "DataSizeInGB": 80,
+        "CpuCount": 6,
+        "MemoryInMB": 16384,
+        "DataSizeInGB": 40,
         "Ip4Address": "Ip4Address-null",
         "TimeoutSeconds": 600,
         "TpmPassthrough": false

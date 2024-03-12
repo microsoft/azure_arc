@@ -48,7 +48,9 @@
         "Microsoft.ExtendedLocation",
         "Microsoft.IoTOperationsOrchestrator",
         "Microsoft.IoTOperationsMQ",
-        "Microsoft.IoTOperationsDataProcessor"
+        "Microsoft.IoTOperationsDataProcessor",
+        #RP for ESA:
+        "Microsoft.openservicemesh"
     )
 
     # Az CLI required extensions
