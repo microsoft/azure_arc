@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esa-webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esa-webserver
+  template:
+    metadata:
+      labels:
+        app: esa-webserver
+    spec:
+      containers:
+        - name: esa-webserver
+          image: jumpstartprod.azurecr.io/esa-webserver:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: RTSP_URL
+              value: rtsp://virtual-rtsp:554/stream
+            - name: LOCAL_STORAGE
+              value: /tmp
+            - name: INFERENCE_CLASS_DETECTION
+              value: cup
+            - name: CLASS_NAMES
+              value: "bottle, person, cup, fork, knife"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virtual-rtsp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: virtual-rtsp
+  template:
+    metadata:
+      labels:
+        app: virtual-rtsp
+    spec:
+      containers:
+      - name: virtual-rtsp
+        image: kerberos/virtual-rtsp:1.0.6
+        ports:
+        - containerPort: 8554
+        env:
+        - name: SOURCE_URL
+          value: "file:///samples/highway-10min-640x480-1.mp4"
