@@ -16,3 +16,12 @@ Run locally
     python .\main.py
     ```
 1. Open the browser and navigate to the Flask URL -> Generally this is the http://localhost:8000
+1. If you want to run it with Docker, first build the container
+    ```bash
+    cd artifacts\esa_ai
+    docker build -t esa-webserver .
+    ```
+1. Run the container
+    ```bash
+    docker run -p 8000:8000 -e RTSP_URL=rtsp://192.168.50.216:554/stream -e LOCAL_STORAGE=/tmp -e INFERENCE_CLASS_DETECTION="hola" -e CLASS_NAMES="bottle, person, cup, fork, knife" -d --restart=always esa-webserver
+    ```
