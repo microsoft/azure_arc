@@ -81,10 +81,10 @@ export KUBECTL_VERSION="1.28/stable" # Do not change!
 export CLUSTERCTL_VERSION="1.5.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.7.6" # Do not change!
-export KUBERNETES_VERSION="1.28.2" # Do not change!
+export KUBERNETES_VERSION="1.28.5" # Do not change!
 export CALICO_VERSION="v3.25.2" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.29.0" # Do not change!
-export K3S_VERSION="1.28.2+k3s1" # Do not change!
+export K3S_VERSION="1.28.5+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -221,7 +221,7 @@ while true; do
   # Iterate over each node and check its status
   for node in $nodes; do
     ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
-    
+
     if [[ $ready != "True" ]]; then
       echo "Node $node is not ready."
       all_ready=false
@@ -255,7 +255,7 @@ sudo service sshd restart
 echo ""
 sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
-# Renaming CAPI cluster context name 
+# Renaming CAPI cluster context name
 echo ""
 sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUSTER_NAME" "arcbox-capi"
 
