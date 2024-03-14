@@ -2210,6 +2210,9 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 # Force TLS 1.2 for connections to prevent TLS/SSL errors
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+$Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
+
 #####################################################################
 # Setup Azure CLI
 #####################################################################
