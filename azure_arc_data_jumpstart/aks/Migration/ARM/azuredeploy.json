@@ -47,7 +47,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.26.6",
+      "defaultValue": "1.28.5",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes"
@@ -80,7 +80,7 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
     "githubAccount": {
       "type": "string",
       "metadata": {

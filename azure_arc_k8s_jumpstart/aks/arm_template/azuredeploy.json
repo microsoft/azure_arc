@@ -78,7 +78,7 @@
             "metadata": {
                 "description": "boolean flag to turn on and off of RBAC"
             }
-        },        
+        },
         "osType": {
             "type": "string",
             "defaultValue": "Linux",
@@ -90,7 +90,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.27.1",
+            "defaultValue": "1.28.5",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes."
@@ -112,7 +112,7 @@
             "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
-                "enableRBAC": "[parameters('enableRBAC')]",                
+                "enableRBAC": "[parameters('enableRBAC')]",
                 "dnsPrefix": "[parameters('dnsPrefix')]",
                 "agentPoolProfiles": [
                     {
