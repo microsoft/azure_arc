@@ -584,9 +584,21 @@ function Deploy-VirtualizationInfrastructure {
         }
     }
 
+<<<<<<< HEAD
     Start-Sleep -Seconds 20
     # Create an array with VM names
     $VMnames = (Get-VM).Name
+=======
+    ###############################################################################
+    # Setting up replacement parameters for AKS Edge Essentials config json file
+    ###############################################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
+    $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
+    $ESAConfigFilePath = "$deploymentFolder\config.json"
+    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
+    $namingGuid = $using:namingGuid
+    $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
+>>>>>>> ec4ecc478b4f47e8c84bd8ce0e12ef4a5e9e5463
 
     $sourcePath = "$PsHome\Profile.ps1"
     $destinationPath = "C:\Deployment\Profile.ps1"
@@ -740,6 +752,7 @@ function Deploy-VirtualizationInfrastructure {
         ###############################################################################
         Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
         $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
+        $ESAConfigFilePath = "$deploymentFolder\config.json"
         $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
         $namingGuid = $using:namingGuid
         $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
@@ -1681,6 +1694,8 @@ function Deploy-AIO {
         catch {
             Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
         }
+        # increase the maximum number of files
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
 
         Write-Host "Configuring firewall specific to AIO"
         Write-Host "Add firewall rule for AIO MQTT Broker"
@@ -1749,9 +1764,16 @@ function Deploy-AIO {
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
 
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+        
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $ESAConfigFilePath
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1772,7 +1794,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret  --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
