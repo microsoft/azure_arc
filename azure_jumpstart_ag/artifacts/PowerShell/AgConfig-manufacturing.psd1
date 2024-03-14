@@ -48,7 +48,7 @@
         "Microsoft.ExtendedLocation",
         "Microsoft.IoTOperationsOrchestrator",
         "Microsoft.IoTOperationsMQ",
-        "Microsoft.IoTOperationsDataProcessor",
+        "Microsoft.IoTOperationsDataProcessor"
     )
 
     # Az CLI required extensions
