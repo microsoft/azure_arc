@@ -49,8 +49,6 @@
         "Microsoft.IoTOperationsOrchestrator",
         "Microsoft.IoTOperationsMQ",
         "Microsoft.IoTOperationsDataProcessor",
-        #RP for ESA:
-        "Microsoft.openservicemesh"
     )
 
     # Az CLI required extensions
