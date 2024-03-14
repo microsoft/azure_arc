@@ -587,15 +587,6 @@ function Deploy-VirtualizationInfrastructure {
     Start-Sleep -Seconds 20
     # Create an array with VM names
     $VMnames = (Get-VM).Name
-    ###############################################################################
-    # Setting up replacement parameters for AKS Edge Essentials config json file
-    ###############################################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
-    $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
-    $ESAConfigFilePath = "$deploymentFolder\config.json"
-    $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
-    $namingGuid = $using:namingGuid
-    $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
 
     $sourcePath = "$PsHome\Profile.ps1"
     $destinationPath = "C:\Deployment\Profile.ps1"
