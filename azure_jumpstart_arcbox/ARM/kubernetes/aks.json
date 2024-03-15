@@ -107,7 +107,7 @@
         "metadata": {
           "description": "The version of Kubernetes"
         },
-        "defaultValue" : "1.26.6"
+        "defaultValue" : "1.28.5"
       }
     },
     "variables": {
