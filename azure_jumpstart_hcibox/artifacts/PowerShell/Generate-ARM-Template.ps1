@@ -32,6 +32,9 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
 foreach ($machine in $arcNodes) {
     $ErrorActionPreference = "Continue"
     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Reader" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Stack HCI Device Management Role" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup
     $ErrorActionPreference = "Stop"
 }
 
