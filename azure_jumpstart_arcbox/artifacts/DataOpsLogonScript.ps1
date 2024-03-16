@@ -215,7 +215,7 @@ foreach ($cluster in $clusters) {
 
         Start-Sleep -Seconds 30
         Write-Host "Custom location name: $cluster.customLocation"
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --debug
 
         Start-Sleep -Seconds 20
         $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
