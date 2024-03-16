@@ -206,17 +206,28 @@ foreach ($cluster in $clusters) {
         } while ($podStatus -eq "Nope")
         Write-Host "Bootstrapper pod is ready!"
 
+        Write-Host "Creating custom location"
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+        Write-Host "Kubernetes Cnnected Cluster ID: $connectedClusterId"
+
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-        Start-Sleep -Seconds 10
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+        Write-Host "Arc data services extension ID: $extensionId"
+
+        Start-Sleep -Seconds 30
+        Write-Host "Custom location name: $cluster.customLocation"
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
 
         Start-Sleep -Seconds 20
-
+        $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+        Write-Host "Custom location ID: $customLocationId"
+        if ($null -eq $customLocationId){
+            Write-Host "Failed to create custom location. Existing deployment"
+            Exit
+        }
+    
         # Deploying the Azure Arc Data Controller
 
         $context = $cluster.context
-        $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
         $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
         $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
         Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
