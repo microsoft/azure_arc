@@ -199,12 +199,21 @@ foreach ($cluster in $clusters) {
 
         Write-Host "`n"
 
-        Do {
+        do {
             Write-Host "Waiting for bootstrapper pod, hold tight..."
             Start-Sleep -Seconds 20
             $podStatus = $(if (kubectl get pods -n arc --kubeconfig $cluster.kubeConfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
         } while ($podStatus -eq "Nope")
+
         Write-Host "Bootstrapper pod is ready!"
+
+        do {
+            Write-Host "Waiting for data services extension status, hold tight..."
+            Start-Sleep -Seconds 20
+            $provisioningState = (az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query provisioningState -o tsv)
+        } while ($provisioningState -ne "Succeeded")
+
+        Write-Host "Data services extension is ready!"
 
         Write-Host "Creating custom location"
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
@@ -213,9 +222,8 @@ foreach ($cluster in $clusters) {
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         Write-Host "Arc data services extension ID: $extensionId"
 
-        Start-Sleep -Seconds 30
         Write-Host "Custom location name: $cluster.customLocation"
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --debug
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
 
         Start-Sleep -Seconds 20
         $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
@@ -226,7 +234,6 @@ foreach ($cluster in $clusters) {
         }
     
         # Deploying the Azure Arc Data Controller
-
         $context = $cluster.context
         $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
         $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
