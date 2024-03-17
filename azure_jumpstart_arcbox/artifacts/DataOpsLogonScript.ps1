@@ -149,25 +149,47 @@ Start-Sleep -Seconds 10
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Host "Checking K8s Nodes"
+        Write-Host "Checking K8s Nodes for ${cluster.clusterName} cluster"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        az connectedk8s connect --name $cluster.clusterName `
-            --resource-group $Env:resourceGroup `
-            --location $Env:azureLocation `
-            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-            --kube-config $cluster.kubeConfig `
-            --distribution $cluster.distribution
+        Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc"
 
-        Start-Sleep -Seconds 10
+        # Try until the provision status is successful.
+        Write-Host "Attempting to connect ${cluster.clusterName} cluster to Azure Arc."
+        try {
+            az connectedk8s connect --name $cluster.clusterName `
+                --resource-group $Env:resourceGroup `
+                --location $Env:azureLocation `
+                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+                --kube-config $cluster.kubeConfig `
+                --distribution $cluster.distribution
+        }
+        catch {
+            <#Do this if a terminating exception happens#>
+            Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
+
+        # Wait for some time to make sure all the pods are deployed and provisioning is completed.
+        $retryCount = 0
+        do {
+            Start-Sleep -Seconds 20
+
+            # Check connected cluster status and make sure provisioning stutus is successful
+            $clusterStatus = (az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query provisioningState -o tsv)
+            $retryCount += 1
+        } while ($clusterStatus -ne "Succeeded" -and $retryCount -lt 3)
+
+        if ($clusterStatus -ne "Succeeded") {
+            Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
 
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-        #Write-Host "Enabling Defender for Containers on AKS clusters"
-        #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
 
@@ -187,6 +209,7 @@ foreach ($cluster in $clusters) {
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
         
+        Write-Host "Creating data services extension on ${cluster.clusterName} cluster."
         az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
@@ -216,7 +239,7 @@ foreach ($cluster in $clusters) {
 
         Write-Host "Data services extension is ready!"
 
-        Write-Host "Creating custom location"
+        Write-Host "Creating custom location ${cluster.clusterName} cluster."
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         Write-Host "Kubernetes Cnnected Cluster ID: $connectedClusterId"
 
