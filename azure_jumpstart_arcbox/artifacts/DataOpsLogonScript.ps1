@@ -223,7 +223,7 @@ foreach ($cluster in $clusters) {
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         Write-Host "Arc data services extension ID: $extensionId"
 
-        Write-Host "Custom location name: $cluster.customLocation"
+        Write-Host "Custom location name: ${cluster.customLocation}"
         az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
 
         Start-Sleep -Seconds 20
