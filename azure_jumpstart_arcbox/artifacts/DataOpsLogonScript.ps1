@@ -4,11 +4,11 @@ $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi"; distribution = "generic" }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks"; distribution = "aks" }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr"; distribution = "aks" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
@@ -48,6 +48,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 az extension add --name connectedk8s --version 1.3.17
 az extension add --name arcdata
+az extension add --name customlocation
 az -v
 
 # Installing Azure Data Studio extensions
@@ -148,24 +149,47 @@ Start-Sleep -Seconds 10
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Host "Checking K8s Nodes"
+        Write-Host "Checking K8s Nodes for $($cluster.clusterName) cluster"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        az connectedk8s connect --name $cluster.clusterName `
-            --resource-group $Env:resourceGroup `
-            --location $Env:azureLocation `
-            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-            --kube-config $cluster.kubeConfig
+        Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc"
 
-        Start-Sleep -Seconds 10
+        # Try until the provision status is successful.
+        Write-Host "Attempting to connect $($cluster.clusterName) cluster to Azure Arc."
+        try {
+            az connectedk8s connect --name $cluster.clusterName `
+                --resource-group $Env:resourceGroup `
+                --location $Env:azureLocation `
+                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+                --kube-config $cluster.kubeConfig `
+                --distribution $cluster.distribution
+        }
+        catch {
+            <#Do this if a terminating exception happens#>
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
+
+        # Wait for some time to make sure all the pods are deployed and provisioning is completed.
+        $retryCount = 0
+        do {
+            Start-Sleep -Seconds 20
+
+            # Check connected cluster status and make sure provisioning stutus is successful
+            $clusterStatus = (az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query provisioningState -o tsv)
+            $retryCount += 1
+        } while ($clusterStatus -ne "Succeeded" -and $retryCount -lt 3)
+
+        if ($clusterStatus -ne "Succeeded") {
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
 
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-        #Write-Host "Enabling Defender for Containers on AKS clusters"
-        #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
 
@@ -185,6 +209,7 @@ foreach ($cluster in $clusters) {
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
         
+        Write-Host "Creating data services extension on $($cluster.clusterName) cluster."
         az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
@@ -198,24 +223,42 @@ foreach ($cluster in $clusters) {
 
         Write-Host "`n"
 
-        Do {
+        do {
             Write-Host "Waiting for bootstrapper pod, hold tight..."
             Start-Sleep -Seconds 20
             $podStatus = $(if (kubectl get pods -n arc --kubeconfig $cluster.kubeConfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
         } while ($podStatus -eq "Nope")
+
         Write-Host "Bootstrapper pod is ready!"
 
+        do {
+            Write-Host "Waiting for data services extension status, hold tight..."
+            Start-Sleep -Seconds 20
+            $provisioningState = (az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query provisioningState -o tsv)
+        } while ($provisioningState -ne "Succeeded")
+
+        Write-Host "Data services extension is ready!"
+
+        Write-Host "Creating custom location $($cluster.clusterName) cluster."
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+        Write-Host "Kubernetes Cnnected Cluster ID: $connectedClusterId"
+
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-        Start-Sleep -Seconds 10
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+        Write-Host "Arc data services extension ID: $extensionId"
+
+        Write-Host "Custom location name: $($cluster.customLocation)"
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
 
         Start-Sleep -Seconds 20
-
-        # Deploying the Azure Arc Data Controller
-
-        $context = $cluster.context
         $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+        Write-Host "Custom location ID: $customLocationId"
+        if ($null -eq $customLocationId){
+            Write-Host "Failed to create custom location. Existing deployment"
+            Exit
+        }
+    
+        # Deploying the Azure Arc Data Controller
+        $context = $cluster.context
         $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
         $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
         Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
