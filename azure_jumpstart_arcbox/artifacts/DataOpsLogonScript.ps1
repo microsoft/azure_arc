@@ -149,13 +149,13 @@ Start-Sleep -Seconds 10
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Host "Checking K8s Nodes for ${cluster.clusterName} cluster"
+        Write-Host "Checking K8s Nodes for $($cluster.clusterName) cluster"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc"
+        Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc"
 
         # Try until the provision status is successful.
-        Write-Host "Attempting to connect ${cluster.clusterName} cluster to Azure Arc."
+        Write-Host "Attempting to connect $($cluster.clusterName) cluster to Azure Arc."
         try {
             az connectedk8s connect --name $cluster.clusterName `
                 --resource-group $Env:resourceGroup `
@@ -166,7 +166,7 @@ foreach ($cluster in $clusters) {
         }
         catch {
             <#Do this if a terminating exception happens#>
-            Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
             Exit
         }
 
@@ -181,7 +181,7 @@ foreach ($cluster in $clusters) {
         } while ($clusterStatus -ne "Succeeded" -and $retryCount -lt 3)
 
         if ($clusterStatus -ne "Succeeded") {
-            Write-Host "Connecting ${cluster.clusterName} cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
             Exit
         }
 
@@ -209,7 +209,7 @@ foreach ($cluster in $clusters) {
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
         
-        Write-Host "Creating data services extension on ${cluster.clusterName} cluster."
+        Write-Host "Creating data services extension on $($cluster.clusterName) cluster."
         az k8s-extension create --name arc-data-services `
             --extension-type microsoft.arcdataservices `
             --cluster-type connectedClusters `
@@ -239,14 +239,14 @@ foreach ($cluster in $clusters) {
 
         Write-Host "Data services extension is ready!"
 
-        Write-Host "Creating custom location ${cluster.clusterName} cluster."
+        Write-Host "Creating custom location $($cluster.clusterName) cluster."
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         Write-Host "Kubernetes Cnnected Cluster ID: $connectedClusterId"
 
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         Write-Host "Arc data services extension ID: $extensionId"
 
-        Write-Host "Custom location name: ${cluster.customLocation}"
+        Write-Host "Custom location name: $($cluster.customLocation)"
         az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
 
         Start-Sleep -Seconds 20
