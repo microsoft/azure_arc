@@ -1,36 +1,38 @@
 @description('Azure service principal client id')
-param spnClientId string
+param spnClientId string = ''
 
 @description('Azure service principal client secret')
+@minLength(12)
+@maxLength(123)
 @secure()
-param spnClientSecret string
+param spnClientSecret string = newGuid()
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
+param spnTenantId string = ''
 
 @minLength(1)
 @maxLength(77)
 @description('Prefix for resource group, i.e. {name}-rg')
-param envName string
+param envName string = toLower(substring(newGuid(), 0, 5))
 
 @description('Location for all resources')
-param location string
+param location string = ''
 
 @maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Username for Windows account')
-param windowsAdminUsername string
+param windowsAdminUsername string = ''
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string = newGuid()
 
 @description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
@@ -46,12 +48,12 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string
+param githubUser string  = 'sampleUser'
 
 @description('GitHub Personal access token for the user account')
 @minLength(1)
 @secure()
-param githubPAT string
+param githubPAT string = newGuid()
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
