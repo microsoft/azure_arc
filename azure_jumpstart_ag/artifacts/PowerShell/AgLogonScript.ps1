@@ -694,9 +694,7 @@ function Deploy-VirtualizationInfrastructure {
 
         ##########################################
         # Deploying AKS Edge Essentials clusters
-        ##########################################
-        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-        $logsFolder = "$deploymentFolder\Logs"
+        #########################################
 
         # Assigning network adapter IP address
         $NetIPAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].NetIPAddress
@@ -945,7 +943,7 @@ function Deploy-AzArcK8s {
             }
         }
     }
-
+    $VMnames = (Get-VM).Name
     foreach ($VM in $VMNames) {
         $secret = $Env:spnClientSecret
         $clientId = $Env:spnClientId
@@ -1041,7 +1039,7 @@ function Deploy-ClusterFluxExtension {
                 'Microsoft.Kubernetes/connectedClusters' { $ClusterType = 'ConnectedClusters' }
                 'Microsoft.ContainerService/managedClusters' { $ClusterType = 'ManagedClusters' }
             }
-
+$F
             if ($clusterType -eq 'ConnectedClusters') {
                 # Check if cluster is connected to Azure Arc control plane
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
@@ -1072,6 +1070,7 @@ function Deploy-ClusterFluxExtension {
                 }
             }
 
+            az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
             $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
             $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
@@ -1116,9 +1115,9 @@ function Deploy-ClusterFluxExtension {
     # Clean up jobs
     $jobs | Remove-Job
     # Abort if Flux-extension fails on any cluster
-    if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
-        throw "One or more Flux-extension deployments failed - aborting"
-    }
+    # if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
+    #     throw "One or more Flux-extension deployments failed - aborting"
+    # }
 }
 
 function Deploy-K8sImagesCache {
@@ -1650,6 +1649,7 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
+    
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -1681,6 +1681,8 @@ function Deploy-AIO {
         catch {
             Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
         }
+        # increase the maximum number of files
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
 
         Write-Host "Configuring firewall specific to AIO"
         Write-Host "Add firewall rule for AIO MQTT Broker"
@@ -1728,6 +1730,7 @@ function Deploy-AIO {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
@@ -1749,9 +1752,27 @@ function Deploy-AIO {
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
 
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+        
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+        $deploymentFolder = "C:\Ag\L1Files"
+        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
+        $response = Invoke-RestMethod -Uri $githubApiUrl
+        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+        $fileUrls | ForEach-Object {
+            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+            $outputFile = Join-Path $deploymentFolder $fileName
+            Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        }
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1772,7 +1793,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -2200,6 +2221,9 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 # Force TLS 1.2 for connections to prevent TLS/SSL errors
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+$Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
+
 #####################################################################
 # Setup Azure CLI
 #####################################################################
@@ -2338,13 +2362,13 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-Deploy-Prometheus
+#Deploy-Prometheus
 
 ##############################################################
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-Deploy-Bookmarks
+#Deploy-Bookmarks
 
 ##############################################################
 # Cleanup

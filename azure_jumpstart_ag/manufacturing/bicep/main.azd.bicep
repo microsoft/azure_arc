@@ -41,7 +41,7 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string
+param githubUser string = 'null'
 
 //@description('GitHub Personal access token for the user account')
 //@minLength(1)
@@ -88,7 +88,7 @@ param aioStorageAccountName string = 'aiostg${namingGuid}'
 param adxClusterName string = 'agadx${namingGuid}'
 
 @description('The custom location RPO ID')
-param customLocationRPOID string
+param customLocationRPOID string = 'null'
 
 @minLength(5)
 @maxLength(50)
