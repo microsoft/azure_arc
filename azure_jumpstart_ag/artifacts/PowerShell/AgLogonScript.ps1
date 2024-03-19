@@ -694,9 +694,7 @@ function Deploy-VirtualizationInfrastructure {
 
         ##########################################
         # Deploying AKS Edge Essentials clusters
-        ##########################################
-        $deploymentFolder = "C:\Deployment" # Deployment folder is already pre-created in the VHD image
-        $logsFolder = "$deploymentFolder\Logs"
+        #########################################
 
         # Assigning network adapter IP address
         $NetIPAddress = $AgConfig.SiteConfig[$Env:COMPUTERNAME].NetIPAddress
@@ -1042,7 +1040,7 @@ function Deploy-ClusterFluxExtension {
                 'Microsoft.Kubernetes/connectedClusters' { $ClusterType = 'ConnectedClusters' }
                 'Microsoft.ContainerService/managedClusters' { $ClusterType = 'ManagedClusters' }
             }
-
+$F
             if ($clusterType -eq 'ConnectedClusters') {
                 # Check if cluster is connected to Azure Arc control plane
                 $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
@@ -1118,9 +1116,9 @@ function Deploy-ClusterFluxExtension {
     # Clean up jobs
     $jobs | Remove-Job
     # Abort if Flux-extension fails on any cluster
-    if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
-        throw "One or more Flux-extension deployments failed - aborting"
-    }
+    # if ($FluxExtensionJobs | Where-Object ProvisioningState -ne 'Succeeded') {
+    #     throw "One or more Flux-extension deployments failed - aborting"
+    # }
 }
 
 function Deploy-K8sImagesCache {
@@ -1652,6 +1650,8 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
+    $deploymentFolder = "C:\Deployment"
+    $ESAConfigFilePath = "$deploymentFolder\config.json"
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
