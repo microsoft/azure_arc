@@ -738,7 +738,6 @@ function Deploy-VirtualizationInfrastructure {
         ###############################################################################
         Write-Host "[$(Get-Date -Format t)] INFO: Building AKS Edge Essentials config json file on $hostname." -ForegroundColor Gray
         $AKSEEConfigFilePath = "$deploymentFolder\ScalableCluster.json"
-        $ESAConfigFilePath = "$deploymentFolder\config.json"
         $AdapterName = (Get-NetAdapter -Name Ethernet*).Name
         $namingGuid = $using:namingGuid
         $arcClusterName = $AgConfig.SiteConfig[$Env:COMPUTERNAME].ArcClusterName + "-$namingGuid"
@@ -1650,8 +1649,7 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
-    $deploymentFolder = "C:\Deployment"
-    $ESAConfigFilePath = "$deploymentFolder\config.json"
+    
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -1732,6 +1730,7 @@ function Deploy-AIO {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
@@ -1755,14 +1754,25 @@ function Deploy-AIO {
 
         # Enable Open Service Mesh extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
         
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $ESAConfigFilePath
+        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+        $deploymentFolder = "C:\Ag\L1Files"
+        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
+        $response = Invoke-RestMethod -Uri $githubApiUrl
+        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+        $fileUrls | ForEach-Object {
+            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+            $outputFile = Join-Path $deploymentFolder $fileName
+            Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        }
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1783,7 +1793,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret  --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
