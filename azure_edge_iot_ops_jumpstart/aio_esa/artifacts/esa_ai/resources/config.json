@@ -1,0 +1,8 @@
+{
+
+    "inputs": [
+	    {
+            "video": "./resources/bolt-detection.mp4"
+        }
+    ]
+}
