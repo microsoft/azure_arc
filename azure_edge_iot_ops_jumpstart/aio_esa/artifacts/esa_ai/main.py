@@ -13,11 +13,7 @@ import numpy as np
 import json
 import sys
 
-
-
-
 # GLOBAL Variables
-
 OBJECT_AREA_MIN = 9000
 OBJECT_AREA_MAX = 50000
 LOW_H = 0
@@ -36,14 +32,7 @@ HEIGHT_OF_OBJ = 0
 WIDTH_OF_OBJ = 0
 
 OBJECT_COUNT = "Object Number : {}".format(COUNT_OBJECT)
-
-"""
-model = YOLO("yolo-Weights/yolov8n.pt")
-
-classNames = classNames = os.environ.get('CLASS_NAMES').split(',')
-print("Class names read from CLASS_NAMES variable: ", classNames)
-"""
-source = "rtsp://host.docker.internal:554/stream"
+source = "rtsp://localhost:554/stream"
 
 if 'RTSP_URL' in os.environ:
     source = os.environ.get('RTSP_URL')
@@ -54,11 +43,6 @@ esa_storage = "./esa_storage"
 if 'LOCAL_STORAGE' in os.environ:
     esa_storage = os.environ.get('LOCAL_STORAGE')
 print("Storing video frames read from LOCAL_STORAGE: ", esa_storage)
-
-"""inference_class_detection = "handbag"
-if 'INFERENCE_CLASS_DETECTION' in os.environ:
-    inference_class_detection = os.environ.get('INFERENCE_CLASS_DETECTION')
-print("Looking for frames read from INFERENCE_CLASS_DETECTION with: ", inference_class_detection)"""
 
 # initialize the output frame and a lock used to ensure thread-safe
 # exchanges of the output frames (useful when multiple browsers/tabs are viewing the stream)
@@ -160,15 +144,11 @@ def flaw_detection():
                     HEIGHT_OF_OBJ = round(height * one_pixel_length * 10, 2)
                     WIDTH_OF_OBJ = round(width * one_pixel_length * 10, 2)
                     COUNT_OBJECT += 1
-                    frame_orient = frame.copy()
-                    frame_clr = frame.copy()
-                    frame_crack = frame.copy()
-                    frame_nodefect = frame.copy()
                     OBJECT_COUNT = "Object Number : {}".format(COUNT_OBJECT)
 
                     # Check for the orientation of the object
-                    orientation_flag, orientation_defect = \
-                        detect_orientation(frame_orient, cnt)
+                    frame, orientation_flag, orientation_defect = \
+                        detect_orientation(frame, cnt)
                     if orientation_flag:
                         value = 1
                         data_base.append(value)
@@ -178,7 +158,7 @@ def flaw_detection():
                         data_base.append(value)
 
                     # Check for the color defect of the object
-                    color_flag, color_defect = detect_color(frame_clr, cnt)
+                    frame, color_flag, color_defect = detect_color(frame, cnt)
                     if color_flag:
                         value = 1
                         data_base.append(value)
@@ -188,7 +168,7 @@ def flaw_detection():
                         data_base.append(value)
 
                     # Check for the crack defect of the object
-                    crack_flag, crack_defect = detect_crack(frame_crack, cnt)
+                    frame, crack_flag, crack_defect = detect_crack(frame, cnt)
                     if crack_flag:
                         value = 1
                         data_base.append(value)
@@ -205,10 +185,10 @@ def flaw_detection():
                         OBJ_DEFECT.append(defect)
                         print("No defect detected in object {}"
                               .format(COUNT_OBJECT))
-                        cv2.putText(frame_nodefect, "Length (mm): {}".format(HEIGHT_OF_OBJ),
+                        cv2.putText(frame, "Length (mm): {}".format(HEIGHT_OF_OBJ),
                                     (5, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75,
                                     (255, 255, 255), 2)
-                        cv2.putText(frame_nodefect, "Width (mm): {}".format(WIDTH_OF_OBJ),
+                        cv2.putText(frame, "Width (mm): {}".format(WIDTH_OF_OBJ),
                                     (5, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.75,
                                     (255, 255, 255), 2)
                         cv2.imwrite("{}/esa_storage/Nodefect_{}.png".format(
@@ -223,23 +203,6 @@ def flaw_detection():
             if not OBJ_DEFECT:
                 continue
 
-            # Create json_body to store the defects
-            else:
-                json_body = {
-                    "measurement": "obj_flaw_detector",
-                    "tags": {
-                        "user": "User"
-                    },
-
-                    "fields": {
-                        "Object Number": COUNT_OBJECT,
-                        "Orientation": data_base[0],
-                        "Color": data_base[1],
-                        "Crack": data_base[2],
-                        "No defect": data_base[3]
-                    }
-                }
-
         all_defects = " ".join(OBJ_DEFECT)
         cv2.putText(frame, "Press q to quit", (410, 50),
                     cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
@@ -251,12 +214,7 @@ def flaw_detection():
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
         cv2.putText(frame, "Width (mm): {}".format(WIDTH_OF_OBJ), (5, 110),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-        """cv2.imshow("Out", frame)
-        keypressed = cv2.waitKey(40)
-        if keypressed == 113 or keypressed == 81:
-            break"""
 
-#adding the below code embeds the video in the video_feed page but fails to show overlays on the faults
         ret, buffer = cv2.imencode('.png', frame)
         frame=buffer.tobytes()
 
@@ -265,8 +223,6 @@ def flaw_detection():
 
     cv2.destroyAllWindows()
     cap.release()
-
-
 
 def get_orientation(contours):
     """
@@ -322,10 +278,8 @@ def detect_orientation(frame, contours, base_dir = os.getcwd()):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
         cv2.putText(frame, "Width (mm): {}".format(WIDTH_OF_OBJ), (5, 110),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-        cv2.imshow("Out", frame)
-        cv2.waitKey(2000)
-    return defect_flag, defect
 
+    return frame, defect_flag, defect
 
 def detect_color(frame, cnt, base_dir = os.getcwd()):
     """
@@ -384,10 +338,7 @@ def detect_color(frame, cnt, base_dir = os.getcwd()):
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
         cv2.putText(frame, "Width (mm): {}".format(WIDTH_OF_OBJ), (5, 110),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-        cv2.imshow("Out", frame)
-        cv2.waitKey(2000)
-    return color_flag, defect
-
+    return frame, color_flag, defect
 
 def detect_crack(frame, cnt, base_dir = os.getcwd()):
     """
@@ -441,11 +392,7 @@ def detect_crack(frame, cnt, base_dir = os.getcwd()):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
             cv2.putText(frame, "Width (mm): {}".format(WIDTH_OF_OBJ), (5, 110),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-            cv2.imshow("Out", frame)
-            cv2.waitKey(2000)
-    return defect_flag, defect
-
-
+    return frame, defect_flag, defect
 
 def stream(frameCount):
     global outputFrame, lock
@@ -463,7 +410,6 @@ def stream(frameCount):
                 continue 
     else:
         print('Camera open failed')
-
 
 def store_jpg_frame(frame_data):
     current_time = datetime.datetime.now()
@@ -500,8 +446,6 @@ if __name__ == '__main__':
         help="# of frames used to construct the background model")
     args = vars(ap.parse_args())
 
-
-
     input_stream = source
     cap = cv2.VideoCapture(input_stream)
     if not cap.isOpened():
@@ -509,7 +453,6 @@ if __name__ == '__main__':
         sys.exit(0)
     fps = cap.get(cv2.CAP_PROP_FPS)
     delay = (int)(1000 / fps)
-
 
     one_pixel_length = 0.0264583333
 
@@ -522,13 +465,12 @@ if __name__ == '__main__':
     """flaw_detection()"""
  
     # start the flask app
-    app.run(host=args["ip"], port=args["port"], debug=True,
-        threaded=True, use_reloader=False)
-    
+    app.run(host=args["ip"], port=args["port"], debug=True, threaded=True, use_reloader=False)
 
     t = threading.Thread(target=stream, args=(args["frame_count"],))
     t.daemon = True
     t.start()
+
 # release the video stream pointer
 cap.release()
 cv2.destroyAllWindows()
