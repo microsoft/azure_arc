@@ -2362,7 +2362,7 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-#Deploy-Prometheus
+Deploy-Prometheus
 
 ##############################################################
 # Creating bookmarks
