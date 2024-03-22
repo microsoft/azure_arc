@@ -1861,11 +1861,13 @@ function Deploy-Prometheus {
     (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso.png"' | Set-Content $_.FullName
     }
 
+    Write-Host "[$(Get-Date -Format t)] INFO: Reset Grafana UI." -ForegroundColor Gray
     # Reset Grafana UI
     Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
     (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
     }
 
+    Write-Host "[$(Get-Date -Format t)] INFO: Reset Grafana Password." -ForegroundColor Gray
     # Reset Grafana Password
     $Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
     grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
