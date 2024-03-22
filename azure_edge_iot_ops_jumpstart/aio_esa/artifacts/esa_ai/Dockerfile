@@ -1,5 +1,3 @@
-#operator api token SX1YKEAcTQqvEQYcGCGq3vzZJin8NkW1xEW2eIP6Kb9hVVhQ_6rA-0HhrRsfsm0uMjLgselkheCP9hq4eViOWg==
-
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim-buster
 
@@ -15,15 +13,11 @@ RUN apt-get update --fix-missing && \
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
-
-
 #Install torch and torchvision CPU only versions
 RUN pip3 install torch==1.8.0+cpu torchvision==0.9.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
-
 
 # Make port 80 available to the world outside this container
 EXPOSE 8000
