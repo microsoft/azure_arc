@@ -8,8 +8,8 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
-//@description('Azure service principal object id')
-//param spnObjectId string
+@description('Azure service principal object id')
+param spnObjectId string
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -59,6 +59,9 @@ param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 
 @description('Name of the storage queue')
 param storageQueueName string = 'aioqueue'
+
+@description('Name of the storage queue')
+param containerName string = 'esacontainer'
 
 @description('Name of the event hub')
 param eventHubName string = 'aiohub${namingGuid}'
@@ -136,7 +139,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
-    //spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -174,6 +176,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
+    containerName: containerName
   }
 }
 
