@@ -1769,7 +1769,7 @@ function Deploy-AIO {
         #    $outputFile = Join-Path $deploymentFolder $fileName
         #    Invoke-RestMethod -Uri $_ -OutFile $outputFile
         #}
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json" --release-train dev
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$L1deploymentFolder\config.json" --release-train dev
 
         do {
             az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
@@ -2200,6 +2200,7 @@ $AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
 $AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 $configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
+$L1deploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $industry = $Env:industry
 $websiteUrls = $AgConfig.URLs
 $githubAccount = $Env:githubAccount
