@@ -1825,12 +1825,36 @@ function Deploy-AIO {
 
         ## Adding MQTT load balancer
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
-        $mqListenerService = "aio-mq-dmqtt-frontend"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
     (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
         $kvIndex++
+    }
+}
+
+function Configure-MQTTIpAddress {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
+
+        do {
+            $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+            $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+            $matchingServices = $services.items | Where-Object {
+                $_.metadata.name -match "aio-mq-dmqtt" -and
+                $_.status.phase -notmatch "running"
+            }
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+            Start-Sleep -Seconds 20
+        } while (
+            $null -eq $mqttIp -and $matchingServices.Count -ne 0
+        )
+
+        Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
+            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
+        }
     }
 }
 
@@ -2194,6 +2218,7 @@ $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
 $aioNamespace = "azure-iot-operations"
+$mqListenerService = "aio-mq-dmqtt-frontend"
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $appsRepo = "jumpstart-agora-apps"
@@ -2273,7 +2298,7 @@ Deploy-VirtualizationInfrastructure
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
 if ($industry -eq "retail") {
-    Deploy-AzContainerRegistry    
+    Deploy-AzContainerRegistry
 }
 
 #####################################################################
@@ -2339,24 +2364,7 @@ if ($industry -eq "manufacturing") {
 # Get MQ IP address
 ##############################################################
 if ($industry -eq "manufacturing") {
-    Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
-
-    do {
-        $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-        $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -match "aio-mq-dmqtt" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $null -eq $mqttIp -and $matchingServices.Count -ne 0
-    )
-
-    Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
-        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
-    }
+    Configure-MQTTIpAddress
 }
 
 #####################################################################
