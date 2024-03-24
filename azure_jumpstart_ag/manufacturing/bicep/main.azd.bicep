@@ -3,7 +3,7 @@ param spnClientId string = ''
 
 @description('Azure service principal client secret')
 @secure()
-param spnClientSecret string = ''
+param spnClientSecret string = newGuid()
 
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string = ''
@@ -19,13 +19,13 @@ param location string = resourceGroup().location
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Username for Windows account')
-param windowsAdminUsername string = 'arcdemo'
+param windowsAdminUsername string = 'Agora'
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string = 'ArcPassword123!!'
+param windowsAdminPassword string
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
@@ -37,11 +37,11 @@ param githubAccount string = 'microsoft'
 param githubBranch string = 'ag_manufacturing'
 
 @description('Choice to deploy Bastion to connect to the client VM')
-param deployBastion bool = false
+param deployBastion bool
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string = 'null'
+param githubUser string = 'Microsoft'
 
 //@description('GitHub Personal access token for the user account')
 //@minLength(1)
@@ -88,7 +88,7 @@ param aioStorageAccountName string = 'aiostg${namingGuid}'
 param adxClusterName string = 'agadx${namingGuid}'
 
 @description('The custom location RPO ID')
-param customLocationRPOID string = 'null'
+param customLocationRPOID string = ''
 
 @minLength(5)
 @maxLength(50)

@@ -85,7 +85,7 @@ Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) 
 }
 
 Function Get-AzAvailablePublicIpAddress ($location, $subscriptionId, $minPublicIP = 0) {
-    
+
     $accessToken = az account get-access-token --query accessToken -o tsv
     $headers = @{
         "Authorization" = "Bearer $accessToken"
