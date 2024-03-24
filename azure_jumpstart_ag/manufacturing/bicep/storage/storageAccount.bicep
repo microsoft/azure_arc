@@ -36,8 +36,10 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
 }
 
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  parent:storageAccount
   name: containerName
   properties: {}
+  dependsOn: [storageAccount]
 }
 
 output queueName string = storageQueueName
