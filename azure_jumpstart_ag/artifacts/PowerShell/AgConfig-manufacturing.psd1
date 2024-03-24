@@ -39,16 +39,11 @@
     AzureProviders          = @(
         "Microsoft.Kubernetes",
         "Microsoft.KubernetesConfiguration",
-        "Microsoft.ExtendedLocation",
         "Microsoft.HybridCompute",
         "Microsoft.GuestConfiguration",
         "Microsoft.HybridConnectivity",
         "Microsoft.DeviceRegistry",
-        "Microsoft.EventGrid",
-        "Microsoft.ExtendedLocation",
-        "Microsoft.IoTOperationsOrchestrator",
-        "Microsoft.IoTOperationsMQ",
-        "Microsoft.IoTOperationsDataProcessor"
+        "Microsoft.EventGrid"
     )
 
     # Az CLI required extensions
