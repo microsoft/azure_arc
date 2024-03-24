@@ -105,13 +105,14 @@ switch ($industry) {
   "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
 }
 
-$AgConfig         = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$AgDirectory      = $AgConfig.AgDirectories["AgDir"]
-$AgToolsDir       = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir       = $AgConfig.AgDirectories["AgIconDir"]
-$AgPowerShellDir  = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgMonitoringDir  = $AgConfig.AgDirectories["AgMonitoringDir"]
-$websiteUrls      = $AgConfig.URLs
+$AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$AgDirectory        = $AgConfig.AgDirectories["AgDir"]
+$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
+$AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
+$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
+$AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
+$AgMonitoringDir    = $AgConfig.AgDirectories["AgMonitoringDir"]
+$websiteUrls        = $AgConfig.URLs
 
 function BITSRequest {
   Param(
@@ -232,6 +233,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additiona
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
+Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
 if($industry -eq "retail"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
