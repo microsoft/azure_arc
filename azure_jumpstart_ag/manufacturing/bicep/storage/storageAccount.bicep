@@ -11,6 +11,7 @@ param kind string = 'StorageV2'
 param skuName string = 'Standard_LRS'
 
 param storageQueueName string = 'aioQueue'
+param containerName string = 'esacontainer'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
@@ -34,6 +35,11 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
   name: storageQueueName
 }
 
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  parent: storageAccount
+  name: containerName
+  properties: {}
+}
 
 output queueName string = storageQueueName
 output storageAccountId string = storageAccount.id
