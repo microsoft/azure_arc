@@ -1,0 +1,35 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: example-static
+  labels:
+    app: example-static
+  namespace: azure-iot-operations
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-static
+  template:
+    metadata:
+      labels:
+        app: example-static
+    spec:
+      containers:
+        - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
+          name: mariner
+          command:
+            - sleep
+            - infinity
+          volumeMounts:
+            ### This name must match the volumes.name attribute below ###
+            - name: blob
+              ### This mountPath is where the PVC will be attached to the pod's filesystem ###
+              mountPath: "/mnt/blob"
+      volumes:
+        ### User-defined 'name' that will be used to link the volumeMounts. This name must match volumeMounts.name as specified above. ###
+        - name: blob
+          persistentVolumeClaim:
+            ### This claimName must refer to the PVC resource 'name' as defined in the PVC config. This name will match what your PVC resource was actually named. ###
+            claimName: esacontainerpvc

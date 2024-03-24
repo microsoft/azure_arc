@@ -1681,8 +1681,6 @@ function Deploy-AIO {
         catch {
             Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
         }
-        # increase the maximum number of files
-        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
 
         Write-Host "Configuring firewall specific to AIO"
         Write-Host "Add firewall rule for AIO MQTT Broker"
@@ -1752,27 +1750,8 @@ function Deploy-AIO {
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
 
-        # Enable Open Service Mesh extension on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
-        $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
-        
-        # Enable ESA extension on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $deploymentFolder = "C:\Ag\L1Files"
-        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
-        $response = Invoke-RestMethod -Uri $githubApiUrl
-        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-        $fileUrls | ForEach-Object {
-            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-            $outputFile = Join-Path $deploymentFolder $fileName
-            Invoke-RestMethod -Uri $_ -OutFile $outputFile
-        }
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
-
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $env:spnObjectID --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1793,7 +1772,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $env:spnObjectID --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -1834,6 +1813,41 @@ function Deploy-AIO {
     }
 }
 
+function Deploy-ESA {
+    # increase the maximum number of files
+    Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
+    
+    # Enable Open Service Mesh extension on the Arc-enabled cluster
+    Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+
+    $ESAsecret = az storage account keys list --resource-group $resourceGroup -n $stagingStorageAccountName --query "[0].value" -o tsv
+
+    # Enable ESA extension on the Arc-enabled cluster
+    Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+    $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+    $deploymentFolder = $AgESAdir
+    $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
+    $response = Invoke-RestMethod -Uri $githubApiUrl
+    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+    $fileUrls | ForEach-Object {
+        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        $outputFile = Join-Path $deploymentFolder $fileName
+        Invoke-RestMethod -Uri $_ -OutFile $outputFile
+    }
+    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
+    kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$ESASecret --from-literal=azurestorageaccountname=$stagingStorageAccountName
+    
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
+    kubectl apply -f "$deploymentFolder\pv.yaml"
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
+    kubectl apply -f "$deploymentFolder\pvc.yaml"
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
+    kubectl apply -f "$deploymentFolder\configPod.yaml"
+
+}
 function Deploy-Prometheus {
     $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
     $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
@@ -2187,13 +2201,13 @@ $spnClientId = $Env:spnClientId
 $spnClientSecret = $Env:spnClientSecret
 $spnTenantId = $Env:spnTenantId
 $subscriptionId = $Env:subscriptionId
+$spnObjectId = $Env:spnObjectId
 $adminUsername = $Env:adminUsername
 $templateBaseUrl = $Env:templateBaseUrl
 $adxClusterName = $Env:adxClusterName
 $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
-$aioNamespace = "azure-iot-operations"
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $appsRepo = "jumpstart-agora-apps"
@@ -2208,6 +2222,7 @@ if ($industry -eq "retail") {
 elseif ($industry -eq "manufacturing") {
     $aioNamespace = "azure-iot-operations"
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    $stagingStorageAccountName = $Env:stagingStorageAccountName
 }
 
 
@@ -2331,7 +2346,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 if ($industry -eq "manufacturing") {
     Deploy-AIO
     #Deploy-InfluxDb
-    #Deploy-ESA
+    Deploy-ESA
     #Deploy-ManufacturingConfigs
 }
 
