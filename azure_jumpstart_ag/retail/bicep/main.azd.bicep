@@ -1,27 +1,22 @@
 @description('Azure service principal client id')
-param spnClientId string
+param spnClientId string = ''
 
 @description('Azure service principal client secret')
 @secure()
-param spnClientSecret string
+param spnClientSecret string = newGuid()
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
-
-@minLength(1)
-@maxLength(77)
-@description('Prefix for resource group, i.e. {name}-rg')
-param envName string
+param spnTenantId string = ''
 
 @description('Location for all resources')
-param location string
+param location string = resourceGroup().location
 
 @maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Username for Windows account')
-param windowsAdminUsername string
+param windowsAdminUsername string = 'Agora'
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
@@ -30,7 +25,7 @@ param windowsAdminUsername string
 param windowsAdminPassword string
 
 @description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
@@ -46,12 +41,12 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string
+param githubUser string  = 'Microsoft'
 
 @description('GitHub Personal access token for the user account')
 @minLength(1)
 @secure()
-param githubPAT string
+param githubPAT string = newGuid()
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
@@ -77,9 +72,6 @@ param adxClusterName string = 'agadx${namingGuid}'
 @description('The name of the Azure Data Explorer POS database')
 param posOrdersDBName string = 'Orders'
 
-@description('The agora industry to be deployed')
-param industry string = 'retail'
-
 @minLength(5)
 @maxLength(50)
 @description('Name of the Azure Container Registry')
@@ -88,18 +80,13 @@ param acrName string = 'agacr${namingGuid}'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
+@description('The agora industry to be deployed')
+param industry string = 'retail'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
-
-targetScope = 'subscription'
-
-resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: '${envName}-rg'
-  location: location
-}
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
-  scope: rg
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
@@ -108,7 +95,6 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
 
 module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
-  scope: rg
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
     subnetNameCloudAksStaging: subnetNameCloudAksStaging
@@ -120,7 +106,6 @@ module networkDeployment 'mgmt/network.bicep' = {
 
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
-  scope: rg
   params: {
     location: location
   }
@@ -128,7 +113,6 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 
 module kubernetesDeployment 'kubernetes/aks.bicep' = {
   name: 'kubernetesDeployment'
-  scope: rg
   params: {
     aksStagingClusterName: aksStagingClusterName
     virtualNetworkNameCloud: networkDeployment.outputs.virtualNetworkNameCloud
@@ -136,14 +120,13 @@ module kubernetesDeployment 'kubernetes/aks.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
-    acrName: acrName
     sshRSAPublicKey: sshRSAPublicKey
+    acrName: acrName
   }
 }
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
-  scope: rg
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
@@ -174,7 +157,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
 
 module iotHubDeployment 'data/iotHub.bicep' = {
   name: 'iotHubDeployment'
-  scope: rg
   params: {
     location: location
     iotHubName: iotHubName
@@ -183,7 +165,6 @@ module iotHubDeployment 'data/iotHub.bicep' = {
 
 module adxDeployment 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
-  scope: rg
   params: {
     location: location
     adxClusterName: adxClusterName
@@ -196,21 +177,9 @@ module adxDeployment 'data/dataExplorer.bicep' = {
 
 module cosmosDBDeployment 'data/cosmosDB.bicep' = {
   name: 'cosmosDBDeployment'
-  scope: rg
   params: {
     location: location
     accountName: accountName
     posOrdersDBName: posOrdersDBName
   }
 }
-
-output AZURE_TENANT_ID string = tenant().tenantId
-output AZURE_RESOURCE_GROUP string = rg.name
-
-output NAMING_GUID string = namingGuid
-output RDP_PORT string = rdpPort
-
-output ADX_CLUSTER_NAME string = adxClusterName
-output IOT_HUB_NAME string = iotHubName
-output COSMOS_DB_NAME string = accountName
-output ACR_NAME string = acrName
