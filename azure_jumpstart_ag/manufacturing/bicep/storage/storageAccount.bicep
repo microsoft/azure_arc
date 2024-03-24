@@ -35,10 +35,13 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
   name: storageQueueName
 }
 
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
-  name: containerName
-  properties: {}
+resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  name: '${storageAccountName}/default/${containerName}'
+  dependsOn: [
+    storageAccount
+  ]
 }
+
 
 output queueName string = storageQueueName
 output storageAccountId string = storageAccount.id
