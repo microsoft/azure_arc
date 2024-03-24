@@ -31,19 +31,19 @@ param bastionHostName string = 'AIO-Demo-Bastion'
 param vmSize string = 'Standard_D8s_v3'
 
 @description('Unique SPN app ID')
-param spnClientId string = ''
+param spnClientId string
 
 @description('Unique SPN object ID')
-param spnObjectId string = ''
+param spnObjectId string
 
 @description('Unique SPN password')
 @minLength(12)
 @maxLength(123)
 @secure()
-param spnClientSecret string = newGuid()
+param spnClientSecret string
 
 @description('Unique SPN tenant ID')
-param spnTenantId string = ''
+param spnTenantId string
 
 @description('Azure subscription ID')
 param subscriptionId string = subscription().subscriptionId
@@ -93,7 +93,7 @@ param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 param adxClusterName string = 'aioadx${namingGuid}'
 
 @description('The custom location RPO ID')
-param customLocationRPOID string = ''
+param customLocationRPOID string
 
 @description('The name of the Azure Key Vault')
 param akvName string = 'aioakv${namingGuid}'
