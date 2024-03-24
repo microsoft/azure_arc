@@ -1756,20 +1756,20 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
         $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
-        
+
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-        $deploymentFolder = "C:\Ag\L1Files"
-        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
-        $response = Invoke-RestMethod -Uri $githubApiUrl
-        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-        $fileUrls | ForEach-Object {
-            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-            $outputFile = Join-Path $deploymentFolder $fileName
-            Invoke-RestMethod -Uri $_ -OutFile $outputFile
-        }
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
+        #$repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+        #$deploymentFolder = "C:\Ag\L1Files"
+        #$githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
+        #$response = Invoke-RestMethod -Uri $githubApiUrl
+        #$fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+        #$fileUrls | ForEach-Object {
+        #    $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+        #    $outputFile = Join-Path $deploymentFolder $fileName
+        #    Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        #}
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json" --release-train dev
 
         do {
             az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
