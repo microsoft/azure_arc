@@ -15,7 +15,6 @@
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgMonitoringDir   = "C:\Ag\Monitoring"
-        AgESAdir          = "C:\Ag\ESA"
     }
 
     # Required URLs
