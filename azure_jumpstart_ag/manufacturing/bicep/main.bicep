@@ -8,10 +8,10 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
-@description('Azure service principal object id')
+@description('Azure service principal Object id')
 param spnObjectId string
 
-@description('Azure service principal object id')
+@description('Azure service principal Subscription id')
 param subscriptionId string
 
 @description('Location for all resources')
@@ -142,6 +142,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
+    spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -159,6 +160,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
     industry: industry
+    aioStorageAccountName: aioStorageAccountName
   }
 }
 

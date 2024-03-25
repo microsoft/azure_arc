@@ -1582,6 +1582,10 @@ function Deploy-InfluxDb {
     $influxdbYaml = "$aioToolsDir\influxdb.yml"
     $influxImportYaml = "$aioToolsDir\influxdb-import-dashboard.yml"
     $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
+    $esapvJson = "$aioToolsDir\config.json"
+    $esapvYaml = "$aioToolsDir\esapv.yml"
+    $esapvcYaml = "$aioToolsDir\esapvc.yml"
+    $esaappYaml = "$aioToolsDir\configPod.yml"
 
     do {
         $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
@@ -1751,7 +1755,7 @@ function Deploy-AIO {
             --only-show-errors
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $env:spnObjectID --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1772,7 +1776,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $env:spnObjectID --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -1820,32 +1824,38 @@ function Deploy-ESA {
     # Enable Open Service Mesh extension on the Arc-enabled cluster
     Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
     az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+    
+    # Get the storage Account secret
+    $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
 
-    $ESAsecret = az storage account keys list --resource-group $resourceGroup -n $stagingStorageAccountName --query "[0].value" -o tsv
+    # Inject params into the yaml file for PV
+    (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'namespace', $aioNamespace | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'esaContainerName', $esaContainerName | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'esaSecretName', $ESAsecret | Set-Content $esapvYaml
+    
+    # Inject params into the yaml file for PVC
+    (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
+    (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
+
+    # Inject params into the yaml file for ESA App
+    (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
+    (Get-Content $esaappYaml ) -replace 'namespace', $aioNamespace | Set-Content $esaappYaml
+    (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
 
     # Enable ESA extension on the Arc-enabled cluster
     Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-    $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
-    $deploymentFolder = $AgESAdir
-    $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
-    $response = Invoke-RestMethod -Uri $githubApiUrl
-    $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
-    $fileUrls | ForEach-Object {
-        $fileName = $_.Substring($_.LastIndexOf("/") + 1)
-        $outputFile = Join-Path $deploymentFolder $fileName
-        Invoke-RestMethod -Uri $_ -OutFile $outputFile
-    }
-    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
-    kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$ESASecret --from-literal=azurestorageaccountname=$stagingStorageAccountName
+    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
+    kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
     
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
-    kubectl apply -f "$deploymentFolder\pv.yaml"
+    kubectl apply -f $esapvYaml
 
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
-    kubectl apply -f "$deploymentFolder\pvc.yaml"
+    kubectl apply -f $esapvcYaml
 
     Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
-    kubectl apply -f "$deploymentFolder\configPod.yaml"
+    kubectl apply -f $esaappYaml
 
 }
 function Deploy-Prometheus {
@@ -2223,6 +2233,7 @@ elseif ($industry -eq "manufacturing") {
     $aioNamespace = "azure-iot-operations"
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $stagingStorageAccountName = $Env:stagingStorageAccountName
+    $aioStorageAccountName = $Env:aioStorageAccountName
 }
 
 

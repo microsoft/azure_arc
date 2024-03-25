@@ -16,6 +16,10 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+
+@description('Name of the storage account')
+param aioStorageAccountName string = 'aiostg${namingGuid}'
+
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
   Project: 'Jumpstart_Agora'
@@ -27,8 +31,11 @@ param subnetId string
 @description('Client id of the service principal')
 param spnClientId string
 
-//@description('Azure service principal object id')
-//param spnObjectId string
+@description('Azure service principal object id')
+param spnObjectId string
+
+@description('Azure service principal subscription id')
+param subscriptionId string
 
 @description('Client secret of the service principal')
 @secure()
@@ -195,7 +202,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -industry ${industry}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -subscriptionId ${subscriptionId} -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -industry ${industry} -aioStorageAccountName ${aioStorageAccountName}'
     }
   }
 }

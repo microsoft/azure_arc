@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim 
 metadata:
     ### CREATE A NAME FOR YOUR PVC ###
-    name: esacontainerpvc
+    name: esaPVCName
     ### USE A NAMESPACE THAT MATCHES YOUR INTENDED CONSUMING POD OR "DEFAULT" ###
     namespace: azure-iot-operations
 spec: 
@@ -14,7 +14,7 @@ spec:
     storageClassName: esa
     volumeMode: Filesystem
     ### THIS NAME IS FROM YOUR PV CONFIG ###
-    volumeName: esacontainerpv
+    volumeName: esaPVName
 status: 
     accessModes: 
         - ReadWriteMany 

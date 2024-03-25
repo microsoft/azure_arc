@@ -25,7 +25,8 @@ param (
   [string]$adxClusterName,
   [string]$namingGuid,
   [string]$industry,
-  [string]$customLocationRPOID
+  [string]$customLocationRPOID,
+  [string]$aioStorageAccountName
 )
 
 ##############################################################
@@ -62,6 +63,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -109,7 +112,6 @@ switch ($industry) {
 
 $AgConfig         = Import-PowerShellDataFile -Path $ConfigurationDataFile
 $AgDirectory      = $AgConfig.AgDirectories["AgDir"]
-$AgESAdir         = $AgConfig.AgDirectories["AgESAdir"]
 $AgToolsDir       = $AgConfig.AgDirectories["AgToolsDir"]
 $AgIconsDir       = $AgConfig.AgDirectories["AgIconDir"]
 $AgPowerShellDir  = $AgConfig.AgDirectories["AgPowerShellDir"]
@@ -248,10 +250,10 @@ elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/ESA/config.json") -OutFile "$AgESAdir\config.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/ESA/pv.yaml") -OutFile "$AgESAdir\pv.yaml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/ESA/pvc.yaml") -OutFile "$AgESAdir\pvc.yaml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/ESA/configPod.yaml") -OutFile "$AgESAdir\configPod.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/config.json") -OutFile "$AgToolsDir\config.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pv.yaml") -OutFile "$AgToolsDir\pv.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pvc.yaml") -OutFile "$AgToolsDir\pvc.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/configPod.yaml") -OutFile "$AgToolsDir\configPod.yaml"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }

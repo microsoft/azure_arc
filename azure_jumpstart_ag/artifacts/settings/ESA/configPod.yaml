@@ -1,20 +1,20 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: example-static
+  name: appname
   labels:
-    app: example-static
-  namespace: azure-iot-operations
+    app: appname
+  namespace: namespace
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: example-static
+      app: appname
   template:
     metadata:
       labels:
-        app: example-static
+        app: appname
     spec:
       containers:
         - image: mcr.microsoft.com/cbl-mariner/base/core:2.0
@@ -32,4 +32,4 @@ spec:
         - name: blob
           persistentVolumeClaim:
             ### This claimName must refer to the PVC resource 'name' as defined in the PVC config. This name will match what your PVC resource was actually named. ###
-            claimName: esacontainerpvc
+            claimName: esaPVCName
