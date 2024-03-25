@@ -1827,6 +1827,12 @@ function Deploy-ESA {
     
     # Get the storage Account secret
     $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
+    
+    # Define names for ESA Yamls
+    $esaPVName = "esapv"
+    $esaContainerName = "esacontainer"
+    $esaPVCName = "esapvc"
+    $esaAppName = "esaapp"
 
     # Inject params into the yaml file for PV
     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
@@ -1836,6 +1842,7 @@ function Deploy-ESA {
     
     # Inject params into the yaml file for PVC
     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
+    (Get-Content $esapvcYaml ) -replace 'namespace', $aioNamespace | Set-Content $esapvcYaml
     (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
 
     # Inject params into the yaml file for ESA App

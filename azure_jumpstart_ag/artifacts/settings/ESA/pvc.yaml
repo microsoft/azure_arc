@@ -4,7 +4,7 @@ metadata:
     ### CREATE A NAME FOR YOUR PVC ###
     name: esaPVCName
     ### USE A NAMESPACE THAT MATCHES YOUR INTENDED CONSUMING POD OR "DEFAULT" ###
-    namespace: azure-iot-operations
+    namespace: namespace
 spec: 
     accessModes: 
         - ReadWriteMany 
