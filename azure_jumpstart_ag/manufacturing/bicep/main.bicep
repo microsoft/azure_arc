@@ -143,6 +143,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnObjectId: spnObjectId
+    subscriptionId: subscriptionId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
