@@ -65,7 +65,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
