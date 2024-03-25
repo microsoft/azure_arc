@@ -1,3 +1,23 @@
+apiVersion: v1 
+kind: PersistentVolumeClaim 
+metadata:
+    name: esa-pvc
+    namespace: default
+spec: 
+    accessModes: 
+        - ReadWriteMany 
+    resources: 
+        requests: 
+            storage: 5Gi 
+    storageClassName: esa
+    volumeMode: Filesystem
+    volumeName: esa-pv
+status: 
+    accessModes: 
+        - ReadWriteMany 
+    capacity: 
+        storage: 5Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,13 +39,22 @@ spec:
             - containerPort: 8000
           env:
             - name: RTSP_URL
-              value: rtsp://virtual-rtsp:554/stream
+              value: rtsp://virtual-rtsp:8554/stream
             - name: LOCAL_STORAGE
-              value: /tmp
-            - name: INFERENCE_CLASS_DETECTION
-              value: cup
-            - name: CLASS_NAMES
-              value: "bottle, person, cup, fork, knife"
+              value: /app/esa_storage
+          volumeMounts:
+            ### This name must match the volumes.name attribute below ###
+            - name: blob
+              ### This mountPath is where the PVC will be attached to the pod's filesystem ###
+              mountPath: "/app/esa_storage"
+      volumes:
+        ### User-defined 'name' that will be used to link the volumeMounts. This name must match volumeMounts.name as specified above. ###
+        - name: blob
+          persistentVolumeClaim:
+            ### This claimName must refer to the PVC resource 'name' as defined in the PVC config. This name will match what your PVC resource was actually named. ###
+            claimName: esa-pvc
+
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -36,16 +65,71 @@ spec:
   selector:
     matchLabels:
       app: virtual-rtsp
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
       labels:
         app: virtual-rtsp
     spec:
+      initContainers:
+        - name: init-samples
+          image: busybox
+          command:
+          - wget
+          - "-O"
+          - "/samples/bolt-detection.mp4"
+          - https://github.com/ldabas-msft/jumpstart-resources/raw/main/bolt-detection.mp4
+          volumeMounts:
+          - name: tmp-samples
+            mountPath: /samples
       containers:
-      - name: virtual-rtsp
-        image: kerberos/virtual-rtsp:1.0.6
-        ports:
-        - containerPort: 8554
-        env:
-        - name: SOURCE_URL
-          value: "file:///samples/highway-10min-640x480-1.mp4"
+        - name: virtual-rtsp
+          image: "agoraarmbladev.azurecr.io/kerberos/virtual-rtsp:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8554
+          env:
+            - name: SOURCE_URL
+              value: "file:///samples/bolt-detection.mp4"
+          volumeMounts:
+            - name: tmp-samples
+              mountPath: /samples
+      volumes:
+        - name: tmp-samples
+          emptyDir: { }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: virtual-rtsp
+  labels:
+    app: virtual-rtsp
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8554
+      targetPort: 8554
+      name: rtsp
+      protocol: TCP
+  selector:
+    app: virtual-rtsp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: esa-webserver-svc
+  labels:
+    app: esa-webserver
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: esa-webserver
