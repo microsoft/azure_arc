@@ -1830,14 +1830,13 @@ function Deploy-ESA {
     
     # Define names for ESA Yamls
     $esaPVName = "esapv"
-    $esaContainerName = "esacontainer"
     $esaPVCName = "esapvc"
     $esaAppName = "esaapp"
 
     # Inject params into the yaml file for PV
     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'namespace', $aioNamespace | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaContainerName', $esaContainerName | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'esaSecretName', $ESAsecret | Set-Content $esapvYaml
     
     # Inject params into the yaml file for PVC
@@ -2218,7 +2217,6 @@ $spnClientId = $Env:spnClientId
 $spnClientSecret = $Env:spnClientSecret
 $spnTenantId = $Env:spnTenantId
 $subscriptionId = $Env:subscriptionId
-$spnObjectId = $Env:spnObjectId
 $adminUsername = $Env:adminUsername
 $templateBaseUrl = $Env:templateBaseUrl
 $adxClusterName = $Env:adxClusterName
@@ -2241,6 +2239,8 @@ elseif ($industry -eq "manufacturing") {
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $stagingStorageAccountName = $Env:stagingStorageAccountName
     $aioStorageAccountName = $Env:aioStorageAccountName
+    $spnObjectId = $Env:spnObjectId
+    $stcontainerName = $Env:stcontainerName
 }
 
 

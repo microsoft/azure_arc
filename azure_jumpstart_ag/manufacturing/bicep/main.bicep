@@ -90,6 +90,9 @@ param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
+@description('The name of ESA container in Storage Account')
+param stcontainerName string = 'esacontainer'
+
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
@@ -162,6 +165,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     customLocationRPOID: customLocationRPOID
     industry: industry
     aioStorageAccountName: aioStorageAccountName
+    stcontainerName: stcontainerName
   }
 }
 
@@ -182,7 +186,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    containerName: containerName
+    stcontainerName: stcontainerName
   }
 }
 
