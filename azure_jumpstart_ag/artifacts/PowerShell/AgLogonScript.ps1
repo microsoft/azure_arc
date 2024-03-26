@@ -1882,7 +1882,21 @@ function Deploy-Prometheus {
 
     # Reset Grafana Password
     $Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-    grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    $retryCount = 5
+    $retryDelay = 30
+    do {
+        try {
+            grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+            $retryCount = 0
+        }
+        catch {
+            $retryCount--
+            if ($retryCount -gt 0) {
+                Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                Start-Sleep -Seconds $retryDelay
+            }
+        }
+    } while ($retryCount -gt 0)
 
     # Get Grafana Admin credentials
     $adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
@@ -2361,7 +2375,7 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-#Deploy-Prometheus
+Deploy-Prometheus
 
 ##############################################################
 # Creating bookmarks
