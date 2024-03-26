@@ -74,6 +74,18 @@
                 "description": "Unique SPN app ID"
             }
         },
+        "storageAccountName": {
+        "type": "string",
+        "metadata": {
+            "description": "The name of the Azure Storage account"
+            }
+        },
+        "storageContainer": {
+        "type": "string",
+        "metadata": {
+            "description": "The name of the Azure Storage container within the specified account"
+            }
+        },
         "password": {
             "type": "securestring",
             "metadata": {
