@@ -154,7 +154,7 @@
         }
     },
     "variables": {
-        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_single_akri/arm_template/')]",
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_edge_iot_ops_jumpstart/aio_esa/')]",
         "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
