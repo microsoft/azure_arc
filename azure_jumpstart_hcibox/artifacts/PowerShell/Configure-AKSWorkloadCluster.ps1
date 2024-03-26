@@ -41,7 +41,7 @@ Invoke-Command -ComputerName "$($HCIBoxConfig.NodeHostConfig[0].Hostname).$($HCI
     $dnsServers = $HCIBoxConfig.AKSDNSIP
     $vlanid = $HCIBoxConfig.AKSVLAN
 
-    az stack-hci-vm network lnet create --subscription $using:subId --resource-group $using:rg --custom-location $customLocationID --location $using:location --name $using:lnetName --vm-switch-name $switchName --ip-allocation-method "static" --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
+    az stack-hci-vm network lnet create --subscription $using:subId --resource-group $using:rg --custom-location $customLocationID --location $using:location --name $using:lnetName --vm-switch-name $switchName --ip-allocation-method "static" --ip-pool-start $HCIBoxConfig.AKSNodeStartIP --ip-pool-end $HCIBoxConfig.AKSNodeEndIP --address-prefixes $addressPrefixes --gateway $gateway --dns-servers $dnsServers --vlan $vlanid
 }
 $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Continue"
