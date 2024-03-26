@@ -8,7 +8,7 @@ param workbookType string = 'workbook'
 param workbookSourceId string = 'azure monitor'
 
 @description('The unique guid for this workbook instance')
-param workbookId string = newGuid()
+param workbookId string = 'c5c6a9e5-74fc-465a-9f11-1dd10aad501b'
 
 resource workbookId_resource 'microsoft.insights/workbooks@2022-04-01' = {
   name: workbookId
