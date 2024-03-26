@@ -63,7 +63,7 @@ if ($env:windowsNode -eq $true) {
     "Version": "$versionAksEdgeConfig",
     "DeploymentType": "SingleMachineCluster",
     "Init": {
-        "ServiceIPRangeSize": 0
+        "ServiceIPRangeSize": 10
     },
     "Network": {
         "NetworkPlugin": "$networkplugin",
@@ -95,7 +95,7 @@ if ($env:windowsNode -eq $true) {
     "Version": "$versionAksEdgeConfig",
     "DeploymentType": "SingleMachineCluster",
     "Init": {
-        "ServiceIPRangeSize": 0
+        "ServiceIPRangeSize": 10
     },
     "Network": {
         "NetworkPlugin": "$networkplugin",
@@ -339,66 +339,6 @@ namespace Win32{
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-
-Write-Host "Checking if local-path storage class is available..."
-$localPathStorageClass = kubectl get storageclass | Select-String -Pattern "local-path"
-if (-not $localPathStorageClass) {
-   Write-Host "Local Path Provisioner not found. Installing..."
-
-# Download the local-path-storage.yaml file
-   $localPathStorageUrl = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
-   $localPathStoragePath = "local-path-storage.yaml"
-   Invoke-WebRequest -Uri $localPathStorageUrl -OutFile $localPathStoragePath
-
-# Apply the local-path-storage.yaml file
-   kubectl apply -f $localPathStoragePath
-   Write-Host "Local Path Provisioner installed successfully."
-} else {
-   Write-Host "Local Path Provisioner is already installed."
-}
-Write-Host "Checking fs.inotify.max_user_instances value..."
-$maxUserInstances = Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "sysctl fs.inotify.max_user_instances" | Select-String -Pattern "fs.inotify.max_user_instances\s+=\s+(\d+)" | ForEach-Object { $_.Matches[0].Groups[1].Value }
-Write-Host "Current fs.inotify.max_user_instances value: $maxUserInstances"
-if ($maxUserInstances -lt 1024) {
-   Write-Host "Increasing fs.inotify.max_user_instances to 1024..."
-   Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
-   Write-Host "fs.inotify.max_user_instances increased to 1024."
-} else {
-   Write-Host "fs.inotify.max_user_instances is already set to 1024 or higher."
-}
-
-
-Write-Host "Installing Open Service Mesh (OSM)..."
-az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
-Write-Host "Open Service Mesh (OSM) installed successfully."
-
-
-
-# Disable ACStor for single-node cluster
-Write-Host "Disabling ACStor for single-node cluster..."
-# Create the config.json file
-$acstorConfig = @{
-    "hydra.acstorController.enabled" = $false
-    "hydra.highAvailability.disk.storageClass" = "local-path"
- }
- $acstorConfigJson = $acstorConfig | ConvertTo-Json -Depth 100
- Set-Content -Path "config.json" -Value $acstorConfigJson
-# Apply the config.json file
-# kubectl apply -f config.json
-Write-Host "ACStor disabled for single-node cluster."
-
-Write-Host "Checking if Edge Storage Accelerator Arc Extension is installed..."
-$extensionExists = az k8s-extension show --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --query "extensionType" --output tsv
-if ($extensionExists -eq "microsoft.edgestorageaccelerator") {
-   Write-Host "Edge Storage Accelerator Arc Extension is already installed."
-} else {
-   Write-Host "Installing Edge Storage Accelerator Arc Extension..."
-   az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "config.json"
-   Write-Host "Edge Storage Accelerator Arc Extension installed successfully."
-}
-
-
-
 # Function to create Kubernetes secret for Azure Storage account
 function Add-AzureStorageAccountSecret {
     param (
@@ -415,34 +355,76 @@ function Add-AzureStorageAccountSecret {
     kubectl create secret generic -n $Namespace $SecretName --from-literal=azurestorageaccountkey="$secretValue" --from-literal=azurestorageaccountname="$StorageAccount"
 }
 
+#Begin ESA Installation. 
+#Documentation: https://aepreviews.ms/docs/edge-storage-accelerator/how-to-install-edge-storage-accelerator/
+Write-Host "Checking if local-path storage class is available..."
+$localPathStorageClass = kubectl get storageclass | Select-String -Pattern "local-path"
+if (-not $localPathStorageClass) {
+   Write-Host "Local Path Provisioner not found. Installing..."
+# Download the local-path-storage.yaml file
+   $localPathStorageUrl = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+   $localPathStoragePath = "local-path-storage.yaml"
+   Invoke-WebRequest -Uri $localPathStorageUrl -OutFile $localPathStoragePath
+# Apply the local-path-storage.yaml file
+   kubectl apply -f $localPathStoragePath
+   Write-Host "Local Path Provisioner installed successfully."
+} else {
+   Write-Host "Local Path Provisioner is already installed."
+}
+Write-Host "Checking fs.inotify.max_user_instances value..."
+$maxUserInstances = Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "sysctl fs.inotify.max_user_instances" | Select-String -Pattern "fs.inotify.max_user_instances\s+=\s+(\d+)" | ForEach-Object { $_.Matches[0].Groups[1].Value }
+Write-Host "Current fs.inotify.max_user_instances value: $maxUserInstances"
+if ($maxUserInstances -lt 1024) {
+   Write-Host "Increasing fs.inotify.max_user_instances to 1024..."
+   Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+   Write-Host "fs.inotify.max_user_instances increased to 1024."
+} else {
+   Write-Host "fs.inotify.max_user_instances is already set to 1024 or higher."
+}
+Write-Host "Installing Open Service Mesh (OSM)..."
+az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+Write-Host "Open Service Mesh (OSM) installed successfully."
+# Disable ACStor for single-node cluster
+Write-Host "Disabling ACStor for single-node cluster..."
+# Create the config.json file
+$acstorConfig = @{
+    "hydra.acstorController.enabled" = $false
+    "hydra.highAvailability.disk.storageClass" = "local-path"
+ }
+ $acstorConfigJson = $acstorConfig | ConvertTo-Json -Depth 100
+ Set-Content -Path "config.json" -Value $acstorConfigJson
+Write-Host "ACStor disabled for single-node cluster."
+Write-Host "Checking if Edge Storage Accelerator Arc Extension is installed..."
+$extensionExists = az k8s-extension show --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --query "extensionType" --output tsv
+if ($extensionExists -eq "microsoft.edgestorageaccelerator") {
+   Write-Host "Edge Storage Accelerator Arc Extension is already installed."
+} else {
+   Write-Host "Installing Edge Storage Accelerator Arc Extension..."
+   az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "config.json"
+   Write-Host "Edge Storage Accelerator Arc Extension installed successfully."
+}
 # Create Kubernetes secret for Azure Storage account
 Write-Host "Creating Kubernetes secret for Azure Storage account..."
 $secretName = "$env:storageContainer-secret"
 Add-AzureStorageAccountSecret -ResourceGroup $env:resourceGroup -StorageAccount $env:storageAccountName -Namespace "default" -SecretName $secretName
 Write-Host "Kubernetes secret created successfully."
-
-
 Write-Host "Downloading pv.yaml file..."
 $pvYamlUrl = "https://raw.githubusercontent.com/fcabrera23/azure_arc/scenarios-esa/azure_edge_iot_ops_jumpstart/aio_esa/yaml/pv.yaml"
 $pvYamlPath = "pv.yaml"
 Invoke-WebRequest -Uri $pvYamlUrl -OutFile $pvYamlPath
-
 # Update the secret name and container name in the pv.yaml file
 $pvYamlContent = Get-Content -Path $pvYamlPath -Raw
 $pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}-secret', $secretName
 $pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}', $env:storageContainer
 Set-Content -Path $pvYamlPath -Value $pvYamlContent
-
 # Apply the pv.yaml file using kubectl
 Write-Host "Applying pv.yaml configuration..."
 kubectl apply -f $pvYamlPath
 Write-Host "pv.yaml configuration applied successfully."
-
 Write-Host "Downloading esa-deploy.yaml file..."
 $esadeployYamlUrl = "https://raw.githubusercontent.com/fcabrera23/azure_arc/scenarios-esa/azure_edge_iot_ops_jumpstart/aio_esa/yaml/esa-deploy.yaml"
 $esadeployYamlPath = "esa-deploy.yaml"
 Invoke-WebRequest -Uri $esadeployYamlUrl -OutFile $esadeployYamlPath
-
 # Apply the p-deploy.yaml file using kubectl
 Write-Host "Applying esadeploy.yaml configuration..."
 kubectl apply -f $esadeployYamlPath
