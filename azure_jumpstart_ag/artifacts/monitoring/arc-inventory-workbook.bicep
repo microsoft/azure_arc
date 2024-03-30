@@ -10,9 +10,12 @@ param workbookSourceId string = 'azure monitor'
 @description('The unique guid for this workbook instance')
 param workbookId string = 'c5c6a9e5-74fc-465a-9f11-1dd10aad501b'
 
+@description('The location to deploy the workbook to')
+param location string = resourceGroup().location
+
 resource workbookId_resource 'microsoft.insights/workbooks@2022-04-01' = {
   name: workbookId
-  location: resourceGroup().location
+  location: location
   kind: 'shared'
   properties: {
     displayName: workbookDisplayName
