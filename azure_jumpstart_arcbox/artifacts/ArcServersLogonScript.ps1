@@ -7,8 +7,6 @@ $agentScript = "$Env:ArcBoxDir\agentScript"
 
 # Set variables to execute remote powershell scripts on guest VMs
 $nestedVMArcBoxDir = $Env:ArcBoxDir
-$spnClientId = $env:spnClientId
-$spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
@@ -135,13 +133,11 @@ if ($Env:flavor -ne "DevOps") {
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
-    az login --service-principal --username $spnClientId --password=$spnClientSecret --tenant $spnTenantId
+    az login --identity --tenant $spnTenantId
     az account set -s $env:subscriptionId
 
     Write-Header "Az PowerShell Login"
-    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
 
     # Register Azure providers
     Write-Header "Registering Providers"
@@ -211,7 +207,8 @@ if ($Env:flavor -ne "DevOps") {
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgentSQL.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
+    $accessToken = (Get-AzAccessToken).Token
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
     # Install Log Analytics extension to support Defender for SQL
     $mmaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='MicrosoftMonitoringAgent']" | ConvertFrom-Json
@@ -419,10 +416,8 @@ if ($Env:flavor -ne "DevOps") {
     $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
     $VMs | ForEach-Object -Parallel {
 
-        $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-        $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
-        $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process -WarningAction SilentlyContinue
+        $null = Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process -WarningAction SilentlyContinue
 
         $vm = $PSItem
         $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
