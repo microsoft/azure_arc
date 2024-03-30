@@ -1835,23 +1835,45 @@ function Deploy-AIO {
 }
 
 function Deploy-Workbook {
+
     $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
 
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying Azure Workbook 'Azure Arc-enabled resources inventory'."
     Write-Host "`n"
 
+    $workbookTemplateFilePath = "$AgMonitoringDir\arc-inventory-workbook.bicep"
+
     # Read the content of the workbook template-file
-    $content = Get-Content -Path "$AgMonitoringDir\arc-inventory-workbook.bicep" -Raw
+    $content = Get-Content -Path $workbookTemplateFilePath -Raw
 
     # Replace placeholders with actual values
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
 
     # Write the updated content back to the file
-    Set-Content -Path $filePath -Value $updatedContent
+    Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
 
     # Deploy the workbook
-    az deployment group create --resource-group $Env:resourceGroup --template-file "$AgMonitoringDir\arc-inventory-workbook.bicep"
+    try {
+
+        $TemplateParameterObject = @{
+            location = $Env:azureLocation
+            workbookDisplayName = 'Azure Arc-enabled resources inventory'
+            workbookType = 'workbook'
+            workbookSourceId = 'azure monitor'
+            workbookId = 'c5c6a9e5-74fc-465a-9f11-1dd10aad501b'
+        }
+
+        New-AzResourceGroupDeployment -ResourceGroupName $Env:resourceGroup -TemplateFile $workbookTemplateFilePath  -ErrorAction Stop -TemplateParameterObject $TemplateParameterObject
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Deployment of template-file $workbookTemplateFilePath succeeded."
+
+    } catch {
+
+        Write-Error "[$(Get-Date -Format t)] ERROR: Deployment of template-file $workbookTemplateFilePath failed. Error details: $PSItem.Exception.Message"
+
+    }
+
 
 }
 
