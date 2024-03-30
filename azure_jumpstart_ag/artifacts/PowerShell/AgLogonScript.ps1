@@ -1840,6 +1840,17 @@ function Deploy-Workbook {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying Azure Workbook 'Azure Arc-enabled resources inventory'."
     Write-Host "`n"
 
+    # Read the content of the workbook template-file
+    $content = Get-Content -Path "$AgMonitoringDir\arc-inventory-workbook.bicep" -Raw
+
+    # Replace placeholders with actual values
+    $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
+    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
+
+    # Write the updated content back to the file
+    Set-Content -Path $filePath -Value $updatedContent
+
+    # Deploy the workbook
     az deployment group create --resource-group $Env:resourceGroup --template-file "$AgMonitoringDir\arc-inventory-workbook.bicep"
 
 }
