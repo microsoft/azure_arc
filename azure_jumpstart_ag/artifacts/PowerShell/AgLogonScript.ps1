@@ -8,9 +8,9 @@ function Deploy-AzCLI {
         $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
-    
+
     $Env:AZURE_CONFIG_DIR = $cliDir.FullName
-    
+
     # Making extension install dynamic
     if ($AgConfig.AzCLIExtensions.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -20,7 +20,7 @@ function Deploy-AzCLI {
             az extension add --name $extension --system --only-show-errors
         }
     }
-    
+
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
     Write-Host
 }
@@ -890,7 +890,7 @@ function Deploy-ClusterSecrets {
             }
         }
     }
-    
+
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
@@ -1046,7 +1046,7 @@ $F
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
                     for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
                         $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-                        
+
                         # Check the condition
                         if ($ConnectivityStatus -eq 'Connected') {
                             # Condition is true, break out of the loop
@@ -1401,7 +1401,7 @@ function Deploy-ManufacturingConfigs {
         #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
     }
 
-    # Loop through the clusters and 
+    # Loop through the clusters and
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig
@@ -1649,7 +1649,7 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
-    
+
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -1756,7 +1756,7 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
         $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
-        
+
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
         $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
@@ -1832,6 +1832,27 @@ function Deploy-AIO {
         kubectl apply -f $mqconfigfile -n $aioNamespace
         $kvIndex++
     }
+}
+
+function Deploy-Workbook {
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying Azure Workbook 'Azure Arc-enabled resources inventory'."
+    Write-Host "`n"
+
+    # Read the content of the workbook template-file
+    $content = Get-Content -Path "$AgMonitoringDir\arc-inventory-workbook.bicep" -Raw
+
+    # Replace placeholders with actual values
+    $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
+    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
+
+    # Write the updated content back to the file
+    Set-Content -Path $filePath -Value $updatedContent
+
+    # Deploy the workbook
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$AgMonitoringDir\arc-inventory-workbook.bicep"
+
 }
 
 function Deploy-Prometheus {
@@ -2287,7 +2308,7 @@ Deploy-VirtualizationInfrastructure
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
 if ($industry -eq "retail") {
-    Deploy-AzContainerRegistry    
+    Deploy-AzContainerRegistry
 }
 
 #####################################################################
@@ -2377,6 +2398,11 @@ if ($industry -eq "manufacturing") {
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
 Deploy-Prometheus
+
+#####################################################################
+# Deploy Azure Workbook for Infrastructure Observability
+#####################################################################
+Deploy-Workbook
 
 ##############################################################
 # Creating bookmarks
