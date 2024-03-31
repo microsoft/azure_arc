@@ -1489,6 +1489,31 @@ function Set-HCIDeployPrereqs {
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
     }
+
+    Get-AzConnectedMachine -ResourceGroupName $env:resourceGroup | foreach-object {
+
+        Write-Host "Checking extension status for $($PSItem.Name)"
+
+        $attempts = 0
+        $maxAttempts = 20
+
+        do {
+            $attempts++
+            $extension = Get-AzConnectedMachineExtension -MachineName $PSItem.Name -ResourceGroupName $env:resourceGroup
+
+            $extension
+
+            if ($extension.ProvisioningState -eq "Succeeded") {
+                break
+            }
+
+            Write-Host "Waiting for extension installation to complete, sleeping for 1 minute. Attempt $attempts of $maxAttempts"
+            Start-Sleep -Seconds 60
+
+        } while ($attempts -lt $maxAttempts)
+
+       }
+
 }
 
 #endregion
