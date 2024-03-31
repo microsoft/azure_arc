@@ -23,13 +23,13 @@ function BITSRequest {
             Get-BitsTransfer $download.name | Resume-BitsTransfer -Asynchronous
         }
         [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
-        Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+        Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress;
     }
     Complete-BitsTransfer $download.JobId
     Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
     $ProgressPreference = "SilentlyContinue"
 }
-    
+
 function New-InternalSwitch {
     param (
         $HCIBoxConfig
@@ -38,27 +38,27 @@ function New-InternalSwitch {
     $querySwitch = Get-VMSwitch -Name $pswitchname -ErrorAction Ignore
     if (!$querySwitch) {
         New-VMSwitch -SwitchType Internal -MinimumBandwidthMode None -Name $pswitchname | Out-Null
-    
+
         #Assign IP to Internal Switch
         $InternalAdapter = Get-Netadapter -Name "vEthernet ($pswitchname)"
         $IP = $HCIBoxConfig.PhysicalHostInternalIP
         $Prefix = ($($HCIBoxConfig.MgmtHostConfig.IP).Split("/"))[1]
         $Gateway = $HCIBoxConfig.SDNLABRoute
         $DNS = $HCIBoxConfig.SDNLABDNS
-        
+
         $params = @{
             AddressFamily  = "IPv4"
             IPAddress      = $IP
             PrefixLength   = $Prefix
             DefaultGateway = $Gateway
         }
-    
+
         $InternalAdapter | New-NetIPAddress @params | Out-Null
         $InternalAdapter | Set-DnsClientServerAddress -ServerAddresses $DNS | Out-Null
     }
-    else { 
-        Write-Host "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
-    } 
+    else {
+        Write-Host "Internal Switch $pswitchname already exists. Not creating a new internal switch."
+    }
 }
 
 function Get-FormattedWACMAC {
@@ -227,7 +227,7 @@ function GenerateAnswerFile {
         $azsmgmtProdKey = "<ProductKey>$($HCIBoxConfig.GUIProductKey)</ProductKey>"
     }
     $vmServicing = ""
-    
+
     if ($IsRouterVM -or $IsDCVM) {
         $components = ""
         $optionXML = ""
@@ -326,7 +326,7 @@ function New-ManagementVM {
     )
     Write-Host "Creating VM $Name"
     # Create disks
-    $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing 
+    $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing
     $VHDX2 = New-VHD -Path "$($HCIBoxConfig.HostVMPath)\$Name-Data.vhdx" -SizeBytes 268435456000 -Dynamic
 
     # Create VM
@@ -345,7 +345,7 @@ function New-ManagementVM {
     Get-VM $Name | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
 
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
-    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
     return $vmMac
@@ -360,16 +360,16 @@ function New-HCINodeVM {
     )
     Write-Host "Creating VM $Name"
     # Create disks
-    $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing 
+    $VHDX1 = New-VHD -ParentPath $VHDXPath -Path "$($HCIBoxConfig.HostVMPath)\$Name.vhdx" -Differencing
     $VHDX2 = New-VHD -Path "$($HCIBoxConfig.HostVMPath)\$Name-Data.vhdx" -SizeBytes 268435456000 -Dynamic
 
-    # Create S2D Storage       
+    # Create S2D Storage
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk1.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk2.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk3.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk4.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
     New-VHD -Path "$HostVMPath\$Name-S2D_Disk5.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
-    New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null  
+    New-VHD -Path "$HostVMPath\$Name-S2D_Disk6.vhdx" -SizeBytes $HCIBoxConfig.S2D_Disk_Size -Dynamic | Out-Null
 
     # Create Nested VM
     New-VM -Name $Name -MemoryStartupBytes $HCIBoxConfig.NestedVMMemoryinGB -VHDPath $VHDX1.Path -SwitchName $VMSwitch -Generation 2 | Out-Null
@@ -395,9 +395,9 @@ function New-HCINodeVM {
     Get-VM $Name | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
 
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
-    # Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+    # Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
     Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageA -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-800
-    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-800 
+    Set-VMNetworkAdapterVlan -VMName $Name -VMNetworkAdapterName StorageB -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-800
 
     Enable-VMIntegrationService -VMName $Name -Name "Guest Service Interface"
     return $vmMac
@@ -409,7 +409,7 @@ function Set-MGMTVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.Hostname) + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $($HCIBoxConfig.MgmtHostConfig.Hostname) + ".vhdx")
     Write-Host "Performing offline installation of Hyper-V on $($HCIBoxConfig.MgmtHostConfig.Hostname)"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 20
@@ -421,7 +421,7 @@ function Set-MGMTVHDX {
     if (!$partition.DriveLetter) {
         $MountedDrive = "X"
         $partition | Set-Partition -NewDriveLetter $MountedDrive
-    }  
+    }
     else {
         $MountedDrive = $partition.DriveLetter
     }
@@ -429,8 +429,8 @@ function Set-MGMTVHDX {
     # Inject Answer File
     Write-Host "Injecting answer file to $path"
     $UnattendXML = GenerateAnswerFile -HostName $($HCIBoxConfig.MgmtHostConfig.Hostname) -IsMgmtVM $true -IPAddress $HCIBoxConfig.MgmtHostConfig.IP -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
-    
-    Write-Host "Mounted Disk Volume is: $MountedDrive" 
+
+    Write-Host "Mounted Disk Volume is: $MountedDrive"
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
     if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
 
@@ -446,11 +446,11 @@ function Set-MGMTVHDX {
     Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
     Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
     New-Item -Path ($MountedDrive + ":\") -Name "Windows Admin Center" -ItemType Directory -Force | Out-Null
-    Copy-Item -Path "$($HCIBoxConfig.Paths["WACDir"])\*.msi" -Destination ($MountedDrive + ":\Windows Admin Center") -Recurse -Force  
+    Copy-Item -Path "$($HCIBoxConfig.Paths["WACDir"])\*.msi" -Destination ($MountedDrive + ":\Windows Admin Center") -Recurse -Force
 
     # Dismount VHDX
     Write-Host "Dismounting VHDX File at path $path"
-    Dismount-VHD $path 
+    Dismount-VHD $path
 }
 
 function Set-HCINodeVHDX {
@@ -461,14 +461,14 @@ function Set-HCINodeVHDX {
         $HCIBoxConfig
     )
     $DriveLetter = $($HCIBoxConfig.HostVMPath).Split(':')
-    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx") 
+    $path = (("\\localhost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $Hostname + ".vhdx")
     Write-Host "Performing offline installation of Hyper-V on $Hostname"
     Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
     Start-Sleep -Seconds 5
 
     # Install necessary tools to converge cluster
     Write-Host "Installing and Configuring Failover Clustering on $Hostname"
-    Install-WindowsFeature -Vhd $path -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools | Out-Null 
+    Install-WindowsFeature -Vhd $path -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools | Out-Null
     Start-Sleep -Seconds 15
 
     Write-Host "Mounting VHDX file at $path"
@@ -476,25 +476,25 @@ function Set-HCINodeVHDX {
     if (!$partition.DriveLetter) {
         $MountedDrive = "Y"
         $partition | Set-Partition -NewDriveLetter $MountedDrive
-    }   
+    }
     else {
         $MountedDrive = $partition.DriveLetter
     }
 
     Write-Host "Injecting answer file to $path"
     $UnattendXML = GenerateAnswerFile -HostName $Hostname -IPAddress $IPAddress -VMMac $VMMac -HCIBoxConfig $HCIBoxConfig
-    Write-Host "Mounted Disk Volume is: $MountedDrive" 
+    Write-Host "Mounted Disk Volume is: $MountedDrive"
     $PantherDir = Get-ChildItem -Path ($MountedDrive + ":\Windows")  -Filter "Panther"
     if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
     Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
 
     New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
-    Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
+    Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
     # Copy-Item -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
 
     # Dismount VHDX
     Write-Host "Dismounting VHDX File at path $path"
-    Dismount-VHD $path  
+    Dismount-VHD $path
 }
 
 function Set-DataDrives {
@@ -512,7 +512,7 @@ function Set-DataDrives {
             Set-Disk -Number 1 -IsOffline $false | Out-Null
                 Initialize-Disk -Number 1 | Out-Null
                 New-Partition -DiskNumber 1 -UseMaximumSize -AssignDriveLetter | Out-Null
-                Format-Volume -DriveLetter D | Out-Null  
+                Format-Volume -DriveLetter D | Out-Null
         }
     }
 }
@@ -522,16 +522,16 @@ function Test-VMAvailable {
         $VMName,
         [PSCredential]$Credential
     )
-    Invoke-Command -VMName $VMName -ScriptBlock { 
+    Invoke-Command -VMName $VMName -ScriptBlock {
         $ErrorOccurred = $false
-        do { 
-            try { 
+        do {
+            try {
                 $ErrorActionPreference = 'Stop'
                 Get-VMHost | Out-Null
-            } 
-            catch { 
+            }
+            catch {
                 $ErrorOccurred = $true
-            } 
+            }
         } while ($ErrorOccurred -eq $true)
     } -Credential $Credential -ErrorAction Ignore
     Write-Host "VM $VMName is now online"
@@ -549,21 +549,21 @@ function Test-AllVMsAvailable
         Test-VMAvailable -VMName $VM.Hostname -Credential $Credential
     }
 }
-    
+
 function New-NATSwitch {
     Param (
         $HCIBoxConfig
     )
     Write-Host "Creating NAT Switch on switch $($HCIBoxConfig.InternalSwitch)"
-    Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -DeviceNaming On 
+    Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -DeviceNaming On
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname | Where-Object { $_.Name -match "Network" } | Connect-VMNetworkAdapter -SwitchName $HCIBoxConfig.natHostVMSwitchName
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname | Where-Object { $_.Name -match "Network" } | Rename-VMNetworkAdapter -NewName "NAT"
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name NAT | Set-VMNetworkAdapter -MacAddressSpoofing On
 
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER | Set-VMNetworkAdapter -MacAddressSpoofing On
-    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.providerVLAN | Out-Null    
-   
+    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name PROVIDER | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.providerVLAN | Out-Null
+
     #Create VLAN 110 NIC in order for NAT to work from L3 Connections
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN110 -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN110 | Set-VMNetworkAdapter -MacAddressSpoofing On
@@ -572,13 +572,13 @@ function New-NATSwitch {
     #Create VLAN 200 NIC in order for NAT to work from L3 Connections
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 | Set-VMNetworkAdapter -MacAddressSpoofing On
-    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.vlan200VLAN | Out-Null    
+    Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name VLAN200 | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.vlan200VLAN | Out-Null
 
     #Create Simulated Internet NIC in order for NAT to work from L3 Connections
     Add-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet -DeviceNaming On -SwitchName $HCIBoxConfig.InternalSwitch
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet | Set-VMNetworkAdapter -MacAddressSpoofing On
     Get-VMNetworkAdapter -VMName $HCIBoxConfig.MgmtHostConfig.Hostname -Name simInternet | Set-VMNetworkAdapterVlan -Access -VlanId $HCIBoxConfig.simInternetVLAN | Out-Null
-}  
+}
 
 function Set-NICs {
     Param (
@@ -605,12 +605,12 @@ function Set-NICs {
             # Set Name and IP Addresses on Storage Interfaces
             $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue        
+                Rename-NetAdapter -Name $storageNIC.Name -NewName  $storageNIC.DisplayValue
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }  
-                If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }  
+                If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }
+                If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }
             }
 
             # Enable WinRM
@@ -637,7 +637,7 @@ function Set-NICs {
                 New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation `
                     -Name AllowFreshCredentialsWhenNTLMOnly -Force
                 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly `
-                    -Name 1 -Value * -PropertyType String -Force 
+                    -Name 1 -Value * -PropertyType String -Force
             } -InDisconnectedSession | Out-Null
         }
     }
@@ -660,7 +660,7 @@ function Set-FabricNetwork {
         # Disable Fabric2 Network Adapter
         # Write-Host "Disabling Fabric2 Adapter"
         # Get-NetAdapter FABRIC2 | Disable-NetAdapter -Confirm:$false | Out-Null
-        
+
         # Enable WinRM on AzSMGMT
         Write-Host "Enabling PSRemoting on $env:COMPUTERNAME"
         Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
@@ -670,11 +670,11 @@ function Set-FabricNetwork {
         Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask | Out-Null
 
         # Create Hyper-V Networking for AzSMGMT
-        Import-Module Hyper-V 
-        
+        Import-Module Hyper-V
+
         Write-Host "Creating VM Switch on $env:COMPUTERNAME"
         New-VMSwitch -AllowManagementOS $true -Name $HCIBoxConfig.FabricSwitch -NetAdapterName $HCIBoxConfig.FabricNIC -MinimumBandwidthMode None | Out-Null
-        
+
         Write-Host "Configuring NAT on $env:COMPUTERNAME"
         $Prefix = ($HCIBoxConfig.natSubnet.Split("/"))[1]
         $natIP = ($HCIBoxConfig.natSubnet.TrimEnd("0./$Prefix")) + (".1")
@@ -713,7 +713,7 @@ function Set-FabricNetwork {
 
         Write-Host "Configuring NAT"
         $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "Network Adapter" -or $_.RegistryValue -eq "NAT" }
-        Rename-NetAdapter -name $NIC.name -newname "Internet" | Out-Null 
+        Rename-NetAdapter -name $NIC.name -newname "Internet" | Out-Null
         $internetIP = $HCIBoxConfig.natHostSubnet.Replace("0/24", "5")
         $internetGW = $HCIBoxConfig.natHostSubnet.Replace("0/24", "1")
         Start-Sleep -Seconds 15
@@ -731,7 +731,7 @@ function Set-FabricNetwork {
         New-NetRoute -DestinationPrefix $HCIBoxConfig.PublicVIPSubnet -NextHop $provGW -InterfaceAlias PROVIDER | Out-Null
 
         # Remove Gateway from Fabric NIC
-        Write-Host "Removing Gateway from Fabric NIC" 
+        Write-Host "Removing Gateway from Fabric NIC"
         $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -match "vSwitch-Fabric" }).InterfaceIndex
         Remove-NetRoute -InterfaceIndex $index -DestinationPrefix "0.0.0.0/0" -Confirm:$false
     }
@@ -757,7 +757,7 @@ function New-DCVM {
         $VMName = $HCIBoxConfig.DCName
 
         # Create Virtual Machine
-        Write-Host "Creating $VMName differencing disks"  
+        Write-Host "Creating $VMName differencing disks"
         New-VHD -ParentPath ($ParentDiskPath + $OSVHDX) -Path ($vmpath + $VMName + '\' + $VMName + '.vhdx') -Differencing | Out-Null
 
         Write-Host "Creating $VMName virtual machine"
@@ -769,13 +769,13 @@ function New-DCVM {
         Write-Host "Configuring $VMName's networking"
         Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter" | Out-Null
         Add-VMNetworkAdapter -VMName $VMName -Name $HCIBoxConfig.DCName -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming 'On' | Out-Null
-        
+
         Write-Host "Configuring $VMName's settings"
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
 
         # Inject Answer File
-        Write-Host "Mounting and injecting answer file into the $VMName VM."        
+        Write-Host "Mounting and injecting answer file into the $VMName VM."
         New-Item -Path "C:\TempMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
         Write-Host "Applying Unattend file to Disk Image..."
@@ -786,9 +786,9 @@ function New-DCVM {
         Remove-Item "C:\TempMount" | Out-Null
 
         # Start Virtual Machine
-        Write-Host "Starting Virtual Machine $VMName" 
+        Write-Host "Starting Virtual Machine $VMName"
         Start-VM -Name $VMName | Out-Null
-        
+
         # Wait until the VM is restarted
         while ((Invoke-Command -VMName $VMName -Credential $using:localCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
@@ -804,7 +804,7 @@ function New-DCVM {
 
             Write-Host "Configuring NIC Settings for $DCName"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq $DCName }
-            Rename-NetAdapter -name $NIC.name -newname $DCName | Out-Null 
+            Rename-NetAdapter -name $NIC.name -newname $DCName | Out-Null
             New-NetIPAddress -InterfaceAlias $DCName -IPAddress $ip -PrefixLength $PrefixLength -DefaultGateway $SDNLabRoute | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias $DCName -ServerAddresses $IP | Out-Null
             Install-WindowsFeature -name AD-Domain-Services -IncludeManagementTools | Out-Null
@@ -820,7 +820,7 @@ function New-DCVM {
         Write-Host "Stopping $VMName"
         Get-VM $VMName | Stop-VM
         Write-Host "Starting $VMName"
-        Get-VM $VMName | Start-VM 
+        Get-VM $VMName | Start-VM
 
         # Wait until DC is created and rebooted
         while ((Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $HCIBoxConfig.DCName { (Get-ADDomainController $args[0]).enabled } -ea SilentlyContinue) -ne $true) { Start-Sleep -Seconds 5 }
@@ -846,7 +846,7 @@ function New-DCVM {
                 PasswordNeverExpires  = $true
             }
             New-ADUser @params
-            
+
             $params = @{
                 Name                  = $adminUser
                 GivenName             = 'Jumpstart'
@@ -864,7 +864,7 @@ function New-DCVM {
             $params.Name = 'NC Client'
             $params.Surname = 'Client'
             $params.SamAccountName = 'NCClient'
-            $params.UserPrincipalName = "NCClient@$SDNDomainFQDN" 
+            $params.UserPrincipalName = "NCClient@$SDNDomainFQDN"
             New-ADUser @params
 
             New-ADGroup -name “NCAdmins” -groupscope Global
@@ -887,8 +887,8 @@ function New-DCVM {
             Write-Host "Adding DNS Forwarders"
             Add-DnsServerForwarder $HCIBoxConfig.natDNS
 
-            # Create Enterprise CA 
-            Write-Host "Installing and Configuring Active Directory Certificate Services and Certificate Templates"    
+            # Create Enterprise CA
+            Write-Host "Installing and Configuring Active Directory Certificate Services and Certificate Templates"
             Install-WindowsFeature -Name AD-Certificate -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             Install-AdcsCertificationAuthority -CAtype 'EnterpriseRootCa' -CryptoProviderName 'ECDSA_P256#Microsoft Software Key Storage Provider' -KeyLength 256 -HashAlgorithmName 'SHA256' -ValidityPeriod 'Years' -ValidityPeriodUnits 10 -Confirm:$false | Out-Null
 
@@ -896,23 +896,23 @@ function New-DCVM {
             $filter = "(CN=WebServer)"
             $ConfigContext = ([ADSI]"LDAP://RootDSE").configurationNamingContext
             $ConfigContext = "CN=Certificate Templates,CN=Public Key Services,CN=Services,$ConfigContext"
-            $ds = New-object System.DirectoryServices.DirectorySearcher([ADSI]"LDAP://$ConfigContext", $filter)  
-            $Template = $ds.Findone().GetDirectoryEntry() 
+            $ds = New-object System.DirectoryServices.DirectorySearcher([ADSI]"LDAP://$ConfigContext", $filter)
+            $Template = $ds.Findone().GetDirectoryEntry()
 
             if ($null -ne $Template) {
-                $objUser = New-Object System.Security.Principal.NTAccount("Domain Computers") 
-                $objectGuid = New-Object Guid 0e10c968-78fb-11d2-90d4-00c04f79dc55                     
-                $ADRight = [System.DirectoryServices.ActiveDirectoryRights]"ExtendedRight"                     
-                $ACEType = [System.Security.AccessControl.AccessControlType]"Allow"                     
-                $ACE = New-Object System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $objUser, $ADRight, $ACEType, $objectGuid                     
-                $Template.ObjectSecurity.AddAccessRule($ACE)                     
+                $objUser = New-Object System.Security.Principal.NTAccount("Domain Computers")
+                $objectGuid = New-Object Guid 0e10c968-78fb-11d2-90d4-00c04f79dc55
+                $ADRight = [System.DirectoryServices.ActiveDirectoryRights]"ExtendedRight"
+                $ACEType = [System.Security.AccessControl.AccessControlType]"Allow"
+                $ACE = New-Object System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $objUser, $ADRight, $ACEType, $objectGuid
+                $Template.ObjectSecurity.AddAccessRule($ACE)
                 $Template.commitchanges()
-            } 
- 
+            }
+
             CMD.exe /c "certutil -setreg ca\ValidityPeriodUnits 8" | Out-Null
             Restart-Service CertSvc
             Start-Sleep -Seconds 60
- 
+
             #Issue Certificate Template
             CMD.exe /c "certutil -SetCATemplates +WebServer"
         }
@@ -934,7 +934,7 @@ function Set-DHCPServerOnDC {
     # Set up DHCP scope for Arc resource bridge
     Invoke-Command -VMName $HCIBoxConfig.DCName -Credential $using:domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
         $HCIBoxConfig = $args[0]
-        
+
         Write-Host "Configuring NIC settings for $DCName VLAN200"
         $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
         Rename-NetAdapter -name $NIC.name -newname VLAN200 | Out-Null
@@ -975,22 +975,22 @@ function New-RouterVM {
         $ParentDiskPath = "C:\VMs\Base\AzSHCI.vhdx"
         $vmpath = "D:\VMs\"
         $VMName = $HCIBoxConfig.BGPRouterName
-    
+
         # Create Host OS Disk
         Write-Host "Creating $VMName differencing disks"
         New-VHD -ParentPath $ParentDiskPath -Path ($vmpath + $VMName + '\' + $VMName + '.vhdx') -Differencing | Out-Null
-    
+
         # Create VM
         Write-Host "Creating the $VMName VM."
         New-VM -Name $VMName -VHDPath ($vmpath + $VMName + '\' + $VMName + '.vhdx') -Path ($vmpath + $VMName) -Generation 2 | Out-Null
-    
+
         # Set VM Configuration
         Write-Host "Setting $VMName's VM Configuration"
         Set-VMMemory -VMName $VMName -DynamicMemoryEnabled $true -StartupBytes $HCIBoxConfig.MEM_BGP -MinimumBytes 500MB -MaximumBytes $HCIBoxConfig.MEM_BGP | Out-Null
-        Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter" | Out-Null 
+        Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter" | Out-Null
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStopAction ShutDown | Out-Null
-    
+
         # Configure VM Networking
         Write-Host "Configuring $VMName's Networking"
         Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName $HCIBoxConfig.FabricSwitch -DeviceNaming On
@@ -1002,31 +1002,31 @@ function New-RouterVM {
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN110 -Access -VlanId $HCIBoxConfig.vlan110VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN200 -Access -VlanId $HCIBoxConfig.vlan200VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName SIMInternet -Access -VlanId $HCIBoxConfig.simInternetVLAN
-        Add-VMNetworkAdapter -VMName $VMName -Name NAT -SwitchName NAT -DeviceNaming On   
-    
+        Add-VMNetworkAdapter -VMName $VMName -Name NAT -SwitchName NAT -DeviceNaming On
+
         # Mount disk and inject Answer File
-        Write-Host "Mounting Disk Image and Injecting Answer File into the $VMName VM." 
+        Write-Host "Mounting Disk Image and Injecting Answer File into the $VMName VM."
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
-        New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null  
+        New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null
         Set-Content -Value $using:Unattend -Path "C:\TempBGPMount\Windows\Panther\Unattend.xml" -Force
-        
+
         # Enable remote access
         Write-Host "Enabling Remote Access"
         Enable-WindowsOptionalFeature -Path C:\TempBGPMount -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
         Enable-WindowsOptionalFeature -Path C:\TempBGPMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
-        Write-Host "Dismounting Disk Image for $VMName VM." 
+        Write-Host "Dismounting Disk Image for $VMName VM."
         Dismount-WindowsImage -Path "C:\TempBGPMount" -Save | Out-Null
         Remove-Item "C:\TempBGPMount"
-        
+
         # Start the VM
         Write-Host "Starting $VMName VM."
-        Start-VM -Name $VMName      
-    
+        Start-VM -Name $VMName
+
         # Wait for VM to be started
-        while ((Invoke-Command -VMName $VMName -Credential $localcred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }    
-    
-        Write-Host "Configuring $VMName" 
+        while ((Invoke-Command -VMName $VMName -Credential $localcred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
+
+        Write-Host "Configuring $VMName"
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $HCIBoxConfig -ScriptBlock {
             $HCIBoxConfig = $args[0]
             $DNS = $HCIBoxConfig.SDNLABDNS
@@ -1042,30 +1042,30 @@ function New-RouterVM {
             $VLAN110PFX = $HCIBoxConfig.BGPRouterIP_VLAN110.Split("/")[1]
             $simInternetIP = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[0]
             $simInternetPFX = $HCIBoxConfig.BGPRouterIP_SimulatedInternet.Split("/")[1]
-    
+
             # Renaming NetAdapters and setting up the IPs inside the VM using CDN parameters
             Write-Host "Configuring $env:COMPUTERNAME's Networking"
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "Mgmt" }
             Rename-NetAdapter -name $NIC.name -newname "Mgmt" | Out-Null
             New-NetIPAddress -InterfaceAlias "Mgmt" -IPAddress $MGMTIP -PrefixLength $MGMTPFX | Out-Null
             Set-DnsClientServerAddress -InterfaceAlias “Mgmt” -ServerAddresses $DNS | Out-Null
-            
+
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "PROVIDER" }
             Rename-NetAdapter -name $NIC.name -newname "PROVIDER" | Out-Null
             New-NetIPAddress -InterfaceAlias "PROVIDER" -IPAddress $PNVIP -PrefixLength $PNVPFX | Out-Null
-            
+
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN200" }
             Rename-NetAdapter -name $NIC.name -newname "VLAN200" | Out-Null
             New-NetIPAddress -InterfaceAlias "VLAN200" -IPAddress $VLANIP -PrefixLength $VLANPFX | Out-Null
-            
+
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "VLAN110" }
             Rename-NetAdapter -name $NIC.name -newname "VLAN110" | Out-Null
             New-NetIPAddress -InterfaceAlias "VLAN110" -IPAddress $VLAN110IP -PrefixLength $VLAN110PFX | Out-Null
-            
+
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "SIMInternet" }
             Rename-NetAdapter -name $NIC.name -newname "SIMInternet" | Out-Null
-            New-NetIPAddress -InterfaceAlias "SIMInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
-    
+            New-NetIPAddress -InterfaceAlias "SIMInternet" -IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null
+
             # Configure NAT
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "NAT" }
             Rename-NetAdapter -name $NIC.name -newname "NAT" | Out-Null
@@ -1076,15 +1076,15 @@ function New-RouterVM {
             if ($natDNS) {
                 Set-DnsClientServerAddress -InterfaceAlias "NAT" -ServerAddresses $natDNS | Out-Null
             }
-    
+
             # Configure Trusted Hosts
             Write-Host "Configuring Trusted Hosts on $env:COMPUTERNAME"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
-            
+
             # Installing Remote Access
-            Write-Host "Installing Remote Access on $env:COMPUTERNAME" 
+            Write-Host "Installing Remote Access on $env:COMPUTERNAME"
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
-    
+
             # Adding a BGP Router to the VM
             # Write-Host "Creating BGP Router on $env:COMPUTERNAME"
             # Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $HCIBoxConfig.BGPRouterASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
@@ -1109,13 +1109,13 @@ function New-RouterVM {
             #     Add-BgpPeer @params -PassThru
             #     $params.Name = 'GW02'
             #     $params.PeerIPAddress = $GW02IP
-            #     Add-BgpPeer @params -PassThru    
+            #     Add-BgpPeer @params -PassThru
             # }
-    
+
             # Enable Large MTU
             Write-Host "Configuring MTU on all Adapters"
-            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"      
-        }     
+            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
+        }
     }
 }
 
@@ -1165,9 +1165,9 @@ function New-AdminCenterVM {
         Set-VMNetworkAdapter -VMName $VMName -StaticMacAddress $HCIBoxConfig.WACMAC # Mac address is linked to the answer file required in next step
 
         # Apply custom Unattend.xml file
-        New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null    
-        
-        Write-Host "Mounting and Injecting Answer File into the $VMName VM." 
+        New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
+
+        Write-Host "Mounting and Injecting Answer File into the $VMName VM."
         Set-Content -Value $using:UnattendXML -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
         Write-Host "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
@@ -1194,14 +1194,14 @@ function New-AdminCenterVM {
             Enable-WindowsOptionalFeature -FeatureName RasRoutingProtocols -All -LimitAccess -Online | Out-Null
             Enable-WindowsOptionalFeature -FeatureName RemoteAccessPowerShell -All -LimitAccess -Online | Out-Null
 
-            Write-Host "Rename Network Adapter in $VMName" 
+            Write-Host "Rename Network Adapter in $VMName"
             Get-NetAdapter | Rename-NetAdapter -NewName Fabric
             Write-Host "Configuring MTU on all Adapters"
-            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
+            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
 
             # Set Gateway
             $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -eq "Fabric" }).InterfaceIndex
-            $NetInterface = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.InterfaceIndex -eq $index }     
+            $NetInterface = Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object { $_.InterfaceIndex -eq $index }
             $NetInterface.SetGateways($HCIBoxConfig.SDNLABRoute) | Out-Null
 
             # Enable CredSSP
@@ -1226,7 +1226,7 @@ function New-AdminCenterVM {
                 Import-Module ServerManager
                 Install-WindowsFeature -Name RSAT-NetworkController -IncludeAllSubFeature -IncludeManagementTools | Out-Null
             }
-            
+
             # Install Windows features
             Write-Host "Installing Hyper-V RSAT Tools on $VMName"
             Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
@@ -1240,36 +1240,36 @@ function New-AdminCenterVM {
 
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
-            
+
             # Create BGP Router
             Add-BgpRouter -BGPIdentifier $WACIP -LocalASN $HCIBoxConfig.WACASN -TransitRouting 'Enabled' -ClusterId 1 -RouteReflector 'Enabled'
 
             $RequestInf = @"
-[Version] 
+[Version]
 Signature="`$Windows NT$"
 
-[NewRequest] 
+[NewRequest]
 Subject = "CN=$($HCIBoxConfig.WACVMName).$($HCIBoxConfig.SDNDomainFQDN)"
 Exportable = True
-KeyLength = 2048                    
-KeySpec = 1                     
-KeyUsage = 0xA0               
-MachineKeySet = True 
-ProviderName = "Microsoft RSA SChannel Cryptographic Provider" 
-ProviderType = 12 
-SMIME = FALSE 
+KeyLength = 2048
+KeySpec = 1
+KeyUsage = 0xA0
+MachineKeySet = True
+ProviderName = "Microsoft RSA SChannel Cryptographic Provider"
+ProviderType = 12
+SMIME = FALSE
 RequestType = CMC
 FriendlyName = "HCIBox Windows Admin Cert"
 
-[Strings] 
-szOID_SUBJECT_ALT_NAME2 = "2.5.29.17" 
-szOID_ENHANCED_KEY_USAGE = "2.5.29.37" 
-szOID_PKIX_KP_SERVER_AUTH = "1.3.6.1.5.5.7.3.1" 
+[Strings]
+szOID_SUBJECT_ALT_NAME2 = "2.5.29.17"
+szOID_ENHANCED_KEY_USAGE = "2.5.29.37"
+szOID_PKIX_KP_SERVER_AUTH = "1.3.6.1.5.5.7.3.1"
 szOID_PKIX_KP_CLIENT_AUTH = "1.3.6.1.5.5.7.3.2"
-[Extensions] 
-%szOID_SUBJECT_ALT_NAME2% = "{text}dns=$($HCIBoxConfig.WACVMName).$($HCIBoxConfig.SDNDomainFQDN)" 
+[Extensions]
+%szOID_SUBJECT_ALT_NAME2% = "{text}dns=$($HCIBoxConfig.WACVMName).$($HCIBoxConfig.SDNDomainFQDN)"
 %szOID_ENHANCED_KEY_USAGE% = "{text}%szOID_PKIX_KP_SERVER_AUTH%,%szOID_PKIX_KP_CLIENT_AUTH%"
-[RequestAttributes] 
+[RequestAttributes]
 CertificateTemplate= WebServer
 "@
 
@@ -1277,7 +1277,7 @@ CertificateTemplate= WebServer
             Set-Content -Value $RequestInf -Path C:\WACCert\WACCert.inf -Force | Out-Null
 
             Register-PSSessionConfiguration -Name 'Microsoft.SDNNested' -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000
-            Write-Host "Requesting and installing SSL Certificate on $using:VMName" 
+            Write-Host "Requesting and installing SSL Certificate on $using:VMName"
             Invoke-Command -ComputerName $VMName -ConfigurationName 'Microsoft.SDNNested' -Credential $domainCred -ArgumentList $HCIBoxConfig -ScriptBlock {
                 $HCIBoxConfig = $args[0]
                 # Get the CA Name
@@ -1292,7 +1292,7 @@ CertificateTemplate= WebServer
                 # Request and Accept SSL Certificate
                 Set-Location C:\WACCert
                 certreq -q -f -new WACCert.inf WACCert.req
-                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" -submit WACCert.req  WACCert.cer 
+                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" -submit WACCert.req  WACCert.cer
                 certreq -q -accept WACCert.cer
                 certutil -q -store my
 
@@ -1321,7 +1321,7 @@ CertificateTemplate= WebServer
             Write-Host 'Installing Az PowerShell'
             $expression = "choco install az.powershell -y --limit-output"
             Invoke-Expression $expression
-    
+
             # Create Shortcut for Hyper-V Manager
             Write-Host "Creating Shortcut for Hyper-V Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\Public\Desktop"
@@ -1337,14 +1337,14 @@ CertificateTemplate= WebServer
             # Create Shortcut for Active Directory Users and Computers
             Write-Host "Creating Shortcut for AD Users and Computers"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Active Directory Users and Computers.lnk" -Destination "C:\Users\Public\Desktop"
-    
+
             # Set Network Profiles
-            Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq "Public" } | Set-NetConnectionProfile -NetworkCategory Private | Out-Null    
-    
+            Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq "Public" } | Set-NetConnectionProfile -NetworkCategory Private | Out-Null
+
             # Disable Automatic Updates
             $WUKey = "HKLM:\software\Policies\Microsoft\Windows\WindowsUpdate"
             New-Item -Path $WUKey -Force | Out-Null
-            New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 -Force | Out-Null  
+            New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 -Force | Out-Null
 
             # Install Kubectl
             Write-Host 'Installing kubectl'
@@ -1380,14 +1380,14 @@ CertificateTemplate= WebServer
 
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
-            Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force            
+            Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
         }
     }
 }
 
 function Test-InternetConnect {
     $testIP = $HCIBoxConfig.natDNS
-    $ErrorActionPreference = "Stop"  
+    $ErrorActionPreference = "Stop"
     $intConnect = Test-NetConnection -ComputerName $testip -Port 53
 
     if (!$intConnect.TcpTestSucceeded) {
@@ -1432,7 +1432,7 @@ function Set-HCIDeployPrereqs {
             $HCIBoxConfig = $args[0]
             $domainCredNoDomain = new-object -typename System.Management.Automation.PSCredential `
                 -argumentlist ($HCIBoxConfig.LCMDeployUsername), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
-            
+
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser
             Install-Module AsHciADArtifactsPreCreationTool -Repository PSGallery -Force -Confirm:$false
             $domainName = $HCIBoxConfig.SDNDomainFQDN.Split('.')
@@ -1448,7 +1448,7 @@ function Set-HCIDeployPrereqs {
             New-HciAdObjectsPreCreation -AzureStackLCMUserCredential $domainCredNoDomain -AsHciOUName $ouName
         }
     }
-    
+
     foreach ($node in $HCIBoxConfig.NodeHostConfig) {
         Invoke-Command -VMName $node.Hostname -Credential $localCred -ArgumentList $env:subscriptionId, $env:spnTenantId, $env:spnClientID, $env:spnClientSecret, $env:resourceGroup, $env:azureLocation -ScriptBlock {
             $subId = $args[0]
@@ -1457,19 +1457,19 @@ function Set-HCIDeployPrereqs {
             $clientSecret = $args[3]
             $resourceGroup = $args[4]
             $location = $args[5]
-    
+
             # Prep nodes for Azure Arc onboarding
             winrm quickconfig -quiet
             netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
-    
+
             # Register PSGallery as a trusted repo
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
             Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    
-            #Install Arc registration script from PSGallery 
+
+            #Install Arc registration script from PSGallery
             Install-Module AzsHCI.ARCinstaller -Force
-    
+
             #Install required PowerShell modules in your node for registration
             Install-Module Az.Accounts -Force
             Install-Module Az.ConnectedMachine -Force
@@ -1481,10 +1481,10 @@ function Set-HCIDeployPrereqs {
             # Workaround for BITS transfer issue
             Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
-    
+
             #Invoke the registration script.
             Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
-            
+
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
         }
@@ -1492,7 +1492,7 @@ function Set-HCIDeployPrereqs {
 }
 
 #endregion
-   
+
 #region Main
 $guiVHDXPath = $HCIBoxConfig.guiVHDXPath
 $azSHCIVHDXPath = $HCIBoxConfig.azSHCIVHDXPath
@@ -1525,7 +1525,7 @@ if ($checksum.Hash -eq $hash) {
 }
 else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
-    throw 
+    throw
 }
 BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
 BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
@@ -1536,7 +1536,7 @@ if ($checksum.Hash -eq $hash) {
 }
 else {
     Write-Error "GUI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
-    throw 
+    throw
 }
 # BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip"}
 # Expand-Archive -Path "$($HCIBoxConfig.Paths.VHDDir)\Ubuntu.vhdx.zip" -DestinationPath $($HCIBoxConfig.Paths.VHDDir)
@@ -1578,7 +1578,7 @@ Copy-Item -Path $HCIBoxConfig.guiVHDXPath -Destination $guipath -Force | Out-Nul
 Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-Null
 
 ################################################################################
-# Create the three nested Virtual Machines 
+# Create the three nested Virtual Machines
 ################################################################################
 # First create the Management VM (AzSMGMT)
 Write-Host "[Build cluster - Step 3/10] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
@@ -1591,7 +1591,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
     Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
-    
+
 # Start Virtual Machines
 Write-Host "[Build cluster - Step 5/10] Starting VMs..." -ForegroundColor Green
 Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
@@ -1611,13 +1611,13 @@ Start-Sleep -Seconds 60
 
 # Format and partition data drives
 Set-DataDrives -HCIBoxConfig $HCIBoxConfig -Credential $localCred
-    
+
 # Configure networking
 Set-NICs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
-    
+
 # Restart Machines
 Restart-VMs -HCIBoxConfig $HCIBoxConfig -Credential $localCred
-    
+
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 
@@ -1649,8 +1649,32 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 Write-Host "[Build cluster - Step 9/10] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
-# Cluster complete. Finish up and add RDP Link to Desktop to WAC machine.
-Write-Host "[Build cluster - Step 10/10] Tidying up..." -ForegroundColor Green
+#######################################################################################
+# Validate and deploy the cluster
+#######################################################################################
+
+Write-Host "[Build cluster - Step 10/11] Validate cluster deployment..." -ForegroundColor Green
+
+$TemplateFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.json"
+$TemplateParameterFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.parameters.json"
+
+New-AzResourceGroupDeployment -Name 'hcicluster-validate' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterValidationDeployment
+
+
+Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundColor Green
+
+if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
+
+    Write-Host "Validation succeeded. Deploying HCI cluster..."
+    New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile
+
+}
+else {
+
+    Write-Error "Validation failed. Aborting deployment. Re-run New-AzResourceGroupDeployment to retry."
+
+}
+
 
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
@@ -1658,6 +1682,6 @@ Write-Host
 Write-Host "Successfully deployed HCIBox infrastructure." -ForegroundColor Green
 Write-Host "Infrastructure deployment time was $($timeSpan.Hours):$($timeSpan.Minutes) (hh:mm)." -ForegroundColor Green
 
-Stop-Transcript 
+Stop-Transcript
 
-#endregion    
+#endregion
