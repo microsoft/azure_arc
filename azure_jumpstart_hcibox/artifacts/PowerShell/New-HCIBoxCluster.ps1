@@ -1515,7 +1515,7 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 }
 
 # Download HCIBox VHDs
-Write-Host "[Build cluster - Step 1/10] Downloading HCIBox VHDs" -ForegroundColor Green
+Write-Host "[Build cluster - Step 1/11] Downloading HCIBox VHDs" -ForegroundColor Green
 BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
@@ -1550,7 +1550,7 @@ $domainCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($HCIBoxConfig.SDNDomainFQDN.Split(".")[0]) +"\Administrator"), (ConvertTo-SecureString $HCIBoxConfig.SDNAdminPassword -AsPlainText -Force)
 
 # Enable PSRemoting
-Write-Host "[Build cluster - Step 2/10] Preparing Azure VM virtualization host..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 2/11] Preparing Azure VM virtualization host..." -ForegroundColor Green
 Write-Host "Enabling PS Remoting on client..."
 Enable-PSRemoting
 set-item WSMan:localhost\client\trustedhosts -value * -Force
@@ -1581,19 +1581,19 @@ Copy-Item -Path $HCIBoxConfig.azSHCIVHDXPath -Destination $hcipath -Force | Out-
 # Create the three nested Virtual Machines
 ################################################################################
 # First create the Management VM (AzSMGMT)
-Write-Host "[Build cluster - Step 3/10] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 3/11] Creating Management VM (AzSMGMT)..." -ForegroundColor Green
 $mgmtMac = New-ManagementVM -Name $($HCIBoxConfig.MgmtHostConfig.Hostname) -VHDXPath "$HostVMPath\GUI.vhdx" -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
 Set-MGMTVHDX -VMMac $mgmtMac -HCIBoxConfig $HCIBoxConfig
 
 # Create the HCI host node VMs
-Write-Host "[Build cluster - Step 4/10] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 4/11] Creating HCI node VMs (AzSHOSTx)..." -ForegroundColor Green
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
     $mac = New-HCINodeVM -Name $VM.Hostname -VHDXPath $hcipath -VMSwitch $InternalSwitch -HCIBoxConfig $HCIBoxConfig
     Set-HCINodeVHDX -HostName $VM.Hostname -IPAddress $VM.IP -VMMac $mac  -HCIBoxConfig $HCIBoxConfig
 }
 
 # Start Virtual Machines
-Write-Host "[Build cluster - Step 5/10] Starting VMs..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 5/11] Starting VMs..." -ForegroundColor Green
 Write-Host "Starting VM: $($HCIBoxConfig.MgmtHostConfig.Hostname)"
 Start-VM -Name $HCIBoxConfig.MgmtHostConfig.Hostname
 foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
@@ -1604,7 +1604,7 @@ foreach ($VM in $HCIBoxConfig.NodeHostConfig) {
 #######################################################################################
 # Prep the virtualization environment
 #######################################################################################
-Write-Host "[Build cluster - Step 6/10] Configuring host networking and storage..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 6/11] Configuring host networking and storage..." -ForegroundColor Green
 # Wait for AzSHOSTs to come online
 Test-AllVMsAvailable -HCIBoxConfig $HCIBoxConfig -Credential $localCred
 Start-Sleep -Seconds 60
@@ -1631,11 +1631,11 @@ Set-FabricNetwork -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 # Provision the router, domain controller, and WAC VMs and join the hosts to the domain
 #######################################################################################
 # Provision Router VM on AzSMGMT
-Write-Host "[Build cluster - Step 7/10] Build router VM..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 7/11] Build router VM..." -ForegroundColor Green
 New-RouterVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred
 
 # Provision Domain controller VM on AzSMGMT
-Write-Host "[Build cluster - Step 8/10] Building Domain Controller VM..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 8/11] Building Domain Controller VM..." -ForegroundColor Green
 New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
 
 # Provision Admincenter VM
@@ -1646,8 +1646,10 @@ New-DCVM -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCr
 # Prepare the cluster for deployment
 #######################################################################################
 # New-S2DCluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
-Write-Host "[Build cluster - Step 9/10] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
+Write-Host "[Build cluster - Step 9/11] Preparing HCI cluster Azure deployment..." -ForegroundColor Green
 Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCred $domainCred
+
+& "$Env:HCIBoxDir\Generate-ARM-Template.ps1"
 
 #######################################################################################
 # Validate and deploy the cluster
