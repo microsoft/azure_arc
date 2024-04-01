@@ -1494,21 +1494,34 @@ function Set-HCIDeployPrereqs {
 
         Write-Host "Checking extension status for $($PSItem.Name)"
 
+        $requiredExtensions = @('AzureEdgeTelemetryAndDiagnostics', 'AzureEdgeDeviceManagement', 'AzureEdgeLifecycleManager')
         $attempts = 0
-        $maxAttempts = 20
+        $maxAttempts = 60
 
         do {
             $attempts++
             $extension = Get-AzConnectedMachineExtension -MachineName $PSItem.Name -ResourceGroupName $env:resourceGroup
 
-            $extension
-
-            if ($extension.ProvisioningState -eq "Succeeded") {
-                break
+            foreach ($extensionName in $requiredExtensions) {
+                $extensionTest = $extension | Where-Object { $_.Name -eq $extensionName }
+                if (!$extensionTest) {
+                    Write-Host "$($PSItem.Name) : Extension $extensionName is missing" -ForegroundColor Yellow
+                    $Wait = $true
+                } elseif ($extensionTest.ProvisioningState -ne "Succeeded") {
+                    Write-Host "$($PSItem.Name) : Extension $extensionName is in place, but not yet provisioned. Current state: $($extensionTest.ProvisioningState)" -ForegroundColor Yellow
+                    $Wait = $true
+                } elseif ($extensionTest.ProvisioningState -eq "Succeeded") {
+                    Write-Host "$($PSItem.Name) : Extension $extensionName is in place and provisioned. Current state: $($extensionTest.ProvisioningState)" -ForegroundColor Green
+                    $Wait = $false
+                }
             }
 
+            if ($Wait){
             Write-Host "Waiting for extension installation to complete, sleeping for 1 minute. Attempt $attempts of $maxAttempts"
             Start-Sleep -Seconds 60
+            } else {
+                break
+            }
 
         } while ($attempts -lt $maxAttempts)
 
