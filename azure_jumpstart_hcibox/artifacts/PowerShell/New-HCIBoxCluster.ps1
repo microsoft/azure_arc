@@ -1496,7 +1496,7 @@ function Set-HCIDeployPrereqs {
 
         $requiredExtensions = @('AzureEdgeTelemetryAndDiagnostics', 'AzureEdgeDeviceManagement', 'AzureEdgeLifecycleManager')
         $attempts = 0
-        $maxAttempts = 60
+        $maxAttempts = 90
 
         do {
             $attempts++
@@ -1517,8 +1517,8 @@ function Set-HCIDeployPrereqs {
             }
 
             if ($Wait){
-            Write-Host "Waiting for extension installation to complete, sleeping for 1 minute. Attempt $attempts of $maxAttempts"
-            Start-Sleep -Seconds 60
+            Write-Host "Waiting for extension installation to complete, sleeping for 2 minutes. Attempt $attempts of $maxAttempts"
+            Start-Sleep -Seconds 120
             } else {
                 break
             }
