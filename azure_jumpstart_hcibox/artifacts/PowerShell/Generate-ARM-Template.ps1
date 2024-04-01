@@ -9,12 +9,6 @@ $Env:HCIBoxDir = "C:\HCIBox"
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Generate-ARM-Template.log"
 
-# Install some modules
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Az.Resources -AllowClobber -Force
-Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
-Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
-
 # Add necessary role assignments
 $ErrorActionPreference = "Continue"
 New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue

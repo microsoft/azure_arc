@@ -89,6 +89,17 @@ foreach ($app in $HCIBoxConfig.ChocolateyPackagesList)
     & choco install $app /y -Force | Write-Output
 }
 
+# Installing modules
+Write-Header "Installing PowerShell modules"
+
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+foreach ($module in $HCIBoxConfig.PowerShellModulesList)
+{
+    Write-Host "Installing $module"
+    Install-Module -Name $module -AllowClobber -Force
+}
+
 Write-Header "Install Azure CLI (64-bit not available via Chocolatey)"
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
@@ -184,7 +195,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     if ($rdpPort -eq 3389)
     {
       netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-    } 
+    }
     else
     {
       $systemroot = get-content env:systemroot
@@ -203,5 +214,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" -Force
