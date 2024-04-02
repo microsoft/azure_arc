@@ -1681,8 +1681,6 @@ function Deploy-AIO {
         catch {
             Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
         }
-        # increase the maximum number of files
-        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
 
         Write-Host "Configuring firewall specific to AIO"
         Write-Host "Add firewall rule for AIO MQTT Broker"
@@ -1772,7 +1770,7 @@ function Deploy-AIO {
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1793,7 +1791,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -1831,6 +1829,72 @@ function Deploy-AIO {
     (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
         $kvIndex++
+    }
+}
+
+function Deploy-ESA {
+    ##############################################################
+    # Deploy Edge Storage Accelerator (ESA)
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+    $esapvJson = "$aioToolsDir\config.json"
+    $esapvYaml = "$aioToolsDir\esapv.yml"
+    $esapvcYaml = "$aioToolsDir\esapvc.yml"
+    $esaappYaml = "$aioToolsDir\configPod.yml"
+
+     # Get the storage Account secret
+     $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
+        
+     # Define names for ESA Yamls
+     $esaPVName = "esapv"
+     $esaPVCName = "esapvc"
+     $esaAppName = "testingapp"
+ 
+     # Inject params into the yaml file for PV
+     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaSecretName', $esaSecret | Set-Content $esapvYaml
+     
+     # Inject params into the yaml file for PVC
+     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
+ 
+     # Inject params into the yaml file for ESA App
+     (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+
+        # increase the maximum number of files
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+        
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+    
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
+        kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvYaml
+    
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvcYaml
+    
+        Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
+        kubectl apply -f $esaappYaml
     }
 }
 
@@ -2250,7 +2314,6 @@ $adxClusterName = $Env:adxClusterName
 $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
-$aioNamespace = "azure-iot-operations"
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $appsRepo = "jumpstart-agora-apps"
@@ -2265,6 +2328,10 @@ if ($industry -eq "retail") {
 elseif ($industry -eq "manufacturing") {
     $aioNamespace = "azure-iot-operations"
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    $stagingStorageAccountName = $Env:stagingStorageAccountName
+    $aioStorageAccountName = $Env:aioStorageAccountName
+    $spnObjectId = $Env:spnObjectId
+    $stcontainerName = $Env:stcontainerName
 }
 
 
@@ -2388,7 +2455,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 if ($industry -eq "manufacturing") {
     Deploy-AIO
     #Deploy-InfluxDb
-    #Deploy-ESA
+    Deploy-ESA
     #Deploy-ManufacturingConfigs
 }
 
