@@ -4,7 +4,7 @@ locals {
 
 resource "aws_instance" "windows" {
   count                       = var.server_count
-  ami                         = data.aws_ami.Windows_2019.image_id
+  ami                         = data.aws_ami.Windows_2022.image_id
   instance_type               = "t2.micro"
   key_name                    = aws_key_pair.keypair.id
   vpc_security_group_ids      = [aws_security_group.ingress-all.id]
