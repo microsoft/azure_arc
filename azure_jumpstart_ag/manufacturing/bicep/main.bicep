@@ -11,9 +11,6 @@ param spnTenantId string
 @description('Azure service principal Object id')
 param spnObjectId string
 
-@description('Azure service principal Subscription id')
-param subscriptionId string
-
 @description('Location for all resources')
 param location string = resourceGroup().location
 
