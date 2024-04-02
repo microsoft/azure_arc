@@ -8,9 +8,9 @@ function Deploy-AzCLI {
         $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
-    
+
     $Env:AZURE_CONFIG_DIR = $cliDir.FullName
-    
+
     # Making extension install dynamic
     if ($AgConfig.AzCLIExtensions.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -20,7 +20,7 @@ function Deploy-AzCLI {
             az extension add --name $extension --system --only-show-errors
         }
     }
-    
+
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
     Write-Host
 }
@@ -890,7 +890,7 @@ function Deploy-ClusterSecrets {
             }
         }
     }
-    
+
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
@@ -1046,7 +1046,7 @@ $F
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
                     for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
                         $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-                        
+
                         # Check the condition
                         if ($ConnectivityStatus -eq 'Connected') {
                             # Condition is true, break out of the loop
@@ -1401,7 +1401,7 @@ function Deploy-ManufacturingConfigs {
         #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
     }
 
-    # Loop through the clusters and 
+    # Loop through the clusters and
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig
@@ -1649,7 +1649,7 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
-    
+
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -1749,6 +1749,25 @@ function Deploy-AIO {
             --features cluster-connect custom-locations `
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
+
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        $repoName = "azure_arc" # While testing, change to your GitHub fork's repository name
+        $deploymentFolder = "C:\Ag\L1Files"
+        $githubApiUrl = "https://api.github.com/repos/$env:githubAccount/$repoName/contents/azure_jumpstart_ag/artifacts/L1Files?ref=$env:githubBranch"
+        $response = Invoke-RestMethod -Uri $githubApiUrl
+        $fileUrls = $response | Where-Object { $_.type -eq "file" } | Select-Object -ExpandProperty download_url
+        $fileUrls | ForEach-Object {
+            $fileName = $_.Substring($_.LastIndexOf("/") + 1)
+            $outputFile = Join-Path $deploymentFolder $fileName
+            Invoke-RestMethod -Uri $_ -OutFile $outputFile
+        }
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$deploymentFolder\config.json"
 
         do {
             az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
@@ -1878,6 +1897,50 @@ function Deploy-ESA {
         kubectl apply -f $esaappYaml
     }
 }
+
+function Deploy-Workbook {
+
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying Azure Workbook 'Azure Arc-enabled resources inventory'."
+    Write-Host "`n"
+
+    $workbookTemplateFilePath = "$AgMonitoringDir\arc-inventory-workbook.bicep"
+
+    # Read the content of the workbook template-file
+    $content = Get-Content -Path $workbookTemplateFilePath -Raw
+
+    # Replace placeholders with actual values
+    $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
+    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
+
+    # Write the updated content back to the file
+    Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
+
+    # Deploy the workbook
+    try {
+
+        $TemplateParameterObject = @{
+            location = $Env:azureLocation
+            workbookDisplayName = 'Azure Arc-enabled resources inventory'
+            workbookType = 'workbook'
+            workbookSourceId = 'azure monitor'
+            workbookId = 'c5c6a9e5-74fc-465a-9f11-1dd10aad501b'
+        }
+
+        New-AzResourceGroupDeployment -ResourceGroupName $Env:resourceGroup -TemplateFile $workbookTemplateFilePath  -ErrorAction Stop -TemplateParameterObject $TemplateParameterObject
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Deployment of template-file $workbookTemplateFilePath succeeded."
+
+    } catch {
+
+        Write-Error "[$(Get-Date -Format t)] ERROR: Deployment of template-file $workbookTemplateFilePath failed. Error details: $PSItem.Exception.Message"
+
+    }
+
+
+}
+
 function Deploy-Prometheus {
     $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
     $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
@@ -1912,7 +1975,21 @@ function Deploy-Prometheus {
 
     # Reset Grafana Password
     $Env:Path += ';C:\Program Files\GrafanaLabs\grafana\bin'
-    grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+    $retryCount = 5
+    $retryDelay = 30
+    do {
+        try {
+            grafana-cli --homepath "C:\Program Files\GrafanaLabs\grafana" admin reset-admin-password $adminPassword | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+            $retryCount = 0
+        }
+        catch {
+            $retryCount--
+            if ($retryCount -gt 0) {
+                Write-Host "[$(Get-Date -Format t)] INFO: Retrying in $retryDelay seconds..." -ForegroundColor Gray
+                Start-Sleep -Seconds $retryDelay
+            }
+        }
+    } while ($retryCount -gt 0)
 
     # Get Grafana Admin credentials
     $adminCredentials = $AgConfig.Monitoring["AdminUser"] + ':' + $adminPassword
@@ -2320,7 +2397,7 @@ Deploy-VirtualizationInfrastructure
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
 if ($industry -eq "retail") {
-    Deploy-AzContainerRegistry    
+    Deploy-AzContainerRegistry
 }
 
 #####################################################################
@@ -2409,7 +2486,12 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-#Deploy-Prometheus
+Deploy-Prometheus
+
+#####################################################################
+# Deploy Azure Workbook for Infrastructure Observability
+#####################################################################
+Deploy-Workbook
 
 ##############################################################
 # Creating bookmarks
