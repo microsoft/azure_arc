@@ -1,3 +1,5 @@
+targetScope = 'subscription'
+
 @description('Azure service principal client id')
 param spnClientId string = ''
 
@@ -8,15 +10,13 @@ param spnClientSecret string = newGuid()
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string = ''
 
+@description('Azure service principal Object id')
+param spnObjectId string = ''
+
 @minLength(1)
 @maxLength(77)
 @description('Prefix for resource group, i.e. {name}-rg')
 param envName string = toLower(substring(newGuid(), 0, 5))
-
-//@description('Azure service principal object id')
-//param spnObjectId string
-
-targetScope = 'subscription'
 
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${envName}-rg'
@@ -55,11 +55,6 @@ param deployBastion bool = false
 @minLength(1)
 param githubUser string = 'Microsoft'
 
-//@description('GitHub Personal access token for the user account')
-//@minLength(1)
-//@secure()
-//param githubPAT string
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
@@ -95,6 +90,9 @@ param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
+
+@description('The name of ESA container in Storage Account')
+param stcontainerName string = 'esacontainer'
 
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
@@ -152,7 +150,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
-    //spnObjectId: spnObjectId
+    spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -170,6 +168,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
     industry: industry
+    stcontainerName: stcontainerName
   }
 }
 
@@ -192,6 +191,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
+    stcontainerName: stcontainerName
   }
 }
 
