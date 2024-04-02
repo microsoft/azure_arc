@@ -179,6 +179,7 @@
     AKSVIPStartIP                        = "10.10.0.10"
     AKSVIPEndIP                          = "10.10.0.100"
     AKSIPPrefix                          = "10.10.0.0/24"
+    AKSControlPlaneIP                    = "10.10.0.5"
     AKSGWIP                              = "10.10.0.1"
     AKSDNSIP                             = "192.168.1.254"
     AKSVLAN                              = "110"

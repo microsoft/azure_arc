@@ -2,6 +2,8 @@
 param spnClientId string = ''
 
 @description('Azure service principal client secret')
+@minLength(12)
+@maxLength(123)
 @secure()
 param spnClientSecret string = newGuid()
 
@@ -27,7 +29,7 @@ param windowsAdminUsername string = 'Agora'
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param windowsAdminPassword string = newGuid()
 
 @description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
 param sshRSAPublicKey string = ''
@@ -46,7 +48,7 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string  = 'Microsoft'
+param githubUser string  = 'sampleUser'
 
 @description('GitHub Personal access token for the user account')
 @minLength(1)
