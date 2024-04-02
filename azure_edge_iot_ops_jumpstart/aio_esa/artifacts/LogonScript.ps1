@@ -358,11 +358,16 @@ function Add-AzureStorageAccountSecret {
 #Begin ESA Installation. 
 #Documentation: https://aepreviews.ms/docs/edge-storage-accelerator/how-to-install-edge-storage-accelerator/
 # Create a storage account
+# Echo the container and account name
+Write-Host "Storage Account Name: $env:storageAccountName"
+Write-Host "Container Name: $env:storageContainer"
+
 Write-Host "Creating storage account..."
 az storage account create --resource-group "$env:resourceGroup" --name "$env:storageAccountName" --location "$env:location" --sku Standard_RAGRS --kind StorageV2 --allow-blob-public-access false
 # Create a container within the storage account
 Write-Host "Creating container within the storage account..."
-az storage container create --name $env:storageContainer --account-name $env:storageAccountName
+az storage container create --name "$env:storageContainer" --account-name "$env:storageAccountName"
+
 
 Write-Host "Checking if local-path storage class is available..."
 $localPathStorageClass = kubectl get storageclass | Select-String -Pattern "local-path"
