@@ -63,6 +63,9 @@ param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 @description('Name of the storage queue')
 param storageQueueName string = 'aioqueue'
 
+@description('Name of the event hub')
+param eventHubName string = 'aiohub${namingGuid}'
+
 @description('Name of the event hub namespace')
 param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 
