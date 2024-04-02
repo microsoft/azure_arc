@@ -21,7 +21,7 @@
       "value": "${JS_WINDOWS_ADMIN_USERNAME}"
     },
     "deployBastion": {
-      "value": false
+      "value": "${JS_DEPLOY_BASTION}"
     },
     "rdpPort": {
       "value": "${JS_RDP_PORT}"

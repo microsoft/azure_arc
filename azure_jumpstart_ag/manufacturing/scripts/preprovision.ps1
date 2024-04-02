@@ -154,6 +154,18 @@ if ($promptOutput = Read-Host "Enter the Windows Admin Username [$JS_WINDOWS_ADM
 # set the env variable
 azd env set JS_WINDOWS_ADMIN_USERNAME -- $JS_WINDOWS_ADMIN_USERNAME
 
+########################################################################
+# Use Azure Bastion?
+########################################################################
+$promptOutput = Read-Host "Configure Azure Bastion for accessing HCIBox host [Y/N]?"
+$JS_DEPLOY_BASTION = $false
+if ($promptOutput -like 'y')
+{
+    $JS_DEPLOY_BASTION = $true
+}
+
+# set the env variable
+azd env set JS_DEPLOY_BASTION $JS_DEPLOY_BASTION
 
 ########################################################################
 # RDP Port
@@ -162,8 +174,12 @@ $JS_RDP_PORT = '3389'
 If ($env:JS_RDP_PORT) {
     $JS_RDP_PORT = $env:JS_RDP_PORT
 }
-if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection [$JS_RDP_PORT]") { $JS_RDP_PORT = $promptOutput }
-
+if ($promptOutput -notlike 'y') {
+    if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection [$JS_RDP_PORT]") 
+    { 
+        $JS_RDP_PORT = $promptOutput 
+    }
+}
 # set the env variable
 azd env set JS_RDP_PORT $JS_RDP_PORT
 
@@ -192,30 +208,31 @@ azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
 ########################################################################
 # Create Azure Service Principal
 ########################################################################
-Write-Host "Creating Azure Service Principal..."
-
-$user = $context.Account.Id.split("@")[0]
-$uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
-try {
-    $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
+Write-Host "Checking for existing stored Azure service principal..."
+if ($null -ne $env:SPN_CLIENT_ID) {
+    Write-Host "Re-using existing service principal..."
+} else {
+    Write-Host "Attempting to create new service principal with scope /subscriptions/$($env:AZURE_SUBSCRIPTION_ID)..."
+    $user = (Get-AzContext).Account.Id.split("@")[0]
+    $uniqueSpnName = "$user-jumpstart-spn-$(Get-Random -Minimum 1000 -Maximum 9999)"
+    try {
+        $spn = New-AzADServicePrincipal -DisplayName $uniqueSpnName -Role "Owner" -Scope "/subscriptions/$($env:AZURE_SUBSCRIPTION_ID)" -ErrorAction Stop
+        $SPN_CLIENT_ID = $spn.AppId
+        $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
+        $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
+        # Set environment variables
+        azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
+        azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
+        azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
+    }
+    catch {
+        
+        If ($error[0].ToString() -match "Forbidden"){
+            Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
+        }
+        else {
+            Throw "An error occurred creating the service principal. Error:" + $error[0].ToString()
+        }
+    }
+    
 }
-catch {
-    If ($error[0].ToString() -match "Forbidden"){
-        Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
-    }
-    elseif ($error[0].ToString() -match "credentials") {
-        Throw "Please run Connect-AzAccount to sign and run 'azd up' again."
-    }
-    else {
-        Throw "An error occurred creating the service principal. Please try again."
-    }
-} 
-
-$SPN_CLIENT_ID = $spn.AppId
-$SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
-$SPN_TENANT_ID = (Get-AzContext).Tenant.Id
-
-# Set environment variables
-azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
-azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
-azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
