@@ -40,8 +40,7 @@ if ($industry -eq "retail") {
     $cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $workflowStatus = ""
-}
-elseif ($industry -eq "manufacturing") {
+}elseif ($industry -eq "manufacturing") {
     $aioNamespace = "azure-iot-operations"
     $mqListenerService = "aio-mq-dmqtt-frontend"
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
