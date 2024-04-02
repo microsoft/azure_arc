@@ -1,3 +1,5 @@
+targetScope = 'subscription'
+
 @description('Azure service principal client id')
 param spnClientId string = ''
 
@@ -15,11 +17,6 @@ param spnObjectId string = ''
 @maxLength(77)
 @description('Prefix for resource group, i.e. {name}-rg')
 param envName string = toLower(substring(newGuid(), 0, 5))
-
-//@description('Azure service principal object id')
-//param spnObjectId string
-
-targetScope = 'subscription'
 
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${envName}-rg'
@@ -57,11 +54,6 @@ param deployBastion bool = false
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
 param githubUser string = 'Microsoft'
-
-//@description('GitHub Personal access token for the user account')
-//@minLength(1)
-//@secure()
-//param githubPAT string
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
