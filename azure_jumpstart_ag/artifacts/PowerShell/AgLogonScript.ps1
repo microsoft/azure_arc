@@ -168,8 +168,8 @@ if ($industry -eq "retail") {
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
 if ($industry -eq "retail") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
     Deploy-RetailConfigs
 }
 
