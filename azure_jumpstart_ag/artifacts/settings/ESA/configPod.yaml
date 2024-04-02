@@ -4,7 +4,7 @@ metadata:
   name: appname
   labels:
     app: appname
-  namespace: namespace
+  namespace: esanamespace
 
 spec:
   replicas: 1

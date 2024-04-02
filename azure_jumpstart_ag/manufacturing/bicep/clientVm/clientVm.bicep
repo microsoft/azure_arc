@@ -34,7 +34,7 @@ param spnClientId string
 @description('Azure service principal object id')
 param spnObjectId string
 
-@description('Azure service principal subscription id')
+@description('Azure Subscription id')
 param subscriptionId string
 
 @description('Client secret of the service principal')

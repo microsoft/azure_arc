@@ -4,7 +4,7 @@ metadata:
     ### CREATE A NAME HERE ###
     name: esaPVName
     ### USE A NAMESPACE THAT MATCHES YOUR INTENDED CONSUMING POD OR "DEFAULT" ###
-    namespace: namespace
+    namespace: esanamespace
 spec:
     capacity:
         ### This storage capacity value is not enforced at this layer. ###
@@ -24,5 +24,5 @@ spec:
             ### FILL IN THE NEXT TWO/THREE VALUES WITH YOUR INFORMATION ###
             secretName: esaSecretName ### From the previous step, this name will be "{YOUR_STORAGE_ACCOUNT}-secret"
             ### If you are using a non-default namespace, please uncomment the line below and add your namespace. ###
-            secretNamespace: namespace
+            secretNamespace: esanamespace
             containerName: esaContainerName

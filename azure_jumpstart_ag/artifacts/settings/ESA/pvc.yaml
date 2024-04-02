@@ -4,7 +4,7 @@ metadata:
     ### CREATE A NAME FOR YOUR PVC ###
     name: esaPVCName
     ### USE A NAMESPACE THAT MATCHES YOUR INTENDED CONSUMING POD OR "DEFAULT" ###
-    namespace: namespace
+    namespace: esanamespace
 spec: 
     accessModes: 
         - ReadWriteMany 
@@ -19,4 +19,4 @@ status:
     accessModes: 
         - ReadWriteMany 
     capacity: 
-        storage: 5Gi
+        storage: 10Gi

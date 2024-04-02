@@ -44,6 +44,5 @@ resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts
   ]
 }
 
-
 output queueName string = storageQueueName
 output storageAccountId string = storageAccount.id

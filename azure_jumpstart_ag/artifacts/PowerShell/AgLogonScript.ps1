@@ -1582,10 +1582,6 @@ function Deploy-InfluxDb {
     $influxdbYaml = "$aioToolsDir\influxdb.yml"
     $influxImportYaml = "$aioToolsDir\influxdb-import-dashboard.yml"
     $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
-    $esapvJson = "$aioToolsDir\config.json"
-    $esapvYaml = "$aioToolsDir\esapv.yml"
-    $esapvcYaml = "$aioToolsDir\esapvc.yml"
-    $esaappYaml = "$aioToolsDir\configPod.yml"
 
     do {
         $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
@@ -1818,51 +1814,66 @@ function Deploy-AIO {
 }
 
 function Deploy-ESA {
-    # increase the maximum number of files
-    Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $esapvJson = "$aioToolsDir\config.json"
+    $esapvYaml = "$aioToolsDir\esapv.yml"
+    $esapvcYaml = "$aioToolsDir\esapvc.yml"
+    $esaappYaml = "$aioToolsDir\configPod.yml"
+
+     # Get the storage Account secret
+     $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
+        
+     # Define names for ESA Yamls
+     $esaPVName = "esapv"
+     $esaPVCName = "esapvc"
+     $esaAppName = "testingapp"
+ 
+     # Inject params into the yaml file for PV
+     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaSecretName', $esaSecret | Set-Content $esapvYaml
+     
+     # Inject params into the yaml file for PVC
+     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
+ 
+     # Inject params into the yaml file for ESA App
+     (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
+     
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+
+        # increase the maximum number of files
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+        
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
     
-    # Enable Open Service Mesh extension on the Arc-enabled cluster
-    Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
-    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
+        kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvYaml
     
-    # Get the storage Account secret
-    $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvcYaml
     
-    # Define names for ESA Yamls
-    $esaPVName = "esapv"
-    $esaPVCName = "esapvc"
-    $esaAppName = "esaapp"
-
-    # Inject params into the yaml file for PV
-    (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'namespace', $aioNamespace | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaSecretName', $ESAsecret | Set-Content $esapvYaml
-    
-    # Inject params into the yaml file for PVC
-    (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
-    (Get-Content $esapvcYaml ) -replace 'namespace', $aioNamespace | Set-Content $esapvcYaml
-    (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
-
-    # Inject params into the yaml file for ESA App
-    (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
-    (Get-Content $esaappYaml ) -replace 'namespace', $aioNamespace | Set-Content $esaappYaml
-    (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
-
-    # Enable ESA extension on the Arc-enabled cluster
-    Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-    az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
-    kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
-    
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
-    kubectl apply -f $esapvYaml
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
-    kubectl apply -f $esapvcYaml
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
-    kubectl apply -f $esaappYaml
-
+        Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
+        kubectl apply -f $esaappYaml
+    }
 }
 function Deploy-Prometheus {
     $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
