@@ -53,9 +53,9 @@ if ($industry -eq "retail") {
 #####################################################################
 # Importing fuctions
 #####################################################################
-Import-Module "$AgPowerShellDir\common.psm1"
-Import-Module "$AgPowerShellDir\retail.psm1"
-Import-Module "$AgPowerShellDir\manufacturing.psm1"
+Import-Module "$AgPowerShellDir\common.psm1" -Force
+Import-Module "$AgPowerShellDir\retail.psm1" -Force
+Import-Module "$AgPowerShellDir\manufacturing.psm1" -Force
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"

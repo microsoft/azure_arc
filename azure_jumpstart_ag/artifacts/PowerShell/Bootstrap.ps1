@@ -258,9 +258,9 @@ elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/config.json") -OutFile "$AgToolsDir\config.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pv.yaml") -OutFile "$AgToolsDir\pv.yaml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pvc.yaml") -OutFile "$AgToolsDir\pvc.yaml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/configPod.yaml") -OutFile "$AgToolsDir\configPod.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pv.yaml") -OutFile "$AgToolsDir\esapv.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pvc.yaml") -OutFile "$AgToolsDir\esapvc.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/configPod.yaml") -OutFile "$AgToolsDir\configPod.yml"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }

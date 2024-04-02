@@ -328,6 +328,8 @@ function Deploy-AIO {
                 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
                 Write-Host "Persisted iptable rules for node exporter"
             }
+                    # increase the maximum number of files
+                Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
             else {
                 Write-Host "iptable rule exists, skip configuring iptable rules..."
             }
@@ -476,17 +478,14 @@ function Deploy-ESA {
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
 
-        # increase the maximum number of files
-        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
-
         # Enable Open Service Mesh extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
 
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
-        kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson --release-train dev --scope cluster --only-show-errors
+        kubectl create secret generic -n $aioNamespace $esaSecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
 
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
         kubectl apply -f $esapvYaml
