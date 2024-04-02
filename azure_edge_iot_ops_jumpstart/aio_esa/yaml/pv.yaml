@@ -20,7 +20,7 @@ spec:
             protocol: edgecache
             edgecache-storage-auth: AccountKey
             ### FILL IN THE NEXT TWO/THREE VALUES WITH YOUR INFORMATION ###
-            secretName: esademo-container-secret ### From the previous step, this name will be "{YOUR_STORAGE_ACCOUNT}-secret"
+            secretName: esa-secret ### From the previous step, this name will be "{YOUR_STORAGE_ACCOUNT}-secret"
             ### If you are using a non-default namespace, please uncomment the line below and add your namespace. ###
             #secretNamespace: YOUR_NAMESPACE_HERE
             containerName: esademo-container
