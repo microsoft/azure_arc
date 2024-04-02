@@ -331,10 +331,10 @@
                 "typeHandlerVersion": "1.10",
                 "autoUpgradeMinorVersion": true,
                 "protectedSettings": {
-                    "fileUris": [
-                        "[uri(variables('templateBaseUrl'), concat('artifacts/Bootstrap.ps1'))]"
-                    ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -windowsNode ', parameters('windowsNode'), ' -templateBaseUrl ', variables('templateBaseUrl'))]"
+                   "fileUris": [
+                       "[uri(variables('templateBaseUrl'), concat('artifacts/Bootstrap.ps1'))]"
+                   ],
+                   "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Bootstrap.ps1', ' -adminUsername ', parameters('adminUsername'), ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -kubernetesDistribution ', parameters('kubernetesDistribution'), ' -windowsNode ', parameters('windowsNode'), ' -templateBaseUrl ', variables('templateBaseUrl'), ' -storageAccountName ', parameters('storageAccountName'), ' -storageContainer ', parameters('storageContainer'))]"
                 }
             }
         },
