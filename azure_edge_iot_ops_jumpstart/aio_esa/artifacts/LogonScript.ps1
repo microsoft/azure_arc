@@ -415,20 +415,21 @@ if ($extensionExists -eq "microsoft.edgestorageaccelerator") {
    az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "config.json"
    Write-Host "Edge Storage Accelerator Arc Extension installed successfully."
 }
+
 # Create Kubernetes secret for Azure Storage account
 Write-Host "Creating Kubernetes secret for Azure Storage account..."
-$secretName = "$env:storageContainer-secret"
-Add-AzureStorageAccountSecret -ResourceGroup $env:resourceGroup -StorageAccount $env:storageAccountName -Namespace "default" -SecretName $secretName
+$secretName = "$env:storageAccountName-secret"
+Add-AzureStorageAccountSecret -ResourceGroup $env:resourceGroup -StorageAccount $env:storageAccountName -Namespace "default" -SecretName "esa-secret"
 Write-Host "Kubernetes secret created successfully."
 Write-Host "Downloading pv.yaml file..."
 $pvYamlUrl = "https://raw.githubusercontent.com/fcabrera23/azure_arc/scenarios-esa/azure_edge_iot_ops_jumpstart/aio_esa/yaml/pv.yaml"
 $pvYamlPath = "pv.yaml"
 Invoke-WebRequest -Uri $pvYamlUrl -OutFile $pvYamlPath
 # Update the secret name and container name in the pv.yaml file
-$pvYamlContent = Get-Content -Path $pvYamlPath -Raw
-$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}-secret', $secretName
-$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}', $env:storageContainer
-Set-Content -Path $pvYamlPath -Value $pvYamlContent
+#$pvYamlContent = Get-Content -Path $pvYamlPath -Raw
+#$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}-secret', $secretName
+#$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}', $env:storageContainer
+#Set-Content -Path $pvYamlPath -Value $pvYamlContent
 # Apply the pv.yaml file using kubectl
 Write-Host "Applying pv.yaml configuration..."
 kubectl apply -f $pvYamlPath
