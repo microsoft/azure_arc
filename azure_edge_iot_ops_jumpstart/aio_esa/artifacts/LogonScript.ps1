@@ -359,7 +359,7 @@ function Add-AzureStorageAccountSecret {
 #Documentation: https://aepreviews.ms/docs/edge-storage-accelerator/how-to-install-edge-storage-accelerator/
 # Create a storage account
 Write-Host "Creating storage account..."
-New-AzStorageAccount -ResourceGroupName "$env:resourceGroup" -Name "$env:storageAccountName" -Location $location -SkuName Standard_RAGRS -Kind StorageV2 -AllowBlobPublicAccess $false
+az storage account create --resource-group "$env:resourceGroup" --name "$env:storageAccountName" --location "$env:location" --sku Standard_RAGRS --kind StorageV2 --allow-blob-public-access false
 # Create a container within the storage account
 Write-Host "Creating container within the storage account..."
 az storage container create --name $env:storageContainer --account-name $env:storageAccountName
