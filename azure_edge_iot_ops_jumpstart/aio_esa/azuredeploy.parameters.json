@@ -33,7 +33,7 @@
       "value": "XXXXX-XXXXX-XXXXX"
     },
     "location": {
-      "value": "eastus"
+      "value": "eastus2"
     },
     "deployBastion": {
       "value": true
@@ -45,7 +45,7 @@
       "value": "XXXXXX"
     },
     "storageContainer": {
-      "value": "XXXXXXXX"
+      "value": "esademo-container"
     }
   }
 }
