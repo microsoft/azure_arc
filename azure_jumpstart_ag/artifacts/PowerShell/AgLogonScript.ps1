@@ -55,7 +55,7 @@ elseif ($industry -eq "manufacturing") {
 # Importing fuctions
 #####################################################################
 Import-Module "$AgPowerShellDir\common.psm1"
-Import-Module "$AgPowerShellDir\retial.psm1"
+Import-Module "$AgPowerShellDir\retail.psm1"
 Import-Module "$AgPowerShellDir\manufacturing.psm1"
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
