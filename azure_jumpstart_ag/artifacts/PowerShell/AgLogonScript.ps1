@@ -1814,9 +1814,12 @@ function Deploy-AIO {
 }
 
 function Deploy-ESA {
-
+    ##############################################################
+    # Deploy Edge Storage Accelerator (ESA)
+    ##############################################################
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
+    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
     $esapvJson = "$aioToolsDir\config.json"
     $esapvYaml = "$aioToolsDir\esapv.yml"
     $esapvcYaml = "$aioToolsDir\esapvc.yml"
@@ -1845,7 +1848,7 @@ function Deploy-ESA {
      (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
      (Get-Content $esaappYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esaappYaml
      (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
-     
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the $clusterName cluster" -ForegroundColor Gray
