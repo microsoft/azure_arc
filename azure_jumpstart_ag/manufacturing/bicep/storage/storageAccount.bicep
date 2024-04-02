@@ -12,6 +12,9 @@ param skuName string = 'Standard_LRS'
 
 param storageQueueName string = 'aioQueue'
 
+@description('The name of ESA container in Storage Account')
+param stcontainerName string
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
@@ -34,6 +37,12 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
   name: storageQueueName
 }
 
+resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  name: '${storageAccountName}/default/${stcontainerName}'
+  dependsOn: [
+    storageAccount
+  ]
+}
 
 output queueName string = storageQueueName
 output storageAccountId string = storageAccount.id

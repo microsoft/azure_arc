@@ -1,0 +1,22 @@
+apiVersion: v1 
+kind: PersistentVolumeClaim 
+metadata:
+    ### CREATE A NAME FOR YOUR PVC ###
+    name: esaPVCName
+    ### USE A NAMESPACE THAT MATCHES YOUR INTENDED CONSUMING POD OR "DEFAULT" ###
+    namespace: esanamespace
+spec: 
+    accessModes: 
+        - ReadWriteMany 
+    resources: 
+        requests: 
+            storage: 5Gi 
+    storageClassName: esa
+    volumeMode: Filesystem
+    ### THIS NAME IS FROM YOUR PV CONFIG ###
+    volumeName: esaPVName
+status: 
+    accessModes: 
+        - ReadWriteMany 
+    capacity: 
+        storage: 10Gi

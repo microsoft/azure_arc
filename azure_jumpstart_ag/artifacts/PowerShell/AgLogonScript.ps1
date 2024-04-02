@@ -8,9 +8,9 @@ function Deploy-AzCLI {
         $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
-    
+
     $Env:AZURE_CONFIG_DIR = $cliDir.FullName
-    
+
     # Making extension install dynamic
     if ($AgConfig.AzCLIExtensions.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
@@ -20,7 +20,7 @@ function Deploy-AzCLI {
             az extension add --name $extension --system --only-show-errors
         }
     }
-    
+
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
     Write-Host
 }
@@ -890,7 +890,7 @@ function Deploy-ClusterSecrets {
             }
         }
     }
-    
+
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
@@ -1046,7 +1046,7 @@ $F
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
                     for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
                         $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
-                        
+
                         # Check the condition
                         if ($ConnectivityStatus -eq 'Connected') {
                             # Condition is true, break out of the loop
@@ -1401,7 +1401,7 @@ function Deploy-ManufacturingConfigs {
         #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
     }
 
-    # Loop through the clusters and 
+    # Loop through the clusters and
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig
@@ -1649,7 +1649,7 @@ function Deploy-AIO {
     # Preparing clusters for aio
     ##############################################################
     $VMnames = (Get-VM).Name
-    
+
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
         ###########################################
@@ -1681,8 +1681,6 @@ function Deploy-AIO {
         catch {
             Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
         }
-        # increase the maximum number of files
-        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command 'echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p'
 
         Write-Host "Configuring firewall specific to AIO"
         Write-Host "Add firewall rule for AIO MQTT Broker"
@@ -1762,7 +1760,7 @@ function Deploy-AIO {
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "$AgDeploymentFolder\config.json" --release-train dev
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -1783,7 +1781,7 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $env:spnClientID --sp-secret $env:spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -1822,6 +1820,112 @@ function Deploy-AIO {
         $kvIndex++
     }
 }
+
+function Deploy-ESA {
+    ##############################################################
+    # Deploy Edge Storage Accelerator (ESA)
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+    $esapvJson = "$aioToolsDir\config.json"
+    $esapvYaml = "$aioToolsDir\esapv.yml"
+    $esapvcYaml = "$aioToolsDir\esapvc.yml"
+    $esaappYaml = "$aioToolsDir\configPod.yml"
+
+     # Get the storage Account secret
+     $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
+        
+     # Define names for ESA Yamls
+     $esaPVName = "esapv"
+     $esaPVCName = "esapvc"
+     $esaAppName = "testingapp"
+ 
+     # Inject params into the yaml file for PV
+     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
+     (Get-Content $esapvYaml ) -replace 'esaSecretName', $esaSecret | Set-Content $esapvYaml
+     
+     # Inject params into the yaml file for PVC
+     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvcYaml
+     (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
+ 
+     # Inject params into the yaml file for ESA App
+     (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esaappYaml
+     (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+
+        # increase the maximum number of files
+        Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+        
+        # Enable Open Service Mesh extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+    
+        # Enable ESA extension on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the Arc-enabled cluster" -ForegroundColor DarkGray
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson
+        kubectl create secret generic -n $aioNamespace "$arcClusterName"-secret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvYaml
+    
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the Arc-enabled cluster" -ForegroundColor DarkGray
+        kubectl apply -f $esapvcYaml
+    
+        Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
+        kubectl apply -f $esaappYaml
+    }
+}
+
+function Deploy-Workbook {
+
+    $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying Azure Workbook 'Azure Arc-enabled resources inventory'."
+    Write-Host "`n"
+
+    $workbookTemplateFilePath = "$AgMonitoringDir\arc-inventory-workbook.bicep"
+
+    # Read the content of the workbook template-file
+    $content = Get-Content -Path $workbookTemplateFilePath -Raw
+
+    # Replace placeholders with actual values
+    $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
+    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
+
+    # Write the updated content back to the file
+    Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
+
+    # Deploy the workbook
+    try {
+
+        $TemplateParameterObject = @{
+            location = $Env:azureLocation
+            workbookDisplayName = 'Azure Arc-enabled resources inventory'
+            workbookType = 'workbook'
+            workbookSourceId = 'azure monitor'
+            workbookId = 'c5c6a9e5-74fc-465a-9f11-1dd10aad501b'
+        }
+
+        New-AzResourceGroupDeployment -ResourceGroupName $Env:resourceGroup -TemplateFile $workbookTemplateFilePath  -ErrorAction Stop -TemplateParameterObject $TemplateParameterObject
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Deployment of template-file $workbookTemplateFilePath succeeded."
+
+    } catch {
+
+        Write-Error "[$(Get-Date -Format t)] ERROR: Deployment of template-file $workbookTemplateFilePath failed. Error details: $PSItem.Exception.Message"
+
+    }
 
 function Configure-MQTTIpAddress {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -2222,8 +2326,6 @@ $adxClusterName = $Env:adxClusterName
 $namingGuid = $Env:namingGuid
 $adminPassword = $Env:adminPassword
 $customLocationRPOID = $Env:customLocationRPOID
-$aioNamespace = "azure-iot-operations"
-$mqListenerService = "aio-mq-dmqtt-frontend"
 $appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $appsRepo = "jumpstart-agora-apps"
@@ -2238,6 +2340,10 @@ if ($industry -eq "retail") {
 elseif ($industry -eq "manufacturing") {
     $aioNamespace = "azure-iot-operations"
     $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    $stagingStorageAccountName = $Env:stagingStorageAccountName
+    $aioStorageAccountName = $Env:aioStorageAccountName
+    $spnObjectId = $Env:spnObjectId
+    $stcontainerName = $Env:stcontainerName
 }
 
 
@@ -2361,7 +2467,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 if ($industry -eq "manufacturing") {
     Deploy-AIO
     #Deploy-InfluxDb
-    #Deploy-ESA
+    Deploy-ESA
     #Deploy-ManufacturingConfigs
 }
 
@@ -2376,6 +2482,11 @@ if ($industry -eq "manufacturing") {
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
 Deploy-Prometheus
+
+#####################################################################
+# Deploy Azure Workbook for Infrastructure Observability
+#####################################################################
+Deploy-Workbook
 
 ##############################################################
 # Creating bookmarks
