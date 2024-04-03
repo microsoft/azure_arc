@@ -6,48 +6,48 @@ Set-PSDebug -Strict
 #####################################################################
 # Initialize the environment
 #####################################################################
-$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-$AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
-$AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
-$configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
-$AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
-$AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
-$industry = $Env:industry
-$websiteUrls = $AgConfig.URLs
-$githubAccount = $Env:githubAccount
-$githubBranch = $Env:githubBranch
-$githubUser = $Env:githubUser
-$resourceGroup = $Env:resourceGroup
-$azureLocation = $Env:azureLocation
-$spnClientId = $Env:spnClientId
-$spnClientSecret = $Env:spnClientSecret
-$spnTenantId = $Env:spnTenantId
-$subscriptionId = $Env:subscriptionId
-$adminUsername = $Env:adminUsername
-$templateBaseUrl = $Env:templateBaseUrl
-$adxClusterName = $Env:adxClusterName
-$namingGuid = $Env:namingGuid
-$adminPassword = $Env:adminPassword
-$customLocationRPOID = $Env:customLocationRPOID
-$appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-$appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
-$appsRepo = "jumpstart-agora-apps"
+$global:AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
+$global:AgToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$global:AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+$global:AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
+$global:configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
+$global:AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
+$global:AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
+$global:industry = $Env:industry
+$global:websiteUrls = $AgConfig.URLs
+$global:githubAccount = $Env:githubAccount
+$global:githubBranch = $Env:githubBranch
+$global:githubUser = $Env:githubUser
+$global:resourceGroup = $Env:resourceGroup
+$global:azureLocation = $Env:azureLocation
+$global:spnClientId = $Env:spnClientId
+$global:spnClientSecret = $Env:spnClientSecret
+$global:spnTenantId = $Env:spnTenantId
+$global:subscriptionId = $Env:subscriptionId
+$global:adminUsername = $Env:adminUsername
+$global:templateBaseUrl = $Env:templateBaseUrl
+$global:adxClusterName = $Env:adxClusterName
+$global:namingGuid = $Env:namingGuid
+$global:adminPassword = $Env:adminPassword
+$global:customLocationRPOID = $Env:customLocationRPOID
+$global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
+$global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
+$global:appsRepo = "jumpstart-agora-apps"
 if ($industry -eq "retail") {
-    $githubPat = $Env:GITHUB_TOKEN
-    $acrName = $Env:acrName.ToLower()
-    $cosmosDBName = $Env:cosmosDBName
-    $cosmosDBEndpoint = $Env:cosmosDBEndpoint
-    $gitHubAPIBaseUri = $websiteUrls["githubAPI"]
-    $workflowStatus = ""
+    $global:githubPat = $Env:GITHUB_TOKEN
+    $global:acrName = $Env:acrName.ToLower()
+    $global:cosmosDBName = $Env:cosmosDBName
+    $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
+    $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
+    $global:workflowStatus = ""
 }elseif ($industry -eq "manufacturing") {
-    $aioNamespace = "azure-iot-operations"
-    $mqListenerService = "aio-mq-dmqtt-frontend"
-    $mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
-    $stagingStorageAccountName = $Env:stagingStorageAccountName
-    $aioStorageAccountName = $Env:aioStorageAccountName
-    $spnObjectId = $Env:spnObjectId
-    $stcontainerName = $Env:stcontainerName
+    $global:aioNamespace = "azure-iot-operations"
+    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    $global:stagingStorageAccountName = $Env:stagingStorageAccountName
+    $global:aioStorageAccountName = $Env:aioStorageAccountName
+    $global:spnObjectId = $Env:spnObjectId
+    $global:stcontainerName = $Env:stcontainerName
 }
 
 #####################################################################
