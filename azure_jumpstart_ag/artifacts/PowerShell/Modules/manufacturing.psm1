@@ -480,7 +480,7 @@ function Deploy-ESA {
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the $clusterName cluster" -ForegroundColor DarkGray
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson --scope cluster --only-show-errors
-        kubectl create secret generic -n $aioNamespace esaSecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        kubectl create secret generic -n $aioNamespace esasecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
 
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the $clusterName cluster" -ForegroundColor DarkGray
         kubectl apply -f $esapvYaml
