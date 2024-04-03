@@ -368,11 +368,6 @@ function Deploy-AIO {
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
 
-        # Enable Open Service Mesh extension on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the Arc-enabled cluster" -ForegroundColor DarkGray
-        $spnObjectId = $(az ad sp show --id $env:spnClientId | ConvertFrom-Json).id
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
-
         do {
             az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
             if ($? -eq $false) {
@@ -459,7 +454,7 @@ function Deploy-ESA {
     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaSecretName', "esaSecret" | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'esaSecretName', "esasecret" | Set-Content $esapvYaml
 
     # Inject params into the yaml file for PVC
     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
@@ -485,7 +480,7 @@ function Deploy-ESA {
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the $clusterName cluster" -ForegroundColor DarkGray
         az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson --scope cluster --only-show-errors
-        kubectl create secret generic -n $aioNamespace esaSecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
+        kubectl create secret generic -n $aioNamespace esasecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
 
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the $clusterName cluster" -ForegroundColor DarkGray
         kubectl apply -f $esapvYaml
