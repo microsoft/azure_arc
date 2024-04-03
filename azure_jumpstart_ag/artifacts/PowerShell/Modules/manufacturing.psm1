@@ -454,7 +454,7 @@ function Deploy-ESA {
     (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
     (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaSecretName', "esaSecret" | Set-Content $esapvYaml
+    (Get-Content $esapvYaml ) -replace 'esaSecretName', "esasecret" | Set-Content $esapvYaml
 
     # Inject params into the yaml file for PVC
     (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
