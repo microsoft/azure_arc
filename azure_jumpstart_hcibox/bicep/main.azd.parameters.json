@@ -28,6 +28,9 @@
         },
         "deployBastion": {
             "value": "${JS_DEPLOY_BASTION}"
+        },
+        "autoDeployClusterResource": {
+            "value": "${JS_AUTO_DEPLOY_CLUSTER_RESOURCE}"
         }
     }
 }

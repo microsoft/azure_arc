@@ -47,6 +47,9 @@ param location string
 @description('Override default RDP port using this parameter. Default is 3389.')
 param rdpPort string = '3389'
 
+@description('Choice to enable automatic deployment of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Default is false.')
+param autoDeployClusterResource bool = false
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_hcibox/'
 
 targetScope = 'subscription'
@@ -100,6 +103,7 @@ module hostDeployment 'host/host.bicep' = {
     natDNS: natDNS
     location: location
     rdpPort: rdpPort
+    autoDeployClusterResource: autoDeployClusterResource
   }
 }
 

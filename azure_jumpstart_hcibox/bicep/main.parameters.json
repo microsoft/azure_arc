@@ -25,6 +25,9 @@
         },
         "deployBastion": {
             "value": false
+        },
+        "autoDeployClusterResource": {
+            "value": false
         }
     }
 }
