@@ -39,41 +39,28 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/LogonScript.ps1") -OutFile "C:\
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/jumpstart_wallpaper_dark.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Installing tools
-workflow ClientTools_01
-        {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubernetes-helm'
-            #Run commands in parallel.
-            Parallel 
-                {
-                    InlineScript {
-                        param (
-                            [string]$chocolateyAppList
-                        )
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-                        {
-                            try{
-                                choco config get cacheLocation
-                            }catch{
-                                Write-Output "Chocolatey not detected, trying to install now"
-                                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-                            }
-                        }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
-                            $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-                        
-                            foreach ($app in $appsToInstall)
-                            {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
-                            }
-                        }                        
-                    }
-                }
-        }
+Write-Host "Installing Chocolatey Apps"
+try {
+    choco config get cacheLocation
+}
+catch {
+    Write-Output "Chocolatey not detected, trying to install now"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
 
-ClientTools_01 | Format-Table
+$chocolateyAppList = 'az.powershell,kubernetes-cli,kubernetes-helm'
+$appsToInstall = $chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall) {
+    Write-Host "Installing $app"
+    & choco install $app /y -Force | Write-Output
+}
+
+Write-Host "Install Azure CLI (64-bit not available via Chocolatey)"
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
+Remove-Item .\AzureCLI.msi
 
 # Enable VirtualMachinePlatform feature, the vm reboot will be done in DSC extension
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
