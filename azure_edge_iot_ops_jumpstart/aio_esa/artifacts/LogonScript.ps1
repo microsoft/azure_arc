@@ -3,14 +3,12 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 ## Deploy AKS EE
 
 # Parameters
-$AksEdgeRemoteDeployVersion = "1.0.230221.1200"
 $schemaVersion = "1.1"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 $aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
 # Requires -RunAsAdministrator
 
-New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
 
 if (! [Environment]::Is64BitProcess) {
     Write-Host "Error: Run this in 64bit Powershell session" -ForegroundColor Red
@@ -42,7 +40,7 @@ Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
 # Here string for the json content
 $aideuserConfig = @"
 {
-    "SchemaVersion": "$AksEdgeRemoteDeployVersion",
+    "SchemaVersion": "$latestReleaseTag",
     "Version": "$schemaVersion",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
@@ -442,3 +440,17 @@ Invoke-WebRequest -Uri $esadeployYamlUrl -OutFile $esadeployYamlPath
 Write-Host "Applying esadeploy.yaml configuration..."
 kubectl apply -f $esadeployYamlPath
 Write-Host "esa-deploy.yaml configuration applied successfully."
+
+# Stop the PowerShell process monitoring Kubernetes pods
+
+Stop-Process -Id $kubectlMonShell.Id
+
+# Remove temporary files and directories
+
+Remove-Item -Path "$installDir\$zipFile" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$installDir\AKS-Edge-main" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "AzureConnectedMachineAgent.msi" -Force -ErrorAction SilentlyContinue
+
+# Stop the transcript
+
+Stop-Transcript
