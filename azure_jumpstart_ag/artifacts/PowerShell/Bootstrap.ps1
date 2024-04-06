@@ -3,6 +3,7 @@ param (
   [string]$adminPassword,
   [string]$spnClientId,
   [string]$spnClientSecret,
+  [string]$spnObjectId,
   [string]$spnTenantId,
   [string]$spnAuthority,
   [string]$subscriptionId,
@@ -24,7 +25,9 @@ param (
   [string]$adxClusterName,
   [string]$namingGuid,
   [string]$industry,
-  [string]$customLocationRPOID
+  [string]$customLocationRPOID,
+  [string]$aioStorageAccountName,
+  [string]$stcontainerName
 )
 
 ##############################################################
@@ -34,6 +37,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnObjectID', $spnObjectId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
@@ -60,6 +64,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -105,13 +111,14 @@ switch ($industry) {
   "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
 }
 
-$AgConfig         = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$AgDirectory      = $AgConfig.AgDirectories["AgDir"]
-$AgToolsDir       = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir       = $AgConfig.AgDirectories["AgIconDir"]
-$AgPowerShellDir  = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgMonitoringDir  = $AgConfig.AgDirectories["AgMonitoringDir"]
-$websiteUrls      = $AgConfig.URLs
+$AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$AgDirectory        = $AgConfig.AgDirectories["AgDir"]
+$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
+$AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
+$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
+$AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
+$AgMonitoringDir    = $AgConfig.AgDirectories["AgMonitoringDir"]
+$websiteUrls        = $AgConfig.URLs
 
 function BITSRequest {
   Param(
@@ -224,6 +231,9 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/common.psm1") -OutFile "$AgPowerShellDir\common.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/retail.psm1") -OutFile "$AgPowerShellDir\retail.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/manufacturing.psm1") -OutFile "$AgPowerShellDir\manufacturing.psm1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
@@ -233,6 +243,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additiona
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
+Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
 if($industry -eq "retail"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
@@ -246,6 +257,10 @@ elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/config.json") -OutFile "$AgToolsDir\config.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pv.yaml") -OutFile "$AgToolsDir\esapv.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pvc.yaml") -OutFile "$AgToolsDir\esapvc.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/configPod.yaml") -OutFile "$AgToolsDir\configPod.yml"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }

@@ -8,8 +8,8 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
-//@description('Azure service principal object id')
-//param spnObjectId string
+@description('Azure service principal Object id')
+param spnObjectId string
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -87,6 +87,9 @@ param eventHubManufacturingCGName string = 'cgmanufacturing'
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
+@description('The name of ESA container in Storage Account')
+param stcontainerName string = 'esacontainer'
+
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
@@ -139,7 +142,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
-    //spnObjectId: spnObjectId
+    spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -157,6 +160,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
     industry: industry
+    aioStorageAccountName: aioStorageAccountName
+    stcontainerName: stcontainerName
   }
 }
 
@@ -178,6 +183,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
+    stcontainerName: stcontainerName
   }
 }
 

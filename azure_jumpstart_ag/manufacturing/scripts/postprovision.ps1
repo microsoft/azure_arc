@@ -3,6 +3,7 @@ if ($null -ne $env:AZURE_RESOURCE_GROUP){
     $adxClusterName = $env:ADX_CLUSTER_NAME
     Select-AzSubscription -SubscriptionId $env:AZURE_SUBSCRIPTION_ID | out-null
     $rdpPort = $env:JS_RDP_PORT
+    $deployBastion = $env:JS_DEPLOY_BASTION
 }
 
 ########################################################################
@@ -47,7 +48,7 @@ if ($httpResponse.StatusCode -ne 200){
 ########################################################################
 
 # Configure NSG Rule for RDP (if needed)
-If ($rdpPort -ne "3389") {
+If ($rdpPort -ne "3389" -and !$deployBastion) {
 
     Write-Host "Configuring NSG Rule for RDP..."
     $nsg =  Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroup -Name Ag-NSG-Prod
@@ -72,8 +73,14 @@ If ($rdpPort -ne "3389") {
 
 
 # Client VM IP address
-$ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "Ag-VM-Client-PIP").IpAddress
+if(!$deployBastion){
+    $ip = (Get-AzPublicIpAddress -ResourceGroupName $resourceGroup -Name "Ag-VM-Client-PIP").IpAddress
+    Write-Host "You can now connect to the client VM using the following command: " -NoNewline
+    Write-Host "mstsc /v:$($ip):$($rdpPort)" -ForegroundColor Green -BackgroundColor Black
+    Write-Host "Remember to use the Windows admin user name [$env:JS_WINDOWS_ADMIN_USERNAME] and the password you specified."
+}else{
+    Write-Host "You can now connect to the client VM using the Azure Bastion service." -ForegroundColor Green
+    Write-Host "Remember to use the Windows admin user name [$env:JS_WINDOWS_ADMIN_USERNAME] and the password you specified."
+}
 
-Write-Host "You can now connect to the client VM using the following command: " -NoNewline
-WRite-Host "mstsc /v:$($ip):$($rdpPort)" -ForegroundColor Green -BackgroundColor Black
-Write-Host "Remember to use the Windows admin user name [$env:JS_WINDOWS_ADMIN_USERNAME] and the password you specified."
+
