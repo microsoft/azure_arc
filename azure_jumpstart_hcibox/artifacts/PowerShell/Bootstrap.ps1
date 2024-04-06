@@ -16,7 +16,8 @@ param (
     [string]$deployResourceBridge,
     [string]$natDNS,
     [string]$rdpPort,
-    [bool]$autoDeployClusterResource
+    [bool]$autoDeployClusterResource,
+    [bool]$autoUpgradeClusterResource
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -36,6 +37,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('autoDeployClusterResource', $autoDeployClusterResource,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
 

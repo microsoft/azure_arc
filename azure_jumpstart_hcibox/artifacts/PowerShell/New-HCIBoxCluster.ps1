@@ -1529,6 +1529,66 @@ function Set-HCIDeployPrereqs {
 
 }
 
+function Update-HCICluster {
+    param (
+        $HCIBoxConfig,
+        [PSCredential]$domainCred
+    )
+
+    $session = New-PSSession -VMName $HCIBoxConfig.NodeHostConfig[0].Hostname -Credential $domainCred
+
+    Write-Host "Getting current version of the cluster"
+
+    Invoke-Command -Session $session -ScriptBlock {
+
+        Get-StampInformation | Select-Object StampVersion,ServicesVersion,InitialDeployedVersion
+
+    }
+
+    Write-Host "Test environment readiness for update"
+
+    Invoke-Command -Session $session -ScriptBlock {
+
+        Test-EnvironmentReadiness | Select-Object Name,Status,Severity
+
+    }
+
+    Write-Host "Getting available updates"
+
+    Invoke-Command -Session $session -ScriptBlock {
+
+        Get-SolutionUpdate | Select-Object DisplayName, State
+
+    } -OutVariable updates
+
+    if ($updates.Count -gt 0) {
+
+    Write-Host "Starting update process"
+
+        Invoke-Command -Session $session -ScriptBlock {
+
+            Get-SolutionUpdate | Start-SolutionUpdate
+
+            }
+
+    }
+    else {
+
+        Write-Host "No updates available"
+        return
+
+    }
+
+    Invoke-Command -Session $session -ScriptBlock {
+
+        Get-SolutionUpdate | Select-Object Version,State,UpdateStateProperties,HealthState
+
+    }
+
+    $session | Remove-PSSession
+
+}
+
 #endregion
 
 #region Main
@@ -1708,7 +1768,20 @@ Write-Host "[Build cluster - Step 11/11] Run cluster deployment..." -ForegroundC
 if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
 
     Write-Host "Validation succeeded. Deploying HCI cluster..."
-    New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile
+    New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment
+
+    if ($env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
+
+        Write-Host "Deployment succeeded. Upgrading HCI cluster..."
+
+        Update-HCICluster -HCIBoxConfig $HCIBoxConfig -domainCred $domainCred
+
+    }
+    else {
+
+        Write-Host '$autoUpgradeClusterResource is false, skipping HCI cluster upgrade...follow the documentation to upgrade the cluster manually'
+
+    }
 
 }
 else {
@@ -1721,6 +1794,8 @@ else {
 else {
     Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment...follow the documentation to deploy the cluster manually'
 }
+
+
 
 $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime

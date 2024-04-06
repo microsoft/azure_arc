@@ -28,6 +28,9 @@
         },
         "autoDeployClusterResource": {
             "value": false
+        },
+        "autoUpdateClusterResource": {
+            "value": false
         }
     }
 }
