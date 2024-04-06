@@ -81,6 +81,9 @@ param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
 @description('The name of the Azure Data Explorer Event Hub production line consumer group')
 param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
 
+@description('The name of the Azure Data Explorer Event Hub manufacturing consumer group')
+param eventHubManufacturingCGName string = 'cgmanufacturing'
+
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
@@ -165,6 +168,7 @@ module eventHub 'data/eventHub.bicep' = {
     location: location
     eventHubConsumerGroupName: eventHubConsumerGroupName
     eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
+    eventHubManufacturingCGName: eventHubManufacturingCGName
   }
 }
 
@@ -215,6 +219,7 @@ module adx 'data/dataExplorer.bicep' = {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
+    eventHubConsumerGroupName: eventHubManufacturingCGName
   }
 }
 
