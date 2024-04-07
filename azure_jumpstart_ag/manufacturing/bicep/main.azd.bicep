@@ -1,25 +1,37 @@
+targetScope = 'subscription'
+
 @description('Azure service principal client id')
-param spnClientId string
+param spnClientId string = ''
 
 @description('Azure service principal client secret')
 @secure()
-param spnClientSecret string
+param spnClientSecret string = newGuid()
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
+param spnTenantId string = ''
 
 @description('Azure service principal Object id')
-param spnObjectId string
+param spnObjectId string = ''
+
+@minLength(1)
+@maxLength(77)
+@description('Prefix for resource group, i.e. {name}-rg')
+param envName string = toLower(substring(newGuid(), 0, 5))
+
+resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+  name: '${envName}-rg'
+  location: location
+}
 
 @description('Location for all resources')
-param location string = resourceGroup().location
+param location string = ''
 
 @maxLength(5)
 @description('Random GUID')
 param namingGuid string = toLower(substring(newGuid(), 0, 5))
 
 @description('Username for Windows account')
-param windowsAdminUsername string
+param windowsAdminUsername string = 'Agora'
 
 @description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
@@ -41,7 +53,7 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string
+param githubUser string = 'Microsoft'
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
@@ -89,7 +101,7 @@ param stcontainerName string = 'esacontainer'
 param adxClusterName string = 'agadx${namingGuid}'
 
 @description('The custom location RPO ID')
-param customLocationRPOID string
+param customLocationRPOID string = ''
 
 @minLength(5)
 @maxLength(50)
@@ -106,6 +118,7 @@ var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
+  scope: rg
   params: {
     workspaceName: logAnalyticsWorkspaceName
     location: location
@@ -114,6 +127,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
 
 module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
+  scope: rg
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
     subnetNameCloudAksStaging: subnetNameCloudAksStaging
@@ -125,6 +139,7 @@ module networkDeployment 'mgmt/network.bicep' = {
 
 module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
+  scope: rg
   params: {
     location: location
   }
@@ -132,6 +147,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
+  scope: rg
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
@@ -155,13 +171,13 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
     industry: industry
-    aioStorageAccountName: aioStorageAccountName
     stcontainerName: stcontainerName
   }
 }
 
 module eventHub 'data/eventHub.bicep' = {
   name: 'eventHubDeployment'
+  scope: rg
   params: {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
@@ -174,6 +190,7 @@ module eventHub 'data/eventHub.bicep' = {
 
 module storageAccount 'storage/storageAccount.bicep' = {
   name: 'aioStorageAccountDeployment'
+  scope: rg
   params: {
     storageAccountName: aioStorageAccountName
     location: location
@@ -184,6 +201,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
 
 module eventGrid 'data/eventGrid.bicep' = {
   name: 'eventGridDeployment'
+  scope: rg
   params: {
     eventGridNamespaceName: eventGridNamespaceName
     eventHubResourceId: eventHub.outputs.eventHubResourceId
@@ -196,6 +214,7 @@ module eventGrid 'data/eventGrid.bicep' = {
 
 module keyVault 'data/keyVault.bicep' = {
   name: 'keyVaultDeployment'
+  scope: rg
   params: {
     tenantId: spnTenantId
     akvNameSite1: akvNameSite1
@@ -206,6 +225,7 @@ module keyVault 'data/keyVault.bicep' = {
 
 module acr 'kubernetes/acr.bicep' = {
   name: 'acrDeployment'
+  scope: rg
   params: {
     acrName: acrName
     location: location
@@ -214,6 +234,7 @@ module acr 'kubernetes/acr.bicep' = {
 
 module adx 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
+  scope: rg
   params: {
     adxClusterName: adxClusterName
     location: location
@@ -223,4 +244,13 @@ module adx 'data/dataExplorer.bicep' = {
     eventHubConsumerGroupName: eventHubManufacturingCGName
   }
 }
+
+output AZURE_TENANT_ID string = tenant().tenantId
+output AZURE_RESOURCE_GROUP string = rg.name
+
+output NAMING_GUID string = namingGuid
+output RDP_PORT string = rdpPort
+
+output ADX_CLUSTER_NAME string = adxClusterName
+output ACR_NAME string = acrName
 
