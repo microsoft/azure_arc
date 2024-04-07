@@ -411,6 +411,12 @@ function Deploy-AIO {
                 exit 1 # Exit the script
             }
         }
+        while ($(Get-Job -Name AIO).State -eq 'Running') {
+            Receive-Job -Name AIO -WarningAction SilentlyContinue
+            Start-Sleep -Seconds 60
+        }
+        Get-Job -name AIO | Remove-Job
+        Write-Host "[$(Get-Date -Format t)] INFO: AIO deployment complete." -ForegroundColor Green
 
             Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
             $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
@@ -440,13 +446,6 @@ function Deploy-AIO {
             kubectl apply -f $mqconfigfile -n $aioNamespace
             $kvIndex++
     }
-    while ($(Get-Job -Name AIO).State -eq 'Running') {
-        Receive-Job -Name AIO -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 60
-    }
-    Get-Job -name AIO | Remove-Job
-    Write-Host "[$(Get-Date -Format t)] INFO: AIO deployment complete." -ForegroundColor Green
-}
 }
 
 function Deploy-ESA {
