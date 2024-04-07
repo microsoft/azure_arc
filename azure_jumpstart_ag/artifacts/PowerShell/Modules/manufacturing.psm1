@@ -354,7 +354,6 @@ function Deploy-AIO {
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
-        $secretName = $clusterName + "-aio"
         $retryCount = 0
         $maxRetries = 5
         $aioStatus = "notDeployed"
@@ -386,14 +385,16 @@ function Deploy-AIO {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         $retryCount = 0
-        $maxRetries = 5
+        $maxRetries = 25
         kubectx $clusterName
         do {
             $output = az iot ops check --as-object
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 45 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 45
+                #az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
