@@ -343,10 +343,9 @@ function Deploy-AIO {
     # Deploying AIO on the clusters
     #############################################################
 
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
-    $jobs = @()
 
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
@@ -360,11 +359,12 @@ function Deploy-AIO {
             $spnClientSecret = $using:spnClientSecret
             $spnObjectId = $using:spnObjectId
             $AgToolsDir = $using:AgToolsDir
+
             Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
             Write-Host "`n"
-            kubectx $clusterName
+            #kubectx $clusterName
             $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
-            $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+            $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$using:kvIndex].id" -o tsv)
             $secretName = $clusterName + "-aio"
             $retryCount = 0
             $maxRetries = 5
@@ -380,7 +380,7 @@ function Deploy-AIO {
                 --only-show-errors
 
             do {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
                 if ($? -eq $false) {
                     $aioStatus = "notDeployed"
                     Write-Host "`n"
@@ -401,7 +401,7 @@ function Deploy-AIO {
                 $output = $output | ConvertFrom-Json
                 $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
                 if ($mqServiceStatus -ne "Success") {
-                    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
                     $retryCount++
                 }
             } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -432,20 +432,21 @@ function Deploy-AIO {
             Start-Sleep -Seconds 60
 
             ## Adding MQTT load balancer
-            $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
-            Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+            <#$mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
+            #Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
             $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
             (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
             kubectl apply -f $mqconfigfile -n $aioNamespace
+            #>
             $kvIndex++
         }
-        while ($(Get-Job -Name AIO).State -eq 'Running') {
-            Receive-Job -Name AIO -WarningAction SilentlyContinue
-            Start-Sleep -Seconds 60
-        }
-        Get-Job -name AIO | Remove-Job
-        Write-Host "[$(Get-Date -Format t)] INFO: AIO deployment complete." -ForegroundColor Green
     }
+    while ($(Get-Job -Name AIO).State -eq 'Running') {
+        Receive-Job -Name AIO -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 60
+    }
+    Get-Job -name AIO | Remove-Job
+    Write-Host "[$(Get-Date -Format t)] INFO: AIO deployment complete." -ForegroundColor Green
 }
 
 function Deploy-ESA {
