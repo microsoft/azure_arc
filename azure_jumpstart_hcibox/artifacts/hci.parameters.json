@@ -65,9 +65,6 @@
     "storageConnectivitySwitchless": {
       "value": false
     },
-    "networkingPattern": {
-      "value": "convergedManagementCompute"
-    },
     "intentList": {
       "value": [
         {
@@ -131,7 +128,7 @@
         {
           "name": "StorageNetwork1",
           "networkAdapterName": "StorageA",
-          "vlanId": "storageNicAVLAN-staging"        
+          "vlanId": "storageNicAVLAN-staging"
         },
         {
           "name": "StorageNetwork2",
