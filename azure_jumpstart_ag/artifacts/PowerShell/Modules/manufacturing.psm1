@@ -272,6 +272,7 @@ function Deploy-AIO {
         # Preparing environment folders structure
         ###########################################
         Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+        Write-Host "`n"
         try {
             $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
             & kubectl apply -f $localPathProvisionerYaml
@@ -360,6 +361,7 @@ function Deploy-AIO {
 
         # Enable custom locations on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
         az connectedk8s enable-features --name $arcClusterName `
             --resource-group $resourceGroup `
@@ -394,6 +396,7 @@ function Deploy-AIO {
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
                 Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Write-Host "`n"
                 Start-Sleep -Seconds 60
                 $retryCount++
             }
@@ -404,6 +407,7 @@ function Deploy-AIO {
             exit 1 # Exit the script
         }
         Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
+        Write-Host "`n"
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
         $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
         $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
