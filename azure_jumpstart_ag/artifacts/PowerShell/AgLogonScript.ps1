@@ -173,15 +173,14 @@ if ($industry -eq "retail") {
     Deploy-RetailConfigs
 }
 
-$kubectlMonShells = @()
-foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    $clusterName = $cluster.Name.ToLower()
-    $arguments = "[System.Console]::Title = '$clusterName Cluster';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
-    $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
-    $kubectlMonShells+=$kubectlMonShell
-}
-
 if ($industry -eq "manufacturing") {
+    $kubectlMonShells = @()
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        $arguments = "[System.Console]::Title = '$clusterName Cluster';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
+        $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
+        $kubectlMonShells+=$kubectlMonShell
+    }
     Deploy-AIO
     #Deploy-InfluxDb
     Deploy-ESA
@@ -266,8 +265,10 @@ Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-foreach ($shell in $kubectlMonShells){
-    Stop-Process -Id $shell.Id
+if ($industry -eq "manufacturing") {
+    foreach ($shell in $kubectlMonShells) {
+        Stop-Process -Id $shell.Id
+    }
 }
 
 Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
