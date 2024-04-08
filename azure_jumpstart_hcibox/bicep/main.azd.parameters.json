@@ -31,6 +31,9 @@
         },
         "autoDeployClusterResource": {
             "value": "${JS_AUTO_DEPLOY_CLUSTER_RESOURCE}"
+        },
+        "autoUpdateClusterResource": {
+            "value": "${JS_AUTO_UPDATE_CLUSTER_RESOURCE}"
         }
     }
 }
