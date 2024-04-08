@@ -262,28 +262,6 @@ if ($env:kubernetesDistribution -eq "k8s") {
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 }
 
-Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
-
-# Deploying Azure log-analytics workspace
-$workspaceName = ($Env:arcClusterName).ToLower()
-$workspaceResourceId = az monitor log-analytics workspace create `
-    --resource-group $Env:resourceGroup `
-    --workspace-name "$workspaceName-law" `
-    --query id -o tsv
-
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" `
-    --cluster-name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --cluster-type connectedClusters `
-    --extension-type Microsoft.AzureMonitor.Containers `
-    --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-
-
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
 Write-Host "`n"
