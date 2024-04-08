@@ -43,11 +43,6 @@ param deployBastion bool = false
 @minLength(1)
 param githubUser string
 
-//@description('GitHub Personal access token for the user account')
-//@minLength(1)
-//@secure()
-//param githubPAT string
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
