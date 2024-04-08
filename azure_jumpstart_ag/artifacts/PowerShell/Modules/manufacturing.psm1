@@ -327,9 +327,9 @@ function Deploy-AIO {
                 Write-Host "Updated runtime iptable rules for node exporter"
                 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
                 Write-Host "Persisted iptable rules for node exporter"
-            }
-                    # increase the maximum number of files
+                # increase the maximum number of files
                 Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+            }
             else {
                 Write-Host "iptable rule exists, skip configuring iptable rules..."
             }
@@ -381,7 +381,7 @@ function Deploy-AIO {
                 $aioStatus = "deployed"
             }
         } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
-
+        $kvIndex++
     }
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
@@ -389,13 +389,12 @@ function Deploy-AIO {
         $maxRetries = 25
         kubectx $clusterName
         do {
-            $output = az iot ops check --as-object
+            $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 45 seconds" -ForegroundColor DarkGray
-                Start-Sleep -Seconds 45
-                #az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -404,6 +403,7 @@ function Deploy-AIO {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
             exit 1 # Exit the script
         }
+        Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
         $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
         $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
@@ -430,7 +430,6 @@ function Deploy-AIO {
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
     (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
-        $kvIndex++
     }
 }
 
@@ -479,7 +478,7 @@ function Deploy-ESA {
 
         # Enable Open Service Mesh extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the $clusterName cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm --only-show-errors
 
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the $clusterName cluster" -ForegroundColor DarkGray
