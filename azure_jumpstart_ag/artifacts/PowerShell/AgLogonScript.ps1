@@ -177,7 +177,7 @@ if ($industry -eq "manufacturing") {
     $kubectlMonShells = @()
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        $arguments = "[System.Console]::Title = '$clusterName Cluster';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
+        $arguments = "[System.Console]::Title = '$clusterName';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
         $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
         $kubectlMonShells+=$kubectlMonShell
     }
