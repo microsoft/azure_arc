@@ -377,11 +377,12 @@ Write-Host "Open Service Mesh (OSM) installed successfully."
 Write-Host "Disabling ACStor for single-node cluster..."
 # Create the config.json file
 $acstorConfig = @{
-    "hydra.acstorController.enabled" = $false
-    "hydra.highAvailability.disk.storageClass" = "local-path"
- }
- $acstorConfigJson = $acstorConfig | ConvertTo-Json -Depth 100
- Set-Content -Path "config.json" -Value $acstorConfigJson
+    "feature.storageClass" = "default"
+    "acstorController.enabled" = $false
+}
+
+$acstorConfigJson = $acstorConfig | ConvertTo-Json -Depth 100
+Set-Content -Path "config.json" -Value $acstorConfigJson
 Write-Host "ACStor disabled for single-node cluster."
 Write-Host "Checking if Edge Storage Accelerator Arc Extension is installed..."
 $extensionExists = az k8s-extension show --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --query "extensionType" --output tsv
