@@ -24,6 +24,15 @@ param eventHubNamespaceName string
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
 
+@description('The name of the Azure Data Explorer POS database')
+param adxDBName string = 'manufacturing'
+
+@description('The name of the Azure Data Explorer Event Hub connection')
+param eventHubConnectionName string = 'manufacturing-eh-messages'
+
+@description('The name of the Azure Data Explorer Event Hub consumer group')
+param eventHubConsumerGroupName string = 'cgmanufacturing'
+
 @description('# of nodes')
 @minValue(1)
 @maxValue(2)
@@ -44,6 +53,23 @@ resource adxCluster 'Microsoft.Kusto/clusters@2023-05-02' = {
   }
 }
 
+resource manufacturingAdxDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
+  parent: adxCluster
+  name: adxDBName
+  location: location
+  kind: 'ReadWrite'
+}
+
+resource manufacturingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'manufacturingScript'
+  parent: manufacturingAdxDB
+  properties: {
+    continueOnErrors: false
+    forceUpdateTag: 'string'
+    scriptContent: loadTextContent('script.kql')
+  }
+}
+
 resource azureEventHubsDataReceiverRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde'
   scope: tenant()
@@ -59,6 +85,26 @@ resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   properties: {
     roleDefinitionId: azureEventHubsDataReceiverRole.id
     principalId: adxCluster.identity.principalId
+  }
+}
+
+resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+  name: eventHubConnectionName
+  kind: 'EventHub'
+  dependsOn: [
+    manufacturingScript
+  ]
+  location: location
+  parent: manufacturingAdxDB
+  properties: {
+    managedIdentityResourceId: adxCluster.id
+    eventHubResourceId: eventHubResourceId
+    consumerGroup: eventHubConsumerGroupName
+    tableName: 'manufacturing'
+    dataFormat: 'json'
+    eventSystemProperties: []
+    compression: 'None'
+    databaseRouting: 'Single'
   }
 }
 

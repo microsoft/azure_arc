@@ -27,6 +27,11 @@ param eventHubConsumerGroupName string = 'aioConsumerGroup'
 @description('The name of the Azure Data Explorer Event Hub production line consumer group')
 param eventHubConsumerGroupNamePl string = 'aioConsumerGroupPl'
 
+@description('The name of the Azure Data Explorer Event Hub manufacturing consumer group')
+param eventHubManufacturingCGName string = 'cgmanufacturing'
+
+
+
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
   tags: resourceTags
@@ -66,5 +71,9 @@ resource eventHubConsumerGroupPl 'Microsoft.EventHub/namespaces/eventhubs/consum
   parent: eventHub
 }
 
+resource eventHubCGManufacturing 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: eventHubManufacturingCGName
+  parent: eventHub
+}
 
 output eventHubResourceId string = eventHub.id

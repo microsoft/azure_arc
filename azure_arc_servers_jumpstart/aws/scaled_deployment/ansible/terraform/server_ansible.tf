@@ -10,7 +10,7 @@ resource "aws_instance" "ansible" {
   }
 
   connection {
-    user        = "centos"
+    user        = "fedora"
     private_key = file("~/.ssh/id_rsa")
     agent       = false
     host        = aws_instance.ansible.public_ip
@@ -18,24 +18,23 @@ resource "aws_instance" "ansible" {
 
   provisioner "file" {
     source      = "ansible_config"
-    destination = "~/ansible"
+    destination = "/home/fedora/ansible"
   }
 
   provisioner "file" {
     source      = "~/.ssh/id_rsa"
-    destination = "~/.ssh/id_rsa"
+    destination = "/home/fedora/.ssh/id_rsa"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo yum install epel-release -y",
-      "sudo yum install nano python3 python3-pip -y",
+      "sudo dnf install python3-pip ansible -y",
       "sudo python3 -m pip install --upgrade setuptools",
       "sudo python3 -m pip install wheel setuptools_rust",
       "sudo python3 -m pip install --upgrade pip",
       "sudo curl https://sh.rustup.rs -sSf | sh -s -- -y",
-      "sudo python3 -m pip install ansible botocore boto3 pywinrm",
-      "sudo chmod 600 /home/centos/.ssh/id_rsa"
+      "sudo python3 -m pip install botocore boto3 pywinrm",
+      "sudo chmod 600 /home/fedora/.ssh/id_rsa"
     ]
   }
 

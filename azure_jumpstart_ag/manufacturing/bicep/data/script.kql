@@ -1,0 +1,23 @@
+//  Create a landing table for manufacturing events
+.create table manufacturing (date_time: datetime, plant_details: dynamic, shift: string, employees_on_shift: dynamic, cars_produced: dynamic, equipment_maintenance: dynamic, production_schedule: dynamic, actual_production: dynamic, equipment_telemetry: dynamic, performance_metrics: dynamic) 
+
+//  Create mapping from JSON ingestion to landing table
+.create table manufacturing ingestion json mapping "manufacturing_mapping"
+```
+[
+    {"column":"date_time","path":"$['date_time']","datatype":""},
+    {"column":"plant_details","path":"$['plant_details']","datatype":""},
+    {"column":"shift","path":"$['shift']","datatype":""},
+    {"column":"employees_on_shift","path":"$['employees_on_shift']","datatype":""},
+    {"column":"cars_produced","path":"$['cars_produced']","datatype":""},
+    {"column":"equipment_maintenance","path":"$['equipment_maintenance']","datatype":""},
+    {"column":"production_schedule","path":"$['production_schedule']","datatype":""},
+    {"column":"actual_production","path":"$['actual_production']","datatype":""},
+    {"column":"equipment_telemetry","path":"$['equipment_telemetry']","datatype":""},
+    {"column":"performance_metrics","path":"$['performance_metrics']","datatype":""}
+]
+```
+
+//  Modify the ingestion batching policy to ingest data frequently
+//  THIS CONFIGURATION SHOULDN'T BE USED IN PRODUCTION:  MaximumBatchingTimeSpan SHOULD BE AT LEAST 1 MINUTE
+.alter table manufacturing policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
