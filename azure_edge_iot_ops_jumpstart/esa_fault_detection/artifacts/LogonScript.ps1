@@ -262,25 +262,6 @@ if ($env:kubernetesDistribution -eq "k8s") {
     --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 }
 
-Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
-
-# Deploying Azure log-analytics workspace
-$workspaceName = ($Env:arcClusterName).ToLower()
-$workspaceResourceId = az monitor log-analytics workspace create `
-    --resource-group $Env:resourceGroup `
-    --workspace-name "$workspaceName-law" `
-    --query id -o tsv
-
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" `
-    --cluster-name $Env:arcClusterName `
-    --resource-group $Env:resourceGroup `
-    --cluster-type connectedClusters `
-    --extension-type Microsoft.AzureMonitor.Containers `
-    --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 ## Arc - enabled Server
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
@@ -418,7 +399,8 @@ $secretName = "$env:storageAccountName-secret"
 Add-AzureStorageAccountSecret -ResourceGroup $env:resourceGroup -StorageAccount $env:storageAccountName -Namespace "default" -SecretName "esa-secret"
 Write-Host "Kubernetes secret created successfully."
 Write-Host "Downloading pv.yaml file..."
-$pvYamlUrl = "https://raw.githubusercontent.com/fcabrera23/azure_arc/scenarios-esa/azure_edge_iot_ops_jumpstart/aio_esa/yaml/pv.yaml"
+$pvYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/esa_fault_detection/yaml/pv.yaml"
+
 $pvYamlPath = "pv.yaml"
 Invoke-WebRequest -Uri $pvYamlUrl -OutFile $pvYamlPath
 # Update the secret name and container name in the pv.yaml file
@@ -431,7 +413,7 @@ Write-Host "Applying pv.yaml configuration..."
 kubectl apply -f $pvYamlPath
 Write-Host "pv.yaml configuration applied successfully."
 Write-Host "Downloading esa-deploy.yaml file..."
-$esadeployYamlUrl = "https://raw.githubusercontent.com/fcabrera23/azure_arc/scenarios-esa/azure_edge_iot_ops_jumpstart/aio_esa/yaml/esa-deploy.yaml"
+$esadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/esa_fault_detection/yaml/esa-deploy.yaml"
 $esadeployYamlPath = "esa-deploy.yaml"
 Invoke-WebRequest -Uri $esadeployYamlUrl -OutFile $esadeployYamlPath
 # Apply the p-deploy.yaml file using kubectl
