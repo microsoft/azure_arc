@@ -2177,6 +2177,30 @@ function Deploy-Bookmarks {
     $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
     $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
 }
+
+function Deploy-OVMSSetup {
+    param (
+        [string]$targetClusterName,
+        [PSObject]$Agconfig
+    )
+    
+    $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
+    $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
+    kubectx $targetClusterName
+    Invoke-Command -VMName $targetClusterName -Credential $Credentials -ScriptBlock {
+        Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+    }
+    kubectl apply -f https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml
+    kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
+
+    # # Create configmap
+    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/jumpstart-agora-apps/manufacturing/contoso_manufacturing/deployment/configs/config.json" -OutFile "$($AgConfig.AgDirectories["AgToolsDir"])\config.json"
+    # kubectl create configmap ovms-config --from-file "$($AgConfig.AgDirectories["AgToolsDir"])\config.json"
+    # # download models    
+    # kubectl apply -f https://raw.githubusercontent.com/microsoft/jumpstart-agora-apps/manufacturing/contoso_manufacturing/deployment/yamls/ovms-models-setup.yaml
+    # # deploy OVMS
+    # kubectl apply -f https://raw.githubusercontent.com/microsoft/jumpstart-agora-apps/manufacturing/contoso_manufacturing/deployment/yamls/ovms-setup.yaml
+}
 #endregion
 
 $ProgressPreference = "SilentlyContinue"
@@ -2344,9 +2368,8 @@ if ($industry -eq "retail") {
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 if ($industry -eq "manufacturing") {
     Deploy-AIO
-    #Deploy-InfluxDb
-    #Deploy-ESA
-    #Deploy-ManufacturingConfigs
+    Deploy-OVMSSetup
+    Deploy-ManufacturingConfigs
 }
 
 ##############################################################
