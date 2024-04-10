@@ -343,7 +343,8 @@ Write-Host "Creating storage account..."
 az storage account create --resource-group "$env:resourceGroup" --name "$env:storageAccountName" --location "$env:location" --sku Standard_RAGRS --kind StorageV2 --allow-blob-public-access false
 # Create a container within the storage account
 Write-Host "Creating container within the storage account..."
-az storage container create --name "$env:storageContainer" --account-name "$env:storageAccountName"
+Start-Sleep -Seconds 5
+az storage container create --name "$env:storageContainer" --account-name "$env:storageAccountName" --auth-mode login
 
 
 Write-Host "Checking if local-path storage class is available..."
