@@ -29,9 +29,6 @@
     "rdpPort": {
       "value": "${JS_RDP_PORT}"
     },
-    "githubUser": {
-      "value": "${JS_GITHUB_USER}"
-    },
     "customLocationRPOID": {
       "value": "${CUSTOM_LOCATION_RP_ID}"
     }
