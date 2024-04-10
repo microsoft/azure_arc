@@ -41,7 +41,7 @@ param deployBastion bool = false
 
 @description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
 @minLength(1)
-param githubUser string
+param githubUser string = 'microsoft'
 
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'

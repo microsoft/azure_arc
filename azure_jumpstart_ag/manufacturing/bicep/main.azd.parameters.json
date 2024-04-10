@@ -17,6 +17,9 @@
     "spnTenantId": {
       "value": "${SPN_TENANT_ID}"
     },
+    "spnObjectId": {
+      "value": "${SPN_OBJECT_ID}"
+    },
     "windowsAdminUsername": {
       "value": "${JS_WINDOWS_ADMIN_USERNAME}"
     },
