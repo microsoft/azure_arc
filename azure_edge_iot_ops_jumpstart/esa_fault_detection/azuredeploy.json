@@ -4,7 +4,7 @@
     "parameters": {
         "vmName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo",
+            "defaultValue": "ESA-Demo",
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
@@ -56,7 +56,7 @@
         },
         "bastionHostName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo-Bastion",
+            "defaultValue": "ESA-Demo-Bastion",
             "metadata": {
                 "description": "the Azure Bastion host name"
             }
@@ -120,7 +120,7 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo-VNET",
+            "defaultValue": "ESA-Demo-VNET",
             "metadata": {
                 "description": "Name of the VNET"
             }
@@ -134,7 +134,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "AKS-EE-Demo-NSG",
+            "defaultValue": "ESA-Demo-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
