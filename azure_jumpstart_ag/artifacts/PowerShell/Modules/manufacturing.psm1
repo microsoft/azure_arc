@@ -187,7 +187,6 @@ function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 }
-
 function Deploy-InfluxDb {
     ##############################################################
     # Deploy OT Inspector (InfluxDB)
@@ -260,11 +259,17 @@ function Deploy-InfluxDb {
     kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 }
+
 function Deploy-AIO {
+    # Deploys Azure IoT Operations on all k8s clusters in the config file
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Preparing clusters for aio
     ##############################################################
-    $VMnames = (Get-VM).Name
+    $VMnames = $AgConfig.SiteConfig.GetEnumerator().Name.ToLower()
 
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
@@ -431,12 +436,16 @@ function Deploy-AIO {
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+        (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
     }
 }
 
 function Deploy-ESA {
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Deploy Edge Storage Accelerator (ESA)
     ##############################################################

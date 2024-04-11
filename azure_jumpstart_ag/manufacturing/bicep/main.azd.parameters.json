@@ -17,6 +17,9 @@
     "spnTenantId": {
       "value": "${SPN_TENANT_ID}"
     },
+    "spnObjectId": {
+      "value": "${SPN_OBJECT_ID}"
+    },
     "windowsAdminUsername": {
       "value": "${JS_WINDOWS_ADMIN_USERNAME}"
     },
@@ -25,9 +28,6 @@
     },
     "rdpPort": {
       "value": "${JS_RDP_PORT}"
-    },
-    "githubUser": {
-      "value": "${JS_GITHUB_USER}"
     },
     "customLocationRPOID": {
       "value": "${CUSTOM_LOCATION_RP_ID}"

@@ -23,9 +23,6 @@
     "deployBastion": {
       "value": false
     },
-    "githubUser": {
-      "value": ""
-    },
     "customLocationRPOID": {
       "value": ""
     }

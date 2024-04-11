@@ -181,9 +181,8 @@ if ($industry -eq "manufacturing") {
         $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
         $kubectlMonShells+=$kubectlMonShell
     }
-    Deploy-AIO
-    #Deploy-InfluxDb
-    Deploy-ESA
+    Deploy-AIO -AgConfig $global:AgConfig -Credentials $global:Credentials
+    Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
 
@@ -197,7 +196,7 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-Deploy-Prometheus
+Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
