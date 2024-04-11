@@ -187,7 +187,6 @@ function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 }
-
 function Deploy-InfluxDb {
     ##############################################################
     # Deploy OT Inspector (InfluxDB)
@@ -260,7 +259,9 @@ function Deploy-InfluxDb {
     kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 }
+
 function Deploy-AIO {
+    # Deploys Azure IoT Operations on all k8s clusters in the config file
     param (
         $AgConfig,
         [PSCredential]$Credentials

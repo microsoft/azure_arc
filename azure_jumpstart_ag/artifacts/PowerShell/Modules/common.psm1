@@ -808,7 +808,6 @@ function Deploy-Workbook {
     }
 }
 
-
 function Deploy-Prometheus {
     param (
         $AgConfig
@@ -816,7 +815,7 @@ function Deploy-Prometheus {
     $AgMonitoringDir = $AgConfig.AgDirectories["AgMonitoringDir"]
     $observabilityNamespace = $AgConfig.Monitoring["Namespace"]
     $observabilityDashboards = $AgConfig.Monitoring["Dashboards"]
-    $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($AgConfig.L1Password))
+    $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($env:adminPassword))
 
     # Set Prod Grafana API endpoint
     $grafanaDS = $AgConfig.Monitoring["ProdURL"] + "/api/datasources"
