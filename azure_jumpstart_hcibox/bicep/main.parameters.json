@@ -29,7 +29,7 @@
         "autoDeployClusterResource": {
             "value": false
         },
-        "autoUpdateClusterResource": {
+        "autoUpgradeClusterResource": {
             "value": false
         }
     }
