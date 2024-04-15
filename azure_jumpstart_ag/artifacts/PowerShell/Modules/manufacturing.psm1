@@ -543,7 +543,7 @@ function Deploy-ADXDashboardReports {
         $adxEndPoint = $kustoCluster.Uri
         if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
             $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-contoso-motors-auto-parts").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-orders-payload.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-contoso-motors-auto-parts" -Value $ordersDashboardBody -Force -ErrorAction Ignore
         }
         else {
             Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
