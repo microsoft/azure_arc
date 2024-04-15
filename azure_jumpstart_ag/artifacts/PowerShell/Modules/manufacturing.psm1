@@ -537,13 +537,19 @@ function Configure-MQTTIpAddress {
 function Deploy-ADXDashboardReports {
     ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
     $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
+
+    # Create directory if do not exist
+    if (-not (Test-Path -LiteralPath $adxDashBoardsDir)) {
+        New-Item -Path $adxDashBoardsDir -ItemType Directory -ErrorAction Stop | Out-Null #-Force
+    }
+
     #$dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
     $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
     if ($null -ne $kustoCluster) {
         $adxEndPoint = $kustoCluster.Uri
         if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
-            $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-contoso-motors-auto-parts").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
-            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-contoso-motors-auto-parts" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+            $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-contoso-motors-auto-parts.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
+            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-contoso-motors-auto-parts.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
         }
         else {
             Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
