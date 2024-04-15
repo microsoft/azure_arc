@@ -187,7 +187,6 @@ function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 }
-
 function Deploy-InfluxDb {
     ##############################################################
     # Deploy OT Inspector (InfluxDB)
@@ -260,11 +259,17 @@ function Deploy-InfluxDb {
     kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 }
+
 function Deploy-AIO {
+    # Deploys Azure IoT Operations on all k8s clusters in the config file
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Preparing clusters for aio
     ##############################################################
-    $VMnames = (Get-VM).Name
+    $VMnames = $AgConfig.SiteConfig.GetEnumerator().Name.ToLower()
 
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
@@ -272,6 +277,7 @@ function Deploy-AIO {
         # Preparing environment folders structure
         ###########################################
         Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+        Write-Host "`n"
         try {
             $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
             & kubectl apply -f $localPathProvisionerYaml
@@ -327,9 +333,9 @@ function Deploy-AIO {
                 Write-Host "Updated runtime iptable rules for node exporter"
                 Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
                 Write-Host "Persisted iptable rules for node exporter"
-            }
-                    # increase the maximum number of files
+                # increase the maximum number of files
                 Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+            }
             else {
                 Write-Host "iptable rule exists, skip configuring iptable rules..."
             }
@@ -354,13 +360,13 @@ function Deploy-AIO {
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
-        $secretName = $clusterName + "-aio"
         $retryCount = 0
         $maxRetries = 5
         $aioStatus = "notDeployed"
 
         # Enable custom locations on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
         az connectedk8s enable-features --name $arcClusterName `
             --resource-group $resourceGroup `
@@ -369,28 +375,33 @@ function Deploy-AIO {
             --only-show-errors
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
                 Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
                 Write-Host "`n"
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
                 $retryCount++
             }
             else {
                 $aioStatus = "deployed"
             }
         } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
-
+        $kvIndex++
+    }
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
         $retryCount = 0
-        $maxRetries = 5
-
+        $maxRetries = 25
+        kubectx $clusterName
         do {
-            $output = az iot ops check --as-object
+            $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --kv-sat-secret-name $secretName --only-show-errors
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
                 $retryCount++
             }
         } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -399,7 +410,8 @@ function Deploy-AIO {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
             exit 1 # Exit the script
         }
-
+        Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
+        Write-Host "`n"
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
         $extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
         $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
@@ -407,7 +419,7 @@ function Deploy-AIO {
         $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 
         az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-        #az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
         az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
         az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
         az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
@@ -424,13 +436,16 @@ function Deploy-AIO {
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+        (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
-        $kvIndex++
     }
 }
 
 function Deploy-ESA {
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Deploy Edge Storage Accelerator (ESA)
     ##############################################################
@@ -475,7 +490,7 @@ function Deploy-ESA {
 
         # Enable Open Service Mesh extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the $clusterName cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
+        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm --only-show-errors
 
         # Enable ESA extension on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the $clusterName cluster" -ForegroundColor DarkGray

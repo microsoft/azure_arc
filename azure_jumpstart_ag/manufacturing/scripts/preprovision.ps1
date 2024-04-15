@@ -193,19 +193,6 @@ azd env set CUSTOM_LOCATION_RP_ID $customLocationRPOID
 
 
 ########################################################################
-# GitHub User
-########################################################################
-$JS_GITHUB_USER = $env:JS_GITHUB_USER
-
-$defaultGhUser = ""
-If ($JS_GITHUB_USER) { $defaultGhUser = " [$JS_GITHUB_USER]"}
-
-if ($promptOutput = Read-Host "Enter your GitHub user name$defaultGhUser") { $JS_GITHUB_USER = $promptOutput }
-
-# set the env variable
-azd env set JS_GITHUB_USER -- $JS_GITHUB_USER
-
-########################################################################
 # Create Azure Service Principal
 ########################################################################
 Write-Host "Checking for existing stored Azure service principal..."
@@ -220,10 +207,12 @@ if ($null -ne $env:SPN_CLIENT_ID) {
         $SPN_CLIENT_ID = $spn.AppId
         $SPN_CLIENT_SECRET = $spn.PasswordCredentials.SecretText
         $SPN_TENANT_ID = (Get-AzContext).Tenant.Id
+        $SPN_OBJECT_ID = $spn.Id
         # Set environment variables
         azd env set SPN_CLIENT_ID -- $SPN_CLIENT_ID
         azd env set SPN_CLIENT_SECRET -- $SPN_CLIENT_SECRET
         azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
+        azd env set SPN_OBJECT_ID -- $SPN_OBJECT_ID
     }
     catch {
         

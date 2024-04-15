@@ -53,9 +53,9 @@ if ($industry -eq "retail") {
 #####################################################################
 # Importing fuctions
 #####################################################################
-Import-Module "$AgPowerShellDir\common.psm1" -Force
-Import-Module "$AgPowerShellDir\retail.psm1" -Force
-Import-Module "$AgPowerShellDir\manufacturing.psm1" -Force
+Import-Module "$AgPowerShellDir\common.psm1" -Force -DisableNameChecking
+Import-Module "$AgPowerShellDir\retail.psm1" -Force -DisableNameChecking
+Import-Module "$AgPowerShellDir\manufacturing.psm1" -Force -DisableNameChecking
 
 Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
@@ -173,11 +173,16 @@ if ($industry -eq "retail") {
     Deploy-RetailConfigs
 }
 
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n azure-iot-operations | Sort-Object -Descending; Start-Sleep -Seconds 5; Clear-Host } }
 if ($industry -eq "manufacturing") {
-    Deploy-AIO
-    #Deploy-InfluxDb
-    Deploy-ESA
+    $kubectlMonShells = @()
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        $arguments = "[System.Console]::Title = '$clusterName';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
+        $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
+        $kubectlMonShells+=$kubectlMonShell
+    }
+    Deploy-AIO -AgConfig $global:AgConfig -Credentials $global:Credentials
+    Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
 
@@ -191,7 +196,7 @@ if ($industry -eq "manufacturing") {
 #####################################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 #####################################################################
-Deploy-Prometheus
+Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
@@ -259,7 +264,11 @@ Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
+if ($industry -eq "manufacturing") {
+    foreach ($shell in $kubectlMonShells) {
+        Stop-Process -Id $shell.Id
+    }
+}
 
 Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"

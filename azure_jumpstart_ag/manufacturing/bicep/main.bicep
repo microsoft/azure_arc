@@ -39,15 +39,6 @@ param githubBranch string = 'ag_manufacturing'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
-@minLength(1)
-param githubUser string
-
-//@description('GitHub Personal access token for the user account')
-//@minLength(1)
-//@secure()
-//param githubPAT string
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
@@ -150,7 +141,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubAccount: githubAccount
     githubBranch: githubBranch
-    githubUser: githubUser
     //githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
