@@ -509,8 +509,8 @@ function Deploy-ESA {
 
 function Configure-MQTTIpAddress {
     $mqttIpArray = @()
-
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+    foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
@@ -548,7 +548,9 @@ function Deploy-MQTTSimulator {
     $index = 0
     $mqsimulatorfile = "$AgToolsDir\mqtt_simulator.yml"
 
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+
+    foreach ($cluster in $clusters) {
         $mqttIp = $mqttIpArray[$index]
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
