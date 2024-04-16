@@ -375,13 +375,13 @@ function Deploy-AIO {
             --only-show-errors
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
                 Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
                 Write-Host "`n"
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false
                 $retryCount++
             }
             else {
@@ -432,7 +432,28 @@ function Deploy-AIO {
 
         Start-Sleep -Seconds 60
 
-        ## Adding MQTT load balancer
+        ## Enabling MQTT Simulator
+        $mqsimulatorfile = "$AgToolsDir\mqtt-simulator.yml"
+        $mqListenerService = "aio-mq-dmqtt-frontend"
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Simulator" -ForegroundColor DarkGray
+        do {
+            $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+            $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
+            $matchingServices = $services.items | Where-Object {
+                $_.metadata.name -match "aio-mq-dmqtt" -and
+                $_.status.phase -notmatch "running"
+            }
+            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
+            Start-Sleep -Seconds 20
+        } while (
+            $null -eq $mqttIp -and $matchingServices.Count -ne 0
+        )
+
+        (Get-Content $mqsimulatorfile ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqsimulatorfile
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+        kubectl apply -f $mqsimulatorfile -n $aioNamespace
+
+        ## Adding MQTT bridge to Event Grid MQTT
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
