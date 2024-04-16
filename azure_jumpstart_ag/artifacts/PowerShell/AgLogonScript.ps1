@@ -186,11 +186,15 @@ if ($industry -eq "manufacturing") {
     #Deploy-ManufacturingConfigs
 }
 
+if ($industry -eq "manufacturing") {
 ##############################################################
 # Get MQ IP address
 ##############################################################
-if ($industry -eq "manufacturing") {
-    Configure-MQTTIpAddress
+    $mqttIp=Configure-MQTTIpAddress
+##############################################################
+# Deploy MQTT Simulator
+##############################################################
+    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIp $mqttIp
 }
 
 #####################################################################
