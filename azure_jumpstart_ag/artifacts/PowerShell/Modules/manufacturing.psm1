@@ -433,7 +433,7 @@ function Deploy-AIO {
         Start-Sleep -Seconds 60
 
         ## Enabling MQTT Simulator
-        $mqsimulatorfile = "$AgToolsDir\mqtt-simulator.yml"
+        $mqsimulatorfile = "$AgToolsDir\mqtt_simulator.yml"
         $mqListenerService = "aio-mq-dmqtt-frontend"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Simulator" -ForegroundColor DarkGray
         do {
