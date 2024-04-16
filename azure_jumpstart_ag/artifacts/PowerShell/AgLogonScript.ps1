@@ -190,11 +190,11 @@ if ($industry -eq "manufacturing") {
 ##############################################################
 # Get MQ IP address
 ##############################################################
-    $mqttIp=Configure-MQTTIpAddress
+    $mqttIpArray=Configure-MQTTIpAddress
 ##############################################################
 # Deploy MQTT Simulator
 ##############################################################
-    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIp $mqttIp
+    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIpArray $mqttIpArray
 }
 
 #####################################################################

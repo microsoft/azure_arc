@@ -508,6 +508,8 @@ function Deploy-ESA {
 }
 
 function Configure-MQTTIpAddress {
+    $mqttIpArray = @()
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -526,23 +528,28 @@ function Configure-MQTTIpAddress {
             $null -eq $mqttIp -and $matchingServices.Count -ne 0
         )
 
+        $mqttIpArray += $mqttIp
+
         Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
             netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
         }
     }
-    return $mqttIp
+
+    return $mqttIpArray
 }
 
 function Deploy-MQTTSimulator {
     param (
         $AgConfig,
         [PSCredential]$Credentials,
-        $mqttIp
+        [array]$mqttIpArray
     )
+
+    $index = 0
     $mqsimulatorfile = "$AgToolsDir\mqtt_simulator.yml"
 
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-
+        $mqttIp = $mqttIpArray[$index]
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
@@ -550,5 +557,6 @@ function Deploy-MQTTSimulator {
         (Get-Content $mqsimulatorfile ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqsimulatorfile
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
         kubectl apply -f $mqsimulatorfile -n $aioNamespace
+        $index++
     }
 }
