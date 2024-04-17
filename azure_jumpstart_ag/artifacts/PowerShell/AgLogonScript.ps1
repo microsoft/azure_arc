@@ -174,7 +174,7 @@ if ($industry -eq "retail") {
 
 if ($industry -eq "manufacturing") {
     Deploy-AIO -AgConfig $AgConfig -Credentials $Credentials
-    Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
+    #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
     SetupMfgRepo -AgConfig $AgConfig
     #Deploy-ManufacturingConfigs
 }
