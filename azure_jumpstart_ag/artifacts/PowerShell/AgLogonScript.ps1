@@ -182,7 +182,7 @@ if ($industry -eq "manufacturing") {
         $kubectlMonShells+=$kubectlMonShell
     }
     Deploy-AIO -AgConfig $global:AgConfig -Credentials $global:Credentials
-    Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
+    #Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
 
