@@ -84,6 +84,9 @@ resource eventGrid 'Microsoft.EventGrid/namespaces@2023-12-15-preview' = {
         ]
       }
       routeTopicResourceId: eventGridTopic.id
+      routingIdentityInfo: {
+        type: 'SystemAssigned'
+      }
     }
   }
 }
