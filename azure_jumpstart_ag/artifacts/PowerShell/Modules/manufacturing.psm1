@@ -187,7 +187,6 @@ function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 }
-
 function Deploy-InfluxDb {
     ##############################################################
     # Deploy OT Inspector (InfluxDB)
@@ -197,7 +196,6 @@ function Deploy-InfluxDb {
     $influxdb_setupYaml = "$aioToolsDir\influxdb_setup.yml"
     $influxdbYaml = "$aioToolsDir\influxdb.yml"
     $influxImportYaml = "$aioToolsDir\influxdb-import-dashboard.yml"
-    $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
 
     do {
         $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
@@ -260,11 +258,17 @@ function Deploy-InfluxDb {
     kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
 
 }
+
 function Deploy-AIO {
+    # Deploys Azure IoT Operations on all k8s clusters in the config file
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Preparing clusters for aio
     ##############################################################
-    $VMnames = (Get-VM).Name
+    $VMnames = $AgConfig.SiteConfig.GetEnumerator().Name.ToLower()
 
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
         $ProgressPreference = "SilentlyContinue"
@@ -376,7 +380,7 @@ function Deploy-AIO {
                 Write-Host "`n"
                 Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
                 Write-Host "`n"
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
+                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
                 $retryCount++
             }
             else {
@@ -427,16 +431,20 @@ function Deploy-AIO {
 
         Start-Sleep -Seconds 60
 
-        ## Adding MQTT load balancer
+        ## Adding MQTT bridge to Event Grid MQTT
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-    (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+        (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
     }
 }
 
 function Deploy-ESA {
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials
+    )
     ##############################################################
     # Deploy Edge Storage Accelerator (ESA)
     ##############################################################
@@ -500,7 +508,9 @@ function Deploy-ESA {
 }
 
 function Configure-MQTTIpAddress {
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $mqttIpArray = @()
+    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+    foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
@@ -518,8 +528,37 @@ function Configure-MQTTIpAddress {
             $null -eq $mqttIp -and $matchingServices.Count -ne 0
         )
 
+        $mqttIpArray += $mqttIp
+
         Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
             netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
         }
+    }
+
+    return $mqttIpArray
+}
+
+function Deploy-MQTTSimulator {
+    param (
+        $AgConfig,
+        [PSCredential]$Credentials,
+        [array]$mqttIpArray
+    )
+
+    $index = 0
+    $mqsimulatorfile = "$AgToolsDir\mqtt_simulator.yml"
+
+    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+
+    foreach ($cluster in $clusters) {
+        $mqttIp = $mqttIpArray[$index]
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        (Get-Content $mqsimulatorfile ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqsimulatorfile
+        netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
+        kubectl apply -f $mqsimulatorfile -n $aioNamespace
+        $index++
     }
 }

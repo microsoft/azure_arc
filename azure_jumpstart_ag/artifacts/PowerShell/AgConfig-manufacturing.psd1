@@ -217,21 +217,13 @@
     )
 
     AppConfig = @{
-        ContosoBakeries_decode = @{
-            GitOpsConfigName = "config-decode"
-            KustomizationName = "decode"
-            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/decode"
-            Namespace = "contoso-bakeries"
+        inferencing_deployment = @{
+            GitOpsConfigName = "deploy-inferencing"
+            KustomizationName = "inferencing"
+            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/inferencing"
+            Namespace = "contoso-motors"
             Order = 1
         }
-        ContosoBakeries_rtspSimulator = @{
-            GitOpsConfigName = "config-rtspSimulator"
-            KustomizationName = "rtspSimulator"
-            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/rtspSimulator"
-            Namespace = "contoso-bakeries"
-            Order = 2
-        }
-
         # SensorMonitor = @{
         #     GitOpsConfigName  = "config-sensormonitor"
         #     KustomizationName = "sensor-monitor"

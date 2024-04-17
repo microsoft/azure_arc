@@ -27,9 +27,11 @@ spec:
           - name: MQTT_Port
             value: "1883"
           - name: MQTT_TOPIC1
-            value: "topic/productionline"
+            value: "topic/weldingrobot"
           - name: MQTT_TOPIC2
-            value: "topic/fryer"
+            value: "topic/productionline"
+          - name: MQTT_TOPIC3
+            value: "topic/assemblyline"
           - name: INFLUX_URL
             value: "http://influxPlaceholder:8086"
           - name: INFLUX_TOKEN
