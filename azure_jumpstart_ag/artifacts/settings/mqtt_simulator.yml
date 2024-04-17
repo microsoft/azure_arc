@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-simulator-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-simulator
+  template:
+    metadata:
+      labels:
+        app: mqtt-simulator
+    spec:
+      containers:
+        - name: mqtt-simulator
+          image: agoraarmbladev.azurecr.io/mqtt-simulator:latest
+          resources:
+            limits:
+              cpu: "1"
+              memory: "500Mi"
+          env:
+            - name: MQTT_BROKER
+              value: "MQTTIpPlaceholder"
+            - name: MQTT_PORT
+              value: "1883"
+            - name: FRECUENCY
+              value: "5"

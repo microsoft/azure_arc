@@ -250,6 +250,7 @@ if($industry -eq "retail"){
 elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_simulator.yml") -OutFile "$AgToolsDir\mqtt_simulator.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-setup.yml") -OutFile "$AgToolsDir\influxdb-setup.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
