@@ -664,4 +664,53 @@ function Deploy-ADXDashboardReports {
             Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
         }
     }
+
+        # Create EventHub environment variables
+        $eventHubNamespace = (az eventhubs namespace list --resource-group $env:resourceGroup --query [0].name --output tsv)
+        if ($null -ne $eventHubNamespace) {
+            # Find EventHub and create connection string
+            $eventHub = (az eventhubs eventhub list --namespace-name $eventHubNamespace --resource-group $env:resourceGroup --query [0].name --output tsv)
+    
+            # Create authorization rule
+            $authRuleName = "data-emulator"
+            az eventhubs eventhub authorization-rule create --authorization-rule-name $authRuleName --eventhub-name $eventHub --namespace-name $eventHubNamespace --resource-group $env:resourceGroup --rights Send Listen
+    
+            # Get connection string
+            $connectionString = (az eventhubs eventhub authorization-rule keys list --resource-group $env:resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHub --name $authRuleName --query primaryConnectionString --output tsv)
+    
+            # Set environment variables
+            [System.Environment]::SetEnvironmentVariable('EVENTHUB_CONNECTION_STRING', $connectionString, [System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable('EVENTHUB_NAME', $eventHub, [System.EnvironmentVariableTarget]::Machine)
+        }
+    
+    # Create desktop icons
+    $AgAppsRepoDir = $AgConfig.AgDirectories["AgAppsRepo"] 
+    $dataEmulatorFile = "$AgAppsRepoDir\data-emulator.py"
+    $AgDataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/data-emulator.py" -OutFile $dataEmulatorFile
+    if (!(Test-Path -Path $dataEmulatorFile)) {
+        Write-Host "Unabled to download data-emulator.py file. Please download manually from GitHub into the DataEmulator folder."
+    }
+
+    $emulationScriptContent = "@echo off `r`ncmd /k `"cd /d $AgDataEmulatorDir & python data-emulator.py`""
+    $emulatorLocation = "$AgDataEmulatorDir\dataemulator.cmd"
+    Set-Content -Path $emulatorLocation -Value $emulationScriptContent
+
+    # Download icon file
+    $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+
+    $iconPath = "$AgIconsDir\emulator.ico"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
+    if (!(Test-Path -Path $iconPath)) {
+        Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
+    }
+
+    # Create desktop shortcut
+    $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = $emulatorLocation
+    $shortcut.IconLocation = "$iconPath, 0"
+    $shortcut.WindowStyle = 8
+    $shortcut.Save()
 }
