@@ -176,28 +176,28 @@ if ($industry -eq "manufacturing") {
     Deploy-AIO -AgConfig $AgConfig -Credentials $Credentials
     #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
     SetupMfgRepo -AgConfig $AgConfig
+    Deploy-AIO
     #Deploy-ManufacturingConfigs
 }
 
 if ($industry -eq "manufacturing") {
-##############################################################
-# Get MQ IP address
-##############################################################
     $mqttIpArray=Configure-MQTTIpAddress
-##############################################################
-# Deploy MQTT Simulator
-##############################################################
-    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIpArray $mqttIpArray
+    Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
 }
 
-#####################################################################
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Deploy-MQTTExplorer
+
+##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
-#####################################################################
+##############################################################
 Deploy-Prometheus -AgConfig $AgConfig
 
-#####################################################################
+##############################################################
 # Deploy Azure Workbook for Infrastructure Observability
-#####################################################################
+##############################################################
 Deploy-Workbook
 
 ##############################################################
