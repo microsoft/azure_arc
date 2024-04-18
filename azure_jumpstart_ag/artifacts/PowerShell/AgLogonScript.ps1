@@ -181,7 +181,7 @@ if ($industry -eq "manufacturing") {
         $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
         $kubectlMonShells+=$kubectlMonShell
     }
-    Deploy-AIO -AgConfig $global:AgConfig -Credentials $global:Credentials
+    Deploy-AIO
     #Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
@@ -194,7 +194,7 @@ if ($industry -eq "manufacturing") {
 ##############################################################
 # Deploy MQTT Simulator
 ##############################################################
-    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIpArray $mqttIpArray
+    Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
 }
 
 ##############################################################
