@@ -1,3 +1,46 @@
+function SetupMfgRepo {
+    param (
+        $AgConfig
+    )
+    Set-Location $AgConfig.AgDirectories["AgAppsRepo"]
+    $appsRepo = "jumpstart-agora-apps"
+    $branch = "manufacturing"
+    Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
+    git clone -b $branch "https://github.com/microsoft/$appsRepo.git" "$appsRepo"
+}
+
+function Deploy-MfgTemp {
+    param (
+        $AgConfig,
+        $Credentials
+    )
+    $appsRepo = "jumpstart-agora-apps"
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        kubectx $cluster.Name.ToLower()
+        Set-Location "$($AgConfig.AgDirectories["AgAppsRepo"])\$appsRepo"
+        
+        # Apply the InfluxDB deployment configuration from the influxdb.yaml file. This will set up InfluxDB in your Kubernetes cluster.
+        kubectl apply -f contoso_manufacturing\deployment\yamls\influxdb.yaml
+        
+        # Apply the ConfigMap for InfluxDB from the influxdb-configmap.yaml file. ConfigMaps are used to store non-confidential data in key-value pairs. This particular ConfigMap contain configuration settings for InfluxDB and the dashboard.
+        kubectl apply -f contoso_manufacturing\deployment\yamls\influxdb-configmap.yaml
+
+        # Apply the deployment configuration for an MQTT simulator from the mqtt_simulator.yaml file. This simulator can be used for generating MQTT messages to test MQTT integrations or listeners in your environment.
+        kubectl apply -f contoso_manufacturing\deployment\yamls\mqtt_simulator.yaml
+
+        # Apply the deployment configuration for an MQTT listener from the mqtt-listener.yaml file. This listener acts as a subscriber to MQTT topics to process or store the incoming messages, potentially integrating with other services like InfluxDB.
+        kubectl apply -f contoso_manufacturing\deployment\yamls\mqtt-listener.yaml
+
+        # Apply the deployment configuration for an RTSP simulator from the rtsp-simulator.yaml file. This simulator can be used to mimic an RTSP feed, useful for testing video processing or streaming applications without the need for actual video sources.
+        #kubectl apply -f contoso_manufacturing\deployment\yamls\rtsp-simulator.yaml
+
+        #kubectl port-forward svc/virtual-rtsp 8554:8554
+
+        # Apply the deployment configuration for the 'decode' application from the decode.yaml file. This application is responsible for connecting to an RTSP feed, capturing frames, and potentially processing or forwarding those frames for further analysis or storage.
+        kubectl apply -f contoso_manufacturing\deployment\yamls\decode.yaml
+    }
+}
+
 function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
     # Cleaning up images-cache namespace on all clusters
@@ -261,10 +304,7 @@ function Deploy-InfluxDb {
 
 function Deploy-AIO {
     # Deploys Azure IoT Operations on all k8s clusters in the config file
-    param (
-        $AgConfig,
-        [PSCredential]$Credentials
-    )
+
     ##############################################################
     # Preparing clusters for aio
     ##############################################################
@@ -424,6 +464,7 @@ function Deploy-AIO {
         az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
         az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
 
+        Start-Sleep -Seconds 60
 
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
         $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
@@ -509,7 +550,7 @@ function Deploy-ESA {
 
 function Configure-MQTTIpAddress {
     $mqttIpArray = @()
-    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+    $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -527,39 +568,77 @@ function Configure-MQTTIpAddress {
         } while (
             $null -eq $mqttIp -and $matchingServices.Count -ne 0
         )
-
-        $mqttIpArray += $mqttIp
+        if (-not [string]::IsNullOrEmpty($mqttIp)) {
+            $newObject = [PSCustomObject]@{
+                cluster = $clusterName
+                ip = $mqttIp
+            }
+            $mqttIpArray += $newObject
+        }
 
         Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
             netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
         }
     }
 
+    $mqttIpArray = $mqttIpArray | Where-Object { $_ -ne "" }
+
     return $mqttIpArray
 }
 
 function Deploy-MQTTSimulator {
     param (
-        $AgConfig,
-        [PSCredential]$Credentials,
         [array]$mqttIpArray
     )
 
-    $index = 0
     $mqsimulatorfile = "$AgToolsDir\mqtt_simulator.yml"
 
-    $clusters = $AgConfig.SiteConfig.GetEnumerator() | Sort-Object Name
+    $clusters = $AgConfig.SiteConfig.GetEnumerator()
 
     foreach ($cluster in $clusters) {
-        $mqttIp = $mqttIpArray[$index]
         $clusterName = $cluster.Name.ToLower()
+        Copy-Item $mqsimulatorfile "$AgToolsDir\mqtt_simulator_$clusterName.yml"
+        $simualtorConfig = "$AgToolsDir\mqtt_simulator_$clusterName.yml"
+        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         kubectx $clusterName
-        (Get-Content $mqsimulatorfile ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqsimulatorfile
+        (Get-Content $simualtorConfig ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $simualtorConfig
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
-        kubectl apply -f $mqsimulatorfile -n $aioNamespace
-        $index++
+        kubectl apply -f $simualtorConfig -n $aioNamespace
+    }
+}
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+function Deploy-MQTTExplorer {
+    param (
+        [array]$mqttIpArray
+    )
+    Write-Host "`n"
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+    Write-Host "`n"
+    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+    $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
+    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $versionToDownload = $latestReleaseTag.Split("v")[1]
+    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+    $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+    $clusters = $AgConfig.SiteConfig.GetEnumerator()
+
+    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+    Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+    Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+    Start-Sleep -Seconds 5
+    Stop-Process -Name "MQTT Explorer"
+    Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
+    foreach ($cluster in $clusters) {
+        $clusterName = $cluster.Name.ToLower()
+        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
+        (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
     }
 }
 
