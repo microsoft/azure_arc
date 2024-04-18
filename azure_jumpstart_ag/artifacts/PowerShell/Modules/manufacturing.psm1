@@ -641,3 +641,78 @@ function Deploy-MQTTExplorer {
         (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
     }
 }
+
+# Function to deploy Azure Data Explorer dashboard reports
+function Deploy-ADXDashboardReports {
+    ### BELOW IS AN ALTERNATIVE APPROACH TO IMPORT DASHBOARD USING README INSTRUCTIONS
+    $adxDashBoardsDir = $AgConfig.AgDirectories["AgAdxDashboards"]
+
+    # Create directory if do not exist
+    if (-not (Test-Path -LiteralPath $adxDashBoardsDir)) {
+        New-Item -Path $adxDashBoardsDir -ItemType Directory -ErrorAction Stop | Out-Null #-Force
+    }
+
+    #$dataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
+    $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxClusterName
+    if ($null -ne $kustoCluster) {
+        $adxEndPoint = $kustoCluster.Uri
+        if ($null -ne $adxEndPoint -and $adxEndPoint -ne "") {
+            $ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-contoso-motors-auto-parts.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName -replace '{{GITHUB_BRANCH}}', $env:githubBranch -replace '{{GITHUB_ACCOUNT}}', $env:githubAccount
+            Set-Content -Path "$adxDashBoardsDir\adx-dashboard-contoso-motors-auto-parts.json" -Value $ordersDashboardBody -Force -ErrorAction Ignore
+        }
+        else {
+            Write-Host "[$(Get-Date -Format t)] ERROR: Unable to find Azure Data Explorer endpoint from the cluster resource in the resource group."
+        }
+    }
+
+    # Create EventHub environment variables
+    $eventHubNamespace = (az eventhubs namespace list --resource-group $env:resourceGroup --query [0].name --output tsv)
+    if ($null -ne $eventHubNamespace) {
+        # Find EventHub and create connection string
+        $eventHub = (az eventhubs eventhub list --namespace-name $eventHubNamespace --resource-group $env:resourceGroup --query [0].name --output tsv)
+
+        # Create authorization rule
+        $authRuleName = "data-emulator"
+        az eventhubs eventhub authorization-rule create --authorization-rule-name $authRuleName --eventhub-name $eventHub --namespace-name $eventHubNamespace --resource-group $env:resourceGroup --rights Send Listen
+
+        # Get connection string
+        $connectionString = (az eventhubs eventhub authorization-rule keys list --resource-group $env:resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHub --name $authRuleName --query primaryConnectionString --output tsv)
+
+        # Set environment variables
+        [System.Environment]::SetEnvironmentVariable('EVENTHUB_CONNECTION_STRING', $connectionString, [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable('EVENTHUB_NAME', $eventHub, [System.EnvironmentVariableTarget]::Machine)
+    }
+    
+    # Create desktop icons
+    $AgDataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
+    $dataEmulatorFile = "$AgDataEmulatorDir\data-emulator.py"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/data_emulator/data-emulator.py" -OutFile $dataEmulatorFile
+    if (!(Test-Path -Path $dataEmulatorFile)) {
+        Write-Host "Unabled to download data-emulator.py file. Please download manually from GitHub into the DataEmulator folder."
+    }
+
+    $emulationScriptContent = "@echo off `r`ncmd /k `"cd /d $AgDataEmulatorDir & python data-emulator.py`""
+    $emulatorLocation = "$AgDataEmulatorDir\dataemulator.cmd"
+    Set-Content -Path $emulatorLocation -Value $emulationScriptContent
+
+    # Download icon file
+    $AgIconsDir = $AgConfig.AgDirectories["AgIconDir"]
+
+    $iconPath = "$AgIconsDir\emulator.ico"
+    Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/icons/emulator.ico" -OutFile $iconPath
+    if (!(Test-Path -Path $iconPath)) {
+        Write-Host "Unabled to download emulator.ico file. Please download manually from GitHub into the icons folder."
+    }
+
+    # Create desktop shortcut
+    $shortcutLocation = "$Env:Public\Desktop\Data Emulator.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = $emulatorLocation
+    $shortcut.IconLocation = "$iconPath, 0"
+    $shortcut.WindowStyle = 8
+    $shortcut.Save()
+
+    # Install azure.eventhub python module to run data emulator
+    pip install azure.eventhub
+}
