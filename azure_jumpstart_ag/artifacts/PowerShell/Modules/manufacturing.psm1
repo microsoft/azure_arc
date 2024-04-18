@@ -712,4 +712,7 @@ function Deploy-ADXDashboardReports {
     $shortcut.IconLocation = "$iconPath, 0"
     $shortcut.WindowStyle = 8
     $shortcut.Save()
+
+    # Install azure.eventhub python module to run data emulator
+    pip install azure.eventhub
 }
