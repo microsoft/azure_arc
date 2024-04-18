@@ -187,13 +187,7 @@ if ($industry -eq "manufacturing") {
 }
 
 if ($industry -eq "manufacturing") {
-##############################################################
-# Get MQ IP address
-##############################################################
     $mqttIpArray=Configure-MQTTIpAddress
-##############################################################
-# Deploy MQTT Simulator
-##############################################################
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
 }
 

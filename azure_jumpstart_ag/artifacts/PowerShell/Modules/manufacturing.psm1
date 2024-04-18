@@ -421,6 +421,7 @@ function Deploy-AIO {
         az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
         az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
 
+        Start-Sleep -Seconds 60
 
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
         $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
@@ -526,7 +527,7 @@ function Configure-MQTTIpAddress {
         )
         if (-not [string]::IsNullOrEmpty($mqttIp)) {
             $newObject = [PSCustomObject]@{
-                cluster = $cluster
+                cluster = $clusterName
                 ip = $mqttIp
             }
             $mqttIpArray += $newObject
@@ -552,10 +553,10 @@ function Deploy-MQTTSimulator {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
 
     foreach ($cluster in $clusters) {
-        Copy-Item $mqsimulatorfile "$AgToolsDir\mqtt_simulator_$cluster.yml"
-        $simualtorConfig = "$AgToolsDir\mqtt_simulator_$cluster.yml"
-        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $cluster } | Select-Object -ExpandProperty ip
         $clusterName = $cluster.Name.ToLower()
+        Copy-Item $mqsimulatorfile "$AgToolsDir\mqtt_simulator_$clusterName.yml"
+        $simualtorConfig = "$AgToolsDir\mqtt_simulator_$clusterName.yml"
+        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         kubectx $clusterName
@@ -576,7 +577,7 @@ function Deploy-MQTTExplorer {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
     Write-Host "`n"
     $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-    $mqttExplorerSettings = "$aioToolsDir\settings.json"
+    $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
     $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
     $versionToDownload = $latestReleaseTag.Split("v")[1]
     $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
@@ -592,7 +593,8 @@ function Deploy-MQTTExplorer {
     Stop-Process -Name "MQTT Explorer"
     Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
     foreach ($cluster in $clusters) {
-        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $cluster } | Select-Object -ExpandProperty ip
-        (Get-Content $mqttExplorerSettings ) -replace "${cluster}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
+        $clusterName = $cluster.Name.ToLower()
+        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
+        (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
     }
 }
