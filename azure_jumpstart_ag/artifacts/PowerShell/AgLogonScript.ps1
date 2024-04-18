@@ -181,30 +181,29 @@ if ($industry -eq "manufacturing") {
         $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
         $kubectlMonShells+=$kubectlMonShell
     }
-    Deploy-AIO -AgConfig $global:AgConfig -Credentials $global:Credentials
-    Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
+    Deploy-AIO
+    #Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
 
 if ($industry -eq "manufacturing") {
-##############################################################
-# Get MQ IP address
-##############################################################
     $mqttIpArray=Configure-MQTTIpAddress
-##############################################################
-# Deploy MQTT Simulator
-##############################################################
-    Deploy-MQTTSimulator -AgConfig $global:AgConfig -Credentials $global:Credentials -mqttIpArray $mqttIpArray
+    Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
 }
 
-#####################################################################
+##############################################################
+# Install MQTT Explorer
+##############################################################
+Deploy-MQTTExplorer
+
+##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
-#####################################################################
+##############################################################
 Deploy-Prometheus -AgConfig $AgConfig
 
-#####################################################################
+##############################################################
 # Deploy Azure Workbook for Infrastructure Observability
-#####################################################################
+##############################################################
 Deploy-Workbook
 
 ##############################################################

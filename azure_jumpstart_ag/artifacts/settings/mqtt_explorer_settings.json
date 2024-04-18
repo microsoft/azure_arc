@@ -4,9 +4,24 @@
       "certValidation": false,
       "clientId": "mqtt-explorer-640c948e",
       "encryption": false,
-      "host": "MQTTIpPlaceholder",
+      "host": "seattleIpPlaceholder",
       "id": "mqtt.eclipse.org",
-      "name": "AIO",
+      "name": "seattle",
+      "port": 1883,
+      "protocol": "mqtt",
+      "subscriptions": [
+        "#",
+        "$SYS/#"
+      ],
+      "type": "mqtt"
+    },
+    "mqtt.eclipse.org2": {
+      "certValidation": false,
+      "clientId": "mqtt-explorer-640c948e",
+      "encryption": false,
+      "host": "chicagoIpPlaceholder",
+      "id": "mqtt.eclipse.org2",
+      "name": "chicago",
       "port": 1883,
       "protocol": "mqtt",
       "subscriptions": [

@@ -184,7 +184,33 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationAddressPrefix: '*'
           destinationPortRange: '9090'
         }
-      }       
+      }
+      {
+        name: 'allow_MQ_8883'
+        properties: {
+          priority: 1009
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '8883'
+        }
+      }
+      {
+        name: 'allow_MQ_1883'
+        properties: {
+          priority: 1010
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '1883'
+        }
+      }
     ]
   }
 }
