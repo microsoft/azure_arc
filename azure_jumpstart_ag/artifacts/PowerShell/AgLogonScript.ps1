@@ -17,7 +17,6 @@ $global:industry = $Env:industry
 $global:websiteUrls = $AgConfig.URLs
 $global:githubAccount = $Env:githubAccount
 $global:githubBranch = $Env:githubBranch
-$global:githubUser = $Env:githubUser
 $global:resourceGroup = $Env:resourceGroup
 $global:azureLocation = $Env:azureLocation
 $global:spnClientId = $Env:spnClientId
@@ -174,15 +173,10 @@ if ($industry -eq "retail") {
 }
 
 if ($industry -eq "manufacturing") {
-    $kubectlMonShells = @()
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        $arguments = "[System.Console]::Title = '$clusterName';for (0 -lt 1) { kubectl get pod -n azure-iot-operations --context $clusterName  | Sort-Object -Descending;Start-Sleep -Seconds 5;Clear-Host}"
-        $kubectlMonShell = Start-Process powershell -ArgumentList $arguments -PassThru
-        $kubectlMonShells+=$kubectlMonShell
-    }
+    Deploy-AIO -AgConfig $AgConfig -Credentials $Credentials
+    #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
+    SetupMfgRepo -AgConfig $AgConfig
     Deploy-AIO
-    #Deploy-ESA -AgConfig $global:AgConfig -Credentials $global:Credentials
     #Deploy-ManufacturingConfigs
 }
 
