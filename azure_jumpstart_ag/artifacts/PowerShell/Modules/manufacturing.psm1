@@ -527,13 +527,16 @@ function Configure-MQTTIpAddress {
         } while (
             $null -eq $mqttIp -and $matchingServices.Count -ne 0
         )
-
-        $mqttIpArray += $mqttIp
+        if (-not [string]::IsNullOrEmpty($mqttIp)) {
+            $mqttIpArray += $mqttIp
+        }
 
         Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
             netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
         }
     }
+
+    $mqttIpArray = $mqttIpArray | Where-Object { $_ -ne "" }
 
     return $mqttIpArray
 }
@@ -561,4 +564,27 @@ function Deploy-MQTTSimulator {
         kubectl apply -f $mqsimulatorfile -n $aioNamespace
         $index++
     }
+}
+
+##############################################################
+# Install MQTT Explorer
+##############################################################
+function Deploy-MQTTExplorer {
+
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
+Write-Host "`n"
+$aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
+$latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
+$versionToDownload = $latestReleaseTag.Split("v")[1]
+$mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
+$output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
+Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
+Start-Process -FilePath $output -ArgumentList "/S" -Wait
+
+Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
+Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
+Start-Sleep -Seconds 5
+Stop-Process -Name "MQTT Explorer"
+Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
 }

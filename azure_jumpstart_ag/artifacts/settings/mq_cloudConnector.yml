@@ -22,7 +22,7 @@ spec:
     tag: 0.1.0-preview
     pullPolicy: IfNotPresent
   protocol: v5
-  bridgeInstances: 2
+  bridgeInstances: 1
   clientIdPrefix: factory-gateway-
   logLevel: debug
   remoteBrokerConnection:
