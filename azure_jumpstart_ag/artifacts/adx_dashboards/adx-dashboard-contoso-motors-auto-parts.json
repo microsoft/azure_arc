@@ -487,7 +487,7 @@
         "width": 18,
         "height": 4
       },
-      "markdownText": "![Contoso Motors adn Auto Parts](https://github.com/chintalavr/azure_arc/blob/ag_manufacturing/azure_jumpstart_ag/artifacts/adx_dashboards/contoso-motors-autoparts.png?raw=true)",
+      "markdownText": "![Contoso Motors adn Auto Parts](https://github.com/{{GITHUB_ACCOUNT}}/azure_arc/blob/{{GITHUB_BRANCH}}/azure_jumpstart_ag/artifacts/adx_dashboards/contoso-motors-autoparts.png?raw=true)",
       "visualOptions": {}
     },
     {
