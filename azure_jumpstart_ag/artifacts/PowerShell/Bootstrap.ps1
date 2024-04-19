@@ -241,8 +241,8 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additiona
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
-Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso-motors.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso-motors.svg
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -OutFile $AgIconsDir\contoso-motors.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
 if($industry -eq "retail"){
