@@ -43,7 +43,7 @@ param windowsAdminPassword string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
-param githubAccount string = 'zaidmohd'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
 param githubBranch string = 'ag_manufacturing'
