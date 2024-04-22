@@ -378,7 +378,7 @@ Write-Host "Open Service Mesh (OSM) installed successfully."
 Write-Host "Disabling ACStor for single-node cluster..."
 # Create the config.json file
 $acstorConfig = @{
-    "feature.storageClass" = "default"
+    "feature.diskStorageClass" = "local-path"
     "acstorController.enabled" = $false
 }
 
