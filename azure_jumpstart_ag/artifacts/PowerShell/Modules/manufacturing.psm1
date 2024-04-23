@@ -628,6 +628,7 @@ function Deploy-MQTTExplorer {
     $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
 
+    $ProgressPreference = "SilentlyContinue"
     Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
     Start-Process -FilePath $output -ArgumentList "/S" -Wait
 
@@ -641,6 +642,7 @@ function Deploy-MQTTExplorer {
         $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
         (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
     }
+    $ProgressPreference = "Continue"
 }
 
 # Function to deploy Azure Data Explorer dashboard reports
