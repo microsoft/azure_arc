@@ -222,7 +222,7 @@
         inferencing_deployment = @{
             GitOpsConfigName = "deploy-inferencing"
             KustomizationName = "inferencing"
-            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/inferencing"
+            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/operations"
             Namespace = "contoso-motors"
             Order = 1
         }
