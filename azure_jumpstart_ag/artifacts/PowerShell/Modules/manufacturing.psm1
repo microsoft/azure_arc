@@ -54,13 +54,13 @@ function Deploy-ManufacturingConfigs {
     }
 
     #  TODO - Will we need to wait for builds in agora repo?
-    while ($workflowStatus.status -ne "completed") {
-        #Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-        #Start-Sleep -Seconds 10
-        #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-    }
+    # while ($workflowStatus.status -ne "completed") {
+    #     #Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
+    #     #Start-Sleep -Seconds 10
+    #     #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
+    # }
 
-    # Loop through the clusters and
+    # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-retail.psd1
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig
