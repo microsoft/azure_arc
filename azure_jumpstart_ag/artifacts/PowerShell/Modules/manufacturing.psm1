@@ -476,11 +476,13 @@ function Deploy-AIO {
 
         ## Adding MQTT bridge to Event Grid MQTT
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
-        (Get-Content $mqconfigfile) -replace 'clusterName', $clusterName | Set-Content $mqconfigfile
+        Copy-Item $mqconfigfile "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
+        $bridgeConfig = "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
+        (Get-Content $bridgeConfig) -replace 'clusterName', $clusterName | Set-Content $bridgeConfig
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
-        (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-        kubectl apply -f $mqconfigfile -n $aioNamespace
+        (Get-Content -Path $bridgeConfig) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $bridgeConfig
+        kubectl apply -f $bridgeConfig -n $aioNamespace
     }
 }
 

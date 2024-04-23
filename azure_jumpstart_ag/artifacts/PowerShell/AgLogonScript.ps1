@@ -186,7 +186,7 @@ if ($industry -eq "manufacturing") {
 ##############################################################
 # Install MQTT Explorer
 ##############################################################
-Deploy-MQTTExplorer
+Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
