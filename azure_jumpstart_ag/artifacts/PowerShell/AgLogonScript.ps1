@@ -175,18 +175,11 @@ if ($industry -eq "retail") {
 if ($industry -eq "manufacturing") {
     #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
     Deploy-AIO
-    #Deploy-ManufacturingConfigs
-}
-
-if ($industry -eq "manufacturing") {
     $mqttIpArray=Configure-MQTTIpAddress
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    #Deploy-ManufacturingConfigs
 }
-
-##############################################################
-# Install MQTT Explorer
-##############################################################
-Deploy-MQTTExplorer
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
