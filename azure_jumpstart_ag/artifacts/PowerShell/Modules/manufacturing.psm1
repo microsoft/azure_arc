@@ -476,7 +476,7 @@ function Deploy-AIO {
 
         ## Adding MQTT bridge to Event Grid MQTT
         $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
-        Copy-Item $mqconfigfile "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
+        Copy-Item $mqconfigfile "$AgToolsDir\mq_cloudConnector_$clusterName.yml" -Force
         $bridgeConfig = "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
         (Get-Content $bridgeConfig) -replace 'clusterName', $clusterName | Set-Content $bridgeConfig
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
@@ -602,7 +602,7 @@ function Deploy-MQTTSimulator {
 
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        Copy-Item $mqsimulatorfile "$AgToolsDir\mqtt_simulator_$clusterName.yml"
+        Copy-Item $mqsimulatorfile "$AgToolsDir\mqtt_simulator_$clusterName.yml" -Force
         $simualtorConfig = "$AgToolsDir\mqtt_simulator_$clusterName.yml"
         $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying MQTT Simulator to the $clusterName cluster" -ForegroundColor Gray
@@ -625,7 +625,7 @@ function Deploy-MQTTExplorer {
     Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
     Write-Host "`n"
     $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-    $mqttExplorerSettings = "$aioToolsDir\mqtt_explorer_settings.json"
+    $mqttExplorerSettings = "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json"
     $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
     $versionToDownload = $latestReleaseTag.Split("v")[1]
     $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
@@ -639,7 +639,7 @@ function Deploy-MQTTExplorer {
     Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
     Start-Sleep -Seconds 5
     Stop-Process -Name "MQTT Explorer"
-    Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json" -Force
+    Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination $mqttExplorerSettings -Force
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
         $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
