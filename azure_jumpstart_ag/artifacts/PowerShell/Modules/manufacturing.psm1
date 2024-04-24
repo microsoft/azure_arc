@@ -9,64 +9,20 @@ function SetupMfgRepo {
     git clone -b $branch "https://github.com/microsoft/$appsRepo.git" "$appsRepo"
 }
 
-function Deploy-MfgTemp {
-    param (
-        $AgConfig,
-        $Credentials
-    )
-    $appsRepo = "jumpstart-agora-apps"
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        kubectx $cluster.Name.ToLower()
-        Set-Location "$($AgConfig.AgDirectories["AgAppsRepo"])\$appsRepo"
-        
-        # Apply the InfluxDB deployment configuration from the influxdb.yaml file. This will set up InfluxDB in your Kubernetes cluster.
-        kubectl apply -f contoso_manufacturing\deployment\yamls\influxdb.yaml
-        
-        # Apply the ConfigMap for InfluxDB from the influxdb-configmap.yaml file. ConfigMaps are used to store non-confidential data in key-value pairs. This particular ConfigMap contain configuration settings for InfluxDB and the dashboard.
-        kubectl apply -f contoso_manufacturing\deployment\yamls\influxdb-configmap.yaml
-
-        # Apply the deployment configuration for an MQTT simulator from the mqtt_simulator.yaml file. This simulator can be used for generating MQTT messages to test MQTT integrations or listeners in your environment.
-        kubectl apply -f contoso_manufacturing\deployment\yamls\mqtt_simulator.yaml
-
-        # Apply the deployment configuration for an MQTT listener from the mqtt-listener.yaml file. This listener acts as a subscriber to MQTT topics to process or store the incoming messages, potentially integrating with other services like InfluxDB.
-        kubectl apply -f contoso_manufacturing\deployment\yamls\mqtt-listener.yaml
-
-        # Apply the deployment configuration for an RTSP simulator from the rtsp-simulator.yaml file. This simulator can be used to mimic an RTSP feed, useful for testing video processing or streaming applications without the need for actual video sources.
-        #kubectl apply -f contoso_manufacturing\deployment\yamls\rtsp-simulator.yaml
-
-        #kubectl port-forward svc/virtual-rtsp 8554:8554
-
-        # Apply the deployment configuration for the 'decode' application from the decode.yaml file. This application is responsible for connecting to an RTSP feed, capturing frames, and potentially processing or forwarding those frames for further analysis or storage.
-        kubectl apply -f contoso_manufacturing\deployment\yamls\decode.yaml
-    }
-}
-
 function Deploy-ManufacturingConfigs {
-    Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
     # Cleaning up images-cache namespace on all clusters
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Start-Job -Name images-cache-cleanup -ScriptBlock {
-            $cluster = $using:cluster
-            $clusterName = $cluster.Name.ToLower()
-            Write-Host "[$(Get-Date -Format t)] INFO: Deleting images-cache namespace on cluster $clusterName" -ForegroundColor Gray
-            kubectl delete namespace "images-cache" --context $clusterName
-        }
+        Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+        kubectx $cluster.Name.ToLower()
+        kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
     }
 
-    #  TODO - Will we need to wait for builds in agora repo?
-    # while ($workflowStatus.status -ne "completed") {
-    #     #Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
-    #     #Start-Sleep -Seconds 10
-    #     #$workflowStatus = (gh run list --workflow=pos-app-initial-images-build.yml --json status) | ConvertFrom-Json
-    # }
-
-    # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-retail.psd1
+    # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-manufacturing.psd1
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig
             $cluster = $using:cluster
-            $site = $cluster.Value
-            $siteName = $site.FriendlyName.ToLower()
             $namingGuid = $using:namingGuid
             $resourceGroup = $using:resourceGroup
             $appClonedRepo = $using:appClonedRepo
@@ -78,7 +34,6 @@ function Deploy-ManufacturingConfigs {
                 $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
                 $branch = $cluster.value.Branch.ToLower()
                 $configName = $app.value.GitOpsConfigName.ToLower()
-                $clusterType = $cluster.value.Type
                 $namespace = $app.value.Namespace
                 $appName = $app.Value.KustomizationName
                 $appPath = $app.Value.KustomizationPath
@@ -86,16 +41,7 @@ function Deploy-ManufacturingConfigs {
                 $maxRetries = 2
 
                 Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
-                if ($clusterType -eq "AKS") {
-                    $type = "managedClusters"
-                    $clusterName = $cluster.value.ArcClusterName
-                }
-                else {
-                    $type = "connectedClusters"
-                }
-                if ($branch -eq "main") {
-                    $store = "dev"
-                }
+                $type = "connectedClusters"
 
                 # Wait for Kubernetes API server to become available
                 $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
@@ -112,45 +58,7 @@ function Deploy-ManufacturingConfigs {
                         Start-Sleep -Seconds 5
                     }
                 } while ($true)
-                If ($app.Value.ConfigMaps) {
-                    # download the config files
-                    foreach ($configMap in $app.value.ConfigMaps.GetEnumerator()) {
-                        $repoPath = $configMap.value.RepoPath
-                        $configPath = "$configMapDir\$appPath\config\$($configMap.Name)\$branch"
-                        $iotHubName = $Env:iotHubHostName.replace(".azure-devices.net", "")
-                        $gitHubUser = $Env:gitHubUser
-                        $githubBranch = $Env:githubBranch
 
-                        New-Item -Path $configPath -ItemType Directory -Force | Out-Null
-
-                        $githubApiUrl = "https://api.github.com/repos/$gitHubUser/$appsRepo/$($repoPath)?ref=$branch"
-                        Get-GitHubFiles -githubApiUrl $githubApiUrl -folderPath $configPath
-
-                        # replace the IoT Hub name and the SAS Tokens with the deployment specific values
-                        # this is a one-off for the broker, but needs to be generalized if/when another app needs it
-                        If ($configMap.Name -eq "mqtt-broker-config") {
-                            $configFile = "$configPath\mosquitto.conf"
-                            $update = (Get-Content $configFile -Raw)
-                            $update = $update -replace "Ag-IotHub-\w*", $iotHubName
-
-                            foreach ($device in $site.IoTDevices) {
-                                $deviceId = "$device-$($site.FriendlyName)"
-                                $deviceSASToken = $(az iot hub generate-sas-token --device-id $deviceId --hub-name $iotHubName --resource-group $resourceGroup --duration (60 * 60 * 24 * 30) --query sas -o tsv --only-show-errors)
-                                $update = $update -replace "Chicago", $site.FriendlyName
-                                $update = $update -replace "SharedAccessSignature.*$($device).*", $deviceSASToken
-                            }
-
-                            $update | Set-Content $configFile
-                        }
-
-                        # create the namespace if needed
-                        If (-not (kubectl get namespace $namespace --context $siteName)) {
-                            kubectl create namespace $namespace --context $siteName
-                        }
-                        # create the configmap
-                        kubectl create configmap $configMap.name --from-file=$configPath --namespace $namespace --context $siteName
-                    }
-                }
 
                 az k8s-configuration flux create `
                     --cluster-name $clusterName `
@@ -479,73 +387,6 @@ function Deploy-AIO {
         $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
         (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
         kubectl apply -f $mqconfigfile -n $aioNamespace
-    }
-}
-
-function Deploy-ESA {
-    param (
-        $AgConfig,
-        [PSCredential]$Credentials
-    )
-    ##############################################################
-    # Deploy Edge Storage Accelerator (ESA)
-    ##############################################################
-    Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the clusters" -ForegroundColor DarkGray
-    Write-Host "`n"
-    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-    $esapvJson = "$aioToolsDir\config.json"
-    $esapvYaml = "$aioToolsDir\esapv.yml"
-    $esapvcYaml = "$aioToolsDir\esapvc.yml"
-    $esaappYaml = "$aioToolsDir\configPod.yml"
-
-    # Get the storage Account secret
-    $esaSecret = az storage account keys list --resource-group $resourceGroup -n $aioStorageAccountName --query "[0].value" -o tsv
-
-    # Define names for ESA Yamls
-    $esaPVName = "esapv"
-    $esaPVCName = "esapvc"
-    $esaAppName = "testingapp"
-
-    # Inject params into the yaml file for PV
-    (Get-Content $esapvYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaContainerName', $stcontainerName | Set-Content $esapvYaml
-    (Get-Content $esapvYaml ) -replace 'esaSecretName', "esasecret" | Set-Content $esapvYaml
-
-    # Inject params into the yaml file for PVC
-    (Get-Content $esapvcYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esapvcYaml
-    (Get-Content $esapvcYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esapvcYaml
-    (Get-Content $esapvcYaml ) -replace 'esaPVName', $esaPVName | Set-Content $esapvcYaml
-
-    # Inject params into the yaml file for ESA App
-    (Get-Content $esaappYaml ) -replace 'appname', $esaAppName | Set-Content $esaappYaml
-    (Get-Content $esaappYaml ) -replace 'esanamespace', $aioNamespace | Set-Content $esaappYaml
-    (Get-Content $esaappYaml ) -replace 'esaPVCName', $esaPVCName | Set-Content $esaappYaml
-
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        Write-Host "[$(Get-Date -Format t)] INFO: Deploying ESA to the $clusterName cluster" -ForegroundColor Gray
-        Write-Host "`n"
-        kubectx $clusterName
-        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
-
-        # Enable Open Service Mesh extension on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling Open Service Mesh on the $clusterName cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm --only-show-errors
-
-        # Enable ESA extension on the Arc-enabled cluster
-        Write-Host "[$(Get-Date -Format t)] INFO: Enabling ESA on the $clusterName cluster" -ForegroundColor DarkGray
-        az k8s-extension create --resource-group $resourceGroup --cluster-name $arcClusterName --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file $esapvJson --scope cluster --only-show-errors
-        kubectl create secret generic -n $aioNamespace esasecret --from-literal=azurestorageaccountkey=$esaSecret --from-literal=azurestorageaccountname=$aioStorageAccountName
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PV on the $clusterName cluster" -ForegroundColor DarkGray
-        kubectl apply -f $esapvYaml
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Deploying PVC on the $clusterNamecluster" -ForegroundColor DarkGray
-        kubectl apply -f $esapvcYaml
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Attaching App on ESA Container" -ForegroundColor DarkGray
-        kubectl apply -f $esaappYaml
     }
 }
 

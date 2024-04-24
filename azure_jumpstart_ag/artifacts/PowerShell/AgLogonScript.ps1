@@ -173,7 +173,6 @@ if ($industry -eq "retail") {
 }
 
 if ($industry -eq "manufacturing") {
-    #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
     Deploy-AIO
     Deploy-ManufacturingConfigs
 }
