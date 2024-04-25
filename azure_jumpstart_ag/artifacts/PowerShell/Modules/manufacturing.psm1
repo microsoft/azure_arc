@@ -74,7 +74,7 @@ function Deploy-ManufacturingConfigs {
                     --url $appClonedRepo `
                     --branch $branch `
                     --sync-interval 5s `
-                    --kustomization name=$appName path=$appPath/$store prune=true retry_interval=1m `
+                    --kustomization name=$appName path=$appPath prune=true retry_interval=1m `
                     --timeout 10m `
                     --namespace $namespace `
                     --only-show-errors `
@@ -117,7 +117,7 @@ function Deploy-ManufacturingConfigs {
                                     --url $appClonedRepo `
                                     --branch $branch `
                                     --sync-interval 5s `
-                                    --kustomization name=$appName path=$appPath/$store prune=true `
+                                    --kustomization name=$appName path=$appPath prune=true `
                                     --timeout 30m `
                                     --namespace $namespace `
                                     --only-show-errors `
