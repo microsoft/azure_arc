@@ -71,6 +71,7 @@ function Deploy-ManufacturingConfigs {
                     --resource-group $resourceGroup `
                     --name $configName `
                     --cluster-type $type `
+                    --scope cluster `
                     --url $appClonedRepo `
                     --branch $branch `
                     --sync-interval 5s `
@@ -114,6 +115,7 @@ function Deploy-ManufacturingConfigs {
                                     --resource-group $resourceGroup `
                                     --name $configName `
                                     --cluster-type $type `
+                                    --scope cluster `
                                     --url $appClonedRepo `
                                     --branch $branch `
                                     --sync-interval 5s `
@@ -143,77 +145,6 @@ function Deploy-ManufacturingConfigs {
     Get-Job -name gitops | Remove-Job
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
-}
-function Deploy-InfluxDb {
-    ##############################################################
-    # Deploy OT Inspector (InfluxDB)
-    ##############################################################
-    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-    $listenerYaml = "$aioToolsDir\mqtt_listener.yml"
-    $influxdb_setupYaml = "$aioToolsDir\influxdb_setup.yml"
-    $influxdbYaml = "$aioToolsDir\influxdb.yml"
-    $influxImportYaml = "$aioToolsDir\influxdb-import-dashboard.yml"
-
-    do {
-        $simulatorPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingPods = $simulatorPod.items | Where-Object {
-            $_.metadata.name -match "mqtt-simulator-deployment" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the simulator to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $matchingPods.Count -ne 0
-    )
-
-    kubectl apply -f $influxdb_setupYaml -n $aioNamespace
-
-    do {
-        $influxIp = kubectl get service "influxdb" -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for InfluxDB IP address to be assigned...Waiting for 10 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 10
-    } while (
-        $null -eq $influxIp
-    )
-
-    (Get-Content $listenerYaml ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $listenerYaml
-    (Get-Content $mqttExplorerSettings ) -replace 'MQTTIpPlaceholder', $mqttIp | Set-Content $mqttExplorerSettings
-    (Get-Content $listenerYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $listenerYaml
-    (Get-Content $influxdbYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxdbYaml
-    (Get-Content $influxdbYaml ) -replace 'influxAdminPwdPlaceHolder', $adminPassword | Set-Content $influxdbYaml
-    (Get-Content $influxdbYaml ) -replace 'influxAdminPlaceHolder', $adminUsername | Set-Content $influxdbYaml
-    (Get-Content $influxImportYaml ) -replace 'influxPlaceholder', $influxIp | Set-Content $influxImportYaml
-
-    kubectl apply -f $aioToolsDir\influxdb.yml -n $aioNamespace
-
-    do {
-        $influxPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingPods = $influxPod.items | Where-Object {
-            $_.metadata.name -match "influxdb-0" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the influx pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $matchingPods.Count -ne 0
-    )
-
-    kubectl apply -f $aioToolsDir\mqtt_listener.yml -n $aioNamespace
-    do {
-        $listenerPod = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-        $matchingPods = $listenerPod.items | Where-Object {
-            $_.metadata.name -match "mqtt-listener-deployment" -and
-            $_.status.phase -notmatch "running"
-        }
-        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for the mqtt listener pods to be deployed...Waiting for 20 seconds" -ForegroundColor DarkGray
-        Start-Sleep -Seconds 20
-    } while (
-        $matchingPods.Count -ne 0
-    )
-
-    kubectl apply -f $aioToolsDir\influxdb-import-dashboard.yml -n $aioNamespace
-    kubectl apply -f $aioToolsDir\influxdb-configmap.yml -n $aioNamespace
-
 }
 
 function Deploy-AIO {

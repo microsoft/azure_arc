@@ -155,7 +155,6 @@
             FriendlyName           = "Detroit"
             IsProduction           = $true
             Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
             Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -178,7 +177,6 @@
             FriendlyName           = "Monterrey"
             IsProduction           = $true
             Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
             Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -218,8 +216,8 @@
 
     AppConfig = @{
         inferencing_deployment = @{
-            GitOpsConfigName = "deploy-inferencing"
-            KustomizationName = "inferencing"
+            GitOpsConfigName = "contoso-motors"
+            KustomizationName = "contoso-motors"
             KustomizationPath="./contoso_manufacturing/operations"
             Namespace = "contoso-motors"
             Order = 1
