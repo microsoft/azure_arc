@@ -10,11 +10,17 @@ function SetupMfgRepo {
 }
 
 function Deploy-ManufacturingConfigs {
+    param (
+        $AgConfig,
+        $Credentials
+    )
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
-    # Cleaning up images-cache namespace on all clusters
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
-        kubectx $cluster.Name.ToLower()
+    $VMs = (Get-VM).Name
+    foreach ($VM in $VMs) {
+        Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+            Invoke-AksEdgeNodeCommand -NodeType Linux -command "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0"
+        }
+        kubectx $VM.ToLower()
         kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
     }
 
@@ -25,7 +31,7 @@ function Deploy-ManufacturingConfigs {
             $cluster = $using:cluster
             $namingGuid = $using:namingGuid
             $resourceGroup = $using:resourceGroup
-            $appClonedRepo = $using:appClonedRepo
+            $appClonedRepo = $using:appUpstreamRepo
             $appsRepo = $using:appsRepo
 
             $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
