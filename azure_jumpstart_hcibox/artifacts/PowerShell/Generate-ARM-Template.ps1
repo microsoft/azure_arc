@@ -1,5 +1,5 @@
 $WarningPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop" 
+$ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 # Set paths
@@ -9,20 +9,8 @@ $Env:HCIBoxDir = "C:\HCIBox"
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Generate-ARM-Template.log"
 
-# Connect to Azure
-Write-Host 'Creating credentials and connecting to Azure'
-$azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
-Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
-
-# Install some modules
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Az.Resources -AllowClobber -Force
-Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
-Import-Module -Name Az.Resources, Az.ConnectedMachine -Force
-
-# Add necessary role assignments 
+# Add necessary role assignments
 $ErrorActionPreference = "Continue"
-New-AzRoleAssignment -ApplicationId $env:spnClientId -RoleDefinitionName "Key Vault Administrator" -ResourceGroup $env:resourceGroup -ErrorAction Continue
 New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue
 $ErrorActionPreference = "Stop"
 
@@ -32,14 +20,17 @@ $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
 foreach ($machine in $arcNodes) {
     $ErrorActionPreference = "Continue"
     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Reader" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Stack HCI Device Management Role" -ResourceGroup $env:resourceGroup
+    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup
     $ErrorActionPreference = "Stop"
 }
 
 # Get storage account key and convert to base 64
 $saKeys = Get-AzStorageAccountKey -ResourceGroupName $env:resourceGroup -Name $env:stagingStorageAccountName
 $storageAccountAccessKey =  [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($saKeys[0].value))
- 
-# Convert user credentials to base64 
+
+# Convert user credentials to base64
 $AzureStackLCM=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($HCIBoxConfig.LCMDeployUsername):$($HCIBoxConfig.SDNAdminPassword)"))
 $LocalUser=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("Administrator:$($HCIBoxConfig.SDNAdminPassword)"))
 $AzureSPN=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($env:spnClientId):$($env:spnClientSecret)"))

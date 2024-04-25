@@ -1,7 +1,7 @@
 @{
 
     # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
-    
+
     # HCIBox Folders
     Paths = @{
         VMDir = "C:\HCIBox\Virtual Machines"
@@ -36,6 +36,11 @@
         'azure-data-studio'
     )
 
+    PowerShellModulesList = @(
+        'Az.Resources',
+        'Az.ConnectedMachine'
+    )
+
     # VSCode extensions
     VSCodeExtensions        = @(
         'ms-vscode-remote.remote-containers',
@@ -49,9 +54,9 @@
 
     HostVMDriveLetter = "V"
     HostVMPath        = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
-    guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
+    guiVHDXPath       = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.
     azsHCIVHDXPath    = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. \
-    
+
     MgmtHostConfig = @{
         Hostname = "AzSMGMT"
         IP       = "192.168.1.11/24"
@@ -71,7 +76,7 @@
             StorageBIP  = "10.71.2.11"
         }
     )
-    
+
     # SDN Lab Admin Password
     SDNAdminPassword                     = '%staging-password%'                  # Do not change - this value is replaced during Bootstrap with the password supplied in the ARM deployment
 
@@ -94,7 +99,7 @@
     GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
 
     # SDN Lab Domain
-    SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name. 
+    SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name.
     DCName                               = "jumpstartdc"                          # Name of the domain controller virtual machine (limit to 14 characters)
 
     # NAT Configuration
@@ -105,7 +110,7 @@
     natDNS                               = "%staging-natDNS%"                     # Do not change - can be configured by passing the optioanl natDNS parameter to the ARM deployment.
 
     # Global MTU
-    SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. 
+    SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts.
 
     #SDN Provisioning
     ProvisionNC                          = $false                                 # Provisions Network Controller Automatically.
@@ -127,7 +132,7 @@
     PhysicalHostInternalIP               = "192.168.1.20"                          # IP Address assigned to Internal Switch vNIC in a Single Host Configuration
 
     # SDN Lab DNS
-    SDNLABDNS                            = "192.168.1.254" 
+    SDNLABDNS                            = "192.168.1.254"
 
     # SDN Lab Gateway
     SDNLABRoute                          = "192.168.1.1"
@@ -179,6 +184,7 @@
     AKSVIPStartIP                        = "10.10.0.10"
     AKSVIPEndIP                          = "10.10.0.100"
     AKSIPPrefix                          = "10.10.0.0/24"
+    AKSControlPlaneIP                    = "10.10.0.5"
     AKSGWIP                              = "10.10.0.1"
     AKSDNSIP                             = "192.168.1.254"
     AKSVLAN                              = "110"

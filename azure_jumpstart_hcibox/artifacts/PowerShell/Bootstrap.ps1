@@ -15,7 +15,9 @@ param (
     [string]$deployAKSHCI,
     [string]$deployResourceBridge,
     [string]$natDNS,
-    [string]$rdpPort
+    [string]$rdpPort,
+    [string]$autoDeployClusterResource,
+    [string]$autoUpgradeClusterResource
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -34,6 +36,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoDeployClusterResource', $autoDeployClusterResource,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
 
@@ -89,6 +93,17 @@ foreach ($app in $HCIBoxConfig.ChocolateyPackagesList)
     & choco install $app /y -Force | Write-Output
 }
 
+# Installing modules
+Write-Header "Installing PowerShell modules"
+
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+foreach ($module in $HCIBoxConfig.PowerShellModulesList)
+{
+    Write-Host "Installing $module"
+    Install-Module -Name $module -AllowClobber -Force
+}
+
 Write-Header "Install Azure CLI (64-bit not available via Chocolatey)"
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
@@ -96,7 +111,7 @@ Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
 Remove-Item .\AzureCLI.msi
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $HCIPath\wallpaper.png
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $HCIPath\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile "$($HCIBoxConfig.Paths["WACDir"])\WindowsAdminCenter.msi"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBoxLogonScript.ps1") -OutFile $HCIPath\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps1") -OutFile $HCIPath\New-HCIBoxCluster.ps1
@@ -184,7 +199,7 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
     if ($rdpPort -eq 3389)
     {
       netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-    } 
+    }
     else
     {
       $systemroot = get-content env:systemroot
@@ -203,5 +218,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log."
 Stop-Transcript
-$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content "$($HCIBoxConfig.Paths.LogsDir)\Bootstrap.log" -Force
