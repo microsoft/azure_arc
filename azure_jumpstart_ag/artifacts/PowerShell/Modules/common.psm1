@@ -776,7 +776,6 @@ function Deploy-Workbook ($workbookFileName) {
     $content = Get-Content -Path $workbookTemplateFilePath -Raw
     # Replace placeholders with actual values
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
-    Write-Host "[$(Get-Date -Format t)] INFO: ASG /subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
     
