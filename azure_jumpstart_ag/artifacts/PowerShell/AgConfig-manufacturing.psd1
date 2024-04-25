@@ -156,7 +156,7 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
-            Branch                 = "main"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "detroit"
@@ -179,7 +179,7 @@
             IsProduction           = $true
             Type                   = "AKSEE"
             posNamespace           = "contoso-supermarket"
-            Branch                 = "main"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "monterrey"
