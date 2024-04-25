@@ -172,7 +172,6 @@ function Deploy-WindowsTools {
 }
 
 function Deploy-VirtualizationInfrastructure {
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
     $password = ConvertTo-SecureString $AgConfig.L1Password -AsPlainText -Force
     $Credentials = New-Object System.Management.Automation.PSCredential($AgConfig.L1Username, $password)
 
