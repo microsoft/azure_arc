@@ -187,10 +187,14 @@ if ($industry -eq "manufacturing") {
 ##############################################################
 Deploy-Prometheus -AgConfig $AgConfig
 
-##############################################################
+#####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
-##############################################################
-Deploy-Workbook
+#####################################################################
+Deploy-Workbook "arc-inventory-workbook.bicep"
+#####################################################################
+# Deploy Azure Workbook for OS Performance
+#####################################################################
+Deploy-Workbook "arc-osperformance-workbook.bicep"
 
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports
