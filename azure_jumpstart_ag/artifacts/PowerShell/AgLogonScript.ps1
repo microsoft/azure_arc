@@ -29,16 +29,17 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
-$global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
 if ($industry -eq "retail") {
+    $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:acrName = $Env:acrName.ToLower()
     $global:cosmosDBName = $Env:cosmosDBName
     $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
+    $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 }elseif ($industry -eq "manufacturing") {
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
