@@ -1,10 +1,11 @@
 import json
 import random
-from datetime import date, timedelta, time, datetime
+from datetime import timedelta, time, datetime
 import time
 import os
 from azure.eventhub import EventHubProducerClient, EventData
 import sys
+import uuid
 
 # Create following environment variables to publish events to Event Hub
 # EVENTHUB_CONNECTION_STRING = ''
@@ -283,7 +284,7 @@ def simulate_assembly_line_data(date_time):
     # Produce equipment maintenance data every 5 minutes
     global production_last_generated
     if int((date_time - production_last_generated).total_seconds() / (5 *60)) > 5:
-        equipment_maintenance = simulate_equipment_maintenance()
+        equipment_maintenance = simulate_equipment_maintenance(date_time)
         maintenance_last_generated = date_time
     else:
         equipment_maintenance = {}
@@ -312,7 +313,18 @@ def simulate_assembly_line_data(date_time):
     return simulation_data
 
 def send_product_to_event_hub(simulation_data):
-    event_data = EventData(json.dumps(simulation_data))
+
+    # format data to pubish into staging table
+    payload_data = {
+            "id": str(uuid.uuid4()),
+            "source": "data_emulator",
+            "type": "data_emulator",
+            "data_base64": simulation_data,  # Data in JSON format
+            "time": str(datetime.now().isoformat()) + "Z",
+            "specversion": 1,
+            "subject": "topic/dataemulator"
+        }
+    event_data = EventData(json.dumps(payload_data))
     event_producer.send_batch([event_data])
 
 if __name__ == "__main__":
@@ -352,6 +364,6 @@ if __name__ == "__main__":
                 simulated_data = simulate_assembly_line_data(current_time)
                 send_product_to_event_hub(simulated_data)
 
-                time.sleep(30)  # send data every 60 seconds
+                time.sleep(30)  # send data every 30 seconds
     finally:
         event_producer.close()

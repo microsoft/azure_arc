@@ -27,9 +27,6 @@ param eventHubResourceId string
 @description('The name of the Azure Data Explorer database')
 param adxDBName string = 'manufacturing'
 
-@description('The name of the Azure Data Explorer Event Hub consumer group for assemblyline')
-param assemblylineCGName string = 'assemblylineemulator'
-
 @description('The name of the Azure Data Explorer Event Hub consumer group for staging data')
 param stagingDataCGName string = 'mqttdataemulator'
 
@@ -85,27 +82,6 @@ resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   properties: {
     roleDefinitionId: azureEventHubsDataReceiverRole.id
     principalId: adxCluster.identity.principalId
-  }
-}
-
-resource assemblylineConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
-  name: 'assemblylineConnection'
-  kind: 'EventHub'
-  dependsOn: [
-    assemblylineScript
-  ]
-  location: location
-  parent: manufacturingAdxDB
-  properties: {
-    managedIdentityResourceId: adxCluster.id
-    eventHubResourceId: eventHubResourceId
-    consumerGroup: assemblylineCGName
-    tableName: 'assemblyline'
-    dataFormat: 'MULTIJSON'
-    mappingRuleName: 'assemblyline_mapping'
-    eventSystemProperties: []
-    compression: 'None'
-    databaseRouting: 'Single'
   }
 }
 
