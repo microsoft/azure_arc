@@ -1,8 +1,8 @@
 //  Create a landing table for manufacturing events
-.create table manufacturing (date_time: datetime, plant_details: dynamic, shift: string, employees_on_shift: dynamic, cars_produced: dynamic, equipment_maintenance: dynamic, production_schedule: dynamic, actual_production: dynamic, equipment_telemetry: dynamic, performance_metrics: dynamic) 
+.create table assemblyline (date_time: datetime, plant_details: dynamic, shift: string, employees_on_shift: dynamic, cars_produced: dynamic, equipment_maintenance: dynamic, production_schedule: dynamic, actual_production: dynamic, equipment_telemetry: dynamic, performance_metrics: dynamic) 
 
 //  Create mapping from JSON ingestion to landing table
-.create table manufacturing ingestion json mapping "manufacturing_mapping"
+.create table assemblyline ingestion json mapping "assemblyline_mapping"
 ```
 [
     {"column":"date_time","path":"$['date_time']","datatype":""},
@@ -20,4 +20,154 @@
 
 //  Modify the ingestion batching policy to ingest data frequently
 //  THIS CONFIGURATION SHOULDN'T BE USED IN PRODUCTION:  MaximumBatchingTimeSpan SHOULD BE AT LEAST 1 MINUTE
-.alter table manufacturing policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+.alter table assemblyline policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+
+// create staging table, ingest base64 encoded data received from MQTT
+.create table staging (['id']: guid, source: string, ['type']: string, data_base64: string, ['time']: datetime, specversion: real, subject: string) 
+
+.create table staging ingestion json mapping "staging_mapping"
+```
+[
+{"column":"id","path":"$['id']","datatype":"guid"},
+{"column":"source","path":"$['source']","datatype":"string"},
+{"column":"type","path":"$['type']","datatype":"string"},
+{"column":"data_base64","path":"$['data_base64']","datatype":""},
+{"column":"time","path":"$['time']","datatype":"datetime"},
+{"column":"specversion","path":"$['specversion']","datatype":"real"},
+{"column":"subject","path":"$['subject']","datatype":"string"}]
+```
+
+// Create table to store data from base64 to json format
+.create table weldingrobot (Timestamp: datetime, Heater_Outlet_Temp: real, Pump1_Flow_Totalizer: real, Pump2_Flow_Totalizer: real, Pump3_Flow_Totalizer: real, Pump1_Temperature_Flow: real, Pump2_Temperature_Flow: real, Pump3_Temperature_Flow: real, Pumps_Total_Flow: real, Pressure_Filter_Inlet: real, Pressure_Filter_Outlet: real, RobotPosition_J0: real, RobotPosition_J1: real, RobotPosition_J2: real, RobotPosition_J3: real, RobotPosition_J4: real, RobotPosition_J5: real, Tank_Level: real, Drive1_Current: real, Drive1_Frequency: int, Drive1_Speed: int, Drive1_Voltage: real, Drive2_Current: real, Drive2_Frequency: int, Drive2_Speed: int, Drive2_Voltage: real, Drive3_Current: real, Drive3_Frequency: int, Drive3_Speed: int, Drive3_Voltage: real, Cooler_Inlet_Temp: real, Cooler_Outlet_Temp: real, Dynamix_Ch1_Acceleration: real, Flow001: real, Pressure001: real, Pressure002: real, Heater_Inlet_Temp: real, Pump1_Conductivity: real, Valve_000_Pump1: boolean, Cooler_ON: boolean, Fan001_On: boolean, Heater_ON: boolean, Filter_Chg_Required: boolean, Filter_Reset: boolean, Filter_Override: boolean, UTC_Time: datetime, Current: real, Voltage: real, Temperature: real, Humidity: real, VacuumAlert: boolean, VacuumPressure: real, Oiltemperature: real, OiltemperatureTarget: real)
+
+// Create a table to store the data from the assemblybatteries topic
+.create table assemblybatteries (Timestamp: datetime, MakeupArea: string, Line: string, Product: string, Process: string, Batch: int, CurrentShift: string, CurrentCellAssemblyPerMinutes: int, TargetCellAssemblyPerMinutes: int, StartTime: datetime, FinishTime: datetime, Waste: real, WasteReason: string, LostTime: string, LostTimeReason: string, LostTimeTimeCount: int, ScheduledBatteries: int, CompletedBatteries: int, ScheduledBatteriesPerHour: int, Temperature: real, ImpactTest: int, VibrationTest: int, CellTest: int, DownTime: int, Thruput: int, OverallEfficiency: int, Availability: int, Performance: int, Quality: int, PlannedProductionTime: int, ActualRuntime: int, UnplannedDowntime: int, PlannedDowntime: int, PlannedQuantity: int, ActualQuantity: int, RejectedQuantity: int, OEE_GoalbyPlant: real, OEE_Seattle: real, OEE_Detroit: real, OEE_Hannover: real, OEE_USA: real, OEE_Mexico: real, OEE_GoalbyProduct: real, OEE_BatteryA: real, OEE_BatteryB: real, OEE_BatteryC: real, OEE_GoalbyShift: real, OEE_MorningShift: real, OEE_DayShift: real, OEE_NightShift: real)
+
+// Create a function to parse the data from the assemblybatteries topic
+.create-or-alter function Expand_assemblybatteries_Data() 
+{
+    staging
+    | where subject == "topic/assemblybatteries"
+    | extend data = parse_json( base64_decode_tostring(data_base64) ) 
+    | project 
+    Timestamp = todatetime(data.data.Timestamp),
+    MakeupArea = tostring(data.data.MakeupArea),
+    Line = tostring(data.data.Line),
+    Product = tostring(data.data.Product),
+    Process = tostring(data.data.Process),
+    Batch = toint(data.data.Batch),
+    CurrentShift = tostring(data.data.CurrentShift),
+    CurrentCellAssemblyPerMinutes = toint(data.data.CurrentCellAssemblyPerMinutes),
+    TargetCellAssemblyPerMinutes = toint(data.data.TargetCellAssemblyPerMinutes),
+    StartTime = todatetime(data.data.StartTime),
+    FinishTime = todatetime(data.data.FinishTime),
+    Waste = toreal(data.data.Waste),
+    WasteReason = tostring(data.data.WasteReason),
+    LostTime = tostring(data.data.LostTime),
+    LostTimeReason = tostring(data.data.LostTimeReason),
+    LostTimeTimeCount = toint(data.data.LostTimeTimeCount),
+    ScheduledBatteries = toint(data.data.ScheduledBatteries),
+    CompletedBatteries = toint(data.data.CompletedBatteries),
+    ScheduledBatteriesPerHour = toint(data.data.ScheduledBatteriesPerHour),
+    Temperature = toreal(data.data.DoughTemperature),
+    ImpactTest = toint(data.data.ImpactTest),
+    VibrationTest = toint(data.data.VibrationTest),
+    CellTest = toint(data.data.CellTest),
+    DownTime = toint(data.data.DownTime),
+    Thruput = toint(data.data.Thruput),
+    OverallEfficiency = toint(data.data.OverallEfficiency),
+    Availability = toint(data.data.Availability),
+    Performance = toint(data.data.Performance),
+    Quality = toint(data.data.Quality),
+    PlannedProductionTime = toint(data.data.PlannedProductionTime),
+    ActualRuntime = toint(data.data.ActualRuntime),
+    UnplannedDowntime = toint(data.data.UnplannedDowntime),
+    PlannedDowntime = toint(data.data.PlannedDowntime),
+    PlannedQuantity = toint(data.data.PlannedQuantity),
+    ActualQuantity = toint(data.data.ActualQuantity),
+    RejectedQuantity = toint(data.data.RejectedQuantity),
+    OEE_GoalbyPlant = toreal(data.data.OEE_GoalbyPlant),
+    OEE_Seattle = toreal(data.data.OEE_Seattle),
+    OEE_Detroit = toreal(data.data.OEE_Detroit),
+    OEE_Hannover = toreal(data.data.OEE_Hannover),
+    OEE_USA = toreal(data.data.OEE_USA),
+    OEE_Mexico = toreal(data.data.OEE_Mexico),
+    OEE_GoalbyProduct = toreal(data.data.OEE_GoalbyProduct),
+    OEE_BatteryA = toreal(data.data.OEE_BatteryA),
+    OEE_BatteryB = toreal(data.data.OEE_BatteryB),
+    OEE_BatteryC = toreal(data.data.OEE_BatteryC),
+    OEE_GoalbyShift = toreal(data.data.OEE_GoalbyShift),
+    OEE_MorningShift = toreal(data.data.OEE_MorningShift),
+    OEE_DayShift = toreal(data.data.OEE_DayShift),
+    OEE_NightShift = toreal(data.data.OEE_NightShift)
+}
+
+// Create policy
+.alter table assemblybatteries policy update @'[{"Source": "staging", "Query": "Expand_assemblybatteries_Data()", "IsEnabled": "True"}]'
+
+// Create function to decode base64 to json format
+.create-or-alter function Expand_weldingrobot_Data() 
+{
+    staging
+    | where subject == "topic/weldingrobot"
+    | extend data = parse_json( base64_decode_tostring(data_base64) ) 
+    | project 
+    Timestamp = todatetime(data.data.Timestamp),
+    Heater_Outlet_Temp = toreal(data.data.Heater_Outlet_Temp),
+    Pump1_Flow_Totalizer = toreal(data.data.Pump1_Flow_Totalizer),
+    Pump2_Flow_Totalizer = toreal(data.data.Pump2_Flow_Totalizer),
+    Pump3_Flow_Totalizer = toreal(data.data.Pump3_Flow_Totalizer),
+    Pump1_Temperature_Flow = toreal(data.data.Pump1_Temperature_Flow),
+    Pump2_Temperature_Flow = toreal(data.data.Pump2_Temperature_Flow),
+    Pump3_Temperature_Flow = toreal(data.data.Pump3_Temperature_Flow),
+    Pumps_Total_Flow = toreal(data.data.Pumps_Total_Flow),
+    Pressure_Filter_Inlet = toreal(data.data.Pressure_Filter_Inlet),
+    Pressure_Filter_Outlet = toreal(data.data.Pressure_Filter_Outlet),
+    RobotPosition_J0 = toreal(data.data.RobotPosition_J0),
+    RobotPosition_J1 = toreal(data.data.RobotPosition_J1),
+    RobotPosition_J2 = toreal(data.data.RobotPosition_J2),
+    RobotPosition_J3 = toreal(data.data.RobotPosition_J3),
+    RobotPosition_J4 = toreal(data.data.RobotPosition_J4),
+    RobotPosition_J5 = toreal(data.data.RobotPosition_J5),
+    Tank_Level = toreal(data.data.Tank_Level),
+    Drive1_Current = toreal(data.data.Drive1_Current),
+    Drive1_Frequency = toint(data.data.Drive1_Frequency),
+    Drive1_Speed = toint(data.data.Drive1_Speed),
+    Drive1_Voltage = toreal(data.data.Drive1_Voltage),
+    Drive2_Current = toreal(data.data.Drive2_Current),
+    Drive2_Frequency = toint(data.data.Drive2_Frequency),
+    Drive2_Speed = toint(data.data.Drive2_Speed),
+    Drive2_Voltage = toreal(data.data.Drive2_Voltage),
+    Drive3_Current = toreal(data.data.Drive3_Current),
+    Drive3_Frequency = toint(data.data.Drive3_Frequency),
+    Drive3_Speed = toint(data.data.Drive3_Speed),
+    Drive3_Voltage = toreal(data.data.Drive3_Voltage),
+    Cooler_Inlet_Temp = toreal(data.data.Cooler_Inlet_Temp),
+    Cooler_Outlet_Temp = toreal(data.data.Cooler_Outlet_Temp),
+    Dynamix_Ch1_Acceleration = toreal(data.data.Dynamix_Ch1_Acceleration),
+    Flow001 = toreal(data.data.Flow001),
+    Pressure001 = toreal(data.data.Pressure001),
+    Pressure002 = toreal(data.data.Pressure002),
+    Heater_Inlet_Temp = toreal(data.data.Heater_Inlet_Temp),
+    Pump1_Conductivity = toreal(data.data.Pump1_Conductivity),
+    Valve_000_Pump1 = toboolean(data.data.Valve_000_Pump1),
+    Cooler_ON = toboolean(data.data.Cooler_ON),
+    Fan001_On = toboolean(data.data.Fan001_On),
+    Heater_ON = toboolean(data.data.Heater_ON),
+    Filter_Chg_Required = toboolean(data.data.Filter_Chg_Required),
+    Filter_Reset = toboolean(data.data.Filter_Reset),
+    Filter_Override = toboolean(data.data.Filter_Override),
+    UTC_Time = todatetime(data.data.UTC_Time),
+    Current = toreal(data.data.Current),
+    Voltage = toreal(data.data.Voltage),
+    Temperature = toreal(data.data.Temperature),
+    Humidity = toreal(data.data.Humidity),
+    VacuumAlert = toboolean(data.data.VacuumAlert),
+    VacuumPressure = toreal(data.data.VacuumPressure),
+    Oiltemperature = toreal(data.data.Oiltemperature),
+    OiltemperatureTarget = toreal(data.data.OiltemperatureTarget)
+}
+
+// Create policy
+.alter table weldingrobot policy update @'[{"Source": "staging", "Query": "Expand_weldingrobot_Data()", "IsEnabled": "True"}]'
+

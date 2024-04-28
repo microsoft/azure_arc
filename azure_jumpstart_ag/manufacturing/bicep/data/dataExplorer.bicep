@@ -24,14 +24,14 @@ param eventHubNamespaceName string
 @description('The resource id of the Event Hub')
 param eventHubResourceId string
 
-@description('The name of the Azure Data Explorer POS database')
+@description('The name of the Azure Data Explorer database')
 param adxDBName string = 'manufacturing'
 
-@description('The name of the Azure Data Explorer Event Hub connection')
-param eventHubConnectionName string = 'manufacturing-eh-messages'
+@description('The name of the Azure Data Explorer Event Hub consumer group for assemblyline')
+param assemblylineCGName string = 'assemblylineemulator'
 
-@description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string = 'cgmanufacturing'
+@description('The name of the Azure Data Explorer Event Hub consumer group for staging data')
+param stagingDataCGName string = 'mqttdataemulator'
 
 @description('# of nodes')
 @minValue(1)
@@ -60,8 +60,8 @@ resource manufacturingAdxDB 'Microsoft.Kusto/clusters/databases@2023-05-02' = {
   kind: 'ReadWrite'
 }
 
-resource manufacturingScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
-  name: 'manufacturingScript'
+resource assemblylineScript 'Microsoft.Kusto/clusters/databases/scripts@2023-05-02' = {
+  name: 'assemblylineScript'
   parent: manufacturingAdxDB
   properties: {
     continueOnErrors: false
@@ -88,20 +88,42 @@ resource eventHubRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
-resource adxEventHubConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
-  name: eventHubConnectionName
+resource assemblylineConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+  name: 'assemblylineConnection'
   kind: 'EventHub'
   dependsOn: [
-    manufacturingScript
+    assemblylineScript
   ]
   location: location
   parent: manufacturingAdxDB
   properties: {
     managedIdentityResourceId: adxCluster.id
     eventHubResourceId: eventHubResourceId
-    consumerGroup: eventHubConsumerGroupName
-    tableName: 'manufacturing'
-    dataFormat: 'json'
+    consumerGroup: assemblylineCGName
+    tableName: 'assemblyline'
+    dataFormat: 'MULTIJSON'
+    mappingRuleName: 'assemblyline_mapping'
+    eventSystemProperties: []
+    compression: 'None'
+    databaseRouting: 'Single'
+  }
+}
+
+resource stagingDataConnection 'Microsoft.Kusto/clusters/databases/dataConnections@2023-08-15' = {
+  name: 'stagingDataConnection'
+  kind: 'EventHub'
+  dependsOn: [
+    assemblylineScript
+  ]
+  location: location
+  parent: manufacturingAdxDB
+  properties: {
+    managedIdentityResourceId: adxCluster.id
+    eventHubResourceId: eventHubResourceId
+    consumerGroup: stagingDataCGName
+    tableName: 'staging'
+    dataFormat: 'MULTIJSON'
+    mappingRuleName: 'staging_mapping'
     eventSystemProperties: []
     compression: 'None'
     databaseRouting: 'Single'
