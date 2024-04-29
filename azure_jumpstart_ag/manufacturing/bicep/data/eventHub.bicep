@@ -21,16 +21,8 @@ param resourceTags object = {
 @description('The location of the Azure Data Explorer cluster')
 param location string = resourceGroup().location
 
-@description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string = 'aioConsumerGroup'
-
-@description('The name of the Azure Data Explorer Event Hub production line consumer group')
-param eventHubConsumerGroupNamePl string = 'aioConsumerGroupPl'
-
-@description('The name of the Azure Data Explorer Event Hub manufacturing consumer group')
-param eventHubManufacturingCGName string = 'cgmanufacturing'
-
-
+@description('The name of the Azure Data Explorer Event Hub consumer group for mqttdataemulator')
+param stagingDataCGName string = 'mqttdataemulator'
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
@@ -61,18 +53,8 @@ resource eventHubAuthRule 'Microsoft.EventHub/namespaces/authorizationRules@2023
   }
 }
 
-resource eventHubConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: eventHubConsumerGroupName
-  parent: eventHub
-}
-
-resource eventHubConsumerGroupPl 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: eventHubConsumerGroupNamePl
-  parent: eventHub
-}
-
-resource eventHubCGManufacturing 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: eventHubManufacturingCGName
+resource weldingrobotCG 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: stagingDataCGName
   parent: eventHub
 }
 
