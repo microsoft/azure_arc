@@ -18,12 +18,8 @@
 ]
 ```
 
-//  Modify the ingestion batching policy to ingest data frequently
-//  THIS CONFIGURATION SHOULDN'T BE USED IN PRODUCTION:  MaximumBatchingTimeSpan SHOULD BE AT LEAST 1 MINUTE
-.alter table assemblyline policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
-
 // create staging table, ingest base64 encoded data received from MQTT
-.create table staging (['id']: string, source: string, ['type']: string, data_base64: string, ['time']: dynamic, specversion: real, subject: string) 
+.create table staging (['id']: string, source: string, ['type']: string, data_base64: string, ['time']: dynamic, specversion: real, subject: string)
 
 .create table staging ingestion json mapping "staging_mapping"
 ```
@@ -37,6 +33,10 @@
 {"column":"subject","path":"$['subject']","datatype":"string"}]
 ```
 
+//  Modify the ingestion batching policy to ingest data frequently
+//  THIS CONFIGURATION SHOULDN'T BE USED IN PRODUCTION:  MaximumBatchingTimeSpan SHOULD BE AT LEAST 1 MINUTE
+.alter table staging policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+
 // Create table to store data from base64 to json format
 .create table weldingrobot (Timestamp: datetime, Heater_Outlet_Temp: real, Pump1_Flow_Totalizer: real, Pump2_Flow_Totalizer: real, Pump3_Flow_Totalizer: real, Pump1_Temperature_Flow: real, Pump2_Temperature_Flow: real, Pump3_Temperature_Flow: real, Pumps_Total_Flow: real, Pressure_Filter_Inlet: real, Pressure_Filter_Outlet: real, RobotPosition_J0: real, RobotPosition_J1: real, RobotPosition_J2: real, RobotPosition_J3: real, RobotPosition_J4: real, RobotPosition_J5: real, Tank_Level: real, Drive1_Current: real, Drive1_Frequency: int, Drive1_Speed: int, Drive1_Voltage: real, Drive2_Current: real, Drive2_Frequency: int, Drive2_Speed: int, Drive2_Voltage: real, Drive3_Current: real, Drive3_Frequency: int, Drive3_Speed: int, Drive3_Voltage: real, Cooler_Inlet_Temp: real, Cooler_Outlet_Temp: real, Dynamix_Ch1_Acceleration: real, Flow001: real, Pressure001: real, Pressure002: real, Heater_Inlet_Temp: real, Pump1_Conductivity: real, Valve_000_Pump1: boolean, Cooler_ON: boolean, Fan001_On: boolean, Heater_ON: boolean, Filter_Chg_Required: boolean, Filter_Reset: boolean, Filter_Override: boolean, UTC_Time: datetime, Current: real, Voltage: real, Temperature: real, Humidity: real, VacuumAlert: boolean, VacuumPressure: real, Oiltemperature: real, OiltemperatureTarget: real)
 
@@ -44,7 +44,7 @@
 .create table assemblybatteries (Timestamp: datetime, MakeupArea: string, Line: string, Product: string, Process: string, Batch: int, CurrentShift: string, CurrentCellAssemblyPerMinutes: int, TargetCellAssemblyPerMinutes: int, StartTime: datetime, FinishTime: datetime, Waste: real, WasteReason: string, LostTime: string, LostTimeReason: string, LostTimeTimeCount: int, ScheduledBatteries: int, CompletedBatteries: int, ScheduledBatteriesPerHour: int, Temperature: real, ImpactTest: int, VibrationTest: int, CellTest: int, DownTime: int, Thruput: int, OverallEfficiency: int, Availability: int, Performance: int, Quality: int, PlannedProductionTime: int, ActualRuntime: int, UnplannedDowntime: int, PlannedDowntime: int, PlannedQuantity: int, ActualQuantity: int, RejectedQuantity: int, OEE_GoalbyPlant: real, OEE_Seattle: real, OEE_Detroit: real, OEE_Hannover: real, OEE_USA: real, OEE_Mexico: real, OEE_GoalbyProduct: real, OEE_BatteryA: real, OEE_BatteryB: real, OEE_BatteryC: real, OEE_GoalbyShift: real, OEE_MorningShift: real, OEE_DayShift: real, OEE_NightShift: real)
 
 // Create a function to parse the data from the assemblybatteries topic
-.create-or-alter function Expand_assemblybatteries_Data() 
+.create-or-alter function Expand_assemblybatteries_Data()
 {
     staging
     | where subject == "topic/assemblybatteries"
@@ -106,7 +106,7 @@
 .alter table assemblybatteries policy update @'[{"Source": "staging", "Query": "Expand_assemblybatteries_Data()", "IsEnabled": "True"}]'
 
 // Create function to decode base64 to json format
-.create-or-alter function Expand_weldingrobot_Data() 
+.create-or-alter function Expand_weldingrobot_Data()
 {
     staging
     | where subject == "topic/weldingrobot"
@@ -171,7 +171,7 @@
 // Create policy
 .alter table weldingrobot policy update @'[{"Source": "staging", "Query": "Expand_weldingrobot_Data()", "IsEnabled": "True"}]'
 
-# Function extract assemblyline telemtry from staging table to assemblyline table
+// Function extract assemblyline telemtry from staging table to assemblyline table
 .create-or-alter function  Expand_assemblyline_Data() {
     staging
     | where subject == "topic/assemblyline"
@@ -192,7 +192,7 @@
 // Create policy
 .alter table assemblyline policy update @'[{"Source": "staging", "Query": "Expand_assemblyline_Data()", "IsEnabled": "True"}]'
 
-# Function extract assemblyline emulator from staging table to assemblyline table
+// Function extract assemblyline emulator from staging table to assemblyline table
 .create-or-alter function  Expand_emulator_Data() {
     staging
     | where subject == "topic/dataemulator"
