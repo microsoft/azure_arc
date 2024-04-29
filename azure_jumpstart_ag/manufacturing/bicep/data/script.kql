@@ -173,42 +173,40 @@
 
 // Function extract assemblyline telemtry from staging table to assemblyline table
 .create-or-alter function  Expand_assemblyline_Data() {
-    staging
-    | where subject == "topic/assemblyline"
-    | extend data = parse_json(base64_decode_tostring(data_base64))
-    | project
-    date_time = todatetime(data.data.date_time),
-    plant_details = data.data.plant_details,
-    shift = tostring(data.data.shift),
-    employees_on_shift = data.data.employees_on_shift,
-    cars_produced = data.data.cars_produced,
-    equipment_maintenance = data.data.equipment_maintenance,
-    production_schedule = data.data.production_schedule,
-    actual_production = data.data.actual_production,
-    equipment_telemetry = data.data.equipment_telemetry,
-    performance_metrics = data.data.performance_metrics
-}
-
-// Create policy
-.alter table assemblyline policy update @'[{"Source": "staging", "Query": "Expand_assemblyline_Data()", "IsEnabled": "True"}]'
-
-// Function extract assemblyline emulator from staging table to assemblyline table
-.create-or-alter function  Expand_emulator_Data() {
+let combinedData = (
     staging
     | where subject == "topic/dataemulator"
     | extend data = parse_json(data_base64)
     | project
-    date_time = todatetime(data.date_time),
-    plant_details = data.plant_details,
-    shift = tostring(data.shift),
-    employees_on_shift = data.employees_on_shift,
-    cars_produced = data.cars_produced,
-    equipment_maintenance = data.equipment_maintenance,
-    production_schedule = data.production_schedule,
-    actual_production = data.actual_production,
-    equipment_telemetry = data.equipment_telemetry,
-    performance_metrics = data.performance_metrics
+        date_time = todatetime(data.date_time),
+        plant_details = data.plant_details,
+        shift = tostring(data.shift),
+        employees_on_shift = data.employees_on_shift,
+        cars_produced = data.cars_produced,
+        equipment_maintenance = data.equipment_maintenance,
+        production_schedule = data.production_schedule,
+        actual_production = data.actual_production,
+        equipment_telemetry = data.equipment_telemetry,
+        performance_metrics = data.performance_metrics
+    )
+    | union (
+        staging
+        | where subject == "topic/assemblyline"
+        | extend data = parse_json(base64_decode_tostring(data_base64))
+        | project
+            date_time = todatetime(data.data.date_time),
+            plant_details = data.data.plant_details,
+            shift = tostring(data.data.shift),
+            employees_on_shift = data.data.employees_on_shift,
+            cars_produced = data.data.cars_produced,
+            equipment_maintenance = data.data.equipment_maintenance,
+            production_schedule = data.data.production_schedule,
+            actual_production = data.data.actual_production,
+            equipment_telemetry = data.data.equipment_telemetry,
+            performance_metrics = data.data.performance_metrics
+    );
+    combinedData
 }
 
 // Create policy
-.alter table assemblyline policy update @'[{"Source": "staging", "Query": "Expand_emulator_Data()", "IsEnabled": "True"}]'
+.alter table assemblyline policy update @'[{"Source": "staging", "Query": "Expand_assemblyline_Data()", "IsEnabled": "True"}]'
