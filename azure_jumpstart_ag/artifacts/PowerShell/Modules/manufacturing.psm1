@@ -12,7 +12,7 @@ function SetupMfgRepo {
 function Deploy-ManufacturingConfigs {
     param (
         $AgConfig,
-        $Credentials
+        [PSCredential]$Credentials
     )
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
     $VMs = (Get-VM).Name

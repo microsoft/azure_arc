@@ -179,7 +179,6 @@ if ($industry -eq "manufacturing") {
     $mqttIpArray=Configure-MQTTIpAddress
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-    #Deploy-ManufacturingConfigs
 }
 
 ##############################################################
