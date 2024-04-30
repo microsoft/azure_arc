@@ -718,7 +718,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "manufacturing\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type)\n| distinct Model = tostring(cp.model), EngineType = tostring(cp.engine_type)\n",
+      "text": "assemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type)\n| distinct Model = tostring(cp.model), EngineType = tostring(cp.engine_type)\n",
       "id": "266487a6-71ec-4dd7-9990-5f1b6a2aca2a",
       "usedVariables": []
     },
@@ -727,7 +727,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "manufacturing\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize Passed = countif(cp.quality_check == \"pass\"), Failed = countif(cp.quality_check == \"fail\") | evaluate narrow()\n| project  Column, toint(Value)",
+      "text": "assemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize Passed = countif(cp.quality_check == \"pass\"), Failed = countif(cp.quality_check == \"fail\") | evaluate narrow()\n| project  Column, toint(Value)",
       "id": "caa8a37f-0829-497e-ac88-6b96c03137e1",
       "usedVariables": []
     },
@@ -736,7 +736,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "// Final cars production\nmanufacturing\n| extend ap= parse_json(actual_production)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| summarize UnitsManufactured = sum(toint(ap.units_manufactured)), UnitsRejected = sum(toint(ap.units_rejected)) | evaluate narrow()\n| project  Column, toint(Value)",
+      "text": "// Final cars production\nassemblyline\n| extend ap= parse_json(actual_production)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| summarize UnitsManufactured = sum(toint(ap.units_manufactured)), UnitsRejected = sum(toint(ap.units_rejected)) | evaluate narrow()\n| project  Column, toint(Value)",
       "id": "3f86cb95-ad80-450b-9b07-f0c4f324a70e",
       "usedVariables": []
     },
@@ -745,7 +745,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "manufacturing\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2) by EquipmentID = tostring(ee.equipment_id) \n",
+      "text": "assemblyline\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2) by EquipmentID = tostring(ee.equipment_id) \n",
       "id": "ceb76c0b-64cf-487f-9b1a-41c7c1adf68a",
       "usedVariables": []
     },
@@ -754,7 +754,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "manufacturing\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2)",
+      "text": "assemblyline\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2)",
       "id": "6e57f2be-95d5-4805-98e4-3a57278c4f90",
       "usedVariables": []
     },
@@ -763,7 +763,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "// Total cars manufactured by type\nmanufacturing\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize count() by tostring(cp.model)",
+      "text": "// Total cars manufactured by type\nassemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize count() by tostring(cp.model)",
       "id": "9277db4c-0c4d-4739-b571-df776263f87d",
       "usedVariables": []
     },
@@ -772,7 +772,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "// Car production by plant\nmanufacturing\n| extend ap= parse_json(actual_production), pd = parse_json(plant_details)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| mv-apply ap on (extend pd.plant_id, pd.location)\n| where ap.units_manufactured > 0 or ap.units_rejected > 0\n| project plant_id = pd.plant_id, location = pd.location, units_manufactured = ap.units_manufactured, units_rejected = ap.units_rejected\n| summarize UnitsManufactured = sum(toint(units_manufactured)), UnitsRejected = sum(toint(units_rejected)) by Location = tostring(location) \n",
+      "text": "// Car production by plant\nassemblyline\n| extend ap= parse_json(actual_production), pd = parse_json(plant_details)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| mv-apply ap on (extend pd.plant_id, pd.location)\n| where ap.units_manufactured > 0 or ap.units_rejected > 0\n| project plant_id = pd.plant_id, location = pd.location, units_manufactured = ap.units_manufactured, units_rejected = ap.units_rejected\n| summarize UnitsManufactured = sum(toint(units_manufactured)), UnitsRejected = sum(toint(units_rejected)) by Location = tostring(location) \n",
       "id": "bd5c10b0-a055-4888-bab0-9ba38fce173b",
       "usedVariables": []
     },
@@ -781,7 +781,7 @@
         "kind": "inline",
         "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
       },
-      "text": "manufacturing\n| extend pm = parse_json(performance_metrics)\n| mv-apply pm on (extend  pm.availability_oee)\n| summarize availability = round(avg(toreal(pm.availability_oee)) * 100.0, 2)",
+      "text": "assemblyline\n| extend pm = parse_json(performance_metrics)\n| mv-apply pm on (extend  pm.availability_oee)\n| summarize availability = round(avg(toreal(pm.availability_oee)) * 100.0, 2)",
       "id": "bfab8c5d-284e-4309-a647-7e37c4b8c2ba",
       "usedVariables": []
     }

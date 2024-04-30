@@ -29,16 +29,17 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
-$global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
 if ($industry -eq "retail") {
+    $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:acrName = $Env:acrName.ToLower()
     $global:cosmosDBName = $Env:cosmosDBName
     $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
+    $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 }elseif ($industry -eq "manufacturing") {
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
@@ -175,27 +176,25 @@ if ($industry -eq "retail") {
 if ($industry -eq "manufacturing") {
     Deploy-AIO
     Deploy-ManufacturingConfigs -AgConfig $AgConfig -Credentials $Credentials
-}
-
-if ($industry -eq "manufacturing") {
     $mqttIpArray=Configure-MQTTIpAddress
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    #Deploy-ManufacturingConfigs
 }
-
-##############################################################
-# Install MQTT Explorer
-##############################################################
-Deploy-MQTTExplorer
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 ##############################################################
 Deploy-Prometheus -AgConfig $AgConfig
 
-##############################################################
+#####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
-##############################################################
-Deploy-Workbook
+#####################################################################
+Deploy-Workbook "arc-inventory-workbook.bicep"
+#####################################################################
+# Deploy Azure Workbook for OS Performance
+#####################################################################
+Deploy-Workbook "arc-osperformance-workbook.bicep"
 
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports

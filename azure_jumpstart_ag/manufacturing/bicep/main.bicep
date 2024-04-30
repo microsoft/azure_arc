@@ -66,14 +66,8 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
-@description('The name of the Azure Data Explorer Event Hub consumer group')
-param eventHubConsumerGroupName string = 'cgadx${namingGuid}'
-
-@description('The name of the Azure Data Explorer Event Hub production line consumer group')
-param eventHubConsumerGroupNamePl string = 'cgadxpl${namingGuid}'
-
-@description('The name of the Azure Data Explorer Event Hub manufacturing consumer group')
-param eventHubManufacturingCGName string = 'cgmanufacturing'
+@description('The name of the Azure Data Explorer Event Hub consumer group for assemblybatteries')
+param stagingDataCGName string = 'mqttdataemulator'
 
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
@@ -161,9 +155,7 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
     location: location
-    eventHubConsumerGroupName: eventHubConsumerGroupName
-    eventHubConsumerGroupNamePl: eventHubConsumerGroupNamePl
-    eventHubManufacturingCGName: eventHubManufacturingCGName
+    stagingDataCGName: stagingDataCGName
   }
 }
 
@@ -215,7 +207,6 @@ module adx 'data/dataExplorer.bicep' = {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
-    eventHubConsumerGroupName: eventHubManufacturingCGName
+    stagingDataCGName: stagingDataCGName
   }
 }
-
