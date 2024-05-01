@@ -141,8 +141,8 @@
 
     # AKS Edge Essentials variables
     SiteConfig              = @{
-        Seattle = @{
-            ArcClusterName         = "Ag-ArcK8s-Seattle"
+        Detroit = @{
+            ArcClusterName         = "Ag-ArcK8s-Detroit"
             NetIPAddress           = "172.20.1.2"
             DefaultGateway         = "172.20.1.1"
             PrefixLength           = "24"
@@ -152,21 +152,19 @@
             ControlPlaneEndpointIp = "172.20.1.21"
             LinuxNodeIp4Address    = "172.20.1.11"
             Subnet                 = "172.20.1.0/24"
-            FriendlyName           = "Seattle"
+            FriendlyName           = "Detroit"
             IsProduction           = $true
             Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
-            Branch                 = "production"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "seattle"
+            GrafanaDataSource      = "detroit"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1", "Freezer-2")
             clusterLogSize         = "1024"
             AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
-        Chicago = @{
-            ArcClusterName         = "Ag-ArcK8s-Chicago"
+        Monterrey = @{
+            ArcClusterName         = "Ag-ArcK8s-Monterrey"
             NetIPAddress           = "172.20.1.3"
             DefaultGateway         = "172.20.1.1"
             PrefixLength           = "24"
@@ -176,16 +174,14 @@
             ControlPlaneEndpointIp = "172.20.1.61"
             LinuxNodeIp4Address    = "172.20.1.51"
             Subnet                 = "172.20.1.0/24"
-            FriendlyName           = "Chicago"
+            FriendlyName           = "Monterrey"
             IsProduction           = $true
             Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
-            Branch                 = "canary"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "chicago"
+            GrafanaDataSource      = "monterrey"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1", "Freezer-2")
             clusterLogSize         = "1024"
             AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
@@ -220,9 +216,9 @@
 
     AppConfig = @{
         inferencing_deployment = @{
-            GitOpsConfigName = "deploy-inferencing"
-            KustomizationName = "inferencing"
-            KustomizationPath="./contoso_manufacturing/operations/contoso_manufacturing/releases/inferencing"
+            GitOpsConfigName = "contoso-motors"
+            KustomizationName = "contoso-motors"
+            KustomizationPath="./contoso_manufacturing/operations"
             Namespace = "contoso-motors"
             Order = 1
         }

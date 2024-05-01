@@ -174,12 +174,11 @@ if ($industry -eq "retail") {
 }
 
 if ($industry -eq "manufacturing") {
-    #Deploy-ESA -AgConfig $AgConfig -Credentials $Credentials
     Deploy-AIO
+    Deploy-ManufacturingConfigs
     $mqttIpArray=Configure-MQTTIpAddress
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-    #Deploy-ManufacturingConfigs
 }
 
 ##############################################################
@@ -262,11 +261,11 @@ Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-if ($industry -eq "manufacturing") {
-    foreach ($shell in $kubectlMonShells) {
-        Stop-Process -Id $shell.Id
-    }
-}
+# if ($industry -eq "manufacturing") {
+#     foreach ($shell in $kubectlMonShells) {
+#         Stop-Process -Id $shell.Id
+#     }
+# }
 
 Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
 Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
