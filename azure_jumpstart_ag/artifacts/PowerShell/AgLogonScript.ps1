@@ -175,7 +175,7 @@ if ($industry -eq "retail") {
 
 if ($industry -eq "manufacturing") {
     Deploy-AIO
-    Deploy-ManufacturingConfigs -AgConfig $AgConfig -Credentials $Credentials
+    Deploy-ManufacturingConfigs
     $mqttIpArray=Configure-MQTTIpAddress
     Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
