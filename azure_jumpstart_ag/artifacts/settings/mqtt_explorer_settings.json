@@ -4,9 +4,9 @@
       "certValidation": false,
       "clientId": "mqtt-explorer-640c948e",
       "encryption": false,
-      "host": "seattleIpPlaceholder",
+      "host": "detroitIpPlaceholder",
       "id": "mqtt.eclipse.org",
-      "name": "seattle",
+      "name": "detroit",
       "port": 1883,
       "protocol": "mqtt",
       "subscriptions": [
@@ -19,9 +19,9 @@
       "certValidation": false,
       "clientId": "mqtt-explorer-640c948e",
       "encryption": false,
-      "host": "chicagoIpPlaceholder",
+      "host": "monterreyIpPlaceholder",
       "id": "mqtt.eclipse.org2",
-      "name": "chicago",
+      "name": "monterrey",
       "port": 1883,
       "protocol": "mqtt",
       "subscriptions": [
