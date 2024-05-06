@@ -204,7 +204,11 @@ Deploy-ADXDashboardReports
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-#Deploy-Bookmarks
+if($industry -eq "retail"){
+    Deploy-RetailBookmarks
+}else{
+    Deploy-ManufacturingBookmarks
+}
 
 ##############################################################
 # Cleanup
