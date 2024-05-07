@@ -5,21 +5,21 @@
          "children": [{
             "children": [ {
                "id": "16",
-               "name": "Grafana Detroit",
+               "name": "Influxdb Detroit",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Detroit-URL"
+               "url": "Influxdb-Detroit-URL"
             }, {
                "id": "17",
-               "name": "Grafana Monterrey",
+               "name": "Influxdb Monterrey",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Monterrey-URL"
+               "url": "Influxdb-Monterrey-URL"
             }],
             "id": "15",
-            "name": "Grafana",
+            "name": "Influxdb",
             "source": "unknown",
             "type": "folder"
          }, {

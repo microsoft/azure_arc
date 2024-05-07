@@ -549,19 +549,20 @@ function Deploy-ManufacturingBookmarks {
         }
         #>
 
-        # Matching url: prometheus-grafana
+        # Matching url: Influxdb
         $matchingServices = $services.items | Where-Object {
-            $_.metadata.name -eq 'prometheus-grafana'
+            $_.metadata.name -eq 'Influxdb' -and
+            $_.spec.ports.port -contains 8086
         }
-        $grafanaIps = $matchingServices.status.loadBalancer.ingress.ip
+        $influxdbIps = $matchingServices.status.loadBalancer.ingress.ip
 
-        foreach ($grafanaIp in $grafanaIps) {
-            $output = "http://$grafanaIp"
+        foreach ($influxdbIp in $influxdbIps) {
+            $output = "http://$influxdbIp"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
             $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("Grafana-" + $cluster.Name + "-URL"), $output
+            $newContent = $content -replace ("Influxdb" + $cluster.Name + "-URL"), $output
             $newContent | Set-Content -Path $bookmarksFileName
 
             Start-Sleep -Seconds 2
