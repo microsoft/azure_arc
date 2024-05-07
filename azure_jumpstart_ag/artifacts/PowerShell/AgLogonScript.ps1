@@ -177,7 +177,7 @@ if ($industry -eq "manufacturing") {
     Deploy-AIO
     Deploy-ManufacturingConfigs
     $mqttIpArray=Configure-MQTTIpAddress
-    Deploy-MQTTSimulator -mqttIpArray $mqttIpArray
+    #Deploy-MQTTSimulator -mqttIpArray $mqttIpArray # this is now being done via helm
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }
 
