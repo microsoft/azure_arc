@@ -18,9 +18,7 @@ $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
 
 # Required for azcopy and Get-AzResource
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
 
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".devops" -ItemType Directory
 
@@ -36,7 +34,8 @@ $Env:capiArcDataClusterName=$Env:capiArcDataClusterName -replace "`n",""
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+az login --identity --tenant $spnTenantId
+az account set -s $env:subscriptionId
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
@@ -87,21 +86,6 @@ Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 Write-Header "Adding Tools Folder to PATH"
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
 $Env:PATH += ";$Env:ToolsDir"
-
-# Create random 13 character string for Key Vault name
-$strLen = 13
-$randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
-$Env:keyVaultName = "ArcBox-KV-$randStr"
-
-[System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
-
-# Create Azure Key Vault
-Write-Header "Creating Azure KeyVault"
-az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
-
-# Allow SPN to import certificates into Key Vault
-Write-Header "Setting KeyVault Access Policies"
-az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
