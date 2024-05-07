@@ -29,8 +29,8 @@ production_last_generated = datetime.now()
 
 # Define common schema templates to generate telemetry data
 plant_details = [ 
-    { "plant_id": "PT-01", "location": "Detroit, MI" },
-    { "plant_id": "PT-02", "location": "Mexico City, MX" },
+    { "plant_id": "PT-01", "location": "Detroit, US" },
+    { "plant_id": "PT-02", "location": "Monterrey, MX" },
     { "plant_id": "PT-03", "location": "Shanghai, CN" },
     { "plant_id": "PT-04", "location": "Hamburg, DE" }
 ]
