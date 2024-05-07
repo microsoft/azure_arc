@@ -32,7 +32,6 @@ function Deploy-ManufacturingConfigs {
 
             $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
                 $app = $_
-                $store = $cluster.value.Branch.ToLower()
                 $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
                 $branch = $cluster.value.Branch.ToLower()
                 $configName = $app.value.GitOpsConfigName.ToLower()
@@ -293,7 +292,6 @@ function Deploy-AIO {
         Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
         Write-Host "`n"
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-        $extName = "mq-" + $using:namingGuid
         $extensionPrincipalId =(az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json)[0].identity.principalId
         $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
         $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
@@ -330,7 +328,7 @@ function Deploy-AIO {
     }
 }
 
-function Configure-MQTTIpAddress {
+function Set-MQTTIpAddress {
     $mqttIpArray = @()
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
