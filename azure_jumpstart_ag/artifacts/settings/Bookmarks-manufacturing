@@ -5,82 +5,41 @@
          "children": [{
             "children": [ {
                "id": "16",
-               "name": "Grafana Dev",
+               "name": "Influxdb Detroit",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Dev-URL"
+               "url": "Influxdb-Detroit-URL"
             }, {
                "id": "17",
-               "name": "Grafana Staging",
+               "name": "Influxdb Monterrey",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Grafana-Staging-URL"
-            }, {
-               "id": "18",
-               "name": "Grafana Prod",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "http://localhost:3000/"
-            } ],
+               "url": "Influxdb-Monterrey-URL"
+            }],
             "id": "15",
-            "name": "Grafana",
+            "name": "Influxdb",
             "source": "unknown",
             "type": "folder"
          }, {
             "children": [ {
                "id": "30",
-               "name": "Prometheus Dev",
+               "name": "Prometheus Detroit",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Prometheus-Dev-URL"
+               "url": "Prometheus-Detroit-URL"
             }, {
                "id": "31",
-               "name": "Prometheus Staging",
+               "name": "Prometheus Monterrey",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
-               "url": "Prometheus-Staging-URL"
-            }, {
-               "id": "32",
-               "name": "Prometheus Canary - Chicago",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Chicago-URL"
-            }, {
-               "id": "33",
-               "name": "Prometheus Prod - Seattle",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Prometheus-Seattle-URL"
-            } ],
+               "url": "Prometheus-Monterrey-URL"
+            }],
             "id": "29",
             "name": "Prometheus",
-            "source": "unknown",
-            "type": "folder"
-         }, {
-            "children": [ {
-               "id": "20",
-               "name": "Agora Apps Repo - Microsoft",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "https://github.com/microsoft/jumpstart-agora-apps"
-            }, {
-               "id": "21",
-               "name": "Agora-Apps-Repo-Your-Fork",
-               "show_icon": false,
-               "source": "unknown",
-               "type": "url",
-               "url": "Agora-Apps-Repo-Clone-URL"
-            } ],
-            "id": "19",
-            "name": "GitHub",
             "source": "unknown",
             "type": "folder"
          }, {

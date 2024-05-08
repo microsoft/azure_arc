@@ -498,3 +498,103 @@ function Deploy-ADXDashboardReports {
     # Install azure.eventhub python module to run data emulator
     pip install azure.eventhub
 }
+
+function Deploy-ManufacturingBookmarks {
+    $bookmarksFileName = "$AgToolsDir\Bookmarks"
+    $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+        $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
+
+        <#
+        # Matching url: pos - customer
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 5000 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':5000'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: pos - manager
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 81 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $posIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($posIp in $posIps) {
+            $output = "http://$posIp" + ':81'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+        #>
+
+        # Matching url: Influxdb
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'Influxdb' -and
+            $_.spec.ports.port -contains 8086
+        }
+        $influxdbIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($influxdbIp in $influxdbIps) {
+            $output = "http://$influxdbIp"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("Influxdb-" + $cluster.Name + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+
+        # Matching url: prometheus
+        $matchingServices = $services.items | Where-Object {
+            $_.spec.ports.port -contains 9090 -and
+            $_.spec.type -eq "LoadBalancer"
+        }
+        $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($prometheusIp in $prometheusIps) {
+            $output = "http://$prometheusIp" + ':9090'
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("Prometheus-" + $cluster.Name + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+    }
+
+    Start-Sleep -Seconds 2
+
+    Copy-Item -Path $bookmarksFileName -Destination $edgeBookmarksPath -Force
+
+    ##############################################################
+    # Pinning important directories to Quick access
+    ##############################################################
+    Write-Host "[$(Get-Date -Format t)] INFO: Pinning important directories to Quick access (Step 16/17)" -ForegroundColor DarkGreen
+    $quickAccess = new-object -com shell.application
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgDir).Self.InvokeVerb("pintohome")
+    $quickAccess.Namespace($AgConfig.AgDirectories.AgLogsDir).Self.InvokeVerb("pintohome")
+}
