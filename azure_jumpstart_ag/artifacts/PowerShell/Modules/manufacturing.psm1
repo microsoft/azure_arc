@@ -507,46 +507,6 @@ function Deploy-ManufacturingBookmarks {
         kubectx $cluster.Name.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
         $services = kubectl get services --all-namespaces -o json | ConvertFrom-Json
 
-        <#
-        # Matching url: pos - customer
-        $matchingServices = $services.items | Where-Object {
-            $_.spec.ports.port -contains 5000 -and
-            $_.spec.type -eq "LoadBalancer"
-        }
-        $posIps = $matchingServices.status.loadBalancer.ingress.ip
-
-        foreach ($posIp in $posIps) {
-            $output = "http://$posIp" + ':5000'
-            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-            # Replace matching value in the Bookmarks file
-            $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Customer"), $output
-            $newContent | Set-Content -Path $bookmarksFileName
-
-            Start-Sleep -Seconds 2
-        }
-
-        # Matching url: pos - manager
-        $matchingServices = $services.items | Where-Object {
-            $_.spec.ports.port -contains 81 -and
-            $_.spec.type -eq "LoadBalancer"
-        }
-        $posIps = $matchingServices.status.loadBalancer.ingress.ip
-
-        foreach ($posIp in $posIps) {
-            $output = "http://$posIp" + ':81'
-            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
-
-            # Replace matching value in the Bookmarks file
-            $content = Get-Content -Path $bookmarksFileName
-            $newContent = $content -replace ("POS-" + $cluster.Name + "-URL-Manager"), $output
-            $newContent | Set-Content -Path $bookmarksFileName
-
-            Start-Sleep -Seconds 2
-        }
-        #>
-
         # Matching url: flask app
         $matchingServices = $services.items | Where-Object {
             $_.metadata.name -eq 'flask-app-service' -and
@@ -574,7 +534,7 @@ function Deploy-ManufacturingBookmarks {
         $influxdbIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($influxdbIp in $influxdbIps) {
-            $output = "http://$influxdbIp"
+            $output = "http://${influxdbIp}:8086"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
@@ -593,7 +553,7 @@ function Deploy-ManufacturingBookmarks {
         $prometheusIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($prometheusIp in $prometheusIps) {
-            $output = "http://$prometheusIp" + ':9090'
+            $output = "http://${prometheusIp}:9090"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
