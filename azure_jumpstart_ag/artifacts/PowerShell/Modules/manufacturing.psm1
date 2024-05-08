@@ -32,7 +32,6 @@ function Deploy-ManufacturingConfigs {
 
             $AgConfig.AppConfig.GetEnumerator() | sort-object -Property @{Expression = { $_.value.Order }; Ascending = $true } | ForEach-Object {
                 $app = $_
-                $store = $cluster.value.Branch.ToLower()
                 $clusterName = $cluster.value.ArcClusterName + "-$namingGuid"
                 $branch = $cluster.value.Branch.ToLower()
                 $configName = $app.value.GitOpsConfigName.ToLower()
@@ -329,7 +328,7 @@ function Deploy-AIO {
     }
 }
 
-function Configure-MQTTIpAddress {
+function Set-MQTTIpAddress {
     $mqttIpArray = @()
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
