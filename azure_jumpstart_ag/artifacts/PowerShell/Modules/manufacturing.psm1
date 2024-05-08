@@ -547,6 +547,25 @@ function Deploy-ManufacturingBookmarks {
         }
         #>
 
+        # Matching url: flask app
+        $matchingServices = $services.items | Where-Object {
+            $_.metadata.name -eq 'flask-app-service' -and
+            $_.spec.ports.port -contains 80
+        }
+        $flaskIps = $matchingServices.status.loadBalancer.ingress.ip
+
+        foreach ($flaskIp in $flaskIps) {
+            $output = "http://$flaskIp"
+            $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+
+            # Replace matching value in the Bookmarks file
+            $content = Get-Content -Path $bookmarksFileName
+            $newContent = $content -replace ("Flask-" + $cluster.Name + "-URL"), $output
+            $newContent | Set-Content -Path $bookmarksFileName
+
+            Start-Sleep -Seconds 2
+        }
+
         # Matching url: Influxdb
         $matchingServices = $services.items | Where-Object {
             $_.metadata.name -eq 'Influxdb' -and

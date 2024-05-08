@@ -22,7 +22,29 @@
             "name": "Influxdb",
             "source": "unknown",
             "type": "folder"
-         }, {
+         },
+         {
+            "children": [ {
+               "id": "18",
+               "name": "Flask app Detroit",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Flask-Detroit-URL"
+            }, {
+               "id": "19",
+               "name": "Flask app Monterrey",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Flask-Monterrey-URL"
+            }],
+            "id": "16",
+            "name": "Influxdb",
+            "source": "unknown",
+            "type": "folder"
+         },
+         {
             "children": [ {
                "id": "30",
                "name": "Prometheus Detroit",
