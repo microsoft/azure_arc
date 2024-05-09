@@ -499,7 +499,7 @@ function Deploy-ManufacturingBookmarks {
         # Matching url: flask app
         $matchingServices = $services.items | Where-Object {
             $_.metadata.name -eq 'flask-app-service' -and
-            $_.spec.ports.port -contains 80
+            $_.spec.ports.port -contains 8888
         }
         $flaskIps = $matchingServices.status.loadBalancer.ingress.ip
 
