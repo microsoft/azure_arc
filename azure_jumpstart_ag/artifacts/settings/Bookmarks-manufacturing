@@ -2,7 +2,29 @@
    "checksum": "d77f9db622cff666aa1ae0f899c3b4ec",
    "roots": {
       "bookmark_bar": {
-         "children": [{
+         "children": [
+         {
+            "children": [ {
+               "id": "18",
+               "name": "Frontend Detroit",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Flask-Detroit-URL"
+            }, {
+               "id": "19",
+               "name": "Frontend Monterrey",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "Flask-Monterrey-URL"
+            }],
+            "id": "16",
+            "name": "Frontend",
+            "source": "unknown",
+            "type": "folder"
+         },
+         {
             "children": [ {
                "id": "16",
                "name": "Influxdb Detroit",
@@ -22,7 +44,22 @@
             "name": "Influxdb",
             "source": "unknown",
             "type": "folder"
-         }, {
+         },
+         {
+            "children": [ {
+               "id": "20",
+               "name": "Grafana",
+               "show_icon": false,
+               "source": "unknown",
+               "type": "url",
+               "url": "http://localhost:3000"
+            }],
+            "id": "17",
+            "name": "Grafana",
+            "source": "unknown",
+            "type": "folder"
+         },
+         {
             "children": [ {
                "id": "30",
                "name": "Prometheus Detroit",
