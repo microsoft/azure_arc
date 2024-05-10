@@ -28,8 +28,9 @@ export LOCATION=$LOCATION
 export VMNAME=$VMNAME
 export URL=$URL
 export PORT=$PORT
-export PASSWORD='$PASSWORD'
+export PASSWORD=$PASSWORD
 
+echo $PASSWORD 
 export HTTP_PROXY="http://$URL:$PORT"
 export HTTPS_PROXY="http://$URL:$PORT"
 export http_proxy="http://$URL:$PORT"
