@@ -10,7 +10,7 @@ LOCATION=$7
 VMNAME=$8
 URL=$9
 PORT=3128
-PASSWORD=$10
+PASSWORD=${10}
 
 
 touch /home/$USER/.bash_profile
