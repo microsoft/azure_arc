@@ -11,7 +11,7 @@ VMNAME=$8
 URL=$9
 PORT=3128
 PASSWORD=$10
-echo $PASSWORD
+
 
 touch /home/$USER/.bash_profile
 chmod +x /home/$USER/.bash_profile
