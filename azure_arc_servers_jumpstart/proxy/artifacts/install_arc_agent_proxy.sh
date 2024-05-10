@@ -65,9 +65,6 @@ echo "Configuring walinux agent"
 sudo service walinuxagent stop
 sudo waagent -deprovision -force
 sudo rm -rf /var/lib/waagent
-touch /etc/apt/apt.conf.d/99verify-peer.conf \
-&& echo >>/etc/apt/apt.conf.d/99verify-peer.conf "Acquire { https::Verify-Peer false }"
-
 
 echo "Configuring Firewall"
 
