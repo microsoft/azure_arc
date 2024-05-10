@@ -30,7 +30,6 @@ export URL=$URL
 export PORT=$PORT
 export PASSWORD=$PASSWORD
 
-echo $PASSWORD 
 export HTTP_PROXY="http://$URL:$PORT"
 export HTTPS_PROXY="http://$URL:$PORT"
 export http_proxy="http://$URL:$PORT"
@@ -58,6 +57,7 @@ sudo echo $PASSWORD > /tmp/pass
 sudo sshpass -f '/tmp/pass' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER@$URL:/tmp/squid-ca-cert-key.pem .
 sudo mv ./squid-ca-cert-key.pem /usr/local/share/ca-certificates/squid-ca-cert-key.crt
 sudo update-ca-certificates
+sudo rm -f  /tmp/pass
 
 
 ## Configure Ubuntu to allow Azure Arc Connected Machine Agent Installation 
@@ -89,9 +89,7 @@ wget -e use_proxy=yes -e https_proxy=$URL:$PORT https://aka.ms/azcmagent -O ~/in
 
 # Install the hybrid agent
 sudo bash ~/install_linux_azcmagent.sh --proxy "http://$URL:$PORT"
-
 sudo azcmagent config set proxy.url "http://$URL:$PORT"
-
 
 # Run connect command
 sudo azcmagent connect \
