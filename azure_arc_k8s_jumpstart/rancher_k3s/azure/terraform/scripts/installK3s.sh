@@ -17,6 +17,8 @@ echo $tenantId:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $azureLocation:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $appObjectId:$8 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export appId=/' vars.sh
 sed -i '4s/^/export password=/' vars.sh
@@ -24,6 +26,8 @@ sed -i '5s/^/export tenantId=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export azureLocation=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
+sed -i '9s/^/export appObjectId=/' vars.sh
+sed -i '10s/^/export resourceGroup=/' vars.sh
 
 chmod +x vars.sh
 . ./vars.sh
@@ -65,10 +69,13 @@ sudo -u $adminUsername az extension add --name "k8s-configuration"
 sudo -u $adminUsername az extension add --name "k8s-extension"
 sudo -u $adminUsername az extension add --name "customlocation"
 
-sudo -u $adminUsername az login --service-principal --username $appId --password=$password --tenant $tenantId
+# sudo -u $adminUsername az login --service-principal --username $appId --password=$password --tenant $tenantId
+
+sudo -u $adminUsername az login --identity --username $appObjectId
+sudo -u $adminUsername az vm identity assign -g $resourceGroup -n $vmName --identities "/subscriptions/06e3cad0-b918-4596-aefa-a7b4bc649276/resourcegroups/jumpstart/providers/Microsoft.ManagedIdentity/userAssignedIdentities/zm-uai"
 
 # Onboard the cluster to Azure Arc and enabling Container Insights using Kubernetes extension
 echo ""
-resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+# resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $azureLocation --kube-config /home/${adminUsername}/.kube/config --tags 'Project=jumpstart_azure_arc_k8s' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers

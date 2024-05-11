@@ -102,3 +102,8 @@ variable "azure_vm_os_disk_size_gb" {
   description = "The Size of the Internal OS Disk in GB."
   default     = "32"
 }
+
+variable "object_id" {
+  type        = string
+  description = "User Assigned managed identity Object ID."
+}
