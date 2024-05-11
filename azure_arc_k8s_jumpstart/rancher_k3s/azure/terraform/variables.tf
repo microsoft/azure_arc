@@ -18,21 +18,6 @@ variable "ssh_rsa_public_key" {
   sensitive   = true
 }
 
-# variable "client_id" {
-#   type        = string
-#   description = "Unique SPN app ID."
-# }
-# variable "client_secret" {
-#   type        = string
-#   description = "Unique SPN password."
-#   sensitive   = true
-# }
-
-# variable "tenant_id" {
-#   type        = string
-#   description = "Unique SPN tenant ID"
-# }
-
 variable "ubuntuOSVersion" {
   type        = string
   description = "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
@@ -101,9 +86,4 @@ variable "azure_vm_os_disk_size_gb" {
   type        = string
   description = "The Size of the Internal OS Disk in GB."
   default     = "32"
-}
-
-variable "object_id" {
-  type        = string
-  description = "User Assigned managed identity Object ID."
 }
