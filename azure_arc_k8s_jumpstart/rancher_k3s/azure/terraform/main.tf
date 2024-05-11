@@ -147,7 +147,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${local.template_base_url}scripts/installK3s.sh"
       ],
-  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url} ${var.azure_resource_group} ${azurerm_linux_virtual_machine.arck3sdemo.identity[0].principal_id }"    }
+  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url} ${var.azure_resource_group} "    }
 PROTECTED_SETTINGS
 }
 
