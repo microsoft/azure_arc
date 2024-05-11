@@ -72,7 +72,7 @@ sudo -u $adminUsername az extension add --name "customlocation"
 # sudo -u $adminUsername az login --service-principal --username $appId --password=$password --tenant $tenantId
 
 sudo -u $adminUsername az login --identity --username $appObjectId
-sudo -u $adminUsername az vm identity assign -g $resourceGroup -n $vmName --identities "/subscriptions/06e3cad0-b918-4596-aefa-a7b4bc649276/resourcegroups/jumpstart/providers/Microsoft.ManagedIdentity/userAssignedIdentities/zm-uai"
+# sudo -u $adminUsername az vm identity assign -g $resourceGroup -n $vmName --identities "/subscriptions/06e3cad0-b918-4596-aefa-a7b4bc649276/resourcegroups/jumpstart/providers/Microsoft.ManagedIdentity/userAssignedIdentities/zm-uai"
 
 # Onboard the cluster to Azure Arc and enabling Container Insights using Kubernetes extension
 echo ""

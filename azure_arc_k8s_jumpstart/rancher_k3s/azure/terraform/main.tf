@@ -113,6 +113,13 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
     disk_size_gb         = var.azure_vm_os_disk_size_gb
   }
 
+  identity {
+    type = UserAssigned
+    identity_ids = [
+      "zm-uai"
+    ]
+  }
+
   tags = {
     Project = "jumpstart_azure_arc_k8s"
   }
@@ -135,7 +142,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${local.template_base_url}scripts/installK3s.sh"
       ],
-  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.client_id} ${var.client_secret} ${var.tenant_id} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url} ${var.object_id} ${var.azure_resource_group}"    }
+  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url} ${var.object_id} ${var.azure_resource_group}"    }
 PROTECTED_SETTINGS
 }
 
