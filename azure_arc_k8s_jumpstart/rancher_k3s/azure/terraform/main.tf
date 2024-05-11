@@ -116,7 +116,7 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
   }
 
   identity {
-    type = SystemAssigned
+    type = "SystemAssigned"
   }
 
   tags = {
@@ -126,7 +126,7 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
 }
 
 resource "azurerm_role_assignment" "rbac" {
-  scope                = "/subscriptions/${data.azurerm_subscription.current.id}"
+  scope                = data.azurerm_subscription.current.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_linux_virtual_machine.arck3sdemo.identity[0].principal_id
 }
