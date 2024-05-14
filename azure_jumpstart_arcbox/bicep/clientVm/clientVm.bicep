@@ -39,11 +39,13 @@ param spnTenantId string
 param azdataUsername string = 'arcdemo'
 
 @secure()
+#disable-next-line secure-parameter-default
 param azdataPassword string = 'ArcPassword123!!'
 param acceptEula string = 'yes'
 param registryUsername string = 'registryUser'
 
 @secure()
+#disable-next-line secure-parameter-default
 param registryPassword string = 'registrySecret'
 param arcDcName string = 'arcdatactrl'
 param mssqlmiName string = 'arcsqlmidemo'
@@ -114,7 +116,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : null
         }
       }
     ]
@@ -140,7 +142,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: flavor == 'DevOps' ? 'Standard_B4ms' : flavor == 'DataOps' ? 'Standard_D8s_v4' : 'Standard_D16s_v4'
+      vmSize: flavor == 'DevOps' ? 'Standard_B4ms' : flavor == 'DataOps' ? 'Standard_D8s_v4' : 'Standard_D8s_v4'
     }
     storageProfile: {
       osDisk: {
