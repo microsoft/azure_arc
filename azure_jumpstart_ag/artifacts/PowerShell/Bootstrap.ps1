@@ -253,16 +253,7 @@ if($industry -eq "retail"){
 elseif ($industry -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_simulator.yml") -OutFile "$AgToolsDir\mqtt_simulator.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-setup.yml") -OutFile "$AgToolsDir\influxdb-setup.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-configmap.yml") -OutFile "$AgToolsDir\influxdb-configmap.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb-import-dashboard.yml") -OutFile "$AgToolsDir\influxdb-import-dashboard.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/influxdb.yml") -OutFile "$AgToolsDir\influxdb.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/config.json") -OutFile "$AgToolsDir\config.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pv.yaml") -OutFile "$AgToolsDir\esapv.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/pvc.yaml") -OutFile "$AgToolsDir\esapvc.yml"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/ESA/configPod.yaml") -OutFile "$AgToolsDir\configPod.yml"
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }

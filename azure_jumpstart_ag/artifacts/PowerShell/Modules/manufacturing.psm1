@@ -1,14 +1,3 @@
-function SetupMfgRepo {
-    param (
-        $AgConfig
-    )
-    Set-Location $AgConfig.AgDirectories["AgAppsRepo"]
-    $appsRepo = "jumpstart-agora-apps"
-    $branch = "manufacturing"
-    Write-Host "INFO: Cloning the GitHub repository locally" -ForegroundColor Gray
-    git clone -b $branch "https://github.com/microsoft/$appsRepo.git" "$appsRepo"
-}
-
 function Deploy-ManufacturingConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
     $VMs = (Get-VM).Name
@@ -510,12 +499,12 @@ function Deploy-ManufacturingBookmarks {
         # Matching url: flask app
         $matchingServices = $services.items | Where-Object {
             $_.metadata.name -eq 'flask-app-service' -and
-            $_.spec.ports.port -contains 80
+            $_.spec.ports.port -contains 8888
         }
         $flaskIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($flaskIp in $flaskIps) {
-            $output = "http://$flaskIp"
+            $output = "http://$flaskIp:8888"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
