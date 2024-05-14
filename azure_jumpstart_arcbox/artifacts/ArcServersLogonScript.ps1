@@ -14,8 +14,7 @@ $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox"
-$sas = "*?si=ArcBox-RL&spr=https&sv=2022-11-02&sr=c&sig=vg8VRjM00Ya%2FGa5izAq3b0axMpR4ylsLsQ8ap3BhrnA%3D"
+$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox/*"
 
 # Archive exising log file and crate new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -69,7 +68,7 @@ if ($Env:flavor -ne "DevOps") {
     # Create an internal switch with NAT
     Write-Host "Creating Internal vSwitch"
     $switchName = 'InternalNATSwitch'
-    
+
     # Verify if internal switch is already created, if not create a new switch
     $inernalSwitch = Get-VMSwitch
     if ($inernalSwitch.Name -ne $switchName) {
@@ -173,7 +172,7 @@ if ($Env:flavor -ne "DevOps") {
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder/$sas --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
+        azcopy cp $vhdSourceFolder --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
     }
 
     # Create the nested VMs if not already created
@@ -292,25 +291,25 @@ if ($Env:flavor -ne "DevOps") {
             Write-Host "Enabling SQL server best practices assessment"
             $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
             az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
-    
+
             # Run Best practices assessment
             Write-Host "Execute SQL server best practices assessment"
-    
+
             # Wait for a minute to finish everyting and run assessment
             Start-Sleep(60)
-    
+
             # Get access token to make ARM REST API call for SQL server BPA
             $armRestApiEndpoint = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
             $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
             $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
-    
+
             # Build API request payload
             $worspaceResourceId = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
             $sqlExtensionId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer"
             $sqlbpaPayloadTemplate = "$Env:templateBaseUrl/artifacts/sqlbpa.payload.json"
             $settingsSaveTime = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
             $apiPayload = (Invoke-WebRequest -Uri $sqlbpaPayloadTemplate).Content -replace '{{RESOURCEID}}', $sqlExtensionId -replace '{{LOCATION}}', $azureLocation -replace '{{WORKSPACEID}}', $worspaceResourceId -replace '{{SAVETIME}}', $settingsSaveTime
-        
+
             # Call REST API to run best practices assessment
             $httpResp = Invoke-WebRequest -Method Patch -Uri $armRestApiEndpoint -Body $apiPayload -Headers $headers
             if (($httpResp.StatusCode -eq 200) -or ($httpResp.StatusCode -eq 202)){
@@ -351,12 +350,12 @@ if ($Env:flavor -ne "DevOps") {
             if ($Env:flavor -eq "Full") {
                 # The "Full" ArcBox flavor has an azcopy network throughput capping
                 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-                azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
+                azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
             }
             else {
                 # Other ArcBox flavors does not have an azcopy network throughput capping
                 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-                azcopy cp $vhdSourceFolder/$sas $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+                azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
             }
         }
 
@@ -482,19 +481,19 @@ Write-Host "Creating deployment logs bundle"
 # Changing to Jumpstart ArcBox wallpaper
 # Changing to Client VM wallpaper
 $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-        
-        public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
+$code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+    public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+        public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
         }
     }
-} 
+}
 '@
 
 # Set wallpaper image based on the ArcBox Flavor deployed
