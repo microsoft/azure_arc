@@ -6,22 +6,22 @@
             "value": ""
         },
         "spnClientId": {
-            "value": "e538c696-5a87-4d53-aa95-a622eeda44f1"
+            "value": ""
         },
         "spnClientSecret": {
-            "value": "Kil8Q~3MT7FjpSff~plh3Tdfcs1Ll0nLjzCjOafo"
+            "value": ""
         },
         "spnTenantId": {
-            "value": "8cefa845-04a2-45ba-9e6f-c7d0e22057b3"
+            "value": ""
         },
         "windowsAdminUsername": {
-            "value": "username"
+            "value": ""
         },
         "windowsAdminPassword": {
             "value": ""
         },
         "logAnalyticsWorkspaceName": {
-            "value": "testarcboxlaw"
+            "value": ""
         },
         "flavor": {
             "value":  "ITPro"
