@@ -2,9 +2,7 @@
 
 Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.
 
-<p align="center">
-  <img src="https://github.com/Azure/arc_jumpstart_docs/raw/main/img/logo/jumpstart.png" alt="Arc Jumpstart logo" width="320">
-</p>
+![Deploy to Azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faktapaz%2Fazure_arc%2Fbootcamp%2Fazure_jumpstart_arcbox%2Fbicep%2Fmain.json)
 
 **Note:** This repository does not contain the source code for the documentation of the Arc Jumpstart which can be found in another [dedicated repository](https://github.com/Azure/arc_jumpstart_docs).
 
