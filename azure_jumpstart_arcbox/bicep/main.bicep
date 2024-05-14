@@ -31,7 +31,7 @@ param logAnalyticsWorkspaceName string
   'DevOps'
   'DataOps'
 ])
-param flavor string = 'Full'
+param flavor string = 'ITPro'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
