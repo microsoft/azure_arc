@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sshRSAPublicKey": {
-            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCysCB2p8hu0MEtphhR53fHNjRdHogaYWbEqYgr+00PTetBMR0ZC1SzEmoEpOhkAfkVdb50nmViPuj0CqulDrxYiQIvwFcjp/LayicR326MzXmHRN9p6/BoGHM3fmZ/ZMtZchi2fvCn+MSro2iMGetqDqgUaaxYN8T3jFWkBjPdUzJBKQdf/nBzEDQWeKntkQ8SSYfqsKKgXkIT6ShOCEB592BjDYrn5ysgp+e1erYsUogP7L+TaE8OMoygAFr19G81cYIz/Re7ugBSzq7NN+Q/vDWB5mIA4LWmgAnInezJj991wKxMeSvGm3dXhIpJyb9xZ4NoOwU4YZJ6xMI066oL9byd7IEZ2Z2w1FmO+WbnxJMnLuuega0zMqBctQhFCJhtScelVQUag/E8jggKNQ3FR2fn5e8vgup2PQZbWYWYrDxbQL6FzRv/7FkYzuAcFJ2k6Ig94M1Y20zEhG+jnY7IWWsHs/cv3Yd6ShTB4LC8hx8BQ3HMBvBsIjbD/Vx3iE643fq9orlD/QgC+71zM0xP1uGBuRnedYgJ/OACC0tlohZg62bWPn0omYbCFr4p/uJ2yxlUD8LNyKiY0kXzZcNLkX7qtAqF+TEKBsSAYloT+9cbJRKyvH9EPKAjGVpHR+LoEwUXdvQmyxmz6t4hlllM1tDBCAYlKUNyUduks8lblQ== corporate\dezapc00@DEDOWLAP028290"
+            "value": ""
         },
         "spnClientId": {
             "value": "e538c696-5a87-4d53-aa95-a622eeda44f1"
