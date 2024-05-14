@@ -46,6 +46,8 @@ param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 @description('DNS Server configuration')
 param dnsServers array = []
 
+var keyVaultName = 'arcbox${uniqueString(resourceGroup().id)}'
+
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
@@ -482,6 +484,15 @@ module policyDeployment './policyAzureArc.bicep' = {
     azureLocation: location
     logAnalyticsWorkspaceId: workspace.id
     flavor: flavor
+  }
+}
+
+module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
+  name: 'keyVaultDeployment'
+  params: {
+    name: keyVaultName
+    enablePurgeProtection: false
+    location: location
   }
 }
 

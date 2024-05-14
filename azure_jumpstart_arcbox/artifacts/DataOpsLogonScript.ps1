@@ -27,14 +27,15 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 # Required for azcopy
 Write-Header "Az PowerShell Login"
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-az account set -s $Env:subscriptionId
+az login --identity --tenant $spnTenantId
+az account set -s $env:subscriptionId
+
+# Retrieve Azure Key Vault secrets and store as runtime environment variables
+$Env:AZDATA_PASSWORD = Get-Secret -Name 'AZDATA_PASSWORD' -AsPlainText
 
 # Register Azure providers
 Write-Header "Registering Providers"
@@ -173,9 +174,9 @@ Stop-Transcript
 # - Deploying data services on CAPI cluster
 ################################################
 
-$kubectlMonShellCapi = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'CAPI Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-capi" ; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShellAKS = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" ; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellCapi = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'CAPI Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-capi" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellAKS = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellAKSDr = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
 
 Write-Header "Deploying Azure Arc Data Controller"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
