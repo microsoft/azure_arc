@@ -168,6 +168,7 @@ Write-Host "Attempting to retrieve Microsoft.AzureStackHCI provider id..."
 $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json
  if ($null -ne $spnProviderId.id) {
     azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
+ }
  else {
     Write-Warning "Microsoft.AzureStackHCI provider id not found, aborting..."
     
