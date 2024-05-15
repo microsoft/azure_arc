@@ -1,54 +1,53 @@
 # Azure Arc Jumpstart source code
 
-Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.
+Willkommen im Arc Jumpstart-Quellcode-Repository! Dieses Repository ist Ihre erste Anlaufstelle für die Arbeit mit den Automatisierungsskripten und -tools von Arc Jumpstart und dient als Backend-Quellcode-Repository, das unsere Website ergänzt. [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart)
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faktapaz%2Fazure_arc%2Fbootcamp%2Fazure_jumpstart_arcbox%2Fbicep%2Fmain.json)
 
-**Note:** This repository does not contain the source code for the documentation of the Arc Jumpstart which can be found in another [dedicated repository](https://github.com/Azure/arc_jumpstart_docs).
+**Note:** Dieses Repository enthält nicht den Quellcode für die Dokumentation von Arc Jumpstart, der in einem anderen Repository zu finden ist  [dedicated repository](https://github.com/Azure/arc_jumpstart_docs).
 
-## What you'll find here
+## Was Sie hier finden werden
 
-- **Automation Source Code:** Arc Jumpstart automation scripts and tools utilized in our scenarios and solutions.
-- **Supportive Documents and Files:** Additional resources used across the [Arc Jumpstart](https://aka.ms/ArcJumpstart) website, aiding in various contexts and providing supplemental information.
+- **Automation Source Code:** Arc Jumpstart-Automatisierungsskripte und -Tools, die in unseren Szenarien und Lösungen verwendet werden.
+- **Supportive Documents and Files:** Zusätzliche Ressourcen, die auf der gesamten  [Arc Jumpstart](https://aka.ms/ArcJumpstart) website genutzt werden, die in verschiedenen Zusammenhängen helfen und ergänzende Informationen liefern.
 
-## How to Utilize this repository
+## Wie Sie dieses Repository nutzen können
 
-This source code repository is designed with contributors in mind and works in tandem with the [our documentation repository](https://github.com/Azure/arc_jumpstart_docs). While it's not mandatory, it's highly likely that contributors will need to clone both repositories to effectively contribute to Arc Jumpstart.
+Dieses Quellcode-Repository wurde für die Mitwirkenden entwickelt und arbeitet mit dem [our documentation repository](https://github.com/Azure/arc_jumpstart_docs). Es ist zwar nicht zwingend erforderlich, aber es ist höchstwahrscheinlich, dass Mitwirkende beide Repositories klonen sollten, um effektiv zu Arc Jumpstart beizutragen.
 
-Before you start, we recommend familiarizing yourself with our comprehensive [contribution guidelines](https://aka.ms/JumpstartContribution). These guidelines outline the standards and practices we follow, ensuring consistency and quality across our documentation.
+Bevor Sie beginnen, empfehlen wir Ihnen, sich mit unserem umfassenden [contribution guidelines](https://aka.ms/JumpstartContribution). In diesen Leitlinien werden die von uns befolgten Standards und Praktiken dargelegt, um die Konsistenz und Qualität unserer Dokumentation zu gewährleisten.
 
-If you're unsure about your future contribution, don't hesitate to start a [GitHub discussion](https://aka.ms/JumpstartDiscussions). This is a great place to ask questions, share ideas, or get feedback on potential contributions. Our community is here to help and we welcome all levels of experience.
+Wenn Sie sich unsicher sind, was Ihren künftigen Beitrag angeht, zögern Sie nicht, eine [GitHub discussion](https://aka.ms/JumpstartDiscussions). Dies ist ein großartiger Ort, um Fragen zu stellen, Ideen auszutauschen oder Feedback zu möglichen Beiträgen zu erhalten. Unsere Gemeinschaft ist da, um zu helfen, und wir begrüßen alle Erfahrungsstufen.
 
-Happy contributing!
+Viel Spaß beim Mitmachen!
 
-## Cloning the repositories
+## Klonen der Repositories
 
-To contribute, you'll likely need to clone both this repository and the [documentation repository](https://github.com/Azure/arc_jumpstart_docs). Use the following commands:
+Um einen Beitrag zu leisten, müssen Sie wahrscheinlich sowohl dieses Repository als auch das [documentation repository](https://github.com/Azure/arc_jumpstart_docs) klonen. Verwenden Sie die folgenden Befehle:
 
 ```bash
 git clone https://github.com/microsoft/azure_arc.git
 git clone https://github.com/Azure/arc_jumpstart_docs.git
 ```
 
-As we continuously improve and expand Arc Jumpstart, we recommend keeping your local clones of the repositories up-to-date. You can do this by pulling the latest changes from the main branch:
+Da wir Arc Jumpstart ständig verbessern und erweitern, empfehlen wir Ihnen, Ihre lokalen Klone der Repositories auf dem neuesten Stand zu halten. Sie können dies tun, indem Sie die neuesten Änderungen aus dem Hauptbranch ziehen:
 
 ```bash
 git pull origin main
 ```
 
-You can use partial clones if you want to reduce the time and size it takes to clone this repository. By default, when you clone this repository, you get all the files and their associated metadata, including blobs and diff history. However, if you don't need all of this information, you can use the following command to clone the repository without the blobs:
+Sie können Teilklone verwenden, wenn Sie die Zeit und den Umfang des Klonens dieses Repositorys reduzieren möchten. Wenn Sie dieses Repository klonen, erhalten Sie standardmäßig alle Dateien und die zugehörigen Metadaten, einschließlich Blobs und Diff-Historie. Wenn Sie jedoch nicht alle diese Informationen benötigen, können Sie den folgenden Befehl verwenden, um das Repository ohne die Blobs zu klonen:
 
 ```bash
 git clone --filter=blob:none https://github.com/microsoft/azure_arc
 ```
 
-## Contribution and feedback
+## Beitrag und Feedback
 
-We value your input! If you have suggestions, feedback, or valuable insights to share, feel free to open an issue. Your contributions help us improve the documentation for the entire community.
+Wir schätzen Ihren Beitrag! Wenn Sie Vorschläge, Feedback oder wertvolle Erkenntnisse mit uns teilen möchten, können Sie gerne ein Problem eröffnen. Ihre Beiträge helfen uns, die Dokumentation für die gesamte Gemeinschaft zu verbessern.
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit the [Microsoft Contributor License Agreements website](https://cla.opensource.microsoft.com).
+Dieses Projekt begrüßt Beiträge und Vorschläge.  Die meisten Beiträge erfordern die Zustimmung zu einer
+Contributor License Agreement (CLA) zustimmen, in dem Sie erklären, dass Sie das Recht haben, uns die Rechte zur Nutzung Ihres Beitrags einzuräumen, und dies auch tatsächlich tun.Einzelheiten finden Sie auf der [Microsoft Contributor License Agreements website](https://cla.opensource.microsoft.com).
 
 When you submit a pull request, a CLA bot will automatically determine whether you need to provide
 a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
