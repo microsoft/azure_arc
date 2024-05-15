@@ -2,6 +2,7 @@
 
 Willkommen im Arc Jumpstart-Quellcode-Repository! Dieses Repository ist Ihre erste Anlaufstelle für die Arbeit mit den Automatisierungsskripten und -tools von Arc Jumpstart und dient als Backend-Quellcode-Repository, das unsere Website ergänzt.
 Dokumentation: [documentation repository](https://github.com/Azure/arc_jumpstart_docs)
+
 Arc Jumpstart: [Arc Jumpstart](https://aka.ms/arcjumpstart)
 
 Die Bereitstellung erfolgt über diesen Button:
