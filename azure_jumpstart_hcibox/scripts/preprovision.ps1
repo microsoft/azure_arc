@@ -166,8 +166,14 @@ azd env set JS_RDP_PORT $JS_RDP_PORT
 # Attempt to retrieve provider id for Microsoft.AzureStackHCI
 Write-Host "Attempting to retrieve Microsoft.AzureStackHCI provider id..."
 $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json
-if ($null -ne $spnProviderId.id) {
+ if ($null -ne $spnProviderId.id) {
     azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
+ else {
+    Write-Warning "Microsoft.AzureStackHCI provider id not found, aborting..."
+    
+    Write-Host 'Consider the following options: 1) Request access from a tenant administrator to get read-permissions to service principals.
+    2) Ask a tenant administrator to run the command $(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json and send you the ID from the output. You can then manually add that value to the AZD .env file: SPN_PROVIDER_ID="xxx" or use the Bicep-based deployment specifying spnProviderId="xxx" in the deployment parameter-file.' -ForegroundColor Yellow
+    throw "Microsoft.AzureStackHCI provider id not found"
 }
 
 ########################################################################
