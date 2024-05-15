@@ -155,7 +155,7 @@
             FriendlyName           = "Detroit"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Branch                 = "build_demo"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "detroit"
@@ -177,7 +177,7 @@
             FriendlyName           = "Monterrey"
             IsProduction           = $true
             Type                   = "AKSEE"
-            Branch                 = "build_demo"
+            Branch                 = "manufacturing"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             GrafanaDataSource      = "monterrey"
