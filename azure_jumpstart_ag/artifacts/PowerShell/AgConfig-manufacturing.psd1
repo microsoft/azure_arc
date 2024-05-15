@@ -118,8 +118,8 @@
     )
 
     # VHDX blob url
-    ProdVHDBlobURL          = 'https://jsvhds.blob.core.windows.net/agora/base/prod-w11iot/AGBase.vhdx?si=Agora-RL&spr=https&sv=2022-11-02&sr=c&sig=kOFIb%2B3IWqnjd9soYUFjiIdSzH%2FXWiz3lgdKbZEAaXs%3D'
-    PreProdVHDBlobURL       = 'https://jsvhds.blob.core.windows.net/agora/base/preprod-w11iot/AGBase.vhdx?si=Agora-RL&spr=https&sv=2022-11-02&sr=c&sig=kOFIb%2B3IWqnjd9soYUFjiIdSzH%2FXWiz3lgdKbZEAaXs%3D'
+    ProdVHDBlobURL          = 'https://jsvhds.blob.core.windows.net/agora/base/prod-w11iot/AGBase.vhdx'
+    PreProdVHDBlobURL       = 'https://jsvhds.blob.core.windows.net/agora/base/preprod-w11iot/AGBase.vhdx'
 
     # L1 virtual machine configuration
     HostVMDrive             = "V"                                   # This value controls the drive letter where the nested virtual
