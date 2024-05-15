@@ -1,0 +1,34 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeTopicMap
+metadata:
+  name: my-topic-map
+  namespace: azure-iot-operations
+spec:
+  mqttBridgeConnectorRef: my-mqtt-bridge
+  routes:
+    - direction: local-to-remote
+      name: route-to-eventgrid
+      qos: 1
+      source: "topic/#"
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeConnector
+metadata:
+  name: my-mqtt-bridge
+  namespace: azure-iot-operations
+spec:
+  image:
+    repository: mcr.microsoft.com/azureiotoperations/mqttbridge
+    tag: 0.1.0-preview
+    pullPolicy: IfNotPresent
+  protocol: v5
+  bridgeInstances: 1
+  clientIdPrefix: clusterName
+  logLevel: debug
+  remoteBrokerConnection:
+    endpoint: eventGridPlaceholder:8883
+    tls:
+      tlsEnabled: true
+    authentication:
+      systemAssignedManagedIdentity:
+        audience: https://eventgrid.azure.net
