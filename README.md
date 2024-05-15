@@ -1,6 +1,8 @@
 # Azure Arc Jumpstart source code
 
-Willkommen im Arc Jumpstart-Quellcode-Repository! Dieses Repository ist Ihre erste Anlaufstelle für die Arbeit mit den Automatisierungsskripten und -tools von Arc Jumpstart und dient als Backend-Quellcode-Repository, das unsere Website ergänzt. [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart)
+Willkommen im Arc Jumpstart-Quellcode-Repository! Dieses Repository ist Ihre erste Anlaufstelle für die Arbeit mit den Automatisierungsskripten und -tools von Arc Jumpstart und dient als Backend-Quellcode-Repository, das unsere Website ergänzt.
+[documentation repository](https://github.com/Azure/arc_jumpstart_docs)
+[Arc Jumpstart](https://aka.ms/arcjumpstart)
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faktapaz%2Fazure_arc%2Fbootcamp%2Fazure_jumpstart_arcbox%2Fbicep%2Fmain.json)
 
