@@ -504,7 +504,7 @@ function Deploy-ManufacturingBookmarks {
         $flaskIps = $matchingServices.status.loadBalancer.ingress.ip
 
         foreach ($flaskIp in $flaskIps) {
-            $output = "http://$flaskIp:8888"
+            $output = "http://${flaskIp}:8888"
             $output | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
 
             # Replace matching value in the Bookmarks file
