@@ -6,21 +6,21 @@
          {
             "children": [ {
                "id": "18",
-               "name": "Frontend Detroit",
+               "name": "Control center Detroit",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "Flask-Detroit-URL"
             }, {
                "id": "19",
-               "name": "Frontend Monterrey",
+               "name": "Control center Monterrey",
                "show_icon": false,
                "source": "unknown",
                "type": "url",
                "url": "Flask-Monterrey-URL"
             }],
             "id": "16",
-            "name": "Frontend",
+            "name": "Control centers",
             "source": "unknown",
             "type": "folder"
          },
