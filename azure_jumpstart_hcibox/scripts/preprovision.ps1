@@ -168,7 +168,7 @@ Write-Host "Attempting to retrieve Microsoft.AzureStackHCI provider id..."
 $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json
  if ($null -ne $spnProviderId.id) {
     azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
- else {
+ } else {
     Write-Warning "Microsoft.AzureStackHCI provider id not found, aborting..."
     
     Write-Host 'Consider the following options: 1) Request access from a tenant administrator to get read-permissions to service principals.
