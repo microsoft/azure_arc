@@ -1,0 +1,789 @@
+{
+  "$schema": "https://dataexplorer.azure.com/static/d/schema/51/dashboard.json",
+  "id": "71f47749-912f-46d4-92ca-b61286839e73",
+  "eTag": "8b1a68cd-b2c1-46b1-8e36-20bb29f97673",
+  "schema_version": "51",
+  "title": "Contoso Motors and Auto Parts",
+  "tiles": [
+    {
+      "id": "86ba667a-63c7-4b8b-ba61-76c21d506910",
+      "title": "Type of Cars Manufactured",
+      "visualType": "multistat",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 0,
+        "y": 12,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "266487a6-71ec-4dd7-9990-5f1b6a2aca2a"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "Model",
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "c693c85b-9b9a-4ea1-b296-b24cb8971319",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "EngineType",
+                "values": [
+                  "electric"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "blue",
+            "tag": "Electric",
+            "icon": "car",
+            "ruleName": ""
+          },
+          {
+            "id": "cb98f18a-cf84-431a-b2c0-245671583f57",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "EngineType",
+                "values": [
+                  "hybrid"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "Hybrid",
+            "icon": "car",
+            "ruleName": ""
+          },
+          {
+            "id": "561d4a9f-d446-4dcd-a534-f8ba657e21f9",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "values": [
+                  "gasoline"
+                ],
+                "operator": "==",
+                "column": "EngineType"
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "yellow",
+            "tag": "Gasoline",
+            "icon": "car",
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "EngineType",
+        "multiStat__slot": {
+          "width": 3,
+          "height": 1
+        }
+      }
+    },
+    {
+      "id": "2fce3f37-c0f9-4edd-9be5-83188a2a6a46",
+      "title": "Production Quality Control",
+      "visualType": "multistat",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 3,
+        "y": 8,
+        "width": 6,
+        "height": 4
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "caa8a37f-0829-497e-ac88-6b96c03137e1"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "Value",
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "fadb24cf-114b-49d4-bbc4-e09ec77d8dce",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "Column",
+                "values": [
+                  "Passed"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": null,
+            "ruleName": ""
+          },
+          {
+            "id": "fc43b0fb-e9bd-4372-b018-4119bc5db734",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "Column",
+                "values": [
+                  "Failed"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": null,
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": null,
+        "multiStat__slot": {
+          "width": 2,
+          "height": 1
+        }
+      }
+    },
+    {
+      "id": "a805f6c6-c356-4915-9ab3-2a13d17302a2",
+      "title": "Actual Production Statistics",
+      "visualType": "multistat",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 3,
+        "y": 4,
+        "width": 6,
+        "height": 4
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "3f86cb95-ad80-450b-9b07-f0c4f324a70e"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "Value",
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "c9b5efb8-db51-4db1-b681-fe6f408829c0",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "Column",
+                "values": [
+                  "UnitsManufactured"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": "completed",
+            "ruleName": ""
+          },
+          {
+            "id": "f7e65c83-ba3d-4177-abbe-008df52934c4",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "==",
+                "column": "Column",
+                "values": [
+                  "UnitsRejected"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": "critical",
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "vertical",
+        "multiStat__labelColumn": null,
+        "multiStat__slot": {
+          "width": 2,
+          "height": 1
+        }
+      }
+    },
+    {
+      "id": "fc15aa93-a039-465b-8fc9-1bcf97c76cf7",
+      "title": "Equipment Overall Efficiency",
+      "visualType": "multistat",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 9,
+        "y": 4,
+        "width": 9,
+        "height": 8
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "ceb76c0b-64cf-487f-9b1a-41c7c1adf68a"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": "Efficiency",
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "63328d11-72ad-4d5f-80fd-75b27c1d69a9",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">",
+                "column": "Efficiency",
+                "values": [
+                  "95%"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "Excellent",
+            "icon": "happy",
+            "ruleName": ""
+          },
+          {
+            "id": "4712b226-a175-4f58-b3ca-27f0233f6790",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">=",
+                "column": "Efficiency",
+                "values": [
+                  "90"
+                ]
+              },
+              {
+                "values": [
+                  "95"
+                ],
+                "operator": "<",
+                "column": "Efficiency"
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "blue",
+            "tag": "Good",
+            "icon": "emojiNeutral",
+            "ruleName": ""
+          },
+          {
+            "id": "a55db212-3c59-4b6c-af8f-da020772e4fe",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "<",
+                "column": "Efficiency",
+                "values": [
+                  "90"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "yellow",
+            "tag": "Fair",
+            "icon": "sad",
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light",
+        "multiStat__displayOrientation": "horizontal",
+        "multiStat__labelColumn": "EquipmentID",
+        "multiStat__slot": {
+          "width": 3,
+          "height": 2
+        }
+      }
+    },
+    {
+      "id": "8edfae11-6e9f-4d42-a6df-5ac010294610",
+      "title": "Contoso Motors and Auto Parts",
+      "visualType": "markdownCard",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 18,
+        "height": 4
+      },
+      "markdownText": "![Contoso Motors adn Auto Parts](https://github.com/{{GITHUB_ACCOUNT}}/azure_arc/blob/{{GITHUB_BRANCH}}/azure_jumpstart_ag/artifacts/adx_dashboards/contoso-motors-autoparts.png?raw=true)",
+      "visualOptions": {}
+    },
+    {
+      "id": "67de7813-5182-483d-8e7f-b360b1ce1d5f",
+      "title": "Overall Efficiency",
+      "visualType": "card",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 0,
+        "y": 4,
+        "width": 3,
+        "height": 4
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "6e57f2be-95d5-4805-98e4-3a57278c4f90"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": null,
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "2d8c2bed-f661-4ad2-97fa-cee1b1a7cbae",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">",
+                "column": null,
+                "values": [
+                  "90"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "",
+            "icon": "happy",
+            "ruleName": ""
+          },
+          {
+            "id": "b615fe3a-54a1-4b10-bff2-b51ac7c5bd5d",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">",
+                "column": null,
+                "values": [
+                  "80"
+                ]
+              },
+              {
+                "values": [
+                  "90"
+                ],
+                "operator": "==",
+                "column": null
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "yellow",
+            "tag": "",
+            "icon": "emojiNeutral",
+            "ruleName": ""
+          },
+          {
+            "id": "4eba33ea-9772-4f05-817c-aedc751609d8",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "<",
+                "column": null,
+                "values": [
+                  "80"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "Poor",
+            "icon": "sad",
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light"
+      }
+    },
+    {
+      "id": "0236925d-7aec-4fb6-93cd-95e9934a26f3",
+      "title": "Contoso Motors and Auto Parts",
+      "visualType": "markdownCard",
+      "pageId": "b26b3811-394b-4451-9407-40d162f34d1c",
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 18,
+        "height": 4
+      },
+      "markdownText": "![Contoso Motors adn Auto Parts](https://github.com/{{GITHUB_ACCOUNT}}/azure_arc/blob/{{GITHUB_BRANCH}}/azure_jumpstart_ag/artifacts/adx_dashboards/contoso-motors-autoparts.png?raw=true)",
+      "visualOptions": {}
+    },
+    {
+      "id": "8ca3cd34-13aa-481d-82ee-ccdf69603f76",
+      "title": "Cars Manufactured by Model",
+      "visualType": "pie",
+      "pageId": "b26b3811-394b-4451-9407-40d162f34d1c",
+      "layout": {
+        "x": 9,
+        "y": 4,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "9277db4c-0c4d-4739-b571-df776263f87d"
+      },
+      "visualOptions": {
+        "hideLegend": false,
+        "xColumn": null,
+        "yColumns": null,
+        "seriesColumns": null,
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "labelDisabled": false,
+        "pie__label": [
+          "name",
+          "percentage"
+        ],
+        "tooltipDisabled": false,
+        "pie__tooltip": [
+          "name",
+          "percentage",
+          "value"
+        ],
+        "pie__orderBy": "size",
+        "pie__kind": "pie",
+        "pie__topNSlices": null,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "ffdc38cb-2792-467f-8445-1c4030398257",
+      "title": "Cars Manufactured by Plant Location",
+      "visualType": "bar",
+      "pageId": "b26b3811-394b-4451-9407-40d162f34d1c",
+      "layout": {
+        "x": 0,
+        "y": 4,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "bd5c10b0-a055-4888-bab0-9ba38fce173b"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "Units Manufactured vs Rejected",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": false,
+        "xColumnTitle": "Plant Location",
+        "xColumn": null,
+        "yColumns": null,
+        "seriesColumns": null,
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "c2ec69a9-9f1e-485f-a49c-44a28c27ba65",
+      "title": "Availability",
+      "visualType": "card",
+      "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "width": 3,
+        "height": 4
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "bfab8c5d-284e-4309-a647-7e37c4b8c2ba"
+      },
+      "visualOptions": {
+        "multiStat__textSize": "auto",
+        "multiStat__valueColumn": null,
+        "colorRulesDisabled": false,
+        "colorRules": [
+          {
+            "id": "a7d41089-df67-4dae-a974-a5fd4116003f",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">",
+                "column": null,
+                "values": [
+                  "90"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "green",
+            "tag": "Good",
+            "icon": "completed",
+            "ruleName": ""
+          },
+          {
+            "id": "3d2d5448-8bf9-4b7f-add5-d050d8a2b75d",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": ">",
+                "column": null,
+                "values": [
+                  "80"
+                ]
+              },
+              {
+                "operator": "<=",
+                "column": null,
+                "values": [
+                  "90"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "yellow",
+            "tag": "Fair",
+            "icon": "critical",
+            "ruleName": ""
+          },
+          {
+            "id": "912eb6bb-40f4-4a1e-82b4-c287343c878a",
+            "ruleType": "colorByCondition",
+            "applyToColumn": null,
+            "hideText": false,
+            "applyTo": "cells",
+            "conditions": [
+              {
+                "operator": "<",
+                "column": null,
+                "values": [
+                  "80"
+                ]
+              }
+            ],
+            "chainingOperator": "and",
+            "visualType": "stat",
+            "colorStyle": "bold",
+            "color": "red",
+            "tag": "",
+            "icon": "warning",
+            "ruleName": ""
+          }
+        ],
+        "colorStyle": "light"
+      }
+    }
+  ],
+  "baseQueries": [],
+  "parameters": [
+    {
+      "kind": "duration",
+      "id": "72e78587-ba97-4390-9374-b93688428c00",
+      "displayName": "Time range",
+      "description": "",
+      "beginVariableName": "_startTime",
+      "endVariableName": "_endTime",
+      "defaultValue": {
+        "kind": "dynamic",
+        "count": 1,
+        "unit": "hours"
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    }
+  ],
+  "dataSources": [
+    {
+      "id": "0a4a6594-6c22-4a61-9c94-63ddb16967af",
+      "name": "{{ADX_CLUSTER_NAME}}",
+      "scopeId": "kusto",
+      "clusterUri": "{{ADX_CLUSTER_URI}}",
+      "database": "manufacturing",
+      "kind": "manual-kusto"
+    }
+  ],
+  "pages": [
+    {
+      "name": "Production Efficiency",
+      "id": "25083f67-f980-4066-a550-5f8bb1a183d6"
+    },
+    {
+      "id": "b26b3811-394b-4451-9407-40d162f34d1c",
+      "name": "Production Metrics"
+    }
+  ],
+  "queries": [
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "assemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type)\n| distinct Model = tostring(cp.model), EngineType = tostring(cp.engine_type)\n",
+      "id": "266487a6-71ec-4dd7-9990-5f1b6a2aca2a",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "assemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize Passed = countif(cp.quality_check == \"pass\"), Failed = countif(cp.quality_check == \"fail\") | evaluate narrow()\n| project  Column, toint(Value)",
+      "id": "caa8a37f-0829-497e-ac88-6b96c03137e1",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "// Final cars production\nassemblyline\n| extend ap= parse_json(actual_production)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| summarize UnitsManufactured = sum(toint(ap.units_manufactured)), UnitsRejected = sum(toint(ap.units_rejected)) | evaluate narrow()\n| project  Column, toint(Value)",
+      "id": "3f86cb95-ad80-450b-9b07-f0c4f324a70e",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "assemblyline\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2) by EquipmentID = tostring(ee.equipment_id) \n",
+      "id": "ceb76c0b-64cf-487f-9b1a-41c7c1adf68a",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "assemblyline\n| extend ee = parse_json(equipment_telemetry)\n| mv-apply ee on (extend  ee.date_time, ee.equipment_id, ee.efficiency)\n| summarize Efficiency = round(avg( toreal(ee.efficiency)), 2)",
+      "id": "6e57f2be-95d5-4805-98e4-3a57278c4f90",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "// Total cars manufactured by type\nassemblyline\n| extend cp= parse_json(cars_produced)\n| mv-apply cp on (extend cp.model, cp.engine_type, cp.assembly_status, cp.quality_check)\n| where cp.assembly_status == \"completed\"\n| summarize count() by tostring(cp.model)",
+      "id": "9277db4c-0c4d-4739-b571-df776263f87d",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "// Car production by plant\nassemblyline\n| extend ap= parse_json(actual_production), pd = parse_json(plant_details)\n| mv-apply ap on (extend ap.units_manufactured, ap.units_rejected)\n| mv-apply ap on (extend pd.plant_id, pd.location)\n| where ap.units_manufactured > 0 or ap.units_rejected > 0\n| project plant_id = pd.plant_id, location = pd.location, units_manufactured = ap.units_manufactured, units_rejected = ap.units_rejected\n| summarize UnitsManufactured = sum(toint(units_manufactured)), UnitsRejected = sum(toint(units_rejected)) by Location = tostring(location) \n",
+      "id": "bd5c10b0-a055-4888-bab0-9ba38fce173b",
+      "usedVariables": []
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0a4a6594-6c22-4a61-9c94-63ddb16967af"
+      },
+      "text": "assemblyline\n| extend pm = parse_json(performance_metrics)\n| mv-apply pm on (extend  pm.availability_oee)\n| summarize availability = round(avg(toreal(pm.availability_oee)) * 100.0, 2)",
+      "id": "bfab8c5d-284e-4309-a647-7e37c4b8c2ba",
+      "usedVariables": []
+    }
+  ]
+}

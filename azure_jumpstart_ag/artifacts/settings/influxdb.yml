@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: contosoba
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: contosoba-clusterrole
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: contosoba
+  namespace: azure-iot-operations
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: contosoba-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: contosoba
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: influxdb
+spec:
+  serviceName: "influxdb"
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      serviceAccount: contosoba
+      containers:
+      - name: influxdb
+        image: influxdb:latest
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - name: api
+          containerPort: 9999
+        - name: gui
+          containerPort: 8086
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/influxdb2
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        storageClassName: "local-path"
+        resources:
+          requests:
+            storage: 10Gi
+        volumeMode: Filesystem
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: influxdb-setup
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-credentials
+          image: influxdb:latest
+          command:
+            - influx
+          args:
+            - setup
+            - --host
+            - http://influxPlaceholder:8086
+            - --bucket
+            - manufacturing
+            - --org
+            - InfluxData
+            - --password
+            - influxAdminPwdPlaceHolder
+            - --username
+            - influxAdminPlaceHolder
+            - --token
+            - secret-token
+            - --force
