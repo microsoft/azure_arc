@@ -3,7 +3,7 @@
   "id": "71f47749-912f-46d4-92ca-b61286839e73",
   "eTag": "8b1a68cd-b2c1-46b1-8e36-20bb29f97673",
   "schema_version": "51",
-  "title": "Contoso Motors and Auto Parts",
+  "title": "Contoso Motors",
   "tiles": [
     {
       "id": "86ba667a-63c7-4b8b-ba61-76c21d506910",
@@ -364,7 +364,7 @@
     },
     {
       "id": "8edfae11-6e9f-4d42-a6df-5ac010294610",
-      "title": "Contoso Motors and Auto Parts",
+      "title": "Contoso Motors",
       "visualType": "markdownCard",
       "pageId": "25083f67-f980-4066-a550-5f8bb1a183d6",
       "layout": {
@@ -478,7 +478,7 @@
     },
     {
       "id": "0236925d-7aec-4fb6-93cd-95e9934a26f3",
-      "title": "Contoso Motors and Auto Parts",
+      "title": "Contoso Motors",
       "visualType": "markdownCard",
       "pageId": "b26b3811-394b-4451-9407-40d162f34d1c",
       "layout": {
