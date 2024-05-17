@@ -17,7 +17,7 @@ $kustoCluster = Get-AzKustoCluster -ResourceGroupName $resourceGroup -Name $adxC
 $adxEndPoint = $kustoCluster.Uri
 
 # Update the dashboards files with the new ADX cluster name and URI
-$templateBaseUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/ag_manufacturing/azure_jumpstart_ag/"
+$templateBaseUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_ag/"
 $ordersDashboardBody     = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-orders-payload.json").Content -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
 $iotSensorsDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/adx_dashboards/adx-dashboard-iotsensor-payload.json") -replace '{{ADX_CLUSTER_URI}}', $adxEndPoint -replace '{{ADX_CLUSTER_NAME}}', $adxClusterName
 

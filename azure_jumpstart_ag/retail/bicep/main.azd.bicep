@@ -41,7 +41,7 @@ param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'ag_manufacturing'
+param githubBranch string = 'main'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
