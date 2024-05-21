@@ -227,7 +227,7 @@ resource vmRoleAssignment_KeyVaultCertificatesOfficer 'Microsoft.Authorization/r
   scope: resourceGroup()
   properties: {
     principalId: vm.identity.principalId
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'f8a3ddcd-f2b4-4a3e-8f1a-7c6c0b6e8b6')
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'a4417e6f-fecd-4de8-b567-7b0420556985')
   }
 }
 
