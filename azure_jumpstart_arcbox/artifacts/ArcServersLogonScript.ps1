@@ -133,10 +133,10 @@ if ($Env:flavor -ne "DevOps") {
     # Required for CLI commands
     Write-Header "Az CLI Login"
     az login --identity --tenant $spnTenantId
-    az account set -s $env:subscriptionId
+    az account set -s $subscriptionId
 
     Write-Header "Az PowerShell Login"
-    Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    Connect-AzAccount -Identity -Tenant $spnTenantId -Subscription $subscriptionId
 
     # Register Azure providers
     Write-Header "Registering Providers"
@@ -375,7 +375,7 @@ if ($Env:flavor -ne "DevOps") {
         Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
         # Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
-        (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$Env:resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
+        (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId', "'$Env:spnClientId'" -replace '\$spnClientSecret', "'$Env:spnClientSecret'" -replace '\$resourceGroup', "'$resourceGroup'" -replace '\$spnTenantId', "'$Env:spnTenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
         # Copy installation script to nested Linux VMs
         Write-Output "Transferring installation script to nested Linux VMs..."
@@ -416,10 +416,10 @@ if ($Env:flavor -ne "DevOps") {
     $VMs | ForEach-Object -Parallel {
 
 
-        $null = Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process -WarningAction SilentlyContinue
+        $null = Connect-AzAccount -Identity -Tenant $spntenantId -Subscription $subscriptionId -Scope Process -WarningAction SilentlyContinue
 
         $vm = $PSItem
-        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
+        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $resourceGroup -SubscriptionId $subscriptionId
 
         $connectedMachineEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15").Content | ConvertFrom-Json
 
