@@ -1,8 +1,7 @@
 BeforeDiscovery {
-    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
-    $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    $null = Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+
 }
 
 Describe "ArcBox resource group" {
