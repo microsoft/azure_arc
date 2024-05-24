@@ -129,7 +129,7 @@ Install-PSResource -Name Posh-SSH -Scope AllUsers -Quiet -AcceptLicense -TrustRe
 # Add Key Vault Secrets
 Connect-AzAccount -Identity
 
-$KeyVault = Get-AzKeyVault -ResourceGroupName $env:resourceGroup
+$KeyVault = Get-AzKeyVault -ResourceGroupName $resourceGroup
 
 # Set Key Vault Name as an environment variable (used by DevOps flavor)
 [System.Environment]::SetEnvironmentVariable('keyVaultName', $KeyVault.VaultName, [System.EnvironmentVariableTarget]::Machine)
@@ -144,9 +144,9 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
     Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
 }
 
-Set-Secret -Name adminPassword -Secret test $adminPassword
-Set-Secret -Name AZDATA_PASSWORD -Secret test $azdataPassword
-Set-Secret -Name registryPassword -Secret test $registryPassword
+Set-Secret -Name adminPassword -Secret $adminPassword
+Set-Secret -Name AZDATA_PASSWORD -Secret $azdataPassword
+Set-Secret -Name registryPassword -Secret $registryPassword
 
 Write-Output "Added the following secrets to Azure Key Vault"
 Get-SecretInfo

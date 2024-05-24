@@ -132,7 +132,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
-    az login --identity --tenant $spnTenantId
+    az login --identity
     az account set -s $subscriptionId
 
     Write-Header "Az PowerShell Login"
@@ -415,6 +415,9 @@ if ($Env:flavor -ne "DevOps") {
     $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
     $VMs | ForEach-Object -Parallel {
 
+        $spnTenantId  =  $Using:spnTenantId
+        $subscriptionId  =  $Using:subscriptionId
+        $resourceGroup  =  $Using:resourceGroup
 
         $null = Connect-AzAccount -Identity -Tenant $spntenantId -Subscription $subscriptionId -Scope Process -WarningAction SilentlyContinue
 
