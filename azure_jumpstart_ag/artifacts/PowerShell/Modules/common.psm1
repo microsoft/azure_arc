@@ -157,7 +157,7 @@ function Deploy-WindowsTools {
         Get-ChildItem "$Env:USERPROFILE\Desktop\Docker Desktop.lnk" | Remove-Item -Confirm:$false
         Copy-Item "$AgToolsDir\settings.json" -Destination "$Env:USERPROFILE\AppData\Roaming\Docker\settings.json" -Force
         Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 25
         Get-Process | Where-Object { $_.name -like "Docker Desktop" } | Stop-Process -Force
         # Cleanup
         Remove-Item $downloadDir -Recurse -Force
