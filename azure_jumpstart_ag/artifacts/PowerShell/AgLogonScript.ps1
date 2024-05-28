@@ -271,9 +271,6 @@ Add-Type $code
 #     }
 # }
 
-Write-Host "[$(Get-Date -Format t)] INFO: Starting Docker Desktop" -ForegroundColor Green
-Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 Write-Host
