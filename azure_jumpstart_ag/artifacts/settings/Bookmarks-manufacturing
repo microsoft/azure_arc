@@ -88,7 +88,7 @@
             "url": "https://dataexplorer.azure.com/dashboards/"
          }, {
             "id": "23",
-            "name": "Azure Arc Jumpstart",
+            "name": "Arc Jumpstart",
             "show_icon": false,
             "source": "unknown",
             "type": "url",
