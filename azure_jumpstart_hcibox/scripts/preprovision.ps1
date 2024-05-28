@@ -21,7 +21,16 @@ $tenantId = (Get-AzContext).tenant.id
 Write-Host "Setting Azure context with subscription id $env:AZURE_SUBSCRIPTION_ID and tenant id $tenantId..."
 $context = Set-AzContext -SubscriptionId $env:AZURE_SUBSCRIPTION_ID -ErrorAction Stop
 
-# Write-Host "Setting az subscription..."
+# Check if Azure CLI is authenticated to the same tenant as Azure PowerShell
+$azCliTenantId = (az account show --query "tenantId" -o tsv) 2>&1
+if ($azCliTenantId -ne $tenantId) {
+    Write-Host "Azure CLI is not authenticated to the same tenant as Azure PowerShell - performing login..."
+
+    az login --tenant $tenantId
+
+}
+
+Write-Host "Setting Azure CLI context to the same subscription as Azure PowerShell..."
 az account set --subscription $env:AZURE_SUBSCRIPTION_ID
 
 # Register providers
@@ -46,8 +55,8 @@ Function Get-AzAvailableCores ($location, $skuFriendlyNames, $minCores = 0) {
     # using az command because there is currently a bug in various versions of PowerShell that affects Get-AzVMUsage
     $usage = (az vm list-usage --location $location --output json --only-show-errors) | ConvertFrom-Json
 
-    $usage = $usage | 
-        Where-Object {$_.localname -match $skuFriendlyNames} 
+    $usage = $usage |
+        Where-Object {$_.localname -match $skuFriendlyNames}
 
     $enhanced = $usage |
         ForEach-Object {
@@ -60,7 +69,7 @@ Function Get-AzAvailableCores ($location, $skuFriendlyNames, $minCores = 0) {
             $_ | Add-Member -MemberType NoteProperty -Name usableLocation -Value $false -Force -PassThru
             If ($_.available -ge $minCores) {
                 $_.usableLocation = $true
-            } 
+            }
             else {
                 $_.usableLocation = $false
             }
@@ -80,13 +89,13 @@ Function Get-AzAvailableLocations ($location, $skuFriendlyNames, $minCores = 0) 
             -and $_.PhysicalLocation -ne ""
         }
 
-    $usableLocations = $locations | 
+    $usableLocations = $locations |
         ForEach-Object {
             $available = Get-AzAvailableCores -location $_.location -skuFriendlyNames $skuFriendlyNames -minCores $minCores |
                 Where-Object {$_.localName -ne "Total Regional vCPUs"}
             If ($available.usableLocation) {
-                $_ | Add-Member -MemberType NoteProperty -Name TotalCores     -Value $available.limit -Force 
-                $_ | Add-Member -MemberType NoteProperty -Name AvailableCores -Value $available.available -Force 
+                $_ | Add-Member -MemberType NoteProperty -Name TotalCores     -Value $available.limit -Force
+                $_ | Add-Member -MemberType NoteProperty -Name AvailableCores -Value $available.available -Force
                 $_ | Add-Member -MemberType NoteProperty -Name usableLocation -Value $available.usableLocation -Force -PassThru
             }
         }
@@ -105,12 +114,12 @@ $available = Get-AzAvailableCores -location $location -skuFriendlyNames $skuFrie
 
 If ($available.usableLocation -contains $false) {
     Write-Host "`n`u{274C} There is not enough VM capacity in the $location region to deploy the Jumpstart environment." -ForegroundColor Red
-    
+
     Write-Host "`nChecking other regions in the same geography with enough capacity ($minCores cores)...`n"
 
-    $locations = Get-AzAvailableLocations -location $location -skuFriendlyNames $skuFriendlyNames -minCores $minCores | 
+    $locations = Get-AzAvailableLocations -location $location -skuFriendlyNames $skuFriendlyNames -minCores $minCores |
         Format-Table Location, DisplayName, TotalCores, AvailableCores, UsableLocation -AutoSize | Out-String
-    
+
     Write-Host $locations
 
     Write-Host "Please run ``azd env --new`` to create a new environment and select the new location.`n"
@@ -153,9 +162,9 @@ If ($env:JS_RDP_PORT) {
     $JS_RDP_PORT = $env:JS_RDP_PORT
 }
 if ($promptOutput -notlike 'y') {
-    if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection [$JS_RDP_PORT]") 
-    { 
-        $JS_RDP_PORT = $promptOutput 
+    if ($promptOutput = Read-Host "Enter the RDP Port for remote desktop connection [$JS_RDP_PORT]")
+    {
+        $JS_RDP_PORT = $promptOutput
     }
 }
 
@@ -170,7 +179,7 @@ $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output
     azd env set SPN_PROVIDER_ID -- $($spnProviderId.id)
  } else {
     Write-Warning "Microsoft.AzureStackHCI provider id not found, aborting..."
-    
+
     Write-Host 'Consider the following options: 1) Request access from a tenant administrator to get read-permissions to service principals.
     2) Ask a tenant administrator to run the command $(az ad sp list --display-name "Microsoft.AzureStackHCI" --output json) | ConvertFrom-Json and send you the ID from the output. You can then manually add that value to the AZD .env file: SPN_PROVIDER_ID="xxx" or use the Bicep-based deployment specifying spnProviderId="xxx" in the deployment parameter-file.' -ForegroundColor Yellow
     throw "Microsoft.AzureStackHCI provider id not found"
@@ -197,7 +206,7 @@ if ($null -ne $env:SPN_CLIENT_ID) {
         azd env set SPN_TENANT_ID -- $SPN_TENANT_ID
     }
     catch {
-        
+
         If ($error[0].ToString() -match "Forbidden"){
             Throw "You do not have permission to create a service principal. Please contact your Azure subscription administrator to grant you the Owner role on the subscription."
         }
@@ -205,5 +214,5 @@ if ($null -ne $env:SPN_CLIENT_ID) {
             Throw "An error occurred creating the service principal. Error:" + $error[0].ToString()
         }
     }
-    
+
 }
