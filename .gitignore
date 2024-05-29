@@ -53,3 +53,4 @@ terraform.rc
 
 *.out
 .VSCodeCounter/*
+azure_jumpstart_ag/manufacturing/bicep/main.*.parameters.json

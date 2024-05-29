@@ -1,19 +1,27 @@
+targetScope = 'subscription'
+
 @description('Azure service principal client id')
 param spnClientId string = ''
 
 @description('Azure service principal client secret')
-@minLength(12)
-@maxLength(123)
 @secure()
 param spnClientSecret string = newGuid()
 
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string = ''
 
+@description('Azure service principal Object id')
+param spnObjectId string = ''
+
 @minLength(1)
 @maxLength(77)
 @description('Prefix for resource group, i.e. {name}-rg')
 param envName string = toLower(substring(newGuid(), 0, 5))
+
+resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
+  name: '${envName}-rg'
+  location: location
+}
 
 @description('Location for all resources')
 param location string = ''
@@ -29,10 +37,7 @@ param windowsAdminUsername string = 'Agora'
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string = newGuid()
-
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string = ''
+param windowsAdminPassword string
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
@@ -46,15 +51,6 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
-@minLength(1)
-param githubUser string  = 'sampleUser'
-
-@description('GitHub Personal access token for the user account')
-@minLength(1)
-@secure()
-param githubPAT string = newGuid()
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
@@ -64,20 +60,35 @@ param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
 
-@description('The name of the Staging Kubernetes cluster resource')
-param aksStagingClusterName string = 'Ag-AKS-Staging'
+@description('Name of the storage queue')
+param storageQueueName string = 'aioqueue'
 
-@description('The name of the IotHub')
-param iotHubName string = 'Ag-IotHub-${namingGuid}'
+@description('Name of the event hub')
+param eventHubName string = 'aiohub${namingGuid}'
 
-@description('The name of the Cosmos DB account')
-param accountName string = 'agcosmos${namingGuid}'
+@description('Name of the event hub namespace')
+param eventHubNamespaceName string = 'aiohubns${namingGuid}'
+
+@description('Name of the event grid namespace')
+param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
+
+@description('The name of the Key Vault for site 1')
+param akvNameSite1 string = 'agakv1${namingGuid}'
+
+@description('The name of the Key Vault for site 2')
+param akvNameSite2 string = 'agakv2${namingGuid}'
+
+@description('Name of the storage account')
+param aioStorageAccountName string = 'aiostg${namingGuid}'
+
+@description('The name of ESA container in Storage Account')
+param stcontainerName string = 'esacontainer'
 
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
-@description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'Orders'
+@description('The custom location RPO ID')
+param customLocationRPOID string = ''
 
 @minLength(5)
 @maxLength(50)
@@ -88,16 +99,9 @@ param acrName string = 'agacr${namingGuid}'
 param rdpPort string = '3389'
 
 @description('The agora industry to be deployed')
-param industry string = 'retail'
+param industry string = 'manufacturing'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
-
-targetScope = 'subscription'
-
-resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: '${envName}-rg'
-  location: location
-}
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -128,21 +132,6 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   }
 }
 
-module kubernetesDeployment 'kubernetes/aks.bicep' = {
-  name: 'kubernetesDeployment'
-  scope: rg
-  params: {
-    aksStagingClusterName: aksStagingClusterName
-    virtualNetworkNameCloud: networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameStaging: subnetNameCloudAksStaging
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    location: location
-    sshRSAPublicKey: sshRSAPublicKey
-    acrName: acrName
-  }
-}
-
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
   scope: rg
@@ -151,6 +140,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
+    spnObjectId: spnObjectId
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
@@ -158,51 +148,82 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubAccount: githubAccount
     githubBranch: githubBranch
-    githubUser: githubUser
-    githubPAT: githubPAT
+    //githubPAT: githubPAT
     location: location
     subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksStagingClusterName: aksStagingClusterName
-    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName: accountName
-    cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
     acrName: acrName
     rdpPort: rdpPort
-    adxClusterName: adxClusterName
     namingGuid: namingGuid
+    adxClusterName: adxClusterName
+    customLocationRPOID: customLocationRPOID
     industry: industry
+    stcontainerName: stcontainerName
   }
 }
 
-module iotHubDeployment 'data/iotHub.bicep' = {
-  name: 'iotHubDeployment'
+module eventHub 'data/eventHub.bicep' = {
+  name: 'eventHubDeployment'
   scope: rg
   params: {
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
     location: location
-    iotHubName: iotHubName
   }
 }
 
-module adxDeployment 'data/dataExplorer.bicep' = {
+module storageAccount 'storage/storageAccount.bicep' = {
+  name: 'aioStorageAccountDeployment'
+  scope: rg
+  params: {
+    storageAccountName: aioStorageAccountName
+    location: location
+    storageQueueName: storageQueueName
+    stcontainerName: stcontainerName
+  }
+}
+
+module eventGrid 'data/eventGrid.bicep' = {
+  name: 'eventGridDeployment'
+  scope: rg
+  params: {
+    eventGridNamespaceName: eventGridNamespaceName
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    queueName: storageQueueName
+    storageAccountResourceId: storageAccount.outputs.storageAccountId
+    namingGuid: namingGuid
+    location: location
+  }
+}
+
+module keyVault 'data/keyVault.bicep' = {
+  name: 'keyVaultDeployment'
+  scope: rg
+  params: {
+    tenantId: spnTenantId
+    akvNameSite1: akvNameSite1
+    akvNameSite2: akvNameSite2
+    location: location
+  }
+}
+
+module acr 'kubernetes/acr.bicep' = {
+  name: 'acrDeployment'
+  scope: rg
+  params: {
+    acrName: acrName
+    location: location
+  }
+}
+
+module adx 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
   scope: rg
   params: {
-    location: location
     adxClusterName: adxClusterName
-    iotHubId: iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-    cosmosDBAccountName: accountName
-    posOrdersDBName: posOrdersDBName
-  }
-}
-
-module cosmosDBDeployment 'data/cosmosDB.bicep' = {
-  name: 'cosmosDBDeployment'
-  scope: rg
-  params: {
     location: location
-    accountName: accountName
-    posOrdersDBName: posOrdersDBName
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
   }
 }
 
@@ -213,6 +234,5 @@ output NAMING_GUID string = namingGuid
 output RDP_PORT string = rdpPort
 
 output ADX_CLUSTER_NAME string = adxClusterName
-output IOT_HUB_NAME string = iotHubName
-output COSMOS_DB_NAME string = accountName
 output ACR_NAME string = acrName
+

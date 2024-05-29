@@ -327,7 +327,7 @@
           "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
         },
         "properties": {
-          "publicIpAllocationMethod": "Dynamic",
+          "publicIpAllocationMethod": "Static",
           "publicIPAddressVersion": "IPv4",
           "dnsSettings": {
             "domainNameLabel": "[parameters('proxydnsLabelPrefix')]"
@@ -344,7 +344,7 @@
           "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
         },
         "properties": {
-          "publicIpAllocationMethod": "Dynamic",
+          "publicIpAllocationMethod": "Static",
           "publicIPAddressVersion": "IPv4",
           "dnsSettings": {
             "domainNameLabel": "[parameters('dnsLabelPrefix')]"

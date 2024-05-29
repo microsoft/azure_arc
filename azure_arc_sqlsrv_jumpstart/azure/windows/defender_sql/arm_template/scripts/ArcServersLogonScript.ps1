@@ -8,7 +8,6 @@ $Env:tempDir = "C:\Temp"
 
 # VHD storage details
 $sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/prod"
-$sas = "?si=JS-RL&spr=https&sv=2022-11-02&sr=c&sig=fIIeEliw5nG78oR6TBCvM70VMz9WXhpF41wdDoOlE8U%3D"
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {
@@ -146,7 +145,7 @@ elseif ($Env:sqlServerEdition -eq "Enterprise"){
 
 $SQLvmvhdPath = "$Env:ArcJSVMDir\JS-Win-SQL-01.vhdx"
 if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
-    $vhdImageUrl = "$sourceFolder/$vhdImageToDownload$sas"
+    $vhdImageUrl = "$sourceFolder/$vhdImageToDownload"
     azcopy cp $vhdImageUrl $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
 }
 
