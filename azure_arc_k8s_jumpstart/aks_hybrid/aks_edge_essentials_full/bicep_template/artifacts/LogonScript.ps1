@@ -14,7 +14,7 @@ $azureLocation = $env:azureLocation
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
-$vhdxUri = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSW11IoTBase.vhdx?sp=r&st=2023-05-09T12:36:32Z&se=2033-05-09T20:36:32Z&spr=https&sv=2022-11-02&sr=b&sig=xFROrqGkKDIdrXqiAMLZGLEwTMToOWoNNDMVz1zvPMc%3D"
+$vhdxUri = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSW11IoTBase.vhdx"
 $hypervVMUser = "Administrator"
 $hypervVMPassword = "JS123!!"
 $kubernetesDistribution = $env:kubernetesDistribution

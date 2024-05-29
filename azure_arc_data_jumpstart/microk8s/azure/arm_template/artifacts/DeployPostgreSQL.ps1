@@ -71,7 +71,7 @@ Start-Sleep -Seconds 60
 # Downloading demo database and restoring onto Postgres
 Write-Host "`n"
 Write-Host "Downloading AdventureWorks.sql template for PostgreSQL (1/3)"
-kubectl exec $pgWorkerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstartprodsg.blob.core.windows.net/sampledb/AdventureWorks2019.sql?sp=r&st=2023-08-10T18:30:33Z&se=2033-08-11T02:30:33Z&spr=https&sv=2022-11-02&sr=b&sig=5kD1PR4gwaCWlefSknggq%2BYsx1FgBrp5Kv1pH42d1nE%3D'" 2>&1 | Out-Null
+kubectl exec $pgWorkerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstartprodsg.blob.core.windows.net/sampledb/AdventureWorks2019.sql'" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on PostgreSQL (2/3)"
 kubectl exec $pgWorkerPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database on PostgreSQL (3/3)"
