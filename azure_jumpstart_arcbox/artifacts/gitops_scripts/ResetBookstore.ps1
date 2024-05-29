@@ -4,8 +4,8 @@ $certdns = "arcbox.devops.com"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\ResetBookstore.log
 
-# Switch kubectl context to arcbox-capi
-kubectx arcbox-capi
+# Switch kubectl context to arcbox-k3s
+kubectx arcbox-datasvc-k3s
 
 ############################
 # - Deploy Ingress for Reset
