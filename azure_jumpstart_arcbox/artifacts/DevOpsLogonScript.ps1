@@ -37,7 +37,7 @@ $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --identity --tenant $spnTenantId
+az login --identity
 az account set -s $env:subscriptionId
 
 # Downloading ArcBox-DataSvc-K3s Kubernetes cluster kubeconfig file
