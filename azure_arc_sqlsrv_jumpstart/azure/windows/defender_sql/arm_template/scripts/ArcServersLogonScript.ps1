@@ -7,7 +7,7 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 
 # VHD storage details
-$sourceFolder = "https://jsvhds.blob.core.windows.net/scenarios/prod"
+$sourceFolder = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod"
 
 $logFilePath = "$Env:ArcJSLogsDir\ArcServersLogonScript.log"
 if ([System.IO.File]::Exists($logFilePath)) {

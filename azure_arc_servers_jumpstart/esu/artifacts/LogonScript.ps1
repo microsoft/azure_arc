@@ -139,7 +139,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
         $imageName = "JSWin2K12Base"
         $vmvhdPath = "$Env:ESUVMDir\${imageName}.vhdx"
         # Moved VHD storage account details here to keep only in place to prevent duplicates.
-        $vhdDownload = "https://jsvhds.blob.core.windows.net/scenarios/prod/JSWin2K12Base.vhdx?sp=r&st=2023-09-11T08:05:53Z&se=2025-11-08T17:05:53Z&spr=https&sv=2022-11-02&sr=b&sig=zoVpd9AMzsTRRE0a7eLJYeFURexY4R9VSzOGKfLOx%2FQ%3D"
+        $vhdDownload = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSWin2K12Base.vhdx?sp=r&st=2023-09-11T08:05:53Z&se=2025-11-08T17:05:53Z&spr=https&sv=2022-11-02&sr=b&sig=zoVpd9AMzsTRRE0a7eLJYeFURexY4R9VSzOGKfLOx%2FQ%3D"
 
     Write-Host "Fetching VM"
 
@@ -209,7 +209,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
         $imageName = "JSSQL12Base"
         $vmvhdPath = "$Env:ESUVMDir\${imageName}.vhdx"
         # Moved VHD storage account details here to keep only in place to prevent duplicates.
-        $vhdDownload = "https://jsvhds.blob.core.windows.net/scenarios/prod/JSSQL12Base.vhdx?sp=r&st=2023-09-27T06:57:38Z&se=2027-09-11T14:57:38Z&spr=https&sv=2022-11-02&sr=b&sig=BXtEL%2B7RdLairRHXd3TA6n5q%2FNktjItvcU1rzol9Dl0%3D"
+        $vhdDownload = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSSQL12Base.vhdx?sp=r&st=2023-09-27T06:57:38Z&se=2027-09-11T14:57:38Z&spr=https&sv=2022-11-02&sr=b&sig=BXtEL%2B7RdLairRHXd3TA6n5q%2FNktjItvcU1rzol9Dl0%3D"
 
     Write-Host "Fetching VM"
 
@@ -278,7 +278,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
             JSWin2K12Base = @{
                 imageName = 'JSWin2K12Base'
                 vmvhdPath = "$Env:ESUVMDir\JSWin2K12Base.vhdx"
-                vhdDownload = "https://jsvhds.blob.core.windows.net/scenarios/prod/JSWin2K12Base.vhdx?sp=r&st=2023-09-11T08:05:53Z&se=2025-11-08T17:05:53Z&spr=https&sv=2022-11-02&sr=b&sig=zoVpd9AMzsTRRE0a7eLJYeFURexY4R9VSzOGKfLOx%2FQ%3D"
+                vhdDownload = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSWin2K12Base.vhdx?sp=r&st=2023-09-11T08:05:53Z&se=2025-11-08T17:05:53Z&spr=https&sv=2022-11-02&sr=b&sig=zoVpd9AMzsTRRE0a7eLJYeFURexY4R9VSzOGKfLOx%2FQ%3D"
                 vmName = "JSWin2K12Base"
                 ip = "10.10.1.100"
                 type = "Windows"
@@ -286,7 +286,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
             JSSQL12Base = @{
                 imageName = "JSSQL12Base"
                 vmvhdPath = "$Env:ESUVMDir\JSSQL12Base.vhdx"
-                vhdDownload = "https://jsvhds.blob.core.windows.net/scenarios/prod/JSSQL12Base.vhdx?sp=r&st=2023-09-27T06:57:38Z&se=2027-09-11T14:57:38Z&spr=https&sv=2022-11-02&sr=b&sig=BXtEL%2B7RdLairRHXd3TA6n5q%2FNktjItvcU1rzol9Dl0%3D"
+                vhdDownload = "https://jumpstartprodsg.blob.core.windows.net/scenarios/prod/JSSQL12Base.vhdx?sp=r&st=2023-09-27T06:57:38Z&se=2027-09-11T14:57:38Z&spr=https&sv=2022-11-02&sr=b&sig=BXtEL%2B7RdLairRHXd3TA6n5q%2FNktjItvcU1rzol9Dl0%3D"
                 vmName = "JSSQL12Base"
                 ip = "10.10.1.101"
                 type = "SQL"

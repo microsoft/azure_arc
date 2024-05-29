@@ -123,7 +123,7 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 Write-Host "Fetching Nested VMs"
 Write-Host "`n"
-$sourceFolder = 'https://jsvhds.blob.core.windows.net/arcbox'
+$sourceFolder = 'https://jumpstartprodsg.blob.core.windows.net/arcbox'
 
 $Env:AZCOPY_BUFFER_GB=4
 Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
