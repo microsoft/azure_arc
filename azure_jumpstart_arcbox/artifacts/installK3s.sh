@@ -56,7 +56,8 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 echo ""
 echo "Log in to Azure"
 echo ""
-sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password=$SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+# sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password=$SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+sudo -u $adminUsername az login --identity
 sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
