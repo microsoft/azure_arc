@@ -1,7 +1,6 @@
-To upload the log bundle zip file for support review, use the below command:
+To upload the log bundle ZIP file for support review, use the following steps command:
 
-azcopy copy "C:\ArcBox\Logs\<Logs Bundle zip file name>.zip" "https://https://jumpstartsupport.blob.core.windows.net/logbundles?sp=cw&st=2022-02-02T22:04:39Z&se=2027-04-22T05:04:39Z&spr=https&sv=2020-08-04&sr=c&sig=2urJGqXvkXTSBpu%2FqCksANy18pY5o44tmzzKjc8eUoM%3D" --recursive
-
-For example:
-
-azcopy copy "C:\ArcBox\Logs\LogsBundle-kavpug.zip" "https://https://jumpstartsupport.blob.core.windows.net/logbundles?sp=cw&st=2022-02-02T22:04:39Z&se=2027-04-22T05:04:39Z&spr=https&sv=2020-08-04&sr=c&sig=2urJGqXvkXTSBpu%2FqCksANy18pY5o44tmzzKjc8eUoM%3D" --recursive
+1. Create a ZIP file with all the required files
+1. Open an [issue](https://github.com/microsoft/azure_arc/issues/new?assignees=&labels=triage&projects=&template=bug_report.md&title=) with the appropiate title and description. 
+1. Attach the log bundle ZIP file
+1. If extra files/logs are required, these will be asked through the GitHub issue discussion view
