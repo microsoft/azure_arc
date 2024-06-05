@@ -10,7 +10,7 @@ $osmCLIReleaseVersion = "v1.2.3"
 $osmMeshName = "osm"
 $ingressNamespace = "ingress-nginx"
 
-$certname = "ingress-cert"
+# $certname = "ingress-cert"
 $certdns = "arcbox.devops.com"
 
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
@@ -198,43 +198,43 @@ az k8s-configuration flux create `
     --branch main --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
-################################################
-# - Install Key Vault Extension / Create Ingress
-################################################
+# ################################################
+# # - Install Key Vault Extension / Create Ingress
+# ################################################
 
-Write-Header "Installing KeyVault Extension"
+# Write-Header "Installing KeyVault Extension"
 
-Write-Host "Generating a TLS Certificate"
-$cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-$certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
-Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+# Write-Host "Generating a TLS Certificate"
+# $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
+# $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
+# Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
+# Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
-Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import `
-    --vault-name $Env:keyVaultName `
-    --password "arcbox" `
-    --name $certname `
-    --file "$Env:TempDir\$certname.pfx"
+# Write-Host "Importing the TLS certificate to Key Vault"
+# az keyvault certificate import `
+#     --vault-name $Env:keyVaultName `
+#     --password "arcbox" `
+#     --name $certname `
+#     --file "$Env:TempDir\$certname.pfx"
 
-Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create `
-    --name 'akvsecretsprovider' `
-    --extension-type Microsoft.AzureKeyVaultSecretsProvider `
-    --scope cluster `
-    --cluster-name $Env:k3sArcDataClusterName `
-    --resource-group $Env:resourceGroup `
-    --cluster-type connectedClusters `
-    --release-namespace kube-system `
-    --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+# Write-Host "Installing Azure Key Vault Kubernetes extension instance"
+# az k8s-extension create `
+#     --name 'akvsecretsprovider' `
+#     --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+#     --scope cluster `
+#     --cluster-name $Env:k3sArcDataClusterName `
+#     --resource-group $Env:resourceGroup `
+#     --cluster-type connectedClusters `
+#     --release-namespace kube-system `
+#     --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
-# Replace Variable values
+# # Replace Variable values
 Get-ChildItem -Path $Env:ArcBoxKVDir |
     ForEach-Object {
-        (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
-        (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $Env:keyVaultName | Set-Content -Path $_.FullName
+        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
+        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $Env:keyVaultName | Set-Content -Path $_.FullName
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_HOST}', $certdns | Set-Content -Path $_.FullName
-        (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
+        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
     }
 
 Write-Header "Creating Ingress Controller"
@@ -242,8 +242,8 @@ Write-Header "Creating Ingress Controller"
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
     # Create the Kubernetes secret with the service principal credentials
-    kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
-    kubectl --namespace $namespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
+    # kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
+    # kubectl --namespace $namespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
 
     # Deploy Key Vault resources and Ingress for Book Store and Hello-Arc App
     kubectl --namespace $namespace apply -f "$Env:ArcBoxKVDir\$namespace.yaml"
@@ -284,7 +284,7 @@ Write-Header "Creating Desktop Icons"
 $shortcutLocation = "$Env:Public\Desktop\K3s Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://$certdns"
+$shortcut.TargetPath = "http://$certdns"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
