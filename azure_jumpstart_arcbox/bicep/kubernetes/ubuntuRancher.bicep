@@ -61,50 +61,12 @@ param storageContainerName string
 ])
 param flavor string
 
-@description('The number of IP addresses to create')
-param numberOfIPAddresses int = 7
-
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-// var PublicIPNoBastion = {
-//   id: publicIpAddress.id
-// }
 var k3sControlPlane = 'true' // deploy single-node k3s control plane
 var diskSize = (flavor == 'DataOps') ? 512 : 64
-
-
-// resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
-//   name: networkInterfaceName
-//   location: azureLocation
-//   properties: {
-//     ipConfigurations: [
-//       {
-//         name: 'ipconfig1'
-//         properties: {
-//           subnet: {
-//             id: subnetId
-//           }
-//           privateIPAllocationMethod: 'Dynamic'
-//           publicIPAddress: deployBastion== false  ? PublicIPNoBastion : null
-//         }
-//       }
-//     ]
-//   }
-// }
-
-// resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if(deployBastion == false){
-//   name: publicIpAddressName
-//   location: azureLocation
-//   properties: {
-//     publicIPAllocationMethod: 'Static'
-//     publicIPAddressVersion: 'IPv4'
-//     idleTimeoutInMinutes: 4
-//   }
-//   sku: {
-//     name: 'Basic'
-//   }
-// }
+var numberOfIPAddresses = (flavor == 'DataOps') ? 7 : 5 // The number of IP addresses to create
 
 // Create multiple public IP addresses if deployBastion is false
 resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
