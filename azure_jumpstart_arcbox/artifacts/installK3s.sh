@@ -123,15 +123,15 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
     sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $k3sClusterNodeConfig
 
-    # Registering Azure resource providers
-    echo ""
-    echo "Registering Azure resource providers"
-    echo ""
-    sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
-    sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
-    sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
-    sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
-    sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
+    # # Registering Azure resource providers
+    # echo ""
+    # echo "Registering Azure resource providers"
+    # echo ""
+    # sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
+    # sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+    # sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
+    # sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+    # sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
 
     # sudo service sshd restart
     # Onboard the cluster to Azure Arc
