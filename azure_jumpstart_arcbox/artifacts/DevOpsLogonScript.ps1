@@ -18,7 +18,7 @@ $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 $clusters = @(
     [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = "arcbox-datasvc-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
 
-    [pscustomobject]@{clusterName = $Env:k3sArcClusterName; context = "arcbox-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
+    [pscustomobject]@{clusterName = $Env:k3sArcClusterName; context = "arcbox-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
@@ -76,17 +76,17 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($E
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
 
-# Merging kubeconfig files from ArcBox-DataSvc-K3s and ArcBox-K3s
-Write-Header "Merging ArcBox-DataSvc-K3s & ArcBox-K3s Kubeconfigs"
-Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
-$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
-kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
-kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
-Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
-Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
-Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
-$Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-kubectx
+# # Merging kubeconfig files from ArcBox-DataSvc-K3s and ArcBox-K3s
+# Write-Header "Merging ArcBox-DataSvc-K3s & ArcBox-K3s Kubeconfigs"
+# Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
+# $Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
+# kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
+# kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
+# Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
+# Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
+# Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
+# $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
+# kubectx
 
 # Download OSM binaries
 Write-Header "Downloading OSM Binaries"
@@ -106,7 +106,8 @@ az -v
 foreach ($cluster in $clusters) {
 
 Write-Header "Configuring kube-vip on K3s cluster"
-kubectx $cluster.context
+$Env:KUBECONFIG=$cluster.kubeConfig
+kubectx
 kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
 $nicName = $cluster.clusterName + "-NIC"
@@ -229,7 +230,8 @@ Write-Host "`n"
 
 # "Create OSM Kubernetes extension instance"
 Write-Header "Creating OSM K8s Extension Instance"
-kubectx $clusters[0].context
+$Env:KUBECONFIG=$cluster[0].kubeConfig
+kubectx
 az k8s-extension create `
     --name $osmMeshName `
     --extension-type Microsoft.openservicemesh `
