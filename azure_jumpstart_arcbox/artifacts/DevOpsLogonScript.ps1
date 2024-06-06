@@ -110,7 +110,7 @@ kubectx $cluster.context
 kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
 $nicName = $cluster.clusterName + "-NIC"
-$k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $cluster.clusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
+$k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
 
 $kubeVipDaemonset = @"
 apiVersion: apps/v1
