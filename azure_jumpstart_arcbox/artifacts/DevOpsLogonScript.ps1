@@ -68,7 +68,6 @@ $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceTyp
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-kubectx
 
 # Downloading ArcBox-K3s log file
 Write-Header "Downloading ArcBox-K3s Install Logs"
@@ -108,11 +107,58 @@ foreach ($cluster in $clusters) {
 Write-Header "Configuring kube-vip on K3s cluster"
 $Env:KUBECONFIG=$cluster.kubeConfig
 kubectx
-kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
+# kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
 $nicName = $cluster.clusterName + "-NIC"
 $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
 
+# Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
+$kubeVipRBAC = @"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-vip
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:kube-vip-role
+rules:
+  - apiGroups: [""]
+    resources: ["services/status"]
+    verbs: ["update"]
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    verbs: ["list","get","watch", "update"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list","get","watch", "update", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["list", "get", "watch", "update", "create"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["list","get","watch", "update"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:kube-vip-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:kube-vip-role
+subjects:
+- kind: ServiceAccount
+  name: kube-vip
+  namespace: kube-system
+"@
+$kubeVipRBAC | kubectl apply -f -
+
+# Apply kube-vip DaemonSet
 $kubeVipDaemonset = @"
 apiVersion: apps/v1
 kind: DaemonSet
@@ -203,12 +249,12 @@ status:
   numberMisscheduled: 0
   numberReady: 0
 "@
-
 $kubeVipDaemonset | kubectl apply -f -
 
 # Kube vip cloud controller
 kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
+# Set kube-vip range-global for kubernetes services
 $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``false``].privateIPAddress" -otsv
 $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
 $lowestServiceIp = $sortedIps[0]
