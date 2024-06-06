@@ -230,7 +230,7 @@ Write-Host "`n"
 
 # "Create OSM Kubernetes extension instance"
 Write-Header "Creating OSM K8s Extension Instance"
-$Env:KUBECONFIG=$cluster[0].kubeConfig
+$Env:KUBECONFIG=$clusters[0].kubeConfig
 kubectx
 az k8s-extension create `
     --name $osmMeshName `
