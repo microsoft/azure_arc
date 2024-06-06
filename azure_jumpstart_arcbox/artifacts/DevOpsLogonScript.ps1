@@ -109,6 +109,7 @@ Write-Header "Configuring kube-vip on K3s cluster"
 kubectx $cluster.context
 kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
+$nicName = $cluster.clusterName + "-NIC"
 $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $cluster.clusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
 
 $kubeVipDaemonset = @"
@@ -207,7 +208,6 @@ $kubeVipDaemonset | kubectl apply -f -
 # Kube vip cloud controller
 kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-$nicName = $cluster.clusterName + "-NIC"
 $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``false``].privateIPAddress" -otsv
 $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
 $lowestServiceIp = $sortedIps[0]
