@@ -16,9 +16,9 @@ $certdns = "arcbox.devops.com"
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = $Env:k3sArcDataClusterName.ToLower() ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = "arcbox-datasvc-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
 
-    [pscustomobject]@{clusterName = $Env:k3sArcClusterName; context = $Env:k3sArcClusterName.ToLower() ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s" }
+    [pscustomobject]@{clusterName = $Env:k3sArcClusterName; context = "arcbox-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
@@ -207,7 +207,8 @@ $kubeVipDaemonset | kubectl apply -f -
 # Kube vip cloud controller
 kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-$serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $cluster.clusterName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+$nicName = $cluster.clusterName + "-NIC"
+$serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``false``].privateIPAddress" -otsv
 $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
 $lowestServiceIp = $sortedIps[0]
 $highestServiceIp = $sortedIps[-1]
@@ -228,6 +229,7 @@ Write-Host "`n"
 
 # "Create OSM Kubernetes extension instance"
 Write-Header "Creating OSM K8s Extension Instance"
+kubectx $clusters[0].context
 az k8s-extension create `
     --name $osmMeshName `
     --extension-type Microsoft.openservicemesh `
