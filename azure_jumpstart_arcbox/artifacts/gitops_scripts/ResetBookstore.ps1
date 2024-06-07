@@ -19,13 +19,9 @@ kind: Ingress
 metadata:
   name: ingress-reset-bookbuyer
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /reset
 spec:
-  tls:
-  - hosts:
-    - "$certdns"
-    secretName: ingress-tls-csi
+  ingressClassName: nginx
   rules:
   - host: "$certdns"
     http:
@@ -49,13 +45,9 @@ kind: Ingress
 metadata:
   name: ingress-reset-bookstore
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /reset
 spec:
-  tls:
-  - hosts:
-    - "$certdns"
-    secretName: ingress-tls-csi
+  ingressClassName: nginx
   rules:
   - host: "$certdns"
     http:
@@ -78,13 +70,9 @@ kind: Ingress
 metadata:
   name: ingress-reset-bookstore-v2
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /reset
 spec:
-  tls:
-  - hosts:
-    - "$certdns"
-    secretName: ingress-tls-csi
+  ingressClassName: nginx
   rules:
   - host: "$certdns"
     http:
@@ -104,6 +92,6 @@ $ingressBookstorev2 | kubectl apply -n bookstore -f -
 # - Invoke Reset API
 ####################
 
-Invoke-WebRequest -Uri "https://$certdns/bookbuyer/reset" -UseBasicParsing
-Invoke-WebRequest -Uri "https://$certdns/bookstore/reset" -UseBasicParsing
-Invoke-WebRequest -Uri "https://$certdns/bookstore-v2/reset" -UseBasicParsing
+Invoke-WebRequest -Uri "http://$certdns/bookbuyer/reset" -UseBasicParsing
+Invoke-WebRequest -Uri "http://$certdns/bookstore/reset" -UseBasicParsing
+Invoke-WebRequest -Uri "http://$certdns/bookstore-v2/reset" -UseBasicParsing

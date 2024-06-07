@@ -9,7 +9,7 @@ $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 $k3sNamespace = "hello-arc"
 $ingressNamespace = "ingress-nginx"
 
-$certname = "k3s-ingress-cert"
+# $certname = "k3s-ingress-cert"
 $certdns = "arcbox.k3sdevops.com"
 
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
@@ -57,113 +57,109 @@ az k8s-configuration flux create `
     --branch main --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
-################################################
-# - Install Key Vault Extension / Create Ingress
-################################################
+# ################################################
+# # - Install Key Vault Extension / Create Ingress
+# ################################################
 
-Write-Host "Generating a TLS Certificate"
-$cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-$certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
-Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+# Write-Host "Generating a TLS Certificate"
+# $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
+# $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
+# Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
+# Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
-Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import `
-  --vault-name $Env:keyVaultName `
-  --password "arcbox" `
-  --name $certname `
-  --file "$Env:TempDir\$certname.pfx"
+# Write-Host "Importing the TLS certificate to Key Vault"
+# az keyvault certificate import `
+#   --vault-name $Env:keyVaultName `
+#   --password "arcbox" `
+#   --name $certname `
+#   --file "$Env:TempDir\$certname.pfx"
  
-Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-az k8s-extension create `
-  --name 'akvsecretsprovider' `
-  --extension-type Microsoft.AzureKeyVaultSecretsProvider `
-  --scope cluster `
-  --cluster-name $Env:k3sArcClusterName `
-  --resource-group $Env:resourceGroup `
-  --cluster-type connectedClusters `
-  --release-namespace kube-system `
-  --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+# Write-Host "Installing Azure Key Vault Kubernetes extension instance"
+# az k8s-extension create `
+#   --name 'akvsecretsprovider' `
+#   --extension-type Microsoft.AzureKeyVaultSecretsProvider `
+#   --scope cluster `
+#   --cluster-name $Env:k3sArcClusterName `
+#   --resource-group $Env:resourceGroup `
+#   --cluster-type connectedClusters `
+#   --release-namespace kube-system `
+#   --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
-# Create the Kubernetes secret with the service principal credentials
-kubectl create secret generic secrets-store-creds --namespace $k3sNamespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
-kubectl --namespace $k3sNamespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
+# # Create the Kubernetes secret with the service principal credentials
+# kubectl create secret generic secrets-store-creds --namespace $k3sNamespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
+# kubectl --namespace $k3sNamespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
 
-# Deploy SecretProviderClass
-$secretProvider = @"
-apiVersion: secrets-store.csi.x-k8s.io/v1
-kind: SecretProviderClass
-metadata:
-  name: azure-kv-sync-tls
-spec:
-  provider: azure
-  secretObjects:                       # secretObjects defines the desired state of synced K8s secret objects                                
-  - secretName: ingress-tls-csi
-    type: kubernetes.io/tls
-    data: 
-    - objectName: "$certname"
-      key: tls.key
-    - objectName: "$certname"
-      key: tls.crt
-  parameters:
-    usePodIdentity: "false"
-    keyvaultName: $Env:keyVaultName                        
-    objects: |
-      array:
-        - |
-          objectName: "$certname"
-          objectType: secret
-    tenantId: "$Env:spnTenantId"
-"@
+# # Deploy SecretProviderClass
+# $secretProvider = @"
+# apiVersion: secrets-store.csi.x-k8s.io/v1
+# kind: SecretProviderClass
+# metadata:
+#   name: azure-kv-sync-tls
+# spec:
+#   provider: azure
+#   secretObjects:                       # secretObjects defines the desired state of synced K8s secret objects                                
+#   - secretName: ingress-tls-csi
+#     type: kubernetes.io/tls
+#     data: 
+#     - objectName: "$certname"
+#       key: tls.key
+#     - objectName: "$certname"
+#       key: tls.crt
+#   parameters:
+#     usePodIdentity: "false"
+#     keyvaultName: $Env:keyVaultName                        
+#     objects: |
+#       array:
+#         - |
+#           objectName: "$certname"
+#           objectType: secret
+#     tenantId: "$Env:spnTenantId"
+# "@
 
-Write-Host "Creating Secret Provider Class"
-$secretProvider | kubectl apply -n $k3sNamespace -f -
+# Write-Host "Creating Secret Provider Class"
+# $secretProvider | kubectl apply -n $k3sNamespace -f -
 
-# Create the pod with volume referencing the secrets-store.csi.k8s.io driver
-$appConsumer = @"
-apiVersion: v1
-kind: Pod
-metadata:
-  name: busybox-secrets-sync
-spec:
-  containers:
-  - name: busybox
-    image: k8s.gcr.io/e2e-test-images/busybox:1.29
-    command:
-      - "/bin/sleep"
-      - "10000"
-    volumeMounts:
-    - name: secrets-store-inline
-      mountPath: "/mnt/secrets-store"
-      readOnly: true
-  volumes:
-    - name: secrets-store-inline
-      csi:
-        driver: secrets-store.csi.k8s.io
-        readOnly: true
-        volumeAttributes:
-          secretProviderClass: "azure-kv-sync-tls"
-        nodePublishSecretRef:
-          name: secrets-store-creds  
-"@
+# # Create the pod with volume referencing the secrets-store.csi.k8s.io driver
+# $appConsumer = @"
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: busybox-secrets-sync
+# spec:
+#   containers:
+#   - name: busybox
+#     image: k8s.gcr.io/e2e-test-images/busybox:1.29
+#     command:
+#       - "/bin/sleep"
+#       - "10000"
+#     volumeMounts:
+#     - name: secrets-store-inline
+#       mountPath: "/mnt/secrets-store"
+#       readOnly: true
+#   volumes:
+#     - name: secrets-store-inline
+#       csi:
+#         driver: secrets-store.csi.k8s.io
+#         readOnly: true
+#         volumeAttributes:
+#           secretProviderClass: "azure-kv-sync-tls"
+#         nodePublishSecretRef:
+#           name: secrets-store-creds  
+# "@
 
-Write-Host "Deploying App referencing the secret"
-$appConsumer | kubectl apply -n $k3sNamespace -f -
+# Write-Host "Deploying App referencing the secret"
+# $appConsumer | kubectl apply -n $k3sNamespace -f -
 
 # Deploy an Ingress Resource referencing the Secret created by the CSI driver
 $ingressController = @"
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-tls
+  name: ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  tls:
-  - hosts:
-    - "$certdns"
-    secretName: ingress-tls-csi
+  ingressClassName: nginx
   rules:
   - host: "$certdns"
     http:
@@ -188,7 +184,7 @@ Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$ip`t$certd
 $shortcutLocation = "$Env:Public\Desktop\K3s Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://$certdns"
+$shortcut.TargetPath = "http://$certdns"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
