@@ -13,7 +13,7 @@ $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jsvhds.blob.core.windows.net/arcbox/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
