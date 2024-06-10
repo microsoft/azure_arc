@@ -107,7 +107,6 @@ foreach ($cluster in $clusters) {
 Write-Header "Configuring kube-vip on K3s cluster"
 $Env:KUBECONFIG=$cluster.kubeConfig
 kubectx
-# kubectl apply -f https://kube-vip.io/manifests/rbac.yaml
 
 $nicName = $cluster.clusterName + "-NIC"
 $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
