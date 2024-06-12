@@ -454,7 +454,7 @@ New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallFo
 Write-Header "Creating Desktop Icons"
 
 # Creating K3s Hello Arc Icon on Desktop
-$shortcutLocation = "$Env:Public\Desktop\K3s Hello-Arc.lnk"
+$shortcutLocation = "$Env:Public\Desktop\Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "http://$certdns"
@@ -463,7 +463,7 @@ $shortcut.WindowStyle = 3
 $shortcut.Save()
 
 # Creating K3s Bookstore Icon on Desktop
-$shortcutLocation = "$Env:Public\Desktop\K3s Bookstore.lnk"
+$shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "pwsh.exe"
