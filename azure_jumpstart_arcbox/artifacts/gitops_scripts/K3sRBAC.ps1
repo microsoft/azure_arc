@@ -1,5 +1,5 @@
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "K3s" | Where-Object { $_ -ne "" }
+$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "ArcBox-K3s" | Where-Object { $_ -ne "" }
 $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
 $k3sNamespace = "hello-arc"
@@ -24,7 +24,7 @@ kubectx
 #############################
 
 # Create GitOps config for Hello-Arc RBAC
-echo "Creating GitOps config for Hello-Arc RBAC"
+Write-Host "Creating GitOps config for Hello-Arc RBAC"
 az k8s-configuration flux create `
     --cluster-name $Env:k3sArcClusterName `
     --resource-group $Env:resourceGroup `
