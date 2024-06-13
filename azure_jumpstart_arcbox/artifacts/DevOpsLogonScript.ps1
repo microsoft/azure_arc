@@ -111,146 +111,146 @@ foreach ($cluster in $clusters) {
   $nicName = $cluster.clusterName + "-NIC"
   $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
 
-  # Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
-  $kubeVipRBAC = @"
-  apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    name: kube-vip
-    namespace: kube-system
-  ---
-  apiVersion: rbac.authorization.k8s.io/v1
+# Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
+$kubeVipRBAC = @"
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-vip
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:kube-vip-role
+rules:
+  - apiGroups: [""]
+    resources: ["services/status"]
+    verbs: ["update"]
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    verbs: ["list","get","watch", "update"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list","get","watch", "update", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["list", "get", "watch", "update", "create"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["list","get","watch", "update"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: system:kube-vip-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  metadata:
-    annotations:
-      rbac.authorization.kubernetes.io/autoupdate: "true"
-    name: system:kube-vip-role
-  rules:
-    - apiGroups: [""]
-      resources: ["services/status"]
-      verbs: ["update"]
-    - apiGroups: [""]
-      resources: ["services", "endpoints"]
-      verbs: ["list","get","watch", "update"]
-    - apiGroups: [""]
-      resources: ["nodes"]
-      verbs: ["list","get","watch", "update", "patch"]
-    - apiGroups: ["coordination.k8s.io"]
-      resources: ["leases"]
-      verbs: ["list", "get", "watch", "update", "create"]
-    - apiGroups: ["discovery.k8s.io"]
-      resources: ["endpointslices"]
-      verbs: ["list","get","watch", "update"]
-  ---
-  kind: ClusterRoleBinding
-  apiVersion: rbac.authorization.k8s.io/v1
-  metadata:
-    name: system:kube-vip-binding
-  roleRef:
-    apiGroup: rbac.authorization.k8s.io
-    kind: ClusterRole
-    name: system:kube-vip-role
-  subjects:
-  - kind: ServiceAccount
-    name: kube-vip
-    namespace: kube-system
+  name: system:kube-vip-role
+subjects:
+- kind: ServiceAccount
+  name: kube-vip
+  namespace: kube-system
 "@
 
-  $kubeVipRBAC | kubectl apply -f -
+$kubeVipRBAC | kubectl apply -f -
 
-  # Apply kube-vip DaemonSet
-  $kubeVipDaemonset = @"
-  apiVersion: apps/v1
-  kind: DaemonSet
-  metadata:
-    creationTimestamp: null
-    labels:
+# Apply kube-vip DaemonSet
+$kubeVipDaemonset = @"
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: kube-vip-ds
+    app.kubernetes.io/version: v0.7.0
+  name: kube-vip-ds
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
       app.kubernetes.io/name: kube-vip-ds
-      app.kubernetes.io/version: v0.7.0
-    name: kube-vip-ds
-    namespace: kube-system
-  spec:
-    selector:
-      matchLabels:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
         app.kubernetes.io/name: kube-vip-ds
-    template:
-      metadata:
-        creationTimestamp: null
-        labels:
-          app.kubernetes.io/name: kube-vip-ds
-          app.kubernetes.io/version: v0.7.0
-      spec:
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node-role.kubernetes.io/master
-                  operator: Exists
-              - matchExpressions:
-                - key: node-role.kubernetes.io/control-plane
-                  operator: Exists
-        containers:
-        - args:
-          - manager
-          env:
-          - name: vip_arp
-            value: "true"
-          - name: port
-            value: "6443"
-          - name: vip_interface
-            value: eth0
-          - name: vip_cidr
-            value: "32"
-          - name: dns_mode
-            value: first
-          - name: cp_enable
-            value: "true"
-          - name: cp_namespace
-            value: kube-system
-          - name: svc_enable
-            value: "true"
-          - name: svc_leasename
-            value: plndr-svcs-lock
-          - name: vip_leaderelection
-            value: "true"
-          - name: vip_leasename
-            value: plndr-cp-lock
-          - name: vip_leaseduration
-            value: "5"
-          - name: vip_renewdeadline
-            value: "3"
-          - name: vip_retryperiod
-            value: "1"
-          - name: address
-            value: "$k3sVIP"
-          - name: prometheus_server
-            value: :2112
-          image: ghcr.io/kube-vip/kube-vip:v0.7.0
-          imagePullPolicy: Always
-          name: kube-vip
-          resources: {}
-          securityContext:
-            capabilities:
-              add:
-              - NET_ADMIN
-              - NET_RAW
-        hostNetwork: true
-        serviceAccountName: kube-vip
-        tolerations:
-        - effect: NoSchedule
-          operator: Exists
-        - effect: NoExecute
-          operator: Exists
-    updateStrategy: {}
-  status:
-    currentNumberScheduled: 0
-    desiredNumberScheduled: 0
-    numberMisscheduled: 0
-    numberReady: 0
+        app.kubernetes.io/version: v0.7.0
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: Exists
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - args:
+        - manager
+        env:
+        - name: vip_arp
+          value: "true"
+        - name: port
+          value: "6443"
+        - name: vip_interface
+          value: eth0
+        - name: vip_cidr
+          value: "32"
+        - name: dns_mode
+          value: first
+        - name: cp_enable
+          value: "true"
+        - name: cp_namespace
+          value: kube-system
+        - name: svc_enable
+          value: "true"
+        - name: svc_leasename
+          value: plndr-svcs-lock
+        - name: vip_leaderelection
+          value: "true"
+        - name: vip_leasename
+          value: plndr-cp-lock
+        - name: vip_leaseduration
+          value: "5"
+        - name: vip_renewdeadline
+          value: "3"
+        - name: vip_retryperiod
+          value: "1"
+        - name: address
+          value: "$k3sVIP"
+        - name: prometheus_server
+          value: :2112
+        image: ghcr.io/kube-vip/kube-vip:v0.7.0
+        imagePullPolicy: Always
+        name: kube-vip
+        resources: {}
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
+      hostNetwork: true
+      serviceAccountName: kube-vip
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+  updateStrategy: {}
+status:
+  currentNumberScheduled: 0
+  desiredNumberScheduled: 0
+  numberMisscheduled: 0
+  numberReady: 0
 "@
 
-  $kubeVipDaemonset | kubectl apply -f -
+$kubeVipDaemonset | kubectl apply -f -
 
   # Kube vip cloud controller
   kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
@@ -373,6 +373,35 @@ az k8s-configuration flux create `
     --branch main --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
+$configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcDataClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)
+
+foreach ($configName in $configs) {
+    Write-Host "Checking GitOps configuration $configName on $Env:k3sArcDataClusterName"
+    $retryCount = 0
+    $maxRetries = 5
+    do {
+      $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $Env:k3sArcDataClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup -o json 2>$null) | convertFrom-JSON
+      if ($configStatus.ComplianceState -eq "Compliant") {
+          Write-Host "GitOps configuration $configName is ready on $Env:k3sArcDataClusterName"
+      }
+      else {
+          if ($configStatus.ComplianceState -ne "Non-compliant") {
+              Start-Sleep -Seconds 60
+          }
+          elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+              Start-Sleep -Seconds 60
+              $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $Env:k3sArcDataClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup -o json 2>$null) | convertFrom-JSON
+              if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                  $retryCount++
+              }
+          }
+          elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
+              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcDataClusterName. Exiting..."
+              break
+          }
+      }
+    } until ($configStatus.ComplianceState -eq "Compliant")
+}
 # ################################################
 # # - Install Key Vault Extension / Create Ingress
 # ################################################
