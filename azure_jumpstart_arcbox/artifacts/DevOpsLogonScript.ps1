@@ -102,10 +102,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-# foreach ($cluster in $clusters) {
-
-$clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
-  $cluster = $_
+foreach ($cluster in $clusters) {
     
   Write-Header "Configuring kube-vip on K3s cluster"
   $Env:KUBECONFIG=$cluster.kubeConfig
@@ -158,6 +155,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     name: kube-vip
     namespace: kube-system
 "@
+
   $kubeVipRBAC | kubectl apply -f -
 
   # Apply kube-vip DaemonSet
@@ -251,6 +249,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     numberMisscheduled: 0
     numberReady: 0
 "@
+
   $kubeVipDaemonset | kubectl apply -f -
 
   # Kube vip cloud controller
