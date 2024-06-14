@@ -624,7 +624,7 @@ function Set-NICs {
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
             # Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
-            # Enable CredSSP and MTU Settings
+            # Enable CredSSP Settings
             Invoke-Command -ComputerName localhost -Credential $using:Credential -ScriptBlock {
                 $fqdn = $Using:HCIBoxConfig.SDNDomainFQDN
 
@@ -721,11 +721,6 @@ function Set-FabricNetwork {
         Start-Sleep -Seconds 15
         New-NetIPAddress -IPAddress $internetIP -PrefixLength 24 -InterfaceIndex $internetIndex -DefaultGateway $internetGW -AddressFamily IPv4 | Out-Null
         Set-DnsClientServerAddress -InterfaceIndex $internetIndex -ServerAddresses ($HCIBoxConfig.natDNS) | Out-Null
-
-        # Enable Large MTU
-        Write-Host "Configuring MTU on all Adapters"
-        Get-NetAdapter | Where-Object { $_.Status -eq "Up" -and $_.Name -ne "Ethernet" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
-        Start-Sleep -Seconds 15
 
         # Provision Public and Private VIP Route
         New-NetRoute -DestinationPrefix $HCIBoxConfig.PublicVIPSubnet -NextHop $provGW -InterfaceAlias PROVIDER | Out-Null
@@ -1112,10 +1107,7 @@ function New-RouterVM {
             #     Add-BgpPeer @params -PassThru
             # }
 
-            # Enable Large MTU
-            Write-Host "Configuring MTU on all Adapters"
-            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
-        }
+       }
     }
 }
 
@@ -1196,8 +1188,6 @@ function New-AdminCenterVM {
 
             Write-Host "Rename Network Adapter in $VMName"
             Get-NetAdapter | Rename-NetAdapter -NewName Fabric
-            Write-Host "Configuring MTU on all Adapters"
-            Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $HCIBoxConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"
 
             # Set Gateway
             $index = (Get-WmiObject Win32_NetworkAdapter | Where-Object { $_.netconnectionid -eq "Fabric" }).InterfaceIndex
