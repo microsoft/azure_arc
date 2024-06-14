@@ -1,5 +1,5 @@
 @description('The name of you Virtual Machine')
-param vmName string = 'ArcBox-K3s'
+param vmName string = 'ArcBox-K3s-Node'
 
 @description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
@@ -16,9 +16,6 @@ param ubuntuOSVersion string = '22_04-lts-gen2'
 
 @description('Location for all resources.')
 param azureLocation string = resourceGroup().location
-
-@description('The size of the VM')
-param vmSize string = 'Standard_B4ms'
 
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
@@ -46,12 +43,6 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
-@description('Choice to deploy Bastion to connect to the client VM')
-param deployBastion bool = false
-
-@description('Storage account container name for artifacts')
-param storageContainerName string
-
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
   'Full'
@@ -61,45 +52,29 @@ param storageContainerName string
 ])
 param flavor string
 
-var publicIpAddressName = '${vmName}-PIP'
+@description('Storage account container name for artifacts')
+param storageContainerName string
+
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var k3sControlPlane = 'true' // deploy single-node k3s control plane
+var vmSize = (flavor == 'DevOps') ? 'Standard_B2ms' : 'Standard_B8ms'
 var diskSize = (flavor == 'DataOps') ? 512 : 64
-var numberOfIPAddresses = (flavor == 'DataOps') ? 7 : 5 // The number of IP addresses to create
 
-// Create multiple public IP addresses if deployBastion is false
-resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
-  name: '${publicIpAddressName}${i}'
-  location: azureLocation
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    publicIPAddressVersion: 'IPv4'
-    idleTimeoutInMinutes: 4
-  }
-  sku: {
-    name: 'Basic'
-  }
-}]
-
-// Create multiple NIC IP configurations and assign the public IP to the IP configuration if deployBastion is false
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
-    ipConfigurations: [for i in range(1, numberOfIPAddresses): {
-      name: 'ipconfig${i}'
-      properties: {
-        subnet: {
-          id: subnetId
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnetId
+          }
+          privateIPAllocationMethod: 'Dynamic'
         }
-        privateIPAllocationMethod: 'Dynamic'
-        publicIPAddress: {
-          id: publicIpAddresses[i-1].id
-        }
-        primary: i == 1 ? true : false
       }
-    }]
+    ]
   }
 }
 
@@ -177,7 +152,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName}'
       fileUris: [
         '${templateBaseUrl}artifacts/installK3s.sh'
       ]

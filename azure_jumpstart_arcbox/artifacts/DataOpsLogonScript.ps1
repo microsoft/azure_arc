@@ -31,7 +31,7 @@ Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscrip
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --identity --tenant $spnTenantId
+az login --identity
 az account set -s $env:subscriptionId
 
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
