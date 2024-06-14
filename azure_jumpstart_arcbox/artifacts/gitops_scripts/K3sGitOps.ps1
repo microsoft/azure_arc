@@ -58,6 +58,36 @@ az k8s-configuration flux create `
     --branch main --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
+$configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)
+
+foreach ($configName in $configs) {
+    Write-Host "Checking GitOps configuration $configName on $Env:k3sArcClusterName"
+    $retryCount = 0
+    $maxRetries = 5
+    do {
+      $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $Env:k3sArcClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup -o json 2>$null) | convertFrom-JSON
+      if ($configStatus.ComplianceState -eq "Compliant") {
+          Write-Host "GitOps configuration $configName is ready on $Env:k3sArcClusterName"
+      }
+      else {
+          if ($configStatus.ComplianceState -ne "Non-compliant") {
+              Start-Sleep -Seconds 60
+          }
+          elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+              Start-Sleep -Seconds 60
+              $configStatus = $(az k8s-configuration flux show --name $configName --cluster-name $Env:k3sArcClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup -o json 2>$null) | convertFrom-JSON
+              if ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -lt $maxRetries) {
+                  $retryCount++
+              }
+          }
+          elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
+              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcClusterName. Exiting..."
+              break
+          }
+      }
+    } until ($configStatus.ComplianceState -eq "Compliant")
+}
+
 # ################################################
 # # - Install Key Vault Extension / Create Ingress
 # ################################################
