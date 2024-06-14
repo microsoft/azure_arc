@@ -40,7 +40,7 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('Target GitHub account')
-param githubAccount string = 'zaidmohd'
+param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
 param githubBranch string = 'arcbox_3.0'
@@ -49,7 +49,7 @@ param githubBranch string = 'arcbox_3.0'
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'zaidmohd'
+param githubUser string = 'microsoft'
 
 @description('Active directory domain services domain name')
 param addsDomainName string = 'jumpstart.local'
