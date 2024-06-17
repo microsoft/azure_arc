@@ -218,7 +218,7 @@ foreach ($cluster in $clusters) {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.29.0 `
+            --version 1.30.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
         Write-Host "`n"

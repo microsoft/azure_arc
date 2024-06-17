@@ -123,7 +123,7 @@ az k8s-extension create --name arc-data-services `
                         --resource-group $env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
-                        --version 1.29.0 `
+                        --version 1.30.0 `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 

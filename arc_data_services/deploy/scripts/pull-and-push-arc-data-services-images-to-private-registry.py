@@ -54,9 +54,9 @@ else:
 if os.getenv("SOURCE_DOCKER_TAG") is None:
     SOURCE_DOCKER_TAG = (
         input(
-            "Provide container image tag for the images at the source - press ENTER for using 'v1.29.0_2024-04-09': "
+            "Provide container image tag for the images at the source - press ENTER for using 'v1.30.0_2024-06-11': "
         )
-        or "v1.29.0_2024-04-09"
+        or "v1.30.0_2024-06-11"
     )
 else:
     SOURCE_DOCKER_TAG = os.environ["SOURCE_DOCKER_TAG"]
@@ -102,14 +102,12 @@ images = [
     "arc-dns",
     "arc-ha-orchestrator",
     "arc-ha-supervisor",
-    "arc-kafka",
     "arc-monitor-collectd",
     "arc-monitor-opensearch",
     "arc-monitor-opensearch-dashboards",
     "arc-monitor-fluentbit",
     "arc-monitor-grafana",
     "arc-monitor-influxdb",
-    "arc-monitor-opentelemetry-collector",
     "arc-monitor-telegraf",
     "arc-postgres-14",
     "arc-postgresql-agent",
