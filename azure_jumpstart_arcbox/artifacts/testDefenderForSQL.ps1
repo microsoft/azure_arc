@@ -1,22 +1,10 @@
 # Execute sql commands to generate defender for cloud alerts
+param (
+    [string]$workingDir = "C:\ArcBox"
+)
 Write-Host "Executing Defender for SQL threat simulation script."
-$attempts = 0
-
-while ($attempts -le 5)
-{
-    $moduleFile = (Get-ChildItem -Path "$Env:ProgramFiles\Microsoft Monitoring Agent\Agent\Health Service State\Resources\" -File SqlAdvancedThreatProtectionShell.psm1 -Recurse -ErrorAction SilentlyContinue).FullName
-    $attempts = $attempts + 1
-    if ($true -eq [System.IO.File]::Exists($moduleFile))
-    {
-        Write-Host "Found module file $moduleFile installed."
-        break
-    }
-    else 
-    {
-        Write-Host "Module file $moduleFile not installed. Waiting for the module to be installed. Attempt: $attempts"
-        Start-Sleep(60) # Wait for agent to isntall all modules
-    }
-}
+Write-Host "Current working directory: $pwd"
+$moduleFile = $workingDir + "\SqlAdvancedThreatProtectionShell.psm1"
 
 if ($true -ne [System.IO.File]::Exists($moduleFile))
 {
