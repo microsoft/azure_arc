@@ -221,7 +221,9 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 5)
 
     # Create SQL server extension as policy to auto deployment is disabled
+    Write-Host "Installing SQL Server extension on the Arc-enabled Server."
     az connectedmachine extension create --machine-name $SQLvmName --name "WindowsAgent.SqlServer" --resource-group $resourceGroup --type "WindowsAgent.SqlServer" --publisher "Microsoft.AzureData" --settings '{\"LicenseType\":\"Paid\", \"SqlManagement\": {\"IsEnabled\":true}}'
+    Write-Host "SQL Server extension installation on the Arc-enabled Server successful."
 
     $retryCount = 0
     do {
