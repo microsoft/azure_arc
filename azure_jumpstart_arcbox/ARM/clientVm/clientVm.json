@@ -358,6 +358,21 @@
             "metadata": {
                 "description": "Assigns Client VM managed identity Owner Role at resource group level"
             }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[guid(variables('vmName'), 'Microsoft.Authorization/roleAssignments', 'Contributor')]",
+            "scope": "subscription().id",
+            "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2019-07-01', 'Full').identity.principalId]"            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+            ],
+            "metadata": {
+                "description": "Assigns Client VM managed identity Contributor Role at subscription level"
+            }
         }
     ],
     "outputs": {
