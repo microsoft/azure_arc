@@ -138,15 +138,8 @@ if ($Env:flavor -ne "DevOps") {
     Write-Header "Az PowerShell Login"
     Connect-AzAccount -Identity -Tenant $spnTenantId -Subscription $subscriptionId
 
-    # Register Azure providers
-    Write-Header "Registering Providers"
-    @("Microsoft.HybridCompute","Microsoft.HybridConnectivity","Microsoft.GuestConfiguration","Microsoft.AzureArcData") | ForEach-Object -Parallel {
-        az provider register --namespace $PSItem --wait --only-show-errors
-    }
-
     # Enable defender for cloud for SQL Server
     # Get workspace information
-    $workspaceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "customerId" -o tsv)
     $workspaceResourceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "id" -o tsv)
 
     # Verify existing plan and update accordingly
