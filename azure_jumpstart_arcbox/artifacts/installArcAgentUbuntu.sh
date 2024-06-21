@@ -14,7 +14,7 @@ bash ~/install_linux_azcmagent.sh # 2>/dev/null
 ArcServerResourceName=$(hostname |sed -e "s/\b\(.\)/\u\1/g")
 
 # Run connect command
-azcmagent connect --service-principal-id $spnClientId --service-principal-secret $spnClientSecret --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "${ArcServerResourceName}" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+azcmagent connect --access-token $accessToken --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "${ArcServerResourceName}" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Configure the agent to allow connections on port 22
 azcmagent config set incomingconnections.ports 22
