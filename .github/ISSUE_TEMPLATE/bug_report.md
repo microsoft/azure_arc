@@ -31,7 +31,6 @@ assignees: ''
 
 **Have you looked at the Troubleshooting and Logs section?**
 <!---Relevant logs retrieval instructions can be found in the Troubleshooting section.
-- [Jumpstart ArcBox "Full" troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/Full#basic-troubleshooting)
 - [Jumpstart ArcBox for IT Pros troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/ITPro#basic-troubleshooting)
 - [Jumpstart ArcBox for DevOps troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/DevOps#basic-troubleshooting)
 - [Jumpstart ArcBox for DataOps troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/DataOps#basic-troubleshooting)

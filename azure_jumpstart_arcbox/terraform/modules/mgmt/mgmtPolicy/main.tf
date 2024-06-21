@@ -25,21 +25,21 @@ locals {
           id     = "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0"
           params = { "logAnalyticsWorkspace": { "value": "${var.workspace_id}" }}
           role   = [ "Log Analytics Contributor", "Azure Connected Machine Resource Administrator", "Monitoring Contributor" ]
-          flavor = [ "Full", "ITPro" ]
+          flavor = ["ITPro" ]
       },
       {
           name   = "(ArcBox) Tag resources"
           id     = "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26"
           params = { "tagName": { "value": "project" }, "tagValue": { "value": "jumpstart_arcbox" }}
           role   = "Tag Contributor"
-          flavor = [ "Full", "DevOps", "ITPro" , "DataOps" ]
+          flavor = [ "DevOps", "ITPro" , "DataOps" ]
       },
       {
           name   = "(ArcBox) Enable Azure Defender on Kubernetes clusters"
           id     = "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c"
           params = {}
           role   = "Log Analytics Contributor"
-          flavor = [ "Full", "DevOps" ]
+          flavor = [ "DevOps" ]
       }
   ]
 }

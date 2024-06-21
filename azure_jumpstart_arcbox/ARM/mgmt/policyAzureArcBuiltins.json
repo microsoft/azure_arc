@@ -27,7 +27,6 @@
                 "name": "(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA",
                 "definitionId": "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0",
                 "flavors": [
-                    "Full",
                     "ITPro",
                     "DataOps"
                 ],
@@ -49,7 +48,6 @@
                 "name": "(ArcBox) Tag resources",
                 "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
                 "flavors": [
-                    "Full",
                     "ITPro",
                     "DevOps",
                     "DataOps"
@@ -68,7 +66,6 @@
                 "name": "(ArcBox) Enable Microsoft Defender on Kubernetes clusters",
                 "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
                 "flavors": [
-                    "Full",
                     "DevOps"
                 ],
                 "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",

@@ -131,10 +131,10 @@ variable "addsDomainName" {
 variable "deployment_flavor" {
   type        = string
   description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'DevOps'."
-  default     = "Full"
+  default     = "ITPro"
 
   validation {
-    condition     = contains(["Full", "ITPro", "DevOps", "DataOps"], var.deployment_flavor)
+    condition     = contains(["ITPro", "DevOps", "DataOps"], var.deployment_flavor)
     error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
   }
 }
@@ -242,7 +242,7 @@ module "adds_vm" {
 
 module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
-  count  = contains(["Full", "DevOps", "DataOps"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["DevOps", "DataOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name        = azurerm_resource_group.rg.name
   vm_name                    = var.capi_vm_name
@@ -271,7 +271,7 @@ module "capi_vm" {
 
 module "rancher_vm" {
   source = "./modules/kubernetes/ubuntuRancher"
-  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = "${local.k3s_arc_data_cluster_name}-${random_string.guid.result}"

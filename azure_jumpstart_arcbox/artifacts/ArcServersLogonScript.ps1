@@ -339,16 +339,8 @@ if ($Env:flavor -ne "DevOps") {
         if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
-            if ($Env:flavor -eq "Full") {
-                # The "Full" ArcBox flavor has an azcopy network throughput capping
-                Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-                azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
-            }
-            else {
-                # Other ArcBox flavors does not have an azcopy network throughput capping
-                Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-                azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
-            }
+            Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
         }
 
         # Create the nested VMs if not already created
