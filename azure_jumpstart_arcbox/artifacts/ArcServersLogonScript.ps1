@@ -142,21 +142,6 @@ if ($Env:flavor -ne "DevOps") {
     # Get workspace information
     $workspaceResourceID = (az monitor log-analytics workspace show --resource-group $resourceGroup --workspace-name $Env:workspaceName --query "id" -o tsv)
 
-    # Verify existing plan and update accordingly
-    $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
-    if ($currentsqlplan.pricingTier -eq "Free") {
-        # Update to standard plan
-        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier). Updating to standard plan."
-        az security pricing create -n SqlServerVirtualMachines --tier 'standard' --subscription $subscriptionId --only-show-errors
-
-        # Set defender for cloud log analytics workspace
-        Write-Header "Updating Log Analytics workspacespace for defender for cloud for SQL Server"
-        az security workspace-setting create -n default --target-workspace $workspaceResourceID --only-show-errors
-    }
-    else {
-        Write-Header "Current Defender for SQL plan is $($currentsqlplan.pricingTier)"
-    }
-
     # Before deploying ArcBox SQL set resource group tag ArcSQLServerExtensionDeployment=Disabled to opt out of automatic SQL onboarding
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
