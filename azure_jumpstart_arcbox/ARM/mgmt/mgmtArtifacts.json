@@ -598,26 +598,6 @@
           }
         ]
       }
-    },
-    {
-      "type": "Microsoft.Security/pricings",
-      "apiVersion": "2024-01-01",
-      "name": "SqlServerVirtualMachines",
-      "properties": {
-        "pricingTier": "Standard"
-      }
-    },
-    {
-      "type": "Microsoft.Security/workspaceSettings",
-      "apiVersion": "2017-08-01-preview",
-      "name": "default",
-      "properties": {
-          "workspaceId": "[concat('/subscriptions/', subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-          "scope": "[subscription().id]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      ]
-    }    
+    }  
   ]
 }
