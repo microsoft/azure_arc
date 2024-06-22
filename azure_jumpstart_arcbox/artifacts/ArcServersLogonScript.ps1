@@ -388,14 +388,12 @@ if ($Env:flavor -ne "DevOps") {
         $Win2k19vmName,$Win2k22vmName | ForEach-Object -Parallel {
 
             $nestedVMArcBoxDir = $Using:nestedVMArcBoxDir
-            $spnClientId  =  $Using:spnClientId
-            $spnClientSecret  =  $Using:spnClientSecret
             $spnTenantId  =  $Using:spnTenantId
             $subscriptionId  =  $Using:subscriptionId
             $resourceGroup  =  $Using:resourceGroup
             $azureLocation  =  $Using:azureLocation
 
-            Invoke-Command -VMName $PSItem -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnClientId $Using:spnClientId, -spnClientSecret $Using:spnClientSecret, -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $using:winCreds
+            Invoke-Command -VMName $PSItem -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -spnTenantId $Using:spnTenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $using:winCreds
 
          }
 
