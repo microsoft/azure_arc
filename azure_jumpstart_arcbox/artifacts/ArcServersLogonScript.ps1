@@ -341,7 +341,7 @@ if ($Env:flavor -ne "DevOps") {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
         }
 
         # Create the nested VMs if not already created
