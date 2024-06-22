@@ -246,12 +246,12 @@ if ($Env:flavor -ne "DevOps") {
             Write-Host "Waiting for Azure Monitoring Agent extension installation to complete ... Retry count: $retryCount"
             Start-Sleep(60)
     
-            if ($retryCount -gt 5) {
+            if ($retryCount -gt 10) {
                 Write-Host "WARNING: Azure Monitor Agent extenstion is taking longger than expected. Enable SQL BPA later through Azure portal."
                 Exit
             }
         }
-    } while ($retryCount -le 5)
+    } while ($retryCount -le 10)
 
     # Enable Best practices assessment
     if ($amaExtension.StatusCode -eq 0) {
