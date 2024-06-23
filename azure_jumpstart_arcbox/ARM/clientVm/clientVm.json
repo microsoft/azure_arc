@@ -167,8 +167,8 @@
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             },
-            "allowedValues": [ "Full", "ITPro", "DevOps", "DataOps" ],
-            "defaultValue": "Full"
+            "allowedValues": [ "ITPro", "DevOps", "DataOps" ],
+            "defaultValue": "ITPro"
         },
         "deployBastion": {
             "type": "bool",
@@ -248,7 +248,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),null)]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ]
@@ -276,6 +276,9 @@
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -341,9 +344,22 @@
                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ' , parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -registryUsername ', parameters('registryUsername'), ' -registryPassword ', parameters('registryPassword'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -mssqlmiName ', parameters('mssqlmiName'), ' -POSTGRES_NAME ', parameters('postgresName'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('postgresWorkerNodeCount'), ' -POSTGRES_DATASIZE ', parameters('postgresDatasize'), ' -POSTGRES_SERVICE_TYPE ', parameters('postgresServiceType'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -capiArcDataClusterName ', parameters('capiArcDataClusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -flavor ', parameters('flavor'), ' -k3sArcClusterName ', parameters('k3sArcClusterName'), ' -aksArcClusterName ', parameters('aksArcClusterName') , ' -aksdrArcClusterName ', parameters('aksdrArcClusterName') , ' -githubUser ', parameters('githubUser'), ' -rdpPort ', parameters('rdpPort'), ' -sshPort ', parameters('sshPort'))]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2022-04-01",
+            "name": "[guid(variables('vmName'), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+            "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2019-07-01', 'Full').identity.principalId]"            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+            ],
+            "metadata": {
+                "description": "Assigns Client VM managed identity Owner Role at resource group level"
+            }
         }
     ],
-
     "outputs": {
         "adminUsername": {
             "type": "string",

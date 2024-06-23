@@ -83,7 +83,7 @@ locals {
   solutions = [
     {
       name   = "Security"
-      flavor = ["Full", "ITPro", "DevOps", "DataOps"]
+      flavor = ["ITPro", "DevOps", "DataOps"]
     }
   ]
 }
