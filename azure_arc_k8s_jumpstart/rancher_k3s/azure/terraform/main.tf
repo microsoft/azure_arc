@@ -8,6 +8,8 @@ locals {
   os_disk_name                = "${var.azure_vm_name}-OSDisk-${random_string.guid.result}"
 }
 
+data "azurerm_subscription" "current" {}
+
 resource "random_string" "guid" {
   length  = 4
   special = false
@@ -113,10 +115,20 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
     disk_size_gb         = var.azure_vm_os_disk_size_gb
   }
 
+  identity {
+    type = "SystemAssigned"
+  }
+
   tags = {
     Project = "jumpstart_azure_arc_k8s"
   }
 
+}
+
+resource "azurerm_role_assignment" "rbac" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_linux_virtual_machine.arck3sdemo.identity[0].principal_id
 }
 
 resource "azurerm_virtual_machine_extension" "custom_script" {
@@ -135,7 +147,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${local.template_base_url}scripts/installK3s.sh"
       ],
-  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.client_id} ${var.client_secret} ${var.tenant_id} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url}"    }
+  "commandToExecute": "bash installK3s.sh ${var.admin_username} ${local.vm_name} ${azurerm_resource_group.arck3sdemo.location} ${local.template_base_url} ${var.azure_resource_group} "    }
 PROTECTED_SETTINGS
 }
 
