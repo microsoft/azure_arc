@@ -17,7 +17,7 @@
         "flavor": {
             "type": "string",
             "metadata": {
-                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'ITPro', 'DevOps'"
             }
         }
     },
@@ -28,7 +28,7 @@
                 "definitionId": "/providers/Microsoft.Authorization/policySetDefinitions/59e9c3eb-d8df-473b-8059-23fd38ddd0f0",
                 "flavors": [
                     "ITPro",
-                    "DataOps"
+                    "DevOps"
                 ],
                 "roleDefinition": [
                     "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",

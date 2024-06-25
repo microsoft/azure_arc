@@ -5,7 +5,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$Env:k3sArcDataClusterName-dc" ; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s" }
 
     [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
@@ -90,42 +90,42 @@ get-WindowsFeature | Where-Object { $_.Name -like "RSAT-AD-Tools" } | Install-Wi
 get-WindowsFeature | Where-Object { $_.Name -like "RSAT-DNS-Server" } | Install-WindowsFeature
 Write-Host "`n"
 
-# Downloading CAPI Kubernetes cluster kubeconfig file
-Write-Header "Downloading CAPI K8s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
+# Downloading k3s Kubernetes cluster kubeconfig file
+Write-Header "Downloading k3s Kubeconfig"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-capi"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
-# Downloading 'installCAPI.log' log file
-Write-Header "Downloading CAPI Install Logs"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
+# Downloading 'installk3s.log' log file
+Write-Header "Downloading k3s Install Logs"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installk3s.log"
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installk3s.log"
 
-#VNet peering with CAPI vnet
-$capiVnetName = $clusters[0].clusterName + '-vnet'
+#VNet peering with k3s vnet
+$k3sVnetName = $clusters[0].clusterName + '-vnet'
 $dcVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
         --name "ArcBox-VNet" `
         --query id --out tsv)
 
-$capiVnetId = $(az network vnet show `
+$k3sVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
-        --name $capiVnetName `
+        --name $k3sVnetName `
         --query id --out tsv)
 
-az network vnet peering create --name "dcVnet-CapiVnet" `
+az network vnet peering create --name "dcVnet-k3sVnet" `
     --resource-group $Env:resourceGroup `
     --vnet-name "ArcBox-VNet" `
-    --remote-vnet $capiVnetId `
+    --remote-vnet $k3sVnetId `
     --allow-vnet-access
 
-az network vnet peering create --name "CapiVnet-dcVnet" `
+az network vnet peering create --name "k3sVnet-dcVnet" `
     --resource-group $Env:resourceGroup `
-    --vnet-name $capiVnetName `
+    --vnet-name $k3sVnetName `
     --remote-vnet $dcVnetId `
     --allow-vnet-access
 
@@ -143,13 +143,13 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx capi="arcbox-capi"
+kubectx k3s="arcbox-k3s"
 
 Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
-    if ($cluster.context -ne 'capi') {
+    if ($cluster.context -ne 'k3s') {
         Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
@@ -171,10 +171,10 @@ foreach ($cluster in $clusters) {
 
 Stop-Transcript
 ################################################
-# - Deploying data services on CAPI cluster
+# - Deploying data services on k3s cluster
 ################################################
 
-$kubectlMonShellCapi = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'CAPI Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-capi" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellk3s = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-k3s" ; Start-Sleep -Seconds 5; Clear-Host } }
 $kubectlMonShellAKS = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" ; Start-Sleep -Seconds 5; Clear-Host } }
 $kubectlMonShellAKSDr = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
 
@@ -314,7 +314,7 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Stop-Process -Id $kubectlMonShellCapi.Id
+Stop-Process -Id $kubectlMonShellk3s.Id
 Stop-Process -Id $kubectlMonShellAKS.Id
 Stop-Process -Id $kubectlMonShellAKSDr.Id
 
