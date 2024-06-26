@@ -356,7 +356,11 @@ if ($flavor -eq "DevOps") {
 if ($flavor -eq "DataOps") {
 
     # Joining ClientVM to AD DS domain
-    $netbiosname = $Env:addsDomainName.Split(".")[0]
+    if ($null -eq $addsDomainName){
+        $addsDomainName = "jumpstart.local"        
+    }
+    
+    $netbiosname = $addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
