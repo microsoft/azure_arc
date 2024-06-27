@@ -215,22 +215,12 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
 }
 
 // Add role assignment for the VM: Azure Key Vault Secret Officer role
-resource vmRoleAssignment_KeyVaultSecretOfficer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'SecretOfficer')
+resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Administrator')
   scope: resourceGroup()
   properties: {
     principalId: vm.identity.principalId
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-  }
-}
-
-// Add role assignment for the VM: Azure Key Vault Certificates Officer role
-resource vmRoleAssignment_KeyVaultCertificatesOfficer 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'CertificatesOfficer')
-  scope: resourceGroup()
-  properties: {
-    principalId: vm.identity.principalId
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'a4417e6f-fecd-4de8-b567-7b0420556985')
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
   }
 }
 
