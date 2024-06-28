@@ -147,7 +147,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
 }
 
 Set-Secret -Name adminPassword -Secret $adminPassword
-Set-Secret -Name AZDATA_PASSWORD -Secret $azdataPassword
+Set-Secret -Name AZDATAPASSWORD -Secret $azdataPassword
 Set-Secret -Name registryPassword -Secret $registryPassword
 
 Write-Output "Added the following secrets to Azure Key Vault"
