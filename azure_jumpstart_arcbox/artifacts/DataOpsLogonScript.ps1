@@ -37,12 +37,13 @@ az account set -s $env:subscriptionId
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
 $Env:AZDATA_PASSWORD = Get-Secret -Name 'AZDATA_PASSWORD' -AsPlainText
 
-# Register Azure providers
+# Register Azure providers. 
+# ---- MOVE THESE INTO PRE-REQUISITES DOCUMENT AND REMOVE---
 Write-Header "Registering Providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
+#az provider register --namespace Microsoft.Kubernetes --wait
+#az provider register --namespace Microsoft.KubernetesConfiguration --wait
+#az provider register --namespace Microsoft.ExtendedLocation --wait
+#az provider register --namespace Microsoft.AzureArcData --wait
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"
