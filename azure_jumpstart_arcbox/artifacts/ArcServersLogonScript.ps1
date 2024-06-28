@@ -245,7 +245,7 @@ if ($Env:flavor -ne "DevOps") {
             $retryCount = $retryCount + 1
             if ($retryCount -gt 10) {
                 Write-Host "WARNING: Azure Monitor Agent extenstion is taking longger than expected. Enable SQL BPA later through Azure portal."
-                Exit
+                break
             }
             else {
                 Write-Host "Waiting for Azure Monitoring Agent extension installation to complete ... Retry count: $retryCount"
