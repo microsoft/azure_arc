@@ -149,10 +149,18 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo ""
     echo "Onboarding the cluster to Azure Arc"
     echo ""
-    resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
-    workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox'
+    #resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
+    workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $storageAccountRG --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+    echo "Log Analytics workspace id $workspaceResourceId"
 
+    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $storageAccountRG --location $location --tags 'Project=jumpstart_arcbox'
+    echo "Onboarding the k3s cluster to Azure Arc completed"
+    
+    # Verify if cluster is connected to Azure Arc successfully
+    connectedClusterInfo=$(sudo -u $adminUsername az connectedk8s show --name $vmName --resource-group $storageAccountRG)
+    echo $connectedClusterInfo
+
+    # Wait
     # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
     echo ""
     echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
