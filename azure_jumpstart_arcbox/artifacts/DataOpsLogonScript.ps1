@@ -34,12 +34,17 @@ Write-Header "Az CLI Login"
 az login --identity
 az account set -s $env:subscriptionId
 
+$KeyVault = Get-AzKeyVault -ResourceGroupName $Env:resourceGroup
+if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
+    Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
+}
+
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
 $AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
 
 # Register Azure providers. 
 # ---- MOVE THESE INTO PRE-REQUISITES DOCUMENT AND REMOVE---
-Write-Header "Registering Providers"
+#Write-Header "Registering Providers"
 #az provider register --namespace Microsoft.Kubernetes --wait
 #az provider register --namespace Microsoft.KubernetesConfiguration --wait
 #az provider register --namespace Microsoft.ExtendedLocation --wait
@@ -102,7 +107,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERN
 
 # Downloading 'installk3s.log' log file
 Write-Header "Downloading k3s Install Logs"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installk3s.log"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s-$Env:k3sArcDataClusterName.log"
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installk3s.log"
 
