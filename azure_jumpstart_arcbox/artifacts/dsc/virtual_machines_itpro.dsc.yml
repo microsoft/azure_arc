@@ -9,13 +9,13 @@ properties:
       settings:
         Name: ArcBox-Win2K19
         SwitchName: 'InternalNATSwitch'
-        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Win2K19.vhdx
+        VhdPath: F:\Virtual Machines\ArcBox-Win2K19.vhdx
         ProcessorCount: 2
         StartupMemory: '12GB'
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines
+        Path: F:\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
     - resource: HyperVDsc/VMHyperV
@@ -25,13 +25,13 @@ properties:
       settings:
         Name: ArcBox-Win2K22
         SwitchName: 'InternalNATSwitch'
-        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Win2K22.vhdx
+        VhdPath: F:\Virtual Machines\ArcBox-Win2K22.vhdx
         ProcessorCount: 2
         StartupMemory: '12GB'
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines
+        Path: F:\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
     - resource: HyperVDsc/VMHyperV
@@ -41,13 +41,13 @@ properties:
       settings:
         Name: ArcBox-Ubuntu-01
         SwitchName: 'InternalNATSwitch'
-        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-01.vhdx
+        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-01.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines
+        Path: F:\Virtual Machines
         EnableGuestService: true
         SecureBoot: false
     - resource: HyperVDsc/VMHyperV
@@ -57,13 +57,13 @@ properties:
       settings:
         Name: ArcBox-Ubuntu-02
         SwitchName: 'InternalNATSwitch'
-        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-Ubuntu-02.vhdx
+        VhdPath: F:\Virtual Machines\ArcBox-Ubuntu-02.vhdx
         ProcessorCount: 2
         StartupMemory: '4GB'
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines
+        Path: F:\Virtual Machines
         EnableGuestService: true
         SecureBoot: false
   configurationVersion: 0.2.0
