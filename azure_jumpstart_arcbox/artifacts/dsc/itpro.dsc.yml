@@ -3,10 +3,10 @@ properties:
 
   resources:
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: terraform
+      id: 7zip
       directives:
-        description: Install Terraform
+        description: Install 7zip
       settings:
-        id: Hashicorp.Terraform
+        id: 7zip.7zip
         source: winget
   configurationVersion: 0.2.0
