@@ -8,13 +8,13 @@ properties:
       settings:
         Name: ArcBox-SQL
         SwitchName: 'InternalNATSwitch'
-        VhdPath: C:\ArcBox\Virtual Machines\ArcBox-SQL.vhdx
+        VhdPath: F:\Virtual Machines\ArcBox-SQL.vhdx
         ProcessorCount: 2
         StartupMemory: '12GB'
         RestartIfNeeded: true
         State: Running
         Generation: 2
-        Path: C:\ArcBox\Virtual Machines
+        Path: F:\Virtual Machines
         EnableGuestService: true
         SecureBoot: true
   configurationVersion: 0.2.0

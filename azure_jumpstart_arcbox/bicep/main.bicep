@@ -101,7 +101,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     azureLocation: location
     flavor: flavor
-    vmName : '${k3sArcDataClusterName}-Node-0${i}' 
+    vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
   }
   dependsOn: [
