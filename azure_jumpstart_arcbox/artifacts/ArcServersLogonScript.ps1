@@ -1,6 +1,6 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
-$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$Env:ArcBoxVMDir = "F:\Virtual Machines"
 $Env:ArcBoxIconDir = "$Env:ArcBoxDir\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 $agentScript = "$Env:ArcBoxDir\agentScript"
@@ -156,7 +156,7 @@ if ($Env:flavor -ne "DevOps") {
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
+        azcopy cp $vhdSourceFolder --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --log-level=ERROR
     }
 
     # Create the nested VMs if not already created
