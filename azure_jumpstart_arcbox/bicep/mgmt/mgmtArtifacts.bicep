@@ -473,6 +473,9 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBas
     name: bastionSku
   }
   properties: {
+    virtualNetwork: bastionSku == 'Developer' ? {
+      id: arcVirtualNetwork.id
+    } : null
     ipConfigurations: bastionSku != 'Developer' ? [
       {
         name: 'IpConf'
