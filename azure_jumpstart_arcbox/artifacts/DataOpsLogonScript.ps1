@@ -65,9 +65,9 @@ $Env:argument2 = "microsoft.azcli"
 $Env:argument3 = "microsoft.azuredatastudio-postgresql"
 $Env:argument4 = "Microsoft.arc"
 
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
+& "azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "azuredatastudio.cmd" $Env:argument1 $Env:argument3
+& "azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
 # Create Azure Data Studio desktop shortcut
 Write-Header "Creating Azure Data Studio Desktop Shortcut"

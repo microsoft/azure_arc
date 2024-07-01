@@ -234,6 +234,8 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 5)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
+    az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
+
     $retryCount = 0
     do {
         $amaExtension = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'AzureMonitorWindowsAgent'}
