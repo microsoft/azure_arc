@@ -503,6 +503,7 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
   params: {
     name: keyVaultName
     enablePurgeProtection: false
+    enableSoftDelete: false
     location: location
   }
 }
