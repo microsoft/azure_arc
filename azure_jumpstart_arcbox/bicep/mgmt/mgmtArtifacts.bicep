@@ -473,7 +473,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBas
     name: bastionSku
   }
   properties: {
-    ipConfigurations: [
+    ipConfigurations: bastionSku != 'Developer' ? [
       {
         name: 'IpConf'
         properties: {
@@ -485,7 +485,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBas
           }
         }
       }
-    ]
+    ] : null
   }
 }
 
