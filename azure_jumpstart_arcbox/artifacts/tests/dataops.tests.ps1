@@ -1,21 +1,18 @@
 
 BeforeDiscovery {
 
-    $capiArcDataClusterName = $env:capiArcDataClusterName
+    $k3sArcDataClusterName = $env:k3sArcDataClusterName
     $aksArcClusterName = $env:aksArcClusterName
     $aksdrArcClusterName = $env:aksdrArcClusterName
 
-    $clusters = @($capiArcDataClusterName, $aksArcClusterName, $aksdrArcClusterName)
-    $customLocations = @("${capiArcDataClusterName}-cl", "${aksArcClusterName}-cl", "${aksdrArcClusterName}-cl")
-    $dataControllers = @("${capiArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
+    $clusters = @($k3sArcDataClusterName, $aksArcClusterName, $aksdrArcClusterName)
+    $customLocations = @("${k3sArcDataClusterName}-cl", "${aksArcClusterName}-cl", "${aksdrArcClusterName}-cl")
+    $dataControllers = @("${k3sArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
     $sqlMiInstances = @("capi-sql", "aks-sql", "aks-dr-sql")
     $drPartners = @("capi-sql", "aks-dr-sql")
     $VMs = @("ArcBox-SQL")
 
-    $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-    $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-
-    $null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    $null = Connect-AzAccount -Identity -Tenant $spntenantId -Subscription $subscriptionId
     az config set extension.use_dynamic_install=yes_without_prompt
 }
 
