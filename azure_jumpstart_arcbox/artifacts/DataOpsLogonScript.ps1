@@ -102,38 +102,17 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/stag
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config-k3s"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config"
+
+$addsDomainNetBiosName = $Env:addsDomainName.Split(".")[0]
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername.$addsDomainNetBiosName\.kube\config"
 
 # Downloading 'installk3s.log' log file
 Write-Header "Downloading k3s Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s-$Env:k3sArcDataClusterName.log"
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installk3s.log"
-
-#VNet peering with k3s vnet
-$k3sVnetName = $clusters[0].clusterName + '-vnet'
-$dcVnetId = $(az network vnet show `
-        --resource-group $Env:resourceGroup `
-        --name "ArcBox-VNet" `
-        --query id --out tsv)
-
-$k3sVnetId = $(az network vnet show `
-        --resource-group $Env:resourceGroup `
-        --name $k3sVnetName `
-        --query id --out tsv)
-
-az network vnet peering create --name "dcVnet-k3sVnet" `
-    --resource-group $Env:resourceGroup `
-    --vnet-name "ArcBox-VNet" `
-    --remote-vnet $k3sVnetId `
-    --allow-vnet-access
-
-az network vnet peering create --name "k3sVnet-dcVnet" `
-    --resource-group $Env:resourceGroup `
-    --vnet-name $k3sVnetName `
-    --remote-vnet $dcVnetId `
-    --allow-vnet-access
 
 Start-Sleep -Seconds 10
 
@@ -149,7 +128,7 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx k3s="arcbox-k3s"
+kubectx k3s="arcbox-datasvc-k3s"
 
 Start-Sleep -Seconds 10
 
@@ -238,15 +217,12 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $Env:spnClientId | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $Env:spnTenantId | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $Env:spnClientSecret | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
             Write-Host "Deploying arc data controller on $clusterName"
             Write-Host "`n"
-            az deployment group create --resource-group $Env:resourceGroup --name $dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+            az deployment group create --resource-group $Env:resourceGroup --name $dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters $dataControllerParams
             Write-Host "`n"
 
             Do {
