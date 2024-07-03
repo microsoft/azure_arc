@@ -130,6 +130,10 @@ kubectx k3s="arcbox-datasvc-k3s"
 
 Start-Sleep -Seconds 10
 
+# Get Log Analytics workspace details
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'k3s') {
@@ -378,8 +382,6 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             $context = $cluster.context
             $customLocationId = $(az customlocation show --name $customLocation --resource-group $Env:resourceGroup --query id -o tsv)
-            $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-            $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
             Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
 
             $dataControllerParams = "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
