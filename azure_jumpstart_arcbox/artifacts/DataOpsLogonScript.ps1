@@ -159,9 +159,9 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-$kubectlMonShellk3s = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-k3s" ; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShellAKS = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" ; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShellAKSDr = Start-Process -PassThru pwsh { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
+Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
+Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
+Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
 
 Write-Header "Deploying Azure Arc Data Controller"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
