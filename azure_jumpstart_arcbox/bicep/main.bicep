@@ -161,7 +161,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     rdpPort: rdpPort
     addsDomainName: addsDomainName
-    customLocationRPOID: customLocationRPOID
+    customLocationRPOID: customLocationRPOID ?? ''
   }
   dependsOn: [
     updateVNetDNSServers

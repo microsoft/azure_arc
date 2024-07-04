@@ -50,7 +50,7 @@ param acceptEula string = 'yes'
 param registryUsername string = 'registryUser'
 
 @secure()
-param registryPassword string = 'registrySecret'
+param registryPassword string = newGuid()
 param arcDcName string = 'arcdatactrl'
 param mssqlmiName string = 'arcsqlmidemo'
 
