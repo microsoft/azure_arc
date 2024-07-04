@@ -6,7 +6,7 @@ $CName = "jumpstartbooks"
 $certdns = "$CName.jumpstart.local"
 $password = "arcbox"
 $appNamespace = "arc"
-$sqlInstance = "capi"
+$sqlInstance = "k3s"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsAppScript.log
 
@@ -27,7 +27,7 @@ openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir
 openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
 
 Write-Header "Creating Ingress Controller"
-foreach ($cluster in @('capi', 'aks-dr')) {
+foreach ($cluster in @('k3s', 'aks-dr')) {
     # Create K8s Ingress TLS secret
     kubectx $cluster
     kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key" --cert "$Env:TempDir\$CName.crt"

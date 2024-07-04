@@ -52,11 +52,10 @@
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       },
       "allowedValues": [
-        "Full",
         "ITPro",
         "DevOps"
       ],
-      "defaultValue": "Full"
+      "defaultValue": "ITPro"
     },
     "githubAccount": {
       "type": "string",

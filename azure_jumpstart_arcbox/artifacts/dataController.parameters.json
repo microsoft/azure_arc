@@ -26,18 +26,6 @@
       "subscriptionId": {
         "value": "subscriptionId-stage"
       },
-      "spnClientId": {
-        "value": "spnClientId-stage"
-      },
-      "spnTenantId": {
-        "value": "spnTenantId-stage"
-      },
-      "spnClientSecret": {
-        "value": "spnClientSecret-stage"
-      },
-      "spnAuthority": {
-        "value": "https://login.microsoftonline.com"
-      },
       "logAnalyticsWorkspaceId": {
         "value": "logAnalyticsWorkspaceId-stage"
       },

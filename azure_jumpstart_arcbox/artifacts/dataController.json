@@ -33,18 +33,6 @@
     "subscriptionId": {
       "type": "string"
     },
-    "spnClientId": {
-      "type": "string"
-    },
-    "spnTenantId": {
-      "type": "string"
-    },
-    "spnClientSecret": {
-      "type": "securestring"
-    },
-    "spnAuthority": {
-      "type": "string"
-    },
     "logAnalyticsWorkspaceId": {
       "type": "string"
     },
@@ -103,12 +91,6 @@
         "logsDashboardCredential": {
           "username": "[parameters('azdataUsername')]",
           "password": "[parameters('azdataPassword')]"
-        },
-        "uploadServicePrincipal": {
-          "clientId": "[parameters('spnClientId')]",
-          "tenantId": "[parameters('spnTenantId')]",
-          "authority": "[parameters('spnAuthority')]",
-          "clientSecret": "[parameters('spnClientSecret')]"
         },
         "logAnalyticsWorkspaceConfig": {
           "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",

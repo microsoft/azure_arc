@@ -10,26 +10,13 @@ switch ($env:flavor) {
         Invoke-Pester -Path "$Env:ArcBoxTestsDir\devops.tests.ps1" -Output Detailed -PassThru -OutVariable tests_devops
         $tests_passed = $tests_passed + $tests_devops.Passed.Count
         $tests_failed = $tests_failed +  $tests_devops.Failed.Count
-}
+    }
     'DataOps' {
         Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed -PassThru -OutVariable tests_dataops
         $tests_passed = $tests_passed + $tests_dataops.Passed.Count
         $tests_failed = $tests_failed +  $tests_dataops.Failed.Count
     }
     'ITPro' {
-        Invoke-Pester -Path "$Env:ArcBoxTestsDir\itpro.tests.ps1" -Output Detailed -PassThru -OutVariable tests_itpro
-        $tests_passed = $tests_passed + $tests_itpro.Passed.Count
-        $tests_failed = $tests_failed +  $tests_itpro.Failed.Count
-}
-    'Full' {
-        Invoke-Pester -Path "$Env:ArcBoxTestsDir\devops.tests.ps1" -Output Detailed -PassThru -OutVariable tests_devops
-        $tests_passed = $tests_passed + $tests_devops.Passed.Count
-        $tests_failed = $tests_failed +  $tests_devops.Failed.Count
-
-        Invoke-Pester -Path "$Env:ArcBoxTestsDir\dataops.tests.ps1" -Output Detailed -PassThru -OutVariable tests_dataops
-        $tests_passed = $tests_passed + $tests_dataops.Passed.Count
-        $tests_failed = $tests_failed +  $tests_dataops.Failed.Count
-
         Invoke-Pester -Path "$Env:ArcBoxTestsDir\itpro.tests.ps1" -Output Detailed -PassThru -OutVariable tests_itpro
         $tests_passed = $tests_passed + $tests_itpro.Passed.Count
         $tests_failed = $tests_failed +  $tests_itpro.Failed.Count

@@ -8,14 +8,23 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxDir = "C:\ArcBox"
 Start-Transcript -Path "$Env:ArcBoxLogsDir\RunAfterClientVMADJoin.log"
 
+# Get windows administrator password from key vault
+Write-Header "Az PowerShell Login"
+Connect-AzAccount -Identity -Tenant $Env:spnTenantId -Subscription $Env:subscriptionId
+$KeyVault = Get-AzKeyVault -ResourceGroupName $Env:resourceGroup
+
+if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
+    Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
+}
+
+$adminPassword = Get-Secret -Name 'adminPassword' -AsPlainText
+
 # Get Activectory Information
 $netbiosname = $Env:addsDomainName.Split('.')[0].ToUpper()
 
 $adminuser = "$netbiosname\$Env:adminUsername"
-$secpass = $Env:adminPassword | ConvertTo-SecureString -AsPlainText -Force
+$secpass = $adminPassword | ConvertTo-SecureString -AsPlainText -Force
 $adminCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $adminuser, $secpass
-#$dcName = [System.Net.Dns]::GetHostByName($env:COMPUTERNAME).HostName
-
 $dcInfo = Get-ADDomainController -Credential $adminCredential
 
 # Print domain information

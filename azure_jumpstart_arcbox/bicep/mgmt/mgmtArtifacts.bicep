@@ -21,7 +21,6 @@ param workspaceName string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
-  'Full'
   'ITPro'
   'DevOps'
   'DataOps'
@@ -36,6 +35,14 @@ param sku string = 'pergb2018'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
+
+@description('Bastion host Sku name')
+@allowed([
+  'Basic'
+  'Standard'
+  'Developer'
+])
+param bastionSku string = 'Basic'
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'ArcBox-NSG'
@@ -77,7 +84,7 @@ var primarySubnet = [
     }
   }
 ]
-var bastionSubnet = [
+var bastionSubnet = bastionSku != 'Developer' ? [
   {
     name: 'AzureBastionSubnet'
     properties: {
@@ -87,7 +94,7 @@ var bastionSubnet = [
       }
     }
   }
-]
+] : []
 var dataOpsSubnets = [
   {
     name: aksSubnetName
@@ -458,11 +465,17 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBastion == true) {
   name: bastionName
   location: location
+  sku: {
+    name: bastionSku
+  }
   properties: {
-    ipConfigurations: [
+    virtualNetwork: bastionSku == 'Developer' ? {
+      id: arcVirtualNetwork.id
+    } : null
+    ipConfigurations: bastionSku != 'Developer' ? [
       {
         name: 'IpConf'
         properties: {
@@ -474,7 +487,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBas
           }
         }
       }
-    ]
+    ] : null
   }
 }
 
@@ -492,6 +505,7 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
   params: {
     name: keyVaultName
     enablePurgeProtection: false
+    enableSoftDelete: false
     location: location
   }
 }

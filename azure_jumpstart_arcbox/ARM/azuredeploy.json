@@ -52,12 +52,11 @@
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps', 'DataOps'"
       },
       "allowedValues": [
-        "Full",
         "ITPro",
         "DevOps",
         "DataOps"
       ],
-      "defaultValue": "Full"
+      "defaultValue": "ITPro"
     },
     "githubAccount": {
       "type": "string",
@@ -119,74 +118,16 @@
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
     "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/aks.json')]",
-    "capiArcDataClusterName": "[concat('ArcBox-CAPI-Data','-',parameters('guid'))]",
     "k3sArcDataClusterName": "[concat('ArcBox-K3s','-',parameters('guid'))]",
     "aksArcDataClusterName": "[concat('ArcBox-AKS-Data','-',parameters('guid'))]",
     "aksDrArcDataClusterName": "[concat('ArcBox-AKS-DR-Data','-',parameters('guid'))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "name": "ubuntuCAPIDeployment",
-      "dependsOn": [
-        "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment",
-        "updateVNetDNSServers"
-      ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('capiTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "sshRSAPublicKey": {
-            "value": "[parameters('sshRSAPublicKey')]"
-          },
-          "spnClientId": {
-            "value": "[parameters('spnClientId')]"
-          },
-          "spnClientSecret": {
-            "value": "[parameters('spnClientSecret')]"
-          },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
-          },
-          "stagingStorageAccountName": {
-            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
-          },
-          "logAnalyticsWorkspace": {
-            "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          },
-          "deployBastion": {
-            "value": "[parameters('deployBastion')]"
-          },
-          "flavor": {
-            "value": "[parameters('flavor')]"
-          },
-          "capiArcDataClusterName" : {
-            "value": "[variables('capiArcDataClusterName')]"
-          },
-          "rdpPort":{
-            "value": "[parameters('rdpPort')]"
-          },
-          "sshPort":{
-            "value": "[parameters('sshPort')]"
-          }
-        }
-      }
-    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
@@ -286,9 +227,6 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
-          },
-          "capiArcDataClusterName": {
-            "value": "[variables('capiArcDataClusterName')]"
           },
           "k3sArcClusterName": {
             "value": "[variables('k3sArcDataClusterName')]"
