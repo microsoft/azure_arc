@@ -40,7 +40,7 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
 param githubBranch string = 'arcbox_3.0'
@@ -161,7 +161,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     rdpPort: rdpPort
     addsDomainName: addsDomainName
-    customLocationRPOID: customLocationRPOID
+    customLocationRPOID: customLocationRPOID ?? ''
   }
   dependsOn: [
     updateVNetDNSServers
