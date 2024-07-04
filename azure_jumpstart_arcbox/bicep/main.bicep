@@ -32,12 +32,11 @@ param logAnalyticsWorkspaceName string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
-  'Full'
   'ITPro'
   'DevOps'
   'DataOps'
 ])
-param flavor string = 'Full'
+param flavor string = 'ITPro'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -78,7 +77,7 @@ var k3sArcDataClusterName = 'ArcBox-DataSvc-K3s-${guid}'
 var k3sArcClusterName = 'ArcBox-K3s-${guid}'
 var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
 
-module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps' || flavor == 'DataOps') {
+module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
@@ -118,7 +117,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   ]
 }]
 
-module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
+module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps') {
   name: 'ubuntuRancherK3sDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey

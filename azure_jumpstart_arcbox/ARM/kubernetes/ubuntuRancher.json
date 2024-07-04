@@ -152,7 +152,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),null)]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'), json('null'))]"
                         }
                     }
                 ]

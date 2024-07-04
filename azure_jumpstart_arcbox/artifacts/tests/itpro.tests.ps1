@@ -1,9 +1,7 @@
 
 BeforeDiscovery {
     $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02","ArcBox-Win2K19","ArcBox-Win2K22")
-
     $null = Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
-
 }
 
 # Assert that the Hyper-V virtual machines in $VMs exists, are running and connected as Azure Arc-enabled servers

@@ -17,11 +17,11 @@ properties:
         id: ahmetb.kubectx
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
-      id: DotNetSDK7
+      id: DotNetSDK8
       directives:
-        description: Install Microsoft DotNet SDK 7
+        description: Install Microsoft DotNet SDK 8
       settings:
-        id: Microsoft.DotNet.SDK.7
+        id: Microsoft.DotNet.SDK.8
         source: winget
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: SQLServerManagementStudio

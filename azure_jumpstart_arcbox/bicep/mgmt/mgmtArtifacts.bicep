@@ -21,7 +21,6 @@ param workspaceName string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
-  'Full'
   'ITPro'
   'DevOps'
   'DataOps'

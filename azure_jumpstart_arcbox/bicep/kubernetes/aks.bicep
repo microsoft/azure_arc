@@ -50,7 +50,7 @@ param enableRBAC bool = true
 param osType string = 'Linux'
 
 @description('The version of Kubernetes')
-param kubernetesVersion string = '1.27.9'
+param kubernetesVersion string = '1.28.9'
 
 var serviceCidr_primary = '10.20.64.0/19'
 var dnsServiceIP_primary = '10.20.64.10'
