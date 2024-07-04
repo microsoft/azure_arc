@@ -5,9 +5,9 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$Env:k3sArcDataClusterName-dc" ; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s" }
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$Env:k3sArcDataClusterName-dc" ; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
+    # [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
+    # [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
@@ -96,11 +96,11 @@ Write-Host "`n"
 
 # Downloading k3s Kubernetes cluster kubeconfig file
 Write-Header "Downloading k3s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Container,Object -Permission racwdlup
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config-k3s"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config"
 
 $addsDomainNetBiosName = $Env:addsDomainName.Split(".")[0]
@@ -108,9 +108,9 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:admin
 
 # Downloading 'installk3s.log' log file
 Write-Header "Downloading k3s Install Logs"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s-$Env:k3sArcDataClusterName.log"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/*"
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installk3s.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
 
 Start-Sleep -Seconds 10
 
@@ -157,20 +157,19 @@ foreach ($cluster in $clusters) {
 }
 
 foreach ($cluster in $clusters) {
-    if ($cluster.context -eq 'k3s') {
-        Write-Host "Enabling custom-locations feature on k3s cluster"
-        az connectedk8s enable-features -n $cluster.clusterName `
-        -g $Env:resourceGroup `
-        --custom-locations-oid $Env:customLocationRPOID `
-        --features cluster-connect custom-locations `
-        --kube-config $cluster.kubeConfig --only-show-errors
+  if ($cluster.context -eq 'k3s') {
+    Write-Host "Enabling custom-locations feature on k3s cluster"
+    az connectedk8s enable-features -n $cluster.clusterName `
+    -g $Env:resourceGroup `
+    --custom-locations-oid $Env:customLocationRPOID `
+    --features cluster-connect custom-locations `
+    --kube-config $cluster.kubeConfig --only-show-errors
 
-        Write-Header "Configuring kube-vip on K3s cluster"
-        kubectx k3s
-        $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
+    Write-Header "Configuring kube-vip on K3s cluster"
+    kubectx k3s
+    $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
 
-        Write-Host "Assignin kube-vip-role on k3s cluster"
-
+Write-Host "Assignin kube-vip-role on k3s cluster"
 $kubeVipRBAC = @"
 apiVersion: v1
 kind: ServiceAccount
@@ -215,7 +214,7 @@ subjects:
   namespace: kube-system
 "@
 
-        $kubeVipRBAC | kubectl apply -f -
+$kubeVipRBAC | kubectl apply -f -
 
 $kubeVipDaemonset = @"
 apiVersion: apps/v1
@@ -308,24 +307,23 @@ status:
   numberReady: 0
 "@
 
-        Write-Host "Deploying Kube vip cloud controller on k3s cluster"
-        $kubeVipDaemonset | kubectl apply -f -
+    $kubeVipDaemonset | kubectl apply -f -
 
-        # Kube vip cloud controller
-        kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+    Write-Host "Deploying Kube vip cloud controller on k3s cluster"
+    kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-        $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
-        $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
-        $lowestServiceIp = $sortedIps[0]
-        $highestServiceIp = $sortedIps[-1]
+    $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+    $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
+    $lowestServiceIp = $sortedIps[0]
+    $highestServiceIp = $sortedIps[-1]
 
-        kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
-        Start-Sleep -Seconds 30
+    kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
+    Start-Sleep -Seconds 30
 
-        Write-Host "Creating longhorn storage on K3scluster"
-        kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml" --kubeconfig $cluster.kubeConfig
-        Start-Sleep -Seconds 30
-        Write-Host "`n"
+    Write-Host "Creating longhorn storage on K3scluster"
+    kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml" --kubeconfig $cluster.kubeConfig
+    Start-Sleep -Seconds 30
+    Write-Host "`n"
     }
 }
 
@@ -334,9 +332,9 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
+Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-datasvc-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
+# Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
+# Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
@@ -397,6 +395,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'storageClass-stage', $cluster.storageClassName | Set-Content -Path $dataControllerParams
 
             Write-Host "Deploying arc data controller on $clusterName"
             Write-Host "`n"

@@ -13,7 +13,7 @@ Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-$customLocationId = $(az customlocation show --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "$Env:k3sArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -28,7 +28,7 @@ $vCoresLimit =  "4"
 $memoryLimit = "8Gi"
 
 # Storage
-$StorageClassName = "managed-premium"
+$StorageClassName = "longhorn"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $dataLogsStorageSize = "5Gi"

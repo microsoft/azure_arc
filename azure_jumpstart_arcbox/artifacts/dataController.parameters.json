@@ -41,13 +41,13 @@
         "value": "arc-private-registry"
       },
       "dataStorageClass": {
-        "value": "managed-premium"
+        "value": "storageClass-stage"
       },
       "dataStorageSize": {
         "value": "15Gi"
       },
       "logsStorageClass": {
-        "value": "managed-premium"
+        "value": "storageClass-stage"
       },
       "logsStorageSize": {
         "value": "10Gi"
