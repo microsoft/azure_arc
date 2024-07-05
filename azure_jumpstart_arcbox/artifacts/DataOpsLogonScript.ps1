@@ -40,7 +40,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
 $AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
 
-# Register Azure providers. 
+# Register Azure providers.
 # ---- MOVE THESE INTO PRE-REQUISITES DOCUMENT AND REMOVE---
 #Write-Header "Registering Providers"
 #az provider register --namespace Microsoft.Kubernetes --wait
@@ -334,9 +334,7 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
+wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-k3s" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
