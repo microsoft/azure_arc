@@ -12,7 +12,7 @@
 RootModule = 'Azure.Arc.Jumpstart.Common.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.4'
+ModuleVersion = '0.0.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -69,7 +69,7 @@ Description = 'Common functions for Azure Arc Jumpstart'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Set-JSDesktopBackground','Convert-JSImageToBitMap'
+FunctionsToExport = 'Set-JSDesktopBackground','Convert-JSImageToBitMap','Show-K8sPodStatus','Deploy-Workbook'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = ''
