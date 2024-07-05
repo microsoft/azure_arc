@@ -10,12 +10,13 @@ function Deploy-Workbook {
     # Read the content of the workbook template-file
     $content = Get-Content -Path $workbookTemplateFilePath -Raw
     # Replace placeholders with actual values
-    $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
-    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
-    $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
+    $updatedContent = $content -replace 'rg-placeholder', $env:resourceGroup
+    $updatedContent = $updatedContent -replace '/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($env:subscriptionId)"
+    $updatedContent = $updatedContent -replace "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/$env:resourceGroup/providers/Microsoft.OperationalInsights/workspaces/xxxx", "/subscriptions/$($env:subscriptionId)/resourceGroups/$($env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($env:workspaceName)"
 
     # Write the updated content back to the file
     Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
+
     # Deploy the workbook
     try {
         New-AzResourceGroupDeployment -ResourceGroupName $Env:resourceGroup -TemplateFile $workbookTemplateFilePath -ErrorAction Stop
