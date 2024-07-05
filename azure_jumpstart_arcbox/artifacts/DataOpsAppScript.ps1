@@ -38,7 +38,7 @@ foreach ($cluster in @('k3s', 'aks-dr')) {
     helm install dataops-ingress nginx-stable/nginx-ingress
 }
 
-# Switch kubectl context to capi
+# Switch kubectl context to k3s
 kubectx $sqlInstance
 
 Write-Header "Adding CName Record for App"
@@ -52,7 +52,7 @@ Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Dom
 Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 # Deploy the App and service
-$appCAPI = @"
+$appK3s = @"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,7 +98,7 @@ spec:
 
 "@
 Write-Header "Deploying App Resource"
-$appCAPI | kubectl apply -n $appNamespace -f -
+$appK3s | kubectl apply -n $appNamespace -f -
 
 # Deploy an Ingress Resource for the app
 $appIngress = @"
@@ -135,7 +135,7 @@ Do {
   $podStatus = $(if(kubectl get pods -n $appNamespace | Select-String "web-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 } while ($podStatus -eq "Nope")
 
-# Creating CAPI Bookstore Arc Icon on Desktop
+# Creating K3s Bookstore Arc Icon on Desktop
 $shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)

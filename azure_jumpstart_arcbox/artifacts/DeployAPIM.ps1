@@ -28,7 +28,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 ################################################
 # Retrive SQL Managed Instances
 ################################################
-kubectx arcbox-capi
+kubectx arcbox-datasvc-k3s
 kubectl get nodes
 
 # Retrieving SQL MI connection endpoints

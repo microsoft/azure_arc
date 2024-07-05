@@ -21,7 +21,7 @@ Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Dom
 Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 # Deploy the App and service
-$appCAPI = @"
+$appK3s = @"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -67,7 +67,7 @@ spec:
 
 "@
 Write-Header "Deploying App Resource"
-$appCAPI | kubectl apply -n $appNamespace -f -
+$appK3s | kubectl apply -n $appNamespace -f -
 
 # Deploy an Ingress Resource for the app
 $appIngress = @"

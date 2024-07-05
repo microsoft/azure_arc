@@ -139,3 +139,25 @@ resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
   }
 }
+
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+  parent: vm
+  name: 'installscript_k3s'
+  location: azureLocation
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {}
+    protectedSettings: {
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName}'
+      fileUris: [
+        '${templateBaseUrl}artifacts/installK3s.sh'
+      ]
+    }
+  }
+  dependsOn: [
+    vmRoleAssignment_Owner
+  ]
+}
