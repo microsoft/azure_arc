@@ -161,13 +161,6 @@ foreach ($cluster in $clusters) {
 
 foreach ($cluster in $clusters) {
 
-    Write-Host "Enabling custom-locations feature on all clusters"
-    az connectedk8s enable-features -n $cluster.clusterName `
-    -g $Env:resourceGroup `
-    --custom-locations-oid $Env:customLocationRPOID `
-    --features cluster-connect custom-locations `
-    --kube-config $cluster.kubeConfig --only-show-errors
-
     if ($cluster.context -eq 'k3s') {
     Write-Header "Configuring kube-vip on K3s cluster"
     kubectx k3s
