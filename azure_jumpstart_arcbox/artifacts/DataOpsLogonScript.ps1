@@ -69,7 +69,7 @@ $Env:argument4 = "Microsoft.arc"
 
 # Create Azure Data Studio desktop shortcut
 Write-Header "Creating Azure Data Studio Desktop Shortcut"
-$TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Azure Data Studio\azuredatastudio.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -80,7 +80,7 @@ $Shortcut.Save()
 Write-Host "`n"
 Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
 Write-Host "`n"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\ssms.exe"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 20\Common7\IDE\ssms.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -333,10 +333,6 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-#Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$k3sConfigUserPath\.kube\config-datasvc-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
-#Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
-#Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
-
 wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
@@ -379,8 +375,8 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             Start-Sleep -Seconds 10
 
             Write-Host "Creating custom location on $clusterName"
-            kubectx $cluster.context
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations
+            kubectx $cluster.context | Out-Null
+            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
             az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
 
             Start-Sleep -Seconds 20
@@ -395,7 +391,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $dataController | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
