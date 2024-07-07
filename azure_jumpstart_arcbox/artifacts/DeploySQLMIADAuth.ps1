@@ -13,6 +13,9 @@ Import-Module DnsServer
 # Get Activectory Information
 $dcInfo = Get-ADDomainController
 
+# Retrieve Azure Key Vault secrets and store as runtime environment variables
+$AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
+
 # Setup reverse DNS for AD authentication
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
 $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
@@ -102,6 +105,7 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
     $sqlmiOUDN = $using:sqlmiOUDN
     $sqlmi_port = $using:sqlmi_port
     $context = $sqlInstance.context
+    $AZDATA_PASSWORD = $using:AZDATA_PASSWORD
 
     Start-Transcript -Path "$Env:ArcBoxLogsDir\SQLMI-$context.log"
 
@@ -233,7 +237,7 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
     (Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
     (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $SQLParams
     (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $env:AZDATA_USERNAME | Set-Content -Path $SQLParams
-    (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $SQLParams
     (Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
     (Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
     (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
@@ -271,10 +275,10 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
     Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
@@ -283,7 +287,7 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
         Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
         kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
         Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-        kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$Env:AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2019' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2019_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+        kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2019' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2019_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
         Write-Host "Restoring AdventureWorks database completed."
     }
 
@@ -339,7 +343,7 @@ $env:AZDATA_USERNAME | Add-Content $Endpoints
 
 Add-Content $Endpoints ""
 Add-Content $Endpoints "SQL Managed Instance SQL login password:"
-$env:AZDATA_PASSWORD | Add-Content $Endpoints
+$AZDATA_PASSWORD | Add-Content $Endpoints
 Add-Content $Endpoints ""
 
 Add-Content $Endpoints "======================================================================"
@@ -378,7 +382,7 @@ $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
 $sa_username = $env:AZDATA_USERNAME
-$sa_password = $env:AZDATA_PASSWORD
+$sa_password = $AZDATA_PASSWORD
 
 $dagConnection = @"
 {
@@ -461,15 +465,11 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-
-# Unzip SqlQueryStress
-Expand-Archive -Path $Env:ArcBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
-
 # Create SQLQueryStress desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQLQueryStress Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "$Env:ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
+$TargetFile = "$Env:ArcBoxDir\SqlQueryStress.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
