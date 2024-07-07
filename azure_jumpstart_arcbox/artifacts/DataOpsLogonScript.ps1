@@ -54,6 +54,8 @@ az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 az extension add --name connectedk8s --version 1.3.17
 az extension add --name arcdata
+az extension add --name k8s-extension
+az extension add --name customlocation
 az -v
 
 # Installing Azure Data Studio extensions
@@ -157,14 +159,15 @@ foreach ($cluster in $clusters) {
 }
 
 foreach ($cluster in $clusters) {
-  if ($cluster.context -eq 'k3s') {
-    Write-Host "Enabling custom-locations feature on k3s cluster"
+
+    Write-Host "Enabling custom-locations feature on all clusters"
     az connectedk8s enable-features -n $cluster.clusterName `
     -g $Env:resourceGroup `
     --custom-locations-oid $Env:customLocationRPOID `
     --features cluster-connect custom-locations `
     --kube-config $cluster.kubeConfig --only-show-errors
 
+    if ($cluster.context -eq 'k3s') {
     Write-Header "Configuring kube-vip on K3s cluster"
     kubectx k3s
     $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
