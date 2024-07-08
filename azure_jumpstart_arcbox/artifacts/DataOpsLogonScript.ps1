@@ -374,11 +374,11 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             kubectx $cluster.context | Out-Null
             az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
-            Start-Sleep -Seconds 10
+            Start-Sleep -Seconds 20
 
             az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
 
-            Start-Sleep -Seconds 20
+            Start-Sleep -Seconds 30
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context

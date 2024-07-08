@@ -16,7 +16,7 @@ Do
 {
 	$appIpaddress= kubectl get svc "dataops-ingress-nginx-ingress-controller" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
    Start-Sleep -Seconds 5
-} while ($appIpaddress -eq $null)
+} while ($null -eq $appIpaddress)
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
 Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
