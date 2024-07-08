@@ -30,7 +30,7 @@ Write-Output "Adding Storage Blob Data Contributor role assignment to SPN $env:s
 $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
 
-$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId -Scope Process
+$null = Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:tenantId -Subscription $env:subscriptionId -Scope Process
 
 Write-Output "Wait for Azure CLI to become available (installed by WinGet)"
 
@@ -69,7 +69,7 @@ $newPath = "C:\Program Files\Microsoft SDKs\Azure\CLI2\wbin"
 $env:Path = $currentPath + ";" + $newPath
 
 Write-Output "Az CLI Login"
-az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:spnTenantId
+az login --service-principal --username $env:spnClientId --password=$env:spnClientSecret --tenant $env:tenantId
 az account set -s $env:subscriptionId
 
 $ClientObjectId = az ad sp list --filter "appId eq '$env:spnClientId'" --output json | ConvertFrom-Json

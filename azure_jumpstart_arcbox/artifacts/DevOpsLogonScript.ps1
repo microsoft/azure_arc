@@ -24,7 +24,7 @@ $clusters = @(
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
 
 # Required for azcopy and Get-AzResource
-Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".devops" -ItemType Directory
 
@@ -438,7 +438,7 @@ Get-ChildItem -Path $Env:ArcBoxKVDir |
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $Env:keyVaultName | Set-Content -Path $_.FullName
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_HOST}', $certdns | Set-Content -Path $_.FullName
-        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
+        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:tenantId | Set-Content -Path $_.FullName
     }
 
 Write-Header "Creating Ingress Controller"

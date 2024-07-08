@@ -4,9 +4,9 @@ param vmName string = 'ArcBox-K3s'
 @description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
 
-@description('SSH Key for the Virtual Machine. SSH key is recommended over password')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([

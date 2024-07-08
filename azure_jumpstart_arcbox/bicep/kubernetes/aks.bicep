@@ -29,16 +29,9 @@ param agentVMSize string = 'Standard_D8s_v4'
 @description('User name for the Linux Virtual Machines')
 param linuxAdminUsername string = 'arcdemo'
 
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
-@description('Client ID (used by cloudprovider)')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param spnClientId string
-
-@description('The Service Principal Client Secret')
-@secure()
-param spnClientSecret string
+param sshRSAPublicKey string = ''
 
 @description('boolean flag to turn on and off of RBAC')
 param enableRBAC bool = true
@@ -106,10 +99,6 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
-    }
   }
 }
 
@@ -158,9 +147,25 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2023
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
-    }
+  }
+}
+
+// Add role assignment for the AKS cluster: Owner role
+resource aksRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aksClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: aksClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+  }
+}
+
+// Add role assignment for the AKS DR cluster: Owner role
+resource aksDRRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(drClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: drClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
   }
 }
