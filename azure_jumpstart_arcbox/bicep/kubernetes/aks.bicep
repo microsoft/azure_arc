@@ -149,3 +149,23 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2023
     }
   }
 }
+
+// Add role assignment for the AKS cluster: Owner role
+resource aksRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aksClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: aksClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+  }
+}
+
+// Add role assignment for the AKS DR cluster: Owner role
+resource aksDRRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(drClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: drClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+  }
+}

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "4648116851621429118"
+      "templateHash": "5764046023032759632"
     }
   },
   "parameters": {
@@ -8410,7 +8410,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "9258770347731613696"
+              "templateHash": "16902719430194420979"
             }
           },
           "parameters": {
@@ -8621,6 +8621,30 @@
                   }
                 }
               }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', parameters('aksClusterName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
+              "properties": {
+                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName')), '2023-10-02-preview', 'full').identity.principalId]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ContainerService/managedClusters', parameters('drClusterName'))]"
+              ]
             }
           ]
         }
@@ -8638,4 +8662,4 @@
       "value": "[if(equals(parameters('flavor'), 'DataOps'), format('{0}@{1}', parameters('windowsAdminUsername'), parameters('addsDomainName')), '')]"
     }
   }
-}
+}s
