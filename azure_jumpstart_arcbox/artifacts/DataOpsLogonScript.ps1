@@ -371,14 +371,14 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             Start-Sleep -Seconds 10
 
             Write-Host "Creating custom location on $clusterName"
-            kubectx $cluster.context | Out-Null
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+            #kubectx $cluster.context | Out-Null
+            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-config $cluster.kubeConfig --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
-            Start-Sleep -Seconds 20
+            Start-Sleep -Seconds 10
 
-            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
+            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --kubeconfig $cluster.kubeConfig --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
 
-            Start-Sleep -Seconds 30
+            Start-Sleep -Seconds 10
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context
