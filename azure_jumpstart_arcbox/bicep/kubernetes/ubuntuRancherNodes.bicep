@@ -24,16 +24,6 @@ param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
 
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
-
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 

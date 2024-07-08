@@ -30,13 +30,6 @@ param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
 
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 

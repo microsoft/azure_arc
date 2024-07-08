@@ -32,14 +32,6 @@ param linuxAdminUsername string = 'arcdemo'
 @description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
 param sshRSAPublicKey string
 
-@description('Client ID (used by cloudprovider)')
-@secure()
-param spnClientId string
-
-@description('The Service Principal Client Secret')
-@secure()
-param spnClientSecret string
-
 @description('boolean flag to turn on and off of RBAC')
 param enableRBAC bool = true
 
@@ -106,10 +98,6 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
-    }
   }
 }
 
@@ -157,10 +145,6 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2023
           }
         ]
       }
-    }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
     }
   }
 }

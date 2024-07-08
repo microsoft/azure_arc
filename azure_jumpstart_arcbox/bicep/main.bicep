@@ -2,13 +2,6 @@
 @secure()
 param sshRSAPublicKey string
 
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
@@ -81,8 +74,6 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
   name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
@@ -100,8 +91,6 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
@@ -121,8 +110,6 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
   name: 'ubuntuRancherK3sDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
@@ -142,8 +129,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
     azdataPassword: windowsAdminPassword
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
@@ -222,8 +207,6 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
   name: 'aksDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     location: location
     aksClusterName : aksArcDataClusterName
     drClusterName : aksDrArcDataClusterName
