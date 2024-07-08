@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "595787426044983085"
+      "templateHash": "1639707254601807246"
     }
   },
   "parameters": {
@@ -1083,12 +1083,13 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
           "contentVersion": "1.0.0.0",
           "metadata": {
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "9510145893466872925"
+              "templateHash": "16467396614522528585"
             }
           },
           "parameters": {
@@ -1300,6 +1301,7 @@
             },
             "customLocationRPOID": {
               "type": "string",
+              "nullable": true,
               "metadata": {
                 "description": "The custom location RPO ID"
               }
@@ -1319,10 +1321,11 @@
             "osDiskType": "Premium_LRS",
             "PublicIPNoBastion": {
               "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
-            }
+            },
+            "customLocationRPID": "[coalesce(parameters('customLocationRPOID'), '')]"
           },
-          "resources": [
-            {
+          "resources": {
+            "networkInterface": {
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2022-01-01",
               "name": "[variables('networkInterfaceName')]",
@@ -1342,10 +1345,10 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+                "publicIpAddress"
               ]
             },
-            {
+            "publicIpAddress": {
               "condition": "[equals(parameters('deployBastion'), false())]",
               "type": "Microsoft.Network/publicIPAddresses",
               "apiVersion": "2022-01-01",
@@ -1360,7 +1363,7 @@
                 "name": "Basic"
               }
             },
-            {
+            "vmDisk": {
               "type": "Microsoft.Compute/disks",
               "apiVersion": "2023-04-02",
               "name": "[format('{0}-VMsDisk', parameters('vmName'))]",
@@ -1376,7 +1379,7 @@
                 "burstingEnabled": true
               }
             },
-            {
+            "vm": {
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2022-03-01",
               "name": "[parameters('vmName')]",
@@ -1433,11 +1436,11 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
-                "[resourceId('Microsoft.Compute/disks', format('{0}-VMsDisk', parameters('vmName')))]"
+                "networkInterface",
+                "vmDisk"
               ]
             },
-            {
+            "vmBootstrap": {
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2022-03-01",
               "name": "[format('{0}/{1}', parameters('vmName'), 'Bootstrap')]",
@@ -1454,38 +1457,38 @@
                   "fileUris": [
                     "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                   ],
-                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -vmAutologon {27} -rdpPort {28} -addsDomainName {29} -customLocationRPOID {30}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), parameters('customLocationRPOID'))]"
+                  "commandToExecute": "[format('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername {0} -adminPassword {1} -tenantId {2} -spnAuthority {3} -subscriptionId {4} -resourceGroup {5} -azdataUsername {6} -azdataPassword {7} -acceptEula {8} -registryUsername {9} -registryPassword {10} -arcDcName {11} -azureLocation {12} -mssqlmiName {13} -POSTGRES_NAME {14} -POSTGRES_WORKER_NODE_COUNT {15} -POSTGRES_DATASIZE {16} -POSTGRES_SERVICE_TYPE {17} -stagingStorageAccountName {18} -workspaceName {19} -templateBaseUrl {20} -flavor {21} -k3sArcDataClusterName {22} -k3sArcClusterName {23} -aksArcClusterName {24} -aksdrArcClusterName {25} -githubUser {26} -vmAutologon {27} -rdpPort {28} -addsDomainName {29} -customLocationRPOID {30}', parameters('windowsAdminUsername'), parameters('windowsAdminPassword'), parameters('tenantId'), parameters('spnAuthority'), subscription().subscriptionId, resourceGroup().name, parameters('azdataUsername'), parameters('azdataPassword'), parameters('acceptEula'), parameters('registryUsername'), parameters('registryPassword'), parameters('arcDcName'), parameters('location'), parameters('mssqlmiName'), parameters('postgresName'), parameters('postgresWorkerNodeCount'), parameters('postgresDatasize'), parameters('postgresServiceType'), parameters('stagingStorageAccountName'), parameters('workspaceName'), parameters('templateBaseUrl'), parameters('flavor'), parameters('k3sArcDataClusterName'), parameters('k3sArcClusterName'), parameters('aksArcClusterName'), parameters('aksdrArcClusterName'), parameters('githubUser'), parameters('vmAutologon'), parameters('rdpPort'), parameters('addsDomainName'), variables('customLocationRPID'))]"
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+                "vm"
               ]
             },
-            {
+            "vmRoleAssignment_KeyVaultAdministrator": {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Administrator')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "principalId": "[reference('vm', '2022-03-01', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+                "vm"
               ]
             },
-            {
+            "vmRoleAssignment_Owner": {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "name": "[guid(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), 'Microsoft.Authorization/roleAssignments', 'Owner')]",
               "properties": {
-                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', parameters('vmName')), '2022-03-01', 'full').identity.principalId]",
+                "principalId": "[reference('vm', '2022-03-01', 'full').identity.principalId]",
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+                "vm"
               ]
             }
-          ],
+          },
           "outputs": {
             "adminUsername": {
               "type": "string",
@@ -1493,7 +1496,7 @@
             },
             "publicIP": {
               "type": "string",
-              "value": "[if(equals(parameters('deployBastion'), false()), concat(reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName')), '2022-01-01').ipAddress), '')]"
+              "value": "[if(equals(parameters('deployBastion'), false()), concat(reference('publicIpAddress').ipAddress), '')]"
             }
           }
         }
