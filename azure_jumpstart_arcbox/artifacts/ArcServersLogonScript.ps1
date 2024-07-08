@@ -256,6 +256,10 @@ if ($Env:flavor -ne "DevOps") {
         }
     } while ($retryCount -le 10)
 
+    # Get access token to make ARM REST API call for SQL server BPA and migration assessments
+    $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
+    $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
+
     # Enable Best practices assessment
     if ($amaExtension.StatusCode -eq 0) {
 
@@ -273,10 +277,7 @@ if ($Env:flavor -ne "DevOps") {
         # Wait for a minute to finish everyting and run assessment
         Start-Sleep(60)
 
-        # Get access token to make ARM REST API call for SQL server BPA
         $armRestApiEndpoint = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
-        $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
-        $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
 
         # Build API request payload
         $worspaceResourceId = "/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/microsoft.operationalinsights/workspaces/$Env:workspaceName".ToLower()
@@ -295,6 +296,22 @@ if ($Env:flavor -ne "DevOps") {
             Write-Host "SQL Best Practices Assessment faild. Please refer troubleshooting guide to run manually."
         }
     } # End of SQL BPA
+
+    # Run SQL Server Azure Migration Assessment
+    $migrationApiURL = "https://management.azure.com/batch?api-version=2020-06-01"
+    $assessmentName = (New-Guid).Guid
+$payLoad = @"
+{"requests":[{"httpMethod":"POST","name":"$assessmentName","requestHeaderDetails":{"commandName":"Microsoft_Azure_HybridData_Platform."},"url":"https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.AzureArcData/SqlServerInstances/$SQLvmName/runMigrationAssessment?api-version=2024-05-01-preview"}]}
+"@
+
+    $httpResp = Invoke-WebRequest -Method Post -Uri $migrationApiURL -Body $payLoad -Headers $headers
+    if (($httpResp.StatusCode -eq 200) -or ($httpResp.StatusCode -eq 202)){
+        Write-Host "Arc-enabled SQL server migration assessment executed. Wait for assessment to complete to view results."
+    }
+    else {
+        <# Action when all if and elseif conditions are false #>
+        Write-Host "SQL Server Migration Assessment faild. Please refer troubleshooting guide to run manually."
+    }
 
     #Install SQLAdvancedThreatProtection solution
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
@@ -323,6 +340,7 @@ if ($Env:flavor -ne "DevOps") {
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
 
+    # Onboard nested Windows and Linux VMs to Azure Arc
     if ($Env:flavor -eq "ITPro") {
         Write-Header "Fetching Nested VMs"
 
