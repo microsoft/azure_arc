@@ -1,16 +1,9 @@
-@description('RSA public key used for securing SSH access to ArcBox resources')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
+@description('Your Microsoft Entra tenant Id')
+param tenantId string
 
 @description('Username for Windows account')
 param windowsAdminUsername string
@@ -67,8 +60,8 @@ param guid string = substring(newGuid(),0,4)
 @description('Azure location to deploy all resources')
 param location string = resourceGroup().location
 
-@description('The custom location RPO ID')
-param customLocationRPOID string?
+@description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
+param customLocationRPOID string = ''
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
@@ -81,14 +74,10 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
   name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
-    deployBastion: deployBastion
     azureLocation: location
     vmName : k3sArcDataClusterName
     storageContainerName: toLower(k3sArcDataClusterName)
@@ -100,9 +89,6 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
@@ -121,14 +107,10 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
   name: 'ubuntuRancherK3sDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
-    deployBastion: deployBastion
     azureLocation: location
     vmName : k3sArcClusterName
     storageContainerName: toLower(k3sArcClusterName)
@@ -142,9 +124,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
     azdataPassword: windowsAdminPassword
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
+    tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
@@ -160,7 +140,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     rdpPort: rdpPort
     addsDomainName: addsDomainName
-    customLocationRPOID: customLocationRPOID ?? ''
+    customLocationRPOID: customLocationRPOID
   }
   dependsOn: [
     updateVNetDNSServers
@@ -222,8 +202,6 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
   name: 'aksDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
     location: location
     aksClusterName : aksArcDataClusterName
     drClusterName : aksDrArcDataClusterName

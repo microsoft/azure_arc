@@ -25,7 +25,7 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 # Required for azcopy
 Write-Header "Az PowerShell Login"
-Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
@@ -54,6 +54,8 @@ az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 az extension add --name connectedk8s --version 1.3.17
 az extension add --name arcdata
+az extension add --name k8s-extension
+az extension add --name customlocation
 az -v
 
 # Installing Azure Data Studio extensions
@@ -69,7 +71,7 @@ $Env:argument4 = "Microsoft.arc"
 
 # Create Azure Data Studio desktop shortcut
 Write-Header "Creating Azure Data Studio Desktop Shortcut"
-$TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Azure Data Studio\azuredatastudio.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -80,7 +82,7 @@ $Shortcut.Save()
 Write-Host "`n"
 Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
 Write-Host "`n"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 19\Common7\IDE\ssms.exe"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 20\Common7\IDE\ssms.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -100,8 +102,8 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($E
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Container,Object -Permission racwdlup
 $sourceFile = $sourceFile + "?" + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s"
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername\.kube\config"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "C:\Users\$Env:adminUsername\.kube\config"
 
 $addsDomainNetBiosName = $Env:addsDomainName.Split(".")[0]
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:adminUsername.$addsDomainNetBiosName\.kube\config"
@@ -133,6 +135,7 @@ Start-Sleep -Seconds 10
 # Get Log Analytics workspace details
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+$workspaceResourceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
@@ -151,20 +154,14 @@ foreach ($cluster in $clusters) {
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --no-wait
         Write-Host "`n"
     }
 }
 
 foreach ($cluster in $clusters) {
-  if ($cluster.context -eq 'k3s') {
-    Write-Host "Enabling custom-locations feature on k3s cluster"
-    az connectedk8s enable-features -n $cluster.clusterName `
-    -g $Env:resourceGroup `
-    --custom-locations-oid $Env:customLocationRPOID `
-    --features cluster-connect custom-locations `
-    --kube-config $cluster.kubeConfig --only-show-errors
 
+    if ($cluster.context -eq 'k3s') {
     Write-Header "Configuring kube-vip on K3s cluster"
     kubectx k3s
     $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
@@ -332,11 +329,7 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'k3s Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-datasvc-k3s"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aks"" ; Start-Sleep -Seconds 5; Clear-Host }"
-Start-Process pwsh.exe -ArgumentList "-NoExit", "-Command", "[System.Console]::Title = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig ""C:\Users\$Env:USERNAME\.kube\config-aksdr"" ; Start-Sleep -Seconds 5; Clear-Host }"
-
-wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-k3s" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
+wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
@@ -378,9 +371,14 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             Start-Sleep -Seconds 10
 
             Write-Host "Creating custom location on $clusterName"
+            #kubectx $cluster.context | Out-Null
+            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+
+            Start-Sleep -Seconds 10
+
             az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
 
-            Start-Sleep -Seconds 20
+            Start-Sleep -Seconds 10
 
             # Deploying the Azure Arc Data Controller
             $context = $cluster.context
@@ -392,7 +390,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $dataController | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
-            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+            (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $dataControllerParams
             (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
@@ -475,9 +473,7 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Stop-Process -Id $kubectlMonShellk3s.Id
-Stop-Process -Id $kubectlMonShellAKS.Id
-Stop-Process -Id $kubectlMonShellAKSDr.Id
+Get-process WindowsTerminal | Stop-Process -Force
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @'

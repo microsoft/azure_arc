@@ -4,9 +4,9 @@ param vmName string = 'ArcBox-K3s'
 @description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
 
-@description('SSH Key for the Virtual Machine. SSH key is recommended over password')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([
@@ -27,16 +27,6 @@ param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
 
-@description('Azure service principal client id')
-param spnClientId string
-
-@description('Azure service principal client secret')
-@secure()
-param spnClientSecret string
-
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
-
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
@@ -46,15 +36,11 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
-@description('Choice to deploy Bastion to connect to the client VM')
-param deployBastion bool = false
-
 @description('Storage account container name for artifacts')
 param storageContainerName string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
-  'Full'
   'ITPro'
   'DevOps'
   'DataOps'

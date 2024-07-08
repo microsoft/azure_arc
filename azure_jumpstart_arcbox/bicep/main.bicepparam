@@ -2,11 +2,7 @@ using 'main.bicep'
 
 param sshRSAPublicKey = '<your RSA public key>'
 
-param spnClientId = '<your service principal client id>'
-
-param spnClientSecret = '<your service principal secret>'
-
-param spnTenantId = '<your spn tenant id>'
+param tenantId = '<your tenant id>'
 
 param windowsAdminUsername = 'arcdemo'
 

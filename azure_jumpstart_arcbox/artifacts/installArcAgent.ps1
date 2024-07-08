@@ -1,7 +1,7 @@
  # Download the package
  param (
     [string]$accessToken,
-    [string]$spnTenantId,
+    [string]$tenantId,
     [string]$subscriptionId,
     [string]$resourceGroup,
     [string]$Azurelocation
@@ -21,7 +21,7 @@
  & "$Env:ProgramW6432\AzureConnectedMachineAgent\azcmagent.exe" connect `
  --access-token $accessToken `
  --resource-group $resourceGroup `
- --tenant-id $spnTenantId `
+ --tenant-id $tenantId `
  --location $Azurelocation `
  --subscription-id $subscriptionId `
  --cloud "AzureCloud" `
