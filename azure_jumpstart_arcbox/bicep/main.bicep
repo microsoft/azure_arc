@@ -61,7 +61,7 @@ param guid string = substring(newGuid(),0,4)
 param location string = resourceGroup().location
 
 @description('The custom location RPO ID')
-param customLocationRPOID string?
+param customLocationRPOID string = ''
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
@@ -140,7 +140,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     vmAutologon: vmAutologon
     rdpPort: rdpPort
     addsDomainName: addsDomainName
-    customLocationRPOID: customLocationRPOID ?? ''
+    customLocationRPOID: customLocationRPOID
   }
   dependsOn: [
     updateVNetDNSServers
