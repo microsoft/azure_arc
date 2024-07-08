@@ -154,7 +154,7 @@ foreach ($cluster in $clusters) {
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --no-wait
         Write-Host "`n"
     }
 }
@@ -372,11 +372,11 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             Write-Host "Creating custom location on $clusterName"
             #kubectx $cluster.context | Out-Null
-            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-config $cluster.kubeConfig --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
+            az connectedk8s enable-features -n $clusterName -g $Env:resourceGroup --kube-context $cluster.context --custom-locations-oid $Env:customLocationRPOID --features cluster-connect custom-locations --only-show-errors
 
             Start-Sleep -Seconds 10
 
-            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --kubeconfig $cluster.kubeConfig --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
+            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
 
             Start-Sleep -Seconds 10
 
