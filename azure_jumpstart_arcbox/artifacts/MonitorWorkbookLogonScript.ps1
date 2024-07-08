@@ -9,7 +9,7 @@ az login --identity
 az account set -s $env:subscriptionId
 
 Write-Header 'Az PowerShell Login'
-Connect-AzAccount -Identity -Tenant $env:spnTenantId -Subscription $env:subscriptionId
+Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Monitor Workbook ARM template for $($env:flavor)"

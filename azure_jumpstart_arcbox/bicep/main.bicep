@@ -3,7 +3,7 @@
 param sshRSAPublicKey string
 
 @description('Azure AD tenant id for your service principal')
-param spnTenantId string
+param tenantId string
 
 @description('Username for Windows account')
 param windowsAdminUsername string
@@ -124,7 +124,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
     azdataPassword: windowsAdminPassword
-    spnTenantId: spnTenantId
+    tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl

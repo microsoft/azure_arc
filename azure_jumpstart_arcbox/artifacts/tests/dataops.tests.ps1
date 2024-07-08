@@ -12,7 +12,7 @@ BeforeDiscovery {
     $drPartners = @("capi-sql", "aks-dr-sql")
     $VMs = @("ArcBox-SQL")
 
-    $null = Connect-AzAccount -Identity -Tenant $spntenantId -Subscription $subscriptionId
+    $null = Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
     az config set extension.use_dynamic_install=yes_without_prompt
 }
 

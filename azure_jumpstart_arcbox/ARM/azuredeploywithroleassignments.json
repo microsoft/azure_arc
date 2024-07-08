@@ -20,7 +20,7 @@
         "description": "Azure service principal client secret"
       }
     },
-    "spnTenantId": {
+    "tenantId": {
       "type": "string",
       "metadata": {
         "description": "Azure AD tenant id for your service principal"
@@ -215,8 +215,8 @@
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
           },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
           },
           "windowsAdminUsername": {
             "value": "[parameters('windowsAdminUsername')]"

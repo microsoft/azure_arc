@@ -10,7 +10,7 @@ Start-Transcript -Path "$Env:ArcBoxLogsDir\RunAfterClientVMADJoin.log"
 
 # Get windows administrator password from key vault
 Write-Header "Az PowerShell Login"
-Connect-AzAccount -Identity -Tenant $Env:spnTenantId -Subscription $Env:subscriptionId
+Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
 $KeyVault = Get-AzKeyVault -ResourceGroupName $Env:resourceGroup
 
 if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {

@@ -25,7 +25,7 @@ Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
 # Required for azcopy
 Write-Header "Az PowerShell Login"
-Connect-AzAccount -Identity -Tenant $env:spntenantId -Subscription $env:subscriptionId
+Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 
 # Required for CLI commands
 Write-Header "Az CLI Login"

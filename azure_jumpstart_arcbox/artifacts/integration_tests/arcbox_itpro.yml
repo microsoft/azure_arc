@@ -58,7 +58,7 @@ stages:
           -TemplateParameterObject @{
               spnClientId = $env:spnClientId
               spnClientSecret = $env:spnClientSecret
-              spnTenantId = $env:spnTenantId
+              tenantId = $env:tenantId
               windowsAdminPassword = $env:windowsAdminPassword
           }
 

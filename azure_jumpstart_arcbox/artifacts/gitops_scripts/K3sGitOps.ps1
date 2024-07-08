@@ -144,7 +144,7 @@ foreach ($configName in $configs) {
 #         - |
 #           objectName: "$certname"
 #           objectType: secret
-#     tenantId: "$Env:spnTenantId"
+#     tenantId: "$Env:tenantId"
 # "@
 
 # Write-Host "Creating Secret Provider Class"
