@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "9978347204368188270"
+      "templateHash": "4648116851621429118"
     }
   },
   "parameters": {
@@ -192,7 +192,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "8873458987868125168"
+              "templateHash": "8959045163472863929"
             }
           },
           "parameters": {
@@ -212,8 +212,9 @@
             },
             "sshRSAPublicKey": {
               "type": "securestring",
+              "defaultValue": "",
               "metadata": {
-                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
               }
             },
             "ubuntuOSVersion": {
@@ -495,7 +496,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "4489057220269630219"
+              "templateHash": "1718526241054900409"
             }
           },
           "parameters": {
@@ -515,8 +516,9 @@
             },
             "sshRSAPublicKey": {
               "type": "securestring",
+              "defaultValue": "",
               "metadata": {
-                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
               }
             },
             "ubuntuOSVersion": {
@@ -757,7 +759,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "8873458987868125168"
+              "templateHash": "8959045163472863929"
             }
           },
           "parameters": {
@@ -777,8 +779,9 @@
             },
             "sshRSAPublicKey": {
               "type": "securestring",
+              "defaultValue": "",
               "metadata": {
-                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
               }
             },
             "ubuntuOSVersion": {
@@ -8407,7 +8410,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "5177458961212579771"
+              "templateHash": "9258770347731613696"
             }
           },
           "parameters": {
@@ -8479,9 +8482,10 @@
               }
             },
             "sshRSAPublicKey": {
-              "type": "string",
+              "type": "securestring",
+              "defaultValue": "",
               "metadata": {
-                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+                "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
               }
             },
             "enableRBAC": {

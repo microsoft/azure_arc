@@ -29,8 +29,9 @@ param agentVMSize string = 'Standard_D8s_v4'
 @description('User name for the Linux Virtual Machines')
 param linuxAdminUsername string = 'arcdemo'
 
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
+@secure()
+param sshRSAPublicKey string = ''
 
 @description('boolean flag to turn on and off of RBAC')
 param enableRBAC bool = true
