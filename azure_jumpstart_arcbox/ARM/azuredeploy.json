@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "14950434767201192095"
+      "templateHash": "3529738756326864807"
     }
   },
   "parameters": {
@@ -132,7 +132,7 @@
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The custom location RPO ID"
+        "description": "The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor."
       }
     }
   },
@@ -1087,7 +1087,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "17442801922388316710"
+              "templateHash": "7748500223683903108"
             }
           },
           "parameters": {
@@ -1301,7 +1301,7 @@
               "type": "string",
               "defaultValue": "",
               "metadata": {
-                "description": "The custom location RPO ID"
+                "description": "The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor."
               }
             },
             "vmsDiskSku": {

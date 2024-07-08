@@ -60,7 +60,7 @@ param guid string = substring(newGuid(),0,4)
 @description('Azure location to deploy all resources')
 param location string = resourceGroup().location
 
-@description('The custom location RPO ID')
+@description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
 param customLocationRPOID string = ''
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'

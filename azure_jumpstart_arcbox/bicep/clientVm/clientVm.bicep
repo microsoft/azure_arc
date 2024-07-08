@@ -95,7 +95,7 @@ param aksdrArcClusterName string = 'ArcBox-AKS-DR-Data'
 @description('Domain name for the jumpstart environment')
 param addsDomainName string = 'jumpstart.local'
 
-@description('The custom location RPO ID')
+@description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
 param customLocationRPOID string = ''
 
 @description('The SKU of the VMs disk')
