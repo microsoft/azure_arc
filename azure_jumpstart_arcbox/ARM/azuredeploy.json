@@ -5,14 +5,15 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "3529738756326864807"
+      "templateHash": "9978347204368188270"
     }
   },
   "parameters": {
     "sshRSAPublicKey": {
       "type": "securestring",
+      "defaultValue": "",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to ArcBox resources"
+        "description": "RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors."
       }
     },
     "tenantId": {

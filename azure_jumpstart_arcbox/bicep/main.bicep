@@ -1,6 +1,6 @@
-@description('RSA public key used for securing SSH access to ArcBox resources')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param sshRSAPublicKey string
+param sshRSAPublicKey string = ''
 
 @description('Your Microsoft Entra tenant Id')
 param tenantId string
