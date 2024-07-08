@@ -36,15 +36,11 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
-@description('Choice to deploy Bastion to connect to the client VM')
-param deployBastion bool = false
-
 @description('Storage account container name for artifacts')
 param storageContainerName string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
-  'Full'
   'ITPro'
   'DevOps'
   'DataOps'
