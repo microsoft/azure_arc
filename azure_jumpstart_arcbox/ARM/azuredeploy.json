@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "8657458656018143290"
+      "templateHash": "595787426044983085"
     }
   },
   "parameters": {
@@ -19,7 +19,7 @@
     "tenantId": {
       "type": "string",
       "metadata": {
-        "description": "Azure AD tenant id for your service principal"
+        "description": "Your Microsoft Entra tenant Id"
       }
     },
     "windowsAdminUsername": {
@@ -1088,7 +1088,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "3947539362097619749"
+              "templateHash": "9510145893466872925"
             }
           },
           "parameters": {
@@ -1168,7 +1168,7 @@
             "tenantId": {
               "type": "string",
               "metadata": {
-                "description": "Tenant id of the service principal"
+                "description": "Your Microsoft Entra tenant Id"
               }
             },
             "azdataUsername": {

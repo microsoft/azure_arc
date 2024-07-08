@@ -2,7 +2,7 @@
 @secure()
 param sshRSAPublicKey string
 
-@description('Azure AD tenant id for your service principal')
+@description('Your Microsoft Entra tenant Id')
 param tenantId string
 
 @description('Username for Windows account')

@@ -33,7 +33,7 @@ param resourceTags object = {
 }
 param spnAuthority string = environment().authentication.loginEndpoint
 
-@description('Tenant id of the service principal')
+@description('Your Microsoft Entra tenant Id')
 param tenantId string
 param azdataUsername string = 'arcdemo'
 
