@@ -473,9 +473,7 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Stop-Process -Id $kubectlMonShellk3s.Id
-Stop-Process -Id $kubectlMonShellAKS.Id
-Stop-Process -Id $kubectlMonShellAKSDr.Id
+Get-process WindowsTerminal | Stop-Process -Force
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @'
