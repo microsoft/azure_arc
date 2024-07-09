@@ -428,7 +428,7 @@ foreach($cluster in $clusters){
     $clusterName = $cluster.clusterName
     $dataController = $cluster.dataController
     $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-    az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+    az role assignment create --assignee-object-id $Env:MSI_OBJECT_ID --assignee-principal-type ServicePrincipal --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
     az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
     az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-logs true
 }
