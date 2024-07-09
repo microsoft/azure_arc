@@ -19,7 +19,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
 
 $adminPassword = Get-Secret -Name 'adminPassword' -AsPlainText
 
-# Get Activectory Information
+# Get Active Directory Information
 $netbiosname = $Env:addsDomainName.Split('.')[0].ToUpper()
 
 $adminuser = "$netbiosname\$Env:adminUsername"
