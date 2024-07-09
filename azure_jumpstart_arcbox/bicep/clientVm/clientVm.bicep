@@ -239,6 +239,8 @@ resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAss
   properties: {
     principalId: vm.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
+    principalType: 'ServicePrincipal'
+
   }
 }
 
@@ -249,6 +251,7 @@ resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04
   properties: {
     principalId: vm.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
   }
 }
 

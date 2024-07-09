@@ -157,6 +157,7 @@ resource aksRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-0
   properties: {
     principalId: aksClusterName_resource.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -167,5 +168,6 @@ resource aksDRRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022
   properties: {
     principalId: drClusterName_resource.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
   }
 }
