@@ -428,7 +428,7 @@ foreach($cluster in $clusters){
     $clusterName = $cluster.clusterName
     $dataController = $cluster.dataController
     $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-    az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+    az role assignment create --assignee-object-id $Env:MSI_OBJECT_ID --assignee-principal-type ServicePrincipal --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
     az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
     az arcdata dc update --name $dataController --resource-group $Env:resourceGroup --auto-upload-logs true
 }
@@ -491,14 +491,15 @@ namespace Win32{
     }
 '@
 
-$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
-if (-not $ArcServersLogonScript) {
-    Write-Header "Changing Wallpaper"
-    $imgPath = "$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code
-    [Win32.Wallpaper]::SetWallpaper($imgPath)
-}
+  Write-Header "Changing wallpaper"
+
+  # bmp file is required for BGInfo
+  Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
+
+  Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
+
+
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
@@ -512,15 +513,14 @@ Write-Header "Running tests to verify infrastructure"
 
 & "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command {
-    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-    Start-Sleep -Seconds 5
-    Write-Host "`n"
-    Write-Host "Creating deployment logs bundle"
-    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
-}'
+Write-Header "Creating deployment logs bundle"
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+#required to avoid "file is being used by another process" error when compressing the logs
+Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
 
 Stop-Transcript

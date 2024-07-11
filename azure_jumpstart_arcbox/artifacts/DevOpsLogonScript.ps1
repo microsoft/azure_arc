@@ -103,7 +103,7 @@ Write-Host "`n"
 az -v
 
 foreach ($cluster in $clusters) {
-    
+
   Write-Header "Configuring kube-vip on K3s cluster"
   $Env:KUBECONFIG=$cluster.kubeConfig
   kubectx
@@ -503,30 +503,12 @@ $shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 7
 $shortcut.Save()
 
-# Changing to Jumpstart ArcBox wallpaper
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
+Write-Header "Changing wallpaper"
 
-     public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+# bmp file is required for BGInfo
+Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
 
-         public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-         }
-    }
- }
-'@
-
-$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="pwsh.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
-
-if(-not $ArcServersLogonScript) {
-    Write-Header "Changing Wallpaper"
-    $imgPath="$Env:ArcBoxDir\wallpaper.png"
-    Add-Type $code
-    [Win32.Wallpaper]::SetWallpaper($imgPath)
-}
+Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
@@ -536,13 +518,14 @@ if ($null -ne (Get-ScheduledTask -TaskName "DevOpsLogonScript" -ErrorAction Sile
 
 Start-Sleep -Seconds 5
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command {
-    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-    Start-Sleep -Seconds 5
-    Write-Host "`n"
-    Write-Host "Creating deployment logs bundle"
-    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
-}'
+Write-Header "Creating deployment logs bundle"
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+#required to avoid "file is being used by another process" error when compressing the logs
+Copy-Item -Path "$Env:ArcBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:ArcBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
+
+Stop-Transcript

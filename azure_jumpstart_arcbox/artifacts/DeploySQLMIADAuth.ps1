@@ -161,8 +161,9 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
 
         ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
         ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        
         # Convert key tab file into base64 data
-        $keytabrawdata = Get-Content $keytab_file -Encoding byte
+        $keytabrawdata = Get-Content $keytab_file -AsByteStream
         $b64keytabtext = [System.Convert]::ToBase64String($keytabrawdata)
         # Grant permission to DSA account on SQLMI OU
     }
