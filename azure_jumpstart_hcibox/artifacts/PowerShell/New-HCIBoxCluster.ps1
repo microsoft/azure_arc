@@ -1466,14 +1466,14 @@ function Set-HCIDeployPrereqs {
             Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
-            $armtoken = Get-AzAccessToken
+            $armtoken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token) -AsPlainText
 
             # Workaround for BITS transfer issue
             Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Disable-NetAdapter -Confirm:$false | Out-Null
 
             #Invoke the registration script.
-            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken.Token -AccountID $clientId
+            Invoke-AzStackHciArcInitialization -SubscriptionID $subId -ResourceGroup $resourceGroup -TenantID $tenantId -Region $location -Cloud "AzureCloud" -ArmAccessToken $armtoken -AccountID $clientId
 
             Get-NetAdapter StorageA | Enable-NetAdapter -Confirm:$false | Out-Null
             Get-NetAdapter StorageB | Enable-NetAdapter -Confirm:$false | Out-Null
