@@ -40,7 +40,7 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 
 #Register the Cluster
 Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Black
-$armtoken = Get-AzAccessToken
+$armtoken = ConvertFrom-SecureString (Get-AzAccessToken -AsSecureString)
 $clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $SDNConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup

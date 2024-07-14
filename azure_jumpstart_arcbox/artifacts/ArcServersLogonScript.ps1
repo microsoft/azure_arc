@@ -179,7 +179,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Onboarding the nested VMs as Azure Arc-enabled servers
     Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-    $accessToken = (Get-AzAccessToken -AsSecureString).Token
+    $accessToken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token)
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
     # Wait for the Arc-enabled server installation to be completed
@@ -394,7 +394,7 @@ $payLoad = @"
         Copy-VMFile $Win2k22vmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
 
         # Update Linux VM onboarding script connect toAzure Arc, get new token as it might have been expired by the time execution reached this line.
-        $accessToken = (Get-AzAccessToken -AsSecureString).Token
+        $accessToken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token)
         (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$accessToken', "'$accessToken'" -replace '\$resourceGroup', "'$resourceGroup'" -replace '\$tenantId', "'$Env:tenantId'" -replace '\$azureLocation', "'$Env:azureLocation'" -replace '\$subscriptionId', "'$subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
         # Copy installation script to nested Linux VMs
