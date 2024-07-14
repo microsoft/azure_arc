@@ -65,7 +65,7 @@ function registerArcForServers() {
     elseif (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2) {
         # New versions of Az.Account support getting access tokens
         #
-        $token = ConvertFrom-SecureString (Get-AzAccessToken -AsSecureString)
+        $token = ConvertFrom-SecureString (Get-AzAccessToken -AsSecureString) -AsPlainText
         $params += "--access-token"
         $params += $token.Token
     }
