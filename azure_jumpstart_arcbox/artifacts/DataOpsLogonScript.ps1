@@ -39,6 +39,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
 
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
 $AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
+$Env:AZDATA_PASSWORD = $AZDATA_PASSWORD
 
 # Register Azure providers.
 # ---- MOVE THESE INTO PRE-REQUISITES DOCUMENT AND REMOVE---

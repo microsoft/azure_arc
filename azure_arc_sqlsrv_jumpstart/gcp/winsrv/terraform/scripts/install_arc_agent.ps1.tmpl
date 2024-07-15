@@ -65,9 +65,9 @@ function registerArcForServers() {
     elseif (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2) {
         # New versions of Az.Account support getting access tokens
         #
-        $token = Get-AzAccessToken
+        $token = (Get-AzAccessToken -AsSecureString).token
         $params += "--access-token"
-        $params += $token.Token
+        $params += ConvertFrom-SecureString $token -AsPlainText
     }
 
     & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" $params
