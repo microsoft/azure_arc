@@ -39,6 +39,7 @@ if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
 
 # Retrieve Azure Key Vault secrets and store as runtime environment variables
 $AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
+$Env:AZDATA_PASSWORD = $AZDATA_PASSWORD
 
 # Register Azure providers.
 # ---- MOVE THESE INTO PRE-REQUISITES DOCUMENT AND REMOVE---
@@ -350,7 +351,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             --auto-upgrade false `
             --scope cluster `
             --release-namespace arc `
-            --version 1.30.0 `
+            --version 1.31.0 `
             --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
             Write-Host "`n"
