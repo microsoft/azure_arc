@@ -33,7 +33,7 @@ $dcInfo
 Write-Host "===================================================="
 
 # Set user user prinicpal name
-Get-ADUser $Env:adminUsername | Set-ADUser -UserPrincipalName "$Env:adminUsername@jumpstart.local"
+Set-ADUser $Env:adminUsername -UserPrincipalName "$Env:adminUsername@jumpstart.local" -Credential $adminCredential
 
 # Create login session with domain credentials
 $cimsession = New-CimSession -Credential $adminCredential
