@@ -117,6 +117,9 @@ if ([bool]$vmAutologon) {
     }
 }
 
+# Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain
+Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "SyncForegroundPolicy" 1
+
 # Copy PowerShell Profile and Reload
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1

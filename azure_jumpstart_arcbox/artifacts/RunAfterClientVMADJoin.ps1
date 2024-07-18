@@ -39,7 +39,13 @@ $cimsession = New-CimSession -Credential $adminCredential
 $Trigger = New-ScheduledTaskTrigger -AtLogOn -User $adminuser
 $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\WinGet.ps1
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+$principal = New-ScheduledTaskPrincipal -RunLevel Highest -UserId $adminuser -LogonType InteractiveOrPassword
+$principal2 = New-ScheduledTaskPrincipal -RunLevel Highest -GroupId "BUILTIN\Administrators"
+
 Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -CimSession $cimsession -Action $Action -RunLevel "Highest" -Force -Settings $settings
+Register-ScheduledTask -TaskName "WinGetLogonScript2" -Trigger $Trigger -User $adminuser -Password $adminPassword -Action $Action -RunLevel "Highest" -Force -Settings $settings
+Register-ScheduledTask -TaskName "WinGetLogonScript3" -Trigger $Trigger -Principal $principal -Action $Action -Force -Settings $settings
+Register-ScheduledTask -TaskName "WinGetLogonScript4" -Trigger $Trigger -Principal $principal2 -Action $Action -Force -Settings $settings
 
 # Creating scheduled task for DataOpsLogonScript.ps1
 $Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\DataOpsLogonScript.ps1"
