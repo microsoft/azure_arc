@@ -117,6 +117,9 @@ if ([bool]$vmAutologon) {
     }
 }
 
+# Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain
+Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "SyncForegroundPolicy" 1
+
 # Copy PowerShell Profile and Reload
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
 .$PsHome\Profile.ps1
@@ -390,9 +393,6 @@ if ($flavor -eq "DataOps") {
     Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
-
-    # Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain
-    Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "SyncForegroundPolicy" 1
 
     # Disabling Windows Server Manager Scheduled Task
     Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
