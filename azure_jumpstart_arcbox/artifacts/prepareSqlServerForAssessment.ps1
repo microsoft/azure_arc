@@ -21,6 +21,9 @@ Invoke-Sqlcmd "RECONFIGURE"
 # Create Archive database to introduce these SQL feature usage
 # Create sample database
 $sqlScriptToExecute = @"
+DROP DATABASE IF EXISTS [ArchiveDB]
+GO
+
 CREATE DATABASE ArchiveDB 
 ON
 PRIMARY ( NAME = Arch1,

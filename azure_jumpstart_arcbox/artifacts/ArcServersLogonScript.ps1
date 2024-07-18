@@ -171,6 +171,11 @@ if ($Env:flavor -ne "DevOps") {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
 
+    # Download SQL assessment preparation script
+    Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
+    Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\prepareSqlServerForAssessment.ps1" -DestinationPath "$nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1" -CreateFullPath -FileSource Host -Force
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1 } -Credential $winCreds
+
     # Copy installation script to nested Windows VMs
     Write-Output "Transferring installation script to nested Windows VMs..."
     Copy-VMFile $SQLvmName -SourcePath "$agentScript\installArcAgent.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host -Force
