@@ -69,4 +69,6 @@ net user $account /active:no
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
 
+Restart-Computer -Force
+
 Stop-Transcript
