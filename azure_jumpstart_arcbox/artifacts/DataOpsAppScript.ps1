@@ -94,7 +94,7 @@ Write-Header "Adding CName Record for App"
 $dcInfo = Get-ADDomainController
 Do
 {
-	$appIpaddress= kubectl get svc "web-app-service" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+	$appIpaddress= kubectl -n $appNamespace get svc "web-app-service" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
    Start-Sleep -Seconds 5
 } while ($null -eq $appIpaddress)
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
