@@ -1,7 +1,8 @@
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 
-$CName = "dataops"
-$certdns = "$CName.jumpstart.local"
+$CName = "dataops.jumpstart.local"
+# $CName = "dataops"
+# $certdns = "$CName.jumpstart.local"
 $appNamespace = "arc"
 $sqlInstance = "aks-dr"
 
@@ -30,7 +31,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: azurearcjumpstart.azurecr.io/demoapp:dr
+        image: jumpstartdev.azurecr.io/demoapp:dr
         ports:
         - containerPort: 80
         volumeMounts:

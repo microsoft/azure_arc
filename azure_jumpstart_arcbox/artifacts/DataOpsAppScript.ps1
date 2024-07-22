@@ -2,8 +2,9 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$CName = "jumpstartbooks"
-$certdns = "$CName.jumpstart.local"
+$CName = "jumpstartbooks.jumpstart.local"
+# $CName = "jumpstartbooks"
+# $certdns = "$CName.jumpstart.local"
 # $password = "arcbox"
 $appNamespace = "arc"
 $sqlInstance = "k3s"
@@ -111,7 +112,7 @@ Do {
 $shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "http://$appIpaddress"
+$shortcut.TargetPath = "http://$CName"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
