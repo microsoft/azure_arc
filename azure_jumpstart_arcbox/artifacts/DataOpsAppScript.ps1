@@ -2,8 +2,8 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-# $CName = "jumpstartbooks"
-# $certdns = "$CName.jumpstart.local"
+$CName = "jumpstartbooks"
+$certdns = "$CName.jumpstart.local"
 # $password = "arcbox"
 $appNamespace = "arc"
 $sqlInstance = "k3s"
@@ -90,16 +90,16 @@ spec:
 Write-Header "Deploying App Resource"
 $appK3s | kubectl apply -n $appNamespace -f -
 
-# Write-Header "Adding CName Record for App"
-# $dcInfo = Get-ADDomainController
+Write-Header "Adding CName Record for App"
+$dcInfo = Get-ADDomainController
 Do
 {
   Write-Host "Waiting for Web App Service, hold tight..."
 	$appIpaddress= kubectl -n $appNamespace get svc "web-app-service" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
    Start-Sleep -Seconds 5
 } while ($null -eq $appIpaddress)
-# Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
-# Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
+Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 Do {
   Write-Host "Waiting for Web App pod, hold tight..."
