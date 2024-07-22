@@ -2,41 +2,41 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$CName = "jumpstartbooks"
-$certdns = "$CName.jumpstart.local"
-$password = "arcbox"
+# $CName = "jumpstartbooks"
+# $certdns = "$CName.jumpstart.local"
+# $password = "arcbox"
 $appNamespace = "arc"
 $sqlInstance = "k3s"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsAppScript.log
 
-# Add OpenSSL to path environment variable
-$openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
-$currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Process)
-$newPathVariable = $currentPathVariable + ";" + $openSSL
-[Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Process)
+# # Add OpenSSL to path environment variable
+# $openSSL = "C:\Program Files\FireDaemon OpenSSL 3\bin"
+# $currentPathVariable = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Process)
+# $newPathVariable = $currentPathVariable + ";" + $openSSL
+# [Environment]::SetEnvironmentVariable("PATH", $newPathVariable, [EnvironmentVariableTarget]::Process)
 
-Write-Host "Generating a TLS Certificate"
-$cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-$certPassword = ConvertTo-SecureString -String $password -Force -AsPlainText
-Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$CName.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$CName.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+# Write-Host "Generating a TLS Certificate"
+# $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
+# $certPassword = ConvertTo-SecureString -String $password -Force -AsPlainText
+# Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$CName.pfx" -Password $certPassword
+# Import-PfxCertificate -FilePath "$Env:TempDir\$CName.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
-openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -nocerts -out "$Env:TempDir\$CName.key" -password pass:$password -passout pass:$password
-openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password
-openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
+# openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -nocerts -out "$Env:TempDir\$CName.key" -password pass:$password -passout pass:$password
+# openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password
+# openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
 
-Write-Header "Creating Ingress Controller"
-foreach ($cluster in @('k3s', 'aks-dr')) {
-    # Create K8s Ingress TLS secret
-    kubectx $cluster
-    kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key" --cert "$Env:TempDir\$CName.crt"
+# Write-Header "Creating Ingress Controller"
+# foreach ($cluster in @('k3s', 'aks-dr')) {
+#     # Create K8s Ingress TLS secret
+#     kubectx $cluster
+#     kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key" --cert "$Env:TempDir\$CName.crt"
 
-    # Deploy NGINX Ingress Controller
-    helm repo add nginx-stable https://helm.nginx.com/stable
-    helm repo update
-    helm install dataops-ingress nginx-stable/nginx-ingress
-}
+#     # Deploy NGINX Ingress Controller
+#     helm repo add nginx-stable https://helm.nginx.com/stable
+#     helm repo update
+#     helm install dataops-ingress nginx-stable/nginx-ingress
+# }
 
 # Switch kubectl context to k3s
 kubectx $sqlInstance
@@ -90,15 +90,16 @@ spec:
 Write-Header "Deploying App Resource"
 $appK3s | kubectl apply -n $appNamespace -f -
 
-Write-Header "Adding CName Record for App"
-$dcInfo = Get-ADDomainController
+# Write-Header "Adding CName Record for App"
+# $dcInfo = Get-ADDomainController
 Do
 {
+  Write-Host "Waiting for Web App Service, hold tight..."
 	$appIpaddress= kubectl -n $appNamespace get svc "web-app-service" -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
    Start-Sleep -Seconds 5
 } while ($null -eq $appIpaddress)
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
-Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
+# Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
+# Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 Do {
   Write-Host "Waiting for Web App pod, hold tight..."
@@ -110,7 +111,7 @@ Do {
 $shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://$certdns"
+$shortcut.TargetPath = "http://$appIpaddress"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
