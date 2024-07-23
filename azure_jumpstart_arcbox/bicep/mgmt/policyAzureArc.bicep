@@ -153,3 +153,21 @@ resource tagIngerit 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   }
 }
 
+resource policy_tagging_resources_rg 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid( tagPolicyAssignemnt.name, any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'),resourceGroup().id)
+  properties: {
+    roleDefinitionId: any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c')
+    principalId: tagPolicyAssignemnt.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource policy_tagging_resources_inherit 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid( tagIngerit.name, any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'),resourceGroup().id)
+  properties: {
+    roleDefinitionId: any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c')
+    principalId: tagIngerit.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
