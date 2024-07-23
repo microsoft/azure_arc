@@ -7,6 +7,16 @@ param logAnalyticsWorkspaceId string
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
 param flavor string
 
+@description('Tags to assign for all ArcBox resources')
+param resourceTags array = [
+  {
+    tagName: 'Solution'
+    tagValue: 'jumpstart_arcbox'
+  }
+]
+
+var tagsRoleDefinitionId =  '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
+
 var policies = [
   {
     name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
@@ -29,7 +39,7 @@ var policies = [
       }
     }
   }
-  {
+  /*{
     name: '(ArcBox) Tag resources'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
     flavors: [
@@ -47,7 +57,7 @@ var policies = [
         value: 'jumpstart_arcbox'
       }
     }
-  }
+  }*/
   {
     name: '(ArcBox) Enable Microsoft Defender on Kubernetes clusters'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c'
@@ -99,77 +109,49 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
   }
 }
 
-resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
+/*resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[1].roleDefinition)
     principalId: contains(policies[1].flavors, flavor)?policies_name[1].identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
-}
+}*/
 
-resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[2].flavors, flavor)) {
-  name: guid( policies[2].name, policies[2].roleDefinition,resourceGroup().id)
+resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
+  name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: any(policies[2].roleDefinition)
-    principalId: contains(policies[2].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
+    roleDefinitionId: any(policies[1].roleDefinition)
+    principalId: contains(policies[1].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
 
-resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: 'tagPolicyAssignemnt'
-  location: resourceGroup().location
-  scope: resourceGroup()
+
+resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for (tag,i) in resourceTags: {
+  name: 'applyTag-${tag[i].tagName}'
+  location: azureLocation
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
-    displayName: 'Apply Tag to resource group'
-    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/726aca4c-86e9-4b04-b0c5-073027359532')
-    parameters: {
+    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26')
+    parameters:{
       tagName: {
-        value: 'Project'
+        value: tag[i].tagName
       }
       tagValue: {
-        value: 'jumpstart_arcbox_policy'
+        value: tag[i].tagValue
       }
     }
   }
-}
+}]
 
-resource tagIngerit 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: 'tagIngerit'
-  scope: resourceGroup()
-  location: resourceGroup().location
-  identity: {
-    type: 'SystemAssigned'
-  }
+resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in resourceTags: {
+  name: guid( tag[i].tagName, tagsRoleDefinitionId,resourceGroup().id)
   properties: {
-    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/cd3aa116-8754-49c9-a813-ad46512ece54')
-    parameters: {
-      tagName: {
-        value: 'Project'
-    }
-  }
-  }
-}
-
-resource policy_tagging_resources_rg 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( tagPolicyAssignemnt.name, any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'),resourceGroup().id)
-  properties: {
-    roleDefinitionId: any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c')
-    principalId: tagPolicyAssignemnt.identity.principalId
+    roleDefinitionId: any(tagsRoleDefinitionId)
+    principalId: applyCustomTags[i].identity.principalId
     principalType: 'ServicePrincipal'
   }
-}
-
-resource policy_tagging_resources_inherit 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid( tagIngerit.name, any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'),resourceGroup().id)
-  properties: {
-    roleDefinitionId: any('/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c')
-    principalId: tagIngerit.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
+}]

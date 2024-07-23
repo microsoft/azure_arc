@@ -63,6 +63,14 @@ param location string = resourceGroup().location
 @description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
 param customLocationRPOID string = ''
 
+@description('Tags to assign for all ArcBox resources')
+param resourceTags array = [
+  {
+    tagName: 'Solution'
+    tagValue: 'jumpstart_arcbox'
+  }
+]
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
 var aksDrArcDataClusterName = 'ArcBox-AKS-DR-Data-${guid}'
@@ -162,6 +170,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     deployBastion: deployBastion
     bastionSku: bastionSku
     location: location
+    resourceTags: resourceTags
   }
 }
 

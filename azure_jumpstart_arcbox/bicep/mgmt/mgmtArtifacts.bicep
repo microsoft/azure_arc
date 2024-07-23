@@ -53,6 +53,14 @@ param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 @description('DNS Server configuration')
 param dnsServers array = []
 
+@description('Tags to assign for all ArcBox resources')
+param resourceTags array = [
+  {
+    tagName: 'Solution'
+    tagValue: 'jumpstart_arcbox'
+  }
+]
+
 var keyVaultName = 'arcbox${uniqueString(resourceGroup().id)}'
 
 var security = {
@@ -497,6 +505,7 @@ module policyDeployment './policyAzureArc.bicep' = {
     azureLocation: location
     logAnalyticsWorkspaceId: workspace.id
     flavor: flavor
+    resourceTags: resourceTags
   }
 }
 
