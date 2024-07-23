@@ -15,7 +15,7 @@ param resourceTags array = [
   }
 ]
 
-var tagsRoleDefinitionId =  '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
+param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 var policies = [
   {
@@ -150,7 +150,7 @@ resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' 
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in resourceTags: {
   name: guid(applyCustomTags[i].name, tagsRoleDefinitionId,resourceGroup().id)
   properties: {
-    roleDefinitionId: any(tagsRoleDefinitionId)
+    roleDefinitionId: tagsRoleDefinitionId
     principalId: applyCustomTags[i].identity.principalId
     principalType: 'ServicePrincipal'
   }
