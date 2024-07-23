@@ -39,7 +39,7 @@ var policies = [
       }
     }
   }
-  /*{
+  {
     name: '(ArcBox) Tag resources'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
     flavors: [
@@ -57,7 +57,7 @@ var policies = [
         value: 'jumpstart_arcbox'
       }
     }
-  }*/
+  }
   {
     name: '(ArcBox) Enable Microsoft Defender on Kubernetes clusters'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c'
