@@ -66,7 +66,6 @@ param customLocationRPOID string = ''
 @description('Tags to assign for all ArcBox resources')
 param resourceTags object = {
   Solution: 'jumpstart_arcbox'
-  Name: 'Seif'
 }
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
