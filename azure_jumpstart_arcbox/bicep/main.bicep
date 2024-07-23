@@ -64,12 +64,10 @@ param location string = resourceGroup().location
 param customLocationRPOID string = ''
 
 @description('Tags to assign for all ArcBox resources')
-param resourceTags array = [
-  {
-    tagName: 'Solution'
-    tagValue: 'jumpstart_arcbox'
-  }
-]
+param resourceTags object = {
+  Solution: 'jumpstart_arcbox'
+  Name: 'Seif'
+}
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'

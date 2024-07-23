@@ -54,12 +54,9 @@ param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 param dnsServers array = []
 
 @description('Tags to assign for all ArcBox resources')
-param resourceTags array = [
-  {
-    tagName: 'Solution'
-    tagValue: 'jumpstart_arcbox'
-  }
-]
+param resourceTags object = {
+  Solution: 'jumpstart_arcbox'
+}
 
 var keyVaultName = 'arcbox${uniqueString(resourceGroup().id)}'
 
@@ -454,9 +451,11 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
   }
 }
 
+
 resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: workspaceName
   location: location
+  tags: resourceTags
   properties: {
     sku: {
       name: sku

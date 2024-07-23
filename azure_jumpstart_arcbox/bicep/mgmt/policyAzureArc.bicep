@@ -8,12 +8,9 @@ param logAnalyticsWorkspaceId string
 param flavor string
 
 @description('Tags to assign for all ArcBox resources')
-param resourceTags array = [
-  {
-    tagName: 'Solution'
-    tagValue: 'jumpstart_arcbox'
-  }
-]
+param resourceTags object = {
+  Solution: 'jumpstart_arcbox'
+}
 
 param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
@@ -128,8 +125,8 @@ resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@202
 }
 
 
-resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for (tag,i) in resourceTags: {
-  name: '(ArcBox) Tag resources-${tag.tagName}'
+resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for (tag,i) in items(resourceTags): {
+  name: '(ArcBox) Tag resources-${tag.key}'
   location: azureLocation
   identity: {
     type: 'SystemAssigned'
@@ -138,16 +135,16 @@ resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' 
     policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26')
     parameters:{
       tagName: {
-        value: tag.tagName
+        value: tag.key
       }
       tagValue: {
-        value: tag.tagValue
+        value: tag.value
       }
     }
   }
 }]
 
-resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in resourceTags: {
+resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in items(resourceTags): {
   name: guid(applyCustomTags[i].name, tagsRoleDefinitionId,resourceGroup().id)
   properties: {
     roleDefinitionId: tagsRoleDefinitionId
