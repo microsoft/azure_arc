@@ -118,11 +118,11 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
   }
 }*/
 
-resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
+resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[2].flavors, flavor)) {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: any(policies[1].roleDefinition)
-    principalId: contains(policies[1].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
+    roleDefinitionId: any(policies[2].roleDefinition)
+    principalId: contains(policies[2].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
     principalType: 'ServicePrincipal'
   }
 }
