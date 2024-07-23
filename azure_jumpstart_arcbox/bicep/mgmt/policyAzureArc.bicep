@@ -125,7 +125,7 @@ resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-
   }
   properties: {
     displayName: 'Apply Tag to resource group'
-    policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/726aca4c-86e9-4b04-b0c5-073027359532'
+    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/726aca4c-86e9-4b04-b0c5-073027359532')
     parameters: {
       tagName: {
         value: 'Project'
@@ -144,7 +144,7 @@ resource tagIngerit 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/cd3aa116-8754-49c9-a813-ad46512ece54'
+    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/cd3aa116-8754-49c9-a813-ad46512ece54')
     parameters: {
       tagName: {
         value: 'Project'
