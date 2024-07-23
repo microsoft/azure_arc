@@ -36,25 +36,6 @@ var policies = [
       }
     }
   }
-  /*{
-    name: '(ArcBox) Tag resources'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
-    flavors: [
-      'Full'
-      'ITPro'
-      'DevOps'
-      'DataOps'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    parameters: {
-      tagName: {
-        value: 'Project'
-      }
-      tagValue: {
-        value: 'jumpstart_arcbox'
-      }
-    }
-  }*/
   {
     name: '(ArcBox) Enable Microsoft Defender on Kubernetes clusters'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c'
@@ -105,15 +86,6 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
     principalType: 'ServicePrincipal'
   }
 }
-
-/*resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
-  name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
-  properties: {
-    roleDefinitionId: any(policies[1].roleDefinition)
-    principalId: contains(policies[1].flavors, flavor)?policies_name[1].identity.principalId:guid('policies_name_id${0}')
-    principalType: 'ServicePrincipal'
-  }
-}*/
 
 resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
