@@ -131,6 +131,9 @@ var dataOpsSubnets = [
 resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   name: virtualNetworkName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -147,6 +150,9 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
 resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (flavor == 'DataOps') {
   name: drVirtualNetworkName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -173,6 +179,9 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (f
 resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
   parent: arcVirtualNetwork
   name: 'peering-to-DR-vnet'
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     allowVirtualNetworkAccess: true
     allowForwardedTraffic: true
@@ -187,6 +196,9 @@ resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetwork
 resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
   parent: drVirtualNetwork
   name: 'peering-to-primary-vnet'
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     allowVirtualNetworkAccess: true
     allowForwardedTraffic: true
@@ -201,6 +213,9 @@ resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtual
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
   name: networkSecurityGroupName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     securityRules: [
       {
@@ -314,6 +329,9 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-0
 resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     securityRules: [
       {
@@ -463,6 +481,9 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
 resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -476,6 +497,9 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (
 resource bastionHost 'Microsoft.Network/bastionHosts@2023-11-01' = if (deployBastion == true) {
   name: bastionName
   location: location
+  dependsOn: [
+    policyDeployment
+  ]
   sku: {
     name: bastionSku
   }
@@ -511,6 +535,9 @@ module policyDeployment './policyAzureArc.bicep' = {
 
 module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
   name: 'keyVaultDeployment'
+  dependsOn: [
+    policyDeployment
+  ]
   params: {
     name: keyVaultName
     enablePurgeProtection: false

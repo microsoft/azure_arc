@@ -28,9 +28,6 @@ param location string = resourceGroup().location
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-param resourceTags object = {
-  Project: 'jumpstart_arcbox'
-}
 param spnAuthority string = environment().authentication.loginEndpoint
 
 @description('Your Microsoft Entra tenant Id')
@@ -158,7 +155,6 @@ resource vmDisk 'Microsoft.Compute/disks@2023-04-02' = {
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
-  tags: resourceTags
   identity: {
     type: 'SystemAssigned'
   }
