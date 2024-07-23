@@ -119,6 +119,7 @@ resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@202
 
 resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: 'tagPolicyAssignemnt'
+  location: resourceGroup().location
   scope: resourceGroup()
   identity: {
     type: 'SystemAssigned'
@@ -140,6 +141,7 @@ resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-
 resource tagIngerit 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: 'tagIngerit'
   scope: resourceGroup()
+  location: resourceGroup().location
   identity: {
     type: 'SystemAssigned'
   }
