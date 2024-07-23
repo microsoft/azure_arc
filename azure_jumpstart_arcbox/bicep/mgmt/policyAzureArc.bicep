@@ -129,7 +129,7 @@ resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@202
 
 
 resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for (tag,i) in resourceTags: {
-  name: 'applyTag-${tag[i].tagName}'
+  name: 'applyTag-${tag.tagName}'
   location: azureLocation
   identity: {
     type: 'SystemAssigned'
@@ -138,10 +138,10 @@ resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' 
     policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26')
     parameters:{
       tagName: {
-        value: tag[i].tagName
+        value: tag.tagName
       }
       tagValue: {
-        value: tag[i].tagValue
+        value: tag.tagValue
       }
     }
   }
