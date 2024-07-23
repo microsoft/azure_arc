@@ -111,7 +111,7 @@ Do {
 $shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "http://$CName"
+$shortcut.TargetPath = "http://$CName.jumpstart.local"
 $shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
