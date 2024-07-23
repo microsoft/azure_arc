@@ -120,6 +120,9 @@ resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@202
 resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: 'tagPolicyAssignemnt'
   scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     displayName: 'Apply Tag to resource group'
     policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/726aca4c-86e9-4b04-b0c5-073027359532'
@@ -137,6 +140,9 @@ resource tagPolicyAssignemnt 'Microsoft.Authorization/policyAssignments@2024-04-
 resource tagIngerit 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: 'tagIngerit'
   scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     policyDefinitionId: '/providers/Microsoft.Authorization/policyDefinitions/cd3aa116-8754-49c9-a813-ad46512ece54'
     parameters: {
