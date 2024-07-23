@@ -1,7 +1,6 @@
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 
-$CName = "dataops.jumpstart.local"
-# $CName = "dataops"
+$CName = "dataops"
 # $certdns = "$CName.jumpstart.local"
 $appNamespace = "arc"
 $sqlInstance = "aks-dr"
