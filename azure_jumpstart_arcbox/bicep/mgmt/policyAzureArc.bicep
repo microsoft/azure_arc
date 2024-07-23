@@ -148,7 +148,7 @@ resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' 
 }]
 
 resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in resourceTags: {
-  name: guid('applyTag${i}', tagsRoleDefinitionId,resourceGroup().id)
+  name: guid(applyCustomTags[i].name, tagsRoleDefinitionId,resourceGroup().id)
   properties: {
     roleDefinitionId: any(tagsRoleDefinitionId)
     principalId: applyCustomTags[i].identity.principalId
