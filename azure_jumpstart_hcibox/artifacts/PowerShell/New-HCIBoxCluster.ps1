@@ -9,6 +9,21 @@ $starttime = Get-Date
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 
 #region functions
+function ConvertFrom-SecureStringToPlainText {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Security.SecureString]$SecureString
+    )
+    
+    $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+    try {
+        return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+    }
+    finally {
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)
+    }
+}
+
 function BITSRequest {
     param (
         [Parameter(Mandatory=$True)]
@@ -1466,7 +1481,7 @@ function Set-HCIDeployPrereqs {
             Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
-            $armtoken = ConvertFrom-SecureString ((Get-AzAccessToken -AsSecureString).Token) -AsPlainText
+            $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
 
             # Workaround for BITS transfer issue
             Get-NetAdapter StorageA | Disable-NetAdapter -Confirm:$false | Out-Null

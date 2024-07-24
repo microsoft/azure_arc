@@ -9,12 +9,24 @@ infra:
   module: "main.azd"
 hooks:
   preprovision:
-    shell: pwsh
-    run: ./scripts/preprovision.ps1
-    continueOnError: false
-    interactive: true
+    windows:
+      shell: pwsh
+      run: ./scripts/preprovision.ps1
+      continueOnError: false
+      interactive: true
+    posix:
+      shell: sh
+      run: ./scripts/preprovision.sh
+      continueOnError: false
+      interactive: true
   postprovision:
-    shell: pwsh
-    run: ./scripts/postprovision.ps1
-    continueOnError: false
-    interactive: true
+    windows:
+      shell: pwsh
+      run: ./scripts/postprovision.ps1
+      continueOnError: false
+      interactive: true
+    posix:
+      shell: sh
+      run: ./scripts/postprovision.sh
+      continueOnError: false
+      interactive: true
