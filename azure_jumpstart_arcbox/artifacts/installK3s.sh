@@ -152,7 +152,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
     echo "Log Analytics workspace id $workspaceResourceId"
 
-    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox'
+    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
     echo "Onboarding the k3s cluster to Azure Arc completed"
     
     # Verify if cluster is connected to Azure Arc successfully

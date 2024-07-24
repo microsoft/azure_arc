@@ -11,6 +11,7 @@ $tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
+$resourceTags = $env:resourceTags
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
 $vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/*"
@@ -212,7 +213,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Create SQL server extension as policy to auto deployment is disabled
     Write-Host "Installing SQL Server extension on the Arc-enabled Server."
-    az connectedmachine extension create --machine-name $SQLvmName --name "WindowsAgent.SqlServer" --resource-group $resourceGroup --type "WindowsAgent.SqlServer" --publisher "Microsoft.AzureData" --settings '{\"LicenseType\":\"Paid\", \"SqlManagement\": {\"IsEnabled\":true}}'
+    az connectedmachine extension create --machine-name $SQLvmName --name "WindowsAgent.SqlServer" --resource-group $resourceGroup --type "WindowsAgent.SqlServer" --publisher "Microsoft.AzureData" --settings '{\"LicenseType\":\"Paid\", \"SqlManagement\": {\"IsEnabled\":true}}' --tags $resourceTags --location $azureLocation --only-show-errors --no-wait
     Write-Host "SQL Server extension installation on the Arc-enabled Server successful."
 
     $retryCount = 0

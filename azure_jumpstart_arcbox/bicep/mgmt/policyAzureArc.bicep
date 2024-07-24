@@ -7,6 +7,13 @@ param logAnalyticsWorkspaceId string
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
 param flavor string
 
+@description('Tags to assign for all ArcBox resources')
+param resourceTags object = {
+  Solution: 'jumpstart_arcbox'
+}
+
+param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+
 var policies = [
   {
     name: '(ArcBox) Enable Azure Monitor for Hybrid VMs with AMA'
@@ -26,25 +33,6 @@ var policies = [
       }
       enableProcessesAndDependencies: {
         value: true
-      }
-    }
-  }
-  {
-    name: '(ArcBox) Tag resources'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
-    flavors: [
-      'Full'
-      'ITPro'
-      'DevOps'
-      'DataOps'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    parameters: {
-      tagName: {
-        value: 'Project'
-      }
-      tagValue: {
-        value: 'jumpstart_arcbox'
       }
     }
   }
@@ -99,7 +87,7 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2020-10-01-p
   }
 }
 
-resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
+resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[1].flavors, flavor)) {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
     roleDefinitionId: any(policies[1].roleDefinition)
@@ -108,12 +96,31 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
   }
 }
 
-resource policy_defender_kubernetes 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = if (contains(policies[2].flavors, flavor)) {
-  name: guid( policies[2].name, policies[2].roleDefinition,resourceGroup().id)
+
+resource applyCustomTags 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for (tag,i) in items(resourceTags): {
+  name: '(ArcBox) Tag resources-${tag.key}'
+  location: azureLocation
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
-    roleDefinitionId: any(policies[2].roleDefinition)
-    principalId: contains(policies[2].flavors, flavor)?policies_name[2].identity.principalId:guid('policies_name_id${0}')
+    policyDefinitionId: any('/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26')
+    parameters:{
+      tagName: {
+        value: tag.key
+      }
+      tagValue: {
+        value: tag.value
+      }
+    }
+  }
+}]
+
+resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = [for (tag,i) in items(resourceTags): {
+  name: guid(applyCustomTags[i].name, tagsRoleDefinitionId,resourceGroup().id)
+  properties: {
+    roleDefinitionId: tagsRoleDefinitionId
+    principalId: applyCustomTags[i].identity.principalId
     principalType: 'ServicePrincipal'
   }
-}
-
+}]

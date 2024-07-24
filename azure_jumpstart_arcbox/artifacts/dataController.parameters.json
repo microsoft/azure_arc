@@ -32,11 +32,6 @@
       "logAnalyticsPrimaryKey": {
         "value": "logAnalyticsPrimaryKey-stage"
       },
-      "resourceTags": {
-        "value": {
-          "Project": "jumpstart_arcbox"
-        }
-      },
       "dockerRegistryCredential": {
         "value": "arc-private-registry"
       },
