@@ -288,11 +288,11 @@ function Deploy-VirtualizationInfrastructure {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
+    $AKSEESchemaVersions = @()
     if($AKSEEPinnedSchemaVersion -eq "useLatest"){
         $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
         $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
         $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
-        $AKSEESchemaVersions = @()
 
         for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
             $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
