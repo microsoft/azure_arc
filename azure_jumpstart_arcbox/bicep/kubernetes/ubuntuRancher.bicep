@@ -48,7 +48,7 @@ var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var k3sControlPlane = 'true' // deploy single-node k3s control plane
 var diskSize = (flavor == 'DataOps') ? 512 : 64
-var numberOfIPAddresses = (flavor == 'DataOps') ? 7 : 5 // The number of IP addresses to create
+var numberOfIPAddresses = (flavor == 'DataOps') ? 8 : 5 // The number of IP addresses to create
 
 // Create multiple public IP addresses if deployBastion is false
 resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
