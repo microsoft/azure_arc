@@ -25,8 +25,3 @@ hooks:
       run: ./scripts/postprovision.ps1
       continueOnError: false
       interactive: true
-    posix:
-      shell: sh
-      run: ./scripts/postprovision.sh
-      continueOnError: false
-      interactive: true
