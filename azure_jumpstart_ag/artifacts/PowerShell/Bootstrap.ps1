@@ -28,8 +28,7 @@ param (
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
   [string]$stcontainerName,
-  [Parameter(Mandatory=$false)]
-  [string]$AKSEEPinnedSchemaVersion
+  [string]$AKSEEPinnedSchemaVersion = ''
 )
 
 ##############################################################
