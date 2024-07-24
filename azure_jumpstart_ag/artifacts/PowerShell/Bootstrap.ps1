@@ -25,11 +25,9 @@ param (
   [string]$adxClusterName,
   [string]$namingGuid,
   [string]$industry,
-  [AllowEmptyString()]
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
   [string]$stcontainerName,
-  [AllowEmptyString()]
   [string]$AKSEEPinnedSchemaVersion
 )
 

@@ -288,7 +288,7 @@ function Deploy-VirtualizationInfrastructure {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
-    if($null -eq $AKSEEPinnedSchemaVersion -or $AKSEEPinnedSchemaVersion -eq ""){
+    if($AKSEEPinnedSchemaVersion -eq "useLatest"){
         $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
         $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
         $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
@@ -393,13 +393,13 @@ function Deploy-VirtualizationInfrastructure {
 
         # Fetch schemaVersion release from the AgConfig file
         $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
-        if ($AKSEESchemaVersionUseLatest -and ($null -eq $AKSEESchemaVersions -or $AKSEESchemaVersions -eq "")) {
+        if ($AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
             $SchemaVersion = $using:AKSEESchemaVersions[0]
         }
-        elseif (!$AKSEESchemaVersionUseLatest -and ($null -eq $AKSEESchemaVersions -or $AKSEESchemaVersions -eq "")) {
+        elseif (!$AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
             $SchemaVersion = $using:AKSEESchemaVersions[1]
         }
-        else {
+        elseif ($AKSEEPinnedSchemaVersion -ne "useLatest") {
             $SchemaVersion = $AKSEEPinnedSchemaVersion
         }
 

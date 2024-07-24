@@ -93,7 +93,7 @@ param rdpPort string = '3389'
 param industry string = 'manufacturing'
 
 @description('The AKSEE schema version to be used. This is only used to pin the AKSEE schema version for testing.')
-param AKSEEPinnedSchemaVersion string = ''
+param AKSEEPinnedSchemaVersion string = 'useLatest'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
