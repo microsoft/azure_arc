@@ -92,6 +92,9 @@ param rdpPort string = '3389'
 @description('The agora industry to be deployed')
 param industry string = 'manufacturing'
 
+@description('The AKSEE schema version to be used. This is only used to pin the AKSEE schema version for testing.')
+param AKSEEPinnedSchemaVersion string = ''
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -146,6 +149,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     industry: industry
     aioStorageAccountName: aioStorageAccountName
     stcontainerName: stcontainerName
+    AKSEEPinnedSchemaVersion: AKSEEPinnedSchemaVersion
   }
 }
 

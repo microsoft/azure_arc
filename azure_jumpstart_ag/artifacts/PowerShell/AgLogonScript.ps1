@@ -31,6 +31,7 @@ $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
 $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
+$global:AKSEEPinnedSchemaVersion = $Env:AKSEEPinnedSchemaVersion
 if ($industry -eq "retail") {
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
