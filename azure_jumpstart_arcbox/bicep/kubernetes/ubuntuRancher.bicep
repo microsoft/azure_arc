@@ -23,10 +23,6 @@ param vmSize string = 'Standard_B4ms'
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-param resourceTags object = {
-  Project: 'jumpstart_arcbox'
-}
-
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
@@ -92,7 +88,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: azureLocation
-  tags: resourceTags
   identity: {
     type: 'SystemAssigned'
   }
