@@ -340,6 +340,7 @@ function Deploy-VirtualizationInfrastructure {
         $AgConfig = $using:AgConfig
         $AgToolsDir = $using:AgToolsDir
         $websiteUrls = $using:websiteUrls
+        $AKSEEPinnedSchemaVersion = $using:AKSEEPinnedSchemaVersion
 
         ##########################################
         # Deploying AKS Edge Essentials clusters
