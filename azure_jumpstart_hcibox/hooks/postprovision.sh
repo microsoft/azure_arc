@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 
 # Configure NSG Rule for RDP (if needed)
 if [ "$JS_RDP_PORT" != "3389" ]; then
