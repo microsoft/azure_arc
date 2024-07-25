@@ -1463,6 +1463,21 @@ function Set-HCIDeployPrereqs {
             $resourceGroup = $args[4]
             $location = $args[5]
 
+            function ConvertFrom-SecureStringToPlainText {
+                param (
+                    [Parameter(Mandatory = $true)]
+                    [System.Security.SecureString]$SecureString
+                )
+                
+                $Ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+                try {
+                    return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($Ptr)
+                }
+                finally {
+                    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Ptr)
+                }
+            }
+            
             # Prep nodes for Azure Arc onboarding
             winrm quickconfig -quiet
             netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
