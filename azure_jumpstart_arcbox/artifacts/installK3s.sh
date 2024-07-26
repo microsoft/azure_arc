@@ -128,10 +128,9 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo "k3sClusterIp: $publicIp" >> $k3sClusterNodeConfig
     sudo -u $adminUsername az extension add --upgrade -n storage-preview
     storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-    storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
-    sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
-    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
-    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $k3sClusterNodeConfig
+    sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --auth-mode login
+    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $localPath
+    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $k3sClusterNodeConfig
 
     # # Registering Azure resource providers
     # echo ""
@@ -181,8 +180,8 @@ else
     k3sClusterNodeConfig="k3sClusterNodeConfig.yaml"
     sudo -u $adminUsername az extension add --upgrade -n storage-preview
     storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-    storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
-    sudo -u $adminUsername az storage azcopy blob download --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source "$k3sClusterNodeConfig"  --destination "/home/$adminUsername/$k3sClusterNodeConfig"
+    # storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
+    sudo -u $adminUsername az storage azcopy blob download --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source "$k3sClusterNodeConfig"  --destination "/home/$adminUsername/$k3sClusterNodeConfig"
 
     # Installing Rancher K3s cluster (single worker node)
     echo ""
@@ -204,4 +203,4 @@ echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
 log="/home/${adminUsername}/jumpstart_logs/installK3s.log"
-sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log --destination "installK3s-$vmName.log"
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $log --destination "installK3s-$vmName.log"
