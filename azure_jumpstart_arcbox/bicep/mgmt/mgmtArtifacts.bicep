@@ -542,7 +542,7 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.5.1' = {
     policyDeployment
   ]
   params: {
-    name: keyVaultName
+    name: toLower(keyVaultName)
     enablePurgeProtection: false
     enableSoftDelete: false
     location: location
