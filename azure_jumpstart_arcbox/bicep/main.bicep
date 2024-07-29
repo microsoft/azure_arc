@@ -61,7 +61,7 @@ param guid string = substring(newGuid(),0,4)
 param location string = resourceGroup().location
 
 @description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
-param customLocationRPOID string = ''
+param customLocationRPOID string = newGuid()
 
 @description('Tags to assign for all ArcBox resources')
 param resourceTags object = {
