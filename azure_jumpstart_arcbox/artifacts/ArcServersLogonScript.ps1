@@ -12,6 +12,7 @@ $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
 $resourceTags = $env:resourceTags
+$namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
 $vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/*"
@@ -146,7 +147,7 @@ if ($Env:flavor -ne "DevOps") {
     # Before deploying ArcBox SQL set resource group tag ArcSQLServerExtensionDeployment=Disabled to opt out of automatic SQL onboarding
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
-    $SQLvmName = "ArcBox-SQL"
+    $SQLvmName = "$namingPrefix-SQL"
     $SQLvmvhdPath = "$Env:ArcBoxVMDir\${SQLvmName}.vhdx"
 
     Write-Host "Fetching SQL VM"
@@ -171,6 +172,9 @@ if ($Env:flavor -ne "DevOps") {
     Start-Sleep -Seconds 20
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
+
+    Write-Header "Renaming the nested SQL VM"
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -ComputerName $using:SQLvmName -Restart } -Credential $winCreds
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
@@ -350,16 +354,16 @@ $payLoad = @"
     if ($Env:flavor -eq "ITPro") {
         Write-Header "Fetching Nested VMs"
 
-        $Win2k19vmName = "ArcBox-Win2K19"
+        $Win2k19vmName = "$namingPrefix-Win2K19"
         $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k19vmName}.vhdx"
 
-        $Win2k22vmName = "ArcBox-Win2K22"
+        $Win2k22vmName = "$namingPrefix-Win2K22"
         $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k22vmName}.vhdx"
 
-        $Ubuntu01vmName = "ArcBox-Ubuntu-01"
+        $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
         $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu01vmName}.vhdx"
 
-        $Ubuntu02vmName = "ArcBox-Ubuntu-02"
+        $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
         $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
@@ -390,9 +394,20 @@ $payLoad = @"
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Start-Sleep -Seconds 5
 
+        # Renaming the nested VMs
+        Write-Header "Renaming the nested Windows VMs"
+        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -ComputerName $using:Win2k19vmName -Restart } -Credential $winCreds
+        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -ComputerName $using:Win2k22vmName -Restart } -Credential $winCreds
+
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
         $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
+
+        # Renaming the nested linux VMs
+        Write-Output "Renaming the nested Linux VMs"
+        $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
+        $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
+        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."

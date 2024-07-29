@@ -3,7 +3,7 @@
 param sshRSAPublicKey string = ''
 
 @description('Your Microsoft Entra tenant Id')
-param tenantId string
+param tenantId string = tenant().tenantId
 
 @description('Username for Windows account')
 param windowsAdminUsername string
@@ -67,6 +67,10 @@ param customLocationRPOID string = newGuid()
 param resourceTags object = {
   Solution: 'jumpstart_arcbox'
 }
+
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
@@ -146,6 +150,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     rdpPort: rdpPort
     addsDomainName: addsDomainName
     customLocationRPOID: customLocationRPOID
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     updateVNetDNSServers
