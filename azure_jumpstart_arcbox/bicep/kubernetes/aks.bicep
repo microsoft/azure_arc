@@ -1,8 +1,8 @@
 @description('The name of the Kubernetes cluster resource')
-param aksClusterName string = 'ArcBox-AKS-Data'
+param aksClusterName string = '${namingPrefix}-AKS-Data'
 
 @description('The name of the Kubernetes cluster resource')
-param drClusterName string = 'ArcBox-AKS-DR-Data'
+param drClusterName string = '${namingPrefix}-AKS-DR-Data'
 
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
@@ -45,14 +45,18 @@ param osType string = 'Linux'
 @description('The version of Kubernetes')
 param kubernetesVersion string = '1.28.9'
 
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
+
 var serviceCidr_primary = '10.20.64.0/19'
 var dnsServiceIP_primary = '10.20.64.10'
 var serviceCidr_secondary = '172.20.64.0/19'
 var dnsServiceIP_secondary = '172.20.64.10'
-var virtualNetworkName = 'ArcBox-VNet'
-var aksSubnetName = 'ArcBox-AKS-Subnet'
-var drVirtualNetworkName = 'ArcBox-DR-VNet'
-var drSubnetName = 'ArcBox-DR-Subnet'
+var virtualNetworkName = '${namingPrefix}-VNet'
+var aksSubnetName = '${namingPrefix}-AKS-Subnet'
+var drVirtualNetworkName = '${namingPrefix}-DR-VNet'
+var drSubnetName = '${namingPrefix}-DR-Subnet'
 
 resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   location: location

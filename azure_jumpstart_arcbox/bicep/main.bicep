@@ -73,10 +73,10 @@ param resourceTags object = {
 param namingPrefix string = 'ArcBox'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
-var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
-var aksDrArcDataClusterName = 'ArcBox-AKS-DR-Data-${guid}'
-var k3sArcDataClusterName = 'ArcBox-DataSvc-K3s-${guid}'
-var k3sArcClusterName = 'ArcBox-K3s-${guid}'
+var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
+var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
+var k3sArcDataClusterName = '${namingPrefix}-DataSvc-K3s-${guid}'
+var k3sArcClusterName = '${namingPrefix}-K3s-${guid}'
 var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps' || flavor == 'DataOps') {
@@ -91,6 +91,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
     vmName : k3sArcDataClusterName
     storageContainerName: toLower(k3sArcDataClusterName)
     flavor: flavor
+    namingPrefix: namingPrefix
   }
 }
 
@@ -106,6 +107,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     flavor: flavor
     vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
@@ -124,6 +126,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
     vmName : k3sArcClusterName
     storageContainerName: toLower(k3sArcClusterName)
     flavor: flavor
+    namingPrefix: namingPrefix
   }
 }
 
@@ -173,6 +176,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     bastionSku: bastionSku
     location: location
     resourceTags: resourceTags
+    namingPrefix: namingPrefix
   }
 }
 
@@ -185,6 +189,7 @@ module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
     deployBastion: deployBastion
     templateBaseUrl: templateBaseUrl
     azureLocation: location
+    namingPrefix: namingPrefix
   }
   dependsOn:[
     mgmtArtifactsAndPolicyDeployment
@@ -216,6 +221,7 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
     location: location
     aksClusterName : aksArcDataClusterName
     drClusterName : aksDrArcDataClusterName
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     updateVNetDNSServers

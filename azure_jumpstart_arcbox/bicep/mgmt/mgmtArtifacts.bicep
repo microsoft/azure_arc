@@ -1,20 +1,20 @@
 @description('Name of the VNet')
-param virtualNetworkName string = 'ArcBox-VNet'
+param virtualNetworkName string = '${namingPrefix}-VNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'ArcBox-Subnet'
+param subnetName string = '${namingPrefix}-Subnet'
 
 @description('Name of the subnet in the virtual network')
-param aksSubnetName string = 'ArcBox-AKS-Subnet'
+param aksSubnetName string = '${namingPrefix}-AKS-Subnet'
 
 @description('Name of the Domain Controller subnet in the virtual network')
-param dcSubnetName string = 'ArcBox-DC-Subnet'
+param dcSubnetName string = '${namingPrefix}-DC-Subnet'
 
 @description('Name of the DR VNet')
-param drVirtualNetworkName string = 'ArcBox-DR-VNet'
+param drVirtualNetworkName string = '${namingPrefix}-DR-VNet'
 
 @description('Name of the DR subnet in the DR virtual network')
-param drSubnetName string = 'ArcBox-DR-Subnet'
+param drSubnetName string = '${namingPrefix}-DR-Subnet'
 
 @description('Name for your log analytics workspace')
 param workspaceName string
@@ -45,10 +45,10 @@ param deployBastion bool = false
 param bastionSku string = 'Basic'
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-NSG'
+param networkSecurityGroupName string = '${namingPrefix}-NSG'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
+param bastionNetworkSecurityGroupName string = '${namingPrefix}-Bastion-NSG'
 
 @description('DNS Server configuration')
 param dnsServers array = []
@@ -57,6 +57,10 @@ param dnsServers array = []
 param resourceTags object = {
   Solution: 'jumpstart_arcbox'
 }
+
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
 
 var keyVaultName = 'arcbox${uniqueString(resourceGroup().id)}'
 
@@ -73,7 +77,7 @@ var drAddressPrefix = '172.16.0.0/16'
 var drSubnetPrefix = '172.16.128.0/17'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
-var bastionName = 'ArcBox-Bastion'
+var bastionName = '${namingPrefix}-Bastion'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 var primarySubnet = [

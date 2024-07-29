@@ -4,13 +4,14 @@ BeforeDiscovery {
     $k3sArcDataClusterName = $env:k3sArcDataClusterName
     $aksArcClusterName = $env:aksArcClusterName
     $aksdrArcClusterName = $env:aksdrArcClusterName
+    $namingPrefix = $env:namingPrefix
 
     $clusters = @($k3sArcDataClusterName, $aksArcClusterName, $aksdrArcClusterName)
     $customLocations = @("${k3sArcDataClusterName}-cl", "${aksArcClusterName}-cl", "${aksdrArcClusterName}-cl")
     $dataControllers = @("${k3sArcDataClusterName}-dc", "${aksArcClusterName}-dc", "${aksdrArcClusterName}-dc")
     $sqlMiInstances = @("k3s-sql", "aks-sql", "aks-dr-sql")
     $drPartners = @("k3s-sql", "aks-dr-sql")
-    $VMs = @("ArcBox-SQL")
+    $VMs = @("$namingPrefix-sql")
 
     $null = Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
     az config set extension.use_dynamic_install=yes_without_prompt

@@ -1,8 +1,8 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'ArcBox-Client'
+param vmName string = '${namingPrefix}-Client'
 
 @description('The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster')
-param k3sArcDataClusterName string = 'ArcBox-K3s-Data'
+param k3sArcDataClusterName string = '${namingPrefix}-K3s-Data'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -90,13 +90,13 @@ param deployBastion bool = false
 param githubUser string
 
 @description('The name of the K3s cluster')
-param k3sArcClusterName string = 'ArcBox-K3s'
+param k3sArcClusterName string = '${namingPrefix}-K3s'
 
 @description('The name of the AKS cluster')
-param aksArcClusterName string = 'ArcBox-AKS-Data'
+param aksArcClusterName string = '${namingPrefix}-AKS-Data'
 
 @description('The name of the AKS DR cluster')
-param aksdrArcClusterName string = 'ArcBox-AKS-DR-Data'
+param aksdrArcClusterName string = '${namingPrefix}-AKS-DR-Data'
 
 @description('Domain name for the jumpstart environment')
 param addsDomainName string = 'jumpstart.local'
@@ -107,7 +107,7 @@ param customLocationRPOID string = ''
 @description('The SKU of the VMs disk')
 param vmsDiskSku string = 'Premium_LRS'
 
-var bastionName = 'ArcBox-Bastion'
+var bastionName = '${namingPrefix}-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'

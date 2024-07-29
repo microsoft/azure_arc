@@ -148,7 +148,7 @@ if ($Env:flavor -ne "DevOps") {
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
     $SQLvmName = "$namingPrefix-SQL"
-    $SQLvmvhdPath = "$Env:ArcBoxVMDir\${SQLvmName}.vhdx"
+    $SQLvmvhdPath = "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx"
 
     Write-Host "Fetching SQL VM"
 
@@ -158,13 +158,15 @@ if ($Env:flavor -ne "DevOps") {
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --log-level=ERROR
+        azcopy cp $vhdSourceFolder --include-pattern "ArcBox-SQL.vhdx" $Env:ArcBoxVMDir --check-length=false --log-level=ERROR
     }
 
     # Create the nested VMs if not already created
     Write-Header "Create Hyper-V VMs"
 
     # Create the nested SQL VMs
+    $sqlDscConfigurationFile = "$Env:ArcBoxDscDir\virtual_machines_sql.dsc.yml"
+    (Get-Content -Path $sqlDscConfigurationFile) -replace 'namingPrefixStage', $namingPrefix | Set-Content -Path $sqlDscConfigurationFile
     winget configure --file C:\ArcBox\DSC\virtual_machines_sql.dsc.yml --accept-configuration-agreements --disable-interactivity
 
     # Restarting Windows VM Network Adapters
@@ -355,27 +357,29 @@ $payLoad = @"
         Write-Header "Fetching Nested VMs"
 
         $Win2k19vmName = "$namingPrefix-Win2K19"
-        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k19vmName}.vhdx"
+        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2k19.vhdx"
 
         $Win2k22vmName = "$namingPrefix-Win2K22"
-        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\${Win2k22vmName}.vhdx"
+        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2k22.vhdx"
 
         $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
-        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu01vmName}.vhdx"
+        $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-01.vhdx"
 
         $Ubuntu02vmName = "$namingPrefix-Ubuntu-02"
-        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\${Ubuntu02vmName}.vhdx"
+        $Ubuntu02vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-02.vhdx"
 
         # Verify if VHD files already downloaded especially when re-running this script
         if (!((Test-Path $win2k19vmvhdPath) -and (Test-Path $Win2k22vmvhdPath) -and (Test-Path $Ubuntu01vmvhdPath) -and (Test-Path $Ubuntu02vmvhdPath))) {
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "${Win2k19vmName}.vhdx;${Win2k22vmName}.vhdx;${Ubuntu01vmName}.vhdx;${Ubuntu02vmName}.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2k19.vhdx;ArcBox-Win2k22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
         }
 
         # Create the nested VMs if not already created
         Write-Header "Create Hyper-V VMs"
+        $serversDscConfigurationFile = "$Env:ArcBoxDscDir\virtual_machines_itpro.dsc.dsc.yml"
+        (Get-Content -Path $serversDscConfigurationFile) -replace 'namingPrefixStage', $namingPrefix | Set-Content -Path $serversDscConfigurationFile
         winget configure --file C:\ArcBox\DSC\virtual_machines_itpro.dsc.yml --accept-configuration-agreements --disable-interactivity
 
         Write-Header "Creating VM Credentials"

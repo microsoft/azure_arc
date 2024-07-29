@@ -2,11 +2,11 @@
 properties:
   resources:
     - resource: HyperVDsc/VMHyperV
-      id: ArcBox-SQL
+      id: namingPrefixStage-SQL
       directives:
-        description: Configure VM ArcBox-SQL
+        description: Configure VM namingPrefixStage-SQL
       settings:
-        Name: ArcBox-SQL
+        Name: namingPrefixStage-SQL
         SwitchName: 'InternalNATSwitch'
         VhdPath: F:\Virtual Machines\ArcBox-SQL.vhdx
         ProcessorCount: 2
