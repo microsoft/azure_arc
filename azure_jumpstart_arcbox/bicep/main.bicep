@@ -99,7 +99,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -118,7 +118,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
   name: 'ubuntuRancherK3sDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -138,7 +138,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     azdataPassword: windowsAdminPassword
     tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
