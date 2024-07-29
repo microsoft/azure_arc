@@ -62,7 +62,7 @@ param resourceTags object = {
 @description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
 param namingPrefix string = 'ArcBox'
 
-var keyVaultName = 'arcbox${uniqueString(resourceGroup().id)}'
+var keyVaultName = '${namingPrefix}${uniqueString(resourceGroup().id)}'
 
 var security = {
   name: 'Security(${workspaceName})'

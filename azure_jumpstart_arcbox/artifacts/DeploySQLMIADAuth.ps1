@@ -407,7 +407,7 @@ $dagConnection = @"
 $aksConnection = @"
 {
     "options": {
-        "connectionName": "ArcBox-AKS",
+        "connectionName": "$namingPrefix-AKS",
         "server": "$aks",
         "database": "",
         "authenticationType": "Integrated",

@@ -10,7 +10,11 @@ param storageAccountType string = 'Standard_LRS'
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
-var storageAccountName = 'arcbox${uniqueString(resourceGroup().id)}'
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
+
+var storageAccountName = '${namingPrefix}${uniqueString(resourceGroup().id)}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName

@@ -3,6 +3,7 @@ $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $Env:ArcBoxVMDir = "F:\Virtual Machines"
 $Env:ArcBoxIconDir = "$Env:ArcBoxDir\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
+$Env:ArcBoxDscDir = "$Env:ArcBoxDir\DSC"
 $agentScript = "$Env:ArcBoxDir\agentScript"
 
 # Set variables to execute remote powershell scripts on guest VMs
@@ -89,7 +90,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Set custom DNS if flaver is DataOps
     if ($Env:flavor -eq 'DataOps') {
-        Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
+        Add-DhcpServerInDC -DnsName "$namingPrefix-client.jumpstart.local"
         Restart-Service dhcpserver
     }
 
@@ -148,7 +149,7 @@ if ($Env:flavor -ne "DevOps") {
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
     $SQLvmName = "$namingPrefix-SQL"
-    $SQLvmvhdPath = "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx"
+    $SQLvmvhdPath = "$Env:ArcBoxVMDir\$namingPrefix-SQL.vhdx"
 
     Write-Host "Fetching SQL VM"
 
@@ -176,7 +177,7 @@ if ($Env:flavor -ne "DevOps") {
     Start-Sleep -Seconds 5
 
     Write-Header "Renaming the nested SQL VM"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -ComputerName $using:SQLvmName -Restart } -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart } -Credential $winCreds
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
@@ -357,10 +358,10 @@ $payLoad = @"
         Write-Header "Fetching Nested VMs"
 
         $Win2k19vmName = "$namingPrefix-Win2K19"
-        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2k19.vhdx"
+        $win2k19vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K19.vhdx"
 
         $Win2k22vmName = "$namingPrefix-Win2K22"
-        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2k22.vhdx"
+        $Win2k22vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Win2K22.vhdx"
 
         $Ubuntu01vmName = "$namingPrefix-Ubuntu-01"
         $Ubuntu01vmvhdPath = "${Env:ArcBoxVMDir}\ArcBox-Ubuntu-01.vhdx"
@@ -373,12 +374,12 @@ $payLoad = @"
             <# Action when all if and elseif conditions are false #>
             $Env:AZCOPY_BUFFER_GB = 4
             Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2k19.vhdx;ArcBox-Win2k22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
+            azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "ArcBox-Win2K19.vhdx;ArcBox-Win2K22.vhdx;ArcBox-Ubuntu-01.vhdx;ArcBox-Ubuntu-02.vhdx;" --recursive=true --check-length=false --log-level=ERROR
         }
 
         # Create the nested VMs if not already created
         Write-Header "Create Hyper-V VMs"
-        $serversDscConfigurationFile = "$Env:ArcBoxDscDir\virtual_machines_itpro.dsc.dsc.yml"
+        $serversDscConfigurationFile = "$Env:ArcBoxDscDir\virtual_machines_itpro.dsc.yml"
         (Get-Content -Path $serversDscConfigurationFile) -replace 'namingPrefixStage', $namingPrefix | Set-Content -Path $serversDscConfigurationFile
         winget configure --file C:\ArcBox\DSC\virtual_machines_itpro.dsc.yml --accept-configuration-agreements --disable-interactivity
 
@@ -400,8 +401,8 @@ $payLoad = @"
 
         # Renaming the nested VMs
         Write-Header "Renaming the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -ComputerName $using:Win2k19vmName -Restart } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -ComputerName $using:Win2k22vmName -Restart } -Credential $winCreds
+        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
+        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
 
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -412,6 +413,8 @@ $payLoad = @"
         $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
         $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+
+        Start-Sleep -Seconds 15
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
@@ -444,7 +447,7 @@ $payLoad = @"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
         Write-Header "Enabling SSH access to Arc-enabled servers"
-        $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02", "ArcBox-Win2K19", "ArcBox-Win2K22")
+        $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K19", "$namingPrefix-Win2K22")
         $VMs | ForEach-Object -Parallel {
             $null = Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId -Scope Process -WarningAction SilentlyContinue
 

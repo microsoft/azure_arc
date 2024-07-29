@@ -164,6 +164,7 @@ module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
     location: location
+    namingPrefix: namingPrefix
   }
 }
 
