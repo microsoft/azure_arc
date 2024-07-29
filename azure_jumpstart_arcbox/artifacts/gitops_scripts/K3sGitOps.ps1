@@ -3,9 +3,10 @@ $Env:ToolsDir = "C:\Tools"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "ArcBox-K3s" | Where-Object { $_ -ne "" }
+$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
 $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
+$namingPrefix = $env:namingPrefix
 $k3sNamespace = "hello-arc"
 $ingressNamespace = "ingress-nginx"
 
