@@ -4,7 +4,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$namingPrefix = $Env:namingPrefix
+$namingPrefix = ($Env:namingPrefix).toLower
 
 $osmReleaseVersion = "1.1.1-1"
 $osmCLIReleaseVersion = "v1.2.3"
