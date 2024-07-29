@@ -148,6 +148,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     # sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $localPath
     # sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $k3sClusterNodeConfig
 
+    azcopy make "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName"
     azcopy cp $localPath "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/config"
     azcopy cp $k3sClusterNodeConfig "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/k3sClusterNodeConfig.yaml"
 
@@ -223,4 +224,5 @@ echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
 log="/home/${adminUsername}/jumpstart_logs/installK3s.log"
-sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $log --destination "installK3s-$vmName.log"
+# sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $log --destination "installK3s-$vmName.log"
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/installK3s-$vmName.log"
