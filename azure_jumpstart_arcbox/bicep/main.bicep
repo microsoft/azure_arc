@@ -208,6 +208,7 @@ module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'
     '10.16.2.100'
     '168.63.129.16'
     ]
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     addsVmDeployment
