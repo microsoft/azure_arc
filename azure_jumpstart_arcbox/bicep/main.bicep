@@ -83,7 +83,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
   name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
