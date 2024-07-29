@@ -50,6 +50,22 @@ sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcome
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
+# Downloading azcopy
+echo ""
+echo "Downloading azcopy"
+echo ""
+wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: Failed to download azcopy"
+    exit 1
+fi
+
+tar -xf azcopy.tar.gz
+sudo mv azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
+sudo chmod +x /usr/local/bin/azcopy
+# Authorize azcopy by using a system-wide managed identity
+export AZCOPY_AUTO_LOGIN_TYPE=MSI
+
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
@@ -126,11 +142,14 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     k3sClusterNodeConfig="/home/$adminUsername/k3sClusterNodeConfig.yaml"
     echo "k3sNodeToken: $(sudo cat /var/lib/rancher/k3s/server/node-token)" >> $k3sClusterNodeConfig
     echo "k3sClusterIp: $publicIp" >> $k3sClusterNodeConfig
-    sudo -u $adminUsername az extension add --upgrade -n storage-preview
-    storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-    sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --auth-mode login
-    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $localPath
-    sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $k3sClusterNodeConfig
+    # sudo -u $adminUsername az extension add --upgrade -n storage-preview
+    # storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
+    # sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --auth-mode login
+    # sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $localPath
+    # sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source $k3sClusterNodeConfig
+
+    azcopy cp $localPath "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/config"
+    azcopy cp $k3sClusterNodeConfig "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/k3sClusterNodeConfig.yaml"
 
     # # Registering Azure resource providers
     # echo ""
@@ -177,18 +196,19 @@ else
     echo ""
     echo "Downloading k3s control plane details"
     echo ""
-    k3sClusterNodeConfig="k3sClusterNodeConfig.yaml"
-    sudo -u $adminUsername az extension add --upgrade -n storage-preview
-    storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
+    k3sClusterNodeConfigYaml="k3sClusterNodeConfig.yaml"
+    # sudo -u $adminUsername az extension add --upgrade -n storage-preview
+    # storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
     # storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
-    sudo -u $adminUsername az storage azcopy blob download --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source "$k3sClusterNodeConfig"  --destination "/home/$adminUsername/$k3sClusterNodeConfig"
+    # sudo -u $adminUsername az storage azcopy blob download --container $storageContainerName --account-name $stagingStorageAccountName --auth-mode login --source "$k3sClusterNodeConfigYaml"  --destination "/home/$adminUsername/$k3sClusterNodeConfigYaml"
+    azcopy cp --check-md5 FailIfDifferentOrMissing "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/$k3sClusterNodeConfigYaml" "/home/$adminUsername/$k3sClusterNodeConfigYaml"
 
     # Installing Rancher K3s cluster (single worker node)
     echo ""
     echo "Installing Rancher K3s cluster node"
     echo ""
-    k3sNodeToken=$(grep 'k3sNodeToken' "/home/$adminUsername/$k3sClusterNodeConfig" | awk '{print $2}')
-    k3sClusterIp=$(grep 'k3sClusterIp' "/home/$adminUsername/$k3sClusterNodeConfig" | awk '{print $2}')
+    k3sNodeToken=$(grep 'k3sNodeToken' "/home/$adminUsername/$k3sClusterNodeConfigYaml" | awk '{print $2}')
+    k3sClusterIp=$(grep 'k3sClusterIp' "/home/$adminUsername/$k3sClusterNodeConfigYaml" | awk '{print $2}')
     curl -sfL https://get.k3s.io | K3S_URL=https://${k3sClusterIp}:6443 K3S_TOKEN=${k3sNodeToken} sh -
     if [[ $? -ne 0 ]]; then
         echo "ERROR: Failed to add k3s worker nodes"
