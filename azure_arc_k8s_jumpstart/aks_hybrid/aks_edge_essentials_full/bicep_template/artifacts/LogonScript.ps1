@@ -312,11 +312,10 @@ if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
     $AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
     $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
     $schemaVersion = $jsonContent.SchemaVersion
+    # Clean up the downloaded release files
+    Remove-Item -Path $output -Force
+    Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
 }
-
-# Clean up the downloaded release files
-Remove-Item -Path $output -Force
-Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
 
 ###############################################################################
 # Setting up replacment parameters for AKS Edge Essentials config json file
