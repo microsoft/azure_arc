@@ -8,7 +8,7 @@ $schemaVersion = "1.1"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 $aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
-
+$AKSEEPinnedSchemaVersion = $Env:AKSEEPinnedSchemaVersion
 # Requires -RunAsAdministrator
 
 New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue

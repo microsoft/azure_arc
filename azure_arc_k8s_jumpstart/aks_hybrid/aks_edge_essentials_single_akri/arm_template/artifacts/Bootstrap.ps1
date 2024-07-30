@@ -8,7 +8,8 @@ param (
     [string]$templateBaseUrl,
     [string]$resourceGroup,
     [string]$windowsNode,
-    [string]$kubernetesDistribution
+    [string]$kubernetesDistribution,
+    [string]$AKSEEPinnedSchemaVersion
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -21,6 +22,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('windowsNode', $windowsNode,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
