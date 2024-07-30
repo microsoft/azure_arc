@@ -4,6 +4,7 @@ $Env:ArcBoxVMDir = "F:\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
+$namingPrefix = ($Env:namingPrefix).toLower()
 
 $clusters = @(
     [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$Env:k3sArcDataClusterName-dc" ; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
@@ -126,7 +127,7 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx k3s="arcbox-datasvc-k3s"
+kubectx k3s="$namingPrefix-datasvc-k3s"
 
 Start-Sleep -Seconds 10
 

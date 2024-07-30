@@ -1,6 +1,7 @@
 
 BeforeDiscovery {
-    $VMs = @("ArcBox-SQL", "ArcBox-Ubuntu-01", "ArcBox-Ubuntu-02","ArcBox-Win2K19","ArcBox-Win2K22")
+    $namingPrefix = $env:namingPrefix
+    $VMs = @("$namingPrefixStage-SQL", "$namingPrefixStage-Ubuntu-01", "$namingPrefixStage-Ubuntu-02","$namingPrefixStage-Win2K19","$namingPrefixStage-Win2K22")
     $null = Connect-AzAccount -Identity -Tenant $env:tenantId -Subscription $env:subscriptionId
 }
 

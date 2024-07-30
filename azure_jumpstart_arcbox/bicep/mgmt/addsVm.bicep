@@ -2,7 +2,7 @@
 param addsDomainName string = 'jumpstart.local'
 
 @description('The name of your Virtual Machine')
-param clientVMName string = 'ArcBox-ADDS'
+param clientVMName string = '${namingPrefix}-ADDS'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -28,11 +28,15 @@ param deployBastion bool = false
 @description('Base URL for ARM template')
 param templateBaseUrl string = ''
 
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
+
 var networkInterfaceName = '${clientVMName}-NIC'
-var virtualNetworkName = 'ArcBox-VNet'
-var dcSubnetName = 'ArcBox-DC-Subnet'
+var virtualNetworkName = '${namingPrefix}-VNet'
+var dcSubnetName = '${namingPrefix}-DC-Subnet'
 var addsPrivateIPAddress = '10.16.2.100'
-var bastionName = 'ArcBox-Bastion'
+var bastionName = '${namingPrefix}-Bastion'
 var osDiskType = 'Premium_LRS'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, dcSubnetName)
 var networkInterfaceRef = networkInterface.id

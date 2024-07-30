@@ -1,5 +1,5 @@
 @description('The name of you Virtual Machine')
-param vmName string = 'ArcBox-K3s'
+param vmName string = '${namingPrefix}-K3s'
 
 @description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
@@ -42,6 +42,10 @@ param storageContainerName string
   'DataOps'
 ])
 param flavor string
+
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'

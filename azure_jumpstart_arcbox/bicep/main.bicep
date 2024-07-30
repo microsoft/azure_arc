@@ -3,7 +3,7 @@
 param sshRSAPublicKey string = ''
 
 @description('Your Microsoft Entra tenant Id')
-param tenantId string
+param tenantId string = tenant().tenantId
 
 @description('Username for Windows account')
 param windowsAdminUsername string
@@ -68,18 +68,22 @@ param resourceTags object = {
   Solution: 'jumpstart_arcbox'
 }
 
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
-var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
-var aksDrArcDataClusterName = 'ArcBox-AKS-DR-Data-${guid}'
-var k3sArcDataClusterName = 'ArcBox-DataSvc-K3s-${guid}'
-var k3sArcClusterName = 'ArcBox-K3s-${guid}'
+var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
+var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
+var k3sArcDataClusterName = '${namingPrefix}-DataSvc-K3s-${guid}'
+var k3sArcClusterName = '${namingPrefix}-K3s-${guid}'
 var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -87,6 +91,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
     vmName : k3sArcDataClusterName
     storageContainerName: toLower(k3sArcDataClusterName)
     flavor: flavor
+    namingPrefix: namingPrefix
   }
 }
 
@@ -94,7 +99,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -102,6 +107,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     flavor: flavor
     vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
@@ -112,7 +118,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
   name: 'ubuntuRancherK3sDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -120,6 +126,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
     vmName : k3sArcClusterName
     storageContainerName: toLower(k3sArcClusterName)
     flavor: flavor
+    namingPrefix: namingPrefix
   }
 }
 
@@ -131,7 +138,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     azdataPassword: windowsAdminPassword
     tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: toLower(stagingStorageAccountDeployment.outputs.storageAccountName)
     templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
@@ -146,6 +153,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     rdpPort: rdpPort
     addsDomainName: addsDomainName
     customLocationRPOID: customLocationRPOID
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     updateVNetDNSServers
@@ -156,6 +164,7 @@ module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
     location: location
+    namingPrefix: namingPrefix
   }
 }
 
@@ -168,6 +177,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     bastionSku: bastionSku
     location: location
     resourceTags: resourceTags
+    namingPrefix: namingPrefix
   }
 }
 
@@ -180,6 +190,7 @@ module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
     deployBastion: deployBastion
     templateBaseUrl: templateBaseUrl
     azureLocation: location
+    namingPrefix: namingPrefix
   }
   dependsOn:[
     mgmtArtifactsAndPolicyDeployment
@@ -197,6 +208,7 @@ module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'
     '10.16.2.100'
     '168.63.129.16'
     ]
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     addsVmDeployment
@@ -211,6 +223,7 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
     location: location
     aksClusterName : aksArcDataClusterName
     drClusterName : aksDrArcDataClusterName
+    namingPrefix: namingPrefix
   }
   dependsOn: [
     updateVNetDNSServers
