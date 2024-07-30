@@ -184,7 +184,7 @@ else
     echo ""
     k3sNodeToken=$(grep 'k3sNodeToken' "/home/$adminUsername/$k3sClusterNodeConfigYaml" | awk '{print $2}')
     k3sClusterIp=$(grep 'k3sClusterIp' "/home/$adminUsername/$k3sClusterNodeConfigYaml" | awk '{print $2}')
-    curl -sfL https://get.k3s.io | K3S_URL=https://${k3sClusterIp}:6443 K3S_TOKEN=${k3sNodeToken} sh -
+    curl -sfL https://get.k3s.io | K3S_URL=https://${k3sClusterIp}:6443 INSTALL_K3S_VERSION=v${K3S_VERSION} K3S_TOKEN=${k3sNodeToken} sh -
     if [[ $? -ne 0 ]]; then
         echo "ERROR: Failed to add k3s worker nodes"
         exit 1
