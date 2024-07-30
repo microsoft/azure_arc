@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 Set-ExecutionPolicy Bypass -Scope Process -Force
 
 # Parameters
-$schemaVersionAksEdgeConfig = "1.9"
+$schemaVersionAksEdgeConfig = "1.13"
 $versionAksEdgeConfig = "1.0"
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $clusterName = "$Env:resourceGroup-$guid"
