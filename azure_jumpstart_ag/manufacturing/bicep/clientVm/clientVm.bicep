@@ -86,7 +86,7 @@ param customLocationRPOID string
 param industry string = 'retail'
 
 @description('The AKSEE schema version to be used. This is only used to pin the AKSEE schema version for testing.')
-param AKSEEPinnedSchemaVersion string = ''
+param AKSEEPinnedSchemaVersion string = 'useLatest'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'
