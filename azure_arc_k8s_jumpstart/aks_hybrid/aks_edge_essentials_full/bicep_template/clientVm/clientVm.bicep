@@ -50,6 +50,9 @@ param githubAccount string = 'microsoft'
 @description('Target GitHub branch')
 param githubBranch string = 'main'
 
+@description('The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.')
+param AKSEEPinnedSchemaVersion string = 'useLatest'
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'AKS-EE-Full-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -153,7 +156,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -templateBaseUrl ${templateBaseUrl} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -kubernetesDistribution ${kubernetesDistribution}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -templateBaseUrl ${templateBaseUrl} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -kubernetesDistribution ${kubernetesDistribution} -AKSEEPinnedSchemaVersion ${AKSEEPinnedSchemaVersion}'
     }
   }
 }

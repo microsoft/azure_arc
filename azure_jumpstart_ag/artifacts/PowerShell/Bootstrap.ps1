@@ -27,7 +27,8 @@ param (
   [string]$industry,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
-  [string]$stcontainerName
+  [string]$stcontainerName,
+  [string]$AKSEEPinnedSchemaVersion
 )
 
 ##############################################################
@@ -66,6 +67,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 

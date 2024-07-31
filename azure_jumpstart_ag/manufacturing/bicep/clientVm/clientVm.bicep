@@ -85,6 +85,9 @@ param customLocationRPOID string
 @description('The agora industry to be deployed')
 param industry string = 'retail'
 
+@description('The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.')
+param AKSEEPinnedSchemaVersion string = 'useLatest'
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -199,7 +202,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -industry ${industry} -aioStorageAccountName ${aioStorageAccountName} -stcontainerName ${stcontainerName}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -industry ${industry} -aioStorageAccountName ${aioStorageAccountName} -stcontainerName ${stcontainerName} -AKSEEPinnedSchemaVersion ${AKSEEPinnedSchemaVersion}'
     }
   }
 }

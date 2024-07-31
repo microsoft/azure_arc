@@ -288,24 +288,26 @@ function Deploy-VirtualizationInfrastructure {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Fetching the latest two AKS Edge Essentials releases." -ForegroundColor Gray
-    $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
-    $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
-    $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
     $AKSEESchemaVersions = @()
+    if($AKSEEPinnedSchemaVersion -eq "useLatest"){
+        $latestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[0].tag_name
+        $beforeLatestReleaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[1].tag_name
+        $AKSEEReleasesTags = ($latestReleaseTag, $beforeLatestReleaseTag)
 
-    for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
-        $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
-        $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
-        $output = Join-Path $AgToolsDir "$releaseTag.zip"
-        Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-        Expand-Archive $output -DestinationPath $AgToolsDir -Force
-        $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
-        $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-        $schemaVersion = $jsonContent.SchemaVersion
-        $AKSEESchemaVersions += $schemaVersion
-        # Clean up the downloaded release files
-        Remove-Item -Path $output -Force
-        Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+        for ($i = 0; $i -lt $AKSEEReleasesTags.Count; $i++) {
+            $releaseTag = (Invoke-WebRequest $websiteUrls["aksEEReleases"] | ConvertFrom-Json)[$i].tag_name
+            $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$releaseTag.zip"
+            $output = Join-Path $AgToolsDir "$releaseTag.zip"
+            Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+            Expand-Archive $output -DestinationPath $AgToolsDir -Force
+            $AKSEEReleaseConfigFilePath = "$AgToolsDir\AKS-Edge-$releaseTag\tools\aksedge-config.json"
+            $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+            $schemaVersion = $jsonContent.SchemaVersion
+            $AKSEESchemaVersions += $schemaVersion
+            # Clean up the downloaded release files
+            Remove-Item -Path $output -Force
+            Remove-Item -Path "$AgToolsDir\AKS-Edge-$releaseTag" -Force -Recurse
+        }
     }
 
     Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
@@ -338,6 +340,7 @@ function Deploy-VirtualizationInfrastructure {
         $AgConfig = $using:AgConfig
         $AgToolsDir = $using:AgToolsDir
         $websiteUrls = $using:websiteUrls
+        $AKSEEPinnedSchemaVersion = $using:AKSEEPinnedSchemaVersion
 
         ##########################################
         # Deploying AKS Edge Essentials clusters
@@ -391,11 +394,14 @@ function Deploy-VirtualizationInfrastructure {
 
         # Fetch schemaVersion release from the AgConfig file
         $AKSEESchemaVersionUseLatest = $AgConfig.SiteConfig[$Env:COMPUTERNAME].AKSEEReleaseUseLatest
-        if ($AKSEESchemaVersionUseLatest) {
+        if ($AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
             $SchemaVersion = $using:AKSEESchemaVersions[0]
         }
-        else {
+        elseif (!$AKSEESchemaVersionUseLatest -and $AKSEEPinnedSchemaVersion -eq "useLatest") {
             $SchemaVersion = $using:AKSEESchemaVersions[1]
+        }
+        elseif ($AKSEEPinnedSchemaVersion -ne "useLatest") {
+            $SchemaVersion = $AKSEEPinnedSchemaVersion
         }
 
         $replacementParams = @{
