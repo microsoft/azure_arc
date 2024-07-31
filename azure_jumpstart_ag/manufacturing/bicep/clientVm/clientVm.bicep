@@ -85,7 +85,7 @@ param customLocationRPOID string
 @description('The agora industry to be deployed')
 param industry string = 'retail'
 
-@description('The AKSEE schema version to be used. This is only used to pin the AKSEE schema version for testing.')
+@description('The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.')
 param AKSEEPinnedSchemaVersion string = 'useLatest'
 
 var encodedPassword = base64(windowsAdminPassword)
