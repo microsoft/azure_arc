@@ -1,5 +1,5 @@
 name:  Housekeeping - PRs management
-description: Azure Arc Jumpstart management of PRs using GitHub Policies
+description: Arc Jumpstart management of PRs using GitHub Policies
 owner: 
 resource: repository
 disabled: false
@@ -60,7 +60,7 @@ configuration:
           action: Opened
       then:
       - addReply:
-          reply: 'Hi ${issueAuthor}! Thank you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
+          reply: 'Hi ${issueAuthor}! Thank you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Arc Jumpstart better.'
       description: 
     - if:
       - payloadType: Pull_Request_Review

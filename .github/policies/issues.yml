@@ -1,5 +1,5 @@
 name:  Housekeeping - Issues management
-description: Azure Arc Jumpstart management of issues using GitHub Policies
+description: Arc Jumpstart management of issues using GitHub Policies
 owner: 
 resource: repository
 disabled: false
@@ -61,7 +61,7 @@ configuration:
           action: Opened
       then:
       - addReply:
-          reply: 'Hi ${issueAuthor}! Thank you for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
+          reply: 'Hi ${issueAuthor}! Thank you for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Arc Jumpstart.'
       description: 
     - if:
       - payloadType: Issue_Comment

@@ -7,7 +7,7 @@ if ($null -ne $env:AZURE_RESOURCE_GROUP){
     # This section is for testing only
     $resourceGroup  = "charris-js-ag-43-rg"
     $adxClusterName = "agadx2827a"
-    Get-AzSubscription -SubscriptionName "Azure Arc Jumpstart Subscription" | Select-AzSubscription
+    Get-AzSubscription -SubscriptionName "Arc Jumpstart Subscription" | Select-AzSubscription
 }
 
 ########################################################################
