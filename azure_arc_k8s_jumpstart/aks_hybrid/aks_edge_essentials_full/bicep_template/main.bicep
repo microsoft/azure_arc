@@ -42,7 +42,7 @@ param subnetNameCloud string = 'AKS-EE-Full-Subnet'
 @description('AKS Edge Essentials Kubernetes distribution')
 param kubernetesDistribution string
 
-@description('''The AKSEE schema version to be used. This is only used to pin the AKSEE schema version for testing.
+@description('''The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.
 To pin a specific version, use the format '1.13'. To use the latest schema version, use 'useLatest'.
 ''')
 param AKSEEPinnedSchemaVersion string = '1.13'
