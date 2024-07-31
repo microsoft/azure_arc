@@ -40,7 +40,8 @@
       "type": "securestring"
     },
     "resourceTags": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "dockerRegistryCredential": {
       "type": "string"

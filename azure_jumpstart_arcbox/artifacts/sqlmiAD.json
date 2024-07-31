@@ -74,7 +74,8 @@
       "type": "int"
     },
     "resourceTags": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "apiVersion": {
       "type": "string"
