@@ -32,7 +32,7 @@ sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
 
 # Set k3 deployment variables
-export K3S_VERSION="v1.29.6+k3s2" # Do not change!
+export K3S_VERSION="1.29.6+k3s2" # Do not change!
 
 chmod +x vars.sh
 . ./vars.sh
