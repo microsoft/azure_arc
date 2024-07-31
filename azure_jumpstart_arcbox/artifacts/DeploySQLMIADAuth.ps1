@@ -2,6 +2,9 @@
 $Env:TempDir = "C:\Temp"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$k3sArcDataClusterName = ($Env:k3sArcDataClusterName).toLower()
+$aksArcClusterName = ($Env:aksArcClusterName).toLower()
+$aksdrArcClusterName = ($Env:aksdrArcClusterName).toLower()
 
 Start-Transcript -Path "$Env:ArcBoxLogsDir\DeploySQLMIADAuth.log"
 
@@ -58,11 +61,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$Env:k3sArcDataClusterName-dc"; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
+    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 
 )
 $sqlmiouName = "ArcSQLMI"

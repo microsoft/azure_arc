@@ -5,11 +5,14 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
 $namingPrefix = ($Env:namingPrefix).toLower()
+$k3sArcDataClusterName = ($Env:k3sArcDataClusterName).toLower()
+$aksArcClusterName = ($Env:aksArcClusterName).toLower()
+$aksdrArcClusterName = ($Env:aksdrArcClusterName).toLower()
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$Env:k3sArcDataClusterName-dc" ; customLocation = "$Env:k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$k3sArcDataClusterName-dc" ; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$aksArcClusterName-dc" ; customLocation = "$aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$aksdrArcClusterName-dc" ; customLocation = "$aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
