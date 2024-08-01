@@ -69,7 +69,7 @@ param resourceTags object = {
 }
 
 @maxLength(7)
-@description('The naming prefix for the nested virtual machines. The maximum length for the naming prefix is 7 characters,example: `ArcBox-Win2k19`')
+@description('The naming prefix for the nested virtual machines and all Azure resources deployed. The maximum length for the naming prefix is 7 characters,example: `ArcBox-Win2k19`')
 param namingPrefix string = 'ArcBox'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
