@@ -129,7 +129,7 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
 }]
 
 resource updateManagerArcPolicyLinux 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: '(ArcBox) Enable Azure Update Manager for Arc-enabled Linux machines'
+  name: '(ArcBox) Enable Azure Update Manager for Linux hybrid machines'
   location: azureLocation
   scope: resourceGroup()
   identity: {
@@ -148,7 +148,7 @@ resource updateManagerArcPolicyLinux 'Microsoft.Authorization/policyAssignments@
 }
 
 resource updateManagerArcPolicyWindows 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: '(ArcBox) Enable Azure Update Manager for Arc-enabled Windows machines'
+  name: '(ArcBox) Enable Azure Update Manager for Windows hybrid machines'
   location: azureLocation
   scope: resourceGroup()
   identity: {

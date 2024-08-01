@@ -180,14 +180,20 @@ if ($Env:flavor -ne "DevOps") {
 
     # Restarting Windows VM Network Adapters
     Write-Host "Restarting Network Adapters"
-    Start-Sleep -Seconds 20
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+    Start-Sleep -Seconds 20
 
     Write-Header "Renaming the nested SQL VM"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart } -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
 
-    Start-Sleep -Seconds 15
+    do {
+        $sqlVMStatus=(Get-VM $SQLvmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
+        Write-Host "Waiting for the nested SQL VM to come back online...waiting for 10 seconds"
+        Start-Sleep -Seconds 10
+    }until($sqlVMStatus -ne "")
+
+    Start-Sleep -Seconds 10
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
@@ -404,10 +410,10 @@ $payLoad = @"
 
         # Restarting Windows VM Network Adapters
         Write-Header "Restarting Network Adapters"
-        Start-Sleep -Seconds 20
+        Start-Sleep -Seconds 5
         Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
-        Start-Sleep -Seconds 5
+        Start-Sleep -Seconds 10
 
         # Renaming the nested VMs
         Write-Header "Renaming the nested Windows VMs"
@@ -422,9 +428,18 @@ $payLoad = @"
         Write-Output "Renaming the nested Linux VMs"
         $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
         $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
-        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 900 -WarningAction SilentlyContinue).Output
 
-        Start-Sleep -Seconds 15
+        do {
+            $win2k19Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
+            $win2k22Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
+            $ubuntu01Status = (Get-VM $ubuntu01vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
+            $ubuntu02Status = (Get-VM $ubuntu02vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
+            Write-Host "Waiting for the nested VMs to come back online...waiting for 10 seconds"
+            Start-Sleep -Seconds 10
+        }until($win2k19Status -ne "" -and $win2k22Status -ne "" -and $ubuntu01Status -ne "" -and $ubuntu02Status -ne "")
+
+        Start-Sleep -Seconds 10
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
