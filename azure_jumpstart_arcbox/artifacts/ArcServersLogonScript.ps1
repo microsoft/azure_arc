@@ -177,7 +177,7 @@ if ($Env:flavor -ne "DevOps") {
     Start-Sleep -Seconds 5
 
     Write-Header "Renaming the nested SQL VM"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart } -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName; Restart-Computer -Force -Wait } -Credential $winCreds
 
     Start-Sleep -Seconds 15
 
@@ -403,8 +403,8 @@ $payLoad = @"
 
         # Renaming the nested VMs
         Write-Header "Renaming the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName; Restart-Computer -Force -Wait } -Credential $winCreds
+        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName; Restart-Computer -Force -Wait } -Credential $winCreds
 
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -414,9 +414,9 @@ $payLoad = @"
         Write-Output "Renaming the nested Linux VMs"
         $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
         $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
-        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 900 -WarningAction SilentlyContinue).Output
 
-        Start-Sleep -Seconds 15
+        Start-Sleep -Seconds 20
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
