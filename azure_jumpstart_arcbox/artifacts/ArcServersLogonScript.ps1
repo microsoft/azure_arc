@@ -406,8 +406,6 @@ $payLoad = @"
         Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
 
-        Start-Sleep -Seconds 20
-
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
         $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -418,7 +416,7 @@ $payLoad = @"
         $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 900 -WarningAction SilentlyContinue).Output
 
-        Start-Sleep -Seconds 20
+        Start-Sleep -Seconds 30
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
