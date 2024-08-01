@@ -181,8 +181,8 @@ if ($Env:flavor -ne "DevOps") {
 
     do {
         $sqlVMStatus=(Get-VM $SQLvmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-        Write-Host "Waiting for the nested SQL VM to come back online...waiting for 5 seconds"
-        Start-Sleep -Seconds 5
+        Write-Host "Waiting for the nested SQL VM to come back online...waiting for 10 seconds"
+        Start-Sleep -Seconds 10
     }until($sqlVMStatus -ne "")
 
     Start-Sleep -Seconds 10
