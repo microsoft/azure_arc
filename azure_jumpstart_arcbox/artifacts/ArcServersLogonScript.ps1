@@ -448,13 +448,13 @@ $payLoad = @"
         $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-        Write-Header "Enabling SSH access to Arc-enabled servers"
+        Write-Header "Enabling SSH access and triggering update assessment for Arc-enabled servers"
         $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K19", "$namingPrefix-Win2K22")
         $VMs | ForEach-Object -Parallel {
-            $null = Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId -Scope Process -WarningAction SilentlyContinue
+            $null = Connect-AzAccount -Identity -Tenant $using:tenantId -Subscription $using:subscriptionId -Scope Process -WarningAction SilentlyContinue
 
             $vm = $PSItem
-            $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $resourceGroup -SubscriptionId $subscriptionId
+            $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $using:resourceGroup -SubscriptionId $using:subscriptionId
             $connectedMachineEndpoint = (Invoke-AzRestMethod -Method get -Path "$($connectedMachine.Id)/providers/Microsoft.HybridConnectivity/endpoints/default?api-version=2023-03-15").Content | ConvertFrom-Json
 
             if (-not ($connectedMachineEndpoint.properties | Where-Object { $_.type -eq "default" -and $_.provisioningState -eq "Succeeded" })) {
@@ -470,6 +470,10 @@ $payLoad = @"
             else {
                 Write-Output "SSH already enabled on $($connectedMachine.Name)"
             }
+
+            Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+
         }
     }
     elseif ($Env:flavor -eq "DataOps") {
@@ -490,6 +494,10 @@ $payLoad = @"
         else {
             Write-Output "SSH already enabled on $($connectedMachine.Name)"
         }
+
+            Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
+            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+
     }
 
     # Removing the LogonScript Scheduled Task so it won't run on next reboot

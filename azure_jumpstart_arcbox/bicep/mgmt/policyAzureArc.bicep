@@ -12,6 +12,9 @@ param resourceTags object = {
   Solution: 'jumpstart_arcbox'
 }
 
+param azureUpdateManagerArcPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46'
+param azureUpdateManagerAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/59efceea-0c96-497e-a4a1-4eb2290dac15'
+
 param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 var policies = [
@@ -124,3 +127,79 @@ resource policy_tagging_resources 'Microsoft.Authorization/roleAssignments@2020-
     principalType: 'ServicePrincipal'
   }
 }]
+
+resource updateManagerArcPolicyLinux 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+  name: '(ArcBox) Enable Azure Update Manager for Arc-enabled Linux machines'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Enable Azure Update Manager for Arc-enabled Linux machines'
+    description: 'Enable Azure Update Manager for Arc-enabled machines'
+    policyDefinitionId: azureUpdateManagerArcPolicyId
+    parameters: {
+      osType: {
+        value: 'Linux'
+      }
+    }
+  }
+}
+
+resource updateManagerArcPolicyWindows 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+  name: '(ArcBox) Enable Azure Update Manager for Arc-enabled Windows machines'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Enable Azure Update Manager for Arc-enabled Windows machines'
+    description: 'Enable Azure Update Manager for Arc-enabled machines'
+    policyDefinitionId: azureUpdateManagerArcPolicyId
+    parameters: {
+      osType: {
+        value: 'Windows'
+      }
+    }
+  }
+}
+
+resource updateManagerAzurePolicyWindows  'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+  name: '(ArcBox) Enable Azure Update Manager for Azure Windows machines'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Enable Azure Update Manager for Azure Windows machines'
+    description: 'Enable Azure Update Manager for Azure machines'
+    policyDefinitionId: azureUpdateManagerAzurePolicyId
+    parameters: {
+      osType: {
+        value: 'Windows'
+      }
+    }
+  }
+}
+
+resource updateManagerAzurePolicyLinux  'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+  name: '(ArcBox) Enable Azure Update Manager for Azure Linux machines'
+  location: azureLocation
+  scope: resourceGroup()
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties:{
+    displayName: '(ArcBox) Enable Azure Update Manager for Azure Linux machines'
+    description: 'Enable Azure Update Manager for Azure machines'
+    policyDefinitionId: azureUpdateManagerAzurePolicyId
+    parameters: {
+      osType: {
+        value: 'Linux'
+      }
+    }
+  }
+}
