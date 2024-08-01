@@ -177,9 +177,9 @@ if ($Env:flavor -ne "DevOps") {
     Start-Sleep -Seconds 5
 
     Write-Header "Renaming the nested SQL VM"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName; Restart-Computer -Force -Wait } -Credential $winCreds
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
 
-    Start-Sleep -Seconds 15
+    Start-Sleep -Seconds 20
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
@@ -396,15 +396,17 @@ $payLoad = @"
 
         # Restarting Windows VM Network Adapters
         Write-Header "Restarting Network Adapters"
-        Start-Sleep -Seconds 20
+        Start-Sleep -Seconds 10
         Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Start-Sleep -Seconds 5
 
         # Renaming the nested VMs
         Write-Header "Renaming the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName; Restart-Computer -Force -Wait } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName; Restart-Computer -Force -Wait } -Credential $winCreds
+        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
+        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+
+        Start-Sleep -Seconds 20
 
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
