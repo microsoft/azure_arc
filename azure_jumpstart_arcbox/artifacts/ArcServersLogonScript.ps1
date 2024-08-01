@@ -172,9 +172,9 @@ if ($Env:flavor -ne "DevOps") {
 
     # Restarting Windows VM Network Adapters
     Write-Host "Restarting Network Adapters"
-    Start-Sleep -Seconds 20
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 5
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+    Start-Sleep -Seconds 20
 
     Write-Header "Renaming the nested SQL VM"
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
