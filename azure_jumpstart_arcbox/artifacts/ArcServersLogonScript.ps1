@@ -16,7 +16,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -113,7 +113,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Host "Creating VM Credentials"
     # Hard-coded username and password for the nested VMs
     $nestedWindowsUsername = "Administrator"
-    $nestedWindowsPassword = "ArcDemo123!!"
+    $nestedWindowsPassword = "JS123!!"
 
     # Create Windows credential object
     $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
@@ -401,8 +401,8 @@ $payLoad = @"
 
         Write-Header "Creating VM Credentials"
         # Hard-coded username and password for the nested VMs
-        $nestedLinuxUsername = "arcdemo"
-        $nestedLinuxPassword = "ArcDemo123!!"
+        $nestedLinuxUsername = "jumpstart"
+        $nestedLinuxPassword = "JS123!!"
 
         # Create Linux credential object
         $secLinuxPassword = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
