@@ -49,6 +49,14 @@ $Shortcut.TargetPath = $WinTerminalPath
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
+# Create desktop shortcut for Logs-folder
+$WshShell = New-Object -comObject WScript.Shell
+$LogsPath = "C:\ArcBox\Logs"
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
+$Shortcut.TargetPath = $LogsPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
 # Configure Windows Terminal as the default terminal application
 $registryPath = "HKCU:\Console\%%Startup"
 
