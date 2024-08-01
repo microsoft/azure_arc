@@ -427,8 +427,8 @@ $payLoad = @"
             $win2k22Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
             $ubuntu01Status = (Get-VM $ubuntu01vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
             $ubuntu02Status = (Get-VM $ubuntu02vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            Write-Host "Waiting for the nested VMs to come back online...waiting for 5 seconds"
-            Start-Sleep -Seconds 5
+            Write-Host "Waiting for the nested VMs to come back online...waiting for 10 seconds"
+            Start-Sleep -Seconds 10
         }until($win2k19Status -ne "" -and $win2k22Status -ne "" -and $ubuntu01Status -ne "" -and $ubuntu02Status -ne "")
 
         Start-Sleep -Seconds 10
