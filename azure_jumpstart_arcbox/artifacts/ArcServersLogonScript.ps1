@@ -185,6 +185,8 @@ if ($Env:flavor -ne "DevOps") {
         Start-Sleep -Seconds 5
     }until($sqlVMStatus -ne "")
 
+    Start-Sleep -Seconds 10
+
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\prepareSqlServerForAssessment.ps1" -DestinationPath "$nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1" -CreateFullPath -FileSource Host -Force
@@ -428,6 +430,8 @@ $payLoad = @"
             Write-Host "Waiting for the nested VMs to come back online...waiting for 5 seconds"
             Start-Sleep -Seconds 5
         }until($win2k19Status -ne "" -and $win2k22Status -ne "" -and $ubuntu01Status -ne "" -and $ubuntu02Status -ne "")
+
+        Start-Sleep -Seconds 10
 
         # Copy installation script to nested Windows VMs
         Write-Output "Transferring installation script to nested Windows VMs..."
