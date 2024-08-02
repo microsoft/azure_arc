@@ -253,16 +253,15 @@ if ($Env:flavor -ne "DevOps") {
         else {
             # Arc SQL Server extension is not installed or still in progress.
             $retryCount = $retryCount + 1
-            if ($retryCount -gt 5) {
-                Write-Host "WARNING: Timeout exceeded installing SQL server extension. Retry count: $retryCount."
-                Exit
+            if ($retryCount -gt 10) {
+                Write-Warning "Timeout exceeded installing SQL server extension. Retry count: $retryCount."
             }
             else {
                 Write-Host "Waiting for SQL server extension installation ... Retry count: $retryCount"
                 Start-Sleep(30)
             }
         }
-    } while($retryCount -le 5)
+    } while($retryCount -le 10)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
     az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
