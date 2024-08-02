@@ -438,6 +438,7 @@ $payLoad = @"
         # Configuring SSH for accessing Linux VMs
         Write-Output "Generating SSH key for accessing nested Linux VMs"
 
+        $null = New-Item -Path ~ -Name .ssh -ItemType Directory
         ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
 
         Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$Env:TEMP\authorized_keys"
@@ -445,7 +446,7 @@ $payLoad = @"
         # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
         Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
 
-        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh" -FileSource Host -Force -CreateFullPath
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
 
         if ($namingPrefix -ne "ArcBox") {
 
@@ -499,7 +500,7 @@ $payLoad = @"
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
         $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp,$Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
-        Invoke-JSSudoCommand -Session $UbuntuSessions -Command "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
+        Invoke-JSSudoCommand -Session $UbuntuSessions -Command "sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 
         Write-Header "Enabling SSH access and triggering update assessment for Arc-enabled servers"
         $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K19", "$namingPrefix-Win2K22")
