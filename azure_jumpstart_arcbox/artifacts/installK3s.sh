@@ -198,4 +198,4 @@ echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
 log="/home/$adminUsername/jumpstart_logs/installK3s.log"
-azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/installK3s-$vmName.log"
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/installK3s-$vmName.log" --check-length=false
