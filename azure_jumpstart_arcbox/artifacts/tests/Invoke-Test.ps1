@@ -1,3 +1,5 @@
+#Requires -Modules @{ ModuleName="Pester"; ModuleVersion="5.6.0"}
+
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 
