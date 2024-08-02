@@ -430,14 +430,9 @@ $payLoad = @"
         $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
         $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 900 -WarningAction SilentlyContinue).Output
 
-        do {
-            $win2k19Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $win2k22Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $ubuntu01Status = (Get-VM $ubuntu01vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $ubuntu02Status = (Get-VM $ubuntu02vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            Write-Host "Waiting for the nested VMs to come back online...waiting for 10 seconds"
-            Start-Sleep -Seconds 10
-        }until($win2k19Status -ne "" -and $win2k22Status -ne "" -and $ubuntu01Status -ne "" -and $ubuntu02Status -ne "")
+        Get-VM | Wait-VM -For IPAddress
+
+        Write-Host "Waiting for the nested VMs to come back online...waiting for 10 seconds"
 
         Start-Sleep -Seconds 10
 
