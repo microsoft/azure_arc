@@ -200,4 +200,6 @@ echo ""
 # Authorize azcopy by using a system-wide managed identity
 sleep 60
 log="/home/$adminUsername/jumpstart_logs/installK3s.log"
-azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/installK3s-$vmName.log"
+vmNameLower=$(echo $vmName | tr '[:upper:]' '[:lower:]')
+storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmNameLower.log"
