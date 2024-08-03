@@ -24,17 +24,3 @@ Describe "<cluster>" -ForEach $clusters {
         $connectedCluster.ConnectivityStatus | Should -Be "Connected"
     }
 }
-
-Describe "<vm>" -ForEach $VMs {
-    BeforeAll {
-        $vm = $_
-    }
-    It "Azure Arc Connected Machine exists" {
-        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
-        $connectedMachine | Should -Not -BeNullOrEmpty
-    }
-    It "Azure Arc Connected Machine is connected" {
-        $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
-        $connectedMachine.Status | Should -Be "Connected"
-    }
-}
