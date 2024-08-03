@@ -199,6 +199,5 @@ echo "Uploading the script logs to staging storage"
 echo ""
 # Authorize azcopy by using a system-wide managed identity
 log="/home/$adminUsername/jumpstart_logs/installK3s.log"
-#vmNameLower=$(echo $vmName | tr '[:upper:]' '[:lower:]')
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
