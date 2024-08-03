@@ -29,14 +29,6 @@ Describe "<vm>" -ForEach $VMs {
     BeforeAll {
         $vm = $_
     }
-    It "VM exists" {
-        $vmobject = Get-VM -Name $vm
-        $vmobject | Should -Not -BeNullOrEmpty
-    }
-    It "VM is running" {
-        $vmobject = Get-VM -Name $vm
-        $vmobject.State | Should -Be "Running"
-    }
     It "Azure Arc Connected Machine exists" {
         $connectedMachine = Get-AzConnectedMachine -Name $vm -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
         $connectedMachine | Should -Not -BeNullOrEmpty

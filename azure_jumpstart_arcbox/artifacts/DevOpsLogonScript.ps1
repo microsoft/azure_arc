@@ -514,6 +514,10 @@ if ($null -ne (Get-ScheduledTask -TaskName "DevOpsLogonScript" -ErrorAction Sile
 
 Start-Sleep -Seconds 5
 
+Write-Header "Running tests to verify infrastructure"
+
+& "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
+
 Write-Header "Creating deployment logs bundle"
 
 $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
