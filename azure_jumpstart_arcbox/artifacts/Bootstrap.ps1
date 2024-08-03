@@ -438,5 +438,5 @@ else {
     $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
 }
 
-    # Restart computer
-    Restart-Computer
+# Restart computer
+Restart-Computer
