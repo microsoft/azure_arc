@@ -16,7 +16,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -113,7 +113,7 @@ if ($Env:flavor -ne "DevOps") {
     Write-Host "Creating VM Credentials"
     # Hard-coded username and password for the nested VMs
     $nestedWindowsUsername = "Administrator"
-    $nestedWindowsPassword = "ArcDemo123!!"
+    $nestedWindowsPassword = "JS123!!"
 
     # Create Windows credential object
     $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
@@ -184,16 +184,18 @@ if ($Env:flavor -ne "DevOps") {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 20
 
-    Write-Header "Renaming the nested SQL VM"
-    Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
+    if ($namingPrefix -ne "ArcBox") {
 
-    do {
-        $sqlVMStatus=(Get-VM $SQLvmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-        Write-Host "Waiting for the nested SQL VM to come back online...waiting for 10 seconds"
+        Write-Header "Renaming the nested SQL VM"
+        Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
+
+        Get-VM *SQL* | Wait-VM -For IPAddress
+
+        Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 10 seconds"
+
         Start-Sleep -Seconds 10
-    }until($sqlVMStatus -ne "")
 
-    Start-Sleep -Seconds 10
+    }
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
@@ -251,16 +253,15 @@ if ($Env:flavor -ne "DevOps") {
         else {
             # Arc SQL Server extension is not installed or still in progress.
             $retryCount = $retryCount + 1
-            if ($retryCount -gt 5) {
-                Write-Host "WARNING: Timeout exceeded installing SQL server extension. Retry count: $retryCount."
-                Exit
+            if ($retryCount -gt 10) {
+                Write-Warning "Timeout exceeded installing SQL server extension. Retry count: $retryCount."
             }
             else {
                 Write-Host "Waiting for SQL server extension installation ... Retry count: $retryCount"
                 Start-Sleep(30)
             }
         }
-    } while($retryCount -le 5)
+    } while($retryCount -le 10)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
     az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
@@ -401,8 +402,8 @@ $payLoad = @"
 
         Write-Header "Creating VM Credentials"
         # Hard-coded username and password for the nested VMs
-        $nestedLinuxUsername = "arcdemo"
-        $nestedLinuxPassword = "ArcDemo123!!"
+        $nestedLinuxUsername = "jumpstart"
+        $nestedLinuxPassword = "JS123!!"
 
         # Create Linux credential object
         $secLinuxPassword = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
@@ -415,29 +416,64 @@ $payLoad = @"
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
         Start-Sleep -Seconds 10
 
-        # Renaming the nested VMs
-        Write-Header "Renaming the nested Windows VMs"
-        Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
-        Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+        if ($namingPrefix -ne "ArcBox") {
+
+            # Renaming the nested VMs
+            Write-Header "Renaming the nested Windows VMs"
+            Invoke-Command -VMName $Win2k19vmName -ScriptBlock { Rename-Computer -newName $using:Win2k19vmName -Restart } -Credential $winCreds
+            Invoke-Command -VMName $Win2k22vmName -ScriptBlock { Rename-Computer -newName $using:Win2k22vmName -Restart } -Credential $winCreds
+
+            Get-VM *Win* | Wait-VM -For IPAddress
+
+            Write-Host "Waiting for the nested Windows VMs to come back online...waiting for 10 seconds"
+
+            Start-Sleep -Seconds 10
+
+        }
 
         # Getting the Ubuntu nested VM IP address
         $Ubuntu01VmIp = Get-VM -Name $Ubuntu01vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
         $Ubuntu02VmIp = Get-VM -Name $Ubuntu02vmName | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
 
-        # Renaming the nested linux VMs
-        Write-Output "Renaming the nested Linux VMs"
-        $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
-        $Command = "sudo hostnamectl set-hostname $ubuntu01vmName;sudo systemctl reboot"
-        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 900 -WarningAction SilentlyContinue).Output
+        # Configuring SSH for accessing Linux VMs
+        Write-Output "Generating SSH key for accessing nested Linux VMs"
 
-        do {
-            $win2k19Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $win2k22Status=(Get-VM $Win2k19vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $ubuntu01Status = (Get-VM $ubuntu01vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            $ubuntu02Status = (Get-VM $ubuntu02vmName | Select-Object networkAdapters -ExpandProperty networkadapters).IPAddresses
-            Write-Host "Waiting for the nested VMs to come back online...waiting for 10 seconds"
-            Start-Sleep -Seconds 10
-        }until($win2k19Status -ne "" -and $win2k22Status -ne "" -and $ubuntu01Status -ne "" -and $ubuntu02Status -ne "")
+        $null = New-Item -Path ~ -Name .ssh -ItemType Directory
+        ssh-keygen -t rsa -N '' -f $Env:USERPROFILE\.ssh\id_rsa
+
+        Copy-Item -Path "$Env:USERPROFILE\.ssh\id_rsa.pub" -Destination "$Env:TEMP\authorized_keys"
+
+        # Automatically accept unseen keys but will refuse connections for changed or invalid hostkeys.
+        Add-Content -Path "$Env:USERPROFILE\.ssh\config" -Value "StrictHostKeyChecking=accept-new"
+
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$Env:TEMP\authorized_keys" -DestinationPath "/home/$nestedLinuxUsername/.ssh/" -FileSource Host -Force -CreateFullPath
+
+        if ($namingPrefix -ne "ArcBox") {
+
+                # Renaming the nested linux VMs
+                Write-Output "Renaming the nested Linux VMs"
+
+                Invoke-Command -HostName $Ubuntu01VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
+
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu01vmName;sudo systemctl reboot"
+
+                }
+
+                Restart-VM -Name $ubuntu01vmName
+
+                Invoke-Command -HostName $Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername -ScriptBlock {
+
+                    Invoke-Expression "sudo hostnamectl set-hostname $using:ubuntu02vmName;sudo systemctl reboot"
+
+                }
+
+                Restart-VM -Name $ubuntu02vmName
+
+            }
+
+        Get-VM *Ubuntu* | Wait-VM -For IPAddress
+
+        Write-Host "Waiting for the nested Linux VMs to come back online...waiting for 10 seconds"
 
         Start-Sleep -Seconds 10
 
@@ -452,8 +488,8 @@ $payLoad = @"
 
         # Copy installation script to nested Linux VMs
         Write-Output "Transferring installation script to nested Linux VMs..."
-        Set-SCPItem -ComputerName $Ubuntu01VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
-        Set-SCPItem -ComputerName $Ubuntu02VmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
+
+        Get-VM *Ubuntu* | Copy-VMFile -SourcePath "$agentScript\installArcAgentModifiedUbuntu.sh" -DestinationPath "/home/$nestedLinuxUsername" -FileSource Host -Force
 
         Write-Header "Onboarding Arc-enabled servers"
 
@@ -463,13 +499,8 @@ $payLoad = @"
         Invoke-Command -VMName $Win2k22vmName -ScriptBlock { powershell -File $Using:nestedVMArcBoxDir\installArcAgent.ps1 -accessToken $using:accessToken, -tenantId $Using:tenantId, -subscriptionId $Using:subscriptionId, -resourceGroup $Using:resourceGroup, -azureLocation $Using:azureLocation } -Credential $winCreds
 
         Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
-        $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
-        $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
-
-        $ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
-        $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-        $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
+        $UbuntuSessions = New-PSSession -HostName $Ubuntu01VmIp,$Ubuntu02VmIp -KeyFilePath "$Env:USERPROFILE\.ssh\id_rsa" -UserName $nestedLinuxUsername
+        Invoke-JSSudoCommand -Session $UbuntuSessions -Command "sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 
         Write-Header "Enabling SSH access and triggering update assessment for Arc-enabled servers"
         $VMs = @("$namingPrefix-SQL", "$namingPrefix-Ubuntu-01", "$namingPrefix-Ubuntu-02", "$namingPrefix-Win2K19", "$namingPrefix-Win2K22")
