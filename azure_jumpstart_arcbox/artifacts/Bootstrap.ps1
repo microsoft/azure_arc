@@ -353,6 +353,9 @@ if ($flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+    # Restart computer
+    Restart-Computer
 }
 
 if ($flavor -eq "DevOps") {
@@ -363,6 +366,9 @@ if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
     $Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+    # Restart computer
+    Restart-Computer
 }
 
 if ($flavor -eq "DataOps") {
