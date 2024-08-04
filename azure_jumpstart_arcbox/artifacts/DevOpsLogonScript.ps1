@@ -4,6 +4,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
+$Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 $namingPrefix = ($Env:namingPrefix).toLower()
 
 $osmReleaseVersion = "1.1.1-1"
@@ -513,6 +514,10 @@ if ($null -ne (Get-ScheduledTask -TaskName "DevOpsLogonScript" -ErrorAction Sile
 }
 
 Start-Sleep -Seconds 5
+
+Write-Header "Running tests to verify infrastructure"
+
+& "$Env:ArcBoxTestsDir\Invoke-Test.ps1"
 
 Write-Header "Creating deployment logs bundle"
 
