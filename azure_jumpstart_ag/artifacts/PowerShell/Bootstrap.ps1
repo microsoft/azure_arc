@@ -108,7 +108,7 @@ $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 
 switch ($scenario) {
   "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-supermarket.psd1") -OutFile $ConfigurationDataFile }
-  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd") -OutFile $ConfigurationDataFile}
+  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd1") -OutFile $ConfigurationDataFile}
 }
 
 $AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
