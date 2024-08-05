@@ -24,7 +24,7 @@ param (
   [string]$githubUser,
   [string]$adxClusterName,
   [string]$namingGuid,
-  [string]$industry,
+  [string]$scenario,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
   [string]$stcontainerName
@@ -62,7 +62,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('scenario', $scenario, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
@@ -106,9 +106,9 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 
-switch ($industry) {
-  "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-retail.psd1") -OutFile $ConfigurationDataFile }
-  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
+switch ($scenario) {
+  "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-supermarket.psd1") -OutFile $ConfigurationDataFile }
+  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd") -OutFile $ConfigurationDataFile}
 }
 
 $AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
@@ -248,11 +248,11 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -Out
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
-if($industry -eq "retail"){
+if($scenario -eq "retail"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 }
-elseif ($industry -eq "manufacturing") {
+elseif ($scenario -eq "manufacturing") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"

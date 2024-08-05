@@ -13,7 +13,7 @@ $global:AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 $global:configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
 $global:AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $global:AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
-$global:industry = $Env:industry
+$global:scenario = $Env:scenario
 $global:websiteUrls = $AgConfig.URLs
 $global:githubAccount = $Env:githubAccount
 $global:githubBranch = $Env:githubBranch
@@ -31,7 +31,7 @@ $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
 $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:acrName = $Env:acrName.ToLower()
@@ -40,7 +40,7 @@ if ($industry -eq "retail") {
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-}elseif ($industry -eq "manufacturing") {
+}elseif ($scenario -eq "manufacturing") {
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -95,7 +95,7 @@ Deploy-WindowsTools
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
     SetupRetailRepo
 }
@@ -104,7 +104,7 @@ if ($industry -eq "retail") {
 #####################################################################
 # Azure IoT Hub resources preparation
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
     Deploy-AzureIoTHub
 }
@@ -118,7 +118,7 @@ Deploy-VirtualizationInfrastructure
 #####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     Deploy-AzContainerRegistry
 }
 
@@ -154,7 +154,7 @@ Deploy-ClusterFluxExtension
 #####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
     kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
     helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
@@ -168,12 +168,12 @@ if ($industry -eq "retail") {
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "retail") {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
     Deploy-RetailConfigs
 }
 
-if ($industry -eq "manufacturing") {
+if ($scenario -eq "manufacturing") {
     Deploy-AIO
     Deploy-ManufacturingConfigs
     $mqttIpArray=Set-MQTTIpAddress
@@ -204,7 +204,7 @@ Deploy-ADXDashboardReports
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-if($industry -eq "retail"){
+if($scenario -eq "retail"){
     Deploy-RetailBookmarks
 }else{
     Deploy-ManufacturingBookmarks
@@ -218,7 +218,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-if($industry -eq "retail"){
+if($scenario -eq "retail"){
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
     while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
@@ -265,7 +265,7 @@ Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-# if ($industry -eq "manufacturing") {
+# if ($scenario -eq "manufacturing") {
 #     foreach ($shell in $kubectlMonShells) {
 #         Stop-Process -Id $shell.Id
 #     }

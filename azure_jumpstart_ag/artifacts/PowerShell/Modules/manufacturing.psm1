@@ -9,7 +9,7 @@ function Deploy-ManufacturingConfigs {
         kubectl create -f https://operatorhub.io/install/ovms-operator.yaml
     }
 
-    # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-manufacturing.psd1
+    # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-motors.psd
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         Start-Job -Name gitops -ScriptBlock {
             $AgConfig = $using:AgConfig

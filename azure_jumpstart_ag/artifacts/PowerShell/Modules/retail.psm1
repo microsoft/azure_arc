@@ -348,7 +348,7 @@ function Deploy-AzureIOTHub {
 }
 
 function Deploy-K8sImagesCache {
-    if ($Env:industry -eq "retail") {
+    if ($Env:scenario -eq "retail") {
         Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
         while ($workflowStatus.status -ne "completed") {
             Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray

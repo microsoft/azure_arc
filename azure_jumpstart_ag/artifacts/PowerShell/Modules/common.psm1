@@ -543,7 +543,7 @@ function Deploy-ClusterSecrets {
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
-    if ($Env:industry -eq "retail") {
+    if ($Env:scenario -eq "retail") {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
         $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
         foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -813,7 +813,7 @@ function Deploy-Prometheus {
     helm repo add prometheus-community $websiteUrls["prometheus"] | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-    if ($Env:industry -eq "retail") {
+    if ($Env:scenario -eq "retail") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
@@ -827,7 +827,7 @@ function Deploy-Prometheus {
         (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
         }
     }
-    elseif ($Env:industry -eq "manufacturing") {
+    elseif ($Env:scenario -eq "manufacturing") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso-motors.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso-motors.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
