@@ -18,7 +18,6 @@ resource MSVMI_PerfandDa_Dcr 'Microsoft.Insights/dataCollectionRules@2021-04-01'
         {
           name: 'VMInsightsPerfCounters'
           streams: ['Microsoft-InsightsMetrics']
-          scheduledTransferPeriod: 'PT1M'
           samplingFrequencyInSeconds: 60
           counterSpecifiers: ['\\VmInsights\\DetailedMetrics']
         }
