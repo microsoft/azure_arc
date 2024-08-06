@@ -102,7 +102,7 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
-var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
+var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -159,6 +159,24 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
     namingGuid: namingGuid
   }
 }
+
+module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
+  name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : '${k3sArcClusterName}-Node-0${i}'
+    storageContainerName: toLower(k3sArcClusterName)
+    namingGuid: namingGuid
+  }
+  dependsOn: [
+    ubuntuRancherK3sDeployment
+  ]
+}]
 
 module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
