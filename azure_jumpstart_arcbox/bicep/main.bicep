@@ -63,6 +63,9 @@ param location string = resourceGroup().location
 @description('The custom location RPO ID. This parameter is only needed when deploying the DataOps flavor.')
 param customLocationRPOID string = newGuid()
 
+@description('Use this parameter to enable or disable debug mode for the automation scripts on the client VM, effectively configuring PowerShell ErrorActionPreference to Break. Intended for use when troubleshooting automation scripts. Default is false.')
+param debugEnabled bool = false
+
 @description('Tags to assign for all ArcBox resources')
 param resourceTags object = {
   Solution: 'jumpstart_arcbox'
@@ -154,6 +157,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     addsDomainName: addsDomainName
     customLocationRPOID: customLocationRPOID
     namingPrefix: namingPrefix
+    debugEnabled: debugEnabled
   }
   dependsOn: [
     updateVNetDNSServers
