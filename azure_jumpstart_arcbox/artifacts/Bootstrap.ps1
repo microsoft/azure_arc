@@ -34,7 +34,8 @@ param (
     [string]$addsDomainName,
     [string]$customLocationRPOID,
     [object]$resourceTags,
-    [string]$namingPrefix
+    [string]$namingPrefix,
+    [string]$debugEnabled
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -66,8 +67,13 @@ param (
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceTags', $resourceTags, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingPrefix', $namingPrefix, [System.EnvironmentVariableTarget]::Machine)
-
 [System.Environment]::SetEnvironmentVariable('ArcBoxDir', "C:\ArcBox", [System.EnvironmentVariableTarget]::Machine)
+
+if ($debugEnabled -eq "true") {
+    [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
+} else {
+    [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Continue", [System.EnvironmentVariableTarget]::Machine)
+}
 
 # Formatting VMs disk
 $disk = (Get-Disk | Where-Object partitionstyle -eq 'raw')[0]
@@ -106,8 +112,6 @@ New-Item -Path $Env:ArcBoxDataOpsDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxTestsDir -ItemType directory -Force
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
-
-$ErrorActionPreference = 'SilentlyContinue'
 
 if ([bool]$vmAutologon) {
 
