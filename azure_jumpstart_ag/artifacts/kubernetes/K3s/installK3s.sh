@@ -27,7 +27,7 @@ sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
 
-exec >installK3s-$vmName.log
+exec >installK3s-${vmName}.log
 exec 2>&1
 
 # Set k3 deployment variables
