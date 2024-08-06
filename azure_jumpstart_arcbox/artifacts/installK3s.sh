@@ -1,7 +1,4 @@
 #!/bin/bash
-exec >installK3s.log
-exec 2>&1
-
 sudo apt-get update
 
 sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
@@ -20,7 +17,6 @@ echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
 
-
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
 sed -i '4s/^/export vmName=/' vars.sh
@@ -30,6 +26,11 @@ sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
+
+export vmName=$3
+
+exec >installK3s-${vmName}.log
+exec 2>&1
 
 # Set k3 deployment variables
 export K3S_VERSION="1.29.6+k3s2" # Do not change!
@@ -42,7 +43,7 @@ sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcome
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
-while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
+while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s-$vmName.log /home/${adminUsername}/jumpstart_logs/installK3s-$vmName.log; done &
 
 # Downloading azcopy
 echo ""
@@ -189,7 +190,7 @@ else
         echo "ERROR: Failed to add k3s worker nodes"
         exit 1
     fi
-    
+
     sudo service sshd restart
 fi
 
@@ -197,7 +198,6 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
-# Authorize azcopy by using a system-wide managed identity
-log="/home/$adminUsername/jumpstart_logs/installK3s.log"
+log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
