@@ -1,3 +1,5 @@
+$ErrorActionPreference = $env:ErrorActionPreference
+
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "F:\Virtual Machines"

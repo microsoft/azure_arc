@@ -1,3 +1,5 @@
+$ErrorActionPreference = $env:ErrorActionPreference
+
 $Env:TempDir = "C:\Temp"
 $Env:ToolsDir = "C:\Tools"
 $Env:ArcBoxDir = "C:\ArcBox"
