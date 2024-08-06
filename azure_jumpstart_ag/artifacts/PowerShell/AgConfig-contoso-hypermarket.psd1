@@ -5,7 +5,6 @@
     AgDirectories           = @{
         AgDir             = "C:\Ag"
         AgPowerShellDir   = "C:\Ag\PowerShell"
-        AgShellDir        = "C:\Ag\Shell"
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgIconDir         = "C:\Ag\Icons"
