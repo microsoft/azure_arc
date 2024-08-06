@@ -151,14 +151,7 @@ Deploy-K8sImagesCache
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
-    Deploy-AzArcK8s -clusterType AKSEE
-}else{
-    $clusters = [PSCustomObject]@{
-        clusterName = $k3sArcClusterName
-        context = "k3s"
-        kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s"
-    }
-    Deploy-AzArcK8s -clusterType K3s -clusters $clusters
+    Deploy-AzArcK8sAKSEE
 }
 
 #####################################################################
