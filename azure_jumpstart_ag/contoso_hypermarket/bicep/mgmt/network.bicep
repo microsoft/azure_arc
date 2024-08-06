@@ -1,11 +1,11 @@
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string
 
-@description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string
+@description('Name of the K3s subnet in the cloud virtual network')
+param subnetNameCloudK3s string
 
-@description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string
+@description('Name of the inner-loop subnet in the cloud virtual network')
+param subnetNameCloud string
 
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
@@ -25,8 +25,8 @@ param networkSecurityGroupNameCloud string = 'Ag-NSG-Prod'
 param bastionNetworkSecurityGroupName string = 'Ag-NSG-Bastion'
 
 var addressPrefixCloud = '10.16.0.0/16'
-var subnetAddressPrefixAksDev = '10.16.80.0/21'
-var subnetAddressPrefixInnerLoop = '10.16.64.0/21'
+var subnetAddressPrefixK3s = '10.16.80.0/21'
+var subnetAddressPrefixCloud = '10.16.64.0/21'
 var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
@@ -45,11 +45,11 @@ var bastionSubnet = [
     }
   }
 ]
-var cloudAKSDevSubnet = [
+var cloudK3sSubnet = [
   {
-    name: subnetNameCloudAksStaging
+    name: subnetNameCloudK3s
     properties: {
-      addressPrefix: subnetAddressPrefixAksDev
+      addressPrefix: subnetAddressPrefixK3s
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
@@ -59,11 +59,11 @@ var cloudAKSDevSubnet = [
   }
 ]
 
-var cloudAKSInnerLoopSubnet = [
+var cloudSubnet = [
   {
-    name: subnetNameCloudAksInnerLoop
+    name: subnetNameCloud
     properties: {
-      addressPrefix: subnetAddressPrefixInnerLoop
+      addressPrefix: subnetAddressPrefixCloud
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
@@ -83,7 +83,7 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudAKSDevSubnet,cloudAKSInnerLoopSubnet) : union(cloudAKSDevSubnet,cloudAKSInnerLoopSubnet,bastionSubnet)
+    subnets: (deployBastion == false) ? union (cloudK3sSubnet,cloudSubnet) : union(cloudK3sSubnet,cloudSubnet,bastionSubnet)
   }
 }
 
@@ -110,7 +110,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_80'
         properties: {
-          priority: 1003
+          priority: 1000
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -123,7 +123,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_8080'
         properties: {
-          priority: 1004
+          priority: 1010
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -136,7 +136,7 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
       {
         name: 'allow_k8s_443'
         properties: {
-          priority: 1005
+          priority: 1020
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -147,35 +147,9 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
         }
       }
       {
-        name: 'allow_pos_5000'
-        properties: {
-          priority: 1006
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '5000'
-        }
-      }
-      {
-        name: 'allow_pos_81'
-        properties: {
-          priority: 1007
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '81'
-        }
-      }
-      {
         name: 'allow_prometheus_9090'
         properties: {
-          priority: 1008
+          priority: 1030
           protocol: 'TCP'
           access: 'Allow'
           direction: 'Inbound'
@@ -184,7 +158,59 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationAddressPrefix: '*'
           destinationPortRange: '9090'
         }
-      }       
+      }
+      {
+        name: 'allow_MQ_8883'
+        properties: {
+          priority: 1040
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '8883'
+        }
+      }
+      {
+        name: 'allow_MQ_1883'
+        properties: {
+          priority: 1050
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '1883'
+        }
+      }
+      {
+        name: 'allow_k8s_kubelet'
+        properties: {
+          priority: 1060
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '10250'
+        }
+      }
+      {
+        name: 'allow_traefik_lb_external'
+        properties: {
+          priority: 1070
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '32323'
+        }
+      }
     ]
   }
 }
@@ -337,6 +363,6 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
 }
 
 output vnetId string = cloudVirtualNetwork.id
-output devSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
-output innerLoopSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
+output k3sSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
+output cloudSubnetId string = cloudVirtualNetwork.properties.subnets[1].id
 output virtualNetworkNameCloud string = cloudVirtualNetwork.name

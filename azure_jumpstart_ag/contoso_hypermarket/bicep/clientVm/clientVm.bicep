@@ -16,6 +16,10 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+
+@description('Name of the storage account')
+param aioStorageAccountName string = 'aiostg${namingGuid}'
+
 @description('Resource tag for Jumpstart Agora')
 param resourceTags object = {
   Project: 'Jumpstart_Agora'
@@ -26,6 +30,9 @@ param subnetId string
 
 @description('Client id of the service principal')
 param spnClientId string
+
+@description('Azure service principal object id')
+param spnObjectId string
 
 @description('Client secret of the service principal')
 @secure()
@@ -44,26 +51,17 @@ param templateBaseUrl string
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string
-
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
 
-@description('The name of the Staging Kubernetes cluster resource')
-param aksStagingClusterName string = 'Ag-AKS-Staging'
-
-@description('The name of the IoT Hub')
-param iotHubHostName string = 'Ag-IoTHub'
+@description('The name of ESA container in Storage Account')
+param stcontainerName string
 
 @description('The login server name of the Azure Container Registry')
 param acrName string
 
-@description('The name of the Cosmos DB account')
-param cosmosDBName string
-
-@description('The URL of the Cosmos DB endpoint')
-param cosmosDBEndpoint string
+@description('The name of the Azure Data Explorer cluster')
+param adxClusterName string
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -74,18 +72,20 @@ param githubAccount string = 'microsoft'
 @description('Target GitHub branch')
 param githubBranch string = 'main'
 
-@description('GitHub Personal access token for the user account')
-@secure()
-param githubPAT string
-
-@description('The name of the Azure Data Explorer cluster')
-param adxClusterName string
-
 @description('Random GUID')
 param namingGuid string
 
+@description('The custom location RPO ID')
+param customLocationRPOID string
+
 @description('The agora scenario to be deployed')
 param scenario string = 'retail'
+
+@description('The name of the Azure Arc K3s cluster')
+param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
+
+@description('The name of the Azure Arc K3s data cluster')
+param k3sArcClusterName string = 'Ag-K3s-Chicago-${namingGuid}'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'
@@ -201,7 +201,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -githubUser ${githubUser} -aksStagingClusterName ${aksStagingClusterName} -iotHubHostName ${iotHubHostName} -acrName ${acrName} -cosmosDBName ${cosmosDBName} -cosmosDBEndpoint ${cosmosDBEndpoint} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -githubPAT ${githubPAT} -adxClusterName ${adxClusterName} -namingGuid ${namingGuid} -scenario ${scenario}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -adxClusterName ${adxClusterName} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -stcontainerName ${stcontainerName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName}'
     }
   }
 }

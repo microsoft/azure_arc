@@ -1,4 +1,4 @@
-function Deploy-ManufacturingConfigs {
+function Deploy-MotorsConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring OVMS prerequisites on Kubernetes nodes." -ForegroundColor Gray
     $VMs = (Get-VM).Name
     foreach ($VM in $VMs) {
@@ -488,7 +488,7 @@ function Deploy-ADXDashboardReports {
     pip install azure.eventhub
 }
 
-function Deploy-ManufacturingBookmarks {
+function Deploy-MotorsBookmarks {
     $bookmarksFileName = "$AgToolsDir\Bookmarks"
     $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 

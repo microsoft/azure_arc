@@ -8,6 +8,9 @@ param spnClientSecret string
 @description('Azure AD tenant id for your service principal')
 param spnTenantId string
 
+@description('Azure service principal object id')
+param spnObjectId string
+
 @description('Location for all resources')
 param location string = resourceGroup().location
 
@@ -39,38 +42,38 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked the repo https://github.com/microsoft/jumpstart-agora-apps')
-@minLength(1)
-param githubUser string
-
-@description('GitHub Personal access token for the user account')
-@minLength(1)
-@secure()
-param githubPAT string
-
 @description('Name of the Cloud VNet')
 param virtualNetworkNameCloud string = 'Ag-Vnet-Prod'
 
 @description('Name of the Staging AKS subnet in the cloud virtual network')
-param subnetNameCloudAksStaging string = 'Ag-Subnet-Staging'
+param subnetNameCloudK3s string = 'Ag-Subnet-K3s'
 
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
-param subnetNameCloudAksInnerLoop string = 'Ag-Subnet-InnerLoop'
-
-@description('The name of the Staging Kubernetes cluster resource')
-param aksStagingClusterName string = 'Ag-AKS-Staging'
-
-@description('The name of the IotHub')
-param iotHubName string = 'Ag-IotHub-${namingGuid}'
-
-@description('The name of the Cosmos DB account')
-param accountName string = 'agcosmos${namingGuid}'
+param subnetNameCloud string = 'Ag-Subnet-Cloud'
 
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
-@description('The name of the Azure Data Explorer POS database')
-param posOrdersDBName string = 'Orders'
+@description('Name of the storage queue')
+param storageQueueName string = 'aioqueue'
+
+@description('Name of the event hub')
+param eventHubName string = 'aiohub${namingGuid}'
+
+@description('Name of the event hub namespace')
+param eventHubNamespaceName string = 'aiohubns${namingGuid}'
+
+@description('Name of the event grid namespace')
+param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
+
+@description('The name of the Azure Data Explorer Event Hub consumer group for assemblybatteries')
+param stagingDataCGName string = 'mqttdataemulator'
+
+@description('The name of ESA container in Storage Account')
+param stcontainerName string = 'esacontainer'
+
+@description('The custom location RPO ID')
+param customLocationRPOID string
 
 @minLength(5)
 @maxLength(50)
@@ -81,9 +84,22 @@ param acrName string = 'agacr${namingGuid}'
 param rdpPort string = '3389'
 
 @description('The agora scenario to be deployed')
-param scenario string = 'retail'
+param scenario string = 'contoso_hypermarket'
+
+@description('The name of the Azure Arc K3s cluster')
+param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
+
+@description('The name of the Azure Arc K3s data cluster')
+param k3sArcClusterName string = 'Ag-K3s-Chicago-${namingGuid}'
+
+@description('The name of the Key Vault for site 1')
+param akvNameSite1 string = 'agakv1${namingGuid}'
+
+@description('The name of the Key Vault for site 2')
+param akvNameSite2 string = 'agakv2${namingGuid}'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
+var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
@@ -97,8 +113,8 @@ module networkDeployment 'mgmt/network.bicep' = {
   name: 'networkDeployment'
   params: {
     virtualNetworkNameCloud: virtualNetworkNameCloud
-    subnetNameCloudAksStaging: subnetNameCloudAksStaging
-    subnetNameCloudAksInnerLoop: subnetNameCloudAksInnerLoop
+    subnetNameCloudK3s: subnetNameCloudK3s
+    subnetNameCloud: subnetNameCloud
     deployBastion: deployBastion
     location: location
   }
@@ -111,19 +127,53 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   }
 }
 
-module kubernetesDeployment 'kubernetes/aks.bicep' = {
-  name: 'kubernetesDeployment'
+module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
+  name: 'ubuntuRancherK3sDataSvcDeployment'
   params: {
-    aksStagingClusterName: aksStagingClusterName
-    virtualNetworkNameCloud: networkDeployment.outputs.virtualNetworkNameCloud
-    aksSubnetNameStaging: subnetNameCloudAksStaging
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    location: location
     sshRSAPublicKey: sshRSAPublicKey
-    acrName: acrName
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : k3sArcDataClusterName
+    storageContainerName: toLower(k3sArcDataClusterName)
+    namingGuid: namingGuid
   }
 }
+
+module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
+  name: 'ubuntuRancherK3sDeployment'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : k3sArcClusterName
+    storageContainerName: toLower(k3sArcClusterName)
+    namingGuid: namingGuid
+  }
+}
+
+module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
+  name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : '${k3sArcDataClusterName}-Node-0${i}'
+    storageContainerName: toLower(k3sArcDataClusterName)
+    namingGuid: namingGuid
+  }
+  dependsOn: [
+    ubuntuRancherK3sDataSvcDeployment
+  ]
+}]
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
@@ -139,47 +189,67 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubAccount: githubAccount
     githubBranch: githubBranch
-    githubUser: githubUser
-    githubPAT: githubPAT
     location: location
-    subnetId: networkDeployment.outputs.innerLoopSubnetId
-    aksStagingClusterName: aksStagingClusterName
-    iotHubHostName: iotHubDeployment.outputs.iotHubHostName
-    cosmosDBName: accountName
-    cosmosDBEndpoint: cosmosDBDeployment.outputs.cosmosDBEndpoint
+    subnetId: networkDeployment.outputs.cloudSubnetId
     acrName: acrName
     rdpPort: rdpPort
     adxClusterName: adxClusterName
     namingGuid: namingGuid
     scenario: scenario
+    customLocationRPOID: customLocationRPOID
+    spnObjectId: spnObjectId
+    stcontainerName: stcontainerName
+    k3sArcClusterName: k3sArcClusterName
+    k3sArcDataClusterName: k3sArcDataClusterName
   }
 }
-
-module iotHubDeployment 'data/iotHub.bicep' = {
-  name: 'iotHubDeployment'
-  params: {
-    location: location
-    iotHubName: iotHubName
-  }
-}
-
-module adxDeployment 'data/dataExplorer.bicep' = {
+module adx 'data/dataExplorer.bicep' = {
   name: 'adxDeployment'
   params: {
-    location: location
     adxClusterName: adxClusterName
-    iotHubId: iotHubDeployment.outputs.iotHubId
-    iotHubConsumerGroup: iotHubDeployment.outputs.iotHubConsumerGroup
-    cosmosDBAccountName: accountName
-    posOrdersDBName: posOrdersDBName
+    location: location
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
   }
 }
 
-module cosmosDBDeployment 'data/cosmosDB.bicep' = {
-  name: 'cosmosDBDeployment'
+module acr 'kubernetes/acr.bicep' = {
+  name: 'acrDeployment'
   params: {
+    acrName: acrName
     location: location
-    accountName: accountName
-    posOrdersDBName: posOrdersDBName
+  }
+}
+
+module keyVault 'data/keyVault.bicep' = {
+  name: 'keyVaultDeployment'
+  params: {
+    tenantId: spnTenantId
+    akvNameSite1: akvNameSite1
+    akvNameSite2: akvNameSite2
+    location: location
+  }
+}
+
+module eventGrid 'data/eventGrid.bicep' = {
+  name: 'eventGridDeployment'
+  params: {
+    eventGridNamespaceName: eventGridNamespaceName
+    eventHubResourceId: eventHub.outputs.eventHubResourceId
+    queueName: storageQueueName
+    storageAccountResourceId: storageAccountDeployment.outputs.storageAccountResourceId
+    namingGuid: namingGuid
+    location: location
+  }
+}
+
+module eventHub 'data/eventHub.bicep' = {
+  name: 'eventHubDeployment'
+  params: {
+    eventHubName: eventHubName
+    eventHubNamespaceName: eventHubNamespaceName
+    location: location
+    stagingDataCGName: stagingDataCGName
   }
 }

@@ -564,107 +564,312 @@ function Deploy-ClusterSecrets {
 }
 
 function Deploy-AzArcK8s {
-    # Running pre-checks to ensure that the aksedge ConfigMap is present on all clusters
-    $maxRetries = 5
-    $retryInterval = 30 # seconds
-    $retryCount = 0
-    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-        $clusterName = $cluster.Name.ToLower()
-        if ($clusterName -ne "staging") {
-            while ($retryCount -lt $maxRetries) {
-                kubectx $clusterName
-                $configMap = kubectl get configmap -n aksedge aksedge
-                if ($null -eq $configMap) {
-                    $retryCount++
-                    Write-Host "Retry ${retryCount}/${maxRetries}: aksedge ConfigMap not found on $clusterName. Retrying in $retryInterval seconds..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-                    Start-Sleep -Seconds $retryInterval
-                }
-                else {
-                    # ConfigMap found, continue with the rest of the script
-                    Write-Host "aksedge ConfigMap found on $clusterName. Continuing with the script..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-                    break # Exit the loop
+    param(
+        [Parameter(Position = 0)]
+        [validateSet('AKSEE', 'K3s')]
+        [string]$clusterType = 'AKSEE'
+    )
+    dynamicparam {
+        $paramDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+        $attributes = New-Object System.Management.Automation.ParameterAttribute
+        $attributes.Mandatory = $true
+
+        if ($clusterType -ne 'AKSEE') {
+            $dynamicParameter = New-Object System.Management.Automation.RuntimeDefinedParameter('clusters', [PSCustomObject], $attributes)
+            $paramDictionary.Add('clusters', $dynamicParameter)
+        }
+        return $paramDictionary
+    }
+    process {
+        if ($clusterType -eq 'K3s') {
+            $clusters = $PSBoundParameters['clusters']
+            Write-Output "Arc-enabling k3s clusters"
+            foreach ($cluster in $clusters) {
+                if ($cluster.context -ne 'k3s') {
+                    Write-Host "Checking K8s Nodes"
+                    kubectl get nodes --kubeconfig $cluster.kubeConfig
+                    Write-Host "`n"
+                    az connectedk8s connect --name $cluster.clusterName `
+                        --resource-group $Env:resourceGroup `
+                        --location $Env:azureLocation `
+                        --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+                        --kube-config $cluster.kubeConfig
+                    Start-Sleep -Seconds 10
+                    # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
+                    Write-Host "`n"
+                    Write-Host "Enabling Container Insights cluster extension"
+                    az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --no-wait
+                    Write-Host "`n"
                 }
             }
-
-            if ($retryCount -eq $maxRetries) {
-                Write-Host "[$(Get-Date -Format t)] ERROR: aksedge ConfigMap not found on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-                exit 1 # Exit the script
+            foreach ($cluster in $clusters) {
+                if ($cluster.context -eq 'k3s') {
+                Write-Header "Configuring kube-vip on K3s cluster"
+                kubectx k3s
+                $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
+            Write-Host "Assignin kube-vip-role on k3s cluster"
+            $kubeVipRBAC = @"
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: kube-vip
+              namespace: kube-system
+            ---
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRole
+            metadata:
+              annotations:
+                rbac.authorization.kubernetes.io/autoupdate: "true"
+              name: system:kube-vip-role
+            rules:
+              - apiGroups: [""]
+                resources: ["services/status"]
+                verbs: ["update"]
+              - apiGroups: [""]
+                resources: ["services", "endpoints"]
+                verbs: ["list","get","watch", "update"]
+              - apiGroups: [""]
+                resources: ["nodes"]
+                verbs: ["list","get","watch", "update", "patch"]
+              - apiGroups: ["coordination.k8s.io"]
+                resources: ["leases"]
+                verbs: ["list", "get", "watch", "update", "create"]
+              - apiGroups: ["discovery.k8s.io"]
+                resources: ["endpointslices"]
+                verbs: ["list","get","watch", "update"]
+            ---
+            kind: ClusterRoleBinding
+            apiVersion: rbac.authorization.k8s.io/v1
+            metadata:
+              name: system:kube-vip-binding
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: ClusterRole
+              name: system:kube-vip-role
+            subjects:
+            - kind: ServiceAccount
+              name: kube-vip
+              namespace: kube-system
+"@
+            
+            $kubeVipRBAC | kubectl apply -f -
+            
+            $kubeVipDaemonset = @"
+            apiVersion: apps/v1
+            kind: DaemonSet
+            metadata:
+              creationTimestamp: null
+              labels:
+                app.kubernetes.io/name: kube-vip-ds
+                app.kubernetes.io/version: v0.7.0
+              name: kube-vip-ds
+              namespace: kube-system
+            spec:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: kube-vip-ds
+              template:
+                metadata:
+                  creationTimestamp: null
+                  labels:
+                    app.kubernetes.io/name: kube-vip-ds
+                    app.kubernetes.io/version: v0.7.0
+                spec:
+                  affinity:
+                    nodeAffinity:
+                      requiredDuringSchedulingIgnoredDuringExecution:
+                        nodeSelectorTerms:
+                        - matchExpressions:
+                          - key: node-role.kubernetes.io/master
+                            operator: Exists
+                        - matchExpressions:
+                          - key: node-role.kubernetes.io/control-plane
+                            operator: Exists
+                  containers:
+                  - args:
+                    - manager
+                    env:
+                    - name: vip_arp
+                      value: "true"
+                    - name: port
+                      value: "6443"
+                    - name: vip_interface
+                      value: eth0
+                    - name: vip_cidr
+                      value: "32"
+                    - name: dns_mode
+                      value: first
+                    - name: cp_enable
+                      value: "true"
+                    - name: cp_namespace
+                      value: kube-system
+                    - name: svc_enable
+                      value: "true"
+                    - name: svc_leasename
+                      value: plndr-svcs-lock
+                    - name: vip_leaderelection
+                      value: "true"
+                    - name: vip_leasename
+                      value: plndr-cp-lock
+                    - name: vip_leaseduration
+                      value: "5"
+                    - name: vip_renewdeadline
+                      value: "3"
+                    - name: vip_retryperiod
+                      value: "1"
+                    - name: address
+                      value: "$k3sVIP"
+                    - name: prometheus_server
+                      value: :2112
+                    image: ghcr.io/kube-vip/kube-vip:v0.7.0
+                    imagePullPolicy: Always
+                    name: kube-vip
+                    resources: {}
+                    securityContext:
+                      capabilities:
+                        add:
+                        - NET_ADMIN
+                        - NET_RAW
+                  hostNetwork: true
+                  serviceAccountName: kube-vip
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                  - effect: NoExecute
+                    operator: Exists
+              updateStrategy: {}
+            status:
+              currentNumberScheduled: 0
+              desiredNumberScheduled: 0
+              numberMisscheduled: 0
+              numberReady: 0
+"@
+            
+                $kubeVipDaemonset | kubectl apply -f -
+            
+                Write-Host "Deploying Kube vip cloud controller on k3s cluster"
+                kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+            
+                $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $Env:k3sArcDataClusterName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+                $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
+                $lowestServiceIp = $sortedIps[0]
+                $highestServiceIp = $sortedIps[-1]
+            
+                kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
+                Start-Sleep -Seconds 30
+            
+                Write-Host "Creating longhorn storage on K3scluster"
+                kubectl apply -f "$Env:AgToolsDir\longhorn.yaml" --kubeconfig $cluster.kubeConfig
+                Start-Sleep -Seconds 30
+                Write-Host "`n"
+                }
             }
         }
-    }
-    $VMnames = (Get-VM).Name
-    foreach ($VM in $VMNames) {
-        $secret = $Env:spnClientSecret
-        $clientId = $Env:spnClientId
-        $tenantId = $Env:spnTenantId
-        $location = $Env:azureLocation
-        $resourceGroup = $Env:resourceGroup
-
-        Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
-            # Install prerequisites
-            . C:\Deployment\Profile.ps1
-            $hostname = hostname
-            $ProgressPreference = "SilentlyContinue"
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-            Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
-
-            # Connect servers to Arc
-            $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
-            $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
-            Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
-            Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
-            Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
-
-            # Connect clusters to Arc
-            $deploymentPath = "C:\Deployment\config.json"
-            Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
-
-            kubectl get svc
-
-            $retryCount = 5  # Number of times to retry the operation
-            $retryDelay = 30  # Delay in seconds between retries
-
-            for ($retry = 1; $retry -le $retryCount; $retry++) {
-                $return = Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
-                if ($return -ne "OK") {
-                    Write-Output "Failed to onboard AKS Edge Essentials cluster to Azure Arc. Retrying (Attempt $retry of $retryCount)..."
-                    if ($retry -lt $retryCount) {
-                        Start-Sleep -Seconds $retryDelay  # Wait before retrying
+        else {
+            Write-Output "Arc-enabling AKSEE clusters"
+            # Running pre-checks to ensure that the aksedge ConfigMap is present on all clusters
+            $maxRetries = 5
+            $retryInterval = 30 # seconds
+            $retryCount = 0
+            foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+                $clusterName = $cluster.Name.ToLower()
+                if ($clusterName -ne "staging") {
+                    while ($retryCount -lt $maxRetries) {
+                        kubectx $clusterName
+                        $configMap = kubectl get configmap -n aksedge aksedge
+                        if ($null -eq $configMap) {
+                            $retryCount++
+                            Write-Host "Retry ${retryCount}/${maxRetries}: aksedge ConfigMap not found on $clusterName. Retrying in $retryInterval seconds..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+                            Start-Sleep -Seconds $retryInterval
+                        }
+                        else {
+                            # ConfigMap found, continue with the rest of the script
+                            Write-Host "aksedge ConfigMap found on $clusterName. Continuing with the script..." | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+                            break # Exit the loop
+                        }
                     }
-                    else {
-                        Write-Output "Exceeded maximum retry attempts. Exiting."
-                        break  # Exit the loop after the maximum number of retries
+
+                    if ($retryCount -eq $maxRetries) {
+                        Write-Host "[$(Get-Date -Format t)] ERROR: aksedge ConfigMap not found on $clusterName. Exiting..." -ForegroundColor White -BackgroundColor Red | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+                        exit 1 # Exit the script
                     }
                 }
-                else {
-                    Write-Output "Successfully onboarded AKS Edge Essentials cluster to Azure Arc."
-                    break  # Exit the loop if the connection is successful
+            }
+            $VMnames = (Get-VM).Name
+            foreach ($VM in $VMNames) {
+                $secret = $Env:spnClientSecret
+                $clientId = $Env:spnClientId
+                $tenantId = $Env:spnTenantId
+                $location = $Env:azureLocation
+                $resourceGroup = $Env:resourceGroup
+
+                Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
+                    # Install prerequisites
+                    . C:\Deployment\Profile.ps1
+                    $hostname = hostname
+                    $ProgressPreference = "SilentlyContinue"
+                    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+                    Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+                    Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+                    Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+                    Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
+
+                    # Connect servers to Arc
+                    $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
+                    $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
+                    Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
+                    Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
+                    Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
+
+                    # Connect clusters to Arc
+                    $deploymentPath = "C:\Deployment\config.json"
+                    Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname AKS Edge Essentials cluster." -ForegroundColor Gray
+
+                    kubectl get svc
+
+                    $retryCount = 5  # Number of times to retry the operation
+                    $retryDelay = 30  # Delay in seconds between retries
+
+                    for ($retry = 1; $retry -le $retryCount; $retry++) {
+                        $return = Connect-AksEdgeArc -JsonConfigFilePath $deploymentPath
+                        if ($return -ne "OK") {
+                            Write-Output "Failed to onboard AKS Edge Essentials cluster to Azure Arc. Retrying (Attempt $retry of $retryCount)..."
+                            if ($retry -lt $retryCount) {
+                                Start-Sleep -Seconds $retryDelay  # Wait before retrying
+                            }
+                            else {
+                                Write-Output "Exceeded maximum retry attempts. Exiting."
+                                break  # Exit the loop after the maximum number of retries
+                            }
+                        }
+                        else {
+                            Write-Output "Successfully onboarded AKS Edge Essentials cluster to Azure Arc."
+                            break  # Exit the loop if the connection is successful
+                        }
+                    }
+
+
+                } 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+            }
+
+            #####################################################################
+            # Tag Azure Arc resources
+            #####################################################################
+            $arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
+            $Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
+
+            # Iterate over the Arc resources and tag it
+            foreach ($arcResourceType in $arcResourceTypes) {
+                $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $Env:resourceGroup
+                foreach ($arcResource in $arcResources) {
+                    Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Merge | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
                 }
             }
 
-
-        } 2>&1 | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
-    }
-
-    #####################################################################
-    # Tag Azure Arc resources
-    #####################################################################
-    $arcResourceTypes = $AgConfig.ArcServerResourceType, $AgConfig.ArcK8sResourceType
-    $Tag = @{$AgConfig.TagName = $AgConfig.TagValue }
-
-    # Iterate over the Arc resources and tag it
-    foreach ($arcResourceType in $arcResourceTypes) {
-        $arcResources = Get-AzResource -ResourceType $arcResourceType -ResourceGroupName $Env:resourceGroup
-        foreach ($arcResource in $arcResources) {
-            Update-AzTag -ResourceId $arcResource.Id -Tag $Tag -Operation Merge | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ArcConnectivity.log")
+            Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
+            Write-Host
         }
     }
-
-    Write-Host "[$(Get-Date -Format t)] INFO: AKS Edge Essentials clusters and hosts have been registered with Azure Arc!" -ForegroundColor Green
-    Write-Host
 
 }
 

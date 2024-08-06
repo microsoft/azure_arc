@@ -1,4 +1,4 @@
-function SetupRetailRepo {
+function SetupSupermarketRepo {
     Set-Location $AgAppsRepo
     Write-Host "INFO: Checking if the $appsRepo repository is forked" -ForegroundColor Gray
     $retryCount = 0
@@ -348,7 +348,7 @@ function Deploy-AzureIOTHub {
 }
 
 function Deploy-K8sImagesCache {
-    if ($Env:scenario -eq "retail") {
+    if ($Env:scenario -eq "contoso_supermarket") {
         Write-Host "[$(Get-Date -Format t)] INFO: Caching contoso-supermarket images on all clusters" -ForegroundColor Gray
         while ($workflowStatus.status -ne "completed") {
             Write-Host "INFO: Waiting for pos-app-initial-images-build workflow to complete" -ForegroundColor Gray
@@ -397,7 +397,7 @@ function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
         }
     }
 }
-function Deploy-RetailConfigs {
+function Deploy-supermarketConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache namespace on all clusters" -ForegroundColor Gray
     # Cleaning up images-cache namespace on all clusters
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
@@ -609,7 +609,7 @@ function Deploy-RetailConfigs {
     Write-Host
 }
 
-function Deploy-RetailBookmarks {
+function Deploy-supermarketBookmarks {
     $bookmarksFileName = "$AgToolsDir\Bookmarks"
     $edgeBookmarksPath = "$Env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 

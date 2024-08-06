@@ -90,7 +90,7 @@ param acrName string = 'agacr${namingGuid}'
 param rdpPort string = '3389'
 
 @description('The agora scenario to be deployed')
-param scenario string = 'manufacturing'
+param scenario string = 'contoso_motors'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 
