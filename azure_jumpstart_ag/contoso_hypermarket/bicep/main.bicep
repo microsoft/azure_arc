@@ -66,6 +66,9 @@ param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 @description('Name of the event grid namespace')
 param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
 
+@description('Name of the storage account')
+param aioStorageAccountName string = 'aiostg${namingGuid}'
+
 @description('The name of the Azure Data Explorer Event Hub consumer group for assemblybatteries')
 param stagingDataCGName string = 'mqttdataemulator'
 
@@ -241,6 +244,16 @@ module eventGrid 'data/eventGrid.bicep' = {
     storageAccountResourceId: storageAccountDeployment.outputs.storageAccountResourceId
     namingGuid: namingGuid
     location: location
+  }
+}
+
+module storageAccount 'storage/storageAccount.bicep' = {
+  name: 'aioStorageAccountDeployment'
+  params: {
+    storageAccountName: aioStorageAccountName
+    location: location
+    storageQueueName: storageQueueName
+    stcontainerName: stcontainerName
   }
 }
 
