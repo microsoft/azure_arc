@@ -379,7 +379,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
             Start-Sleep -Seconds 10
 
             try {
-                az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+                az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
             } catch {
                 Write-Host "Error creating custom location: $_"
                 Exit
