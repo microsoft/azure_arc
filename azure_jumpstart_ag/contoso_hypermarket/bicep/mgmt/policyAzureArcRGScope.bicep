@@ -56,7 +56,7 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2022-06-01' = 
     type: 'SystemAssigned'
   }
   properties: {
-    policyDefinitionId: item.definitionId
+    policyDefinitionId: any(item.definitionId)
     parameters: item.parameters
   }
 }]
@@ -64,7 +64,7 @@ resource policies_name 'Microsoft.Authorization/policyAssignments@2022-06-01' = 
 resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2022-04-01' =  {
   name: guid( policies[0].name, policies[0].roleDefinition[0],resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[0].roleDefinition[0]
+    roleDefinitionId: any(policies[0].roleDefinition[0])
     principalId: policies_name[0].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -73,7 +73,7 @@ resource policy_AMA_role_0 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[0].name, policies[0].roleDefinition[1],resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[0].roleDefinition[1]
+    roleDefinitionId: any(policies[0].roleDefinition[1])
     principalId: policies_name[0].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -82,7 +82,7 @@ resource policy_AMA_role_1 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[0].name, policies[0].roleDefinition[2],resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[0].roleDefinition[2]
+    roleDefinitionId: any(policies[0].roleDefinition[2])
     principalId: policies_name[0].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -91,7 +91,7 @@ resource policy_AMA_role_2 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 resource policy_arc_windows_azure_security_agent 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[1].name, policies[1].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[1].roleDefinition
+    roleDefinitionId: any(policies[1].roleDefinition)
     principalId: policies_name[1].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -100,7 +100,7 @@ resource policy_arc_windows_azure_security_agent 'Microsoft.Authorization/roleAs
 resource policy_arc_linux_azure_security_agent 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[2].name, policies[2].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[2].roleDefinition
+    roleDefinitionId: any(policies[2].roleDefinition)
     principalId: policies_name[2].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -109,7 +109,7 @@ resource policy_arc_linux_azure_security_agent 'Microsoft.Authorization/roleAssi
 resource policy_arc_windows_mde 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[3].name, policies[3].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[3].roleDefinition
+    roleDefinitionId: any(policies[3].roleDefinition)
     principalId: policies_name[3].identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -118,7 +118,7 @@ resource policy_arc_windows_mde 'Microsoft.Authorization/roleAssignments@2022-04
 resource policy_arc_linux_mde 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid( policies[4].name, policies[4].roleDefinition,resourceGroup().id)
   properties: {
-    roleDefinitionId: policies[4].roleDefinition
+    roleDefinitionId: any(policies[4].roleDefinition)
     principalId: policies_name[4].identity.principalId
     principalType: 'ServicePrincipal'
   }
