@@ -30,4 +30,12 @@ properties:
       settings:
         id: Helm.Helm
         source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Istio.Istio
+      directives:
+        description: Install Istio configuration command line utility
+      settings:
+        id: Istio.Istio
+        source: winget
+
   configurationVersion: 0.2.0
