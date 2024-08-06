@@ -113,6 +113,7 @@ $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 switch ($scenario) {
   "contoso_supermarket" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-supermarket.psd1") -OutFile $ConfigurationDataFile }
   "contoso_motors" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd1") -OutFile $ConfigurationDataFile}
+  "contoso_hypermarket" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-hypermarket.psd1") -OutFile $ConfigurationDataFile}
 }
 
 $AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
@@ -264,8 +265,6 @@ elseif ($scenario -eq "contoso_motors") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
 elseif ($scenario -eq "contoso_hypermarket") {
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/installK3s.sh") -OutFile "$AgShellDir\installK3s.sh"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/welcomeK3s.sh") -OutFile "$AgShellDir\welcomeK3s.sh"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"

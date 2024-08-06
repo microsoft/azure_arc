@@ -453,7 +453,7 @@ function Deploy-ADXDashboardReports {
         [System.Environment]::SetEnvironmentVariable('EVENTHUB_CONNECTION_STRING', $connectionString, [System.EnvironmentVariableTarget]::Machine)
         [System.Environment]::SetEnvironmentVariable('EVENTHUB_NAME', $eventHub, [System.EnvironmentVariableTarget]::Machine)
     }
-    
+
     # Create desktop icons
     $AgDataEmulatorDir = $AgConfig.AgDirectories["AgDataEmulator"]
     $dataEmulatorFile = "$AgDataEmulatorDir\data-emulator.py"
