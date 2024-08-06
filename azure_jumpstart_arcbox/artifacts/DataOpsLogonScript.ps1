@@ -378,8 +378,13 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 
             Start-Sleep -Seconds 10
 
-            az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --only-show-errors
-
+            try {
+                az customlocation create --name $customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+            } catch {
+                Write-Host "Error creating custom location: $_"
+                Exit
+            }
+            
             Start-Sleep -Seconds 10
 
             # Deploying the Azure Arc Data Controller
