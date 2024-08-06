@@ -11,16 +11,6 @@ echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
 
-exec >installK3s-$vmName.log
-exec 2>&1
-
-sudo apt-get update
-
-sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
-sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
-sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
-
-
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
 sed -i '4s/^/export vmName=/' vars.sh
@@ -30,6 +20,15 @@ sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
+
+exec >installK3s-$vmName.log
+exec 2>&1
+
+sudo apt-get update
+
+sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Set k3 deployment variables
 export K3S_VERSION="1.29.6+k3s2" # Do not change!
