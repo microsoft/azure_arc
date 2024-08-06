@@ -122,7 +122,6 @@ $AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
 $AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
 $AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgShellDir         = $AgConfig.AgDirectories["AgShellDir"]
 $AgMonitoringDir    = $AgConfig.AgDirectories["AgMonitoringDir"]
 $websiteUrls        = $AgConfig.URLs
 
