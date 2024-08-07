@@ -50,6 +50,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:spnObjectId = $Env:spnObjectId
     $global:stcontainerName = $Env:stcontainerName
 }elseif ($scenario -eq "contoso_hypermarket"){
+    $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
 }
@@ -117,8 +118,8 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
 if ($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
     Deploy-VirtualizationInfrastructure
 }
 
