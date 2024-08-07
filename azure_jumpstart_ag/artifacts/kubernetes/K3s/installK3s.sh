@@ -49,7 +49,7 @@ echo ""
 echo "Downloading azcopy"
 echo ""
 #wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
-curl -o azcopy.tar.gz 'https://aka.ms/downloadazcopy-v10-linux'
+curl -Lo azcopy.tar.gz 'https://aka.ms/downloadazcopy-v10-linux'
 if [[ $? -ne 0 ]]; then
     echo "ERROR: Failed to download azcopy"
     exit 1
