@@ -160,24 +160,6 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
   }
 }
 
-module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
-  name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
-  params: {
-    sshRSAPublicKey: sshRSAPublicKey
-    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
-    logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    templateBaseUrl: templateBaseUrl
-    subnetId: networkDeployment.outputs.k3sSubnetId
-    azureLocation: location
-    vmName : '${k3sArcClusterName}-Node-0${i}'
-    storageContainerName: toLower(k3sArcClusterName)
-    namingGuid: namingGuid
-  }
-  dependsOn: [
-    ubuntuRancherK3sDeployment
-  ]
-}]
-
 module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
@@ -193,6 +175,24 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
+  ]
+}]
+
+module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
+  name: 'ubuntuRancherK3sNodesDeployment-${i}'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
+    templateBaseUrl: templateBaseUrl
+    subnetId: networkDeployment.outputs.k3sSubnetId
+    azureLocation: location
+    vmName : '${k3sArcClusterName}-Node-0${i}'
+    storageContainerName: toLower(k3sArcClusterName)
+    namingGuid: namingGuid
+  }
+  dependsOn: [
+    ubuntuRancherK3sDeployment
   ]
 }]
 

@@ -152,7 +152,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
 
     sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
     echo "Onboarding the k3s cluster to Azure Arc completed"
-    
+
     # Verify if cluster is connected to Azure Arc successfully
     connectedClusterInfo=$(sudo -u $adminUsername az connectedk8s show --name $vmName --resource-group $resourceGroup)
     echo "Connected cluster info: $connectedClusterInfo"
@@ -198,7 +198,6 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
-sleep 30
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
