@@ -288,18 +288,18 @@ foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
 
 Write-Header "Applying GitOps Configs"
 
-# Create GitOps config for NGINX Ingress Controller
-Write-Host "Creating GitOps config for NGINX Ingress Controller"
-az k8s-configuration flux create `
-    --cluster-name $Env:k3sArcDataClusterName `
-    --resource-group $Env:resourceGroup `
-    --name config-nginx `
-    --namespace $ingressNamespace `
-    --cluster-type connectedClusters `
-    --scope cluster `
-    --url $appClonedRepo `
-    --branch main --sync-interval 3s `
-    --kustomization name=nginx path=./nginx/release
+# # Create GitOps config for NGINX Ingress Controller
+# Write-Host "Creating GitOps config for NGINX Ingress Controller"
+# az k8s-configuration flux create `
+#     --cluster-name $Env:k3sArcDataClusterName `
+#     --resource-group $Env:resourceGroup `
+#     --name config-nginx `
+#     --namespace $ingressNamespace `
+#     --cluster-type connectedClusters `
+#     --scope cluster `
+#     --url $appClonedRepo `
+#     --branch main --sync-interval 3s `
+#     --kustomization name=nginx path=./nginx/release
 
 # Create GitOps config for Bookstore application
 Write-Host "Creating GitOps config for Bookstore application"
@@ -309,7 +309,7 @@ az k8s-configuration flux create `
     --name config-bookstore `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch arcbox_3.0 --sync-interval 3s `
+    --branch "arcbox_3.0" --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
