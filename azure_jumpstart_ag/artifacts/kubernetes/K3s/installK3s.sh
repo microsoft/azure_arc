@@ -49,8 +49,8 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 echo ""
 echo "Downloading azcopy"
 echo ""
-sudo apt-get update
-wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
+#wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
+curl -o azcopy.tar.gz 'https://aka.ms/downloadazcopy-v10-linux'
 if [[ $? -ne 0 ]]; then
     echo "ERROR: Failed to download azcopy"
     exit 1
