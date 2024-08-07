@@ -1044,3 +1044,191 @@ function Deploy-Prometheus {
     }
     Write-Host
 }
+
+# Deploys Azure IoT Operations on all k8s clusters in the config file
+function Deploy-AIO {
+    param (
+        [switch]$isAKSEE
+    )
+    ##############################################################
+    # Preparing AKSEE clusters for aio
+    ##############################################################
+    if($isAKSEE.IsPresent){
+        $VMnames = $AgConfig.SiteConfig.GetEnumerator().Name.ToLower()
+
+        Invoke-Command -VMName $VMnames -Credential $Credentials -ScriptBlock {
+            $ProgressPreference = "SilentlyContinue"
+            ###########################################
+            # Preparing environment folders structure
+            ###########################################
+            Write-Host "[$(Get-Date -Format t)] INFO: Preparing AKSEE clusters for AIO" -ForegroundColor DarkGray
+            Write-Host "`n"
+            try {
+                $localPathProvisionerYaml = "https://raw.githubusercontent.com/Azure/AKS-Edge/main/samples/storage/local-path-provisioner/local-path-storage.yaml"
+                & kubectl apply -f $localPathProvisionerYaml
+                $pvcYaml = @"
+                apiVersion: v1
+                kind: PersistentVolumeClaim
+                metadata:
+                  name: local-path-pvc
+                  namespace: default
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  storageClassName: local-path
+                  resources:
+                    requests:
+                      storage: 15Gi
+"@
+
+                $pvcYaml | kubectl apply -f -
+
+                Write-Host "Successfully deployment the local path provisioner"
+            }
+            catch {
+                Write-Host "Error: local path provisioner deployment failed" -ForegroundColor Red
+            }
+
+            Write-Host "Configuring firewall specific to AIO"
+            Write-Host "Add firewall rule for AIO MQTT Broker"
+            New-NetFirewallRule -DisplayName "AIO MQTT Broker" -Direction Inbound  -Action Allow | Out-Null
+            try {
+                $deploymentInfo = Get-AksEdgeDeploymentInfo
+                # Get the service ip address start to determine the connect address
+                $connectAddress = $deploymentInfo.LinuxNodeConfig.ServiceIpRange.split("-")[0]
+                $portProxyRulExists = netsh interface portproxy show v4tov4 | findstr /C:"1883" | findstr /C:"$connectAddress"
+                if ( $null -eq $portProxyRulExists ) {
+                    Write-Host "Configure port proxy for AIO"
+                    netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$connectAddress | Out-Null
+                    netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=18883 connectaddress=$connectAddress | Out-Null
+                    netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=8883 connectaddress=$connectAddress | Out-Null
+                }
+                else {
+                    Write-Host "Port proxy rule for AIO exists, skip configuring port proxy..."
+                }
+            }
+            catch {
+                Write-Host "Error: port proxy update for aio failed" -ForegroundColor Red
+            }
+            Write-Host "Update the iptables rules"
+            try {
+                $iptableRulesExist = Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables-save | grep -- '-m tcp --dport 9110 -j ACCEPT'" -ignoreError
+                if ( $null -eq $iptableRulesExist ) {
+                    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9110 -j ACCEPT"
+                    Write-Host "Updated runtime iptable rules for node exporter"
+                    Invoke-AksEdgeNodeCommand -NodeType "Linux" -command "sudo sed -i '/-A OUTPUT -j ACCEPT/i-A INPUT -p tcp -m tcp --dport 9110 -j ACCEPT' /etc/systemd/scripts/ip4save"
+                    Write-Host "Persisted iptable rules for node exporter"
+                    # increase the maximum number of files
+                    Invoke-AksEdgeNodeCommand -NodeType "Linux" -Command "echo 'fs.inotify.max_user_instances = 1024' | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"
+                }
+                else {
+                    Write-Host "iptable rule exists, skip configuring iptable rules..."
+                }
+            }
+            catch {
+                Write-Host "Error: iptable rule update failed" -ForegroundColor Red
+            }
+        } | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1Infra.log")
+    }
+    #############################################################
+    # Deploying AIO on the clusters
+    #############################################################
+
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $kvIndex = 0
+    $clusters = Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup
+    foreach ($cluster in $clusters) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+        $retryCount = 0
+        $maxRetries = 5
+        $aioStatus = "notDeployed"
+
+        # Enable custom locations on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az connectedk8s enable-features --name $clusterName `
+            --resource-group $resourceGroup `
+            --features cluster-connect custom-locations `
+            --custom-locations-oid $customLocationRPOID `
+            --only-show-errors
+
+        do {
+            az iot ops init --cluster $clusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops init --cluster $clusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+        $kvIndex++
+    }
+    foreach ($cluster in $clusters) {
+        $clusterName = $cluster.Name.ToLower()
+        $retryCount = 0
+        $maxRetries = 25
+        kubectx $clusterName
+        do {
+            $output = az iot ops check --as-object --only-show-errors
+            $output = $output | ConvertFrom-Json
+            $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+            if ($mqServiceStatus -ne "Success") {
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
+                $retryCount++
+            }
+        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+            exit 1 # Exit the script
+        }
+        Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
+        Write-Host "`n"
+        Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
+        $extensionPrincipalId =(az k8s-extension list --cluster-name $clusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json)[0].identity.principalId
+        $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+        $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
+        $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+        $eventGridNamespacePrincipalId = (az eventgrid namespace list --resource-group $resourceGroup -o json --only-show-errors | ConvertFrom-Json)[0].identity.principalId
+
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $eventGridNamespacePrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        #az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+        az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+
+        Start-Sleep -Seconds 60
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
+        $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"
+        az eventgrid namespace update -g $resourceGroup -n $eventGridNamespaceName --topic-spaces-configuration $eventGridConfig --only-show-errors
+
+        Start-Sleep -Seconds 60
+
+        ## Adding MQTT bridge to Event Grid MQTT
+        $mqconfigfile = "$AgToolsDir\mq_cloudConnector.yml"
+        Copy-Item $mqconfigfile "$AgToolsDir\mq_cloudConnector_$clusterName.yml" -Force
+        $bridgeConfig = "$AgToolsDir\mq_cloudConnector_$clusterName.yml"
+        (Get-Content $bridgeConfig) -replace 'clusterName', $clusterName | Set-Content $bridgeConfig
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
+        $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
+        (Get-Content -Path $bridgeConfig) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $bridgeConfig
+        kubectl apply -f $bridgeConfig -n $aioNamespace
+
+        ## Patching MQTT listener
+    }
+}

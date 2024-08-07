@@ -13,6 +13,7 @@ $global:AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 $global:configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
 $global:AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $global:AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
+$global:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
 $global:scenario = $Env:scenario
 $global:websiteUrls = $AgConfig.URLs
 $global:githubAccount = $Env:githubAccount
@@ -61,7 +62,7 @@ Import-Module "$AgPowerShellDir\contoso_supermarket.psm1" -Force -DisableNameChe
 Import-Module "$AgPowerShellDir\contoso_motors.psm1" -Force -DisableNameChecking
 Import-Module "$AgPowerShellDir\contoso_hypermarket.psm1" -Force -DisableNameChecking
 
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
+Start-Transcript -Path ($AgLogsDir + "\AgLogonScript.log")
 Write-Header "Executing Jumpstart Agora automation scripts"
 $startTime = Get-Date
 
@@ -129,6 +130,13 @@ if ($scenario -eq "contoso_supermarket") {
 }
 
 #####################################################################
+# Get clusters config files
+#####################################################################
+if($scsenario -eq "contoso_hypermarket"){
+    Get-K3sConfigFile
+}
+
+#####################################################################
 # Creating Kubernetes namespaces on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating namespaces on clusters (Step 8/17)" -ForegroundColor DarkGreen
@@ -182,7 +190,8 @@ if ($scenario -eq "contoso_supermarket") {
 }
 
 if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
-    Deploy-AIO
+    $AKSEEClusters = $AgConfig.SiteConfig.GetEnumerator()
+    Deploy-AIO -isAKSEE -clusters $AKSEEClusters
     Deploy-MotorsConfigs
     $mqttIpArray=Set-MQTTIpAddress
     #Deploy-MQTTSimulator -mqttIpArray $mqttIpArray # this is now being done via helm
