@@ -34,7 +34,6 @@ exec 2>&1
 
 # Set k3 deployment variables
 export K3S_VERSION="1.29.6+k3s2" # Do not change!
-
 chmod +x vars.sh
 . ./vars.sh
 
