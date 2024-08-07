@@ -9,9 +9,6 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:ArcBoxTestsDir = "$Env:ArcBoxDir\Tests"
 $namingPrefix = ($Env:namingPrefix).toLower()
 
-$osmReleaseVersion = "1.1.1-1"
-$osmCLIReleaseVersion = "v1.2.3"
-$osmMeshName = "osm"
 $ingressNamespace = "ingress-nginx"
 $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
 
@@ -86,12 +83,6 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 # $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 # kubectx
 
-# Download OSM binaries
-Write-Header "Downloading OSM Binaries"
-Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmCLIReleaseVersion/osm-$osmCLIReleaseVersion-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmCLIReleaseVersion-windows-amd64.zip"
-Expand-Archive "$Env:TempDir\osm-$osmCLIReleaseVersion-windows-amd64.zip" -DestinationPath $Env:TempDir
-Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
-
 Write-Header "Adding Tools Folder to PATH"
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
 $Env:PATH += ";$Env:ToolsDir"
@@ -109,6 +100,9 @@ foreach ($cluster in $clusters) {
 
   $nicName = $cluster.clusterName + "-NIC"
   $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
+  
+  Write-Header "Installing istio on K3s cluster"
+  istioctl install --skip-confirmation
 
 # Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
 $kubeVipRBAC = @"
@@ -274,20 +268,6 @@ $kubeVipDaemonset | kubectl apply -f -
 # kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml"
 # Start-Sleep -Seconds 30
 
-# "Create OSM Kubernetes extension instance"
-Write-Header "Creating OSM K8s Extension Instance"
-$Env:KUBECONFIG=$clusters[0].kubeConfig
-kubectx
-az k8s-extension create `
-    --name $osmMeshName `
-    --extension-type Microsoft.openservicemesh `
-    --scope cluster `
-    --cluster-name $Env:k3sArcDataClusterName `
-    --resource-group $Env:resourceGroup `
-    --cluster-type connectedClusters `
-    --version $osmReleaseVersion `
-    --auto-upgrade-minor-version 'false'
-
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
@@ -295,13 +275,12 @@ foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc',
     kubectl create namespace $namespace
 }
 
-# Add the bookstore namespaces to the OSM control plane
-Write-Header "Adding Bookstore Namespaces to OSM"
-osm namespace add bookstore bookbuyer bookwarehouse
+# Label Bookstore Namespaces for Istio injection
+Write-Header "Labeling K8s Namespaces for Istio Injection"
+foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
+    kubectl label namespace $namespace istio-injection=enabled
+}
 
-# To be able to discover the endpoints of this service, we need OSM controller to monitor the corresponding namespace.
-# However, Nginx must NOT be injected with an Envoy sidecar to function properly.
-osm namespace add "$ingressNamespace" --mesh-name "$osmMeshName" --disable-sidecar-injection
 
 #############################
 # - Apply GitOps Configs
@@ -330,7 +309,7 @@ az k8s-configuration flux create `
     --name config-bookstore `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch arcbox_3.0 --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
@@ -343,21 +322,8 @@ az k8s-configuration flux create `
     --scope namespace `
     --namespace bookstore `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch main--sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/rbac-sample
-
-# Create GitOps config for Bookstore Traffic Split
-Write-Host "Creating GitOps config for Bookstore Traffic Split"
-az k8s-configuration flux create `
-    --cluster-name $Env:k3sArcDataClusterName `
-    --resource-group $Env:resourceGroup `
-    --name config-bookstore-osm `
-    --cluster-type connectedClusters `
-    --scope namespace `
-    --namespace bookstore `
-    --url $appClonedRepo `
-    --branch main --sync-interval 3s `
-    --kustomization name=bookstore path=./bookstore/osm-sample
 
 # Create GitOps config for Hello-Arc application
 Write-Host "Creating GitOps config for Hello-Arc application"
