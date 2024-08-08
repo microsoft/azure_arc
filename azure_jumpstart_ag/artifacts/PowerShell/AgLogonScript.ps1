@@ -70,7 +70,7 @@ Import-Module "$AgPowerShellDir\contoso_motors.psm1" -Force -DisableNameChecking
 Import-Module "$AgPowerShellDir\contoso_hypermarket.psm1" -Force -DisableNameChecking
 
 Start-Transcript -Path ($AgLogsDir + "\AgLogonScript.log")
-Write-Header "Executing Jumpstart Agora automation scripts"
+Write-Host "Executing Jumpstart Agora automation scripts"
 $startTime = Get-Date
 
 # Disable Windows firewall
