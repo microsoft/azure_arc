@@ -193,7 +193,9 @@ if ($scenario -eq "contoso_supermarket") {
 if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
     $AKSEEClusters = $AgConfig.SiteConfig.GetEnumerator()
     Deploy-AIO -isAKSEE -clusters $AKSEEClusters
-    Deploy-MotorsConfigs
+    if($scenario -eq "contoso_motors"){
+        Deploy-MotorsConfigs
+    }
     $mqttIpArray=Set-MQTTIpAddress
     #Deploy-MQTTSimulator -mqttIpArray $mqttIpArray # this is now being done via helm
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
