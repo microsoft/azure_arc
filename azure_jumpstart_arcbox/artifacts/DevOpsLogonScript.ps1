@@ -257,17 +257,11 @@ $kubeVipDaemonset | kubectl apply -f -
   kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
   Start-Sleep -Seconds 30
 
-  Write-Header "Creating longhorn storage on K3scluster"
+  Write-Header "Creating longhorn storage on $($cluster.clusterName)"
   kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml" --kubeconfig $cluster.kubeConfig
   Start-Sleep -Seconds 30
   Write-Host "`n"
 }
-
-# # Longhorn setup for RWX-capable storage class
-# Write-Header "Creating longhorn storage"
-# kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml"
-# Start-Sleep -Seconds 30
-
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
