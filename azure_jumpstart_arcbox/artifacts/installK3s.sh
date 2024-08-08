@@ -29,6 +29,9 @@ sed -i '10s/^/export k3sControlPlane=/' vars.sh
 
 export vmName=$3
 
+# Save the original stdout and stderr
+exec 3>&1 4>&2
+
 exec >installK3s-${vmName}.log
 exec 2>&1
 
@@ -198,6 +201,9 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
+# Restore the original stdout and stderr
+exec 1>&3 2>&4 # Further commands will now output to the original stdout and stderr and not the log file
+
 sleep 60
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
