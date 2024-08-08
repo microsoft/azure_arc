@@ -133,7 +133,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Get clusters config files
 #####################################################################
-if($scsenario -eq "contoso_hypermarket"){
+if($scenario -eq "contoso_hypermarket"){
     Get-K3sConfigFile
 }
 
