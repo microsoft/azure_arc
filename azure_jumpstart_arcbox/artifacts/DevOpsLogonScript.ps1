@@ -257,17 +257,18 @@ $kubeVipDaemonset | kubectl apply -f -
   kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
   Start-Sleep -Seconds 30
 
-  Write-Header "Creating longhorn storage on K3scluster"
+  Write-Header "Creating longhorn storage on $($cluster.clusterName)"
   kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml" --kubeconfig $cluster.kubeConfig
   Start-Sleep -Seconds 30
   Write-Host "`n"
 }
 
-# # Longhorn setup for RWX-capable storage class
-# Write-Header "Creating longhorn storage"
-# kubectl apply -f "$Env:ArcBoxDir\longhorn.yaml"
-# Start-Sleep -Seconds 30
-
+foreach ($cluster in $clusters) {
+  if ($cluster.context -like '*-datasvc-k3s') {
+    $Env:KUBECONFIG=$cluster.kubeConfig
+    kubectx
+  }
+}
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
@@ -280,7 +281,6 @@ Write-Header "Labeling K8s Namespaces for Istio Injection"
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
     kubectl label namespace $namespace istio-injection=enabled
 }
-
 
 #############################
 # - Apply GitOps Configs
@@ -322,7 +322,7 @@ az k8s-configuration flux create `
     --scope namespace `
     --namespace bookstore `
     --url $appClonedRepo `
-    --branch main--sync-interval 3s `
+    --branch main --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/rbac-sample
 
 # Create GitOps config for Hello-Arc application
