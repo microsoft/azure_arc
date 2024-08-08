@@ -402,7 +402,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --broker-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"
