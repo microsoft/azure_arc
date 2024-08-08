@@ -309,7 +309,7 @@ az k8s-configuration flux create `
     --name config-bookstore `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch "arcbox_3.0" --sync-interval 3s `
+    --branch arcbox_3.0 --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
@@ -322,7 +322,7 @@ az k8s-configuration flux create `
     --scope namespace `
     --namespace bookstore `
     --url $appClonedRepo `
-    --branch main--sync-interval 3s `
+    --branch main --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/rbac-sample
 
 # Create GitOps config for Hello-Arc application
