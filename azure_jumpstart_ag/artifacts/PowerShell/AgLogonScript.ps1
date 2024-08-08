@@ -50,9 +50,15 @@ if ($scenario -eq "contoso_supermarket") {
     $global:spnObjectId = $Env:spnObjectId
     $global:stcontainerName = $Env:stcontainerName
 }elseif ($scenario -eq "contoso_hypermarket"){
+    $global:aioNamespace = "azure-iot-operations"
+    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
+    $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
+    $global:spnObjectId = $Env:spnObjectId
+    $global:stcontainerName = $Env:stcontainerName
 }
 
 #####################################################################

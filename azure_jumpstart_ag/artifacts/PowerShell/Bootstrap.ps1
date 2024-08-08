@@ -389,7 +389,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
