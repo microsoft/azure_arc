@@ -201,10 +201,7 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
-# Restore the original stdout and stderr
-exec 1>&3 2>&4 # Further commands will now output to the original stdout and stderr and not the log file
 
-sleep 60
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
-azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
