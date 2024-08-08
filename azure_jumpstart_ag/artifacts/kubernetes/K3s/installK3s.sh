@@ -198,7 +198,23 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
+
+sleep 10
+
 exec > /dev/tty 2>&1
+
+# Check if the log file size has stopped growing
+log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
+prev_size=0
+while true; do
+    curr_size=$(stat -c%s "$log")
+    if [[ $curr_size -eq $prev_size ]]; then
+        break
+    fi
+    prev_size=$curr_size
+    sleep 5
+done
+
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
