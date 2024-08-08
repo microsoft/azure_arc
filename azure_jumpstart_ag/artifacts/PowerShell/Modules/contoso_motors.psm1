@@ -130,43 +130,6 @@ function Deploy-MotorsConfigs {
     Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
     Write-Host
 }
-function Set-MQTTIpAddress {
-    $mqttIpArray = @()
-    $clusters = $AgConfig.SiteConfig.GetEnumerator()
-    foreach ($cluster in $clusters) {
-        $clusterName = $cluster.Name.ToLower()
-        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
-
-        do {
-            $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
-            $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-            $matchingServices = $services.items | Where-Object {
-                $_.metadata.name -match "aio-mq-dmqtt" -and
-                $_.status.phase -notmatch "running"
-            }
-            Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
-            Start-Sleep -Seconds 20
-        } while (
-            $null -eq $mqttIp -and $matchingServices.Count -ne 0
-        )
-        if (-not [string]::IsNullOrEmpty($mqttIp)) {
-            $newObject = [PSCustomObject]@{
-                cluster = $clusterName
-                ip = $mqttIp
-            }
-            $mqttIpArray += $newObject
-        }
-
-        Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
-            netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
-        }
-    }
-
-    $mqttIpArray = $mqttIpArray | Where-Object { $_ -ne "" }
-
-    return $mqttIpArray
-}
 
 function Deploy-MQTTSimulator {
     param (
@@ -189,41 +152,6 @@ function Deploy-MQTTSimulator {
         netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$mqttIp
         kubectl apply -f $simualtorConfig -n $aioNamespace
     }
-}
-
-##############################################################
-# Install MQTT Explorer
-##############################################################
-function Deploy-MQTTExplorer {
-    param (
-        [array]$mqttIpArray
-    )
-    Write-Host "`n"
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing MQTT Explorer." -ForegroundColor DarkGreen
-    Write-Host "`n"
-    $aioToolsDir = $AgConfig.AgDirectories["AgToolsDir"]
-    $mqttExplorerSettings = "$env:USERPROFILE\AppData\Roaming\MQTT-Explorer\settings.json"
-    $latestReleaseTag = (Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].tag_name
-    $versionToDownload = $latestReleaseTag.Split("v")[1]
-    $mqttExplorerReleaseDownloadUrl = ((Invoke-WebRequest $mqttExplorerReleasesUrl | ConvertFrom-Json)[0].assets | Where-object { $_.name -like "MQTT-Explorer-Setup-${versionToDownload}.exe" }).browser_download_url
-    $output = Join-Path $aioToolsDir "mqtt-explorer-$latestReleaseTag.exe"
-    $clusters = $AgConfig.SiteConfig.GetEnumerator()
-
-    $ProgressPreference = "SilentlyContinue"
-    Invoke-WebRequest $mqttExplorerReleaseDownloadUrl -OutFile $output
-    Start-Process -FilePath $output -ArgumentList "/S" -Wait
-
-    Write-Host "[$(Get-Date -Format t)] INFO: Configuring MQTT explorer" -ForegroundColor DarkGray
-    Start-Process "$env:USERPROFILE\AppData\Local\Programs\MQTT-Explorer\MQTT Explorer.exe"
-    Start-Sleep -Seconds 5
-    Stop-Process -Name "MQTT Explorer"
-    Copy-Item "$aioToolsDir\mqtt_explorer_settings.json" -Destination $mqttExplorerSettings -Force
-    foreach ($cluster in $clusters) {
-        $clusterName = $cluster.Name.ToLower()
-        $mqttIp = $mqttIpArray | Where-Object { $_.cluster -eq $clusterName } | Select-Object -ExpandProperty ip
-        (Get-Content $mqttExplorerSettings ) -replace "${clusterName}IpPlaceholder", $mqttIp | Set-Content $mqttExplorerSettings
-    }
-    $ProgressPreference = "Continue"
 }
 
 # Function to deploy Azure Data Explorer dashboard reports

@@ -146,12 +146,14 @@
             ArcClusterName         = "Ag-K3s-Seattle"
             FriendlyName           = "Seattle"
             GrafanaDataSource      = "seattle"
+            Type                   = "K3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
         Chicago = @{
             ArcClusterName         = "Ag-K3s-Chicago"
             FriendlyName           = "Chicago"
             GrafanaDataSource      = "chicago"
+            Type                   = "K3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
     }
