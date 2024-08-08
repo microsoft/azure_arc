@@ -25,6 +25,7 @@ param (
     [string]$k3sArcClusterName,
     [string]$aksArcClusterName,
     [string]$aksdrArcClusterName,
+    [string]$githubBranch,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$flavor,
@@ -57,6 +58,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor, [System.EnvironmentVariableTarget]::Machine)
@@ -113,7 +115,7 @@ New-Item -Path $Env:ArcBoxTestsDir -ItemType directory -Force
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
-if ([bool]$vmAutologon) {
+if ($vmAutologon -eq "true") {
 
     Write-Host "Configuring VM Autologon"
 
@@ -123,6 +125,10 @@ if ([bool]$vmAutologon) {
     if($flavor -eq "DataOps"){
         Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
     }
+} else {
+
+    Write-Host "Not configuring VM Autologon"
+
 }
 
 # Set SyncForegroundPolicy to 1 to ensure that the scheduled task runs after the client VM joins the domain

@@ -146,6 +146,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
+    githubBranch: githubBranch
     githubUser: githubUser
     location: location
     k3sArcDataClusterName : k3sArcDataClusterName
