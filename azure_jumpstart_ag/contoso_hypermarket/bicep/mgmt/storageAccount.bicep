@@ -36,7 +36,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
 // Add role assignment for the SPN: Storage Blob Data Contributo
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(spnObjectId, 'Microsoft.Authorization/roleAssignments', 'StorageBlobDataContributor')
+  name: guid(spnObjectId, resourceGroup().id, 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
   scope: resourceGroup()
   properties: {
     principalId: spnObjectId
