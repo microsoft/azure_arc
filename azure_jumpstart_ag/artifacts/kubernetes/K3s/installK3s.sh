@@ -199,22 +199,25 @@ echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
 
-sleep 10
-
 exec > /dev/tty 2>&1
-
-# Check if the log file size has stopped growing
-log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
-prev_size=0
-while true; do
-    curr_size=$(stat -c%s "$log")
-    if [[ $curr_size -eq $prev_size ]]; then
-        break
+sleep 20
+# Function to check if the log file is still being written to
+is_log_file_still_writing() {
+    local log_file=$1
+    local prev_size=$(stat -c%s "$log_file")
+    sleep 5
+    local curr_size=$(stat -c%s "$log_file")
+    if [[ $prev_size -eq $curr_size ]]; then
+        return 1
+    else
+        return 0
     fi
-    prev_size=$curr_size
+}
+
+# Wait until the log file is fully written
+log="/home/${adminUsername}/jumpstart_logs/installK3s-${vmName}.log"
+while is_log_file_still_writing $log; do
     sleep 5
 done
-
-log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
-storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
-azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log"
+#storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/installK3s-$vmName.log" --check-length=false
