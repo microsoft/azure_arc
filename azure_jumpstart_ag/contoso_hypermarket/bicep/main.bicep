@@ -127,6 +127,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
   params: {
     location: location
+    spnObjectId: spnObjectId
   }
 }
 
