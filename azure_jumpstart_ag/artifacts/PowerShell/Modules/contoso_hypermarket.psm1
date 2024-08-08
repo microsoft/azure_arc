@@ -8,8 +8,8 @@ function Get-K3sConfigFile{
     #azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile1 "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
     #azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile2 "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
 
-    az storage azcopy blob download -c $container1 --account-name $stagingStorageAccountName -s "config" -d "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
-    az storage azcopy blob download -c $container2 --account-name $stagingStorageAccountName -s "config" -d "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    az storage azcopy blob download -c $container1 --account-name $stagingStorageAccountName -s "config" -d "C:\Users\$adminUsername\.kube\ag-k3s-seattle" --auth-mode login
+    az storage azcopy blob download -c $container2 --account-name $stagingStorageAccountName -s "config" -d "C:\Users\$adminUsername\.kube\ag-k3s-chicago" --auth-mode login
 
     # Merging config files
     $ENV:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
