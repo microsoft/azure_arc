@@ -101,8 +101,8 @@ foreach ($cluster in $clusters) {
   $nicName = $cluster.clusterName + "-NIC"
   $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
   
-  Write-Header "Installing istio on K3s cluster"
-  istioctl install --skip-confirmation
+  # Write-Header "Installing istio on K3s cluster"
+  # istioctl install --skip-confirmation
 
 # Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
 $kubeVipRBAC = @"
