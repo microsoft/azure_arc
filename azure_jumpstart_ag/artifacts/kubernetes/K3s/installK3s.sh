@@ -91,7 +91,6 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     sudo -u $adminUsername az extension add --name connectedk8s
     sudo -u $adminUsername az extension add --name k8s-configuration
     sudo -u $adminUsername az extension add --name k8s-extension
-    sudo -u $adminUsername az extension add --name storage-preview
 
     # Installing Rancher K3s cluster (single control plane)
     echo ""
@@ -202,5 +201,4 @@ echo ""
 sudo -u $adminUsername az login --identity
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
-#azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false
-#sudo -u $adminUsername az storage azcopy blob upload -c $storageContainerNameLower --account-name $stagingStorageAccountName -s $log -d NewBlob
+azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false 2>/dev/null
