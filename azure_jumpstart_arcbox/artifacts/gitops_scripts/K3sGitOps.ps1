@@ -43,7 +43,7 @@ az k8s-configuration flux create `
     --cluster-type connectedClusters `
     --scope cluster `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $Env:githubBranch --sync-interval 3s `
     --kustomization name=nginx path=./nginx/release
 
 # Create GitOps config for Hello-Arc application
@@ -105,7 +105,7 @@ foreach ($configName in $configs) {
 #   --password "arcbox" `
 #   --name $certname `
 #   --file "$Env:TempDir\$certname.pfx"
- 
+
 # Write-Host "Installing Azure Key Vault Kubernetes extension instance"
 # az k8s-extension create `
 #   --name 'akvsecretsprovider' `
@@ -129,17 +129,17 @@ foreach ($configName in $configs) {
 #   name: azure-kv-sync-tls
 # spec:
 #   provider: azure
-#   secretObjects:                       # secretObjects defines the desired state of synced K8s secret objects                                
+#   secretObjects:                       # secretObjects defines the desired state of synced K8s secret objects
 #   - secretName: ingress-tls-csi
 #     type: kubernetes.io/tls
-#     data: 
+#     data:
 #     - objectName: "$certname"
 #       key: tls.key
 #     - objectName: "$certname"
 #       key: tls.crt
 #   parameters:
 #     usePodIdentity: "false"
-#     keyvaultName: $Env:keyVaultName                        
+#     keyvaultName: $Env:keyVaultName
 #     objects: |
 #       array:
 #         - |
@@ -176,7 +176,7 @@ foreach ($configName in $configs) {
 #         volumeAttributes:
 #           secretProviderClass: "azure-kv-sync-tls"
 #         nodePublishSecretRef:
-#           name: secrets-store-creds  
+#           name: secrets-store-creds
 # "@
 
 # Write-Host "Deploying App referencing the secret"
