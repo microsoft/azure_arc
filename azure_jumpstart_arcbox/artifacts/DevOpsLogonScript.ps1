@@ -263,8 +263,12 @@ $kubeVipDaemonset | kubectl apply -f -
   Write-Host "`n"
 }
 
-# Set the KUBECONFIG environment variable to the K3s Arc Data Cluster
-$Env:KUBECONFIG="C:\Users\$Env:adminUsername\.kube\config"
+foreach ($cluster in $clusters) {
+  if ($cluster.context -like '*-datasvc-k3s') {
+    $Env:KUBECONFIG=$cluster.kubeConfig
+    kubectx
+  }
+}
 
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
