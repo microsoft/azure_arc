@@ -1,34 +1,40 @@
-apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: MqttBridgeTopicMap
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowEndpoint
+metadata:
+  name: eventgrid
+spec:
+  endpointType: mqtt
+  authentication:
+    method: systemAssignedManagedIdentity
+    systemAssignedManagedIdentitySettings:
+      audience: https://eventgrid.azure.net
+  mqttSettings:
+    host: eventGridPlaceholder:8883
+    tls:
+      mode: Enabled
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: Dataflow
 metadata:
   name: my-topic-map
-  namespace: azure-iot-operations
 spec:
-  mqttBridgeConnectorRef: my-mqtt-bridge
-  routes:
-    - direction: local-to-remote
-      name: route-to-eventgrid
-      qos: 1
-      source: "topic/#"
+  profileRef: my-dataflow-profile
+  operations:
+  - operationType: source
+    name: source1
+    sourceSettings:
+      endpointRef: mq
+      dataSources:
+        - "topic/#"
+  - operationType: destination
+    name: destination1
+    destinationSettings:
+      endpointRef: eventgrid
+      dataDestination: factory-gateway-
 ---
-apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: MqttBridgeConnector
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowProfile
 metadata:
-  name: my-mqtt-bridge
-  namespace: azure-iot-operations
+  name: my-dataflow-profile
 spec:
-  image:
-    repository: mcr.microsoft.com/azureiotoperations/mqttbridge
-    tag: 0.1.0-preview
-    pullPolicy: IfNotPresent
-  protocol: v5
-  bridgeInstances: 1
-  clientIdPrefix: clusterName
-  logLevel: debug
-  remoteBrokerConnection:
-    endpoint: eventGridPlaceholder:8883
-    tls:
-      tlsEnabled: true
-    authentication:
-      systemAssignedManagedIdentity:
-        audience: https://eventgrid.azure.net
+  instanceCount: 1
