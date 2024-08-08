@@ -26,7 +26,6 @@ function Deploy-AzPowerShell {
     $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-
     # Install PowerShell modules
     if ($AgConfig.PowerShellModules.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
