@@ -199,8 +199,8 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
-
+sudo -u $adminUsername az login --identity
 log="/home/${adminUsername}/jumpstart_logs/installK3s-${vmName}.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 #azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false
-az storage azcopy blob upload -c $storageContainerNameLower --account-name $storageContainerNameLower -s $log -d NewBlob
+az storage azcopy blob upload -c $storageContainerNameLower --account-name $stagingStorageAccountName -s $log -d NewBlob
