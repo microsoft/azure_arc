@@ -263,6 +263,9 @@ $kubeVipDaemonset | kubectl apply -f -
   Write-Host "`n"
 }
 
+# Set the KUBECONFIG environment variable to the K3s Arc Data Cluster
+$Env:KUBECONFIG="C:\Users\$Env:adminUsername\.kube\config"
+
 # Create Kubernetes Namespaces
 Write-Header "Creating K8s Namespaces"
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc', 'ingress-nginx')) {
@@ -274,7 +277,6 @@ Write-Header "Labeling K8s Namespaces for Istio Injection"
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
     kubectl label namespace $namespace istio-injection=enabled
 }
-
 
 #############################
 # - Apply GitOps Configs
