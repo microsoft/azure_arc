@@ -29,6 +29,8 @@ sed -i '10s/^/export k3sControlPlane=/' vars.sh
 
 export vmName=$3
 
+exec 3>&1 4>&2
+
 exec >installK3s-${vmName}.log
 exec 2>&1
 
