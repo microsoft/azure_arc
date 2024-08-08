@@ -29,6 +29,7 @@ sed -i '10s/^/export k3sControlPlane=/' vars.sh
 
 export vmName=$3
 
+# Save the original stdout and stderr
 exec 3>&1 4>&2
 
 exec >installK3s-${vmName}.log
@@ -36,6 +37,7 @@ exec 2>&1
 
 # Set k3 deployment variables
 export K3S_VERSION="1.29.6+k3s2" # Do not change!
+
 chmod +x vars.sh
 . ./vars.sh
 
@@ -50,8 +52,7 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 echo ""
 echo "Downloading azcopy"
 echo ""
-#wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
-curl -Lo azcopy.tar.gz 'https://aka.ms/downloadazcopy-v10-linux'
+wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
 if [[ $? -ne 0 ]]; then
     echo "ERROR: Failed to download azcopy"
     exit 1
@@ -154,7 +155,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
 
     sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
     echo "Onboarding the k3s cluster to Azure Arc completed"
-
+    
     # Verify if cluster is connected to Azure Arc successfully
     connectedClusterInfo=$(sudo -u $adminUsername az connectedk8s show --name $vmName --resource-group $resourceGroup)
     echo "Connected cluster info: $connectedClusterInfo"
@@ -200,7 +201,9 @@ fi
 echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
+# Restore the original stdout and stderr
 exec 1>&3 2>&4 # Further commands will now output to the original stdout and stderr and not the log file
+sleep 30
 log="/home/$adminUsername/jumpstart_logs/installK3s-$vmName.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false >/dev/null 2>&1
