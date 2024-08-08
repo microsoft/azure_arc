@@ -199,11 +199,10 @@ echo ""
 echo "Uploading the script logs to staging storage"
 echo ""
 
-exec > /dev/tty 2>&1
-sleep 20
-
+sleep 30
 # Wait until the log file is fully written
 sudo -u $adminUsername az login --identity
+export AZCOPY_AUTO_LOGIN_TYPE=MSI
 log="/home/${adminUsername}/jumpstart_logs/installK3s-${vmName}.log"
 storageContainerNameLower=$(echo $storageContainerName | tr '[:upper:]' '[:lower:]')
 azcopy cp $log "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerNameLower/installK3s-$vmName.log" --check-length=false
