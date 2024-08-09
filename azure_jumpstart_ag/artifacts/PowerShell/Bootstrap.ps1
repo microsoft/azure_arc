@@ -264,7 +264,7 @@ elseif ($scenario -eq "contoso_motors") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
 elseif ($scenario -eq "contoso_hypermarket") {
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/k3s/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"

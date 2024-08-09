@@ -46,7 +46,9 @@
         "Microsoft.GuestConfiguration",
         "Microsoft.HybridConnectivity",
         "Microsoft.DeviceRegistry",
-        "Microsoft.EventGrid"
+        "Microsoft.EventGrid",
+        "Microsoft.IoTOperationsOrchestrator",
+        "Microsoft.IoTOperations"
     )
 
     # Az CLI required extensions

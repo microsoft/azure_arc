@@ -817,7 +817,7 @@ function Deploy-Prometheus {
     helm repo add prometheus-community $websiteUrls["prometheus"] | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
     helm repo update | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
-    if ($Env:scenario -eq "retail") {
+    if ($Env:scenario -eq "contoso_supermarket") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
@@ -831,7 +831,7 @@ function Deploy-Prometheus {
         (Get-Content $_.FullName) -replace 'Welcome to Grafana', 'Welcome to Grafana for Contoso Supermarket Production' | Set-Content $_.FullName
         }
     }
-    elseif ($Env:scenario -eq "manufacturing") {
+    elseif ($Env:scenario -eq "contoso_motors") {
         # Update Grafana Icons
         Copy-Item -Path $AgIconsDir\contoso-motors.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
         Copy-Item -Path $AgIconsDir\contoso-motors.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
@@ -1162,20 +1162,31 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        az connectedk8s enable-features --name $arcClusterName `
+        if($cluster.Value.Type -eq "K3s"){
+            az connectedk8s enable-features --name $arcClusterName `
+            --resource-group $resourceGroup `
+            --features cluster-connect custom-locations `
+            --custom-locations-oid $customLocationRPOID `
+            --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
+            --only-show-errors
+        }else{
+            az connectedk8s enable-features --name $arcClusterName `
             --resource-group $resourceGroup `
             --features cluster-connect custom-locations `
             --custom-locations-oid $customLocationRPOID `
             --only-show-errors
+        }
+
+        Start-Sleep -Seconds 10
 
         do {
-            az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --no-block --only-show-errors
+            az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
                 Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
                 Write-Host "`n"
-                az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --no-block --only-show-errors
+                az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --no-block --only-show-errors
                 $retryCount++
             }
             else {
@@ -1188,7 +1199,11 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         $retryCount = 0
         $maxRetries = 25
-        kubectx $clusterName
+        if($cluster.Value.type -eq "K3s"){
+            kubectl config use-context "ag-k3s-$clusterName"
+        }else{
+            kubectx $clusterName
+        }
 
         Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
         Write-Host "`n"
@@ -1233,7 +1248,11 @@ function Set-MQTTIpAddress {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        if($cluster.Value.type -eq "K3s"){
+            kubectl config use-context "ag-k3s-$clusterName"
+        }else{
+            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        }
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
 
         do {
