@@ -16,9 +16,23 @@ function Get-K3sConfigFile{
     azcopy copy $sourceFile2 "C:\Users\$adminUsername\.kube\ag-k3s-chicago" --check-length=false
 
     # Merging config files
-    $ENV:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
-    kubectl config view --flatten > "C:\Users\$adminUsername\.kube\config"
-    $ENV:KUBECONFIG= ""
+    #$ENV:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    #kubectl config view --flatten > "C:\Users\$adminUsername\.kube\config"
+    #$ENV:KUBECONFIG= ""
+    #kubectx seattle="ag-k3s-seattle"
+    #kubectx chicago="ag-k3s-chicago"
+
+
+    # Merging kubeconfig files from CAPI and Rancher K3s
+    Copy-Item -Path "C:\Users\$adminUsername\.kube\config" -Destination "C:\Users\$adminUsername\.kube\config.backup"
+    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    kubectl config view --raw > C:\users\$adminUsername\.kube\config_tmp
+    kubectl config get-clusters --kubeconfig=C:\users\$adminUsername\.kube\config_tmp
+    Remove-Item -Path "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+    Remove-Item -Path "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
+    Move-Item -Path "C:\Users\$adminUsername\.kube\config_tmp" -Destination "C:\users\$adminUsername\.kube\config" -Force
+    $Env:KUBECONFIG="C:\users\$adminUsername\.kube\config"
+
     kubectx seattle="ag-k3s-seattle"
     kubectx chicago="ag-k3s-chicago"
 
