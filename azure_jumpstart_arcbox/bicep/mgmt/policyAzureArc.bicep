@@ -215,7 +215,7 @@ resource sshPostureControlAudit  'Microsoft.Authorization/policyAssignments@2024
     policyDefinitionId: sshPostureControlAzurePolicyId
     parameters: {
       IncludeArcMachines: {
-        value: true
+        value: 'true'
       }
     }
   }
