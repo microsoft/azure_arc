@@ -17,7 +17,7 @@ Import-Module $moduleFile
 Get-Command -Module SqlAdvancedThreatProtectionShell
 
 Write-Host "Executing SQL injection"
-$saPasswordEncrypted = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
+$saPasswordEncrypted = ConvertTo-SecureString -String "JS123!!" -AsPlainText -Force
 Test-SqlAtpInjection -UserName sa -Password $saPasswordEncrypted # High risk
 Start-Sleep(30) # Wait between tests
 
