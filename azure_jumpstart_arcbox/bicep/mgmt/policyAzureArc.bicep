@@ -14,6 +14,7 @@ param resourceTags object = {
 
 param azureUpdateManagerArcPolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46'
 param azureUpdateManagerAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/59efceea-0c96-497e-a4a1-4eb2290dac15'
+param sshPostureControlAzurePolicyId string = '/providers/Microsoft.Authorization/policyDefinitions/a8f3e6a6-dcd2-434c-b0f7-6f309ce913b4'
 
 param tagsRoleDefinitionId string = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
@@ -199,6 +200,22 @@ resource updateManagerAzurePolicyLinux  'Microsoft.Authorization/policyAssignmen
     parameters: {
       osType: {
         value: 'Linux'
+      }
+    }
+  }
+}
+
+resource sshPostureControlAudit  'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+  name: '(ArcBox) Enable SSH Posture Control audit'
+  location: azureLocation
+  scope: resourceGroup()
+  properties:{
+    displayName: '(ArcBox) Enable SSH Posture Control audit'
+    description: 'Enable SSH Posture Control in audit mode'
+    policyDefinitionId: sshPostureControlAzurePolicyId
+    parameters: {
+      IncludeArcMachines: {
+        value: true
       }
     }
   }
