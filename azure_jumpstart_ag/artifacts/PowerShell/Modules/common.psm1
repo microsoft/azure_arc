@@ -26,6 +26,7 @@ function Deploy-AzPowerShell {
     $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+    Set-AzContext -Subscription $subscriptionId
     # Install PowerShell modules
     if ($AgConfig.PowerShellModules.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
@@ -515,7 +516,11 @@ function Deploy-AzContainerRegistry {
 function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        if($cluster.Value.Type -eq "K3s"){
+            kubectl config use-context "ag-k3s-$clusterName"
+        }else{
+            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+        }
         foreach ($namespace in $AgConfig.Namespaces) {
             Write-Host "[$(Get-Date -Format t)] INFO: Creating namespace $namespace on $clusterName" -ForegroundColor Gray
             kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -1142,7 +1147,11 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        kubectx $clusterName
+        if($cluster.Value.type -eq "K3s"){
+            kubectl config use-context "ag-k3s-$clusterName"
+        }else{
+            kubectx $clusterName
+        }
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
         $retryCount = 0

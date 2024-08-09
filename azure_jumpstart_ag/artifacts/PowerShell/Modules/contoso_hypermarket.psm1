@@ -4,9 +4,6 @@ function Get-K3sConfigFile{
     $seattleContainer = $k3sArcDataClusterName.ToLower()
     $chicagoContainer = $k3sArcClusterName.ToLower()
 
-    #$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-    #$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-    #Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId
     $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
 
     $sourceFile1 = "https://$stagingStorageAccountName.blob.core.windows.net/$seattleContainer/config"
@@ -15,26 +12,9 @@ function Get-K3sConfigFile{
     azcopy copy $sourceFile1 "C:\Users\$adminUsername\.kube\ag-k3s-seattle" --check-length=false
     azcopy copy $sourceFile2 "C:\Users\$adminUsername\.kube\ag-k3s-chicago" --check-length=false
 
-    # Merging config files
-    #$ENV:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
-    #kubectl config view --flatten > "C:\Users\$adminUsername\.kube\config"
-    #$ENV:KUBECONFIG= ""
-    #kubectx seattle="ag-k3s-seattle"
-    #kubectx chicago="ag-k3s-chicago"
-
-
     # Merging kubeconfig files from CAPI and Rancher K3s
     Copy-Item -Path "C:\Users\$adminUsername\.kube\config" -Destination "C:\Users\$adminUsername\.kube\config.backup"
     $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
-    kubectl config view --raw > C:\users\$adminUsername\.kube\config_tmp
-    kubectl config get-clusters --kubeconfig=C:\users\$adminUsername\.kube\config_tmp
-    Remove-Item -Path "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
-    Remove-Item -Path "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
-    Move-Item -Path "C:\Users\$adminUsername\.kube\config_tmp" -Destination "C:\users\$adminUsername\.kube\config" -Force
-    $Env:KUBECONFIG="C:\users\$adminUsername\.kube\config"
-
-    kubectx seattle="ag-k3s-seattle"
-    kubectx chicago="ag-k3s-chicago"
 
     # Downloading 'installk3s.log' log file
     Write-Header "Downloading k3s Install Logs"
@@ -188,20 +168,20 @@ function Configure-K3sClusters {
           numberMisscheduled: 0
           numberReady: 0
 "@
-        
+
             $kubeVipDaemonset | kubectl apply -f -
-        
+
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
             kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
-        
+
             $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
             $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
             $lowestServiceIp = $sortedIps[0]
             $highestServiceIp = $sortedIps[-1]
-        
+
             kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
             Start-Sleep -Seconds 30
-        
+
             Write-Host "Creating longhorn storage on K3scluster"
             kubectl apply -f "$AgToolsDir\longhorn.yaml"
             Start-Sleep -Seconds 30
