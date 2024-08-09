@@ -362,7 +362,7 @@ foreach ($configName in $configs) {
               }
           }
           elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
-              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcDataClusterName. Exiting..."
+              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcDataClusterName. Exiting..." -ForegroundColor Red
               break
           }
       }
