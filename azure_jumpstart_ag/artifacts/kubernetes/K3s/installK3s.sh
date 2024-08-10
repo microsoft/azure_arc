@@ -67,6 +67,8 @@ export AZCOPY_AUTO_LOGIN_TYPE=MSI
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+sleep 60
+
 echo ""
 echo "Log in to Azure"
 echo ""
