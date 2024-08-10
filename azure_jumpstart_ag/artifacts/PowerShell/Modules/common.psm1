@@ -1204,6 +1204,7 @@ function Deploy-AIO {
     }
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $retryCount = 0
         $maxRetries = 25
         if($cluster.Value.type -eq "K3s"){
@@ -1221,7 +1222,7 @@ function Deploy-AIO {
                 Start-Sleep -Seconds 60
                 $retryCount++
             }
-        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+        } until ($mqServiceStatus -eq "Success" -or $mqServiceStatus -eq "warning" -or $retryCount -eq $maxRetries)
 
         if ($retryCount -eq $maxRetries) {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
@@ -1298,9 +1299,10 @@ function Set-MQTTIpAddress {
             }
             $mqttIpArray += $newObject
         }
-
-        Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
+        if($cluster.Value.type -eq "AKSEE"){
+            Invoke-Command -VMName $clusterName -Credential $Credentials -ScriptBlock {
             netsh interface portproxy add v4tov4 listenport=1883 listenaddress=0.0.0.0 connectport=1883 connectaddress=$using:mqttIp
+            }
         }
     }
 
