@@ -39,7 +39,7 @@ param namingGuid string
 
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var vmSize = 'Standard_B8ms'
+var vmSize = 'Standard_D4s_v5'
 var diskSize = 512
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
