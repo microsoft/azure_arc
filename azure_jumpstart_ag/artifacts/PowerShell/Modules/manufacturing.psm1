@@ -263,7 +263,6 @@ function Deploy-AIO {
         $retryCount = 0
         $maxRetries = 25
         kubectx $clusterName
-        <#
         do {
             $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
@@ -279,7 +278,6 @@ function Deploy-AIO {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
             exit 1 # Exit the script
         }
-        #>
         #Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
         #Write-Host "`n"
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
