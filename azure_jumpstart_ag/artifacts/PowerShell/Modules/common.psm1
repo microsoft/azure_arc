@@ -674,7 +674,7 @@ function Deploy-AzArcK8sAKSEE {
 
 function Deploy-ClusterFluxExtension {
     $resourceTypes = @($AgConfig.ArcK8sResourceType, $AgConfig.AksResourceType)
-    $resources = Get-AzResource -ResourceGroupName $Env:resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
+    $resources = Get-AzResource -ResourceGroupName $resourceGroup | Where-Object { $_.ResourceType -in $resourceTypes }
 
     $jobs = @()
     foreach ($resource in $resources) {
@@ -694,10 +694,10 @@ function Deploy-ClusterFluxExtension {
             }
             if ($clusterType -eq 'ConnectedClusters') {
                 # Check if cluster is connected to Azure Arc control plane
-                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
+                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $resourceGroup -ClusterName $resourceName).ConnectivityStatus
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
                     for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
+                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
                         # Check the condition
                         if ($ConnectivityStatus -eq 'Connected') {
@@ -723,16 +723,16 @@ function Deploy-ClusterFluxExtension {
             }
 
             az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
-            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
             $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
             if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
                 for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
                     try {
                         if ($extension) {
-                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
+                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --force --yes
                         }
-                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
+                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
                         break # Command succeeded, exit the loop
                     }
                     catch {
