@@ -2,6 +2,7 @@ function Get-K3sConfigFile{
   # Downloading k3s Kubernetes cluster kubeconfig file
   Write-Host "Downloading k3s Kubeconfigs"
   $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
+  $Env:KUBECONFIG=""
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
