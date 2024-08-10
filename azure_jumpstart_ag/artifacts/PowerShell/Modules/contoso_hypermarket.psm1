@@ -10,6 +10,7 @@ function Get-K3sConfigFile{
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
     $Env:KUBECONFIG+="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName;"
+    [System.Environment]::SetEnvironmentVariable("KUBECONFIG", $Env:KUBECONFIG, [System.EnvironmentVariableTarget]::Machine)
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
     azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$AgLogsDir\" --include-pattern "*.log"
   }

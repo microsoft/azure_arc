@@ -158,7 +158,9 @@ Deploy-ClusterSecrets
 #####################################################################
 # Cache contoso-supermarket images on all clusters
 #####################################################################
-Deploy-K8sImagesCache
+if ($scenario -eq "contoso_supermarket") {
+    Deploy-K8sImagesCache
+}
 
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc

@@ -1146,12 +1146,13 @@ function Deploy-AIO {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
-
+    $kubeConfig = $Env:KUBECONFIG
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         if($cluster.Value.type -eq "K3s"){
+            $Env:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectl config use-context "ag-k3s-$clusterName"
         }else{
             kubectx $clusterName
@@ -1246,6 +1247,7 @@ function Deploy-AIO {
 
         ## Patching MQTT listener
     }
+    $Env:KUBECONFIG = $kubeConfig
 }
 
 function Set-MQTTIpAddress {
