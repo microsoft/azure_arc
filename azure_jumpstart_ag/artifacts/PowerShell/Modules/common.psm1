@@ -1148,7 +1148,6 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         if($cluster.Value.type -eq "K3s"){
-            Write-Host "Setting context to K3s: ag-k3s-$clusterName"
             kubectl config use-context "ag-k3s-$clusterName"
         }else{
             kubectx $clusterName
