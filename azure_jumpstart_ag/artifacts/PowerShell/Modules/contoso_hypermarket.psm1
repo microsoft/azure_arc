@@ -1,32 +1,17 @@
 function Get-K3sConfigFile{
   # Downloading k3s Kubernetes cluster kubeconfig file
   Write-Host "Downloading k3s Kubeconfigs"
-  $seattleContainer = $k3sArcDataClusterName.ToLower()
-  $chicagoContainer = $k3sArcClusterName.ToLower()
-
-  #$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-  #$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-  #Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId
   $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
-
-  $sourceFile1 = "https://$stagingStorageAccountName.blob.core.windows.net/$seattleContainer/config"
-  $sourceFile2 = "https://$stagingStorageAccountName.blob.core.windows.net/$chicagoContainer/config"
-
-  azcopy copy $sourceFile1 "C:\Users\$adminUsername\.kube\ag-k3s-seattle" --check-length=false
-  azcopy copy $sourceFile2 "C:\Users\$adminUsername\.kube\ag-k3s-chicago" --check-length=false
-
-  # Merging kubeconfig files from CAPI and Rancher K3s
-  $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-seattle;C:\Users\$adminUsername\.kube\ag-k3s-chicago"
-
-  #kubectx seattle="ag-k3s-seattle"
-  #kubectx chicago="ag-k3s-chicago"
-
-  #kubectl config use-context ag-k3s-chicago
-
-  # Downloading 'installk3s.log' log file
-  Write-Header "Downloading k3s Install Logs"
-  $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$($k3sArcDataClusterName.ToLower())/*"
-  azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$AgLogsDir\" --include-pattern "*.log"
+  foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+    $clusterName = $cluster.Name.ToLower()
+    $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+    $containerName = $arcClusterName.toLower()
+    $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
+    azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
+    $Env:KUBECONFIG+="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName;"
+    $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
+    azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$AgLogsDir\" --include-pattern "*.log"
+  }
 }
 
 function Configure-K3sClusters {

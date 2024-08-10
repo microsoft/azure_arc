@@ -1148,6 +1148,7 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         if($cluster.Value.type -eq "K3s"){
+            Write-Host "Setting context to K3s: ag-k3s-$clusterName"
             kubectl config use-context "ag-k3s-$clusterName"
         }else{
             kubectx $clusterName
@@ -1168,6 +1169,7 @@ function Deploy-AIO {
             --features cluster-connect custom-locations `
             --custom-locations-oid $customLocationRPOID `
             --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
+            --kube-context "ag-k3s-$clusterName" `
             --only-show-errors
         }else{
             az connectedk8s enable-features --name $arcClusterName `
@@ -1180,6 +1182,7 @@ function Deploy-AIO {
         Start-Sleep -Seconds 10
 
         do {
+            kubectl config --kubeconfig="ag-k3s-$clusterName" use-context $clusterName
             az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
