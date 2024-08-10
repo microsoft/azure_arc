@@ -504,7 +504,7 @@ function Deploy-VirtualizationInfrastructure {
 
 function Deploy-AzContainerRegistry {
     az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
-    az account set -s $subscriptionId
+    az account set -s $Env:subscriptionId
     az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 
@@ -698,10 +698,10 @@ function Deploy-ClusterFluxExtension {
             }
             if ($clusterType -eq 'ConnectedClusters') {
                 # Check if cluster is connected to Azure Arc control plane
-                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $resourceGroup -ClusterName $resourceName).ConnectivityStatus
+                $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
                 if (-not ($ConnectivityStatus -eq 'Connected')) {
                     for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
-                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $resourceGroup -ClusterName $resourceName).ConnectivityStatus
+                        $ConnectivityStatus = (Get-AzConnectedKubernetes -ResourceGroupName $Env:resourceGroup -ClusterName $resourceName).ConnectivityStatus
 
                         # Check the condition
                         if ($ConnectivityStatus -eq 'Connected') {
@@ -727,16 +727,17 @@ function Deploy-ClusterFluxExtension {
             }
 
             az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
-            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
+            az account set -s $Env:subscriptionId
+            $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
             $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
 
             if ($extension.ProvisioningState -ne 'Succeeded' -and ($ConnectivityStatus -eq 'Connected' -or $clusterType -eq "ManagedClusters")) {
                 for ($attempt = 1; $attempt -le $retryCount; $attempt++) {
                     try {
                         if ($extension) {
-                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --force --yes
+                            az k8s-extension delete --name "flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --force --yes
                         }
-                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
+                        az k8s-extension create --name "flux" --extension-type "microsoft.flux" --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json -OutVariable extension
                         break # Command succeeded, exit the loop
                     }
                     catch {
@@ -1206,9 +1207,25 @@ function Deploy-AIO {
         $retryCount = 0
         $maxRetries = 25
         if($cluster.Value.type -eq "K3s"){
+            $Env:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectl config use-context "ag-k3s-$clusterName"
         }else{
             kubectx $clusterName
+        }
+        do {
+            $output = az iot ops check --as-object --only-show-errors
+            $output = $output | ConvertFrom-Json
+            $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+            if ($mqServiceStatus -ne "Success") {
+                Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
+                $retryCount++
+            }
+        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+
+        if ($retryCount -eq $maxRetries) {
+            Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
+            exit 1 # Exit the script
         }
 
         Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
