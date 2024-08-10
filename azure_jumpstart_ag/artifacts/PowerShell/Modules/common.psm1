@@ -534,7 +534,11 @@ function Deploy-ClusterSecrets {
         foreach ($namespace in $AgConfig.Namespaces) {
             if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-                kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                if($cluster.Value.Type -eq "K3s"){
+                    kubectl config use-context "ag-k3s-$clusterName"
+                }else{
+                    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
+                }
                 kubectl create secret docker-registry acr-secret `
                     --namespace $namespace `
                     --docker-server="$acrName.azurecr.io" `
