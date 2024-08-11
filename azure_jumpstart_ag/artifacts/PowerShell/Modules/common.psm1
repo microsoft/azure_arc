@@ -551,7 +551,7 @@ function Deploy-ClusterSecrets {
     #####################################################################
     # Create secrets for GitHub actions
     #####################################################################
-    if ($Env:scenario -eq "retail") {
+    if ($Env:scenario -eq "contoso_supermarket") {
         Write-Host "[$(Get-Date -Format t)] INFO: Creating Kubernetes secrets" -ForegroundColor Gray
         $cosmosDBKey = $(az cosmosdb keys list --name $cosmosDBName --resource-group $resourceGroup --query primaryMasterKey --output tsv)
         foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {

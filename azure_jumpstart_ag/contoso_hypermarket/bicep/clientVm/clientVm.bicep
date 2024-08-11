@@ -79,7 +79,7 @@ param namingGuid string
 param customLocationRPOID string
 
 @description('The agora scenario to be deployed')
-param scenario string = 'retail'
+param scenario string = 'contoso_supermarket'
 
 @description('The name of the Azure Arc K3s cluster')
 param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
