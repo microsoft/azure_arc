@@ -85,7 +85,7 @@ param adxClusterName string
 param namingGuid string
 
 @description('The agora scenario to be deployed')
-param scenario string = 'retail'
+param scenario string = 'conotos_supermarket'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'

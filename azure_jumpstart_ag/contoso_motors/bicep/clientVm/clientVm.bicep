@@ -83,7 +83,7 @@ param namingGuid string
 param customLocationRPOID string
 
 @description('The agora scenario to be deployed')
-param scenario string = 'retail'
+param scenario string = 'contoso_motors'
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'

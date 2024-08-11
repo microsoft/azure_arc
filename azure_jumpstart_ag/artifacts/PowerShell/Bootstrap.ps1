@@ -400,11 +400,13 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 ##############################################################
 # Install Hyper-V, WSL and reboot
 ##############################################################
-Write-Header "Installing Hyper-V"
-Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+  Write-Header "Installing Hyper-V"
+  Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+  Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+}
 
 Stop-Transcript
 
