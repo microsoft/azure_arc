@@ -60,6 +60,7 @@
     # Chocolatey packages list
     ChocolateyPackagesList  = @(
         'az.powershell',
+        'powershell-core',
         'kubernetes-cli',
         'vcredist140',
         'microsoft-edge',
