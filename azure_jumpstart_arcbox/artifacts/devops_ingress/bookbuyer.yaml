@@ -17,18 +17,3 @@ spec:
             port:
               number: 14001
         path: /bookbuyer
-# ---
-# kind: IngressBackend
-# apiVersion: policy.openservicemesh.io/v1alpha1
-# metadata:
-#   name: backend
-# spec:
-#   backends:
-#   - name: bookbuyer
-#     port:
-#       number: 14001
-#       protocol: http
-#   sources:
-#   - kind: Service
-#     namespace: ingress-nginx
-#     name: ingress-nginx-controller
