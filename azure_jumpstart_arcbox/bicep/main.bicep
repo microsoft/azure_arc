@@ -80,7 +80,7 @@ var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
 var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
 var k3sArcDataClusterName = '${namingPrefix}-DataSvc-K3s-${guid}'
 var k3sArcClusterName = '${namingPrefix}-K3s-${guid}'
-var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
+var k3sClusterNodesCount = (flavor == 'DataOps') ? 3 : 1 // Number of nodes to deploy in the K3s cluster
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuRancherK3sDataSvcDeployment'
