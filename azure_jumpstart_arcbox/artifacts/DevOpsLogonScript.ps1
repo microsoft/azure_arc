@@ -101,8 +101,8 @@ foreach ($cluster in $clusters) {
   $nicName = $cluster.clusterName + "-NIC"
   $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $nicName --query "[?primary == ``true``].privateIPAddress" -otsv
   
-  # Write-Header "Installing istio on K3s cluster"
-  # istioctl install --skip-confirmation
+  Write-Header "Installing istio on K3s cluster"
+  istioctl install --skip-confirmation
 
 # Apply kube-vip RBAC manifests https://kube-vip.io/manifests/rbac.yaml
 $kubeVipRBAC = @"
@@ -277,11 +277,11 @@ foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc',
     kubectl create namespace $namespace
 }
 
-# # Label Bookstore Namespaces for Istio injection
-# Write-Header "Labeling K8s Namespaces for Istio Injection"
-# foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
-#     kubectl label namespace $namespace istio-injection=enabled
-# }
+# Label Bookstore Namespaces for Istio injection
+Write-Header "Labeling K8s Namespaces for Istio Injection"
+foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse')) {
+    kubectl label namespace $namespace istio-injection=enabled
+}
 
 #############################
 # - Apply GitOps Configs
@@ -289,18 +289,18 @@ foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc',
 
 Write-Header "Applying GitOps Configs"
 
-# # Create GitOps config for NGINX Ingress Controller
-# Write-Host "Creating GitOps config for NGINX Ingress Controller"
-# az k8s-configuration flux create `
-#     --cluster-name $Env:k3sArcDataClusterName `
-#     --resource-group $Env:resourceGroup `
-#     --name config-nginx `
-#     --namespace $ingressNamespace `
-#     --cluster-type connectedClusters `
-#     --scope cluster `
-#     --url $appClonedRepo `
-#     --branch main --sync-interval 3s `
-#     --kustomization name=nginx path=./nginx/release
+# Create GitOps config for NGINX Ingress Controller
+Write-Host "Creating GitOps config for NGINX Ingress Controller"
+az k8s-configuration flux create `
+    --cluster-name $Env:k3sArcDataClusterName `
+    --resource-group $Env:resourceGroup `
+    --name config-nginx `
+    --namespace $ingressNamespace `
+    --cluster-type connectedClusters `
+    --scope cluster `
+    --url $appClonedRepo `
+    --branch main --sync-interval 3s `
+    --kustomization name=nginx path=./nginx/release
 
 # Create GitOps config for Bookstore application
 Write-Host "Creating GitOps config for Bookstore application"
@@ -310,7 +310,7 @@ az k8s-configuration flux create `
     --name config-bookstore `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch arcbox_3.0 --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
@@ -398,7 +398,7 @@ foreach ($configName in $configs) {
 #     --release-namespace kube-system `
 #     --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
-# # Replace Variable values
+# Replace Variable values
 Get-ChildItem -Path $Env:ArcBoxKVDir |
     ForEach-Object {
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
@@ -407,7 +407,7 @@ Get-ChildItem -Path $Env:ArcBoxKVDir |
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:tenantId | Set-Content -Path $_.FullName
     }
 
-Write-Header "Creating Ingress Controller"
+# Write-Header "Creating Ingress Controller"
 
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
