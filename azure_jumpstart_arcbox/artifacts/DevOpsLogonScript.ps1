@@ -263,6 +263,7 @@ $kubeVipDaemonset | kubectl apply -f -
   Write-Host "`n"
 }
 
+# Switch Kubernetes context to ArcBox-DataSvc-K3s cluster
 foreach ($cluster in $clusters) {
   if ($cluster.context -like '*-datasvc-k3s') {
     $Env:KUBECONFIG=$cluster.kubeConfig
@@ -361,7 +362,7 @@ foreach ($configName in $configs) {
               }
           }
           elseif ($configStatus.ComplianceState -eq "Non-compliant" -and $retryCount -eq $maxRetries) {
-              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcDataClusterName. Exiting..."
+              Write-Host "GitOps configuration $configName has failed on $Env:k3sArcDataClusterName. Exiting..." -ForegroundColor Red
               break
           }
       }
@@ -397,7 +398,7 @@ foreach ($configName in $configs) {
 #     --release-namespace kube-system `
 #     --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
-# # Replace Variable values
+# Replace Variable values
 Get-ChildItem -Path $Env:ArcBoxKVDir |
     ForEach-Object {
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
