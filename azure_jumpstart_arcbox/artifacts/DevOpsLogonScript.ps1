@@ -407,7 +407,7 @@ Get-ChildItem -Path $Env:ArcBoxKVDir |
         # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:tenantId | Set-Content -Path $_.FullName
     }
 
-# Write-Header "Creating Ingress Controller"
+Write-Header "Creating Ingress Controller"
 
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
