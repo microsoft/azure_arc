@@ -131,8 +131,6 @@ if ($Env:flavor -ne "DevOps") {
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
 
-    $Env:AZURE_CONFIG_DIR = $cliDir.FullName
-
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
 
@@ -198,6 +196,9 @@ if ($Env:flavor -ne "DevOps") {
         Start-Sleep -Seconds 10
 
     }
+
+    # Enable Windows Firewall rule for SQL Server
+    Invoke-Command -VMName $SQLvmName -ScriptBlock { New-NetFirewallRule -DisplayName "Allow SQL Server TCP 1433" -Direction Inbound -Protocol TCP -LocalPort 1433 -Action Allow } -Credential $winCreds
 
     # Download SQL assessment preparation script
     Invoke-WebRequest ($Env:templateBaseUrl + "artifacts/prepareSqlServerForAssessment.ps1") -OutFile $nestedVMArcBoxDir\prepareSqlServerForAssessment.ps1
