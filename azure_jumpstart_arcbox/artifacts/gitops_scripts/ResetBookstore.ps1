@@ -4,7 +4,7 @@ $certdns = "arcbox.devops.com"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\ResetBookstore.log
 
-# Switch kubectl context to arcbox-datasvc-k3s
+# Switch kubectl context to arcbox-k3s-datasvc
 $Env:KUBECONFIG="C:\Users\$Env:adminUsername\.kube\config"
 kubectx
 

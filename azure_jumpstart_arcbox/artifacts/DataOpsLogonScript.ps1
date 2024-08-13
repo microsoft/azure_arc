@@ -12,7 +12,7 @@ $aksArcClusterName = ($Env:aksArcClusterName).toLower()
 $aksdrArcClusterName = ($Env:aksdrArcClusterName).toLower()
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$k3sArcDataClusterName-dc" ; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; dataController = "$k3sArcDataClusterName-dc" ; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc" }
     [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$aksArcClusterName-dc" ; customLocation = "$aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
     [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$aksdrArcClusterName-dc" ; customLocation = "$aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 )
@@ -149,7 +149,7 @@ Write-Host "`n"
 # Downloading k3s Kubernetes cluster kubeconfig file
 Write-Header "Downloading k3s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/config"
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "C:\Users\$Env:adminUsername\.kube\config"
 
 $addsDomainNetBiosName = $Env:addsDomainName.Split(".")[0]
@@ -174,7 +174,7 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx k3s="$namingPrefix-datasvc-k3s"
+kubectx k3s="$namingPrefix-k3s-datasvc"
 
 Start-Sleep -Seconds 10
 
@@ -375,7 +375,7 @@ Stop-Transcript
 # - Deploying data services on k3s cluster
 ################################################
 
-wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-datasvc-k3s" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
+wt --% --maximized new-tab pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc" -clusterName 'k3s Cluster'; split-pane -p "PowerShell" pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" -clusterName 'AKS Cluster'; split-pane -H pwsh.exe -NoExit -Command Show-K8sPodStatus -kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" -clusterName 'AKS-DR Cluster'
 
 Write-Header "Deploying Azure Arc Data Controllers on Kubernetes cluster"
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
