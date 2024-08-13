@@ -174,7 +174,7 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx k3s="config-k3s-datasvc"
+kubectx k3s="arcbox-k3s-data"
 
 Start-Sleep -Seconds 10
 
