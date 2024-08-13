@@ -37,7 +37,7 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-$Env:k3sArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s-DataSvc" | Where-Object { $_ -ne "" }
+$Env:k3sArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s-Data" | Where-Object { $_ -ne "" }
 $Env:k3sArcDataClusterName=$Env:k3sArcDataClusterName -replace "`n",""
 
 $Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
