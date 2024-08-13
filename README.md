@@ -1,4 +1,4 @@
-# Azure Arc Jumpstart source code
+# Arc Jumpstart source code
 
 Welcome to the Arc Jumpstart source code repository! This repository is your go-to resource for working with and contributing to the Arc Jumpstart automation scripts and tools and acts as the backend source code repository which complements our [documentation repository](https://github.com/Azure/arc_jumpstart_docs) that eventually populates the [Arc Jumpstart](https://aka.ms/arcjumpstart) website.
 
@@ -36,6 +36,12 @@ As we continuously improve and expand Arc Jumpstart, we recommend keeping your l
 
 ```bash
 git pull origin main
+```
+
+You can use partial clones if you want to reduce the time and size it takes to clone this repository. By default, when you clone this repository, you get all the files and their associated metadata, including blobs and diff history. However, if you don't need all of this information, you can use the following command to clone the repository without the blobs:
+
+```bash
+git clone --filter=blob:none https://github.com/microsoft/azure_arc
 ```
 
 ## Contribution and feedback

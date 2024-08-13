@@ -65,7 +65,7 @@ data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
   filter {
     name   = "virtualization-type"
@@ -74,11 +74,11 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # canonical
 }
 
-data "aws_ami" "Windows_2019" {
+data "aws_ami" "Windows_2022" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
+    values = ["Windows_Server-2022-English-Full-Base-*"]
   }
   filter {
     name   = "architecture"
@@ -92,10 +92,14 @@ data "aws_ami" "centos" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["CentOS 7.8.2003 x86_64"]
+    values = ["Fedora-Cloud-Base-39*"]
   }
   filter {
     name   = "architecture"
     values = ["x86_64"]
+  }
+  filter {
+    name = "virtualization-type"
+    values = ["hvm"]
   }
 }

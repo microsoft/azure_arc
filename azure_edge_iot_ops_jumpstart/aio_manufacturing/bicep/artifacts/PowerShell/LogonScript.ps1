@@ -402,7 +402,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"
@@ -414,6 +414,7 @@ do {
     }
 } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
 
+<#
 $retryCount = 0
 $maxRetries = 5
 
@@ -422,7 +423,7 @@ do {
     $output = $output | ConvertFrom-Json
     $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
     if ($mqServiceStatus -ne "Success") {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --mq-service-type loadBalancer --mq-insecure true --simulate-plc true --only-show-errors
+        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
         $retryCount++
     }
 } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
@@ -431,20 +432,23 @@ if ($retryCount -eq $maxRetries) {
     Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
     exit 1 # Exit the script
 }
+#>
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
+$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations']" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
 $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
+$eventGridNamespacePrincipalId = (az eventgrid namespace list --resource-group $resourceGroup -o json --only-show-errors | ConvertFrom-Json)[0].identity.principalId
 
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
-az role assignment create --assignee-object-id $spnObjectId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
+az role assignment create --assignee-object-id $eventGridNamespacePrincipalId --role "EventGrid Data Sender" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridNamespaceId --assignee-principal-type ServicePrincipal --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role "EventGrid TopicSpaces Subscriber" --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
 az role assignment create --assignee-object-id $extensionPrincipalId --role 'EventGrid TopicSpaces Publisher' --scope $eventGridTopicId --assignee-principal-type ServicePrincipal --only-show-errors
 
+Start-Sleep -Seconds 60
 
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring routing to use system-managed identity" -ForegroundColor DarkGray
 $eventGridConfig = "{routing-identity-info:{type:'SystemAssigned'}}"

@@ -42,6 +42,11 @@ param subnetNameCloud string = 'AKS-EE-Full-Subnet'
 @description('AKS Edge Essentials Kubernetes distribution')
 param kubernetesDistribution string
 
+@description('''The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.
+To pin a specific version, use the format '1.13'. To use the latest schema version, use 'useLatest'.
+''')
+param AKSEEPinnedSchemaVersion string = '1.13'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/'
 
 module networkDeployment 'mgmt/network.bicep' = {
@@ -69,5 +74,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     location: location
     subnetId: networkDeployment.outputs.subnetId
     kubernetesDistribution: kubernetesDistribution
+    AKSEEPinnedSchemaVersion: AKSEEPinnedSchemaVersion
   }
 }

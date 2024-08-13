@@ -11,6 +11,9 @@
         "spnTenantId": {
             "value": "<your service principal tenant id>"
         },
+        "spnProviderId": {
+            "value": "<your Microsoft.AzureStackHCI resource provider object id>"
+        },
         "windowsAdminUsername": {
             "value": "arcdemo"
         },
@@ -23,14 +26,11 @@
         "deployBastion": {
             "value": false
         },
-        "registerCluster": {
-            "value": true
+        "autoDeployClusterResource": {
+            "value": false
         },
-        "deployResourceBridge": {
-            "value": true
-        },
-        "deployAKSHCI": {
-            "value": true
+        "autoUpgradeClusterResource": {
+            "value": false
         }
     }
 }

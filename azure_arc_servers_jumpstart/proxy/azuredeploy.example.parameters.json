@@ -15,7 +15,7 @@
         "value": "arcdemo"
       },
       "adminPassword": {
-        "value": "ArcPassword123!!"
+        "value": "ArcPassword123"
       },
       "dnsLabelPrefix": {
         "value": "arcproxyclient123"

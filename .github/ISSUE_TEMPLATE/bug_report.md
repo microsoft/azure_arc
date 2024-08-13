@@ -8,7 +8,10 @@ assignees: ''
 ---
 <!--- 🛑 Please check existing issues first before continuing: https://github.com/microsoft/azure_arc/issues --->
 
-<!---  Disclaimer: The intent of this "Bug report" template is to address issues related to the Azure Arc Jumpstart scenarios, ArcBox, HCIBox, Agora, and all other project ares. The Azure Arc Jumpstart team does not handle Azure Arc core product issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com). --->
+<!--- Disclaimer: The intent of this "Bug report" template is to address feature requests related to the various Arc Jumpstart solution. The Arc Jumpstart team does not handle and/or support Azure Arc upstream core product related issues, bugs and feature requests and will try to assist on a best effort basis. For a core product issue or feature request/feedback, please create an official [Azure support ticket](https://azure.microsoft.com/support/create-ticket/) or [general feedback request](https://feedback.azure.com). --->
+
+> **Note:** For ease of issues and pull requests management and tracking, we kindly ask you to provide a meaningful and concise title to this issue and answer all questions to the best of your ability.
+
 
 **Is your issue related to a Jumpstart scenario, ArcBox, HCIBox, or Agora?**
 <!--- A link to the Jumpstart scenario you are working on. --->
@@ -36,6 +39,7 @@ assignees: ''
 - [Jumpstart ArcBox for DataOps troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_arcbox/DataOps#basic-troubleshooting)
 - [HCIBox troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_hcibox/getting_started#basic-troubleshooting)
 - [Agora - Contoso Supermarket troubleshooting](https://azurearcjumpstart.com/azure_jumpstart_ag/retail/contoso_supermarket/troubleshooting)
+- [Agora - Contoso Motors troubleshooting](https://arcjumpstart.com/azure_jumpstart_ag/manufacturing/contoso_motors/troubleshooting)
 --->
 
 **Screenshots**

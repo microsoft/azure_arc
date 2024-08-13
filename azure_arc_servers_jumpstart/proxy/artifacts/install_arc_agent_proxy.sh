@@ -10,7 +10,8 @@ LOCATION=$7
 VMNAME=$8
 URL=$9
 PORT=3128
-PASSWORD=$10
+PASSWORD=${10}
+
 
 touch /home/$USER/.bash_profile
 chmod +x /home/$USER/.bash_profile
@@ -31,6 +32,8 @@ export PASSWORD=$PASSWORD
 
 export HTTP_PROXY="http://$URL:$PORT"
 export HTTPS_PROXY="http://$URL:$PORT"
+export http_proxy="http://$URL:$PORT"
+export https_proxy="http://$URL:$PORT"
 export FTP_PROXY="http://$URL:$PORT"
 export DNS_PROXY="http://$URL:$PORT"
 export RSYNC_PROXY="http://$URL:$PORT"
@@ -38,22 +41,23 @@ export RSYNC_PROXY="http://$URL:$PORT"
 # Set up proxy 
 
 echo "export HTTP_PROXY="http://$URL:$PORT"" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export HTTPS_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export FTP_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export DNS_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export RSYNC_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-
+echo "export HTTPS_PROXY="http://$URL:$PORT"" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export FTP_PROXY="http://$URL:$PORT"" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export DNS_PROXY="http://$URL:$PORT""| sudo tee -a  /etc/profile.d/proxy.sh
+echo "export RSYNC_PROXY="http://$URL:$PORT"" | sudo tee -a  /etc/profile.d/proxy.sh
 
 # Set up certificate
 sudo touch /etc/apt/apt.conf
 echo "Acquire::http::proxy \"http://$URL:$PORT\";" | sudo tee /etc/apt/apt.conf > /dev/null
+
+
 sudo apt-get update
 sudo apt-get install -y sshpass
 sudo echo $PASSWORD > /tmp/pass
 sudo sshpass -f '/tmp/pass' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $USER@$URL:/tmp/squid-ca-cert-key.pem .
-rm -f /tmp/pass
 sudo mv ./squid-ca-cert-key.pem /usr/local/share/ca-certificates/squid-ca-cert-key.crt
 sudo update-ca-certificates
+sudo rm -f  /tmp/pass
 
 
 ## Configure Ubuntu to allow Azure Arc Connected Machine Agent Installation 
@@ -67,7 +71,10 @@ echo "Configuring Firewall"
 sudo ufw --force enable
 sudo ufw deny out from any to 169.254.169.254
 sudo ufw default allow incoming
+
+
 sudo apt-get update
+
 
 echo "Reconfiguring Hostname"
 
@@ -75,10 +82,11 @@ sudo hostname $VMNAME
 sudo -E /bin/sh -c 'echo $VMNAME > /etc/hostname'
 
 # Download the installation package
-wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh --no-check-certificate
+wget -e use_proxy=yes -e https_proxy=$URL:$PORT https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh --no-check-certificate
 
 # Install the hybrid agent
 sudo bash ~/install_linux_azcmagent.sh --proxy "http://$URL:$PORT"
+sudo azcmagent config set proxy.url "http://$URL:$PORT"
 
 # Run connect command
 sudo azcmagent connect \
@@ -91,7 +99,6 @@ sudo azcmagent connect \
   --tags "Project=jumpstart_azure_arc_servers" \
   --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a" 
 
-sudo azcmagent config set proxy.url "http://$URL:$PORT"
 
 sudo rm -f /home/$USER/.bash_profile
 EOT

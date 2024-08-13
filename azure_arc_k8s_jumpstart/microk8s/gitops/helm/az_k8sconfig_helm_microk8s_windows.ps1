@@ -6,7 +6,7 @@ $password="<Your Azure service principal password>"
 $tenantId="<Your Azure tenant ID>"
 $resourceGroup="<Azure resource group name>"
 $arcClusterName="<The name of your k8s cluster as it will be shown in Azure Arc>"
-$appClonedRepo="<The URL for the Azure Arc Jumpstart forked GitHub repository>"
+$appClonedRepo="<The URL for the  forked GitHub repository>"
 $namespace='hello-arc'
 
 # Logging in to Azure using service principal

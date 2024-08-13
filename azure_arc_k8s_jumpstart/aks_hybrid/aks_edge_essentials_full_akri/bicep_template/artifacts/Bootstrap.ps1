@@ -12,7 +12,8 @@ param (
     [string]$rdpPort,
     [string]$githubAccount,
     [string]$githubBranch,
-    [string]$kubernetesDistribution
+    [string]$kubernetesDistribution,
+    [string]$AKSEEPinnedSchemaVersion
 )
 
 # Inject ARM template parameters as environment variables
@@ -30,6 +31,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesDistribution', $kubernetesDistribution, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"

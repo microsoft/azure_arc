@@ -33,6 +33,9 @@ param spnClientSecret string
 @description('Tenant id of the service principal')
 param spnTenantId string
 
+@description('Azure AD object id for your Microsoft.AzureStackHCI resource provider')
+param spnProviderId string
+
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
@@ -59,6 +62,12 @@ param natDNS string = '8.8.8.8'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
+
+@description('Choice to enable automatic deployment of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Default is false.')
+param autoDeployClusterResource bool = false
+
+@description('Choice to enable automatic upgrade of Azure Arc enabled HCI cluster resource after the client VM deployment is complete. Only applicable when autoDeployClusterResource is true. Default is false.')
+param autoUpgradeClusterResource bool = false
 
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'HCIBox-Bastion'
@@ -246,9 +255,9 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+        uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -spnProviderId ${spnProviderId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -registerCluster ${registerCluster} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge} -natDNS ${natDNS} -rdpPort ${rdpPort} -autoDeployClusterResource ${autoDeployClusterResource} -autoUpgradeClusterResource ${autoUpgradeClusterResource}'
     }
   }
 }

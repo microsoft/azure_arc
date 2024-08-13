@@ -75,13 +75,13 @@ echo ""
 
   # Installing snap
   echo ""
-  echo "Installing snap"  
+  echo "Installing snap"
   sudo apt install snapd
   echo ""
 
   # Installing jq
   echo ""
-  echo "Installing jq" 
+  echo "Installing jq"
   sudo apt install jq -y
   echo ""
 
@@ -219,7 +219,7 @@ EOF
     # Iterate over each node and check its status
     for node in $nodes; do
       ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
-      
+
       if [[ $ready != "True" ]]; then
         echo "Node $node is not ready."
         all_ready=false
