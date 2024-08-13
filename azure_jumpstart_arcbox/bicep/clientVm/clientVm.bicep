@@ -113,6 +113,11 @@ param vmsDiskSku string = 'Premium_LRS'
 @description('Use this parameter to enable or disable debug mode for the automation scripts on the client VM, effectively configuring PowerShell ErrorActionPreference to Break. Default is false.')
 param debugEnabled bool = false
 
+param autoShutdownEnabled bool = false
+param autoShutdownTime string = '1800' // The time for auto-shutdown in HHmm format (24-hour clock)
+param autoShutdownTimezone string = 'UTC' // Timezone for the auto-shutdown
+param autoShutdownEmailRecipient string = ''
+
 var bastionName = '${namingPrefix}-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -274,6 +279,27 @@ resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-
     principalId: vm.identity.principalId
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
     principalType: 'ServicePrincipal'
+  }
+}
+
+resource autoShutdown 'Microsoft.DevTestLab/schedules@2018-09-15' = if (autoShutdownEnabled) {
+  name: 'shutdown-computevm-${vm.name}'
+  location: location
+  properties: {
+    status: 'Enabled'
+    taskType: 'ComputeVmShutdownTask'
+    dailyRecurrence: {
+      time: autoShutdownTime
+    }
+    timeZoneId: autoShutdownTimezone
+    notificationSettings: {
+      status: 'Enabled'
+      timeInMinutes: 30
+      webhookUrl: ''
+      emailRecipient: autoShutdownEmailRecipient
+      notificationLocale: 'en'
+    }
+    targetResourceId: vm.id
   }
 }
 
