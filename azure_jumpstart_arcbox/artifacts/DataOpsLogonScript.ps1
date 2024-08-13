@@ -19,6 +19,48 @@ $clusters = @(
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
 
+# Remove registry keys that are used to automatically logon the user (only used for first-time setup)
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+$keys = @("AutoAdminLogon", "DefaultUserName", "DefaultPassword")
+
+foreach ($key in $keys) {
+    try {
+        $property = Get-ItemProperty -Path $registryPath -Name $key -ErrorAction Stop
+        Remove-ItemProperty -Path $registryPath -Name $key
+        Write-Host "Removed registry key that are used to automatically logon the user: $key"
+    } catch {
+        Write-Verbose "Key $key does not exist."
+    }
+}
+
+# Create Windows Terminal desktop shortcut
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Create desktop shortcut for Logs-folder
+$WshShell = New-Object -comObject WScript.Shell
+$LogsPath = "C:\ArcBox\Logs"
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
+$Shortcut.TargetPath = $LogsPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Configure Windows Terminal as the default terminal application
+$registryPath = "HKCU:\Console\%%Startup"
+
+if (Test-Path $registryPath) {
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+} else {
+    New-Item -Path $registryPath -Force | Out-Null
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+}
+
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".dataops" -ItemType Directory
 
 if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -386,7 +428,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
                 Write-Host "Error creating custom location: $_" -ForegroundColor Red
                 Exit 1
             }
-            
+
             Start-Sleep -Seconds 10
 
             # Deploying the Azure Arc Data Controller
