@@ -24,22 +24,3 @@ spec:
             port:
               number: 14001
         path: /bookstore-v2
----
-kind: IngressBackend            # Ingress Backend for Bookstore App
-apiVersion: policy.openservicemesh.io/v1alpha1
-metadata:
-  name: backend
-spec:
-  backends:
-  - name: bookstore
-    port:
-      number: 14001
-      protocol: http
-  - name: bookstore-v2
-    port:
-      number: 14001
-      protocol: http
-  sources:
-  - kind: Service
-    namespace: ingress-nginx
-    name: ingress-nginx-controller
