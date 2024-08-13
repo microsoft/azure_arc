@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+  resources:
+    - resource: HyperVDsc/VMHyperV
+      id: namingPrefixStage-SQL
+      directives:
+        description: Configure VM namingPrefixStage-SQL
+      settings:
+        Name: namingPrefixStage-SQL
+        SwitchName: 'InternalNATSwitch'
+        VhdPath: F:\Virtual Machines\ArcBox-SQL.vhdx
+        ProcessorCount: 2
+        StartupMemory: '6GB'
+        RestartIfNeeded: true
+        State: Running
+        Generation: 2
+        Path: F:\Virtual Machines
+        EnableGuestService: true
+        SecureBoot: true
+  configurationVersion: 0.2.0

@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sshRSAPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCsdlSaF10Uw0fFysiIV0VYeJGE1CaV0ZjZcakcKgafiqZ04sAzf7KnoIjPVyx6LXoDTKGtv1e5eFjRZA7Z0Bu+a3JqY252/yr/B2R3Mu5qZHbKFncpVEXn7sUmYk4rDG5vToFxbhpKX5EGyvM1M0quoUv3Uv9reBsSDdjk7n7oA2Q+89rj4nfRuTEMQRwvNBaLeNRSlWuzPq4EkpwxSWRzIC2auC5K0rxGiTMPTXMOQ3l0DvzKRoEsygHA4c3uw0PTntSlgSSTgtGdQfuX63hAD4QPTVfeQdsW5+Nq3clr+6SHgeGdwHhKjUVTF+E2olfSYtuV4CqPW8dZdDBOZg7pXLMSVumZVKCZiUV6uBJkvLBRMzMiFsfXOVrgyThMqq+8y4tg/V3l/3S8z5Lngy4WoCAQMHQ1SloPmy9s4QnbjCFEQx/cIq9H+Uw6HAYhdQFh/w/tuIP+KIqOpMOrltZuaoqx3AOOL3BPXJMbv3opiZxCEZQFf68n+Zn6uRc9u1EENA9s1DrjG1j/CHWzbX/t63Ig/xQLgKLu9T+evua3dcWsYc3j1Gvk8R+ioXV7x0/fi6twrhSQxBIIL0D2Pxm8TBfJ3mVXk0kYGGq1mBsoxAzjoBhcbdwUMXHbAksj4/UuuAK5VfH278hlXo/BHSgDLZ98fdS63nq7rIr6qWmBrQ=="
+        },
+        "windowsAdminUsername": {
+            "value": "arcdemo"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "arcbox-la"
+        },
+        "flavor": {
+            "value":  "ITPro"
+        },
+        "deployBastion": {
+            "value": false
+        },
+        "githubAccount": {
+          "value": "microsoft"
+        },
+        "githubBranch": {
+          "value": "arcbox_3.0"
+        },
+        "vmAutologon": {
+            "value": true
+        },
+        "rdpPort": {
+            "value": "3390"
+        }
+    }
+}

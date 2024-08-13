@@ -12,7 +12,6 @@ param (
 
 [System.Environment]::SetEnvironmentVariable('domainName', $domainName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('domainAdminUsername', $domainAdminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('domainAdminPassword', $domainAdminPassword,[System.EnvironmentVariableTarget]::Machine)
 
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 

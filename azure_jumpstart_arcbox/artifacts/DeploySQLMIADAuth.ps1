@@ -2,6 +2,9 @@
 $Env:TempDir = "C:\Temp"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$k3sArcDataClusterName = ($Env:k3sArcDataClusterName).toLower()
+$aksArcClusterName = ($Env:aksArcClusterName).toLower()
+$aksdrArcClusterName = ($Env:aksdrArcClusterName).toLower()
 
 Start-Transcript -Path "$Env:ArcBoxLogsDir\DeploySQLMIADAuth.log"
 
@@ -12,6 +15,9 @@ Import-Module DnsServer
 
 # Get Activectory Information
 $dcInfo = Get-ADDomainController
+
+# Retrieve Azure Key Vault secrets and store as runtime environment variables
+$AZDATA_PASSWORD = Get-Secret -Name 'AZDATAPASSWORD' -AsPlainText
 
 # Setup reverse DNS for AD authentication
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
@@ -55,11 +61,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql'; dataController = "$Env:capiArcDataClusterName-dc"; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
+    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc" }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$aksArcClusterName-dc" ; customLocation = "$aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$aksdrArcClusterName-dc" ; customLocation = "$aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -92,218 +98,211 @@ $filename = "SQLMIEndpoints.txt"
 $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
-foreach ($sqlInstance in $sqlInstances) {
 
-    Start-Job -Name arcbox -ScriptBlock {
-        $ErrorActionPreference = 'SilentlyContinue'
-        $WarningPreference = 'SilentlyContinue'
-        $dcInfo = $using:dcInfo
-        $Endpoints = $using:Endpoints
-        $sqlmiOUDN = $using:sqlmiOUDN
-        $sqlInstances = $using:sqlInstances
-        $sqlmi_port = $using:sqlmi_port
-        $sqlInstance = $using:sqlInstance
-        $context = $sqlInstance.context
+$sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
+    $ErrorActionPreference = 'SilentlyContinue'
+    $WarningPreference = 'SilentlyContinue'
+    $sqlInstance = $_
+    $dcInfo = $using:dcInfo
+    $Endpoints = $using:Endpoints
+    $sqlmiOUDN = $using:sqlmiOUDN
+    $sqlmi_port = $using:sqlmi_port
+    $context = $sqlInstance.context
+    $AZDATA_PASSWORD = $using:AZDATA_PASSWORD
 
-        Start-Transcript -Path "$Env:ArcBoxLogsDir\SQLMI-$context.log"
+    Start-Transcript -Path "$Env:ArcBoxLogsDir\SQLMI-$context.log"
 
-        $sqlInstance = $using:sqlInstance
-        $sqlMIName = $sqlInstance.instanceName
-        $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
-        $sqlmi_secondary_fqdn_name = $sqlMIName + "-secondary." + $dcInfo.domain
+    $sqlMIName = $sqlInstance.instanceName
+    $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
+    $sqlmi_secondary_fqdn_name = $sqlMIName + "-secondary." + $dcInfo.domain
 
-        # Create dedicated service account for AD connector
-        $arcsaname = "sa-$sqlMIName"
-        $arcsapass = "ArcDSA#Pwd123$"
-        $arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
-        $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
+    # Create dedicated service account for AD connector
+    $arcsaname = "sa-$sqlMIName"
+    $arcsapass = "ArcDSA#Pwd123$"
+    $arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
+    $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
 
-        $samaccountname = $arcsaname
-        $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
-        $domain_name = $dcInfo.domain.ToUpper()
+    $samaccountname = $arcsaname
+    $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
+    $domain_name = $dcInfo.domain.ToUpper()
 
-        try {
-            New-ADUser -Name $arcsaname `
-                -UserPrincipalName $sqlmisaupn `
-                -Path $sqlmiOUDN `
-                -AccountPassword $arcsasecpass `
-                -Enabled $true `
-                -ChangePasswordAtLogon $false `
-                -PasswordNeverExpires $true
-        }
-        catch {
-            # User already exists
-            Write-Host "User $arcsaname already existings in the directory."
-        }
-
-        Start-Sleep -Seconds 10
-        # Geneate key tab
-        try {
-            setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
-            setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
-    
-            # Secondary instance spn
-            setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name} ${domain_netbios_name}\${samaccountname}
-            setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
-    
-            $keytab_file = "$Env:ArcBoxDir\$sqlMIName.keytab"
-            ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-        
-            # Generate Keytab for secondary
-            ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-        
-            ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-            # Convert key tab file into base64 data
-            $keytabrawdata = Get-Content $keytab_file -Encoding byte
-            $b64keytabtext = [System.Convert]::ToBase64String($keytabrawdata)
-            # Grant permission to DSA account on SQLMI OU
-        }
-        catch{
-
-        }
-        
-
-        Start-Sleep -Seconds 10
-
-        Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
-        $adConnectorParams = "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
-        $adConnectorName = $sqlInstance.dataController + "/adarc"
-        $serviceAccountProvisioning = "manual"
-        (Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
-        (Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
-        (Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
-        (Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
-        (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
-        (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
-
-        az deployment group create --resource-group $Env:resourceGroup --name $sqlInstance.instanceName --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
-        Write-Host "`n"
-        Do {
-            Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
-            Start-Sleep -Seconds 30
-            $adcStatus = $(if (kubectl get adc adarc -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($adcStatus -eq "Nope")
-
-        Write-Host "`n"
-        Write-Host "Azure Arc AD connector ready!"
-        Write-Host "`n"
-
-        Remove-Item "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json" -Force
-
-        # Deploying Azure Arc SQL Managed Instance
-
-        Write-Host "Deploying Azure Arc SQL Managed Instance"
-        $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstance.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-        $customLocationId = $(az customlocation show --name $sqlInstance.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
-
-        ################################################
-        # Localize ARM template
-        ################################################
-        $ServiceType = "LoadBalancer"
-        $readableSecondaries = $ServiceType
-
-        # Resource Requests
-        $vCoresRequest = "2"
-        $memoryRequest = "4Gi"
-        $vCoresLimit = "4"
-        $memoryLimit = "8Gi"
-
-        # Storage
-        $StorageClassName = $sqlInstance.storageClassName
-        $dataStorageSize = "30Gi"
-        $logsStorageSize = "30Gi"
-        $dataLogsStorageSize = "30Gi"
-
-        # High Availability
-        $replicas = 3 # Deploy SQL MI "Business Critical" tier
-        #######################################################
-
-
-
-        Copy-Item "$Env:ArcBoxDir\sqlmiAD.parameters.json" -Destination "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
-        $SQLParams = "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
-
-(Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $env:AZDATA_USERNAME | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'memoryRequest-stage', $memoryRequest | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage', $vCoresLimit | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'memoryLimit-stage', $memoryLimit | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dnsNameSecondary-stage' , $sqlmi_secondary_fqdn_name | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
-
-        az deployment group create --resource-group $Env:resourceGroup --name $sqlInstance.instanceName --template-file "$Env:ArcBoxDir\sqlmiAD.json" --parameters "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
-        Write-Host "`n"
-
-        Do {
-            Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
-            Start-Sleep -Seconds 45
-            $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-        } while ($dcStatus -eq "Nope")
-        Write-Host "Azure Arc SQL Managed Instance is ready!"
-        Write-Host "`n"
-
-        Remove-Item "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json" -Force
-
-        # Create windows account in SQLMI to support AD authentication and grant sysadmin role
-        $podname = "${sqlMIName}-0"
-        kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
-        Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
-
-        kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
-        Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
-
-        # Downloading demo database and restoring onto SQL MI
-        if ($sqlMIName -eq "capi-sql") {
-            Write-Host "`n"
-            Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-            kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
-            Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-            kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$Env:AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2019' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2019_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
-            Write-Host "Restoring AdventureWorks database completed."
-        }
-
-        Stop-Transcript
+    try {
+        New-ADUser -Name $arcsaname `
+            -UserPrincipalName $sqlmisaupn `
+            -Path $sqlmiOUDN `
+            -AccountPassword $arcsasecpass `
+            -Enabled $true `
+            -ChangePasswordAtLogon $false `
+            -PasswordNeverExpires $true
+    }
+    catch {
+        # User already exists
+        Write-Host "User $arcsaname already existings in the directory."
     }
 
-}
+    Start-Sleep -Seconds 10
+    # Geneate key tab
+    try {
+        setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
+        setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
 
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 5
-}
+        # Secondary instance spn
+        setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name} ${domain_netbios_name}\${samaccountname}
+        setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
 
-Get-Job -name arcbox | Remove-Job
+        $keytab_file = "$Env:ArcBoxDir\$sqlMIName.keytab"
+        ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+
+        # Generate Keytab for secondary
+        ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+
+        ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+        
+        # Convert key tab file into base64 data
+        $keytabrawdata = Get-Content $keytab_file -AsByteStream
+        $b64keytabtext = [System.Convert]::ToBase64String($keytabrawdata)
+        # Grant permission to DSA account on SQLMI OU
+    }
+    catch{
+
+    }
+
+
+    Start-Sleep -Seconds 10
+
+    Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
+    $adConnectorParams = "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
+    $adConnectorName = $sqlInstance.dataController + "/adarc"
+    $serviceAccountProvisioning = "manual"
+    (Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
+    (Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
+    (Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
+    (Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
+    (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
+    (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
+
+    Write-Host "Deploying Azure Arc AD connector for $sqlMIName"
+    az deployment group create --resource-group $Env:resourceGroup --name $sqlInstance.instanceName --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
+    Write-Host "`n"
+    Do {
+        Write-Host "Waiting for AD connector deployment for $sqlMIName. Hold tight, this might take a few minutes...(30s sleeping loop)"
+        Start-Sleep -Seconds 30
+        $adcStatus = $(if (kubectl get adc adarc -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($adcStatus -eq "Nope")
+
+    Write-Host "`n"
+    Write-Host "Azure Arc AD connector ready!"
+    Write-Host "`n"
+
+    Remove-Item "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json" -Force
+
+    # Deploying Azure Arc SQL Managed Instance
+
+    Write-Host "Deploying the $sqlMIName Azure Arc SQL Managed Instance"
+    $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstance.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+    $customLocationId = $(az customlocation show --name $sqlInstance.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+
+    ################################################
+    # Localize ARM template
+    ################################################
+    $ServiceType = "LoadBalancer"
+    $readableSecondaries = $ServiceType
+
+    # Resource Requests
+    $vCoresRequest = "2"
+    $memoryRequest = "4Gi"
+    $vCoresLimit = "4"
+    $memoryLimit = "8Gi"
+
+    # Storage
+    $StorageClassName = $sqlInstance.storageClassName
+    $dataStorageSize = "30Gi"
+    $logsStorageSize = "30Gi"
+    $dataLogsStorageSize = "30Gi"
+
+    # High Availability
+    $replicas = 3 # Deploy SQL MI "Business Critical" tier
+    #######################################################
+
+
+
+    Copy-Item "$Env:ArcBoxDir\sqlmiAD.parameters.json" -Destination "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
+    $SQLParams = "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
+
+    (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $env:AZDATA_USERNAME | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $using:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'memoryRequest-stage', $memoryRequest | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage', $vCoresLimit | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'memoryLimit-stage', $memoryLimit | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'dnsNameSecondary-stage' , $sqlmi_secondary_fqdn_name | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
+    (Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
+
+    az deployment group create --resource-group $Env:resourceGroup --name $sqlInstance.instanceName --template-file "$Env:ArcBoxDir\sqlmiAD.json" --parameters "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json"
+    Write-Host "`n"
+
+    Do {
+        Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Start-Sleep -Seconds 45
+        $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc --kubeconfig $sqlInstance.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($dcStatus -eq "Nope")
+    Write-Host "$sqlMIName Azure Arc SQL Managed Instance is ready!"
+    Write-Host "`n"
+
+    Remove-Item "$Env:ArcBoxDir\sqlmiAD-$context-stage.parameters.json" -Force
+
+    # Create windows account in SQLMI to support AD authentication and grant sysadmin role
+    $podname = "${sqlMIName}-0"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
+    Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
+
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
+    Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
+
+    # Downloading demo database and restoring onto SQL MI
+    if ($sqlMIName -eq "k3s-sql") {
+        Write-Host "`n"
+        Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+        kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+        Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+        kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2019' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2019_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+        Write-Host "Restoring AdventureWorks database completed."
+    }
+
+    Stop-Transcript
+}
 
 Start-Transcript -Path "$Env:ArcBoxLogsDir\DeploySQLMIADAuth.log" -Append
 
 Write-Header "Generating endpoints file"
+Write-Host "`n"
+
 foreach ($sqlInstance in $sqlInstances){
 
 # Retrieving SQL MI connection endpoint
@@ -348,7 +347,7 @@ $env:AZDATA_USERNAME | Add-Content $Endpoints
 
 Add-Content $Endpoints ""
 Add-Content $Endpoints "SQL Managed Instance SQL login password:"
-$env:AZDATA_PASSWORD | Add-Content $Endpoints
+$AZDATA_PASSWORD | Add-Content $Endpoints
 Add-Content $Endpoints ""
 
 Add-Content $Endpoints "======================================================================"
@@ -387,7 +386,7 @@ $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
 $sa_username = $env:AZDATA_USERNAME
-$sa_password = $env:AZDATA_PASSWORD
+$sa_password = $AZDATA_PASSWORD
 
 $dagConnection = @"
 {
@@ -411,7 +410,7 @@ $dagConnection = @"
 $aksConnection = @"
 {
     "options": {
-        "connectionName": "ArcBox-AKS",
+        "connectionName": "$namingPrefix-AKS",
         "server": "$aks",
         "database": "",
         "authenticationType": "Integrated",
@@ -470,15 +469,11 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-
-# Unzip SqlQueryStress
-Expand-Archive -Path $Env:ArcBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
-
 # Create SQLQueryStress desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQLQueryStress Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "$Env:ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
+$TargetFile = "$Env:ArcBoxDir\SqlQueryStress.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)

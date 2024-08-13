@@ -20,7 +20,7 @@
         "description": "Azure service principal client secret"
       }
     },
-    "spnTenantId": {
+    "tenantId": {
       "type": "string",
       "metadata": {
         "description": "Azure AD tenant id for your service principal"
@@ -52,11 +52,10 @@
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       },
       "allowedValues": [
-        "Full",
         "ITPro",
         "DevOps"
       ],
-      "defaultValue": "Full"
+      "defaultValue": "ITPro"
     },
     "githubAccount": {
       "type": "string",
@@ -216,8 +215,8 @@
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
           },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
           },
           "windowsAdminUsername": {
             "value": "[parameters('windowsAdminUsername')]"

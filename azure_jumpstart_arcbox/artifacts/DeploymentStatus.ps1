@@ -17,7 +17,7 @@ Write-Host "You now have $arcNumResources Azure Arc resources in '$Env:resourceG
 Write-Host "`n"
 
 # ArcBox Full edition report if applicabale
-if ($Env:flavor -eq "Full" -Or $Env:flavor -eq "Developer") {
+if ($Env:flavor -eq "DevOps") {
     if ( $arcNumResources -eq 11 )
     {
         Write-Host "Great success!"

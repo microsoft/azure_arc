@@ -6,7 +6,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $spnClientId = $env:spnClientId
 $spnClientSecret = $env:spnClientSecret
-$spnTenantId = $env:spnTenantId
+$tenantId = $env:tenantId
 $subscriptionId = $env:subscriptionId
 $azureLocation = $env:azureLocation
 $resourceGroup = $env:resourceGroup
@@ -22,13 +22,13 @@ catch {
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:tenantId
 az config set extension.use_dynamic_install=yes_without_prompt
 
 ################################################
 # Retrive SQL Managed Instances
 ################################################
-kubectx arcbox-capi
+kubectx arcbox-k3s-datasvc
 kubectl get nodes
 
 # Retrieving SQL MI connection endpoints
