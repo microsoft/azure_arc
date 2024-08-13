@@ -193,6 +193,7 @@ echo ""
 if is_extension_installed "azuremonitor-containers"; then
     echo "Extension 'azuremonitor-containers' is already installed."
 else
+    echo "Extension 'azuremonitor-containers' is not installed -  triggering installation"
     sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
 fi
 
@@ -200,6 +201,7 @@ fi
 if is_extension_installed "microsoft.azuredefender.kubernetes"; then
     echo "Extension 'microsoft.azuredefender.kubernetes' is already installed."
 else
+    echo "Extension 'microsoft.azuredefender.kubernetes' is not installed -  triggering installation"
     sudo -u $adminUsername az k8s-extension create -n "microsoft.azuredefender.kubernetes" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
 fi
 
@@ -212,6 +214,7 @@ echo ""
 if is_extension_installed "azurepolicy"; then
     echo "Extension 'azurepolicy' is already installed."
 else
+    echo "Extension 'azurepolicy' is not installed -  triggering installation"
     sudo -u $adminUsername az k8s-extension create --name "azurepolicy" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights --only-show-errors
 fi
 
