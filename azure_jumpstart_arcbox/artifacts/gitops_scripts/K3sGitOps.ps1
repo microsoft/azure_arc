@@ -56,7 +56,7 @@ az k8s-configuration flux create `
     --cluster-type connectedClusters `
     --scope namespace `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
 $configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)
