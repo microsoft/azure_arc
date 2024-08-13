@@ -37,7 +37,7 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-$Env:k3sArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-k3s-datasvc" | Where-Object { $_ -ne "" }
+$Env:k3sArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s-DataSvc" | Where-Object { $_ -ne "" }
 $Env:k3sArcDataClusterName=$Env:k3sArcDataClusterName -replace "`n",""
 
 $Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
@@ -48,13 +48,13 @@ Write-Header "Az CLI Login"
 az login --identity
 az account set -s $env:subscriptionId
 
-# Downloading ArcBox-k3s-datasvc Kubernetes cluster kubeconfig file
-Write-Header "Downloading $namingPrefix-k3s-datasvc K8s Kubeconfig"
+# Downloading ArcBox-K3s-DataSvc Kubernetes cluster kubeconfig file
+Write-Header "Downloading $namingPrefix-K3s-DataSvc K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/config"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
-# Downloading ArcBox-k3s-datasvc log file
-Write-Header "Downloading $namingPrefix-k3s-datasvc Install Logs"
+# Downloading ArcBox-K3s-DataSvc log file
+Write-Header "Downloading $namingPrefix-K3s-DataSvc Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/*"
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
@@ -71,8 +71,8 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($E
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
 
-# # Merging kubeconfig files from ArcBox-k3s-datasvc and ArcBox-K3s
-# Write-Header "Merging ArcBox-k3s-datasvc & ArcBox-K3s Kubeconfigs"
+# # Merging kubeconfig files from ArcBox-K3s-DataSvc and ArcBox-K3s
+# Write-Header "Merging ArcBox-K3s-DataSvc & ArcBox-K3s Kubeconfigs"
 # Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
 # $Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
 # kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
@@ -263,9 +263,9 @@ $kubeVipDaemonset | kubectl apply -f -
   Write-Host "`n"
 }
 
-# Switch Kubernetes context to ArcBox-k3s-datasvc cluster
+# Switch Kubernetes context to ArcBox-K3s-DataSvc cluster
 foreach ($cluster in $clusters) {
-  if ($cluster.context -like '*-k3s-datasvc') {
+  if ($cluster.context -like '*-K3s-DataSvc') {
     $Env:KUBECONFIG=$cluster.kubeConfig
     kubectx
   }
