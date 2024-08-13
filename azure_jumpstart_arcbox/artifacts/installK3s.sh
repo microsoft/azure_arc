@@ -172,18 +172,48 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo "Connected cluster info: $connectedClusterInfo"
 
     # Wait
-    # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
-    echo ""
-    echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
-    echo ""
-    sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
-    sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+# Function to check if an extension is already installed
+is_extension_installed() {
+    extension_name=$1
+    extension_count=$(sudo -u $adminUsername az k8s-extension list --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --query "[?name=='$extension_name'] | length(@)")
 
-    # Enabling Azure Policy for Kubernetes on the cluster
-    echo ""
-    echo "Enabling Azure Policy for Kubernetes on the cluster"
-    echo ""
-    sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights --only-show-errors
+    if [ "$extension_count" -gt 0 ]; then
+        return 0 # Extension is installed
+    else
+        return 1 # Extension is not installed
+    fi
+}
+
+# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+echo ""
+echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
+echo ""
+
+# Check and install azuremonitor-containers extension
+if is_extension_installed "azuremonitor-containers"; then
+    echo "Extension 'azuremonitor-containers' is already installed."
+else
+    sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+fi
+
+# Check and install microsoft.azuredefender.kubernetes extension
+if is_extension_installed "microsoft.azuredefender.kubernetes"; then
+    echo "Extension 'microsoft.azuredefender.kubernetes' is already installed."
+else
+    sudo -u $adminUsername az k8s-extension create -n "microsoft.azuredefender.kubernetes" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+fi
+
+# Enabling Azure Policy for Kubernetes on the cluster
+echo ""
+echo "Enabling Azure Policy for Kubernetes on the cluster"
+echo ""
+
+# Check and install arc-azurepolicy extension
+if is_extension_installed "azurepolicy"; then
+    echo "Extension 'azurepolicy' is already installed."
+else
+    sudo -u $adminUsername az k8s-extension create --name "azurepolicy" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights --only-show-errors
+fi
 
 else
     # Downloading k3s control plane details
