@@ -78,7 +78,7 @@ param namingPrefix string = 'ArcBox'
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 var aksArcDataClusterName = '${namingPrefix}-AKS-Data-${guid}'
 var aksDrArcDataClusterName = '${namingPrefix}-AKS-DR-Data-${guid}'
-var k3sArcDataClusterName = '${namingPrefix}-DataSvc-K3s-${guid}'
+var k3sArcDataClusterName = '${namingPrefix}-K3s-DataSvc-${guid}'
 var k3sArcClusterName = '${namingPrefix}-K3s-${guid}'
 var k3sClusterNodesCount = 3 // Number of nodes to deploy in the K3s cluster
 
