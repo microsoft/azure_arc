@@ -131,8 +131,6 @@ if ($Env:flavor -ne "DevOps") {
         $folder.Attributes += [System.IO.FileAttributes]::Hidden
     }
 
-    $Env:AZURE_CONFIG_DIR = $cliDir.FullName
-
     # Install Azure CLI extensions
     Write-Header "Az CLI extensions"
 
