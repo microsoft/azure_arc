@@ -11,7 +11,7 @@
                         }
                     },
                     "method": "post",
-                    "body": "Azure Arc Jumpstart is amazing!",
+                    "body": "Arc Jumpstart is amazing!",
                     "headers": {
                         "ReadFileMetadataFromServer": true
                     },

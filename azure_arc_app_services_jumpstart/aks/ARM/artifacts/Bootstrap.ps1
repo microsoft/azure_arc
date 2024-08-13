@@ -76,10 +76,10 @@ Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/ma
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1
 if ($deployAppService -eq $true -Or $deployFunction -eq $true -Or $deployApiMgmt -eq $true -Or $deployLogicApp -eq $true) {
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"  
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1" 
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1" 
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1" 
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1"
 }
 
 # Downloading GitHub artifacts for ContainerAppsLogonScript.ps1
@@ -91,9 +91,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/ContainerAppsLogonScript.ps1") 
 workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
-            $kubectlVersion = '1.26.6'
+            $kubectlVersion = '1.28.5'
             #Run commands in parallel.
-            Parallel 
+            Parallel
                 {
                     InlineScript {
                         param (
@@ -108,11 +108,11 @@ workflow ClientTools_01
                                 iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                             }
                         }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
+                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){
+                            Write-Host "Chocolatey Apps Specified"
+
                             $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-                        
+
                             foreach ($app in $appsToInstall)
                             {
                                 if ($app -eq "kubernetes-cli"){
@@ -173,5 +173,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" }
 $logSuppress | Set-Content C:\Temp\Bootstrap.log -Force

@@ -204,7 +204,7 @@ while true; do
   # Iterate over each node and check its status
   for node in $nodes; do
     ready=$(kubectl get nodes $node --kubeconfig=./$CLUSTER_NAME.kubeconfig -o json | jq -r '.status.conditions[] | select(.type=="Ready") | .status')
-    
+
     if [[ $ready != "True" ]]; then
       echo "Node $node is not ready."
       all_ready=false
@@ -237,7 +237,7 @@ sudo service sshd restart
 echo ""
 sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
-# Renaming CAPI cluster context name 
+# Renaming CAPI cluster context name
 echo ""
 sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUSTER_NAME" "arcdata-capi"
 

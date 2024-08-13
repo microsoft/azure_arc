@@ -6,7 +6,7 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
-export appClonedRepo='<The URL for the "Azure Arc Jumpstart" forked GitHub repository>'
+export appClonedRepo='<The URL for the "Arc Jumpstart" forked GitHub repository>'
 export namespace='hello-arc'
 
 # Installing Helm 3

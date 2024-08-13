@@ -1,0 +1,6 @@
+{
+    "hydra.highAvailability.disk.storageClass": "default",
+    "hydra.acstorController.enabled": false,
+    "hydra.highAvailability.disk.storageClass": "local-path",
+    "hydra.cachedStorageSize": "20Gi"
+}

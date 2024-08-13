@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+    name: esa-pv
+    namespace: default
+spec:
+    capacity:
+        ### This storage capacity value is not enforced at this layer. ###
+        storage: 10Gi
+    accessModes:
+        - ReadWriteMany
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: esa
+    csi:
+        driver: edgecache.csi.azure.com
+        readOnly: false
+        ### Make sure this volumeid is unique in the cluster. You will need to specify it in the spec::volumeName of the PVC. ###
+        volumeHandle: esa-pv
+        volumeAttributes:
+            protocol: edgecache
+            edgecache-storage-auth: AccountKey
+            ### FILL IN THE NEXT TWO/THREE VALUES WITH YOUR INFORMATION ###
+            secretName: esa-secret ### From the previous step, this name will be "{YOUR_STORAGE_ACCOUNT}-secret"
+            ### If you are using a non-default namespace, please uncomment the line below and add your namespace. ###
+            #secretNamespace: YOUR_NAMESPACE_HERE
+            containerName: esademo-container

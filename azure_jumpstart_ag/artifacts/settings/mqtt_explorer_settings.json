@@ -1,0 +1,34 @@
+{
+  "ConnectionManager_connections": {
+    "mqtt.eclipse.org": {
+      "certValidation": false,
+      "clientId": "mqtt-explorer-640c948e",
+      "encryption": false,
+      "host": "detroitIpPlaceholder",
+      "id": "mqtt.eclipse.org",
+      "name": "detroit",
+      "port": 1883,
+      "protocol": "mqtt",
+      "subscriptions": [
+        "#",
+        "$SYS/#"
+      ],
+      "type": "mqtt"
+    },
+    "mqtt.eclipse.org2": {
+      "certValidation": false,
+      "clientId": "mqtt-explorer-640c948e",
+      "encryption": false,
+      "host": "monterreyIpPlaceholder",
+      "id": "mqtt.eclipse.org2",
+      "name": "monterrey",
+      "port": 1883,
+      "protocol": "mqtt",
+      "subscriptions": [
+        "#",
+        "$SYS/#"
+      ],
+      "type": "mqtt"
+    }
+  }
+}

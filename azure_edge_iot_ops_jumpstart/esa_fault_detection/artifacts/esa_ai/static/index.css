@@ -1,0 +1,15 @@
+body {
+    background-color: black;
+}
+
+.logo {
+    width: 30%;
+    margin:auto;
+    display:block; 
+}
+
+.video-feed {
+    width: 60%;
+    margin:auto;
+    display:block; 
+}

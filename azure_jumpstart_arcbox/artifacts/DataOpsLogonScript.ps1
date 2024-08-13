@@ -189,13 +189,38 @@ foreach ($cluster in $clusters) {
         Write-Host "Checking K8s Nodes"
         kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
-        az connectedk8s connect --name $cluster.clusterName `
-            --resource-group $Env:resourceGroup `
-            --location $Env:azureLocation `
-            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-            --kube-config $cluster.kubeConfig
+        Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc"
 
-        Start-Sleep -Seconds 10
+        # Try until the provision status is successful.
+        Write-Host "Attempting to connect $($cluster.clusterName) cluster to Azure Arc."
+        try {
+            az connectedk8s connect --name $cluster.clusterName `
+                --resource-group $Env:resourceGroup `
+                --location $Env:azureLocation `
+                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+                --kube-config $cluster.kubeConfig `
+                --distribution $cluster.distribution
+        }
+        catch {
+            <#Do this if a terminating exception happens#>
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
+
+        # Wait for some time to make sure all the pods are deployed and provisioning is completed.
+        $retryCount = 0
+        do {
+            Start-Sleep -Seconds 20
+
+            # Check connected cluster status and make sure provisioning stutus is successful
+            $clusterStatus = (az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query provisioningState -o tsv)
+            $retryCount += 1
+        } while ($clusterStatus -ne "Succeeded" -and $retryCount -lt 3)
+
+        if ($clusterStatus -ne "Succeeded") {
+            Write-Host "Connecting $($cluster.clusterName) cluster to Azure Arc failed. Exiting deployment. Please check logs and retry again later!"
+            Exit
+        }
 
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"

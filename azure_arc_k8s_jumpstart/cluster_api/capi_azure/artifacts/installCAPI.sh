@@ -73,7 +73,7 @@ echo ""
 
   # Installing snap
   echo ""
-  echo "Installing snap"  
+  echo "Installing snap"
   sudo apt install snapd
   echo ""
 

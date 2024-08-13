@@ -8,6 +8,7 @@ $schemaVersion = "1.1"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 $aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
+$AKSEEPinnedSchemaVersion = $Env:AKSEEPinnedSchemaVersion
 # Requires -RunAsAdministrator
 
 New-Variable -Name AksEdgeRemoteDeployVersion -Value $AksEdgeRemoteDeployVersion -Option Constant -ErrorAction SilentlyContinue
@@ -26,18 +27,21 @@ if ($env:kubernetesDistribution -eq "k8s") {
 }
 
 Write-Host "Fetching the latest AKS Edge Essentials release."
-$latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
-
-$AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
-$output = Join-Path "C:\temp" "$latestReleaseTag.zip"
-Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
-Expand-Archive $output -DestinationPath "C:\temp" -Force
-$AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
-$jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
-$schemaVersionAksEdgeConfig = $jsonContent.SchemaVersion
-# Clean up the downloaded release files
-Remove-Item -Path $output -Force
-Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
+if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
+    $SchemaVersion = $AKSEEPinnedSchemaVersion
+}else{
+    $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
+    $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
+    $output = Join-Path "C:\temp" "$latestReleaseTag.zip"
+    Invoke-WebRequest $AKSEEReleaseDownloadUrl -OutFile $output
+    Expand-Archive $output -DestinationPath "C:\temp" -Force
+    $AKSEEReleaseConfigFilePath = "C:\temp\AKS-Edge-$latestReleaseTag\tools\aksedge-config.json"
+    $jsonContent = Get-Content -Raw -Path $AKSEEReleaseConfigFilePath | ConvertFrom-Json
+    $schemaVersion = $jsonContent.SchemaVersion
+    # Clean up the downloaded release files
+    Remove-Item -Path $output -Force
+    Remove-Item -Path "C:\temp\AKS-Edge-$latestReleaseTag" -Force -Recurse
+}
 
 # Here string for the json content
 $aideuserConfig = @"

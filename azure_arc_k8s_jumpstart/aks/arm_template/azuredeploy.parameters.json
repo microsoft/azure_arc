@@ -4,7 +4,7 @@
     "parameters": {
         "clusterName": {
             "value": "<AKS cluster name>"
-        },      
+        },
          "linuxAdminUsername": {
             "value": "<OS Username>"
         },
@@ -18,7 +18,7 @@
             "value": "<Your Azure service principal password>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.27.1>"
+            "value": "<Kubernetes Version, e.g. 1.28.5>"
         }
     }
 }

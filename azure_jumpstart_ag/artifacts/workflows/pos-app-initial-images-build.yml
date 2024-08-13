@@ -14,7 +14,7 @@ jobs:
       steps:
       # checkout the repo
       - name: 'Checkout repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 'Login to ACR'
         uses: azure/docker-login@v1
@@ -26,7 +26,7 @@ jobs:
       - name: 'Build and push pos v1.0 images'
         env:
           latest_tag: "v1.0"
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 25
           retry_on: error
@@ -45,7 +45,7 @@ jobs:
       - name: 'Build and push cloudSync v1.0 images'
         env:
             latest_tag: "v1.0"
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 25
           retry_on: error
@@ -64,7 +64,7 @@ jobs:
       - name: 'Build and push contosoAi v1.0 images'
         env:
             latest_tag: "v1.0"
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 25
           retry_on: error
@@ -83,7 +83,7 @@ jobs:
       - name: 'Build and push queue monitoring backend v1.0 images'
         env:
             latest_tag: "v1.0"
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 25
           retry_on: error
@@ -102,7 +102,7 @@ jobs:
       - name: 'Build and push queue monitoring frontend v1.0 images'
         env:
             latest_tag: "v1.0"
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         with:
           timeout_minutes: 25
           retry_on: error

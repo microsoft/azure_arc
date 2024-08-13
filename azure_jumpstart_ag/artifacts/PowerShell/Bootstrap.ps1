@@ -3,6 +3,7 @@ param (
   [string]$adminPassword,
   [string]$spnClientId,
   [string]$spnClientSecret,
+  [string]$spnObjectId,
   [string]$spnTenantId,
   [string]$spnAuthority,
   [string]$subscriptionId,
@@ -15,14 +16,19 @@ param (
   [string]$acrName,
   [string]$cosmosDBName,
   [string]$cosmosDBEndpoint,
-  [string]$githubUser,
   [string]$templateBaseUrl,
   [string]$rdpPort,
   [string]$githubAccount,
   [string]$githubBranch,
   [string]$githubPAT,
+  [string]$githubUser,
   [string]$adxClusterName,
-  [string]$namingGuid
+  [string]$namingGuid,
+  [string]$industry,
+  [string]$customLocationRPOID,
+  [string]$aioStorageAccountName,
+  [string]$stcontainerName,
+  [string]$AKSEEPinnedSchemaVersion
 )
 
 ##############################################################
@@ -32,6 +38,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnObjectID', $spnObjectId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
@@ -48,14 +55,19 @@ param (
 [System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBName', $cosmosDBName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBEndpoint', $cosmosDBEndpoint, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubAccount', $githubAccount, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubBranch', $githubBranch, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('GITHUB_TOKEN', $githubPAT, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -95,14 +107,20 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 # Download configuration data file and declaring directories
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile $ConfigurationDataFile
-$AgConfig         = Import-PowerShellDataFile -Path $ConfigurationDataFile
-$AgDirectory      = $AgConfig.AgDirectories["AgDir"]
-$AgToolsDir       = $AgConfig.AgDirectories["AgToolsDir"]
-$AgIconsDir       = $AgConfig.AgDirectories["AgIconDir"]
-$AgPowerShellDir  = $AgConfig.AgDirectories["AgPowerShellDir"]
-$AgMonitoringDir  = $AgConfig.AgDirectories["AgMonitoringDir"]
-$websiteUrls      = $AgConfig.URLs
+
+switch ($industry) {
+  "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-retail.psd1") -OutFile $ConfigurationDataFile }
+  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
+}
+
+$AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
+$AgDirectory        = $AgConfig.AgDirectories["AgDir"]
+$AgToolsDir         = $AgConfig.AgDirectories["AgToolsDir"]
+$AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
+$AgIconsDir         = $AgConfig.AgDirectories["AgIconDir"]
+$AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
+$AgMonitoringDir    = $AgConfig.AgDirectories["AgMonitoringDir"]
+$websiteUrls        = $AgConfig.URLs
 
 function BITSRequest {
   Param(
@@ -212,19 +230,35 @@ $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.repla
 # Download artifacts
 ##############################################################
 [System.Environment]::SetEnvironmentVariable('AgConfigPath', "$AgPowerShellDir\AgConfig.psd1", [System.EnvironmentVariableTarget]::Machine)
+Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
+
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig.psd1") -OutFile "$AgPowerShellDir\AgConfig.psd1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/common.psm1") -OutFile "$AgPowerShellDir\common.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/retail.psm1") -OutFile "$AgPowerShellDir\retail.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/manufacturing.psm1") -OutFile "$AgPowerShellDir\manufacturing.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-global.json") -OutFile "$AgMonitoringDir\grafana-cluster-global.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/arc-inventory-workbook.bicep") -OutFile "$AgMonitoringDir\arc-inventory-workbook.bicep"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/arc-osperformance-workbook.bicep") -OutFile "$AgMonitoringDir\arc-osperformance-workbook.bicep"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
-Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks") -OutFile "$AgToolsDir\Bookmarks"
-Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -OutFile $AgIconsDir\contoso-motors.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
+Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-global.json") -OutFile "$AgMonitoringDir\grafana-cluster-global.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
+if($industry -eq "retail"){
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
+}
+elseif ($industry -eq "manufacturing") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+}
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }

@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: 'Checkout repository'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 'Login to ACR'
       uses: azure/docker-login@v1
@@ -67,7 +67,7 @@ jobs:
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/$namespace/contoso-supermarket/pos:$latest_tag
 
     - name: 'Checkout production branch'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       env:
         latest_tag: ${{ steps.latestImageTag.outputs.latest_tag }}
         prod_latest_tag: ${{ steps.prodLatestImageTag.outputs.latest_tag }}
