@@ -265,7 +265,7 @@ $kubeVipDaemonset | kubectl apply -f -
 
 # Switch Kubernetes context to ArcBox-K3s-DataSvc cluster
 foreach ($cluster in $clusters) {
-  if ($cluster.context -like '*-K3s-DataSvc') {
+  if ($cluster.context -like '*-k3s-datasvc') {
     $Env:KUBECONFIG=$cluster.kubeConfig
     kubectx
   }
