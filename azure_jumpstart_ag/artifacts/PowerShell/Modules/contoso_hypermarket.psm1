@@ -20,7 +20,7 @@ function Configure-K3sClusters {
   Write-Header "Configuring kube-vip on K3s clusterS"
   $clusters = $AgConfig.SiteConfig.GetEnumerator()
   foreach ($cluster in $clusters) {
-      if ($cluster.Value.Type -eq "k3S") {
+      if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Name.ToLower()
           $vmName = $cluster.Value.ArcClusterName+"-$namingGuid"
           kubectl config use-context "ag-k3s-$clusterName"
@@ -69,9 +69,9 @@ function Configure-K3sClusters {
         name: kube-vip
         namespace: kube-system
       "@
-      
+
       $kubeVipRBAC | kubectl apply -f -
-      
+
       $kubeVipDaemonset = @"
       apiVersion: apps/v1
       kind: DaemonSet
@@ -162,20 +162,20 @@ function Configure-K3sClusters {
         numberMisscheduled: 0
         numberReady: 0
 "@
-      
+
           $kubeVipDaemonset | kubectl apply -f -
-      
+
           Write-Host "Deploying Kube vip cloud controller on k3s cluster"
           kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
-      
+
           $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
           $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
           $lowestServiceIp = $sortedIps[0]
           $highestServiceIp = $sortedIps[-1]
-      
+
           kubectl create configmap -n kube-system kubevip --from-literal range-global=$lowestServiceIp-$highestServiceIp
           Start-Sleep -Seconds 30
-      
+
           Write-Host "Creating longhorn storage on K3scluster"
           kubectl apply -f "$AgToolsDir\longhorn.yaml"
           Start-Sleep -Seconds 30
