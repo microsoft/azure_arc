@@ -1,9 +1,8 @@
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
+$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" -and $_ -notmatch "-Data-" }
 $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
 $namingPrefix = $Env:namingPrefix
-$k3sNamespace = "hello-arc"
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\K3sRBAC.log

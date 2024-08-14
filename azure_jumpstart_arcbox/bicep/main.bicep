@@ -138,7 +138,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor 
   }
 }
 
-module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, 3): if (flavor == 'DevOps') {
+module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): if (flavor == 'DevOps') {
   name: 'ubuntuRancherK3sNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey

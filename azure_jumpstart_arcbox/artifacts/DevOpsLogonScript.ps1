@@ -12,7 +12,6 @@ $namingPrefix = ($Env:namingPrefix).toLower()
 $ingressNamespace = "ingress-nginx"
 $Env:AZCOPY_AUTO_LOGIN_TYPE = "MSI"
 
-# $certname = "ingress-cert"
 $certdns = "arcbox.devops.com"
 
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
@@ -92,7 +91,6 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERN
 # Downloading ArcBox-K3s-data log file
 Write-Header "Downloading $namingPrefix-K3s-data Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/*"
-$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
 
 # Downloading ArcBox-K3s cluster kubeconfig file
@@ -104,7 +102,6 @@ $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 # Downloading ArcBox-K3s log file
 Write-Header "Downloading $namingPrefix-K3s Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcClusterName.ToLower())/*"
-$sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
 
 Write-Header "Adding Tools Folder to PATH"
@@ -393,7 +390,7 @@ foreach ($configName in $configs) {
     } until ($configStatus.ComplianceState -eq "Compliant")
 }
 # ################################################
-# # - Install Key Vault Extension / Create Ingress
+# Create Ingress
 # ################################################
 
 # Replace Variable values
@@ -406,7 +403,7 @@ Write-Header "Creating Ingress Controller"
 
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
-    # Deploy Key Vault resources and Ingress for Book Store and Hello-Arc App
+    # Deploy Ingress for Book Store and Hello-Arc App
     kubectl --namespace $namespace apply -f "$Env:ArcBoxKVDir\$namespace.yaml"
 }
 
