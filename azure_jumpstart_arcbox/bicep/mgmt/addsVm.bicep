@@ -2,7 +2,7 @@
 param addsDomainName string = 'jumpstart.local'
 
 @description('The name of your Virtual Machine')
-param clientVMName string = 'ArcBox-ADDS'
+param clientVMName string = '${namingPrefix}-ADDS'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -11,7 +11,7 @@ param windowsAdminUsername string = 'arcdemo'
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string = 'ArcPassword123!!'
+param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
 param windowsOSVersion string = '2022-datacenter-g2'
@@ -28,11 +28,15 @@ param deployBastion bool = false
 @description('Base URL for ARM template')
 param templateBaseUrl string = ''
 
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
+
 var networkInterfaceName = '${clientVMName}-NIC'
-var virtualNetworkName = 'ArcBox-VNet'
-var dcSubnetName = 'ArcBox-DC-Subnet'
+var virtualNetworkName = '${namingPrefix}-VNet'
+var dcSubnetName = '${namingPrefix}-DC-Subnet'
 var addsPrivateIPAddress = '10.16.2.100'
-var bastionName = 'ArcBox-Bastion'
+var bastionName = '${namingPrefix}-Bastion'
 var osDiskType = 'Premium_LRS'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, dcSubnetName)
 var networkInterfaceRef = networkInterface.id
@@ -54,7 +58,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
           }
           privateIPAllocationMethod: 'Static'
           privateIPAddress: addsPrivateIPAddress
-          publicIPAddress: ((!deployBastion) ? PublicIPNoBastion : json('null'))
+          publicIPAddress: ((!deployBastion) ? PublicIPNoBastion : null)
         }
       }
     ]
@@ -127,7 +131,7 @@ resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03
     type: 'CustomScriptExtension'
     typeHandlerVersion: '1.10'
     autoUpgradeMinorVersion: true
-    settings: {
+    protectedSettings: {
       fileUris: [
         uri(templateBaseUrl, 'artifacts/SetupADDS.ps1')
       ]

@@ -78,7 +78,7 @@
                 "description": "Azure service principal client secret"
             }
         },
-        "spnTenantId": {
+        "tenantId": {
             "type": "string",
             "metadata": {
                 "description": "Azure AD tenant id for your service principal"
@@ -152,7 +152,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'), json('null'))]"
                         }
                     }
                 ]
@@ -243,7 +243,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('deployBastion'),  ' ', parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('deployBastion'),  ' ', parameters('templateBaseUrl'))]",
                     "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installK3s.sh')]" ]
                 }
             }

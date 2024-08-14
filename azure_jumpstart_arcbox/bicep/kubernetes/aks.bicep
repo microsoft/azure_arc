@@ -1,8 +1,8 @@
 @description('The name of the Kubernetes cluster resource')
-param aksClusterName string = 'ArcBox-AKS-Data'
+param aksClusterName string = '${namingPrefix}-AKS-Data'
 
 @description('The name of the Kubernetes cluster resource')
-param drClusterName string = 'ArcBox-AKS-DR-Data'
+param drClusterName string = '${namingPrefix}-AKS-DR-Data'
 
 @description('The location of the Managed Cluster resource')
 param location string = resourceGroup().location
@@ -29,16 +29,9 @@ param agentVMSize string = 'Standard_D8s_v4'
 @description('User name for the Linux Virtual Machines')
 param linuxAdminUsername string = 'arcdemo'
 
-@description('Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example \'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm\'')
-param sshRSAPublicKey string
-
-@description('Client ID (used by cloudprovider)')
+@description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
-param spnClientId string
-
-@description('The Service Principal Client Secret')
-@secure()
-param spnClientSecret string
+param sshRSAPublicKey string = ''
 
 @description('boolean flag to turn on and off of RBAC')
 param enableRBAC bool = true
@@ -50,20 +43,22 @@ param enableRBAC bool = true
 param osType string = 'Linux'
 
 @description('The version of Kubernetes')
-param kubernetesVersion string = '1.28.5'
+param kubernetesVersion string = '1.28.9'
+
+@maxLength(7)
+@description('The naming prefix for the nested virtual machines. Example: ArcBox-Win2k19')
+param namingPrefix string = 'ArcBox'
 
 var serviceCidr_primary = '10.20.64.0/19'
 var dnsServiceIP_primary = '10.20.64.10'
-var dockerBridgeCidr_primary = '172.17.0.1/16'
 var serviceCidr_secondary = '172.20.64.0/19'
 var dnsServiceIP_secondary = '172.20.64.10'
-var dockerBridgeCidr_secondary = '192.168.0.1/16'
-var virtualNetworkName = 'ArcBox-VNet'
-var aksSubnetName = 'ArcBox-AKS-Subnet'
-var drVirtualNetworkName = 'ArcBox-DR-VNet'
-var drSubnetName = 'ArcBox-DR-Subnet'
+var virtualNetworkName = '${namingPrefix}-VNet'
+var aksSubnetName = '${namingPrefix}-AKS-Subnet'
+var drVirtualNetworkName = '${namingPrefix}-DR-VNet'
+var drSubnetName = '${namingPrefix}-DR-Subnet'
 
-resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   location: location
   name: aksClusterName
   identity: {
@@ -97,7 +92,6 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_primary
       dnsServiceIP: dnsServiceIP_primary
-      dockerBridgeCidr: dockerBridgeCidr_primary
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
@@ -109,14 +103,10 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
-    }
   }
 }
 
-resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2022-07-02-preview' = {
+resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2023-10-02-preview' = {
   location: location
   name: drClusterName
   identity: {
@@ -150,7 +140,6 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2022
       networkPlugin: 'azure'
       serviceCidr: serviceCidr_secondary
       dnsServiceIP: dnsServiceIP_secondary
-      dockerBridgeCidr: dockerBridgeCidr_secondary
     }
     linuxProfile: {
       adminUsername: linuxAdminUsername
@@ -162,9 +151,27 @@ resource drClusterName_resource 'Microsoft.ContainerService/managedClusters@2022
         ]
       }
     }
-    servicePrincipalProfile: {
-      clientId: spnClientId
-      secret: spnClientSecret
-    }
+  }
+}
+
+// Add role assignment for the AKS cluster: Owner role
+resource aksRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(aksClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: aksClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add role assignment for the AKS DR cluster: Owner role
+resource aksDRRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(drClusterName_resource.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: drClusterName_resource.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
   }
 }

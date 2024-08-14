@@ -59,11 +59,6 @@
         "replicas": {
             "value": replicasStage
         },
-        "resourceTags": {
-            "value": {
-                "Project": "jumpstart_arcbox"
-            }
-        },
         "apiVersion": {
             "value": "2023-01-15-preview"
         },

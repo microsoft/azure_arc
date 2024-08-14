@@ -5,14 +5,8 @@
         "sshRSAPublicKey": {
             "value": "<your RSA public key>"
         },
-        "spnClientId": {
-            "value": "<your service principal client id>"
-        },
-        "spnClientSecret": {
-            "value": "<your service principal secret>"
-        },
-        "spnTenantId": {
-            "value": "<your spn tenant id>"
+        "tenantId": {
+            "value": "<your tenant id>"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
@@ -24,7 +18,7 @@
             "value": "<your unique Log Analytics workspace name>"
         },
         "flavor": {
-            "value": "Full"
+            "value": "ITPro"
         },
         "deployBastion": {
             "value": false

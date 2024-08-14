@@ -8,14 +8,23 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxDir = "C:\ArcBox"
 Start-Transcript -Path "$Env:ArcBoxLogsDir\RunAfterClientVMADJoin.log"
 
-# Get Activectory Information
+# Get windows administrator password from key vault
+Write-Header "Az PowerShell Login"
+Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $Env:subscriptionId
+$KeyVault = Get-AzKeyVault -ResourceGroupName $Env:resourceGroup
+
+if (-not (Get-SecretVault -Name $KeyVault.VaultName -ErrorAction Ignore)) {
+    Register-SecretVault -Name $KeyVault.VaultName -ModuleName Az.KeyVault -VaultParameters @{ AZKVaultName = $KeyVault.VaultName } -DefaultVault
+}
+
+$adminPassword = Get-Secret -Name 'adminPassword' -AsPlainText
+
+# Get Active Directory Information
 $netbiosname = $Env:addsDomainName.Split('.')[0].ToUpper()
 
 $adminuser = "$netbiosname\$Env:adminUsername"
-$secpass = $Env:adminPassword | ConvertTo-SecureString -AsPlainText -Force
+$secpass = $adminPassword | ConvertTo-SecureString -AsPlainText -Force
 $adminCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $adminuser, $secpass
-#$dcName = [System.Net.Dns]::GetHostByName($env:COMPUTERNAME).HostName
-
 $dcInfo = Get-ADDomainController -Credential $adminCredential
 
 # Print domain information
@@ -26,29 +35,36 @@ Write-Host "===================================================="
 # Create login session with domain credentials
 $cimsession = New-CimSession -Credential $adminCredential
 
-# Creating scheduled task for DataServicesLogonScript.ps1
+# Creating scheduled task for WinGet.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn -User $adminuser
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\DataOpsLogonScript.ps1"
-$WorkbookAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1"
-$nestedSQLAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\ArcServersLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument $Env:ArcBoxDir\WinGet.ps1
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfNetworkAvailable -NetworkName "Any"
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -CimSession $cimsession -Action $Action -RunLevel "Highest" -Force -Settings $settings
+
+# Creating scheduled task for DataOpsLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\DataOpsLogonScript.ps1"
+$WorkbookAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1"
+$nestedSQLAction = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "$Env:ArcBoxDir\ArcServersLogonScript.ps1"
 
 # Register schedule task under local account
-Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'DataOpsLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "DataOpsLogonScript" -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
+Write-Host "Registered scheduled task 'DataOpsLogonScript'."
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
+Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript'."
 
 # Creating scheduled task for ArcServersLogonScript.ps1
-Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
-Write-Host "Registered scheduled task 'ArcServersLogonScript' to run at user logon."
+Register-ScheduledTask -TaskName "ArcServersLogonScript" -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
+Write-Host "Registered scheduled task 'ArcServersLogonScript'."
 
 #Disable local account
-$account=(Get-LocalGroupMember -Group "Administrators" | where {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
+$account=(Get-LocalGroupMember -Group "Administrators" | Where-Object {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
 net user $account /active:no
 
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
+
+Restart-Computer -Force
 
 Stop-Transcript
