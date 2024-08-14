@@ -103,7 +103,7 @@ module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = if (
   }
 }
 
-module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): if (flavor == 'Full' || flavor == 'DataOps' || flavor == 'DevOps') {
+module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): if (flavor == 'DataOps' || flavor == 'DevOps') {
   name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
@@ -171,6 +171,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
   dependsOn: [
     updateVNetDNSServers
+    ubuntuRancherK3sDataSvcDeployment
+    ubuntuRancherK3sDeployment
   ]
 }
 

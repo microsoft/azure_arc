@@ -61,7 +61,7 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc" }
+    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-data" }
 
     [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$aksArcClusterName-dc" ; customLocation = "$aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
@@ -279,10 +279,10 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS" 2>&1 $null
     Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'" 2>&1 $null
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
@@ -376,7 +376,7 @@ az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primary
 Write-Host "`n"
 
 $cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
-Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
+Add-DnsServerResourceRecordCName -Name "${namingPrefix}Dag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 
 Write-Header "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication"
@@ -384,14 +384,14 @@ Write-Header "Creating Azure Data Studio settings for SQL Managed Instance conne
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
-$arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
+$arcboxDag = "${namingPrefix}Dag.jumpstart.local" + ",$sqlmi_port"
 $sa_username = $env:AZDATA_USERNAME
 $sa_password = $AZDATA_PASSWORD
 
 $dagConnection = @"
 {
  "options": {
-      "connectionName": "ArcBoxDAG",
+      "connectionName": "${namingPrefix}DAG",
       "server": "$arcboxDag",
       "database": "",
       "authenticationType": "Integrated",
@@ -433,7 +433,7 @@ $sqlServerConnection = @"
         "database": "",
         "authenticationType": "SqlLogin",
         "user": "sa",
-        "password": "ArcDemo123!!",
+        "password": "JS123!!",
         "applicationName": "azdata",
         "groupId": "C777F06B-202E-4480-B475-FA416154D458",
         "databaseDisplayName": ""

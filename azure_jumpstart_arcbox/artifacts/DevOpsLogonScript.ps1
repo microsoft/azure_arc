@@ -18,7 +18,7 @@ $certdns = "arcbox.devops.com"
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 $clusters = @(
-    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = "$namingPrefix-k3s-datasvc" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
+    [pscustomobject]@{clusterName = $Env:k3sArcDataClusterName; context = "$namingPrefix-k3s-data" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config" }
 
     [pscustomobject]@{clusterName = $Env:k3sArcClusterName; context = "$namingPrefix-k3s" ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s" }
 )
@@ -79,24 +79,18 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-$Env:k3sArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s-Data" | Where-Object { $_ -ne "" }
-$Env:k3sArcDataClusterName=$Env:k3sArcDataClusterName -replace "`n",""
-
-$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
-$Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
-
 # Required for CLI commands
 Write-Header "Az CLI Login"
 az login --identity
 az account set -s $env:subscriptionId
 
-# Downloading ArcBox-K3s-DataSvc Kubernetes cluster kubeconfig file
-Write-Header "Downloading $namingPrefix-K3s-DataSvc K8s Kubeconfig"
+# Downloading ArcBox-K3s-data Kubernetes cluster kubeconfig file
+Write-Header "Downloading $namingPrefix-K3s-data K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/config"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
-# Downloading ArcBox-K3s-DataSvc log file
-Write-Header "Downloading $namingPrefix-K3s-DataSvc Install Logs"
+# Downloading ArcBox-K3s-data log file
+Write-Header "Downloading $namingPrefix-K3s-data Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcDataClusterName.ToLower())/*"
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
@@ -112,18 +106,6 @@ Write-Header "Downloading $namingPrefix-K3s Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/$($Env:k3sArcClusterName.ToLower())/*"
 $sourceFile = $sourceFile + "?" + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\" --include-pattern "*.log"
-
-# # Merging kubeconfig files from ArcBox-K3s-DataSvc and ArcBox-K3s
-# Write-Header "Merging ArcBox-K3s-DataSvc & ArcBox-K3s Kubeconfigs"
-# Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
-# $Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
-# kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
-# kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
-# Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
-# Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
-# Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
-# $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-# kubectx
 
 Write-Header "Adding Tools Folder to PATH"
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
@@ -305,9 +287,9 @@ $kubeVipDaemonset | kubectl apply -f -
   Write-Host "`n"
 }
 
-# Switch Kubernetes context to ArcBox-K3s-DataSvc cluster
+# Switch Kubernetes context to ArcBox-K3s-data cluster
 foreach ($cluster in $clusters) {
-  if ($cluster.context -like '*-k3s-datasvc') {
+  if ($cluster.context -like '*-k3s-data') {
     $Env:KUBECONFIG=$cluster.kubeConfig
     kubectx
   }
@@ -414,49 +396,16 @@ foreach ($configName in $configs) {
 # # - Install Key Vault Extension / Create Ingress
 # ################################################
 
-# Write-Header "Installing KeyVault Extension"
-
-# Write-Host "Generating a TLS Certificate"
-# $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-# $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
-# Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-# Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
-
-# Write-Host "Importing the TLS certificate to Key Vault"
-# az keyvault certificate import `
-#     --vault-name $Env:keyVaultName `
-#     --password "arcbox" `
-#     --name $certname `
-#     --file "$Env:TempDir\$certname.pfx"
-
-# Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-# az k8s-extension create `
-#     --name 'akvsecretsprovider' `
-#     --extension-type Microsoft.AzureKeyVaultSecretsProvider `
-#     --scope cluster `
-#     --cluster-name $Env:k3sArcDataClusterName `
-#     --resource-group $Env:resourceGroup `
-#     --cluster-type connectedClusters `
-#     --release-namespace kube-system `
-#     --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
-
 # Replace Variable values
 Get-ChildItem -Path $Env:ArcBoxKVDir |
     ForEach-Object {
-        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
-        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $Env:keyVaultName | Set-Content -Path $_.FullName
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_HOST}', $certdns | Set-Content -Path $_.FullName
-        # (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:tenantId | Set-Content -Path $_.FullName
     }
 
 Write-Header "Creating Ingress Controller"
 
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
-    # Create the Kubernetes secret with the service principal credentials
-    # kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
-    # kubectl --namespace $namespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
-
     # Deploy Key Vault resources and Ingress for Book Store and Hello-Arc App
     kubectl --namespace $namespace apply -f "$Env:ArcBoxKVDir\$namespace.yaml"
 }

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "13913810108142988750"
+      "templateHash": "2738768575994422412"
     }
   },
   "parameters": {
@@ -78,7 +78,7 @@
     },
     "githubBranch": {
       "type": "string",
-      "defaultValue": "arcbox_3.0",
+      "defaultValue": "main",
       "metadata": {
         "description": "Target GitHub branch"
       }
@@ -511,7 +511,7 @@
         "name": "ubuntuRancherK3sDataSvcNodesDeployment",
         "count": "[length(range(0, variables('k3sClusterNodesCount')))]"
       },
-      "condition": "[or(or(equals(parameters('flavor'), 'Full'), equals(parameters('flavor'), 'DataOps')), equals(parameters('flavor'), 'DevOps'))]",
+      "condition": "[or(equals(parameters('flavor'), 'DataOps'), equals(parameters('flavor'), 'DevOps'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('ubuntuRancherK3sDataSvcNodesDeployment-{0}', range(0, variables('k3sClusterNodesCount'))[copyIndex()])]",
@@ -1704,6 +1704,8 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', 'mgmtArtifactsAndPolicyDeployment')]",
         "[resourceId('Microsoft.Resources/deployments', 'stagingStorageAccountDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ubuntuRancherK3sDataSvcDeployment')]",
+        "[resourceId('Microsoft.Resources/deployments', 'ubuntuRancherK3sDeployment')]",
         "[resourceId('Microsoft.Resources/deployments', 'updateVNetDNSServers')]"
       ]
     },
