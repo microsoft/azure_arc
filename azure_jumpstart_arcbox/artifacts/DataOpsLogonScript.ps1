@@ -198,8 +198,7 @@ foreach ($cluster in $clusters) {
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
                 --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-config $cluster.kubeConfig `
-                --distribution $cluster.distribution
+                --kube-config $cluster.kubeConfig
         }
         catch {
             <#Do this if a terminating exception happens#>
