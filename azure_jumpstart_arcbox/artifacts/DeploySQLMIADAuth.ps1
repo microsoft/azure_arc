@@ -279,10 +279,10 @@ $sqlInstances | Foreach-Object -ThrottleLimit 5 -Parallel {
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS" 2>&1 $null
     Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
-    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
+    kubectl exec $podname -c arc-sqlmi -n arc --kubeconfig $sqlInstance.kubeConfig -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'" 2>&1 $null
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
