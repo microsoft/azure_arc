@@ -376,7 +376,7 @@ az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primary
 Write-Host "`n"
 
 $cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
-Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
+Add-DnsServerResourceRecordCName -Name "${namingPrefix}Dag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 
 Write-Header "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication"
@@ -384,14 +384,14 @@ Write-Header "Creating Azure Data Studio settings for SQL Managed Instance conne
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
-$arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
+$arcboxDag = "${namingPrefix}Dag.jumpstart.local" + ",$sqlmi_port"
 $sa_username = $env:AZDATA_USERNAME
 $sa_password = $AZDATA_PASSWORD
 
 $dagConnection = @"
 {
  "options": {
-      "connectionName": "ArcBoxDAG",
+      "connectionName": "${namingPrefix}DAG",
       "server": "$arcboxDag",
       "database": "",
       "authenticationType": "Integrated",
