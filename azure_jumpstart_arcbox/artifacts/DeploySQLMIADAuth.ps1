@@ -61,7 +61,7 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-datasvc" }
+    [pscustomobject]@{instanceName = 'k3s-sql'; dataController = "$k3sArcDataClusterName-dc"; customLocation = "$k3sArcDataClusterName-cl" ; storageClassName = 'longhorn' ; licenseType = 'LicenseIncluded' ; context = 'k3s' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-k3s-data" }
 
     [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$aksArcClusterName-dc" ; customLocation = "$aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
