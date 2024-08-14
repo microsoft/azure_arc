@@ -175,7 +175,6 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 kubectx k3s="$namingPrefix-k3s-data"
-
 Start-Sleep -Seconds 10
 
 # Get Log Analytics workspace details

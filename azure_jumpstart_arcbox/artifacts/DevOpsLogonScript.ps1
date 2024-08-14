@@ -341,7 +341,7 @@ az k8s-configuration flux create `
     --cluster-type connectedClusters `
     --scope cluster `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=nginx path=./nginx/release
 
 # Create GitOps config for Bookstore application
@@ -352,7 +352,7 @@ az k8s-configuration flux create `
     --name config-bookstore `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch arcbox_3.0 --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/yaml
 
 # Create GitOps config for Bookstore RBAC
@@ -365,7 +365,7 @@ az k8s-configuration flux create `
     --scope namespace `
     --namespace bookstore `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=bookstore path=./bookstore/rbac-sample
 
 # Create GitOps config for Hello-Arc application
@@ -378,7 +378,7 @@ az k8s-configuration flux create `
     --cluster-type connectedClusters `
     --scope namespace `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=helloarc path=./hello-arc/yaml
 
 $configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcDataClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)

@@ -32,5 +32,5 @@ az k8s-configuration flux create `
     --name config-helloarc-rbac `
     --cluster-type connectedClusters `
     --url $appClonedRepo `
-    --branch main --sync-interval 3s `
+    --branch $env:githubBranch --sync-interval 3s `
     --kustomization name=bookstore path=./k8s-rbac-sample
