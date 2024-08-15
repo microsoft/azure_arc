@@ -3,14 +3,13 @@ $Env:ToolsDir = "C:\Tools"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" }
+$Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "$namingPrefix-K3s" | Where-Object { $_ -ne "" -and $_ -notmatch "-Data-" }
 $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
 $namingPrefix = $Env:namingPrefix
 $k3sNamespace = "hello-arc"
 $ingressNamespace = "ingress-nginx"
 
-# $certname = "k3s-ingress-cert"
 $certdns = "arcbox.k3sdevops.com"
 
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
@@ -89,100 +88,7 @@ foreach ($configName in $configs) {
     } until ($configStatus.ComplianceState -eq "Compliant")
 }
 
-# ################################################
-# # - Install Key Vault Extension / Create Ingress
-# ################################################
-
-# Write-Host "Generating a TLS Certificate"
-# $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-# $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
-# Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-# Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
-
-# Write-Host "Importing the TLS certificate to Key Vault"
-# az keyvault certificate import `
-#   --vault-name $Env:keyVaultName `
-#   --password "arcbox" `
-#   --name $certname `
-#   --file "$Env:TempDir\$certname.pfx"
-
-# Write-Host "Installing Azure Key Vault Kubernetes extension instance"
-# az k8s-extension create `
-#   --name 'akvsecretsprovider' `
-#   --extension-type Microsoft.AzureKeyVaultSecretsProvider `
-#   --scope cluster `
-#   --cluster-name $Env:k3sArcClusterName `
-#   --resource-group $Env:resourceGroup `
-#   --cluster-type connectedClusters `
-#   --release-namespace kube-system `
-#   --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
-
-# # Create the Kubernetes secret with the service principal credentials
-# kubectl create secret generic secrets-store-creds --namespace $k3sNamespace --from-literal clientid=$Env:spnClientID --from-literal clientsecret=$Env:spnClientSecret
-# kubectl --namespace $k3sNamespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
-
-# # Deploy SecretProviderClass
-# $secretProvider = @"
-# apiVersion: secrets-store.csi.x-k8s.io/v1
-# kind: SecretProviderClass
-# metadata:
-#   name: azure-kv-sync-tls
-# spec:
-#   provider: azure
-#   secretObjects:                       # secretObjects defines the desired state of synced K8s secret objects
-#   - secretName: ingress-tls-csi
-#     type: kubernetes.io/tls
-#     data:
-#     - objectName: "$certname"
-#       key: tls.key
-#     - objectName: "$certname"
-#       key: tls.crt
-#   parameters:
-#     usePodIdentity: "false"
-#     keyvaultName: $Env:keyVaultName
-#     objects: |
-#       array:
-#         - |
-#           objectName: "$certname"
-#           objectType: secret
-#     tenantId: "$Env:tenantId"
-# "@
-
-# Write-Host "Creating Secret Provider Class"
-# $secretProvider | kubectl apply -n $k3sNamespace -f -
-
-# # Create the pod with volume referencing the secrets-store.csi.k8s.io driver
-# $appConsumer = @"
-# apiVersion: v1
-# kind: Pod
-# metadata:
-#   name: busybox-secrets-sync
-# spec:
-#   containers:
-#   - name: busybox
-#     image: k8s.gcr.io/e2e-test-images/busybox:1.29
-#     command:
-#       - "/bin/sleep"
-#       - "10000"
-#     volumeMounts:
-#     - name: secrets-store-inline
-#       mountPath: "/mnt/secrets-store"
-#       readOnly: true
-#   volumes:
-#     - name: secrets-store-inline
-#       csi:
-#         driver: secrets-store.csi.k8s.io
-#         readOnly: true
-#         volumeAttributes:
-#           secretProviderClass: "azure-kv-sync-tls"
-#         nodePublishSecretRef:
-#           name: secrets-store-creds
-# "@
-
-# Write-Host "Deploying App referencing the secret"
-# $appConsumer | kubectl apply -n $k3sNamespace -f -
-
-# Deploy an Ingress Resource referencing the Secret created by the CSI driver
+# Deploy an Ingress Resource for Hello-Arc
 $ingressController = @"
 apiVersion: networking.k8s.io/v1
 kind: Ingress

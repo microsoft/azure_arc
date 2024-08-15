@@ -259,7 +259,6 @@ if ($flavor -eq "DevOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/hello-arc.yaml") -OutFile $Env:ArcBoxKVDir\hello-arc.yaml
     Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/K3sGitOps.ps1") -OutFile $Env:ArcBoxGitOpsDir\K3sGitOps.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/K3sRBAC.ps1") -OutFile $Env:ArcBoxGitOpsDir\K3sRBAC.ps1
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/ResetBookstore.ps1") -OutFile $Env:ArcBoxGitOpsDir\ResetBookstore.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:ArcBoxIconDir\arc.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/tests/devops.tests.ps1") -OutFile $Env:ArcBoxTestsDir\devops.tests.ps1
