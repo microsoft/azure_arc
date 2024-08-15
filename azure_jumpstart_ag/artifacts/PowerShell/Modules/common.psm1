@@ -517,7 +517,8 @@ function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         if($cluster.Value.Type -eq "K3s"){
-            kubectl config use-context "ag-k3s-$clusterName"
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+            kubectx
         }else{
             kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }
@@ -535,7 +536,8 @@ function Deploy-ClusterSecrets {
             if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
                 if($cluster.Value.Type -eq "K3s"){
-                    kubectl config use-context "ag-k3s-$clusterName"
+                    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+                    kubectx
                 }else{
                     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
                 }
@@ -1161,14 +1163,13 @@ function Deploy-AIO {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
-    $kubeConfig = $Env:KUBECONFIG
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
         if($cluster.Value.type -eq "K3s"){
-            $Env:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectl config use-context "ag-k3s-$clusterName"
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+            kubectx
         }else{
             kubectx $clusterName
         }
@@ -1222,8 +1223,8 @@ function Deploy-AIO {
         $retryCount = 0
         $maxRetries = 25
         if($cluster.Value.type -eq "K3s"){
-            $Env:KUBECONFIG = "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectl config use-context "ag-k3s-$clusterName"
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+            kubectx
         }else{
             kubectx $clusterName
         }
@@ -1279,7 +1280,6 @@ function Deploy-AIO {
 
         ## Patching MQTT listener
     }
-    $Env:KUBECONFIG = $kubeConfig
 }
 
 function Set-MQTTIpAddress {
@@ -1288,7 +1288,8 @@ function Set-MQTTIpAddress {
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
         if($cluster.Value.type -eq "K3s"){
-            kubectl config use-context "ag-k3s-$clusterName"
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+            kubectx
         }else{
             kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         }

@@ -9,23 +9,22 @@ function Get-K3sConfigFile{
     $containerName = $arcClusterName.toLower()
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
-    $Env:KUBECONFIG+="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName;"
-    [System.Environment]::SetEnvironmentVariable("KUBECONFIG", $Env:KUBECONFIG, [System.EnvironmentVariableTarget]::Machine)
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
     azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$AgLogsDir\" --include-pattern "*.log"
   }
 }
 
 function Configure-K3sClusters {
-  Write-Header "Configuring kube-vip on K3s clusterS"
+  Write-Host "Configuring kube-vip on K3s clusterS"
   $clusters = $AgConfig.SiteConfig.GetEnumerator()
   foreach ($cluster in $clusters) {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Name.ToLower()
           $vmName = $cluster.Value.ArcClusterName+"-$namingGuid"
-          kubectl config use-context "ag-k3s-$clusterName"
+          $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+          kubectx
           $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
-          Write-Host "Assignin kube-vip-role on k3s cluster"
+          Write-Host "Assigning kube-vip-role on k3s cluster"
           $kubeVipRBAC = @"
       apiVersion: v1
       kind: ServiceAccount
