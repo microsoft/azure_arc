@@ -37,5 +37,4 @@ properties:
       settings:
         id: Istio.Istio
         source: winget
-
   configurationVersion: 0.2.0

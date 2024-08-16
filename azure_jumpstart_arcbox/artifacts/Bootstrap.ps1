@@ -429,6 +429,8 @@ else {
     # Disabling Windows Server Manager Scheduled Task
     Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
+    if ($flavor -eq "ITPro") {
+
     Write-Header "Installing Hyper-V"
 
     # Install Hyper-V and reboot
@@ -436,6 +438,8 @@ else {
     Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
     Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
     Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+    }
 
     # Clean up Bootstrap.log
     Write-Host "Clean up Bootstrap.log"
