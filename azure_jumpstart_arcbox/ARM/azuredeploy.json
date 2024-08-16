@@ -39,7 +39,7 @@
     },
     "vmAutologon": {
       "type": "bool",
-      "defaultValue": false,
+      "defaultValue": true,
       "metadata": {
         "description": "Enable automatic logon into ArcBox Virtual Machine"
       }

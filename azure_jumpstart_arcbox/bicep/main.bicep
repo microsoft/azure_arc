@@ -15,7 +15,7 @@ param windowsAdminUsername string
 param windowsAdminPassword string
 
 @description('Enable automatic logon into ArcBox Virtual Machine')
-param vmAutologon bool = false
+param vmAutologon bool = true
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
