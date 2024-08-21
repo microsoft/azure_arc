@@ -2,8 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "apiVersion": {
-      "value": "2023-08-01-preview"
+    "witnessType": {
+      "value": "Cloud"
     },
     "clusterName": {
       "value": "clusterName-staging"
@@ -11,14 +11,32 @@
     "arcNodeResourceIds": {
       "value": arcNodeResourceIds-staging
     },
-    "localAdminSecretValue": {
-      "value": "localAdminSecretValue-staging"
+    "localAdminUserName": {
+      "value": "localAdminUserName-staging"
+    },
+    "localAdminPassword": {
+      "value": "localAdminPassword-staging"
+    },
+    "AzureStackLCMAdminUsername": {
+      "value": "AzureStackLCMAdminUserName-staging"
+    },
+    "AzureStackLCMAdminPassword": {
+      "value": "AzureStackLCMAdminAdminPassword-staging"
     },
     "domainAdminSecretValue": {
       "value": "domainAdminSecretValue-staging"
     },
-    "arbDeploymentSpnValue": {
-      "value": "arbDeploymentSpnValue-staging"
+    "arbDeploymentAppId": {
+      "value": "arbDeploymentAppId-staging"
+    },
+    "arbDeploymentAppSecret": {
+      "value": "arbDeploymentAppSecret-staging"
+    },
+    "arbDeploymentSPNObjectID": {
+      "value": "arbDeploymentSPNObjectID-staging"
+    },
+    "hciResourceProviderObjectID": {
+      "value": "hciResourceProviderObjectID-staging"
     },
     "storageWitnessValue": {
       "value": "storageWitnessValue-staging"

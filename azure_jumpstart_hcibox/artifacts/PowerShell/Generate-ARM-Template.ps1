@@ -34,6 +34,7 @@ $storageAccountAccessKey =  [Convert]::ToBase64String([System.Text.Encoding]::UT
 $AzureStackLCM=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($HCIBoxConfig.LCMDeployUsername):$($HCIBoxConfig.SDNAdminPassword)"))
 $LocalUser=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("Administrator:$($HCIBoxConfig.SDNAdminPassword)"))
 $AzureSPN=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($env:spnClientId):$($env:spnClientSecret)"))
+$SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
 
 # Construct OU path
 $domainName = $HCIBoxConfig.SDNDomainFQDN.Split('.')
@@ -75,9 +76,14 @@ $diagnosticsStorageName = "hciboxdiagsa$guid"
 $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'clusterName-staging', $HCIBoxConfig.ClusterName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'arcNodeResourceIds-staging', $arcNodeResourceIds | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'localAdminSecretValue-staging', $LocalUser | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'domainAdminSecretValue-staging', $AzureStackLCM | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'arbDeploymentSpnValue-staging', $AzureSPN | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'localAdminUserName-staging', 'Administrator' | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'localAdminPassword-staging', $($HCIBoxConfig.SDNAdminPassword) | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'AzureStackLCMAdminUserName-staging', $($HCIBoxConfig.LCMDeployUsername) | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'AzureStackLCMAdminAdminPassword-staging', $($HCIBoxConfig.SDNAdminPassword) | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'arbDeploymentAppId-staging', $($env:spnClientId) | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'arbDeploymentAppSecret-staging', $($env:spnClientSecret) | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'arbDeploymentSPNObjectID-staging', $SPNobjectId | Set-Content -Path $hciParams
+(Get-Content -Path $hciParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'storageWitnessValue-staging', $storageAccountAccessKey | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'domainFqdn-staging', $($HCIBoxConfig.SDNDomainFQDN) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'namingPrefix-staging', $($HCIBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $hciParams
