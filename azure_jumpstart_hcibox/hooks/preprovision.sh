@@ -56,6 +56,8 @@ fi
 # set the env variable
 azd env set JS_DEPLOY_BASTION $JS_DEPLOY_BASTION
 
+
+
 ########################################################################
 # RDP Port
 ########################################################################
@@ -90,6 +92,30 @@ else
     echo "2) Ask a tenant administrator to run the command 'az ad sp list --display-name \"Microsoft.AzureStackHCI\" --output json | jq -r '.[].id'' and send you the ID from the output. You can then manually add that value to the AZD .env file: SPN_PROVIDER_ID=\"xxx\" or use the Bicep-based deployment specifying spnProviderId=\"xxx\" in the deployment parameter-file."
     exit 1
 fi
+
+########################################################################
+# Autodeploy cluster?
+########################################################################
+read -p "Configure automatic Azure Stack HCI cluster validation and creation? [Y/N] " promptOutput
+JS_AUTO_DEPLOY_CLUSTER_RESOURCE=false
+if [[ $promptOutput == "Y" ]] || [[ $promptOutput == "y" ]]; then
+    JS_AUTO_DEPLOY_CLUSTER_RESOURCE=true
+fi
+
+# set the env variable
+azd env set JS_AUTO_DEPLOY_CLUSTER_RESOURCE $JS_AUTO_DEPLOY_CLUSTER_RESOURCE
+
+########################################################################
+# Auto upgradecluster?
+########################################################################
+read -p "Automatically download and install updates to cluster nodes if available? [Y/N] " promptOutput
+JS_AUTO_UPGRADE_CLUSTER_RESOURCE=false
+if [[ $promptOutput == "Y" ]] || [[ $promptOutput == "y" ]]; then
+    JS_AUTO_UPGRADE_CLUSTER_RESOURCE=true
+fi
+
+# set the env variable
+azd env set JS_AUTO_UPGRADE_CLUSTER_RESOURCE $JS_AUTO_UPGRADE_CLUSTER_RESOURCE
 
 ########################################################################
 # Create Azure Service Principal
