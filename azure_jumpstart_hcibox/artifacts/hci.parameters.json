@@ -23,9 +23,6 @@
     "AzureStackLCMAdminPassword": {
       "value": "AzureStackLCMAdminAdminPassword-staging"
     },
-    "domainAdminSecretValue": {
-      "value": "domainAdminSecretValue-staging"
-    },
     "arbDeploymentAppId": {
       "value": "arbDeploymentAppId-staging"
     },
@@ -37,9 +34,6 @@
     },
     "hciResourceProviderObjectID": {
       "value": "hciResourceProviderObjectID-staging"
-    },
-    "storageWitnessValue": {
-      "value": "storageWitnessValue-staging"
     },
     "domainFqdn": {
       "value": "domainFqdn-staging"
@@ -58,9 +52,6 @@
     },
     "adouPath": {
       "value": "adouPath-staging"
-    },
-    "secretsLocation": {
-      "value": "secretsLocation-staging"
     },
     "subnetMask": {
       "value": "subnetMask-staging"

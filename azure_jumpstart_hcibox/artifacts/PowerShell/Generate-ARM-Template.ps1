@@ -26,14 +26,7 @@ foreach ($machine in $arcNodes) {
     $ErrorActionPreference = "Stop"
 }
 
-# Get storage account key and convert to base 64
-$saKeys = Get-AzStorageAccountKey -ResourceGroupName $env:resourceGroup -Name $env:stagingStorageAccountName
-$storageAccountAccessKey =  [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($saKeys[0].value))
-
 # Convert user credentials to base64
-$AzureStackLCM=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($HCIBoxConfig.LCMDeployUsername):$($HCIBoxConfig.SDNAdminPassword)"))
-$LocalUser=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("Administrator:$($HCIBoxConfig.SDNAdminPassword)"))
-$AzureSPN=[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$($env:spnClientId):$($env:spnClientSecret)"))
 $SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
 
 # Construct OU path
@@ -49,7 +42,6 @@ $dns = "[""" + $HCIBoxConfig.vmDNS + """]"
 # Create keyvault name
 $guid = ([System.Guid]::NewGuid()).ToString().subString(0,5).ToLower()
 $keyVaultName = "hcibox-kv-" + $guid
-$secretsLocation = "https://$keyVaultName.vault.azure.net"
 
 # Set physical nodes
 $physicalNodesSettings = "[ "
@@ -84,7 +76,6 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'arbDeploymentAppSecret-staging', $($env:spnClientSecret) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'arbDeploymentSPNObjectID-staging', $SPNobjectId | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'hciResourceProviderObjectID-staging', $env:spnProviderId | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'storageWitnessValue-staging', $storageAccountAccessKey | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'domainFqdn-staging', $($HCIBoxConfig.SDNDomainFQDN) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'namingPrefix-staging', $($HCIBoxConfig.LCMDeploymentPrefix) | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'adouPath-staging', $ouPath | Set-Content -Path $hciParams
@@ -94,7 +85,6 @@ $hciParams = "$env:HCIBoxDir\hci.parameters.json"
 (Get-Content -Path $hciParams) -replace 'endingIp-staging', $HCIBoxConfig.clusterIpRangeEnd | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'dnsServers-staging', $dns | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'keyVaultName-staging', $keyVaultName | Set-Content -Path $hciParams
-(Get-Content -Path $hciParams) -replace 'secretsLocation-staging', $secretsLocation | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'physicalNodesSettings-staging', $physicalNodesSettings | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'ClusterWitnessStorageAccountName-staging', $env:stagingStorageAccountName | Set-Content -Path $hciParams
 (Get-Content -Path $hciParams) -replace 'diagnosticStorageAccountName-staging', $diagnosticsStorageName | Set-Content -Path $hciParams
