@@ -1812,7 +1812,7 @@ else {
 
 }
 else {
-    Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment...follow the documentation to deploy the cluster manually'
+    Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment. If desired, follow the documentation to deploy the cluster manually'
 }
 
 
