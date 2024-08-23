@@ -10,21 +10,21 @@ $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\Generate-ARM-Template.log"
 
 # Add necessary role assignments
-$ErrorActionPreference = "Continue"
-New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue
-$ErrorActionPreference = "Stop"
+# $ErrorActionPreference = "Continue"
+# New-AzRoleAssignment -ObjectId $env:spnProviderId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup -ErrorAction Continue
+# $ErrorActionPreference = "Stop"
 
 $arcNodes = Get-AzConnectedMachine -ResourceGroup $env:resourceGroup
 $arcNodeResourceIds = $arcNodes.Id | ConvertTo-Json
 
-foreach ($machine in $arcNodes) {
-    $ErrorActionPreference = "Continue"
-    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
-    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Reader" -ResourceGroup $env:resourceGroup
-    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Stack HCI Device Management Role" -ResourceGroup $env:resourceGroup
-    New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup
-    $ErrorActionPreference = "Stop"
-}
+# foreach ($machine in $arcNodes) {
+#     $ErrorActionPreference = "Continue"
+#     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Key Vault Secrets User" -ResourceGroup $env:resourceGroup
+#     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Reader" -ResourceGroup $env:resourceGroup
+#     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Stack HCI Device Management Role" -ResourceGroup $env:resourceGroup
+#     New-AzRoleAssignment -ObjectId $machine.IdentityPrincipalId -RoleDefinitionName "Azure Connected Machine Resource Manager" -ResourceGroup $env:resourceGroup
+#     $ErrorActionPreference = "Stop"
+# }
 
 # Convert user credentials to base64
 $SPNobjectId=$(az ad sp show --id $env:spnClientId --query id -o tsv)
