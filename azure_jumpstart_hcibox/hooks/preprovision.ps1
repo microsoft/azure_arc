@@ -185,6 +185,33 @@ $spnProviderId=$(az ad sp list --display-name "Microsoft.AzureStackHCI" --output
     throw "Microsoft.AzureStackHCI provider id not found"
 }
 
+
+########################################################################
+# Automatically deploy cluster?
+########################################################################
+$promptOutput = Read-Host "Configure automatic Azure Stack HCI cluster validation and creation? [Y/N] "
+$JS_AUTO_DEPLOY_CLUSTER_RESOURCE = $false
+if ($promptOutput -like 'y')
+{
+    $JS_AUTO_DEPLOY_CLUSTER_RESOURCE = $true
+}
+
+# set the env variable
+azd env set JS_AUTO_DEPLOY_CLUSTER_RESOURCE $JS_AUTO_DEPLOY_CLUSTER_RESOURCE
+
+########################################################################
+# Automatically upgrade cluster?
+########################################################################
+$promptOutput = Read-Host "Automatically download and install updates to cluster nodes if available? [Y/N] "
+$JS_AUTO_UPGRADE_CLUSTER_RESOURCE = $false
+if ($promptOutput -like 'y')
+{
+    $JS_AUTO_UPGRADE_CLUSTER_RESOURCE = $true
+}
+
+# set the env variable
+azd env set JS_AUTO_UPGRADE_CLUSTER_RESOURCE $JS_AUTO_UPGRADE_CLUSTER_RESOURCE
+
 ########################################################################
 # Create Azure Service Principal
 ########################################################################
