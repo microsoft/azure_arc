@@ -1775,7 +1775,7 @@ Set-HCIDeployPrereqs -HCIBoxConfig $HCIBoxConfig -localCred $localCred -domainCr
 
 Write-Host "[Build cluster - Step 10/11] Validate cluster deployment..." -ForegroundColor Green
 
-if ($env:autoDeployClusterResource) {
+if ("True" -eq $env:autoDeployClusterResource) {
 
 $TemplateFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.json"
 $TemplateParameterFile = Join-Path -Path $env:HCIBoxDir -ChildPath "hci.parameters.json"
@@ -1790,7 +1790,7 @@ if ($ClusterValidationDeployment.ProvisioningState -eq "Succeeded") {
     Write-Host "Validation succeeded. Deploying HCI cluster..."
     New-AzResourceGroupDeployment -Name 'hcicluster-deploy' -ResourceGroupName $env:resourceGroup -TemplateFile $TemplateFile -deploymentMode "Deploy" -TemplateParameterFile $TemplateParameterFile -OutVariable ClusterDeployment
 
-    if ($env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
+    if ("True" -eq $env:autoUpgradeClusterResource -and $ClusterDeployment.ProvisioningState -eq "Succeeded") {
 
         Write-Host "Deployment succeeded. Upgrading HCI cluster..."
 
@@ -1812,7 +1812,7 @@ else {
 
 }
 else {
-    Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment...follow the documentation to deploy the cluster manually'
+    Write-Host '$autoDeployClusterResource is false, skipping HCI cluster deployment. If desired, follow the documentation to deploy the cluster manually'
 }
 
 
