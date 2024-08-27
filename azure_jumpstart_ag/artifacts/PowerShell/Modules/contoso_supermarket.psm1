@@ -376,6 +376,59 @@ function Deploy-K8sImagesCache {
         }
     }
 }
+
+function Save-K8sImage {
+    param (
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$applicationName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$imageName,
+        [Parameter(Mandatory = $True)]
+        [string]$imageTag,
+        [Parameter(Mandatory = $True)]
+        [string]$namespace,
+        [Parameter(Mandatory = $True)]
+        [string]$imagePullSecret,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$branch,
+        [Parameter(Mandatory = $True)]
+        [string]$acrName,
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True)]
+        [string]$context
+    )
+    $imageToPull = "${acrName}.azurecr.io/${branch}/${applicationName}/${imageName}:${imageTag}"
+$yaml = @"
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: images-cache-$imageName
+spec:
+  selector:
+    matchLabels:
+      app: images-cache-$imageName
+  template:
+    metadata:
+      labels:
+        app: images-cache-$imageName
+    spec:
+      containers:
+      - image: $imageToPull
+        imagePullPolicy: IfNotPresent
+        name: images-cache-$imageName
+      imagePullSecrets:
+      - name: $imagePullSecret
+"@
+    $yaml | kubectl apply -f - --context $context -n $namespace
+
+}
 function Get-GitHubFiles ($githubApiUrl, $folderPath, [Switch]$excludeFolders) {
     # Force TLS 1.2 for connections to prevent TLS/SSL errors
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
