@@ -1233,11 +1233,14 @@ function Deploy-AIO {
             $output = $output | ConvertFrom-Json
             $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
             if ($mqServiceStatus -ne "Success") {
+                if($retryCount -eq 5 -and $mqServiceStatus -eq "warning"){
+                    break;
+                }
                 Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
                 Start-Sleep -Seconds 60
                 $retryCount++
             }
-        } until ($mqServiceStatus -eq "Success" -or $mqServiceStatus -eq "warning" -or $retryCount -eq $maxRetries)
+        } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
 
         if ($retryCount -eq $maxRetries) {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
