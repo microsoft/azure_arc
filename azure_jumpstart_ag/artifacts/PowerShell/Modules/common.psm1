@@ -26,7 +26,7 @@ function Deploy-AzPowerShell {
     $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
-
+    Set-AzContext -Subscription $subscriptionId
     # Install PowerShell modules
     if ($AgConfig.PowerShellModules.Count -ne 0) {
         Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
@@ -510,7 +510,7 @@ function Deploy-VirtualizationInfrastructure {
 
 function Deploy-AzContainerRegistry {
     az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
-    az account set -s $subscriptionId
+    az account set -s $Env:subscriptionId
     az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
 
