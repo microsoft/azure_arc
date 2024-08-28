@@ -222,6 +222,7 @@ foreach ($url in $websiteUrls.Values) {
 # Copy PowerShell Profile and Reload
 ##############################################################
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile "$HOME\Documents\PowerShell\Profile.ps1"
 .$PsHome\Profile.ps1
 
 ##############################################################
