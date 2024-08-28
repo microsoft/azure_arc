@@ -235,7 +235,7 @@ function Deploy-VirtualizationInfrastructure {
     # Create an array with VM names
     $VMnames = (Get-VM).Name
 
-    $sourcePath = "$PsHome\Profile.ps1"
+    $sourcePath = "$HOME\Documents\PowerShell\Profile.ps1"
     $destinationPath = "C:\Deployment\Profile.ps1"
     $maxRetries = 3
 
