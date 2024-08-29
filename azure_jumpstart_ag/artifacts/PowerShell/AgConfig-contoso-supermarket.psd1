@@ -75,7 +75,9 @@
         'zoomit',
         'openssl.light',
         'mqtt-explorer',
-        'gh'
+        'gh',
+        'python',
+        'bicep'
     )
 
     # VSCode extensions
