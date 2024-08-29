@@ -199,7 +199,9 @@ Deploy-Workbook "arc-osperformance-workbook.bicep"
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports
 #####################################################################
-Deploy-ADXDashboardReports
+if($scenario -eq "manufacturing"){
+    Deploy-ADXDashboardReports
+}
 
 ##############################################################
 # Creating bookmarks
