@@ -38,4 +38,3 @@ metadata:
   name: my-dataflow-profile
 spec:
   instanceCount: 1
----
