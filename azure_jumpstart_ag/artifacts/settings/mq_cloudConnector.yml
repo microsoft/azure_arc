@@ -14,13 +14,6 @@ spec:
       mode: Enabled
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowProfile
-metadata:
-  name: my-dataflow-profile
-spec:
-  instanceCount: 1
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: Dataflow
 metadata:
   name: my-topic-map
@@ -38,3 +31,11 @@ spec:
     destinationSettings:
       endpointRef: eventgrid
       dataDestination: factory-gateway-
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowProfile
+metadata:
+  name: my-dataflow-profile
+spec:
+  instanceCount: 1
+---
