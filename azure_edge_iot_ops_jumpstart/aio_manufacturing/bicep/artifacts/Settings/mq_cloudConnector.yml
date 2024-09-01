@@ -1,6 +1,19 @@
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowEndpoint
 metadata:
+  name: mqtt
+spec:
+  endpointType: mqtt
+  authentication:
+    method: serviceAccountToken
+    serviceAccountTokenSettings:
+      audience: aio-mqtt
+  mqttSettings:
+    {}
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowEndpoint
+metadata:
   name: eventgrid
 spec:
   endpointType: mqtt
@@ -12,29 +25,32 @@ spec:
     host: eventGridPlaceholder:8883
     tls:
       mode: Enabled
+    clientIdPrefix: clusterName
+    protocol: Mqtt
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: Dataflow
 metadata:
-  name: my-topic-map
+  name: my-dataflow
 spec:
   profileRef: my-dataflow-profile
+  mode: enabled
   operations:
   - operationType: source
     name: source1
     sourceSettings:
-      endpointRef: mq
+      endpointRef: mqtt
       dataSources:
         - "topic/#"
   - operationType: destination
     name: destination1
     destinationSettings:
       endpointRef: eventgrid
-      dataDestination: factory-gateway-
+      dataDestination: factory
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowProfile
 metadata:
   name: my-dataflow-profile
 spec:
-  instanceCount: 1
+  instanceCount: 2

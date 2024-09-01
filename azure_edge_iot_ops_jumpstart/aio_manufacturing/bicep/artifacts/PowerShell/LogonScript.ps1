@@ -402,7 +402,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName.ToLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --sp-object-id $spnObjectId --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc false --disable-rsync-rules true --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"
@@ -462,6 +462,7 @@ $mqListenerService = "aio-mq-dmqtt-frontend"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
+(Get-Content -Path $mqconfigfile) -replace 'clusterName', $arcClusterName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n $aioNamespace
 
 ##############################################################
