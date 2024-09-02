@@ -142,7 +142,7 @@
         },
         "AKSEEPinnedSchemaVersion": {
             "type": "string",
-            "defaultValue": "1.9",
+            "defaultValue": "1.13",
             "metadata": {
                 "description": "The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.To pin a specific version, use the format '1.13'. To use the latest schema version, use 'useLatest'"
             }
