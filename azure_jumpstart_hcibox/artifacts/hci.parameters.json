@@ -2,8 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "apiVersion": {
-      "value": "2023-08-01-preview"
+    "witnessType": {
+      "value": "Cloud"
     },
     "clusterName": {
       "value": "clusterName-staging"
@@ -11,17 +11,29 @@
     "arcNodeResourceIds": {
       "value": arcNodeResourceIds-staging
     },
-    "localAdminSecretValue": {
-      "value": "localAdminSecretValue-staging"
+    "localAdminUserName": {
+      "value": "localAdminUserName-staging"
     },
-    "domainAdminSecretValue": {
-      "value": "domainAdminSecretValue-staging"
+    "localAdminPassword": {
+      "value": "localAdminPassword-staging"
     },
-    "arbDeploymentSpnValue": {
-      "value": "arbDeploymentSpnValue-staging"
+    "AzureStackLCMAdminUsername": {
+      "value": "AzureStackLCMAdminUserName-staging"
     },
-    "storageWitnessValue": {
-      "value": "storageWitnessValue-staging"
+    "AzureStackLCMAdminPassword": {
+      "value": "AzureStackLCMAdminAdminPassword-staging"
+    },
+    "arbDeploymentAppId": {
+      "value": "arbDeploymentAppId-staging"
+    },
+    "arbDeploymentAppSecret": {
+      "value": "arbDeploymentAppSecret-staging"
+    },
+    "arbDeploymentSPNObjectID": {
+      "value": "arbDeploymentSPNObjectID-staging"
+    },
+    "hciResourceProviderObjectID": {
+      "value": "hciResourceProviderObjectID-staging"
     },
     "domainFqdn": {
       "value": "domainFqdn-staging"
@@ -40,9 +52,6 @@
     },
     "adouPath": {
       "value": "adouPath-staging"
-    },
-    "secretsLocation": {
-      "value": "secretsLocation-staging"
     },
     "subnetMask": {
       "value": "subnetMask-staging"
