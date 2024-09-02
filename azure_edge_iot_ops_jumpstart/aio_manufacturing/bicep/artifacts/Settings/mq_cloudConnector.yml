@@ -1,7 +1,7 @@
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowEndpoint
 metadata:
-  name: mqtt
+  name: mq
 spec:
   endpointType: mqtt
   authentication:
@@ -19,14 +19,11 @@ spec:
   endpointType: mqtt
   authentication:
     method: systemAssignedManagedIdentity
-    systemAssignedManagedIdentitySettings:
-      audience: https://eventgrid.azure.net
+    systemAssignedManagedIdentitySettings:{audience: https://eventgrid.azure.net}
   mqttSettings:
     host: eventGridPlaceholder:8883
     tls:
       mode: Enabled
-    clientIdPrefix: clusterName
-    protocol: Mqtt
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: Dataflow
@@ -39,7 +36,7 @@ spec:
   - operationType: source
     name: source1
     sourceSettings:
-      endpointRef: mqtt
+      endpointRef: mq
       dataSources:
         - "topic/#"
   - operationType: destination
