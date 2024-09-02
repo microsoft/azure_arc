@@ -4,7 +4,6 @@ Start-Transcript -Path C:\Temp\LogonScript.log
 
 # Parameters
 $AksEdgeRemoteDeployVersion = "1.7.639.0"
-$schemaVersion = "1.9"
 $versionAksEdgeConfig = "1.0"
 $aksEdgeDeployModules = "main"
 $aksEEReleasesUrl = "https://api.github.com/repos/Azure/AKS-Edge/releases"
@@ -28,7 +27,7 @@ if ($env:kubernetesDistribution -eq "k8s") {
 
 Write-Host "Fetching the latest AKS Edge Essentials release."
 if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
-    $SchemaVersion = $AKSEEPinnedSchemaVersion
+    $schemaVersionAksEdgeConfig = $AKSEEPinnedSchemaVersion
 }else{
     $latestReleaseTag = (Invoke-WebRequest $aksEEReleasesUrl | ConvertFrom-Json)[0].tag_name
     $AKSEEReleaseDownloadUrl = "https://github.com/Azure/AKS-Edge/archive/refs/tags/$latestReleaseTag.zip"
@@ -47,7 +46,7 @@ if ($AKSEEPinnedSchemaVersion -ne "useLatest") {
 $aideuserConfig = @"
 {
     "SchemaVersion": "$AksEdgeRemoteDeployVersion",
-    "Version": "$schemaVersion",
+    "Version": "$schemaVersionAksEdgeConfig",
     "AksEdgeProduct": "$productName",
     "AksEdgeProductUrl": "",
     "Azure": {
