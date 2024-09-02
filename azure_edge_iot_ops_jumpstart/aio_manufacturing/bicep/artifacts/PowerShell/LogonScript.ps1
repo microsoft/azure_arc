@@ -462,7 +462,7 @@ $mqListenerService = "aio-mq-dmqtt-frontend"
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring the MQ Event Grid bridge" -ForegroundColor DarkGray
 $eventGridHostName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].topicSpacesConfiguration.hostname" -o tsv --only-show-errors)
 (Get-Content -Path $mqconfigfile) -replace 'eventGridPlaceholder', $eventGridHostName | Set-Content -Path $mqconfigfile
-(Get-Content -Path $mqconfigfile) -replace 'clusterName', $arcClusterName | Set-Content -Path $mqconfigfile
+#(Get-Content -Path $mqconfigfile) -replace 'clusterName', $arcClusterName | Set-Content -Path $mqconfigfile
 kubectl apply -f $mqconfigfile -n $aioNamespace
 
 ##############################################################
