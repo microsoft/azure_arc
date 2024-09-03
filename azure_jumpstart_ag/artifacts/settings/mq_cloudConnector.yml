@@ -1,17 +1,15 @@
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowEndpoint
 metadata:
-  name: mq-source
+  name: mq
 spec:
-  endpointType: mqttSettings
+  endpointType: mqtt
   authentication:
     method: serviceAccountToken
     serviceAccountTokenSettings:
-      audience: aio-mq
+      audience: aio-mqtt
   mqttSettings:
-    host: "aio-mq-dmqtt-frontend:1883"
-    tls:
-      mode: Enabled
+    {}
 ---
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowEndpoint
@@ -32,13 +30,13 @@ kind: Dataflow
 metadata:
   name: my-dataflow
 spec:
-  profileRef: dataflowProfile
+  profileRef: my-dataflow-profile
   mode: enabled
   operations:
   - operationType: source
     name: source1
     sourceSettings:
-      endpointRef: mq-source
+      endpointRef: mq
       dataSources:
         - "topic/#"
         - azure-iot-operations/data/#
@@ -51,9 +49,6 @@ spec:
 apiVersion: connectivity.iotoperations.azure.com/v1beta1
 kind: DataflowProfile
 metadata:
-  name: dataflowProfile
+  name: my-dataflow-profile
 spec:
-  instanceCount: 1
-  diagnostics:
-    logs:
-      level: "debug"
+  instanceCount: 2
