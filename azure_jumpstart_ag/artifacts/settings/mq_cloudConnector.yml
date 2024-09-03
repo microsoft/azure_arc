@@ -19,7 +19,8 @@ spec:
   endpointType: mqtt
   authentication:
     method: systemAssignedManagedIdentity
-    systemAssignedManagedIdentitySettings:{audience: https://eventgrid.azure.net}
+    systemAssignedManagedIdentitySettings:
+      audience: https://eventgrid.azure.net
   mqttSettings:
     host: eventGridPlaceholder:8883
     tls:
