@@ -30,7 +30,7 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
-$global:appUpstreamRepo = "https://github.com/sebassem/jumpstart-agora-apps"
+$global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
 if ($scenario -eq "contoso_supermarket") {
     $global:githubUser = $Env:githubUser
