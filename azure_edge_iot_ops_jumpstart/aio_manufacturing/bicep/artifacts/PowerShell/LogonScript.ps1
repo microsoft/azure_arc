@@ -206,9 +206,20 @@ if ($aioConfig.AzCLIExtensions.Count -ne 0) {
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $aioConfig.AzCLIExtensions) {
-        az extension add --name $extension --system --only-show-errors
+        $extensionName = $extension.name
+        $extensionVersion = $extension.version
+        if ($extensionVersion -ne "latest" -and $null -ne $extensionVersion) {
+            # Install extension with specific version
+            az extension add --name $extensionName --version $extensionVersion --system --only-show-errors
+            Write-Host "Installed $extensionName version $extensionVersion"
+        } else {
+            # Install extension without specifying a version
+            az extension add --name $extensionName --system --only-show-errors
+            Write-Host "Installed $extensionName (latest version)"
+        }
     }
 }
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
 Write-Host
@@ -402,7 +413,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --disable-rsync-rules true --no-block --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"

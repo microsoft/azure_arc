@@ -48,13 +48,13 @@
 
     # Az CLI required extensions
     AzCLIExtensions         = @(
-        'k8s-extension',
-        'k8s-configuration',
-        'eventgrid',
-        'customlocation',
-        'kusto',
-        'storage-preview',
-        'azure-iot-ops'
+        @{name="k8s-extension"; version="latest"},
+        @{name="k8s-configuration"; version="latest"},
+        @{name="eventgrid"; version="latest"},
+        @{name="customlocation"; version="latest"},
+        @{name="kusto"; version="latest"},
+        @{name="storage-preview"; version="latest"},
+        @{name="azure-iot-ops"; version="0.5.1b1"}
     )
 
     # PowerShell modules
