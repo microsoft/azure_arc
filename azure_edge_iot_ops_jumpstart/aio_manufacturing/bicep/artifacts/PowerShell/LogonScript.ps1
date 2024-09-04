@@ -202,7 +202,7 @@ az extension add --name connectedk8s --version 1.3.17
 
 # Making extension install dynamic
 if ($aioConfig.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor DarkGray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $aioConfig.AzCLIExtensions) {
