@@ -201,11 +201,11 @@ az account set --subscription $subscriptionId
 az extension add --name connectedk8s --version 1.3.17
 
 # Making extension install dynamic
-if ($AgConfig.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+if ($aioConfig.AzCLIExtensions.Count -ne 0) {
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
-    foreach ($extension in $AgConfig.AzCLIExtensions) {
+    foreach ($extension in $aioConfig.AzCLIExtensions) {
         $extensionName = $extension.name
         $extensionVersion = $extension.version
         if ($extensionVersion -ne "latest" -and $null -ne $extensionVersion) {
