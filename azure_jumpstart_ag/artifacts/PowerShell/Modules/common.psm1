@@ -14,9 +14,20 @@ function Deploy-AzCLI {
         az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
         # Installing Azure CLI extensions
         foreach ($extension in $AgConfig.AzCLIExtensions) {
-            az extension add --name $extension --system --only-show-errors
+            $extensionName = $extension.name
+            $extensionVersion = $extension.version
+            if ($extensionVersion -ne "latest" -and $null -ne $extensionVersion) {
+                # Install extension with specific version
+                az extension add --name $extensionName --version $extensionVersion --system --only-show-errors
+                Write-Host "Installed $extensionName version $extensionVersion"
+            } else {
+                # Install extension without specifying a version
+                az extension add --name $extensionName --system --only-show-errors
+                Write-Host "Installed $extensionName (latest version)"
+            }
         }
     }
+
 
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
     Write-Host
