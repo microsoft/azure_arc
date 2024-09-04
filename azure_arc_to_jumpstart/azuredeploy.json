@@ -1,0 +1,257 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "windowsAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for Windows account"
+            }
+        },
+        "windowsAdminPassword": {
+            "type": "securestring",
+            "minLength": 12,
+            "maxLength": 123,
+            "metadata": {
+                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "RSA public key used for securing SSH access to Azure resources"
+            }
+        },
+        "spnClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure service principal client id"
+            }
+        },
+        "spnClientSecret": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Azure service principal client secret"
+            }
+        },
+        "spnTenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure AD tenant id for your service principal"
+            }
+        },
+        "kubernetesVersion": {
+            "defaultValue": "1.29.7",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubernetes"
+            }
+        },
+        "clusterName": {
+            "type": "string",
+            "defaultValue": "to-AKS",
+            "metadata": {
+                "description": "The name of the Kubernetes cluster resource"
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "defaultValue": "todns",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+            }
+        },
+        "extensionName":{
+            "defaultValue": "toolchainorchext",
+            "type": "string",
+            "metadata": {
+                "description": "the extension's name"
+            }
+        },
+        "customLocationName": {
+            "defaultValue": "toolchainorclocation",
+            "type": "string",
+            "metadata": {
+                "description": "the custom location that the extension will work on"
+            }
+        },
+        "extensionVersion": {
+            "defaultValue": "0.1.3",
+            "type": "string",
+            "metadata": {
+                "description": "the extension's version"
+            }
+        },
+        "githubAccount": {
+            "type": "string",
+            "metadata": {
+                "description": "Target GitHub account"
+            },
+            "defaultValue": "lirenjie95"
+        },
+        "githubBranch": {
+            "type": "string",
+            "metadata": {
+                "description": "Target GitHub branch"
+            },
+            "defaultValue": "to-jumpstart"
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            },
+            "defaultValue": false
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "to-Demo-Bastion",
+            "metadata": {
+                "description": "the Azure Bastion host name"
+            }
+        }
+    },
+    "variables": {
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_to_jumpstart/')]",
+        "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+        "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
+        "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+        // Virtual Network configuration
+        "virtualNetworkName": "to-VNet",
+        "subnetName": "to-Subnet",
+        "addressPrefix": "172.16.0.0/16",
+        "subnetAddressPrefix": "172.16.1.0/24",
+        "bastionSubnetPrefix": "172.16.2.64/26",
+        "bastionSubnetName": "AzureBastionSubnet",
+        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "comments": "Deploys a VNET and Subnet for Client VM",
+            "apiVersion": "2021-04-01",
+            "name": "VNETDeployment",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('VNETUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[variables('virtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('subnetName')]"
+                    },
+                    "addressPrefix": {
+                        "value": "[variables('addressPrefix')]"
+                    },
+                    "subnetAddressPrefix": {
+                        "value": "[variables('subnetAddressPrefix')]"
+                    },
+                    "deployBastion" : {
+                        "value": "[parameters('deployBastion')]"
+                    },
+                    "bastionSubnetPrefix": {
+                        "value": "[variables('bastionSubnetPrefix')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "comments": "Deploys an AKS Cluster",
+            "apiVersion": "2021-04-01",
+            "name": "aksDeployment",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('aksTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "sshRSAPublicKey": {
+                        "value": "[parameters('sshRSAPublicKey')]"
+                    },
+                    "spnClientId": {
+                        "value": "[parameters('spnClientId')]"
+                    },
+                    "spnClientSecret": {
+                        "value": "[parameters('spnClientSecret')]"
+                    },
+                    "kubernetesVersion": {
+                        "value": "[parameters('kubernetesVersion')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[parameters('dnsPrefix')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "comments": "Deploys the Client Windows VM",
+            "apiVersion": "2021-04-01",
+            "name": "clientVmDeployment",
+            "dependsOn": [ "VNETDeployment", "aksDeployment" ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('clientVmTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "windowsAdminUsername": {
+                        "value": "[parameters('windowsAdminUsername')]"
+                    },
+                    "windowsAdminPassword": {
+                        "value": "[parameters('windowsAdminPassword')]"
+                    },
+                    "spnClientId": {
+                        "value": "[parameters('spnClientId')]"
+                    },
+                    "spnClientSecret": {
+                        "value": "[parameters('spnClientSecret')]"
+                    },
+                    "spnTenantId": {
+                        "value": "[parameters('spnTenantId')]"
+                    },
+                    "clusterName": {
+                        "value": "[parameters('clusterName')]"
+                    },
+                    "extensionName":{
+                        "value": "[parameters('extensionName')]"
+                    },
+                    "customLocationName": {
+                        "value": "[parameters('customLocationName')]"
+                    },
+                    "extensionVersion": {
+                        "value": "[parameters('extensionVersion')]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[variables('virtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[variables('subnetName')]"
+                    },
+                    "templateBaseUrl": {
+                        "value": "[variables('templateBaseUrl')]"
+                    },
+                    "deployBastion": {
+                        "value": "[parameters('deployBastion')]"
+                    },
+                    "bastionHostName": {
+                        "value": "[parameters('bastionHostName')]"
+                    },
+                    "bastionSubnetRef": {
+                        "value": "[variables('bastionSubnetRef')]"
+                    },
+                    "bastionSubnetPrefix": {
+                        "value": "[variables('bastionSubnetPrefix')]"
+                    }
+                }
+            }
+        }
+    ]
+}
