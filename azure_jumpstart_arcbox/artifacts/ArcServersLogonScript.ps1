@@ -373,6 +373,12 @@ $payLoad = @"
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
 
+    # Enable least privileged access
+    az sql server-arc extension feature-flag set --name LeastPrivilege --enable true --resource-group $resourceGroup --machine-name $SQLvmName
+
+    # Enable automated backups
+    az sql server-arc backups-policy set --name $SQLvmName --resource-group $resourceGroup --retention-days 31 --full-backup-days 7 --diff-backup-hours 12 --tlog-backup-mins 5
+
     # Onboard nested Windows and Linux VMs to Azure Arc
     if ($Env:flavor -eq "ITPro") {
         Write-Header "Fetching Nested VMs"

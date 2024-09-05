@@ -41,6 +41,12 @@ CREATE TABLE ArchiveDB.dbo.Records
     [Chart] VARBINARY(MAX) FILESTREAM NULL
 );
 GO
+
+ALTER DATABASE ArchiveDB SET RECOVERY FULL;
+GO
+
+ALTER DATABASE AdventureWorksLT2019 SET RECOVERY FULL;
+GO
 "@
 
 Invoke-Sqlcmd $sqlScriptToExecute
