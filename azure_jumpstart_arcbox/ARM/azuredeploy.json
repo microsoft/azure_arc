@@ -9099,7 +9099,7 @@
           "resources": [
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2023-10-02-preview",
+              "apiVersion": "2024-02-02-preview",
               "name": "[parameters('aksClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9143,12 +9143,16 @@
                       }
                     ]
                   }
+                },
+                "autoUpgradeProfile": {
+                  "upgradeChannel": "stable",
+                  "nodeOSUpgradeChannel": "NodeImage"
                 }
               }
             },
             {
               "type": "Microsoft.ContainerService/managedClusters",
-              "apiVersion": "2023-10-02-preview",
+              "apiVersion": "2024-02-02-preview",
               "name": "[parameters('drClusterName')]",
               "location": "[parameters('location')]",
               "identity": {
@@ -9192,6 +9196,10 @@
                       }
                     ]
                   }
+                },
+                "autoUpgradeProfile": {
+                  "upgradeChannel": "stable",
+                  "nodeOSUpgradeChannel": "NodeImage"
                 }
               }
             },
