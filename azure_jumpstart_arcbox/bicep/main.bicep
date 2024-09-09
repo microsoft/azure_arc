@@ -186,7 +186,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownEnabled: autoShutdownEnabled
     autoShutdownTime: autoShutdownTime
     autoShutdownTimezone: autoShutdownTimezone
-    autoShutdownEmailRecipient: autoShutdownEmailRecipient
+    autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
   }
   dependsOn: [
     updateVNetDNSServers
