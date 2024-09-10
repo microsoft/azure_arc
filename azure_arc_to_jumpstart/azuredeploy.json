@@ -113,6 +113,7 @@
     },
     "variables": {
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_to_jumpstart/')]",
+        // Please edit the githubAccount and githubBranch parameters when merge this file
         "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
         "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
         "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
