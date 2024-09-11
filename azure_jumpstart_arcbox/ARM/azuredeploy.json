@@ -176,6 +176,15 @@
     "autoShutdownEmailRecipient": {
       "type": "string",
       "defaultValue": ""
+    },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Developer",
+      "allowedValues": [
+        "Developer",
+        "Standard",
+        "Enterprise"
+      ]
     }
   },
   "variables": {
@@ -1201,6 +1210,9 @@
           },
           "autoShutdownEmailRecipient": {
             "value": "[parameters('autoShutdownEmailRecipient')]"
+          },
+          "sqlServerEdition": {
+            "value": "[parameters('sqlServerEdition')]"
           }
         },
         "template": {

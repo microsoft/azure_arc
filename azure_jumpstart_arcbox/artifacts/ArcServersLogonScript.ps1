@@ -18,7 +18,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/prod/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -156,18 +156,23 @@ if ($Env:flavor -ne "DevOps") {
     # Before deploying ArcBox SQL set resource group tag ArcSQLServerExtensionDeployment=Disabled to opt out of automatic SQL onboarding
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
+    $vhdImageToDownload = "ArcBox-SQL.vhdx"
+    if ($Env:sqlServerEdition -eq "Standard"){
+        $vhdImageToDownload = "ArcBox-SQL-STD.vhdx"
+    }
+    elseif ($Env:sqlServerEdition -eq "Enterprise"){
+        $vhdImageToDownload = "ArcBox-SQL-ENT.vhdx"
+    }
+
+    Write-Host "Fetching SQL VM"
     $SQLvmName = "$namingPrefix-SQL"
     $SQLvmvhdPath = "$Env:ArcBoxVMDir\$namingPrefix-SQL.vhdx"
 
-    Write-Host "Fetching SQL VM"
-
     # Verify if VHD files already downloaded especially when re-running this script
     if (!(Test-Path $SQLvmvhdPath)) {
-        <# Action when all if and elseif conditions are false #>
-        $Env:AZCOPY_BUFFER_GB = 4
-        # Other ArcBox flavors does not have an azcopy network throughput capping
+        $vhdImageUrl = "$sourceFolder/$vhdImageToDownload"
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder --include-pattern "ArcBox-SQL.vhdx" $Env:ArcBoxVMDir --check-length=false --log-level=ERROR
+        azcopy cp $vhdImageUrl $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
     }
 
     # Create the nested VMs if not already created
