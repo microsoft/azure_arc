@@ -105,7 +105,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2022-02-01",
+            "apiVersion": "2024-02-02-preview",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
@@ -134,6 +134,10 @@
                             }
                         ]
                     }
+                },
+                "autoUpgradeProfile": {
+                    "upgradeChannel": "stable",
+                    "nodeOSUpgradeChannel": "NodeImage"
                 },
                 "servicePrincipalProfile": {
                     "clientId": "[parameters('servicePrincipalClientId')]",

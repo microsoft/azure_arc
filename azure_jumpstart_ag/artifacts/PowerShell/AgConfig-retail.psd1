@@ -45,9 +45,9 @@
 
     # Az CLI required extensions
     AzCLIExtensions         = @(
-        'k8s-extension',
-        'k8s-configuration',
-        'azure-iot'
+        @{name="k8s-extension"; version="latest"},
+        @{name="k8s-configuration"; version="latest"},
+        @{name="azure-iot"; version="latest"}
     )
 
     # PowerShell modules
