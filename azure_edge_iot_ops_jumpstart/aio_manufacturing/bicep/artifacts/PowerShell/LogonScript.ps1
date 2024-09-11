@@ -206,9 +206,20 @@ if ($aioConfig.AzCLIExtensions.Count -ne 0) {
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $aioConfig.AzCLIExtensions) {
-        az extension add --name $extension --system --only-show-errors
+        $extensionName = $extension.name
+        $extensionVersion = $extension.version
+        if ($extensionVersion -ne "latest" -and $null -ne $extensionVersion) {
+            # Install extension with specific version
+            az extension add --name $extensionName --version $extensionVersion --system --only-show-errors
+            Write-Host "Installed $extensionName version $extensionVersion"
+        } else {
+            # Install extension without specifying a version
+            az extension add --name $extensionName --system --only-show-errors
+            Write-Host "Installed $extensionName (latest version)"
+        }
     }
 }
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
 Write-Host
@@ -402,7 +413,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
+    az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --disable-rsync-rules true --no-block --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"
@@ -414,28 +425,33 @@ do {
     }
 } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
 
-<#
+
 $retryCount = 0
-$maxRetries = 5
+$maxRetries = 15
 
 do {
-    $output = az iot ops check --as-object
-    $output = $output | ConvertFrom-Json
-    $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
-    if ($mqServiceStatus -ne "Success") {
-        az iot ops init --cluster $arcClusterName -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientID --sp-object-id $spnObjectId --sp-secret $spnClientSecret --broker-service-type loadBalancer --add-insecure-listener true --simulate-plc true --only-show-errors
-        $retryCount++
-    }
-} until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
+        $output = az iot ops check --as-object --only-show-errors
+        $output = $output | ConvertFrom-Json
+        $mqServiceStatus = ($output.postDeployment | Where-Object { $_.name -eq "evalBrokerListeners" }).status
+        if ($mqServiceStatus -ne "Success") {
+            if($retryCount -eq 5 -and $mqServiceStatus -eq "warning"){
+                break;
+            }
+            Write-Host "Waiting for AIO to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+            Start-Sleep -Seconds 60
+            $retryCount++
+        }
+    } until ($mqServiceStatus -eq "Success" -or $retryCount -eq $maxRetries)
 
 if ($retryCount -eq $maxRetries) {
     Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
     exit 1 # Exit the script
 }
-#>
+
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations']" --output json | ConvertFrom-Json).identity.principalId
+#$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations']" --output json | ConvertFrom-Json).identity.principalId
+$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
 $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
 $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)
 $eventGridNamespaceId = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)

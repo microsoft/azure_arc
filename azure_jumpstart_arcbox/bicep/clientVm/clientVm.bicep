@@ -300,7 +300,7 @@ resource autoShutdown 'Microsoft.DevTestLab/schedules@2018-09-15' = if (autoShut
     }
     timeZoneId: autoShutdownTimezone
     notificationSettings: {
-      status: 'Enabled'
+      status: empty(autoShutdownEmailRecipient) ? 'Disabled' : 'Enabled' // Set status based on whether an email is provided
       timeInMinutes: 30
       webhookUrl: ''
       emailRecipient: autoShutdownEmailRecipient

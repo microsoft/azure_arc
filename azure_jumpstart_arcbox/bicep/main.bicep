@@ -23,21 +23,13 @@ param rdpPort string = '3389'
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'ITPro\', \'DevOps\', \'DataOps\'')
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\', \'DataOps\'')
 @allowed([
   'ITPro'
   'DevOps'
   'DataOps'
 ])
 param flavor string = 'ITPro'
-
-@description('SQL Server edition to deploy. Valid values are: \'Developer\', \'Standard\', \'Enterprise\'')
-@allowed([
-  'Developer'
-  'Standard'
-  'Enterprise'
-])
-param sqlServerEdition string = 'Developer'
 
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
@@ -194,8 +186,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownEnabled: autoShutdownEnabled
     autoShutdownTime: autoShutdownTime
     autoShutdownTimezone: autoShutdownTimezone
-    autoShutdownEmailRecipient: autoShutdownEmailRecipient
-    sqlServerEdition: sqlServerEdition
+    autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
   }
   dependsOn: [
     updateVNetDNSServers
