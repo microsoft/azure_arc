@@ -10,7 +10,7 @@ function Deploy-AzCLI {
 
     # Making extension install dynamic
     if ($AgConfig.AzCLIExtensions.Count -ne 0) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($AgConfig.AzCLIExtensions -join ', ') -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions" -ForegroundColor Gray
         az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
         # Installing Azure CLI extensions
         foreach ($extension in $AgConfig.AzCLIExtensions) {
