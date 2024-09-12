@@ -201,9 +201,16 @@ if ($Env:flavor -ne "DevOps") {
 
         Get-VM *SQL* | Wait-VM -For IPAddress
 
-        Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 10 seconds"
+        Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 30 seconds"
+        Start-Sleep -Seconds 30
 
-        Start-Sleep -Seconds 10
+        # Wait for VM to start again
+        while ((Get-VM -vmName $SQLvmName).State -ne 'Running') {
+            Write-Host "Waiting for VM to start..."
+            Start-Sleep -Seconds 5
+        }
+
+        Write-Host "VM has rebooted successfully!"
     }
 
     # Enable Windows Firewall rule for SQL Server
