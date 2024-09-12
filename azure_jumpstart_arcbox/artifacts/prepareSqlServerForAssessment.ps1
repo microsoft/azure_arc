@@ -8,7 +8,7 @@ if (![System.IO.Directory]::Exists($fsDirPath)) {
 }
 
 $sqlInstance = "MSSQLSERVER"
-$wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement15" -Class FilestreamSettings | where {$_.InstanceName -eq $sqlInstance}
+$wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement16" -Class FilestreamSettings | where {$_.InstanceName -eq $sqlInstance}
 $wmi.EnableFilestream(2, $sqlInstance)
 Get-Service -Name $sqlInstance | Restart-Service -Force
 
