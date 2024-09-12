@@ -170,9 +170,8 @@ if ($Env:flavor -ne "DevOps") {
 
     # Verify if VHD files already downloaded especially when re-running this script
     if (!(Test-Path $SQLvmvhdPath)) {
-        $vhdImageUrl = "$sourceFolder/$vhdImageToDownload"
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdImageUrl $SQLvmvhdPath --recursive=true --check-length=false --log-level=ERROR
+        azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "$vhdImageToDownload" --recursive=true --check-length=false --log-level=ERROR
     }
 
     # Create the nested VMs if not already created
