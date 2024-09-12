@@ -172,6 +172,9 @@ if ($Env:flavor -ne "DevOps") {
     if (!(Test-Path $SQLvmvhdPath)) {
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
         azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "$vhdImageToDownload" --recursive=true --check-length=false --log-level=ERROR
+
+        # Rename VHD file
+        Rename-Item -Path "$Env:ArcBoxVMDir\$vhdImageToDownload" -NewName  $SQLvmvhdPath -Force
     }
 
     # Create the nested VMs if not already created
