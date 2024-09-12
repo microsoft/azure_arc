@@ -191,7 +191,10 @@ if ($Env:flavor -ne "DevOps") {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 20
 
-    if ($namingPrefix -ne "ArcBox") {
+    # Rename server if hostname is not as ArcBox-SQL or doesn't match naming prefix
+    $hostname = Invoke-Command -VMName $SQLvmName -ScriptBlock { hostname } -Credential $winCreds
+
+    if ($hostname -ne $SQLvmName) {
 
         Write-Header "Renaming the nested SQL VM"
         Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
@@ -201,7 +204,6 @@ if ($Env:flavor -ne "DevOps") {
         Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 10 seconds"
 
         Start-Sleep -Seconds 10
-
     }
 
     # Enable Windows Firewall rule for SQL Server
