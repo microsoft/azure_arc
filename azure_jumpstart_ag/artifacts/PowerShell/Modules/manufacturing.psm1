@@ -281,10 +281,17 @@ function Deploy-AIO {
             Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
             exit 1 # Exit the script
         }
-        #Write-Host "AIO deployed successfully on the $clusterName cluster" -ForegroundColor Green
-        #Write-Host "`n"
+
+        do{
+            $extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
+            if($null -eq $extensionPrincipalId){
+                Write-Host "Waiting for the mq extension to be installed...waiting for 60 seconds" -ForegroundColor DarkGray
+                Start-Sleep -Seconds 60
+            }
+        }until($null -ne $extensionPrincipalId)
+
         Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
-        $extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
+        #$extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
         #$extensionPrincipalId = (az k8s-extension show --cluster-name $arcClusterName --name "mq" --resource-group $resourceGroup --cluster-type "connectedClusters" --output json | ConvertFrom-Json).identity.principalId
         $eventGridTopicId = (az eventgrid topic list --resource-group $resourceGroup --query "[0].id" -o tsv --only-show-errors)
         $eventGridNamespaceName = (az eventgrid namespace list --resource-group $resourceGroup --query "[0].name" -o tsv --only-show-errors)

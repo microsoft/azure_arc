@@ -202,7 +202,7 @@ az extension add --name connectedk8s --version 1.3.17
 
 # Making extension install dynamic
 if ($aioConfig.AzCLIExtensions.Count -ne 0) {
-    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions: " ($aioConfig.AzCLIExtensions -join ', ') -ForegroundColor DarkGray
+    Write-Host "[$(Get-Date -Format t)] INFO: Installing Azure CLI extensions" -ForegroundColor DarkGray
     az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
     # Installing Azure CLI extensions
     foreach ($extension in $aioConfig.AzCLIExtensions) {
@@ -413,7 +413,7 @@ $maxRetries = 5
 $aioStatus = "notDeployed"
 
 do {
-    az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+    az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --only-show-errors
     if ($? -eq $false) {
         $aioStatus = "notDeployed"
         Write-Host "`n"
@@ -447,7 +447,6 @@ if ($retryCount -eq $maxRetries) {
     Write-Host "[$(Get-Date -Format t)] ERROR: AIO deployment failed. Exiting..." -ForegroundColor White -BackgroundColor Red
     exit 1 # Exit the script
 }
-
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
 $extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
