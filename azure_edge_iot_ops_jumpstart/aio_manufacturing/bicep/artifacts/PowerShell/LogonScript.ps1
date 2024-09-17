@@ -448,6 +448,13 @@ if ($retryCount -eq $maxRetries) {
     exit 1 # Exit the script
 }
 
+do{
+$extension = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
+if($null -eq $extension){
+    Write-Host "Waiting for the extension to be deployed successfully on $clusterName...waiting for 60 seconds" -ForegroundColor DarkGray
+    Start-Sleep -Seconds 60
+}
+} until($null -ne $extension)
 
 Write-Host "[$(Get-Date -Format t)] INFO: Started Event Grid role assignment process" -ForegroundColor DarkGray
 $extensionPrincipalId = (az k8s-extension list --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type "connectedClusters" --query "[?extensionType=='microsoft.iotoperations.mq']" --output json | ConvertFrom-Json).identity.principalId
