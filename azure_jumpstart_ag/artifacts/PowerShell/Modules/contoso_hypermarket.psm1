@@ -17,9 +17,6 @@ function Get-K3sConfigFile{
 function Set-K3sClusters {
   Write-Host "Configuring kube-vip on K3s clusters"
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
-    Write-Output $cluster.Value.Type $cluster.Value.FriendlyName $cluster.Value.ArcClusterName
-  }
-  foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
           $vmName = $cluster.Value.ArcClusterName + "-$env:namingGuid"
