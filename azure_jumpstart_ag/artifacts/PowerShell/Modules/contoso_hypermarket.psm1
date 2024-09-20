@@ -178,7 +178,7 @@ status:
           Start-Sleep -Seconds 30
 
           Write-Host "Creating longhorn storage on K3scluster"
-          kubectl apply -f "$AgToolsDir\longhorn.yaml"
+          kubectl apply -f "$($Agconfig.AgDirectories.AgToolsDir)\longhorn.yaml"
           Start-Sleep -Seconds 30
           Write-Host "`n"
           }
