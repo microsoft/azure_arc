@@ -141,7 +141,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 if($scenario -eq "contoso_hypermarket"){
     Get-K3sConfigFile
-    Configure-K3sClusters
+    Set-K3sClusters
 }
 
 #####################################################################
