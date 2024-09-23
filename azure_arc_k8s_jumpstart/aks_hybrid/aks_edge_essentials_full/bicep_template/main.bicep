@@ -43,9 +43,9 @@ param subnetNameCloud string = 'AKS-EE-Full-Subnet'
 param kubernetesDistribution string
 
 @description('''The AKS Edge Essentials schema version to be used. This is only used to pin the AKS Edge Essentials schema version for testing.
-To pin a specific version, use the format '1.13'. To use the latest schema version, use 'useLatest'.
+To pin a specific version, use the format '1.14'. To use the latest schema version, use 'useLatest'.
 ''')
-param AKSEEPinnedSchemaVersion string = '1.13'
+param AKSEEPinnedSchemaVersion string = '1.14'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/aks_hybrid/aks_edge_essentials_full/bicep_template/'
 
