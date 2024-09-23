@@ -7,8 +7,9 @@ $logFilePath = Join-Path -Path $Env:ArcBoxLogsDir -ChildPath ('WinGet-provisioni
 
 Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 
-# Install WinGet DSC resource - also installs Microsoft.WinGet.Client as implicit dependency
-Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease
+# Install WinGet PowerShell modules
+Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
+Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
 
 # Install DSC resources required for ArcBox
 Install-PSResource -Name DSCR_Font -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
