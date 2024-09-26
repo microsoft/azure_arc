@@ -24,11 +24,12 @@ param (
   [string]$githubUser,
   [string]$adxClusterName,
   [string]$namingGuid,
-  [string]$industry,
+  [string]$scenario,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
   [string]$stcontainerName,
-  [string]$AKSEEPinnedSchemaVersion
+  [string]$k3sArcClusterName,
+  [string]$k3sArcDataClusterName
 )
 
 ##############################################################
@@ -63,11 +64,12 @@ param (
 [System.Environment]::SetEnvironmentVariable('AgDir', "C:\Ag", [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adxClusterName', $adxClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingGuid', $namingGuid, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('industry', $industry, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('scenario', $scenario, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AKSEEPinnedSchemaVersion', $AKSEEPinnedSchemaVersion, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -108,9 +110,10 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
 ##############################################################
 $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"
 
-switch ($industry) {
-  "retail" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-retail.psd1") -OutFile $ConfigurationDataFile }
-  "manufacturing" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-manufacturing.psd1") -OutFile $ConfigurationDataFile}
+switch ($scenario) {
+  "contoso_supermarket" { Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-supermarket.psd1") -OutFile $ConfigurationDataFile }
+  "contoso_motors" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-motors.psd1") -OutFile $ConfigurationDataFile}
+  "contoso_hypermarket" {Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgConfig-contoso-hypermarket.psd1") -OutFile $ConfigurationDataFile}
 }
 
 $AgConfig           = Import-PowerShellDataFile -Path $ConfigurationDataFile
@@ -219,6 +222,7 @@ foreach ($url in $websiteUrls.Values) {
 # Copy PowerShell Profile and Reload
 ##############################################################
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -OutFile "$AgPowerShellDir\Profile.ps1"
 .$PsHome\Profile.ps1
 
 ##############################################################
@@ -234,8 +238,9 @@ Copy-Item $ConfigurationDataFile "$AgPowerShellDir\AgConfig.psd1" -Force
 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/AgLogonScript.ps1") -OutFile "$AgPowerShellDir\AgLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/common.psm1") -OutFile "$AgPowerShellDir\common.psm1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/retail.psm1") -OutFile "$AgPowerShellDir\retail.psm1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/manufacturing.psm1") -OutFile "$AgPowerShellDir\manufacturing.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_supermarket.psm1") -OutFile "$AgPowerShellDir\contoso_supermarket.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_motors.psm1") -OutFile "$AgPowerShellDir\contoso_motors.psm1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Modules/contoso_hypermarket.psm1") -OutFile "$AgPowerShellDir\contoso_hypermarket.psm1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/DockerDesktopSettings.json") -OutFile "$AgToolsDir\settings.json"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/agora_wallpaper_dark.png" -OutFile $AgDirectory\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full.json"
@@ -250,14 +255,22 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -Out
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 
-if($industry -eq "retail"){
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-retail") -OutFile "$AgToolsDir\Bookmarks"
+if($scenario -eq "contoso_supermarket"){
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-freezer-monitoring.json") -OutFile "$AgMonitoringDir\grafana-freezer-monitoring.json"
 }
-elseif ($industry -eq "manufacturing") {
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-manufacturing") -OutFile "$AgToolsDir\Bookmarks"
+elseif ($scenario -eq "contoso_motors") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-motors") -OutFile "$AgToolsDir\Bookmarks"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+}
+elseif ($scenario -eq "contoso_hypermarket") {
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/longhorn.yaml") -OutFile "$AgToolsDir\longhorn.yaml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
+
+
 }
 
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
@@ -377,7 +390,7 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "C:\Program Files\PowerShell\7\pwsh.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
@@ -388,11 +401,13 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 ##############################################################
 # Install Hyper-V, WSL and reboot
 ##############################################################
-Write-Header "Installing Hyper-V"
-Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
-Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+  Write-Header "Installing Hyper-V"
+  Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+  Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+  Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+}
 
 Stop-Transcript
 

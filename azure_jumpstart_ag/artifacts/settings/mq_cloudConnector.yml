@@ -1,34 +1,55 @@
-apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: MqttBridgeTopicMap
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowEndpoint
 metadata:
-  name: my-topic-map
-  namespace: azure-iot-operations
+  name: mq
 spec:
-  mqttBridgeConnectorRef: my-mqtt-bridge
-  routes:
-    - direction: local-to-remote
-      name: route-to-eventgrid
-      qos: 1
-      source: "topic/#"
+  endpointType: mqtt
+  authentication:
+    method: serviceAccountToken
+    serviceAccountTokenSettings:
+      audience: aio-mqtt
+  mqttSettings:
+    {}
 ---
-apiVersion: mq.iotoperations.azure.com/v1beta1
-kind: MqttBridgeConnector
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowEndpoint
 metadata:
-  name: my-mqtt-bridge
-  namespace: azure-iot-operations
+  name: eventgrid
 spec:
-  image:
-    repository: mcr.microsoft.com/azureiotoperations/mqttbridge
-    tag: 0.1.0-preview
-    pullPolicy: IfNotPresent
-  protocol: v5
-  bridgeInstances: 1
-  clientIdPrefix: factory-gateway-
-  logLevel: debug
-  remoteBrokerConnection:
-    endpoint: eventGridPlaceholder:8883
+  endpointType: mqtt
+  authentication:
+    method: systemAssignedManagedIdentity
+    systemAssignedManagedIdentitySettings:
+      audience: https://eventgrid.azure.net
+  mqttSettings:
+    host: eventGridPlaceholder:8883
     tls:
-      tlsEnabled: true
-    authentication:
-      systemAssignedManagedIdentity:
-        audience: https://eventgrid.azure.net
+      mode: Enabled
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: Dataflow
+metadata:
+  name: my-dataflow
+spec:
+  profileRef: my-dataflow-profile
+  mode: enabled
+  operations:
+  - operationType: source
+    name: source1
+    sourceSettings:
+      endpointRef: mq
+      dataSources:
+        - "topic/#"
+        - azure-iot-operations/data/#
+  - operationType: destination
+    name: destination1
+    destinationSettings:
+      endpointRef: eventgrid
+      dataDestination: factory
+---
+apiVersion: connectivity.iotoperations.azure.com/v1beta1
+kind: DataflowProfile
+metadata:
+  name: my-dataflow-profile
+spec:
+  instanceCount: 2
