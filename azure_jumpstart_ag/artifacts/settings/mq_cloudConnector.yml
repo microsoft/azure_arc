@@ -1,55 +1,34 @@
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowEndpoint
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeTopicMap
 metadata:
-  name: mq
+  name: my-topic-map
+  namespace: azure-iot-operations
 spec:
-  endpointType: mqtt
-  authentication:
-    method: serviceAccountToken
-    serviceAccountTokenSettings:
-      audience: aio-mqtt
-  mqttSettings:
-    {}
+  mqttBridgeConnectorRef: my-mqtt-bridge
+  routes:
+    - direction: local-to-remote
+      name: route-to-eventgrid
+      qos: 1
+      source: "topic/#"
 ---
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowEndpoint
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeConnector
 metadata:
-  name: eventgrid
+  name: my-mqtt-bridge
+  namespace: azure-iot-operations
 spec:
-  endpointType: mqtt
-  authentication:
-    method: systemAssignedManagedIdentity
-    systemAssignedManagedIdentitySettings:
-      audience: https://eventgrid.azure.net
-  mqttSettings:
-    host: eventGridPlaceholder:8883
+  image:
+    repository: mcr.microsoft.com/azureiotoperations/mqttbridge
+    tag: 0.1.0-preview
+    pullPolicy: IfNotPresent
+  protocol: v5
+  bridgeInstances: 1
+  clientIdPrefix: factory-gateway-
+  logLevel: debug
+  remoteBrokerConnection:
+    endpoint: eventGridPlaceholder:8883
     tls:
-      mode: Enabled
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: Dataflow
-metadata:
-  name: my-dataflow
-spec:
-  profileRef: my-dataflow-profile
-  mode: enabled
-  operations:
-  - operationType: source
-    name: source1
-    sourceSettings:
-      endpointRef: mq
-      dataSources:
-        - "topic/#"
-        - azure-iot-operations/data/#
-  - operationType: destination
-    name: destination1
-    destinationSettings:
-      endpointRef: eventgrid
-      dataDestination: factory
----
-apiVersion: connectivity.iotoperations.azure.com/v1beta1
-kind: DataflowProfile
-metadata:
-  name: my-dataflow-profile
-spec:
-  instanceCount: 2
+      tlsEnabled: true
+    authentication:
+      systemAssignedManagedIdentity:
+        audience: https://eventgrid.azure.net
