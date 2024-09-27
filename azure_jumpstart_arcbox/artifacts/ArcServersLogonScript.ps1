@@ -256,7 +256,7 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 5)
 
     # Create SQL server extension as policy to auto deployment is disabled
-    Write-Host "Installing SQL Server extension on the Arc-enabled Server."
+    Write-Host "Installing SQL Server extension on the Arc-enabled Server.`n"
     az connectedmachine extension create --machine-name $SQLvmName --name "WindowsAgent.SqlServer" --resource-group $resourceGroup --type "WindowsAgent.SqlServer" --publisher "Microsoft.AzureData" --settings '{\"LicenseType\":\"Paid\", \"SqlManagement\": {\"IsEnabled\":true}}' --tags $resourceTags --location $azureLocation --only-show-errors --no-wait
     Write-Host "SQL Server extension installation on the Arc-enabled Server successful."
 
@@ -266,7 +266,7 @@ if ($Env:flavor -ne "DevOps") {
         $sqlExtension  = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'WindowsAgent.SqlServer'}
         if ($sqlExtension -and ($sqlExtension.ProvisioningState -eq "Succeeded")) {
             # SQL server extension is installed and ready to run SQL BPA
-            Write-Host "SQL server extension is installed and ready to run SQL BPA."
+            Write-Host "SQL server extension is installed and ready to run SQL BPA.`n"
             break;
         }
         else {
@@ -283,7 +283,7 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 10)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
-    Write-Host "Installing Azure Monitoring Agent extension."
+    Write-Host "Installing Azure Monitoring Agent extension.`n"
     az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
 
     $retryCount = 0
@@ -314,16 +314,16 @@ if ($Env:flavor -ne "DevOps") {
     if ($amaExtension.StatusCode -eq 0) {
 
         # Create custom log analytics table for SQL assessment
-        Write-Host "Creating Log Analytis workspace table for SQL best practices assessment"
+        Write-Host "Creating Log Analytis workspace table for SQL best practices assessment.`n"
         az monitor log-analytics workspace table create --resource-group $resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime --only-show-errors
 
         # Verify if ArcBox SQL resource is created
-        Write-Host "Enabling SQL server best practices assessment"
+        Write-Host "Enabling SQL server best practices assessment.`n"
         $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
         az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
 
         # Run Best practices assessment
-        Write-Host "Execute SQL server best practices assessment"
+        Write-Host "Execute SQL server best practices assessment.`n"
 
         # Wait for a minute to finish everyting and run assessment
         Start-Sleep(60)
@@ -349,7 +349,7 @@ if ($Env:flavor -ne "DevOps") {
     } # End of SQL BPA
 
     # Run SQL Server Azure Migration Assessment
-    Write-Host "Enabling SQL Server Azure Migration Assessment."
+    Write-Host "Enabling SQL Server Azure Migration Assessment.`n"
     $migrationApiURL = "https://management.azure.com/batch?api-version=2020-06-01"
     $assessmentName = (New-Guid).Guid
 $payLoad = @"
@@ -366,11 +366,11 @@ $payLoad = @"
     }
 
     #Install SQLAdvancedThreatProtection solution
-    Write-Host "Installing SQLAdvancedThreatProtection Log Analytics solution."
+    Write-Host "Installing SQLAdvancedThreatProtection Log Analytics solution.`n"
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
     #Install SQLVulnerabilityAssessment solution
-    Write-Host "Install SQLVulnerabilityAssessment Log Analytics solution."
+    Write-Host "Install SQLVulnerabilityAssessment Log Analytics solution.`n"
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName --only-show-errors
 
     # Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
@@ -378,28 +378,28 @@ $payLoad = @"
     (Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $workspaceResourceID | Set-Content -Path $sqlDefenderDcrFile
 
     # Create data collection rules for Defender for SQL
-    Write-Host "Creating Azure Monitor data collection rule"
+    Write-Host "Creating Azure Monitor data collection rule.`n"
     $dcrName = "Jumpstart-DefenderForSQL-DCR"
     az monitor data-collection rule create --resource-group $resourceGroup --location $env:azureLocation --name $dcrName --rule-file $sqlDefenderDcrFile
 
     # Associate DCR with Azure Arc-enabled Server resource
-    Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server"
+    Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server.`n"
     $dcrRuleId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Insights/dataCollectionRules/$dcrName"
     az monitor data-collection rule association create --name "$SQLvmName" --rule-id $dcrRuleId --resource $azConnectedMachineId
 
     # Test Defender for SQL
-    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud.`n"
     $remoteScriptFileFile = "$Env:ArcBoxDir\testDefenderForSQL.ps1"
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$Env:ArcBoxDir\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
 
     # Enable least privileged access
-    Write-Host "Enabling Arc-enabled SQL server least privileged access. "
+    Write-Host "Enabling Arc-enabled SQL server least privileged access.`n"
     az sql server-arc extension feature-flag set --name LeastPrivilege --enable true --resource-group $resourceGroup --machine-name $SQLvmName
 
     # Enable automated backups
-    Write-Host "Enabling Arc-enabled SQL server automated backups. "
+    Write-Host "Enabling Arc-enabled SQL server automated backups.`n"
     az sql server-arc backups-policy set --name $SQLvmName --resource-group $resourceGroup --retention-days 31 --full-backup-days 7 --diff-backup-hours 12 --tlog-backup-mins 5
 
     # Onboard nested Windows and Linux VMs to Azure Arc
