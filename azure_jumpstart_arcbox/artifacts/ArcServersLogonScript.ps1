@@ -18,7 +18,7 @@ $resourceTags = $env:resourceTags
 $namingPrefix = $env:namingPrefix
 
 # Moved VHD storage account details here to keep only in place to prevent duplicates.
-$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/prod/*"
+$vhdSourceFolder = "https://jumpstartprodsg.blob.core.windows.net/arcbox/preprod/*"
 
 # Archive existing log file and create new one
 $logFilePath = "$Env:ArcBoxLogsDir\ArcServersLogonScript.log"
@@ -156,7 +156,7 @@ if ($Env:flavor -ne "DevOps") {
     # Before deploying ArcBox SQL set resource group tag ArcSQLServerExtensionDeployment=Disabled to opt out of automatic SQL onboarding
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
-    $vhdImageToDownload = "ArcBox-SQL.vhdx"
+    $vhdImageToDownload = "ArcBox-SQL-DEV.vhdx"
     if ($Env:sqlServerEdition -eq "Standard"){
         $vhdImageToDownload = "ArcBox-SQL-STD.vhdx"
     }
@@ -283,6 +283,7 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 10)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
+    Write-Host "Installing Azure Monitoring Agent extension."
     az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
 
     $retryCount = 0
@@ -313,6 +314,7 @@ if ($Env:flavor -ne "DevOps") {
     if ($amaExtension.StatusCode -eq 0) {
 
         # Create custom log analytics table for SQL assessment
+        Write-Host "Creating Log Analytis workspace table for SQL best practices assessment"
         az monitor log-analytics workspace table create --resource-group $resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime --only-show-errors
 
         # Verify if ArcBox SQL resource is created
@@ -347,6 +349,7 @@ if ($Env:flavor -ne "DevOps") {
     } # End of SQL BPA
 
     # Run SQL Server Azure Migration Assessment
+    Write-Host "Enabling SQL Server Azure Migration Assessment."
     $migrationApiURL = "https://management.azure.com/batch?api-version=2020-06-01"
     $assessmentName = (New-Guid).Guid
 $payLoad = @"
@@ -363,9 +366,11 @@ $payLoad = @"
     }
 
     #Install SQLAdvancedThreatProtection solution
+    Write-Host "Installing SQLAdvancedThreatProtection Log Analytics solution."
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
     #Install SQLVulnerabilityAssessment solution
+    Write-Host "Install SQLVulnerabilityAssessment Log Analytics solution."
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName --only-show-errors
 
     # Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
@@ -390,9 +395,11 @@ $payLoad = @"
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
 
     # Enable least privileged access
+    Write-Host "Enabling Arc-enabled SQL server least privileged access. "
     az sql server-arc extension feature-flag set --name LeastPrivilege --enable true --resource-group $resourceGroup --machine-name $SQLvmName
 
     # Enable automated backups
+    Write-Host "Enabling Arc-enabled SQL server automated backups. "
     az sql server-arc backups-policy set --name $SQLvmName --resource-group $resourceGroup --retention-days 31 --full-backup-days 7 --diff-backup-hours 12 --tlog-backup-mins 5
 
     # Onboard nested Windows and Linux VMs to Azure Arc
@@ -586,7 +593,6 @@ $payLoad = @"
 }
 
 #Changing to Jumpstart ArcBox wallpaper
-
 Write-Header "Changing wallpaper"
 
 # bmp file is required for BGInfo
