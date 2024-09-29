@@ -224,6 +224,8 @@ else
     echo "Downloading k3s control plane details"
     echo ""
     k3sClusterNodeConfigYaml="k3sClusterNodeConfig.yaml"
+    sleep 60
+
     azcopy cp --check-md5 FailIfDifferentOrMissing "https://$stagingStorageAccountName.blob.core.windows.net/$storageContainerName/$k3sClusterNodeConfigYaml" "/home/$adminUsername/$k3sClusterNodeConfigYaml"
 
     # Installing Rancher K3s cluster (single worker node)

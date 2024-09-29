@@ -376,7 +376,7 @@ function Deploy-VirtualizationInfrastructure {
 
         # Fetching latest AKS Edge Essentials msi file
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
-        Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEk3s.msi
+        Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEK3s.msi
 
         # Fetching required GitHub artifacts from Jumpstart repository
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
