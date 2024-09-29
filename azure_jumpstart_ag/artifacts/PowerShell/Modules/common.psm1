@@ -376,7 +376,7 @@ function Deploy-VirtualizationInfrastructure {
 
         # Fetching latest AKS Edge Essentials msi file
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching latest AKS Edge Essentials install file on $hostname." -ForegroundColor Gray
-        Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEK3s.msi
+        Invoke-WebRequest $websiteUrls["aksEEk3s"] -OutFile $deploymentFolder\AKSEEk3s.msi
 
         # Fetching required GitHub artifacts from Jumpstart repository
         Write-Host "[$(Get-Date -Format t)] INFO: Fetching GitHub artifacts" -ForegroundColor Gray
@@ -526,7 +526,7 @@ function Deploy-AzContainerRegistry {
 function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.Type -eq "K3s"){
+        if($cluster.Value.Type -eq "k3s"){
             $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectx
         }else{
@@ -545,7 +545,7 @@ function Deploy-ClusterSecrets {
         foreach ($namespace in $AgConfig.Namespaces) {
             if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-                if($cluster.Value.Type -eq "K3s"){
+                if($cluster.Value.Type -eq "k3s"){
                     $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
                     kubectx
                 }else{
@@ -1177,7 +1177,7 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        if($cluster.Value.type -eq "K3s"){
+        if($cluster.Value.type -eq "k3s"){
             $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectx
         }else{
@@ -1193,7 +1193,7 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        if($cluster.Value.Type -eq "K3s"){
+        if($cluster.Value.Type -eq "k3s"){
             az connectedk8s enable-features --name $arcClusterName `
             --resource-group $resourceGroup `
             --features cluster-connect custom-locations `
@@ -1232,7 +1232,7 @@ function Deploy-AIO {
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $retryCount = 0
         $maxRetries = 25
-        if($cluster.Value.type -eq "K3s"){
+        if($cluster.Value.type -eq "k3s"){
             $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectx
         }else{
@@ -1309,7 +1309,7 @@ function Set-MQTTIpAddress {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.type -eq "K3s"){
+        if($cluster.Value.type -eq "k3s"){
             $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
             kubectx
         }else{

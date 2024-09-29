@@ -143,20 +143,20 @@
     natSubnet               = "192.168.46.0/24"                      # This value is the subnet is the NAT router will use to route to  AzSMGMT to access the Internet. It can be any /24 subnet and is only used for routing.
     natDNS                  = "%staging-natDNS%"                     # Do not change - can be configured by passing the optional natDNS parameter to the ARM deployment.
 
-    # AKS Edge Essentials variables
+    # Site Kubernetes cluster configurations
     SiteConfig              = @{
         Seattle = @{
             ArcClusterName         = "Ag-K3s-Seattle"
             FriendlyName           = "Seattle"
             GrafanaDataSource      = "seattle"
-            Type                   = "K3s"
+            Type                   = "k3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
         Chicago = @{
             ArcClusterName         = "Ag-K3s-Chicago"
             FriendlyName           = "Chicago"
             GrafanaDataSource      = "chicago"
-            Type                   = "K3s"
+            Type                   = "k3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
         }
     }

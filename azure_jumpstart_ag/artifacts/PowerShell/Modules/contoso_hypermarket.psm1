@@ -10,18 +10,17 @@ function Get-K3sConfigFile{
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
-    azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$AgLogsDir\" --include-pattern "*.log"
+    azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "$AgLogsDir\" --include-pattern "*.log"
   }
 }
 
-function Configure-K3sClusters {
-  Write-Host "Configuring kube-vip on K3s clusterS"
-  $clusters = $AgConfig.SiteConfig.GetEnumerator()
-  foreach ($cluster in $clusters) {
+function Set-K3sClusters {
+  Write-Host "Configuring kube-vip on K3s clusters"
+  foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
-          $clusterName = $cluster.Name.ToLower()
-          $vmName = $cluster.Value.ArcClusterName+"-$namingGuid"
-          $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+          $clusterName = $cluster.Value.FriendlyName.ToLower()
+          $vmName = $cluster.Value.ArcClusterName + "-$env:namingGuid"
+          $Env:KUBECONFIG="C:\Users\$env:adminUsername\.kube\ag-k3s-$clusterName"
           kubectx
           $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
           Write-Host "Assigning kube-vip-role on k3s cluster"
@@ -176,7 +175,7 @@ status:
           Start-Sleep -Seconds 30
 
           Write-Host "Creating longhorn storage on K3scluster"
-          kubectl apply -f "$AgToolsDir\longhorn.yaml"
+          kubectl apply -f "$($Agconfig.AgDirectories.AgToolsDir)\longhorn.yaml"
           Start-Sleep -Seconds 30
           Write-Host "`n"
           }
