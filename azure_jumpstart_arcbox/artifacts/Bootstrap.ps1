@@ -36,7 +36,8 @@ param (
     [string]$customLocationRPOID,
     [object]$resourceTags,
     [string]$namingPrefix,
-    [string]$debugEnabled
+    [string]$debugEnabled,
+    [string]$sqlServerEdition
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
@@ -70,6 +71,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('resourceTags', $resourceTags, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('namingPrefix', $namingPrefix, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ArcBoxDir', "C:\ArcBox", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('sqlServerEdition', $sqlServerEdition, [System.EnvironmentVariableTarget]::Machine)
 
 if ($debugEnabled -eq "true") {
     [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
