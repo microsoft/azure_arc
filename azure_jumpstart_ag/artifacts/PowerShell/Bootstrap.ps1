@@ -278,8 +278,21 @@ BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$Ag
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
+
 ##############################################################
-# Install Chocolatey packages
+# Install Winget
+##############################################################
+# Install WinGet PowerShell modules
+Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
+Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
+# Install WinGet CLI
+$null = Repair-WinGetPackageManager -AllUsers
+$winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
+# Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
+& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
+
+##############################################################
+# Install Winget packages
 ##############################################################
 $maxRetries = 3
 $retryDelay = 30  # seconds
@@ -288,25 +301,16 @@ $retryCount = 0
 $success = $false
 
 while (-not $success -and $retryCount -lt $maxRetries) {
-  try {
-    Write-Header "Installing Chocolatey packages"
-    try {
-      choco config get cacheLocation
-    }
-    catch {
-      Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
-    }
+    Write-Host "Winget packages specified"
 
-    Write-Host "Chocolatey packages specified"
+    try{
+      foreach ($app in $AgConfig.WingetPackagesList) {
+        Write-Host "Installing $app"
+        & winget install -e --id $app | Write-Output
+      }
 
-    foreach ($app in $AgConfig.ChocolateyPackagesList) {
-      Write-Host "Installing $app"
-      & choco install $app /y -Force | Write-Output
-    }
-
-    # If the command succeeds, set $success to $true to exit the loop
-    $success = $true
+      # If the command succeeds, set $success to $true to exit the loop
+      $success = $true
   }
   catch {
     # If an exception occurs, increment the retry count

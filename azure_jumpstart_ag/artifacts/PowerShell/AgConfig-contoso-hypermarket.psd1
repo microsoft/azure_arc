@@ -95,6 +95,28 @@
         'python'
     )
 
+    # Winget packages list
+    WingetPackagesList  = @(
+        'Microsoft.PowerShell',
+        'Microsoft.Bicep',
+        'Kubernetes.kubectl',
+        'vcredist140',
+        'Microsoft.Edge',
+        'Microsoft.Azure.AZCopy.10',
+        'Microsoft.VisualStudioCode',
+        'Git.Git',
+        '7zip.7zip',
+        'ahmetb.kubectx',
+        'PuTTY.PuTTY',
+        'Helm.Helm',
+        'Microsoft.DotNet.SDK.8',
+        'Microsoft.Sysinternals.ZoomIt',
+        'FireDaemon.OpenSSL',
+        'thomasnordquist.MQTT-Explorer',
+        'GitHub.cli',
+        'Python.Python.3.12'
+    )
+
     # Pip packages list
     PipPackagesList     = @(
         'paho-mqtt'
