@@ -282,12 +282,15 @@ BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$lates
 ##############################################################
 # Install Winget
 ##############################################################
-# Install WinGet PowerShell modules
+# Installing PowerShell Modules
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
 Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
+
 # Install WinGet CLI
 $null = Repair-WinGetPackageManager -AllUsers
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
+
 # Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
 & $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
 
