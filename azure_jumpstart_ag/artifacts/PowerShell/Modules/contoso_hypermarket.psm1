@@ -24,7 +24,8 @@ function Set-K3sClusters {
           kubectx
           $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
           Write-Host "Assigning kube-vip-role on k3s cluster"
-          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
+          $k3sVIP
+          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
           kubectl apply -f $kubeVipRbac
 
           $kubeVipDaemonset = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
@@ -35,6 +36,7 @@ function Set-K3sClusters {
           kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
           $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+          $serviceIpRange 
           $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
           $lowestServiceIp = $sortedIps[0]
           $highestServiceIp = $sortedIps[-1]
