@@ -18,7 +18,7 @@ function Set-K3sClusters {
   Write-Host "Configuring kube-vip on K3s clusterS"
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
-          az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+          az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
           az account set -s $subscriptionId
 
           $clusterName = $cluster.Value.FriendlyName.ToLower()
