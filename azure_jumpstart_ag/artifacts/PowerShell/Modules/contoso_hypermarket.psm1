@@ -5,7 +5,7 @@ function Get-K3sConfigFile{
   $Env:KUBECONFIG=""
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
-    $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+    $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$Env:namingGuid"
     $containerName = $arcClusterName.toLower()
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/config"
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
@@ -19,7 +19,7 @@ function Set-K3sClusters {
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
-          $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
+          $vmName = $cluster.Value.ArcClusterName + "-$Env:namingGuid"
           $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
           kubectx
           $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
