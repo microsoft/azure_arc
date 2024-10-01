@@ -175,6 +175,7 @@ if ($industry -eq "retail") {
 }
 
 if ($industry -eq "manufacturing") {
+    Update-AzureIoTOpsExtension
     Deploy-AIO
     Deploy-ManufacturingConfigs
     $mqttIpArray=Set-MQTTIpAddress
