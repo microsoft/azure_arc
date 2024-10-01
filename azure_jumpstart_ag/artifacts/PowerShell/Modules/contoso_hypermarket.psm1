@@ -24,7 +24,7 @@ function Set-K3sClusters {
           kubectx
           $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
           Write-Host "Assigning kube-vip-role on k3s cluster"
-          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
+          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
           kubectl apply -f $kubeVipRbac
 
           $kubeVipDaemonset = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
