@@ -22,7 +22,7 @@ function Set-K3sClusters {
           $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
           $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
           kubectx
-          $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
+          $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
           Write-Host "K3s VIP: $k3sVIP" -ForegroundColor Green
           Write-Host "Assigning kube-vip-role on k3s cluster"
           $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
@@ -35,7 +35,7 @@ function Set-K3sClusters {
           Write-Host "Deploying Kube vip cloud controller on k3s cluster"
           kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-          $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+          $serviceIpRange = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv)
           Write-Host "serviceIpRange: $serviceIpRange" -ForegroundColor Green
           $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
           $lowestServiceIp = $sortedIps[0]
