@@ -1,13 +1,29 @@
 #  This script introduces some addtional SQL server features that are supported only on IaaS, some on both IaaS and SQL MI
-# Enable FILESTREAM in configuration manager
+Install-Module -Name SqlServer -AllowClobber -Force -Scope AllUsers
+Import-Module -Name SqlServer
 
+$sqlInstance = "MSSQLSERVER"
+
+# Get the SQL Server instance
+$managedComputer = New-Object Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer
+
+# Find the TCP/IP protocol
+$serverProtocols = $managedComputer.ServerInstances[$sqlInstance].ServerProtocols
+
+$ find TCP protocol
+$tcpProtocol = $serverProtocols | Where-Object { $_.Name -eq "TCP" }
+
+# Enable TCP/IP protocol and apply changes
+$tcpProtocol.IsEnabled = $true
+$tcpProtocol.Alter()
+
+# Enable FILESTREAM in configuration manager
 # Create Filestream file storage location
 $fsDirPath = "C:\sqlfilestream"
 if (![System.IO.Directory]::Exists($fsDirPath)) {
     New-Item -Path $fsDirPath -ItemType Directory
 }
 
-$sqlInstance = "MSSQLSERVER"
 $wmi = Get-WmiObject -Namespace "ROOT\Microsoft\SqlServer\ComputerManagement16" -Class FilestreamSettings | where {$_.InstanceName -eq $sqlInstance}
 $wmi.EnableFilestream(2, $sqlInstance)
 Get-Service -Name $sqlInstance | Restart-Service -Force
