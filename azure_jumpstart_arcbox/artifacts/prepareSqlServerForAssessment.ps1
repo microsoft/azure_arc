@@ -15,14 +15,14 @@ $serverProtocols = $managedComputer.ServerInstances[$sqlInstance].ServerProtocol
 $tcpProtocol = $serverProtocols | Where-Object { $_.Name -eq "TCP" }
 
 # Enable TCP/IP protocol and apply changes
-$tcpProtocol.IsEnabled = $true
-$tcpProtocol.Alter()
+if ($tcpProtocol.IsEnabled -eq $false)
+{
+    $tcpProtocol.IsEnabled = $true
+    $tcpProtocol.Alter()
 
-# Restart SQL service
-Restart-Service -Name $sqlInstance
-
-# Wait for the service to come online
-Start-Sleep -Seconds 30
+    # Restart SQL service
+    Restart-Service -Name $sqlInstance
+}
 
 # Enable FILESTREAM in configuration manager
 # Create Filestream file storage location
