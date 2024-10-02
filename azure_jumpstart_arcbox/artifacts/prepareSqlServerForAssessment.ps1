@@ -1,7 +1,7 @@
 #  This script introduces some addtional SQL server features that are supported only on IaaS, some on both IaaS and SQL MI
 Install-PackageProvider -Name NuGet -Force
 Install-Module -Name SqlServer -AllowClobber -Force -Scope AllUsers
-Import-Module -Name SqlServer
+Import-Module -Name SqlServer -Force -PassThru
 
 $sqlInstance = "MSSQLSERVER"
 
@@ -36,10 +36,8 @@ $wmi.EnableFilestream(2, $sqlInstance)
 Get-Service -Name $sqlInstance | Restart-Service -Force
 
 # Enable filestream access levels in the database
-Set-ExecutionPolicy RemoteSigned -Force
-Import-Module "sqlps" -DisableNameChecking
-Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2;"
-Invoke-Sqlcmd "RECONFIGURE"
+Invoke-Sqlcmd "EXEC sp_configure filestream_access_level, 2;" -TrustServerCertificate
+Invoke-Sqlcmd "RECONFIGURE" -TrustServerCertificate
 
 # Create Archive database to introduce these SQL feature usage
 # Create sample database
@@ -72,6 +70,6 @@ ALTER DATABASE AdventureWorksLT2022 SET RECOVERY FULL;
 GO
 "@
 
-Invoke-Sqlcmd $sqlScriptToExecute
+Invoke-Sqlcmd $sqlScriptToExecute -TrustServerCertificate
 
 # Wait for the script to complete
