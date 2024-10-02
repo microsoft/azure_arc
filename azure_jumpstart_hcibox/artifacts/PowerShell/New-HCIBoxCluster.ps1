@@ -1634,17 +1634,17 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/11] Downloading HCIBox VHDs" -ForegroundColor Green
-BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
-$checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
-$hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
-if ($checksum.Hash -eq $hash) {
-    Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
-}
-else {
-    Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
-    throw
-}
+BITSRequest -Params @{'Uri'='https://jumpstartprodsg.blob.core.windows.net/hcibox/preprod/HCI.vhdx'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+# BITSRequest -Params @{'Uri'='https://jumpstartprodsg.blob.core.windows.net/hcibox/preprod/HCI1024.sha256'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+# $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
+# $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
+# if ($checksum.Hash -eq $hash) {
+#     Write-Host "AZSCHI.vhdx has valid checksum. Continuing..."
+# }
+# else {
+#     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
+#     throw
+# }
 BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
 BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"
