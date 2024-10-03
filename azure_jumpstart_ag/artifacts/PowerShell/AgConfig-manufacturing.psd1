@@ -77,7 +77,7 @@
         'kubernetes-cli',
         'vcredist140',
         'microsoft-edge',
-        'azcopy10 --version=10.25.1',
+        'azcopy10',
         'vscode',
         'git',
         '7zip',
