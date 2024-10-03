@@ -286,6 +286,7 @@ BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$lates
 # Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+Install-Module -Name Az -Force
 
 ##############################################################
 # Install Azure CLI (64-bit not available via Chocolatey)
