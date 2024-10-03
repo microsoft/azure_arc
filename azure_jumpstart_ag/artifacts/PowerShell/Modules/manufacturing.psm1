@@ -581,10 +581,9 @@ function Deploy-ManufacturingBookmarks {
 function Update-AzureIoTOpsExtension {
     try {
         Write-Host "Starting patching of azure-iot-ops extension..." -ForegroundColor Green
-        & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "$env:USERPROFILE/.azure/cliextensions/azure-iot-ops" azure-identity==1.17.1
+        & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "& "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "C:\Program Files\Microsoft SDKs\Azure\CLI2\Lib\site-packages\azure-cli-extensions\azure-iot-ops" azure-identity==1.17.1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Installation of azure-iot-ops extension completed successfully." -ForegroundColor Green
-            Start-Sleep -Seconds 60
         } else {
             Write-Host "Installation of azure-iot-ops extension failed with exit code $LASTEXITCODE." -ForegroundColor Red
         }
