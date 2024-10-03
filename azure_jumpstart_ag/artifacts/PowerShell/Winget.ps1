@@ -1,8 +1,8 @@
-$ErrorActionPreference = $env:ErrorActionPreference
+$ErrorActionPreference = 'SilentlyContinue'
 
-$AgDir = 'C:\ArcBox'
+$AgDir = 'C:\Ag'
 $AgLogsDir = "$AgDir\Logs"
-$AgConfig = Import-PowerShellDataFile -Path $AgConfigPath
+$AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
 
 $logFilePath = Join-Path -Path $AgLogsDir -ChildPath ('WinGet-provisioning-' + (Get-Date -Format 'yyyyMMddHHmmss') + '.log')
 
@@ -24,7 +24,7 @@ Write-Header 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
 
 # Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
-& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
+& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget --silent--accept-package-agreements
 
 ##############################################################
 # Install Winget packages
@@ -41,7 +41,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     try {
         foreach ($app in $AgConfig.WingetPackagesList) {
             Write-Host "Installing $app"
-            & winget install -e --id $app | Write-Output
+            & winget install -e --id $app --silent --accept-package-agreements --accept-source-agreements --ignore-warnings --log "$AgLogsDir\winget.log"  > $null 2>&1
         }
 
         # If the command succeeds, set $success to $true to exit the loop
