@@ -637,6 +637,7 @@ function Set-NICs {
 
             # Rename non-storage adapters
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
+            New-NetIPAddress -IPAddress $VM.IP -InterfaceAlias FABRIC -PrefixLength 24
             # Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
             # Enable CredSSP Settings
@@ -657,6 +658,7 @@ function Set-NICs {
         }
     }
 }
+
 
 function Set-FabricNetwork {
     param (
@@ -1480,20 +1482,20 @@ function Set-HCIDeployPrereqs {
             
             # Prep nodes for Azure Arc onboarding
             winrm quickconfig -quiet
-            netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4:8,any dir=in action=allow
+            netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol=icmpv4 dir=in action=allow
 
-            # Register PSGallery as a trusted repo
-            Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-            Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
-            Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+            # # Register PSGallery as a trusted repo
+            # Register-PSRepository -Default -InstallationPolicy Trusted -ErrorAction SilentlyContinue
+            # Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+            # Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
-            #Install Arc registration script from PSGallery
-            Install-Module AzsHCI.ARCinstaller -Force
+            # #Install Arc registration script from PSGallery
+            # Install-Module AzsHCI.ARCinstaller -Force
 
-            #Install required PowerShell modules in your node for registration
-            Install-Module Az.Accounts -Force
-            Install-Module Az.ConnectedMachine -Force
-            Install-Module Az.Resources -Force
+            # #Install required PowerShell modules in your node for registration
+            # Install-Module Az.Accounts -Force
+            # Install-Module Az.ConnectedMachine -Force
+            # Install-Module Az.Resources -Force
             $azureAppCred = (New-Object System.Management.Automation.PSCredential $clientId, (ConvertTo-SecureString -String $clientSecret -AsPlainText -Force))
             Connect-AzAccount -ServicePrincipal -SubscriptionId $subId -TenantId $tenantId -Credential $azureAppCred
             $armtoken = ConvertFrom-SecureStringToPlainText -SecureString ((Get-AzAccessToken -AsSecureString).Token)
