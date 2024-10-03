@@ -254,6 +254,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -OutFile $AgIconsDir\contoso-motors.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Winget.ps1") -OutFile "$AgPowerShellDir\Winget.ps1"
 
 if($scenario -eq "contoso_supermarket"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"
@@ -285,52 +286,6 @@ BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$lates
 # Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
-Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
-Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
-
-# Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers
-$winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
-
-# Windows Terminal needs to be installed per user, while WinGet Configuration runs as SYSTEM. Hence, this package is installed in the logon script.
-& $winget install Microsoft.WindowsTerminal --version 1.18.3181.0 -s winget
-
-##############################################################
-# Install Winget packages
-##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
-
-$retryCount = 0
-$success = $false
-
-while (-not $success -and $retryCount -lt $maxRetries) {
-    Write-Host "Winget packages specified"
-
-    try{
-      foreach ($app in $AgConfig.WingetPackagesList) {
-        Write-Host "Installing $app"
-        & winget install -e --id $app | Write-Output
-      }
-
-      # If the command succeeds, set $success to $true to exit the loop
-      $success = $true
-  }
-  catch {
-    # If an exception occurs, increment the retry count
-    $retryCount++
-
-    # If the maximum number of retries is not reached yet, display an error message
-    if ($retryCount -lt $maxRetries) {
-      Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-      Start-Sleep -Seconds $retryDelay
-    }
-    else {
-      Write-Host "All attempts failed. Exiting..."
-      exit 1  # Stop script execution if maximum retries reached
-    }
-  }
-}
 
 ##############################################################
 # Install Azure CLI (64-bit not available via Chocolatey)
@@ -397,9 +352,14 @@ New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgC
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
+$ScheduledTaskExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "C:\Program Files\PowerShell\7\pwsh.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
-Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $Env:AgDir\WinGet.ps1
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+#$Trigger = New-ScheduledTaskTrigger -AtLogOn
+#$Action = New-ScheduledTaskAction -Execute "C:\Program Files\PowerShell\7\pwsh.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+#Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
 # Disabling Windows Server Manager Scheduled Task
