@@ -28,6 +28,11 @@ function Deploy-AzCLI {
         }
     }
 
+    # Patch azure-identity for azure-iot-ops
+    Write-Host "[$(Get-Date -Format t)] INFO: Patching azure-identity for azure-iot-ops" -ForegroundColor Gray
+    "C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "$env:USERPROFILE/.azure/cliextensions/azure-iot-ops" azure-identity==1.17.1
+
+    Start-Sleep -Seconds 60
 
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
     Write-Host
