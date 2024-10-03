@@ -638,7 +638,7 @@ function Set-NICs {
             # Rename non-storage adapters
             Get-NetAdapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC
             $trimip = $($VM.IP).Substring(0, $VM.IP.IndexOf('/'))
-            New-NetIPAddress -IPAddress $trimip -NextHop $HCIBoxConfig.SDNLabRoute -InterfaceAlias FABRIC -PrefixLength 24
+            New-NetIPAddress -IPAddress $trimip -DefaultGateway $HCIBoxConfig.SDNLabRoute -InterfaceAlias FABRIC -PrefixLength 24
             # Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2
 
             # Enable CredSSP Settings
