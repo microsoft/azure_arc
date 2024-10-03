@@ -72,29 +72,6 @@
         'Az.EventHub'
     )
 
-    # Chocolatey packages list
-    ChocolateyPackagesList  = @(
-        'az.powershell',
-        'powershell-core',
-        'bicep',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnet-sdk',
-        'zoomit',
-        'openssl.light',
-        'mqtt-explorer',
-        'gh',
-        'python'
-    )
-
     # Winget packages list
     WingetPackagesList  = @(
         'Microsoft.PowerShell',
