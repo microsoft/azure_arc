@@ -368,10 +368,10 @@ Install-Module -Name Posh-SSH -Force
 
 $ScheduledTaskExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $AgPowerShellDir\WinGet.ps1
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument $AgPowerShellDir\WinGet.ps1
 Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
-$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
 Register-ScheduledTask -TaskName "AgLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
