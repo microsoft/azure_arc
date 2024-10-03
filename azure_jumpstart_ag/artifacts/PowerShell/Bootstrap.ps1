@@ -284,6 +284,7 @@ BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$lates
 ##############################################################
 # Installing PowerShell Modules
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
 Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Version 1.8.1911
 Install-PSResource -Name Microsoft.WinGet.DSC -Scope AllUsers -Quiet -AcceptLicense -TrustRepository -Prerelease -Version 1.8.1911-alpha
 
