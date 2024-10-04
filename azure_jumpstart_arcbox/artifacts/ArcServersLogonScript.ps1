@@ -557,7 +557,7 @@ $payLoad = @"
             }
 
             Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
-            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
 
         }
     }
@@ -580,8 +580,8 @@ $payLoad = @"
             Write-Output "SSH already enabled on $($connectedMachine.Name)"
         }
 
-            Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
-            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+        Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
+        $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
 
     }
 
