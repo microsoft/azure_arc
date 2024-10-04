@@ -151,6 +151,8 @@
             GrafanaDataSource      = "seattle"
             Type                   = "k3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmService            = "service/prometheus-kube-prometheus-prometheus"
         }
         Chicago = @{
             ArcClusterName         = "Ag-K3s-Chicago"
@@ -158,6 +160,8 @@
             GrafanaDataSource      = "chicago"
             Type                   = "k3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmService            = "service/prometheus-kube-prometheus-prometheus"
         }
     }
 
