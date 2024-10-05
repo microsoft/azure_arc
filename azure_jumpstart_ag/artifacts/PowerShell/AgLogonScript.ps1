@@ -13,7 +13,8 @@ $global:AgAppsRepo = $AgConfig.AgDirectories["AgAppsRepo"]
 $global:configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
 $global:AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $global:AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
-$global:industry = $Env:industry
+$global:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
+$global:scenario = $Env:scenario
 $global:websiteUrls = $AgConfig.URLs
 $global:githubAccount = $Env:githubAccount
 $global:githubBranch = $Env:githubBranch
@@ -31,8 +32,7 @@ $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
 $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
-$global:AKSEEPinnedSchemaVersion = $Env:AKSEEPinnedSchemaVersion
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:acrName = $Env:acrName.ToLower()
@@ -41,12 +41,22 @@ if ($industry -eq "retail") {
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
-}elseif ($industry -eq "manufacturing") {
+}elseif ($scenario -eq "contoso_motors") {
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
+    $global:spnObjectId = $Env:spnObjectId
+    $global:stcontainerName = $Env:stcontainerName
+}elseif ($scenario -eq "contoso_hypermarket"){
+    $global:aioNamespace = "azure-iot-operations"
+    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
+    $global:stagingStorageAccountName = $Env:stagingStorageAccountName
+    $global:aioStorageAccountName = $Env:aioStorageAccountName
+    $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
+    $global:k3sArcClusterName = $Env:k3sArcClusterName
     $global:spnObjectId = $Env:spnObjectId
     $global:stcontainerName = $Env:stcontainerName
 }
@@ -55,11 +65,12 @@ if ($industry -eq "retail") {
 # Importing fuctions
 #####################################################################
 Import-Module "$AgPowerShellDir\common.psm1" -Force -DisableNameChecking
-Import-Module "$AgPowerShellDir\retail.psm1" -Force -DisableNameChecking
-Import-Module "$AgPowerShellDir\manufacturing.psm1" -Force -DisableNameChecking
+Import-Module "$AgPowerShellDir\contoso_supermarket.psm1" -Force -DisableNameChecking
+Import-Module "$AgPowerShellDir\contoso_motors.psm1" -Force -DisableNameChecking
+Import-Module "$AgPowerShellDir\contoso_hypermarket.psm1" -Force -DisableNameChecking
 
-Start-Transcript -Path ($AgConfig.AgDirectories["AgLogsDir"] + "\AgLogonScript.log")
-Write-Header "Executing Jumpstart Agora automation scripts"
+Start-Transcript -Path ($AgLogsDir + "\AgLogonScript.log")
+Write-Host "Executing Jumpstart Agora automation scripts"
 $startTime = Get-Date
 
 # Disable Windows firewall
@@ -96,16 +107,16 @@ Deploy-WindowsTools
 #####################################################################
 # Configure Jumpstart Agora Apps repository
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "INFO: Forking and preparing Apps repository locally (Step 4/17)" -ForegroundColor DarkGreen
-    SetupRetailRepo
+    SetupSupermarketRepo
 }
 
 
 #####################################################################
 # Azure IoT Hub resources preparation
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "[$(Get-Date -Format t)] INFO: Creating Azure IoT resources (Step 5/17)" -ForegroundColor DarkGreen
     Deploy-AzureIoTHub
 }
@@ -113,14 +124,24 @@ if ($industry -eq "retail") {
 #####################################################################
 # Configure L1 virtualization infrastructure
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
-Deploy-VirtualizationInfrastructure
+if ($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring L1 virtualization infrastructure (Step 6/17)" -ForegroundColor DarkGreen
+    Deploy-VirtualizationInfrastructure
+}
 
 #####################################################################
 # Setup Azure Container registry on cloud AKS staging environment
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     Deploy-AzContainerRegistry
+}
+
+#####################################################################
+# Get clusters config files
+#####################################################################
+if($scenario -eq "contoso_hypermarket"){
+    Get-K3sConfigFile
+    Set-K3sClusters
 }
 
 #####################################################################
@@ -138,13 +159,17 @@ Deploy-ClusterSecrets
 #####################################################################
 # Cache contoso-supermarket images on all clusters
 #####################################################################
-Deploy-K8sImagesCache
+if ($scenario -eq "contoso_supermarket") {
+    Deploy-K8sImagesCache
+}
 
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
-Deploy-AzArcK8s
+if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+    Deploy-AzArcK8sAKSEE
+}
 
 #####################################################################
 # Installing flux extension on clusters
@@ -155,7 +180,7 @@ Deploy-ClusterFluxExtension
 #####################################################################
 # Deploying nginx on AKS cluster
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying nginx on AKS cluster (Step 12/17)" -ForegroundColor DarkGreen
     kubectx $AgConfig.SiteConfig.Staging.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
     helm repo add $AgConfig.nginx.RepoName $AgConfig.nginx.RepoURL | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
@@ -169,17 +194,18 @@ if ($industry -eq "retail") {
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
-if ($industry -eq "retail") {
+if ($scenario -eq "contoso_supermarket") {
     Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
-    Deploy-RetailConfigs
+    Deploy-SupermarketConfigs
 }
 
-if ($industry -eq "manufacturing") {
+if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
     Update-AzureIoTOpsExtension
     Deploy-AIO
-    Deploy-ManufacturingConfigs
+    if($scenario -eq "contoso_motors"){
+        Deploy-MotorsConfigs
+    }
     $mqttIpArray=Set-MQTTIpAddress
-    #Deploy-MQTTSimulator -mqttIpArray $mqttIpArray # this is now being done via helm
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }
 
@@ -200,7 +226,7 @@ Deploy-Workbook "arc-osperformance-workbook.bicep"
 #####################################################################
 # Deploy Azure Data Explorer Dashboard Reports
 #####################################################################
-if($industry -eq "manufacturing"){
+if($scenario -eq "contoso_motors"){
     Deploy-ADXDashboardReports
 }
 
@@ -208,10 +234,12 @@ if($industry -eq "manufacturing"){
 # Creating bookmarks
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
-if($industry -eq "retail"){
-    Deploy-RetailBookmarks
-}else{
-    Deploy-ManufacturingBookmarks
+if($scenario -eq "contoso_supermarket"){
+    Deploy-SupermarketBookmarks
+}elseif($scenario -eq "contoso_motors"){
+    Deploy-MotorsBookmarks
+}elseif($scenario -eq "contoso_hypermarket"){
+    #Deploy-HypermarketBookmarks
 }
 
 ##############################################################
@@ -222,7 +250,7 @@ Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-if($industry -eq "retail"){
+if($scenario -eq "contoso_supermarket"){
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray
     while ($(Get-Job -Name images-cache-cleanup).State -eq 'Running') {
         Write-Host "[$(Get-Date -Format t)] INFO: Waiting for images-cache job to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
@@ -269,7 +297,7 @@ Add-Type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-# if ($industry -eq "manufacturing") {
+# if ($scenario -eq "contoso_motors") {
 #     foreach ($shell in $kubectlMonShells) {
 #         Stop-Process -Id $shell.Id
 #     }
