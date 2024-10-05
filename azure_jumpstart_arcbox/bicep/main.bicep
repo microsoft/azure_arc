@@ -31,6 +31,14 @@ param logAnalyticsWorkspaceName string
 ])
 param flavor string = 'ITPro'
 
+@description('SQL Server edition to deploy. Valid values are: \'Developer\', \'Standard\', \'Enterprise\'')
+@allowed([
+  'Developer'
+  'Standard'
+  'Enterprise'
+])
+param sqlServerEdition string = 'Developer'
+
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
 
@@ -187,6 +195,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     autoShutdownTime: autoShutdownTime
     autoShutdownTimezone: autoShutdownTimezone
     autoShutdownEmailRecipient: empty(autoShutdownEmailRecipient) ? null : autoShutdownEmailRecipient
+    sqlServerEdition: sqlServerEdition
   }
   dependsOn: [
     updateVNetDNSServers

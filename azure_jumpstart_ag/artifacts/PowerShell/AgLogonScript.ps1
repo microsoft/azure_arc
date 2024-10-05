@@ -200,6 +200,7 @@ if ($scenario -eq "contoso_supermarket") {
 }
 
 if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
+    Update-AzureIoTOpsExtension
     Deploy-AIO
     if($scenario -eq "contoso_motors"){
         Deploy-MotorsConfigs

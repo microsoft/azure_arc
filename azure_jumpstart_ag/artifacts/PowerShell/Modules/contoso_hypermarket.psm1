@@ -16,15 +16,17 @@ function Get-K3sConfigFile{
 
 function Set-K3sClusters {
   Write-Host "Configuring kube-vip on K3s clusterS"
+  az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+  az account set -s $subscriptionId
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
           $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
           $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
           kubectx
-          $k3sVIP = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv
+          $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
           Write-Host "Assigning kube-vip-role on k3s cluster"
-          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
+          $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
           kubectl apply -f $kubeVipRbac
 
           $kubeVipDaemonset = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
@@ -34,7 +36,7 @@ function Set-K3sClusters {
           Write-Host "Deploying Kube vip cloud controller on k3s cluster"
           kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
 
-          $serviceIpRange = az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv
+          $serviceIpRange = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``false``].privateIPAddress" -otsv)
           $sortedIps = $serviceIpRange | Sort-Object {[System.Version]$_}
           $lowestServiceIp = $sortedIps[0]
           $highestServiceIp = $sortedIps[-1]
