@@ -29,7 +29,6 @@ function Deploy-AzCLI {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
-    Write-Host
 }
 
 function Deploy-AzPowerShell {
