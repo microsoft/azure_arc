@@ -400,6 +400,28 @@ catch {
 Write-Host "`n"
 Write-Host "[$(Get-Date -Format t)] INFO: Installing the Azure IoT Ops CLI extension" -ForegroundColor DarkGray
 Write-Host "`n"
+
+##############################################################
+# Patching Azure IoT Ops Extension
+##############################################################
+Write-Host "`n"
+Write-Host "[$(Get-Date -Format t)] INFO: Patching the Azure IoT Ops CLI extension" -ForegroundColor DarkGray
+try {
+    Write-Host "Starting patching of azure-iot-ops extension..." -ForegroundColor Green
+    & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "C:\Program Files\Microsoft SDKs\Azure\CLI2\Lib\site-packages\azure-cli-extensions\azure-iot-ops" azure-identity==1.17.1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Installation of azure-iot-ops extension completed successfully." -ForegroundColor Green
+    } else {
+        Write-Host "Installation of azure-iot-ops extension failed with exit code $LASTEXITCODE." -ForegroundColor Red
+    }
+} catch {
+    Write-Host "An error occurred during the patching of the azure-iot-ops extension." -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+}
+Write-Host "`n"
+
+
+
 ##############################################################
 # Deploy aio
 ##############################################################
