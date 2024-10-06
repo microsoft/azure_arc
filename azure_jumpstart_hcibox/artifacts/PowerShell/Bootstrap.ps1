@@ -112,12 +112,16 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/New-HCIBoxCluster.ps
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-AKSWorkloadCluster.ps1") -OutFile $HCIPath\Configure-AKSWorkloadCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Configure-VMLogicalNetwork.ps1") -OutFile $HCIPath\Configure-VMLogicalNetwork.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Generate-ARM-Template.ps1") -OutFile $HCIPath\Generate-ARM-Template.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\common.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hci.tests.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\hci.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/hcibox-bginfo.bgi") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\hcibox-bginfo.bgi"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$($HCIBoxConfig.Paths["TestsDir"])\Invoke-Test.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$($HCIBoxConfig.Paths["LogsDir"])\LogInstructions.txt"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $HCIPath\jumpstart-user-secret.yaml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $HCIPath\hci.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $HCIPath\hci.parameters.json
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile $HCIPath\DSC\packages.dsc.yml
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile $HCIPath\DSC\hyper-v.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\packages.dsc.yml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile "$($HCIBoxConfig.Paths["DSCDir"])\hyper-v.dsc.yml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$HCIPath\WinGet.ps1"
 
 # Replace password and DNS placeholder
