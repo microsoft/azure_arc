@@ -57,7 +57,7 @@ properties:
         description: Install Microsoft DotNet SDK 8
       settings:
         id: Microsoft.DotNet.SDK.8
-        source: winget
+        source: winget    
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       id: helm
       directives:
@@ -78,6 +78,13 @@ properties:
         description: Install OpenSSL
       settings:
         id: FireDaemon.OpenSSL
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.AzureDataStudio
+      directives:
+        description: Install Microsoft Azure Data Studio
+      settings:
+        id: Microsoft.AzureDataStudio
         source: winget
     - resource: DSCR_Font/cFont
       id: CascadiaMono
