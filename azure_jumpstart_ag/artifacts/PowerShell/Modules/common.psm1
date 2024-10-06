@@ -953,8 +953,13 @@ function Deploy-Prometheus {
     # Deploying Kube Prometheus Stack for stores
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
+        if ($Env:scenario -eq "contoso_hypermarket") {
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$($_.Value.FriendlyName.ToLower())"
+            kubectx | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
+        else {
+            kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'
