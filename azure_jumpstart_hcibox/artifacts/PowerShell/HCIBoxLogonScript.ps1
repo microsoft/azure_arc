@@ -157,14 +157,14 @@ Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "HCIBoxLogonScript" -Confirm:$false
 
-#Changing to Jumpstart ArcBox wallpaper
+#Changing to Jumpstart HCIBox wallpaper
 
 Write-Header "Changing wallpaper"
 
 # bmp file is required for BGInfo
-Convert-JSImageToBitMap -SourceFilePath "$Env:ArcBoxDir\wallpaper.png" -DestinationFilePath "$Env:ArcBoxDir\wallpaper.bmp"
+Convert-JSImageToBitMap -SourceFilePath "$Env:HCIBoxDir\wallpaper.png" -DestinationFilePath "$Env:HCIBoxDir\wallpaper.bmp"
 
-Set-JSDesktopBackground -ImagePath "$Env:ArcBoxDir\wallpaper.bmp"
+Set-JSDesktopBackground -ImagePath "$Env:HCIBoxDir\wallpaper.bmp"
 
 Write-Header "Running tests to verify infrastructure"
 
