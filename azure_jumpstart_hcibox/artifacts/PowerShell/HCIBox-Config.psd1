@@ -19,25 +19,6 @@
         VMPath = "C:\VMs"
     }
 
-    ChocolateyPackagesList = @(
-        'az.powershell',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'terraform',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnet-sdk',
-        'setdefaultbrowser',
-        'zoomit',
-        'azure-data-studio'
-    )
-
     PowerShellModulesList = @(
         'Az.Resources',
         'Az.ConnectedMachine'
