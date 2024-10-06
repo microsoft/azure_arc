@@ -18,7 +18,8 @@ param (
   [string]$rdpPort,
   [string]$autoDeployClusterResource,
   [string]$autoUpgradeClusterResource,
-  [string]$debugEnabled
+  [string]$debugEnabled,
+  [string]$vmAutologon
 )
 
 Write-Output "Input parameters:"
@@ -49,6 +50,20 @@ if ($debugEnabled -eq "true") {
   [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
 } else {
   [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Continue", [System.EnvironmentVariableTarget]::Machine)
+}
+
+if ($vmAutologon -eq "true") {
+
+  Write-Host "Configuring VM Autologon"
+
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+
+} else {
+
+  Write-Host "Not configuring VM Autologon"
+
 }
 
 #######################################################################
