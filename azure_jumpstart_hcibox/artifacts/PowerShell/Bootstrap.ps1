@@ -52,6 +52,8 @@ if ($debugEnabled -eq "true") {
   [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Continue", [System.EnvironmentVariableTarget]::Machine)
 }
 
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+
 if ($vmAutologon -eq "true") {
 
   Write-Host "Configuring VM Autologon"
@@ -120,7 +122,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFil
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
-$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
 (Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $HCIPath\HCIBox-Config.psd1
 (Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $HCIPath\HCIBox-Config.psd1
 
