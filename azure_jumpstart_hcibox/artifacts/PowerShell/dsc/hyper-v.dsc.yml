@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+
+  resources:
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kubectl
+      directives:
+        description: Install kubectl
+      settings:
+        id: Kubernetes.kubectl
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: kubectx
+      directives:
+        description: Install kubectx
+      settings:
+        id: ahmetb.kubectx
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: DotNetSDK8
+      directives:
+        description: Install Microsoft DotNet SDK 8
+      settings:
+        id: Microsoft.DotNet.SDK.8
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: SQLServerManagementStudio
+      directives:
+        description: Install Microsoft SQL Server Management Studio
+      settings:
+        id: Microsoft.SQLServerManagementStudio
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.Azure.DataCLI
+      directives:
+        description: Install Microsoft Azure Data CLI
+      settings:
+        id: Microsoft.Azure.DataCLI
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Microsoft.AzureDataStudio
+      directives:
+        description: Install Microsoft Azure Data Studio
+      settings:
+        id: Microsoft.AzureDataStudio
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: FireDaemon.OpenSSL
+      directives:
+        description: Install OpenSSL
+      settings:
+        id: FireDaemon.OpenSSL
+        source: winget
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Istio.Istio
+      directives:
+        description: Install Istio configuration command line utility
+      settings:
+        id: Istio.Istio
+        source: winget
+    - resource: PSDscResources/WindowsFeature
+      id: Hyper-V
+      directives:
+        description: Install Hyper-V
+      settings:
+        Name: Hyper-V
+        Ensure: Present
+    - resource: HyperVDsc/VMHost
+      id: VMHost
+      directives:
+        description: Configure VM Host settings
+      settings:
+        IsSingleInstance: Yes
+        EnableEnhancedSessionMode: True
+    - resource: HyperVDsc/VMSwitch
+      id: VMSwitch
+      directives:
+        description: Configure VM Switch
+      settings:
+        Name: InternalNATSwitch
+        Ensure: Present
+        Type: Internal
+    - resource: NetworkingDsc/IPAddress
+      id: IPAddress.VMSwitch
+      directives:
+        description: Configure VM Switch vNIC IP Address
+      settings:
+        InterfaceAlias: 'vEthernet (InternalNATSwitch)'
+        IPAddress: '10.10.1.1/24'
+        AddressFamily: IPv4
+        KeepExistingAddress: false
+  configurationVersion: 0.2.0

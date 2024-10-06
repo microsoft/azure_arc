@@ -1,45 +1,48 @@
 param (
-    [string]$adminUsername,
-    [string]$adminPassword,
-    [string]$spnClientId,
-    [string]$spnClientSecret,
-    [string]$spnProviderId,
-    [string]$spnTenantId,
-    [string]$subscriptionId,
-    [string]$resourceGroup,
-    [string]$azureLocation,
-    [string]$stagingStorageAccountName,
-    [string]$workspaceName,
-    [string]$templateBaseUrl,
-    [string]$registerCluster,
-    [string]$deployAKSHCI,
-    [string]$deployResourceBridge,
-    [string]$natDNS,
-    [string]$rdpPort,
-    [string]$autoDeployClusterResource,
-    [string]$autoUpgradeClusterResource
+  [string]$adminUsername,
+  [string]$adminPassword,
+  [string]$spnClientId,
+  [string]$spnClientSecret,
+  [string]$spnProviderId,
+  [string]$spnTenantId,
+  [string]$subscriptionId,
+  [string]$resourceGroup,
+  [string]$azureLocation,
+  [string]$stagingStorageAccountName,
+  [string]$workspaceName,
+  [string]$templateBaseUrl,
+  [string]$registerCluster,
+  [string]$deployAKSHCI,
+  [string]$deployResourceBridge,
+  [string]$natDNS,
+  [string]$rdpPort,
+  [string]$autoDeployClusterResource,
+  [string]$autoUpgradeClusterResource
 )
 
-[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnProviderId', $spnProviderId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('autoDeployClusterResource', $autoDeployClusterResource,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('natDNS', $natDNS,[System.EnvironmentVariableTarget]::Machine)
+Write-Output "Input parameters:"
+$PSBoundParameters
+
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnProviderId', $spnProviderId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoDeployClusterResource', $autoDeployClusterResource, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('natDNS', $natDNS, [System.EnvironmentVariableTarget]::Machine)
 
 #######################################################################
 ## Setup basic environment
@@ -50,12 +53,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -Out
 
 # Creating HCIBox path
 $HCIPath = "C:\HCIBox"
-[System.Environment]::SetEnvironmentVariable('HCIBoxDir', $HCIPath,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('HCIBoxDir', $HCIPath, [System.EnvironmentVariableTarget]::Machine)
 New-Item -Path $HCIPath -ItemType directory -Force
 
 # Downloading configuration file
 $ConfigurationDataFile = "$HCIPath\HCIBox-Config.psd1"
-[System.Environment]::SetEnvironmentVariable('HCIBoxConfigFile', $ConfigurationDataFile,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('HCIBoxConfigFile', $ConfigurationDataFile, [System.EnvironmentVariableTarget]::Machine)
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/HCIBox-Config.psd1") -OutFile $ConfigurationDataFile
 
 # Importing configuration data
@@ -63,8 +66,8 @@ $HCIBoxConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Create paths
 foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
-    Write-Output "Creating path $($path.Value)"
-    New-Item -Path $path.Value -ItemType directory -Force | Out-Null
+  Write-Output "Creating path $($path.Value)"
+  New-Item -Path $path.Value -ItemType directory -Force | Out-Null
 }
 
 # Begin transcript
@@ -76,39 +79,6 @@ Start-Transcript -Path "$($HCIBoxConfig.Paths["LogsDir"])\Bootstrap.log"
 # Extending C:\ partition to the maximum size
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
-
-# Installing tools
-Write-Header "Installing Chocolatey Apps"
-try {
-    choco config get cacheLocation
-}
-catch {
-    Write-Output "Chocolatey not detected, trying to install now"
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-foreach ($app in $HCIBoxConfig.ChocolateyPackagesList)
-{
-    Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
-}
-
-# Installing modules
-Write-Header "Installing PowerShell modules"
-
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-
-foreach ($module in $HCIBoxConfig.PowerShellModulesList)
-{
-    Write-Host "Installing $module"
-    Install-Module -Name $module -AllowClobber -Force
-}
-
-Write-Header "Install Azure CLI (64-bit not available via Chocolatey)"
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-Remove-Item .\AzureCLI.msi
 
 Write-Host "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest "https://raw.githubusercontent.com/Azure/arc_jumpstart_docs/main/img/wallpaper/hcibox_wallpaper_dark.png" -OutFile $HCIPath\wallpaper.png
@@ -122,12 +92,38 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/jumpstart-user-secret.yaml") -OutFile $HCIPath\jumpstart-user-secret.yaml
 Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.json") -OutFile $HCIPath\hci.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/hci.parameters.json") -OutFile $HCIPath\hci.parameters.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/packages.dsc.yml") -OutFile $HCIPath\DSC\packages.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/dsc/hyper-v.dsc.yml") -OutFile $HCIPath\DSC\hyper-v.dsc.yml
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/WinGet.ps1") -OutFile "$HCIPath\WinGet.ps1"
 
 # Replace password and DNS placeholder
 Write-Host "Updating config placeholders with injected values."
 $adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
-(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $HCIPath\HCIBox-Config.psd1
-(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-natDNS%',$natDNS | Set-Content -Path $HCIPath\HCIBox-Config.psd1
+(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-password%', $adminPassword | Set-Content -Path $HCIPath\HCIBox-Config.psd1
+(Get-Content -Path $HCIPath\HCIBox-Config.psd1) -replace '%staging-natDNS%', $natDNS | Set-Content -Path $HCIPath\HCIBox-Config.psd1
+
+# Installing PowerShell Modules
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+$modules = @("Az", "Az.ConnectedMachine", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
+
+foreach ($module in $modules) {
+    Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
+}
+
+##############################################################
+# Installing PowerShell 7
+##############################################################
+$ProgressPreference = 'SilentlyContinue'
+$url = "https://github.com/PowerShell/PowerShell/releases/latest"
+$latestVersion = (Invoke-WebRequest -UseBasicParsing -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
+$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/$latestVersion/PowerShell-$($latestVersion.Substring(1,5))-win-x64.msi"
+Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -OutFile .\PowerShell7.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1'
+Remove-Item .\PowerShell7.msi
+
+Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
 
 # Disabling Windows Server Manager Scheduled Task
 Write-Host "Disabling Windows Server Manager scheduled task."
@@ -139,7 +135,7 @@ $RegistryPath = "HKLM:\SOFTWARE\Microsoft\ServerManager"
 $Name = "DoNotPopWACConsoleAtSMLaunch"
 $Value = "1"
 if (-not (Test-Path $RegistryPath)) {
-    New-Item -Path $RegistryPath -Force | Out-Null
+  New-Item -Path $RegistryPath -Force | Out-Null
 }
 New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
 
@@ -147,7 +143,7 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 Write-Host "Disabling network profile prompt."
 $RegistryPath = "HKLM:\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"
 if (-not (Test-Path $RegistryPath)) {
-    New-Item -Path $RegistryPath -Force | Out-Null
+  New-Item -Path $RegistryPath -Force | Out-Null
 }
 
 # Configuring CredSSP and WinRM
@@ -155,22 +151,28 @@ Write-Host "Enabling CredSSP."
 Enable-WSManCredSSP -Role Server -Force | Out-Null
 Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null
 
+$ScheduledTaskExecutable = "pwsh.exe"
+
+# Creating scheduled task for WinGet.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $HCIPath\WinGet.ps1
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
 # Creating scheduled task for HCIBoxLogonScript.ps1
 Write-Host "Creating scheduled task for HCIBoxLogonScript.ps1"
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $HCIPath\HCIBoxLogonScript.ps1
-Register-ScheduledTask -TaskName "HCIBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute $ScheduledTaskExecutable -Argument $HCIPath\HCIBoxLogonScript.ps1
+Register-ScheduledTask -TaskName "HCIBoxLogonScript"  -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disable Edge 'First Run' Setup
 Write-Host "Configuring Microsoft Edge."
-$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-$firstRunRegistryName  = 'HideFirstRunExperience'
+$edgePolicyRegistryPath = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$firstRunRegistryName = 'HideFirstRunExperience'
 $firstRunRegistryValue = '0x00000001'
 $savePasswordRegistryName = 'PasswordManagerEnabled'
 $savePasswordRegistryValue = '0x00000000'
 
 if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
-    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+  New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
 }
 
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
@@ -178,35 +180,31 @@ New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -
 
 # Change RDP Port
 Write-Host "Updating RDP Port - RDP port number from configuration is $rdpPort"
-if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389"))
-{
-    Write-Host "Configuring RDP port number to $rdpPort"
-    $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
-    $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
-    Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
+if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
+  Write-Host "Configuring RDP port number to $rdpPort"
+  $TSPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server'
+  $RDPTCPpath = $TSPath + '\Winstations\RDP-Tcp'
+  Set-ItemProperty -Path $TSPath -name 'fDenyTSConnections' -Value 0
 
-    # RDP port
-    $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
-    Write-Host "Current RDP PortNumber: $portNumber"
-    if (!($portNumber -eq $rdpPort))
-    {
-      Write-Host Setting RDP PortNumber to $rdpPort
-      Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
-      Restart-Service TermService -force
-    }
+  # RDP port
+  $portNumber = (Get-ItemProperty -Path $RDPTCPpath -Name 'PortNumber').PortNumber
+  Write-Host "Current RDP PortNumber: $portNumber"
+  if (!($portNumber -eq $rdpPort)) {
+    Write-Host Setting RDP PortNumber to $rdpPort
+    Set-ItemProperty -Path $RDPTCPpath -name 'PortNumber' -Value $rdpPort
+    Restart-Service TermService -force
+  }
 
-    #Setup firewall rules
-    if ($rdpPort -eq 3389)
-    {
-      netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
-    }
-    else
-    {
-      $systemroot = get-content env:systemroot
-      netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
-    }
+  #Setup firewall rules
+  if ($rdpPort -eq 3389) {
+    netsh advfirewall firewall set rule group="remote desktop" new Enable=Yes
+  }
+  else {
+    $systemroot = get-content env:systemroot
+    netsh advfirewall firewall add rule name="Remote Desktop - Custom Port" dir=in program=$systemroot\system32\svchost.exe service=termservice action=allow protocol=TCP localport=$RDPPort enable=yes
+  }
 
-    Write-Host "RDP port configuration complete."
+  Write-Host "RDP port configuration complete."
 }
 
 # Install Hyper-V and reboot
