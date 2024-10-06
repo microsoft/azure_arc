@@ -226,6 +226,19 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/PSProfile.ps1") -Out
 .$PsHome\Profile.ps1
 
 ##############################################################
+# Installing PowerShell 7
+##############################################################
+$ProgressPreference = 'SilentlyContinue'
+$url = "https://github.com/PowerShell/PowerShell/releases/latest"
+$latestVersion = (Invoke-WebRequest -UseBasicParsing -Uri $url).Content | Select-String -Pattern "v[0-9]+\.[0-9]+\.[0-9]+" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value
+$downloadUrl = "https://github.com/PowerShell/PowerShell/releases/download/$latestVersion/PowerShell-$($latestVersion.Substring(1,5))-win-x64.msi"
+Invoke-WebRequest -UseBasicParsing -Uri $downloadUrl -OutFile .\PowerShell7.msi
+Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell7.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1'
+Remove-Item .\PowerShell7.msi
+
+Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
+
+##############################################################
 # Get latest Grafana OSS release
 ##############################################################
 $latestRelease = (Invoke-RestMethod -Uri $websiteUrls["grafana"]).tag_name.replace('v', '')
@@ -254,6 +267,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $A
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -OutFile $AgIconsDir\contoso-motors.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Winget.ps1") -OutFile "$AgPowerShellDir\Winget.ps1"
 
 if($scenario -eq "contoso_supermarket"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"
@@ -278,51 +292,14 @@ BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$Ag
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
+
 ##############################################################
-# Install Chocolatey packages
+# Install Winget
 ##############################################################
-$maxRetries = 3
-$retryDelay = 30  # seconds
-
-$retryCount = 0
-$success = $false
-
-while (-not $success -and $retryCount -lt $maxRetries) {
-  try {
-    Write-Header "Installing Chocolatey packages"
-    try {
-      choco config get cacheLocation
-    }
-    catch {
-      Write-Output "Chocolatey not detected, trying to install now"
-      Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($AgConfig.URLs.chocoInstallScript))
-    }
-
-    Write-Host "Chocolatey packages specified"
-
-    foreach ($app in $AgConfig.ChocolateyPackagesList) {
-      Write-Host "Installing $app"
-      & choco install $app /y -Force | Write-Output
-    }
-
-    # If the command succeeds, set $success to $true to exit the loop
-    $success = $true
-  }
-  catch {
-    # If an exception occurs, increment the retry count
-    $retryCount++
-
-    # If the maximum number of retries is not reached yet, display an error message
-    if ($retryCount -lt $maxRetries) {
-      Write-Host "Attempt $retryCount failed. Retrying in $retryDelay seconds..."
-      Start-Sleep -Seconds $retryDelay
-    }
-    else {
-      Write-Host "All attempts failed. Exiting..."
-      exit 1  # Stop script execution if maximum retries reached
-    }
-  }
-}
+# Installing PowerShell Modules
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
+Install-Module -Name Az -Force
 
 ##############################################################
 # Install Azure CLI (64-bit not available via Chocolatey)
@@ -389,9 +366,13 @@ New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgC
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
+$ScheduledTaskExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "C:\Program Files\PowerShell\7\pwsh.exe" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
-Register-ScheduledTask -TaskName "AgLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument $AgPowerShellDir\WinGet.ps1
+Register-ScheduledTask -TaskName "WinGetLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+$Action = New-ScheduledTaskAction -Execute "${ScheduledTaskExecutable}" -Argument "$AgPowerShellDir\AgLogonScript.ps1"
+Register-ScheduledTask -TaskName "AgLogonScript" -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################
 # Disabling Windows Server Manager Scheduled Task
