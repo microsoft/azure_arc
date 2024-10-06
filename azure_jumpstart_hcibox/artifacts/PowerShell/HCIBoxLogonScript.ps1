@@ -16,10 +16,6 @@ Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
 # Setup Azure CLI and Azure PowerShell
 #####################################################################
 
-Write-Output "Testing bootstrap - aborting"
-Stop-Transcript
-exit
-
 # Login to Azure CLI with service principal provided by user
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
@@ -148,10 +144,14 @@ elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
 
 Stop-Transcript
 
+Write-Output "Testing bootstrap - aborting"
+Stop-Transcript
+exit
+
 # Build HCI cluster
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
-Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
+Start-Transcript -Append -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
@@ -177,8 +177,8 @@ $LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
 $null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
 
 #required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$Env:HCIBoxLogsDir\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$Env:HCIBoxLogsDir\LogsBundle-$RandomString.zip" -PassThru
+Copy-Item -Path "$($HCIBoxConfig.Paths.LogsDir)\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($HCIBoxConfig.Paths.LogsDir)\LogsBundle-$RandomString.zip" -PassThru
 
 
 Stop-Transcript
