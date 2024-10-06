@@ -17,7 +17,8 @@ param (
   [string]$natDNS,
   [string]$rdpPort,
   [string]$autoDeployClusterResource,
-  [string]$autoUpgradeClusterResource
+  [string]$autoUpgradeClusterResource,
+  [string]$debugEnabled
 )
 
 Write-Output "Input parameters:"
@@ -43,6 +44,12 @@ $PSBoundParameters
 [System.Environment]::SetEnvironmentVariable('autoUpgradeClusterResource', $autoUpgradeClusterResource, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('natDNS', $natDNS, [System.EnvironmentVariableTarget]::Machine)
+
+if ($debugEnabled -eq "true") {
+  [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Break", [System.EnvironmentVariableTarget]::Machine)
+} else {
+  [System.Environment]::SetEnvironmentVariable('ErrorActionPreference', "Continue", [System.EnvironmentVariableTarget]::Machine)
+}
 
 #######################################################################
 ## Setup basic environment
