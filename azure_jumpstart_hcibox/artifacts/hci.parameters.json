@@ -44,7 +44,7 @@
     "keyVaultName": {
       "value": "keyVaultName-staging"
     },
-    "ClusterWitnessStorageAccountName": {
+    "clusterWitnessStorageAccountName": {
       "value": "ClusterWitnessStorageAccountName-staging"
     },
     "diagnosticStorageAccountName": {
