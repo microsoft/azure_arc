@@ -144,10 +144,6 @@ elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
 
 Stop-Transcript
 
-Write-Output "Testing bootstrap - aborting"
-Stop-Transcript
-exit
-
 # Build HCI cluster
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
