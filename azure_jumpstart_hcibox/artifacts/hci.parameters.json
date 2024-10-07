@@ -23,7 +23,7 @@
     "AzureStackLCMAdminPassword": {
       "value": "AzureStackLCMAdminAdminPassword-staging"
     },
-    "arbDeploymentAppId": {
+    "arbDeploymentAppID": {
       "value": "arbDeploymentAppId-staging"
     },
     "arbDeploymentAppSecret": {
@@ -148,6 +148,9 @@
     },
     "networkingType": {
       "value": "switchlessMultiServerDeployment"
+    },
+    "enableStorageAutoIp": {
+      "value": true
     },
     "customLocation": {
       "value": "customLocation-staging"
