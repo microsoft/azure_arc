@@ -624,8 +624,8 @@ function Set-NICs {
             }
             $storageNICs = Get-Netadapter | Where-Object { $_.Name -match "Storage" }
             foreach ($storageNIC in $storageNICs) {
-                If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }
-                If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }
+                #If ($storageNIC.Name -eq 'StorageA') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageAIP -PrefixLength 24 | Out-Null }
+                #If ($storageNIC.Name -eq 'StorageB') { New-NetIPAddress -InterfaceAlias $storageNIC.Name -IPAddress $storageBIP -PrefixLength 24 | Out-Null }
             }
 
             # Enable WinRM
@@ -1634,8 +1634,17 @@ foreach ($path in $HCIBoxConfig.Paths.GetEnumerator()) {
 
 # Download HCIBox VHDs
 Write-Host "[Build cluster - Step 1/11] Downloading HCIBox VHDs" -ForegroundColor Green
-BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
-BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+
+#BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" }
+#BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-HCI-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" }
+
+$Env:AZCOPY_BUFFER_GB = 4
+Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+
+azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.vhdx "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/hcibox23h2v2.sha256 "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256" --recursive=true --check-length=false --log-level=ERROR
+
+
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\AZSHCI.sha256"
 if ($checksum.Hash -eq $hash) {
@@ -1645,8 +1654,13 @@ else {
     Write-Error "AZSCHI.vhdx is corrupt. Aborting deployment. Re-run C:\HCIBox\HCIBoxLogonScript.ps1 to retry"
     throw
 }
-BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
-BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
+
+#BITSRequest -Params @{'Uri'='https://aka.ms/VHD-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"}
+#BITSRequest -Params @{'Uri'='https://aka.ms/VHDHash-HCIBox-Mgmt-Prod'; 'Filename'="$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" }
+
+azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.vhdx "$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx" --recursive=true --check-length=false --log-level=ERROR
+azcopy cp https://jumpstartprodsg.blob.core.windows.net/hcibox23h2/WinServerApril2024.sha256 "$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256" --recursive=true --check-length=false --log-level=ERROR
+
 $checksum = Get-FileHash -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.vhdx"
 $hash = Get-Content -Path "$($HCIBoxConfig.Paths.VHDDir)\GUI.sha256"
 if ($checksum.Hash -eq $hash) {
