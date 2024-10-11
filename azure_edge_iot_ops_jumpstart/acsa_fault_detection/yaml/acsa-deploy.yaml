@@ -2,7 +2,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   ### Create a name for your PVC ###
-  name: esa-pvc
+  name: acsa-pvc
   ### Use a namespace that matched your intended consuming pod, or "default" ###
   namespace: default
 spec:
@@ -18,7 +18,7 @@ kind: EdgeSubvolume
 metadata:
   name: faultdata
 spec:
-  edgevolume: esa-pvc
+  edgevolume: acsa-pvc
   path: faultdata # If you change this path, line 33 in deploymentExample.yaml must be updated. Don't use a preceding slash.
   auth:
     authType: MANAGED_IDENTITY
@@ -29,19 +29,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: esa-webserver
+  name: acsa-webserver
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: esa-webserver
+      app: acsa-webserver
   template:
     metadata:
       labels:
-        app: esa-webserver
+        app: acsa-webserver
     spec:
       containers:
-        - name: esa-webserver
+        - name: acsa-webserver
           image: jumpstartprod.azurecr.io/public/jumpstart/scenarios/acsa_ai_webserver:1.0.0
           ports:
             - containerPort: 8000
@@ -49,18 +49,18 @@ spec:
             - name: RTSP_URL
               value: rtsp://virtual-rtsp:8554/stream
             - name: LOCAL_STORAGE
-              value: /app/esa_storage/faultdata
+              value: /app/acsa_storage/faultdata
           volumeMounts:
             ### This name must match the volumes.name attribute below ###
             - name: blob
               ### This mountPath is where the PVC will be attached to the pod's filesystem ###
-              mountPath: "/app/esa_storage"
+              mountPath: "/app/acsa_storage"
       volumes:
         ### User-defined 'name' that will be used to link the volumeMounts. This name must match volumeMounts.name as specified above. ###
         - name: blob
           persistentVolumeClaim:
             ### This claimName must refer to the PVC resource 'name' as defined in the PVC config. This name will match what your PVC resource was actually named. ###
-            claimName: esa-pvc
+            claimName: acsa-pvc
 
 
 ---
@@ -131,9 +131,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: esa-webserver-svc
+  name: acsa-webserver-svc
   labels:
-    app: esa-webserver
+    app: acsa-webserver
 spec:
   type: LoadBalancer
   ports:
@@ -141,4 +141,4 @@ spec:
       targetPort: 8000
       protocol: TCP
   selector:
-    app: esa-webserver
+    app: acsa-webserver
