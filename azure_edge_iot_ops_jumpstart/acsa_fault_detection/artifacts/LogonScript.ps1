@@ -388,10 +388,17 @@ $principalID = az k8s-extension list --cluster-name $env:arcClusterName --resour
 az role assignment create --assignee-object-id $principalID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Owner" --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.Storage/storageAccounts/$env:storageAccountName"
 
 
-$acsadeployYamlUrl = "https://raw.githubusercontent.com/ldabas-msft/azure_arc/acsa-fix/azure_edge_iot_ops_jumpstart/acsa_fault_detection/yaml/acsa-deploy.yaml"
+$acsadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/acsa_fault_detection/yaml/acsa-deploy.yaml"
 $acsadeployYamlPath = "acsa-deploy.yaml"
 Invoke-WebRequest -Uri $acsadeployYamlUrl -OutFile $acsadeployYamlPath
-# Apply the p-deploy.yaml file using kubectl
+
+# Replace {STORAGEACCOUNT} with the actual storage account name
+$yamlContent = Get-Content $acsadeployYamlPath -Raw
+$yamlContent = $yamlContent.Replace("{STORAGEACCOUNT}", $env:storageAccountName)
+Set-Content -Path $acsadeployYamlPath -Value $yamlContent
+
+
+# Apply the acsa-deploy.yaml file using kubectl
 Write-Host "Applying acsa-deploy.yaml configuration..."
 kubectl apply -f $acsadeployYamlPath
 Write-Host "acsa-deploy.yaml configuration applied successfully."
