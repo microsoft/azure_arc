@@ -1,58 +1,66 @@
-apiVersion: v1 
-kind: PersistentVolumeClaim 
+kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
-    name: esa-pvc
-    namespace: default
-spec: 
-    accessModes: 
-        - ReadWriteMany 
-    resources: 
-        requests: 
-            storage: 5Gi 
-    storageClassName: esa
-    volumeMode: Filesystem
-    volumeName: esa-pv
-status: 
-    accessModes: 
-        - ReadWriteMany 
-    capacity: 
-        storage: 5Gi
+  ### Create a name for your PVC ###
+  name: acsa-pvc
+  ### Use a namespace that matched your intended consuming pod, or "default" ###
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: cloud-backed-sc
+---
+apiVersion: "arccontainerstorage.azure.net/v1"
+kind: EdgeSubvolume
+metadata:
+  name: faultdata
+spec:
+  edgevolume: acsa-pvc
+  path: faultdata # If you change this path, line 33 in deploymentExample.yaml must be updated. Don't use a preceding slash.
+  auth:
+    authType: MANAGED_IDENTITY
+  storageaccountendpoint: "https://{STORAGEACCOUNT}.blob.core.windows.net/"
+  container: fault-detection
+  ingestPolicy: edgeingestpolicy-default # Optional: See the following instructions if you want to update the ingestPolicy with your own configuration
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: esa-webserver
+  name: acsa-webserver
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: esa-webserver
+      app: acsa-webserver
   template:
     metadata:
       labels:
-        app: esa-webserver
+        app: acsa-webserver
     spec:
       containers:
-        - name: esa-webserver
-          image: jumpstartprod.azurecr.io/esa-webserver:latest
+        - name: acsa-webserver
+          image: mcr.microsoft.com/jumpstart/scenarios/acsa_ai_webserver:1.0.0
           ports:
             - containerPort: 8000
           env:
             - name: RTSP_URL
               value: rtsp://virtual-rtsp:8554/stream
             - name: LOCAL_STORAGE
-              value: /app/esa_storage
+              value: /app/acsa_storage/faultdata
           volumeMounts:
             ### This name must match the volumes.name attribute below ###
             - name: blob
               ### This mountPath is where the PVC will be attached to the pod's filesystem ###
-              mountPath: "/app/esa_storage"
+              mountPath: "/app/acsa_storage"
       volumes:
         ### User-defined 'name' that will be used to link the volumeMounts. This name must match volumeMounts.name as specified above. ###
         - name: blob
           persistentVolumeClaim:
             ### This claimName must refer to the PVC resource 'name' as defined in the PVC config. This name will match what your PVC resource was actually named. ###
-            claimName: esa-pvc
+            claimName: acsa-pvc
 
 
 ---
@@ -89,7 +97,8 @@ spec:
             mountPath: /samples
       containers:
         - name: virtual-rtsp
-          image: "agoraarmbladev.azurecr.io/kerberos/virtual-rtsp:latest"
+          ### chnage to dockerhub image link
+          image: "kerberos/virtual-rtsp"
           imagePullPolicy: Always
           ports:
             - containerPort: 8554
@@ -122,9 +131,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: esa-webserver-svc
+  name: acsa-webserver-svc
   labels:
-    app: esa-webserver
+    app: acsa-webserver
 spec:
   type: LoadBalancer
   ports:
@@ -132,4 +141,4 @@ spec:
       targetPort: 8000
       protocol: TCP
   selector:
-    app: esa-webserver
+    app: acsa-webserver

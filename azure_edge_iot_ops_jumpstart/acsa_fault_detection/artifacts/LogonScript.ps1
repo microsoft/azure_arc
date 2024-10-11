@@ -332,7 +332,7 @@ function Add-AzureStorageAccountSecret {
     kubectl create secret generic -n $Namespace $SecretName --from-literal=azurestorageaccountkey="$secretValue" --from-literal=azurestorageaccountname="$StorageAccount"
 }
 
-#Begin ESA Installation. 
+#Begin ACSA Installation. 
 #Documentation: https://aepreviews.ms/docs/edge-storage-accelerator/how-to-install-edge-storage-accelerator/
 # Create a storage account
 # Echo the container and account name
@@ -374,54 +374,34 @@ if ($maxUserInstances -lt 1024) {
 Write-Host "Installing Open Service Mesh (OSM)..."
 az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name osm
 Write-Host "Open Service Mesh (OSM) installed successfully."
-# Disable ACStor for single-node cluster
-Write-Host "Disabling ACStor for single-node cluster..."
-# Create the config.json file
-$acstorConfig = @{
-    "feature.diskStorageClass" = "local-path"
-    "acstorController.enabled" = $false
-}
 
-$acstorConfigJson = $acstorConfig | ConvertTo-Json -Depth 100
-Set-Content -Path "config.json" -Value $acstorConfigJson
-Write-Host "ACStor disabled for single-node cluster."
-Write-Host "Checking if Edge Storage Accelerator Arc Extension is installed..."
-$extensionExists = az k8s-extension show --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --query "extensionType" --output tsv
-if ($extensionExists -eq "microsoft.edgestorageaccelerator") {
-   Write-Host "Edge Storage Accelerator Arc Extension is already installed."
-} else {
-   Write-Host "Installing Edge Storage Accelerator Arc Extension..."
-   az k8s-extension create --resource-group "$env:resourceGroup" --cluster-name "$env:arcClusterName" --cluster-type connectedClusters --name hydraext --extension-type microsoft.edgestorageaccelerator --config-file "config.json"
-   Write-Host "Edge Storage Accelerator Arc Extension installed successfully."
-}
 
-# Create Kubernetes secret for Azure Storage account
-Write-Host "Creating Kubernetes secret for Azure Storage account..."
-$secretName = "$env:storageAccountName-secret"
-Add-AzureStorageAccountSecret -ResourceGroup $env:resourceGroup -StorageAccount $env:storageAccountName -Namespace "default" -SecretName "esa-secret"
-Write-Host "Kubernetes secret created successfully."
-Write-Host "Downloading pv.yaml file..."
-$pvYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/esa_fault_detection/yaml/pv.yaml"
+$uniqueSuffix = (New-Guid).Guid.Substring(0,6)
+$extensionName = "acsa-$uniqueSuffix"
+Write-Output "Extension Name: $extensionName"
 
-$pvYamlPath = "pv.yaml"
-Invoke-WebRequest -Uri $pvYamlUrl -OutFile $pvYamlPath
-# Update the secret name and container name in the pv.yaml file
-#$pvYamlContent = Get-Content -Path $pvYamlPath -Raw
-#$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}-secret', $secretName
-#$pvYamlContent = $pvYamlContent -replace '\${CONTAINER_NAME}', $env:storageContainer
-#Set-Content -Path $pvYamlPath -Value $pvYamlContent
-# Apply the pv.yaml file using kubectl
-Write-Host "Applying pv.yaml configuration..."
-kubectl apply -f $pvYamlPath
-Write-Host "pv.yaml configuration applied successfully."
-Write-Host "Downloading esa-deploy.yaml file..."
-$esadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/esa_fault_detection/yaml/esa-deploy.yaml"
-$esadeployYamlPath = "esa-deploy.yaml"
-Invoke-WebRequest -Uri $esadeployYamlUrl -OutFile $esadeployYamlPath
-# Apply the p-deploy.yaml file using kubectl
-Write-Host "Applying esadeploy.yaml configuration..."
-kubectl apply -f $esadeployYamlPath
-Write-Host "esa-deploy.yaml configuration applied successfully."
+az k8s-extension create --resource-group $env:resourceGroup --cluster-name $env:arcClusterName --cluster-type connectedClusters --name $extensionName --extension-type microsoft.arc.containerstorage --config feature.diskStorageClass="default,local-path" --config edgeStorageConfiguration.create=true
+
+
+$principalID = az k8s-extension list --cluster-name $env:arcClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --query "[?extensionType=='microsoft.arc.containerstorage'].identity.principalId | [0]" -o tsv
+
+az role assignment create --assignee-object-id $principalID --assignee-principal-type ServicePrincipal --role "Storage Blob Data Owner" --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.Storage/storageAccounts/$env:storageAccountName"
+
+
+$acsadeployYamlUrl = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_edge_iot_ops_jumpstart/acsa_fault_detection/yaml/acsa-deploy.yaml"
+$acsadeployYamlPath = "acsa-deploy.yaml"
+Invoke-WebRequest -Uri $acsadeployYamlUrl -OutFile $acsadeployYamlPath
+
+# Replace {STORAGEACCOUNT} with the actual storage account name
+$yamlContent = Get-Content $acsadeployYamlPath -Raw
+$yamlContent = $yamlContent.Replace("{STORAGEACCOUNT}", $env:storageAccountName)
+Set-Content -Path $acsadeployYamlPath -Value $yamlContent
+
+
+# Apply the acsa-deploy.yaml file using kubectl
+Write-Host "Applying acsa-deploy.yaml configuration..."
+kubectl apply -f $acsadeployYamlPath
+Write-Host "acsa-deploy.yaml configuration applied successfully."
 
 # Stop the PowerShell process monitoring Kubernetes pods
 
