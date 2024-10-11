@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: acsa-webserver
-          image: jumpstartprod.azurecr.io/public/jumpstart/scenarios/acsa_ai_webserver:1.0.0
+          image: mcr.microsoft.com/jumpstart/scenarios/acsa_ai_webserver:1.0.0
           ports:
             - containerPort: 8000
           env:
