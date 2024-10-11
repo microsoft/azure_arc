@@ -1,27 +1,20 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim-buster
+# Use a base Python image
+FROM mcr.microsoft.com/cbl-mariner/base/python:3
 
-# Set the working directory to /app
-WORKDIR /app
+# Copy application files to the container
+WORKDIR /usr/src/app
 
 # Install necessary dependencies
 USER root
-RUN apt-get update --fix-missing && \
-    apt-get install -y python3-opencv && \
-    rm -rf /var/lib/apt/lists/*
+RUN tdnf install -y mesa-libGL glib2
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
-
-#Install torch and torchvision CPU only versions
-RUN pip3 install torch==1.8.0+cpu torchvision==0.9.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+COPY . .
 
 # Make port 80 available to the world outside this container
 EXPOSE 8000
 
 # Run main.py when the container launches
-CMD ["python", "main.py"]
-
+CMD ["/usr/bin/python3", "main.py"]

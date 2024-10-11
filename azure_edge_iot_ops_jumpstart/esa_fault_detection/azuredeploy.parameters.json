@@ -6,7 +6,7 @@
       "value": "Standard_D8s_v3"
     },
     "vmName": {
-      "value": "ESA-Win-Demo"
+      "value": "ACSA-Win-Demo"
     },
     "kubernetesDistribution": {
       "value": "k3s"
@@ -45,7 +45,13 @@
       "value": "XXXXXX"
     },
     "storageContainer": {
-      "value": "esademo-container"
+      "value": "fault-detection"
+    },
+    "githubAccount": {
+      "value": "your-github-account"
+    },
+    "githubBranch": {
+      "value": "your-branch-name"
     }
   }
 }

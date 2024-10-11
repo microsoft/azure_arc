@@ -39,7 +39,7 @@ if 'RTSP_URL' in os.environ:
 print("Incoming video feed read from RTSP_URL: ", source)
 
 """#esa_storage = "/home/aksedge-user/"  """
-esa_storage = "./esa_storage"
+esa_storage = "./esa_storage/faultdata"
 if 'LOCAL_STORAGE' in os.environ:
     esa_storage = os.environ.get('LOCAL_STORAGE')
 print("Storing video frames read from LOCAL_STORAGE: ", esa_storage)
