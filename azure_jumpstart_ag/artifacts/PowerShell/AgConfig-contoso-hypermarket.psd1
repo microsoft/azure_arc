@@ -151,7 +151,7 @@
             GrafanaDataSource      = "seattle"
             Type                   = "k3s"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            HelmSetValue           = "alertmanager.enabled=true,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
             IsProduction           = $true
         }
