@@ -29,7 +29,6 @@ function Deploy-AzCLI {
     }
 
     Write-Host "[$(Get-Date -Format t)] INFO: Az CLI configuration complete!" -ForegroundColor Green
-    Write-Host
 }
 
 function Deploy-AzPowerShell {
@@ -954,8 +953,13 @@ function Deploy-Prometheus {
     # Deploying Kube Prometheus Stack for stores
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
+        if ($Env:scenario -eq "contoso_hypermarket") {
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$($_.Value.FriendlyName.ToLower())"
+            kubectx | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
+        else {
+            kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'
@@ -1078,6 +1082,21 @@ function Deploy-Prometheus {
 
     }
     Write-Host
+}
+
+function Update-AzureIoTOpsExtension {
+    try {
+        Write-Host "Starting patching of azure-iot-ops extension..." -ForegroundColor Green
+        & "C:\Program Files\Microsoft SDKs\Azure\CLI2\python.exe" -m pip install -U --target "C:\Program Files\Microsoft SDKs\Azure\CLI2\Lib\site-packages\azure-cli-extensions\azure-iot-ops" azure-identity==1.17.1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Installation of azure-iot-ops extension completed successfully." -ForegroundColor Green
+        } else {
+            Write-Host "Installation of azure-iot-ops extension failed with exit code $LASTEXITCODE." -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "An error occurred during the patching of the azure-iot-ops extension." -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
 }
 
 # Deploys Azure IoT Operations on all k8s clusters in the config file
