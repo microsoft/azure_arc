@@ -43,7 +43,7 @@ chmod +x vars.sh
 . ./vars.sh
 
 # Creating login message of the day (motd)
-sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
@@ -74,7 +74,7 @@ check_vm_extension_lock() {
 }
 
 # Run the lock check before attempting the installation
-check_vm_extension_lock()
+check_vm_extension_lock
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -97,7 +97,7 @@ done
 sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
-check_vm_extension_lock()
+check_vm_extension_lock
 
 if [[ "$k3sControlPlane" == "true" ]]; then
 
