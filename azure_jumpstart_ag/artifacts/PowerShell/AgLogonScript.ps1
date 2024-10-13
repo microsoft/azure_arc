@@ -212,7 +212,7 @@ if ($scenario -eq "contoso_supermarket") {
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
 ##############################################################
-Deploy-Prometheus -AgConfig $AgConfig
+# Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability
