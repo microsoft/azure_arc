@@ -12,7 +12,7 @@ $ingressNamespace = "ingress-nginx"
 
 $certdns = "arcbox.k3sdevops.com"
 
-$appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
+$appClonedRepo = "https://github.com/$Env:githubUser/jumpstart-apps"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\K3sGitOps.log
 
@@ -56,7 +56,7 @@ az k8s-configuration flux create `
     --scope namespace `
     --url $appClonedRepo `
     --branch $env:githubBranch --sync-interval 3s `
-    --kustomization name=helloarc path=./hello-arc/yaml
+    --kustomization name=helloarc path=./arcbox/hello_arc/yaml
 
 $configs = $(az k8s-configuration flux list --cluster-name $Env:k3sArcClusterName --cluster-type connectedClusters --resource-group $Env:resourceGroup --query "[].name" -otsv)
 
