@@ -97,6 +97,8 @@ done
 sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
+check_vm_extension_lock()
+
 if [[ "$k3sControlPlane" == "true" ]]; then
 
     # Installing Azure Arc extensions
