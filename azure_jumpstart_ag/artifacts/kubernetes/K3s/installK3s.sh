@@ -27,6 +27,7 @@ sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
+sed -i '11s/^/export resourceGroup=/' vars.sh
 
 export vmName=$3
 
