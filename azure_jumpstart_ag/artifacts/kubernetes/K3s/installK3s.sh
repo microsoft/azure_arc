@@ -16,6 +16,7 @@ echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:$10 | awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
@@ -65,15 +66,15 @@ sudo chmod +x /usr/local/bin/azcopy
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
 
 # Function to check if dpkg lock is in place
-check_dpkg_lock() {
-    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-        echo "Waiting for other package management processes to complete..."
+check_vm_extension_lock() {
+    while sudo -u $adminUsername az vm extension list --resource-group $resourceGroup --vm-name $vmName --query "[?provisioningState=='Creating' || provisioningState=='Updating' || provisioningState=='Deleting']" -o tsv | grep -q .; do
+        echo "Waiting for other VM extension operations to complete..."
         sleep 5
     done
 }
 
 # Run the lock check before attempting the installation
-check_dpkg_lock
+check_vm_extension_lock()
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
