@@ -102,7 +102,7 @@ $Env:AZDATA_PASSWORD = $AZDATA_PASSWORD
 Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
-az extension add --name connectedk8s --version 1.3.17
+az extension add --name connectedk8s --version 1.9.3
 az extension add --name arcdata
 az extension add --name k8s-extension
 az extension add --name customlocation

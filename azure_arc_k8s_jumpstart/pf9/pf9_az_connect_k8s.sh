@@ -19,7 +19,7 @@ az provider register --namespace Microsoft.ExtendedLocation --wait
 
 # Installing the Azure Arc Extensions
 echo "Installing the Azure Arc Extensions"
-az extension add --name connectedk8s
+az extension add --name connectedk8s --version 1.9.3
 az extension add --name k8s-configuration
 
 echo "Creating the Resource Group"
