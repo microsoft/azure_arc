@@ -68,7 +68,7 @@ export AZCOPY_AUTO_LOGIN_TYPE=MSI
 
 # Function to check if dpkg lock is in place
 check_vm_extension_lock() {
-    while sudo -u $adminUsername az vm extension list --resource-group $resourceGroup --vm-name $vmName --query "[?provisioningState=='Creating' || provisioningState=='Updating' || provisioningState=='Deleting']" -o tsv | grep -q .; do
+    while sudo -u $adminUsername az vm extension list --resource-group $resourceGroup --vm-name $vmName --query "[?provisioningState=='Creating' || provisioningState=='Updating' || provisioningState=='Deleting'] | [?name!='installscript_k3s']" -o tsv | grep -q .; do
         echo "Waiting for other VM extension operations to complete..."
         sleep 5
     done
