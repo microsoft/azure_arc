@@ -67,15 +67,15 @@ sudo chmod +x /usr/local/bin/azcopy
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
 
 # Function to check if dpkg lock is in place
-check_vm_extension_lock() {
-    while sudo -u $adminUsername az vm extension list --resource-group $resourceGroup --vm-name $vmName --query "[?provisioningState=='Creating' || provisioningState=='Updating' || provisioningState=='Deleting'] | [?name!='installscript_k3s']" -o tsv | grep -q .; do
-        echo "Waiting for other VM extension operations to complete..."
+check_dpkg_lock() {
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+        echo "Waiting for other package management processes to complete..."
         sleep 5
     done
 }
 
 # Run the lock check before attempting the installation
-check_vm_extension_lock
+check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -98,7 +98,7 @@ done
 sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
-check_vm_extension_lock
+check_dpkg_lock
 
 if [[ "$k3sControlPlane" == "true" ]]; then
 
@@ -106,7 +106,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo ""
     echo "Installing Azure Arc extensions"
     echo ""
-    sudo -u $adminUsername az extension add --name connectedk8s
+    sudo -u $adminUsername az extension add --name connectedk8s --version 1.9.3
     sudo -u $adminUsername az extension add --name k8s-configuration
     sudo -u $adminUsername az extension add --name k8s-extension
 
