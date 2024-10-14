@@ -3,7 +3,7 @@
 param vmName string = 'Ag-K3s-Node-${namingGuid}'
 
 @description('Username for the Virtual Machine')
-param adminUsername string = 'arcdemo'
+param adminUsername string = 'agora'
 
 @description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
