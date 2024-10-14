@@ -623,7 +623,7 @@ function Deploy-AzArcK8s {
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
             Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion 0.10.3
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
@@ -794,7 +794,7 @@ function Deploy-Workbook ($workbookFileName) {
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
-    
+
     # Write the updated content back to the file
     Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
     # Deploy the workbook
