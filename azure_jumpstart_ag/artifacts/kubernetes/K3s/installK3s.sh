@@ -176,7 +176,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
             success=true
             break
         else
-            echo "Attempt $((retry_count+1)) failed. Retrying..."
+            echo "Failed to onboard cluster to Azure Arc. Retrying (Attempt $((retry_count+1)))..."
             retry_count=$((retry_count+1))
             sleep 5
         fi
@@ -211,13 +211,13 @@ echo ""
 echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
 echo ""
 
-# # Check and install azuremonitor-containers extension
-# if is_extension_installed "azuremonitor-containers"; then
-#     echo "Extension 'azuremonitor-containers' is already installed."
-# else
-#     echo "Extension 'azuremonitor-containers' is not installed -  triggering installation"
-#     sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
-# fi
+# Check and install azuremonitor-containers extension
+if is_extension_installed "azuremonitor-containers"; then
+    echo "Extension 'azuremonitor-containers' is already installed."
+else
+    echo "Extension 'azuremonitor-containers' is not installed -  triggering installation"
+    sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+fi
 
 # Check and install microsoft.azuredefender.kubernetes extension
 if is_extension_installed "microsoft.azuredefender.kubernetes"; then
