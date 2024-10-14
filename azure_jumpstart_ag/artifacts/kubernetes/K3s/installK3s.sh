@@ -176,7 +176,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
         else
             echo "Failed to onboard cluster to Azure Arc. Retrying (Attempt $((retry_count+1)))..."
             retry_count=$((retry_count+1))
-            sleep 5
+            sleep 10
         fi
     done
 
