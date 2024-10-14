@@ -16,7 +16,7 @@ echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $resourceGroup:$10 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:${10}| awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
