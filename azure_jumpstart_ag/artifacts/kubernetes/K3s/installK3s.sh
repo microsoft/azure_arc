@@ -164,8 +164,6 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
     echo "Log Analytics workspace id $workspaceResourceId"
 
-    # sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
-
     max_retries=5
     retry_count=0
     success=false
