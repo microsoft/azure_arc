@@ -37,9 +37,9 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-sudo -u $adminUsername az extension add --name connectedk8s --yes
-sudo -u $adminUsername az extension add --name k8s-configuration --yes
-sudo -u $adminUsername az extension add --name k8s-extension --yes
+sudo -u $adminUsername az extension add --name connectedk8s  --version 1.9.3
+sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
 
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password=$SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID

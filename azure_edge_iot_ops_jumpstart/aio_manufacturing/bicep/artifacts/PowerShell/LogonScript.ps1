@@ -198,7 +198,7 @@ az login --service-principal --username $spnClientID --password=$spnClientSecret
 az account set --subscription $subscriptionId
 
 # Installing Azure CLI extensions
-az extension add --name connectedk8s --version 1.3.17
+az extension add --name connectedk8s --version 1.9.3
 
 # Making extension install dynamic
 if ($aioConfig.AzCLIExtensions.Count -ne 0) {
