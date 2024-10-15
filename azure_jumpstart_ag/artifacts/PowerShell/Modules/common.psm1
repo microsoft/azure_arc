@@ -627,7 +627,7 @@ function Deploy-AzArcK8sAKSEE {
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
             Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion 0.10.3
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
@@ -799,7 +799,7 @@ function Deploy-Workbook ($workbookFileName) {
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
-    
+
     # Write the updated content back to the file
     Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
     # Deploy the workbook
@@ -953,8 +953,13 @@ function Deploy-Prometheus {
     # Deploying Kube Prometheus Stack for stores
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-
+        if ($Env:scenario -eq "contoso_hypermarket") {
+            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$($_.Value.FriendlyName.ToLower())"
+            kubectx | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
+        else {
+            kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+        }
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'

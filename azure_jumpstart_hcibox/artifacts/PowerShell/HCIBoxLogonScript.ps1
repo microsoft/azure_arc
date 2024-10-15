@@ -8,20 +8,13 @@ Set-PSDebug -Strict
 
 # Load config file
 $HCIBoxConfig = Import-PowerShellDataFile -Path $Env:HCIBoxConfigFile
+$Env:HCIBoxTestsDir = "$Env:HCIBoxDir\Tests"
 
 Start-Transcript -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
 
 #####################################################################
 # Setup Azure CLI and Azure PowerShell
 #####################################################################
-$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
-
-if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
-    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
-    $folder.Attributes += [System.IO.FileAttributes]::Hidden
-}
-
-$Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Login to Azure CLI with service principal provided by user
 Write-Header "Az CLI Login"
@@ -67,6 +60,60 @@ if ($null -eq $roleAssignment) {
 }
 
 #############################################################
+# Remove registry keys that are used to automatically logon the user (only used for first-time setup)
+#############################################################
+
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+$keys = @("AutoAdminLogon", "DefaultUserName", "DefaultPassword")
+
+foreach ($key in $keys) {
+    try {
+        $property = Get-ItemProperty -Path $registryPath -Name $key -ErrorAction Stop
+        Remove-ItemProperty -Path $registryPath -Name $key
+        Write-Host "Removed registry key that are used to automatically logon the user: $key"
+    } catch {
+        Write-Verbose "Key $key does not exist."
+    }
+}
+
+#############################################################
+# Create Windows Terminal desktop shortcut
+#############################################################
+
+$WshShell = New-Object -comObject WScript.Shell
+$WinTerminalPath = (Get-ChildItem "C:\Program Files\WindowsApps" -Recurse | Where-Object { $_.name -eq "wt.exe" }).FullName
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Windows Terminal.lnk")
+$Shortcut.TargetPath = $WinTerminalPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+#############################################################
+# Create desktop shortcut for Logs-folder
+#############################################################
+
+$WshShell = New-Object -comObject WScript.Shell
+$LogsPath = "C:\HCIBox\Logs"
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
+$Shortcut.TargetPath = $LogsPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+#############################################################
+# Configure Windows Terminal as the default terminal application
+#############################################################
+
+$registryPath = "HKCU:\Console\%%Startup"
+
+if (Test-Path $registryPath) {
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+} else {
+    New-Item -Path $registryPath -Force | Out-Null
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+}
+
+#############################################################
 # Install VSCode extensions
 #############################################################
 
@@ -100,42 +147,34 @@ Stop-Transcript
 # Build HCI cluster
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
-Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
-
-# Changing to Jumpstart ArcBox wallpaper
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
-
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-
-            public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-            }
-        }
-    }
-'@
-
-Write-Header "Changing Wallpaper"
-$imgPath="$Env:HCIBoxDir\wallpaper.png"
-Add-Type $code
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+Start-Transcript -Append -Path "$($HCIBoxConfig.Paths.LogsDir)\HCIBoxLogonScript.log"
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "HCIBoxLogonScript" -Confirm:$false
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Header "Uploading Log Bundle"
-Invoke-Expression 'cmd /c start Powershell -Command {
-    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-    Start-Sleep -Seconds 5
-    Write-Host "`n"
-    Write-Host "Creating deployment logs bundle"
-    7z a $Env:HCIBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
-}'
+#Changing to Jumpstart HCIBox wallpaper
+
+Write-Header "Changing wallpaper"
+
+# bmp file is required for BGInfo
+Convert-JSImageToBitMap -SourceFilePath "$Env:HCIBoxDir\wallpaper.png" -DestinationFilePath "$Env:HCIBoxDir\wallpaper.bmp"
+
+Set-JSDesktopBackground -ImagePath "$Env:HCIBoxDir\wallpaper.bmp"
+
+Write-Header "Running tests to verify infrastructure"
+
+& "$Env:HCIBoxTestsDir\Invoke-Test.ps1"
+
+Write-Header "Creating deployment logs bundle"
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+#required to avoid "file is being used by another process" error when compressing the logs
+Copy-Item -Path "$($HCIBoxConfig.Paths.LogsDir)\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($HCIBoxConfig.Paths.LogsDir)\LogsBundle-$RandomString.zip" -PassThru
+
 
 Stop-Transcript

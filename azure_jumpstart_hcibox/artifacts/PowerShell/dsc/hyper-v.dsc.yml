@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+
+  resources:
+    - resource: PSDscResources/WindowsFeature
+      id: Hyper-V
+      directives:
+        description: Install Hyper-V role
+      settings:
+        Name: Hyper-V
+        Ensure: Present
+  configurationVersion: 0.2.0

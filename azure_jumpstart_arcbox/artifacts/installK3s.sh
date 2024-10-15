@@ -102,7 +102,7 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     echo ""
     echo "Installing Azure Arc extensions"
     echo ""
-    sudo -u $adminUsername az extension add --name connectedk8s
+    sudo -u $adminUsername az extension add --name connectedk8s --version 1.9.3
     sudo -u $adminUsername az extension add --name k8s-configuration
     sudo -u $adminUsername az extension add --name k8s-extension
 
