@@ -43,7 +43,7 @@ function Deploy-AzPowerShell {
         foreach ($module in $AgConfig.PowerShellModules) {
             $moduleName = $module.name
             $moduleVersion = $module.version
-            if ($extensionVersion -ne "latest" -and $null -ne $moduleVersion) {
+            if ($moduleVersion -ne "latest" -and $null -ne $moduleVersion) {
                 # Install extension with specific version
                 Install-Module $moduleName -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion $moduleVersion
                 Write-Host "Installed $moduleName version $moduleVersion"
