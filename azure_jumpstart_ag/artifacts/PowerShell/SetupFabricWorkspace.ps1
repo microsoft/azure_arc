@@ -69,7 +69,7 @@ else {
 
 # Get access token to authorize access to Fabric APIs
 $fabricAccessToken = (az account get-access-token --resource $fabricResource --query accessToken --output tsv)  
-if ($accessToken -eq '') {
+if ($fabricAccessToken -eq '') {
   write-host "ERROR: Failed to get access token using managed identity."
   Exit
 }
@@ -428,9 +428,7 @@ $streamBody = @"
 
 # Use MWC Token to create event data connection
  Write-Host "INFO: Creating eventstream in KQL database to ingest data."
-$dataSourceConnectionId = Invoke-RestMethod -Method Post -Uri $streamApi -Body $streamBody -ContentType "application/json" -Headers @{
-  Authorization = "MwcToken $mwcToken"
-}
+$dataSourceConnectionId = Invoke-RestMethod -Method Post -Uri $streamApi -Body $streamBody -ContentType "application/json" -Headers @{ Authorization = "MwcToken $mwcToken" }
 if (($mwcTokenResp.StatusCode -ge 200) -or ($mwcTokenResp.StatusCode -le 204)){
   Write-Host "INFO: Created eventstream in KQL database."
 }
