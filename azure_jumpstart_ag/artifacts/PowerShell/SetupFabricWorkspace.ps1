@@ -154,6 +154,7 @@ $kqlDatabasesResp = Invoke-WebRequest -Method Get -Uri $kqlDatabasesApi -Headers
 $kqlDatabaseInfo = (ConvertFrom-Json($kqlDatabasesResp.Content)).value
 $kqlQueryServiceUri = $kqlDatabaseInfo[0].properties.queryServiceUri
 $kqlDatabaseId = $kqlDatabaseInfo[0].id
+$kqlDatabaseName = $kqlDatabaseInfo[0].displayName
 
 # Create KQL database tables to store retail data
 $databaseName = $eventhouseName
@@ -438,4 +439,44 @@ else {
 }
 
 # Import data sceince notebook for sales forecast
-# TBD
+# Download dashboard report and Update to use KQL database
+$ordersSalesForecastNotebook = "orders-sales-forecast.ipynb"
+Write-Host "INFO: Downloading and preparing nootebook to import into Fabric workspace."
+$ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/notebooks/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
+
+# Convert the KQL dashboard report payload to base64
+Write-Host "INFO: Conerting report content into base64 encoded format."
+$base64Payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ordersNotebookBody))
+
+# Build KQL dashboard report payload from the report template
+$body = @"
+{
+  "displayName": "Orders Sales Forecast Notebook",
+  "description": "A notebook description",
+  "definition": {
+    "format": "ipynb",
+    "parts": [
+      {
+        "path": "$ordersSalesForecastNotebook",
+        "payload": "$base64Payload",
+        "payloadType": "InlineBase64"
+      }
+    ]
+  }
+}
+"@
+
+# Create KQL dashboard report
+$nootebookApi = "https://api.fabric.microsoft.com/v1/workspaces/$fabricWorkspaceId/notebooks"
+$headers = @{"Authorization" = "Bearer $fabricAccessToken"; "Content-Type" = "application/json"}
+$httpResp = Invoke-RestMethod -Method Post -Uri $nootebookApi -Headers $headers -Body $body
+if (($httpResp.StatusCode -ge 200) -or ($httpResp.StatusCode -le 204)){
+  Write-Host "INFO: Created notebook in Fabric workspace."
+}
+else {
+  Write-Host "ERROR: Failed to create notebook."
+  Exit
+}
+
+# Stop logging into the log file
+Stop-Transcript
