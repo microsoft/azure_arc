@@ -1,7 +1,5 @@
 param (
-  [string]$tenantID,                    # Azure AD tenant id where Fabric workspace is created
-  [string]$loginAs = "user",            # Use this to switch beteween user or managed-identity. Use user type until managed identity is supported by all services used in this scenario
-  [string]$runLocally = "false"         # Use this flag to run locally outside of Agora Client VM
+  [string]$fabricConfigFile = "C:\Temp\fabric\FabricConfig.json"            # Used to run the script locally
 )
 
 ####################################################################################################
@@ -12,30 +10,42 @@ param (
 # Make sure Create Workpace is enabled in Frabric for service principals. 
 #Access settings using https://app.fabric.microsoft.com/admin-portal/tenantSettings?experience=power-bi
 
+# NOTE: To run locally create a file named FabricConfig.json with the following content
+#
+# {
+#   "tenantID": "",                     # Azure AD tenant ID where Agora Retail 2.0 is deployed
+#   "runAs": "user",                    # Indicates whether to run under regular user account or managed identity
+#   "azureLocation": "eastus",          # Region where Agora Retail 2.0 is deployed
+#   "resourceGroup": "rg-fabric",       # Resource group where Agora Retail 2.0 is deployed
+#   "templateBaseUrl": "https://raw.githubusercontent.com/main/azure_arc/main/azure_arc_data/azure_jumpstart_ag/artifacts"
+# }
+#
 ####################################################################################################
 $ProgressPreference = "SilentlyContinue"
 Set-PSDebug -Strict
 
-az config set extension.use_dynamic_install=yes_without_prompt
-az extension add --name microsoft-fabric --allow-preview true
-
 #####################################################################
 # Initialize the environment
 #####################################################################
-if ($runLocally -eq "true") {
-  $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
-  $AgLogsDir = "."
+if ([System.IO.File]::Exists($fabricConfigFile)){
+  $fabricConfig = Get-Content $fabricConfigFile | ConvertFrom-Json
+  $runAs = $fabricConfig.runAs
+  $tenantID= $fabricConfig.tenantID
+  $resourceGroup = $fabricConfig.resourceGroup
+  $azureLocation = $fabricConfig.azureLocation
+  $templateBaseUrl = $fabricConfig.templateBaseUrl
   $namingGuid = (New-Guid).ToString().Substring(31, 5)
-  $resourceGroup = "rg-fabric"
-  $azureLocation = "eastus"
+  $fabricCapacityName = $fabricConfig.fabricCapacityName
+  $AgLogsDir = "."
 } 
 else {
   $AgConfig = Import-PowerShellDataFile -Path $Env:AgConfigPath
   $AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-  $namingGuid = $Env:namingGuid
   $tenantID =  $Env:tenantId
   $resourceGroup = $Env:resourceGroup
   $azureLocation = $Env:azureLocation
+  $templateBaseUrl = $env:templateBaseUrl
+  $namingGuid = $Env:namingGuid
 }
 
 Start-Transcript -Path ($AgLogsDir + "\SetupFabricWorkspace.log")
@@ -48,7 +58,7 @@ $powerbiResource = "https://analysis.windows.net/powerbi/api" # Power BI API res
 $AgScenarioPrefix = "JSAgoraHyperMarket"                      # Prefix to use for Fabric workspace and other items created in Fabric
 
 # Login to Azure as end user or managed identity to get access tokens for different API endpoints
-if ($userType -eq "user") {
+if ($runAs -eq "user") {
   # login using interactive logon
   az login --tenant $tenantID --allow-no-subscriptions
 }
@@ -66,7 +76,9 @@ if ($accessToken -eq '') {
 
 # Create Fabric workspace. Generate new guid or use guid prefix in agora deployment
 $fabricWorkspaceName = "$AgScenarioPrefix-$namingGuid".ToLower()
-$fabricCapacityName = "jsagoraeastus" # $fabricWorkspaceName
+if ($fabricCapacityName -eq "") {
+  $fabricCapacityName = $fabricWorkspaceName
+}
 
 # List Fabric capacities to assign to Fabric workspace to avoid Powrer BI Premium license
 write-host "INFO: Checking if there is a Fabric capacity created with specified name."
@@ -228,10 +240,9 @@ else {
 }
 
 # Download dashboard report and Update to use KQL database
-$hyperMarketDashboardReport = "hypermarket-fabric-dashboard.json"
+$hyperMarketDashboardReport = "fabric-hypermarket-dashboard.json"
 Write-Host "INFO: Downloading and preparing dashboard report to import into Fabric workspace."
-$ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$env:templateBaseUrl/artifacts/adx_dashboards/$hyperMarketDashboardReport").Content -replace '{{KQL_CLUSTER_URI}}', $queryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
-$ordersDashboardBody = (Get-Content -Path "C:\azure_arc\azure_jumpstart_ag\artifacts\adx_dashboards\fabric-hypermarket-dashboard.json") -replace '{{KQL_CLUSTER_URI}}', $queryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
+$ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/adx_dashboards/$hyperMarketDashboardReport").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
 
 # Convert the KQL dashboard report payload to base64
 Write-Host "INFO: Conerting report content into base64 encoded format."
@@ -277,17 +288,44 @@ if ($powerbiAccessToken -eq '') {
 # Power BI API endpoint to create EventHut connection
 $powerBIEndpoint = "https://api.powerbi.com/v2.0/myorg/me/gatewayClusterCloudDatasource"
 
-# Create body to create EventHub data source
-$eventHubNamespace = ""
-$eventHubName = ""
-$eventHugNameKeyName = ""
-$eventHubSecret = ""
+# Get Evenhub connection details
+$eventHubInfo = (az resource list --resource-group $resourceGroup --resource-type "Microsoft.EventHub/namespaces" | ConvertFrom-Json)
+if ($eventHubInfo.Count -ne 1) {
+  Write-Host "ERROR: Resource group contains no Eventhub namespaces or more than one. Make sure to have only one EventHub namesapce in the resource group."
+}
 
+$eventHubNamespace = $eventHubInfo[0].name
+$eventHubName = "orders"
+
+# Make sure Eventhub with name 'orders' exists
+$eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
+$eventHubOrders = $eventHubs | Where-Object { $_.name -eq "orders" }
+if ($null -eq $eventHubOrders) {
+  Write-Host "ERROR: Event Hub with name 'orders' not found."
+  Exit
+}
+
+# Get authorization key
+$authRuleName = "FabricAutomation"
+az eventhubs eventhub authorization-rule create --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name $authRuleName --rights [Listen, Send]
+
+# Get Event Hub credentials
+Write-Host "INFO: Retrieving Event Hub key for '$authRuleName' Shared Acess Policy."
+$eventHubKey = az eventhubs eventhub authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name $authRuleName --query primaryKey --output tsv
+if ($eventHubKey -eq '') {
+  Write-Host "ERROR: Failed to retrieve Event Hub key."
+  Exit
+}
+
+Write-Host "INFO: Received Event Hub key."
+
+# Create body to create EventHub data source
+$eventHubEndpoint = "$eventHubNamespace.servicebus.windows.net"
 $connectionBody = @"
 {
   "datasourceName": "Agora_Retail_2_0_EventHub_Connection",
   "datasourceType": "Extension",
-  "connectionDetails": "{\"endpoint\":\"$eventHubNamespace\",\"entityPath\":\"$eventHubName\"}",
+  "connectionDetails": "{\"endpoint\":\"$eventHubEndpoint\",\"entityPath\":\"$eventHubName\"}",
   "singleSignOnType": "None",
   "mashupTestConnectionDetails": {
     "functionName": "EventHub.Contents",
@@ -298,7 +336,7 @@ $connectionBody = @"
         "name": "endpoint",
         "type": "text",
         "isRequired": true,
-        "value": "$eventHubNamespace"
+        "value": "$eventHubEndpoint"
       },
       {
         "name": "entityPath",
@@ -311,7 +349,7 @@ $connectionBody = @"
   "referenceDatasource": false,
   "credentialDetails": {
     "credentialType": "Basic",
-    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHugNameKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubSecret\"}]}",
+    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$authRuleName\"},{\"name\":\"password\",\"value\":\"$eventHubKey\"}]}",
     "encryptedConnection": "Any",
     "privacyLevel": "Organizational",
     "skipTestConnection": false,
@@ -323,12 +361,18 @@ $connectionBody = @"
 "@
 
 # Call API to create Event Hub connection in Power BI
-$connectionResp = Invoke-RestMethod -Method Post -Uri $powerBIEndpoint -Body $connectionBody -ContentType "application/json" -Headers @{
-    Authorization = "Bearer $powerbiAccessToken"
+Write-Host "INFO: Calling API to create EventHub data connection."
+$dataConnectionResp = Invoke-RestMethod -Method Post -Uri $powerBIEndpoint -Body $connectionBody -ContentType "application/json" -Headers @{ Authorization = "Bearer $powerbiAccessToken" }
+if (($dataConnectionResp.StatusCode -ge 200) -or ($dataConnectionResp.StatusCode -le 204)){
+  Write-Host "INFO: Created EventHub data connection."
+}
+else {
+  Write-Host "ERROR: Failed to create EventHub data connection."
+  Exit
 }
 
 # Get connection id
-$DataSourceConnectionId = $connectionResp.id
+$DataSourceConnectionId = $dataConnectionResp.id
 
 # Create header to authorize with Power BI service
 $headers = @{
@@ -349,8 +393,17 @@ $mwcTokenBody = @"
 }
 "@
 
+Write-Host "INFO: Requesting MWC token from Power BI API."
 $mwcTokenApi = "https://wabi-us-central-b-primary-redirect.analysis.windows.net/metadata/v201606/generatemwctokenv2"
 $mwcTokenResp = Invoke-RestMethod -Method Post -Uri $mwcTokenApi -Headers $headers -Body $mwcTokenBody
+if (($mwcTokenResp.StatusCode -ge 200) -or ($mwcTokenResp.StatusCode -le 204)){
+  Write-Host "INFO: Received MWC token."
+}
+else {
+  Write-Host "ERROR: Failed to get MWC token."
+  Exit
+}
+
 $mwcToken = $mwcTokenResp.token
 
 # Event Hub connection body
@@ -368,14 +421,23 @@ $streamBody = @"
     "DataFormat": "multijson",
     "DataSourceConnectionId": "$DataSourceConnectionId",
     "DataConnectionType": "EventHubDataConnection",
-    "DataConnectionName": "Test-EventHub-Connection"
+    "DataConnectionName": "Contoso-Hypermarket-EventHub-Connection"
   }
 }
 "@
 
 # Use MWC Token to create event data connection
+ Write-Host "INFO: Creating eventstream in KQL database to ingest data."
 $dataSourceConnectionId = Invoke-RestMethod -Method Post -Uri $streamApi -Body $streamBody -ContentType "application/json" -Headers @{
   Authorization = "MwcToken $mwcToken"
 }
+if (($mwcTokenResp.StatusCode -ge 200) -or ($mwcTokenResp.StatusCode -le 204)){
+  Write-Host "INFO: Created eventstream in KQL database."
+}
+else {
+  Write-Host "ERROR: Failed to create eventstream in KQL database."
+  Exit
+}
 
-$dataSourceConnectionId
+# Import data sceince notebook for sales forecast
+# TBD
