@@ -231,7 +231,7 @@ if($scenario -eq "contoso_motors"){
 }
 
 ##############################################################
-# Creating bookmarks
+# Creating bookmarks and setting merged kubeconfigs
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket"){
@@ -240,6 +240,7 @@ if($scenario -eq "contoso_supermarket"){
     Deploy-MotorsBookmarks
 }elseif($scenario -eq "contoso_hypermarket"){
     #Deploy-HypermarketBookmarks
+    $Env:KUBECONFIG = "$Env:USERPROFILE\.kube\config-raw"
 }
 
 ##############################################################
