@@ -36,11 +36,22 @@ function Deploy-AzPowerShell {
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     Set-AzContext -Subscription $subscriptionId
-    # Install PowerShell modules
+
+    # Making module install dynamic
     if ($AgConfig.PowerShellModules.Count -ne 0) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules" -ForegroundColor Gray
         foreach ($module in $AgConfig.PowerShellModules) {
-            Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+            $moduleName = $module.name
+            $moduleVersion = $module.version
+            if ($moduleVersion -ne "latest" -and $null -ne $moduleVersion) {
+                # Install extension with specific version
+                Install-Module $moduleName -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion $moduleVersion
+                Write-Host "Installed $moduleName version $moduleVersion"
+            } else {
+                # Install extension without specifying a version
+                Install-Module -Name $moduleName -Force
+                Write-Host "Installed $moduleName (latest version)"
+            }
         }
     }
 
