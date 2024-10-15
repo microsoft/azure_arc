@@ -22,7 +22,7 @@ echo ""
 
 echo ""
 az config set extension.use_dynamic_install=yes_without_prompt
-sudo -u $USER az extension add --name connectedk8s
+sudo -u $USER az extension add --name connectedk8s --version 1.9.3
 sudo -u $USER az extension add --name k8s-configuration
 sudo -u $USER az extension add --name k8s-extension
 echo ""
