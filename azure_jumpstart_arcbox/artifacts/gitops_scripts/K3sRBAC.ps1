@@ -3,7 +3,7 @@ $Env:k3sArcClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -Re
 $Env:k3sArcClusterName=$Env:k3sArcClusterName -replace "`n",""
 
 $namingPrefix = $Env:namingPrefix
-$appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
+$appClonedRepo = "https://github.com/$Env:githubUser/jumpstart-apps"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\K3sRBAC.log
 

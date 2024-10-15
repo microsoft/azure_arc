@@ -93,10 +93,10 @@ param sqlServerEdition string = 'Developer'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+@description('User github account where they have forked https://github.com/Azure/jumpstart-apps')
 param githubUser string
 
-@description('Git branch to use from the forked repo https://github.com/microsoft/azure-arc-jumpstart-apps')
+@description('Git branch to use from the forked repo https://github.com/Azure/jumpstart-apps')
 param githubBranch string
 
 @description('The name of the K3s cluster')
