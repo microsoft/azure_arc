@@ -19,7 +19,7 @@ sudo snap install helm --classic
 echo "Installing Azure CLI & Azure Arc Extensions"
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-sudo az extension add --name connectedk8s
+sudo az extension add --name connectedk8s --version 1.9.3
 sudo az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"

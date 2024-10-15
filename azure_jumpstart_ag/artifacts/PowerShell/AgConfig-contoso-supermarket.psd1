@@ -52,9 +52,9 @@
 
     # PowerShell modules
     PowerShellModules       = @(
-        'Az.ConnectedKubernetes'
-        'Az.KubernetesConfiguration'
-        'Az.Kusto'
+        @{name='Az.ConnectedKubernetes'; version="0.10.3"},
+        @{name='Az.KubernetesConfiguration'; version="latest"},
+        @{name='Az.Kusto'; version="latest"}
     )
 
     # Chocolatey packages list

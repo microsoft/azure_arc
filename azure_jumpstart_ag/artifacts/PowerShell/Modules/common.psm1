@@ -36,11 +36,22 @@ function Deploy-AzPowerShell {
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     Set-AzContext -Subscription $subscriptionId
-    # Install PowerShell modules
+
+    # Making module install dynamic
     if ($AgConfig.PowerShellModules.Count -ne 0) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules" -ForegroundColor Gray
         foreach ($module in $AgConfig.PowerShellModules) {
-            Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+            $moduleName = $module.name
+            $moduleVersion = $module.version
+            if ($moduleVersion -ne "latest" -and $null -ne $moduleVersion) {
+                # Install extension with specific version
+                Install-Module $moduleName -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion $moduleVersion
+                Write-Host "Installed $moduleName version $moduleVersion"
+            } else {
+                # Install extension without specifying a version
+                Install-Module -Name $moduleName -Force
+                Write-Host "Installed $moduleName (latest version)"
+            }
         }
     }
 
@@ -627,7 +638,7 @@ function Deploy-AzArcK8sAKSEE {
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
             Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion 0.10.3
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
@@ -799,7 +810,7 @@ function Deploy-Workbook ($workbookFileName) {
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
-    
+
     # Write the updated content back to the file
     Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
     # Deploy the workbook

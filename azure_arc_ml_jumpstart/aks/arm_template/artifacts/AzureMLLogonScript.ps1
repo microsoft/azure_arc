@@ -41,7 +41,7 @@ if ($k8s -eq "connectedk8s") {
 }
 
 # Following version is most stable version to make this scenario work
-az extension add --name connectedk8s --version 1.3.17
+az extension add --name connectedk8s --version 1.9.3
 
 Write-Host "`n"
 az config set extension.use_dynamic_install=yes_without_prompt
