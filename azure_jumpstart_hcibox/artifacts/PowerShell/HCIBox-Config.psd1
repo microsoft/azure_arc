@@ -4,6 +4,8 @@
 
     # HCIBox Folders
     Paths = @{
+        DSCDir = "C:\HCIBox\DSC"
+        TestsDir = "C:\HCIBox\Tests"
         VMDir = "C:\HCIBox\Virtual Machines"
         LogsDir = "C:\HCIBox\Logs"
         IconDir = "C:\HCIBox\Icons"
@@ -16,25 +18,6 @@
         TempDir = "C:\Temp"
         VMPath = "C:\VMs"
     }
-
-    ChocolateyPackagesList = @(
-        'az.powershell',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'terraform',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnet-sdk',
-        'setdefaultbrowser',
-        'zoomit',
-        'azure-data-studio'
-    )
 
     PowerShellModulesList = @(
         'Az.Resources',
