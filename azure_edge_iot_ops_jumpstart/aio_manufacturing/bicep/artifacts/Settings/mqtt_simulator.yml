@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mqtt-simulator
-          image: jumpstartprod.azurecr.io/contoso-bakeries-mqtt-simulator:latest
+          image: mcr.microsoft.com/jumpstart/scenarios/mqtt_simulator:1.0.0
           resources:
             limits:
               cpu: "1"
