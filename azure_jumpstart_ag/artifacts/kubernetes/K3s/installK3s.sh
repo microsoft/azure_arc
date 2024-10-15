@@ -204,10 +204,10 @@ is_extension_installed() {
     fi
 }
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
-echo ""
-echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
-echo ""
+# # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+# echo ""
+# echo "Enabling Container Insights and Microsoft Defender for Containers cluster extensions"
+# echo ""
 
 # # Check and install azuremonitor-containers extension
 # if is_extension_installed "azuremonitor-containers"; then
