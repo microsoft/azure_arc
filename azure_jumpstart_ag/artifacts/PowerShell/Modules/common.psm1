@@ -542,7 +542,7 @@ function Deploy-ClusterSecrets {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         foreach ($namespace in $AgConfig.Namespaces) {
-            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
+            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache" -or $namespace -eq "contoso-hypermarket") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
                 if($cluster.Value.Type -eq "k3s"){
                     $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
