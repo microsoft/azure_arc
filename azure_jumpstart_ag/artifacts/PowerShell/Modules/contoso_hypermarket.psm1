@@ -18,39 +18,55 @@ function Merge-K3sConfigFiles{
 
 $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
 
-$configFile1 = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
-$configFile2 = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+$kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
+$kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+
+
+Install-Module -Name powershell-yaml -Force -Scope CurrentUser -AllowClobber
+Import-Module powershell-yaml
 
 # Extract base file names (without extensions) to use as new names
-$suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($configFile1)
-$suffix2 = [System.IO.Path]::GetFileNameWithoutExtension($configFile2)
+$suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig1Path)
+$suffix2 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig2Path)
 
-# Load the kubeconfig files
-$kubeconfig1 = [io.file]::ReadAllText($configFile1) | ConvertFrom-Yaml
-$kubeconfig2 = [io.file]::ReadAllText($configFile2) | ConvertFrom-Yaml
+# Load the kubeconfig files, ensuring no empty lines or structures
+$kubeconfig1 = get-content $kubeconfig1Path | ConvertFrom-Yaml
+$kubeconfig2 =  get-content $kubeconfig2Path | ConvertFrom-Yaml
 
-# Function to replace cluster, user, and context names with the file name
+# Function to replace cluster, user, and context names with the file name, while keeping original server addresses
 function Set-NamesWithFileName {
     param (
         [hashtable]$kubeconfigData,
         [string]$newName
     )
-    # Replace cluster, user, and context names with the provided file name
+
+    # Replace cluster names but keep the server addresses
     foreach ($cluster in $kubeconfigData.clusters) {
-        $cluster.name = $newName
+        if ($cluster.name -and $cluster.cluster.server) {
+            $cluster.name = "$newName"
+        }
     }
+
+    # Replace user names
     foreach ($user in $kubeconfigData.users) {
-        $user.name = $newName
+        if ($user.name) {
+            $user.name = "$newName"
+        }
     }
+
+    # Replace context names, but retain the correct mapping to cluster and user
     foreach ($context in $kubeconfigData.contexts) {
-        $context.name = $newName
-        $context.context.cluster = $newName
-        $context.context.user = $newName
+        if ($context.name -and $context.context.cluster -and $context.context.user) {
+            $context.name = "$newName"
+            $context.context.cluster = "$newName"
+            $context.context.user = "$newName"
+        }
     }
+
     return $kubeconfigData
 }
 
-# Replace names in the first and second kubeconfig with their respective file names
+# Apply renaming using file names
 $kubeconfig1 = Set-NamesWithFileName -kubeconfigData $kubeconfig1 -newName $suffix1
 $kubeconfig2 = Set-NamesWithFileName -kubeconfigData $kubeconfig2 -newName $suffix2
 
@@ -59,18 +75,19 @@ $mergedClusters = $kubeconfig1.clusters + $kubeconfig2.clusters
 $mergedUsers = $kubeconfig1.users + $kubeconfig2.users
 $mergedContexts = $kubeconfig1.contexts + $kubeconfig2.contexts
 
-# Prepare the merged kubeconfig
+# Prepare the merged kubeconfig ensuring no empty or null fields
 $mergedKubeconfig = @{
     apiVersion = $kubeconfig1.apiVersion
     kind = $kubeconfig1.kind
-    clusters = $mergedClusters
-    users = $mergedUsers
-    contexts = $mergedContexts
+    clusters = $mergedClusters | Where-Object { $_.name -and $_.cluster.server }
+    users = $mergedUsers | Where-Object { $_.name }
+    contexts = $mergedContexts | Where-Object { $_.name -and $_.context.cluster -and $_.context.user }
     "current-context" = $kubeconfig1."current-context"  # Retain the current context of the first file
 }
 
 # Convert the merged data back to YAML and save to a new file
 $mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
+
 Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
 kubectx
 }
