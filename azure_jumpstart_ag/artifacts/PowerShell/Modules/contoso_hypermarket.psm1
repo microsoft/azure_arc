@@ -21,10 +21,6 @@ $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
 $kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
 $kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
 
-
-Install-Module -Name powershell-yaml -Force -Scope CurrentUser -AllowClobber
-Import-Module powershell-yaml
-
 # Extract base file names (without extensions) to use as new names
 $suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig1Path)
 $suffix2 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig2Path)
