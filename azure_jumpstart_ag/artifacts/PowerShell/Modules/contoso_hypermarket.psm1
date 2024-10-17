@@ -15,12 +15,11 @@ function Get-K3sConfigFile{
 }
 
 function Merge-K3sConfigFiles{
-  [string]
-  $configFile1,
-  [string]
-  $configFile2
 
 $mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
+
+$configFile1 = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
+$configFile2 = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
 
 # Extract base file names (without extensions) to use as new names
 $suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($configFile1)
