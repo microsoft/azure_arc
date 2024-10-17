@@ -14,6 +14,68 @@ function Get-K3sConfigFile{
   }
 }
 
+function Merge-K3sConfigFiles{
+  [string]
+  $configFile1,
+  [string]
+  $configFile2
+
+$mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
+
+# Extract base file names (without extensions) to use as new names
+$suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($configFile1)
+$suffix2 = [System.IO.Path]::GetFileNameWithoutExtension($configFile2)
+
+# Load the kubeconfig files
+$kubeconfig1 = [io.file]::ReadAllText($configFile1) | ConvertFrom-Yaml
+$kubeconfig2 = [io.file]::ReadAllText($configFile2) | ConvertFrom-Yaml
+
+# Function to replace cluster, user, and context names with the file name
+function Set-NamesWithFileName {
+    param (
+        [hashtable]$kubeconfigData,
+        [string]$newName
+    )
+    # Replace cluster, user, and context names with the provided file name
+    foreach ($cluster in $kubeconfigData.clusters) {
+        $cluster.name = $newName
+    }
+    foreach ($user in $kubeconfigData.users) {
+        $user.name = $newName
+    }
+    foreach ($context in $kubeconfigData.contexts) {
+        $context.name = $newName
+        $context.context.cluster = $newName
+        $context.context.user = $newName
+    }
+    return $kubeconfigData
+}
+
+# Replace names in the first and second kubeconfig with their respective file names
+$kubeconfig1 = Set-NamesWithFileName -kubeconfigData $kubeconfig1 -newName $suffix1
+$kubeconfig2 = Set-NamesWithFileName -kubeconfigData $kubeconfig2 -newName $suffix2
+
+# Merge the clusters, users, and contexts from both kubeconfigs
+$mergedClusters = $kubeconfig1.clusters + $kubeconfig2.clusters
+$mergedUsers = $kubeconfig1.users + $kubeconfig2.users
+$mergedContexts = $kubeconfig1.contexts + $kubeconfig2.contexts
+
+# Prepare the merged kubeconfig
+$mergedKubeconfig = @{
+    apiVersion = $kubeconfig1.apiVersion
+    kind = $kubeconfig1.kind
+    clusters = $mergedClusters
+    users = $mergedUsers
+    contexts = $mergedContexts
+    "current-context" = $kubeconfig1."current-context"  # Retain the current context of the first file
+}
+
+# Convert the merged data back to YAML and save to a new file
+$mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
+Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
+kubectx
+}
+
 function Set-K3sClusters {
   Write-Host "Configuring kube-vip on K3s clusterS"
   az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
@@ -22,8 +84,8 @@ function Set-K3sClusters {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
           $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
-          $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-          kubectx
+          #$Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+          kubectx $clusterName
           $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
           Write-Host "Assigning kube-vip-role on k3s cluster"
           $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
