@@ -3,7 +3,7 @@
 variable "azure_vm_name" {
   type        = string
   description = "The name of you Virtual Machine."
-  default     = "Arc-K3s-Demo"
+  default     = "twt-k3s"
 }
 
 variable "admin_username" {
