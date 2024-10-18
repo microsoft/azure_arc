@@ -39,28 +39,28 @@ param storageContainerName string
 @description('Random GUID')
 param namingGuid string
 
-var publicIpAddressName = '${vmName}-PIP'
+//var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var k3sControlPlane = 'true' // deploy single-node k3s control plane
 var diskSize = 512
 var numberOfIPAddresses =  14 // The number of IP addresses to create
 
-// Create multiple public IP addresses if deployBastion is false
-resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
-  name: '${publicIpAddressName}${i}'
-  location: azureLocation
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    publicIPAddressVersion: 'IPv4'
-    idleTimeoutInMinutes: 4
-  }
-  sku: {
-    name: 'Basic'
-  }
-}]
+// // Create multiple public IP addresses
+// resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
+//   name: '${publicIpAddressName}${i}'
+//   location: azureLocation
+//   properties: {
+//     publicIPAllocationMethod: 'Static'
+//     publicIPAddressVersion: 'IPv4'
+//     idleTimeoutInMinutes: 4
+//   }
+//   sku: {
+//     name: 'Basic'
+//   }
+// }]
 
-// Create multiple NIC IP configurations and assign the public IP to the IP configuration if deployBastion is false
+// Create multiple NIC IP configurations and assign the public IP to the IP configuration
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: azureLocation
@@ -73,7 +73,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
         }
         privateIPAllocationMethod: 'Dynamic'
         publicIPAddress: {
-          id: publicIpAddresses[i-1].id
+          id: null
         }
         primary: i == 1 ? true : false
       }
