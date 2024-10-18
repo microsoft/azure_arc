@@ -2,7 +2,6 @@ function Get-K3sConfigFile{
   # Downloading k3s Kubernetes cluster kubeconfig file
   Write-Host "Downloading k3s Kubeconfigs"
   $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
-  $Env:KUBECONFIG=""
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
@@ -11,11 +10,16 @@ function Get-K3sConfigFile{
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
     azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "$AgLogsDir\" --include-pattern "*.log"
+    #$kubeconfigpath = $kubeconfigpath + "$Env:USERPROFILE\.kube\ag-k3s-$clusterName" + ";"
   }
+  #$Env:KUBECONFIG = $kubeconfigpath # Set the KUBECONFIG environment variable to the merged kubeconfig path
+  #kubectl config view --merge --flatten > "$Env:USERPROFILE\.kube\config-raw"
+  #$Env:KUBECONFIG = "$Env:USERPROFILE\.kube\config-raw"
+  #kubectx # display available clusters
 }
 
 function Set-K3sClusters {
-  Write-Host "Configuring kube-vip on K3s clusterS"
+  Write-Host "Configuring kube-vip on K3s clusters"
   az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
   az account set -s $subscriptionId
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
