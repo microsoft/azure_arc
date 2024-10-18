@@ -240,7 +240,6 @@ if($scenario -eq "contoso_supermarket"){
     Deploy-MotorsBookmarks
 }elseif($scenario -eq "contoso_hypermarket"){
     #Deploy-HypermarketBookmarks
-    $Env:KUBECONFIG = "$Env:USERPROFILE\.kube\config-raw"
 }
 
 ##############################################################
