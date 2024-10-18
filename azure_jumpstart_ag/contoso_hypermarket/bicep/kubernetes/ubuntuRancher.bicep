@@ -72,9 +72,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
           id: subnetId
         }
         privateIPAllocationMethod: 'Dynamic'
-        publicIPAddress: {
-          id: null
-        }
         primary: i == 1 ? true : false
       }
     }]
