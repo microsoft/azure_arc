@@ -2290,8 +2290,8 @@
       {
         "current": {
           "selected": false,
-          "text": "Managed_Prometheus_zmazmon1",
-          "value": "zmazmon1"
+          "text": "chicago",
+          "value": "fe0ylwo898wlcb"
         },
         "hide": 0,
         "includeAll": false,
@@ -2360,8 +2360,8 @@
     ]
   },
   "time": {
-    "from": "2024-10-16T17:17:09.316Z",
-    "to": "2024-10-16T18:17:09.316Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [

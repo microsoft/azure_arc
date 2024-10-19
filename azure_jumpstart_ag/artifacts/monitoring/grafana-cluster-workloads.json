@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 39,
+  "id": 10,
   "links": [],
   "panels": [
     {
@@ -171,6 +171,7 @@
       "fieldConfig": {
         "defaults": {
           "custom": {
+            "align": "auto",
             "cellOptions": {
               "type": "auto"
             },
@@ -383,7 +384,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.2+security-01",
       "targets": [
         {
           "datasource": {
@@ -609,8 +610,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -916,8 +916,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1285,8 +1284,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1380,8 +1378,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1499,8 +1496,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1594,8 +1590,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1713,8 +1708,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1808,8 +1802,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1927,8 +1920,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2022,8 +2014,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2082,7 +2073,7 @@
         "current": {
           "selected": false,
           "text": "chicago",
-          "value": "fe0ylwo898wlcb"
+          "value": "ae1dnyprv0zr4a"
         },
         "hide": 0,
         "includeAll": false,
