@@ -69,7 +69,8 @@
         @{name='Az.Kusto'; version="latest"},
         @{name='Az.EventGrid'; version="latest"},
         @{name='Az.Storage'; version="latest"},
-        @{name='Az.EventHub'; version="latest"}
+        @{name='Az.EventHub'; version="latest"},
+        @{name='powershell-yaml'; version="latest"}
     )
 
     # Chocolatey packages list
