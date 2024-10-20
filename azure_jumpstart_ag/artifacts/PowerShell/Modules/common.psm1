@@ -1071,7 +1071,7 @@ function Deploy-Prometheus {
             $grafanaDBBody = @{
                 dashboard = $dashboardObject
                 overwrite = $true
-            } | ConvertTo-Json -Depth 8
+            } | ConvertTo-Json -Depth 10
 
             if ($_.Value.IsProduction) {
                 # Set Grafana Dashboard endpoint
