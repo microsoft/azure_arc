@@ -98,7 +98,6 @@ function Set-K3sClusters {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
           $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
-          #$Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
           kubectx $clusterName
           $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
           Write-Host "Assigning kube-vip-role on k3s cluster"
