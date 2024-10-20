@@ -2064,8 +2064,8 @@
   "refresh": "1m",
   "schemaVersion": 39,
   "tags": [
-    "kubernetes-mixin",
-    "Microsoft-managed"
+    "jumpstart-agora",
+    "contoso"
   ],
   "templating": {
     "list": [
