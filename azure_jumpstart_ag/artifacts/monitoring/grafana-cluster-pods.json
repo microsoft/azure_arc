@@ -2321,7 +2321,7 @@
         "multi": false,
         "name": "namespace",
         "options": [],
-        "query": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\"}, namespace)",
+        "query": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\", namespace=~\".*contoso.*\"}, namespace)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -2389,7 +2389,7 @@
     ]
   },
   "timezone": "utc",
-  "title": "Contoso Hypermarket Pods",
+  "title": "Kubernetes / Workloads / Pods",
   "uid": "9701f5d6-af2d-442b-a2a4-d4d05f9b79b1",
   "version": 1,
   "weekStart": ""

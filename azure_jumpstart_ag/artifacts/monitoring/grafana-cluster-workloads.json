@@ -2197,7 +2197,7 @@
     ]
   },
   "timezone": "utc",
-  "title": "Contoso Hypermarket Workloads",
+  "title": "Kubernetes / Workloads",
   "uid": "3151475894614845ba54456099696738ff",
   "version": 1,
   "weekStart": ""
