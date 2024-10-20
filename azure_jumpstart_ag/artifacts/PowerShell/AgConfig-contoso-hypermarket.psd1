@@ -192,6 +192,7 @@
     Namespaces              = @(
         "observability"
         "images-cache"
+        "contoso-hypermarket"
     )
 
     AppConfig = @{
