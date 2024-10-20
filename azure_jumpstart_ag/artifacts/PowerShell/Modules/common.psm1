@@ -1084,7 +1084,7 @@ function Deploy-Prometheus {
             $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
-                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                "\$\{DS_PROMETHEUS}" = "prometheus"
             }
             $content = Get-Content $grafanaDBPath
             foreach ($key in $replacementParams.Keys) {
@@ -1101,24 +1101,15 @@ function Deploy-Prometheus {
 
             # Need to set this to null to let Grafana generate a new ID
             $dashboardObject.id = $null
-            # Set dashboard title
-            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
             # Request body with dashboard to add
             $grafanaDBBody = @{
                 dashboard = $dashboardObject
                 overwrite = $true
             } | ConvertTo-Json -Depth 10
 
-            if ($_.Value.IsProduction) {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-                $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
-            }
-            else {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
-                $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
-            }
+            # Set Grafana Dashboard endpoint
+            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
 
             # Make HTTP request to the API
             $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id

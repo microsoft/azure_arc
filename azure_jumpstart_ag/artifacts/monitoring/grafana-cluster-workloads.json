@@ -2103,7 +2103,7 @@
         "multi": false,
         "name": "namespace",
         "options": [],
-        "query": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\"}, namespace)",
+        "query": "label_values(kube_namespace_status_phase{job=\"kube-state-metrics\", namespace=~\".*contoso.*\"}, namespace)",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
