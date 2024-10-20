@@ -141,6 +141,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 if($scenario -eq "contoso_hypermarket"){
     Get-K3sConfigFile
+    Merge-K3sConfigFiles
     Set-K3sClusters
 }
 
@@ -231,7 +232,7 @@ if($scenario -eq "contoso_motors"){
 }
 
 ##############################################################
-# Creating bookmarks
+# Creating bookmarks and setting merged kubeconfigs
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket"){
@@ -247,8 +248,11 @@ if($scenario -eq "contoso_supermarket"){
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs (Step 17/17)" -ForegroundColor DarkGreen
 # Creating Hyper-V Manager desktop shortcut
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+if($scenario -ne "contoso_hypermarket") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+}
 
 if($scenario -eq "contoso_supermarket"){
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray

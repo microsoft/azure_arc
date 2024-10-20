@@ -2,7 +2,6 @@ function Get-K3sConfigFile{
   # Downloading k3s Kubernetes cluster kubeconfig file
   Write-Host "Downloading k3s Kubeconfigs"
   $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
-  $Env:KUBECONFIG=""
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
@@ -14,16 +13,91 @@ function Get-K3sConfigFile{
   }
 }
 
+function Merge-K3sConfigFiles{
+
+$mergedKubeconfigPath = "C:\Users\$adminUsername\.kube\config"
+
+$kubeconfig1Path = "C:\Users\$adminUsername\.kube\ag-k3s-seattle"
+$kubeconfig2Path = "C:\Users\$adminUsername\.kube\ag-k3s-chicago"
+
+# Extract base file names (without extensions) to use as new names
+$suffix1 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig1Path)
+$suffix2 = [System.IO.Path]::GetFileNameWithoutExtension($kubeconfig2Path)
+
+# Load the kubeconfig files, ensuring no empty lines or structures
+$kubeconfig1 = get-content $kubeconfig1Path | ConvertFrom-Yaml
+$kubeconfig2 =  get-content $kubeconfig2Path | ConvertFrom-Yaml
+
+# Function to replace cluster, user, and context names with the file name, while keeping original server addresses
+function Set-NamesWithFileName {
+    param (
+        [hashtable]$kubeconfigData,
+        [string]$newName
+    )
+
+    # Replace cluster names but keep the server addresses
+    foreach ($cluster in $kubeconfigData.clusters) {
+        if ($cluster.name -and $cluster.cluster.server) {
+            $cluster.name = "$newName"
+        }
+    }
+
+    # Replace user names
+    foreach ($user in $kubeconfigData.users) {
+        if ($user.name) {
+            $user.name = "$newName"
+        }
+    }
+
+    # Replace context names, but retain the correct mapping to cluster and user
+    foreach ($context in $kubeconfigData.contexts) {
+        if ($context.name -and $context.context.cluster -and $context.context.user) {
+            $context.name = "$newName"
+            $context.context.cluster = "$newName"
+            $context.context.user = "$newName"
+        }
+    }
+
+    return $kubeconfigData
+}
+
+# Apply renaming using file names
+$kubeconfig1 = Set-NamesWithFileName -kubeconfigData $kubeconfig1 -newName $suffix1
+$kubeconfig2 = Set-NamesWithFileName -kubeconfigData $kubeconfig2 -newName $suffix2
+
+# Merge the clusters, users, and contexts from both kubeconfigs
+$mergedClusters = $kubeconfig1.clusters + $kubeconfig2.clusters
+$mergedUsers = $kubeconfig1.users + $kubeconfig2.users
+$mergedContexts = $kubeconfig1.contexts + $kubeconfig2.contexts
+
+# Prepare the merged kubeconfig ensuring no empty or null fields
+$mergedKubeconfig = @{
+    apiVersion = $kubeconfig1.apiVersion
+    kind = $kubeconfig1.kind
+    clusters = $mergedClusters | Where-Object { $_.name -and $_.cluster.server }
+    users = $mergedUsers | Where-Object { $_.name }
+    contexts = $mergedContexts | Where-Object { $_.name -and $_.context.cluster -and $_.context.user }
+    "current-context" = $kubeconfig1."current-context"  # Retain the current context of the first file
+}
+
+# Convert the merged data back to YAML and save to a new file
+$mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
+
+Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
+kubectx seattle="ag-k3s-seattle"
+kubectx chicago="ag-k3s-chicago"
+
+}
+
 function Set-K3sClusters {
-  Write-Host "Configuring kube-vip on K3s clusterS"
+  Write-Host "Configuring kube-vip on K3s clusters"
   az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
   az account set -s $subscriptionId
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
       if ($cluster.Value.Type -eq "k3s") {
           $clusterName = $cluster.Value.FriendlyName.ToLower()
           $vmName = $cluster.Value.ArcClusterName + "-$namingGuid"
-          $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-          kubectx
+          kubectx $clusterName
           $k3sVIP = $(az network nic ip-config list --resource-group $Env:resourceGroup --nic-name $vmName-NIC --query "[?primary == ``true``].privateIPAddress" -otsv)
           Write-Host "Assigning kube-vip-role on k3s cluster"
           $kubeVipRbac = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipRbac.yml"
