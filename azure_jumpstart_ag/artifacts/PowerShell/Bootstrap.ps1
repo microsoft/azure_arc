@@ -250,6 +250,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/arc-osperformance-wo
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-workloads.json") -OutFile "$AgMonitoringDir\grafana-cluster-workloads.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-pods.json") -OutFile "$AgMonitoringDir\grafana-cluster-pods.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full-v2.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full-v2.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
