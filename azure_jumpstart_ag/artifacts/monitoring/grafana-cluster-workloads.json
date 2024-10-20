@@ -354,7 +354,7 @@
                   {
                     "targetBlank": true,
                     "title": "Drill down",
-                    "url": "/d/ac3253a2c4a149d68ccd0a58c7ab6738/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
+                    "url": "/d/9701f5d6-af2d-442b-a2a4-d4d05f9b79b1/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
                   }
                 ]
               },
@@ -779,7 +779,7 @@
                   {
                     "targetBlank": true,
                     "title": "Drill down",
-                    "url": "/d/ac3253a2c4a149d68ccd0a58c7ab6738/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
+                    "url": "/d/9701f5d6-af2d-442b-a2a4-d4d05f9b79b1/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
                   }
                 ]
               },
@@ -1108,7 +1108,7 @@
                   {
                     "targetBlank": true,
                     "title": "Drill down",
-                    "url": "/d/ac3253a2c4a149d68ccd0a58c7ab6738/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
+                    "url": "/d/9701f5d6-af2d-442b-a2a4-d4d05f9b79b1/k8s-resources-pod?var-datasource=$datasource&var-namespace=$namespace&from=$__from&to=$__to&var-pod=$__value"
                   }
                 ]
               },
