@@ -85,7 +85,9 @@ $mergedKubeconfig = @{
 $mergedKubeconfig | ConvertTo-Yaml | Set-Content -Path $mergedKubeconfigPath
 
 Write-Host "Kubeconfig files successfully merged into $mergedKubeconfigPath"
-kubectx
+kubectx seattle="ag-k3s-seattle"
+kubectx chicago="ag-k3s-chicago"
+
 }
 
 function Set-K3sClusters {

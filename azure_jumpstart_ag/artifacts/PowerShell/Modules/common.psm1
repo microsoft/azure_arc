@@ -536,12 +536,12 @@ function Deploy-AzContainerRegistry {
 function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.Type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
+        #if($cluster.Value.Type -eq "k3s"){
+        #    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+        #    kubectx
+        #}else{
             kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        #}
         foreach ($namespace in $AgConfig.Namespaces) {
             Write-Host "[$(Get-Date -Format t)] INFO: Creating namespace $namespace on $clusterName" -ForegroundColor Gray
             kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -555,12 +555,12 @@ function Deploy-ClusterSecrets {
         foreach ($namespace in $AgConfig.Namespaces) {
             if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-                if($cluster.Value.Type -eq "k3s"){
-                    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-                    kubectx
-                }else{
+                #if($cluster.Value.Type -eq "k3s"){
+                #    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+                #    kubectx
+                #}else{
                     kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-                }
+                #}
                 kubectl create secret docker-registry acr-secret `
                     --namespace $namespace `
                     --docker-server="$acrName.azurecr.io" `
@@ -1207,12 +1207,12 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
+        #if($cluster.Value.type -eq "k3s"){
+        #    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+        #    kubectx
+        #}else{
             kubectx $clusterName
-        }
+        #}
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
         $retryCount = 0
@@ -1223,21 +1223,21 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        if($cluster.Value.Type -eq "k3s"){
+        #if($cluster.Value.Type -eq "k3s"){
+        #    az connectedk8s enable-features --name $arcClusterName `
+        #    --resource-group $resourceGroup `
+        #    --features cluster-connect custom-locations `
+        #    --custom-locations-oid $customLocationRPOID `
+        #    --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
+        #    --kube-context "ag-k3s-$clusterName" `
+        #    --only-show-errors
+        #}else{
             az connectedk8s enable-features --name $arcClusterName `
             --resource-group $resourceGroup `
             --features cluster-connect custom-locations `
             --custom-locations-oid $customLocationRPOID `
-            --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
-            --kube-context "ag-k3s-$clusterName" `
             --only-show-errors
-        }else{
-            az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --only-show-errors
-        }
+        #}
 
         Start-Sleep -Seconds 10
 
@@ -1262,12 +1262,12 @@ function Deploy-AIO {
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $retryCount = 0
         $maxRetries = 25
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
+        #if($cluster.Value.type -eq "k3s"){
+        #    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+        #    kubectx
+        #}else{
             kubectx $clusterName
-        }
+        #}
         do {
             $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
@@ -1339,12 +1339,12 @@ function Set-MQTTIpAddress {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
+        #if($cluster.Value.type -eq "k3s"){
+        #    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
+        #    kubectx
+        #}else{
             kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        #}
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
 
         do {
