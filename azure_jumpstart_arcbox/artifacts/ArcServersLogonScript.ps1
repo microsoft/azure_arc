@@ -156,18 +156,25 @@ if ($Env:flavor -ne "DevOps") {
     # Before deploying ArcBox SQL set resource group tag ArcSQLServerExtensionDeployment=Disabled to opt out of automatic SQL onboarding
     az tag create --resource-id "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup" --tags ArcSQLServerExtensionDeployment=Disabled
 
+    $vhdImageToDownload = "ArcBox-SQL-DEV.vhdx"
+    if ($Env:sqlServerEdition -eq "Standard"){
+        $vhdImageToDownload = "ArcBox-SQL-STD.vhdx"
+    }
+    elseif ($Env:sqlServerEdition -eq "Enterprise"){
+        $vhdImageToDownload = "ArcBox-SQL-ENT.vhdx"
+    }
+
+    Write-Host "Fetching SQL VM"
     $SQLvmName = "$namingPrefix-SQL"
     $SQLvmvhdPath = "$Env:ArcBoxVMDir\$namingPrefix-SQL.vhdx"
 
-    Write-Host "Fetching SQL VM"
-
     # Verify if VHD files already downloaded especially when re-running this script
     if (!(Test-Path $SQLvmvhdPath)) {
-        <# Action when all if and elseif conditions are false #>
-        $Env:AZCOPY_BUFFER_GB = 4
-        # Other ArcBox flavors does not have an azcopy network throughput capping
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-        azcopy cp $vhdSourceFolder --include-pattern "ArcBox-SQL.vhdx" $Env:ArcBoxVMDir --check-length=false --log-level=ERROR
+        azcopy cp $vhdSourceFolder $Env:ArcBoxVMDir --include-pattern "$vhdImageToDownload" --recursive=true --check-length=false --log-level=ERROR
+
+        # Rename VHD file
+        Rename-Item -Path "$Env:ArcBoxVMDir\$vhdImageToDownload" -NewName  $SQLvmvhdPath -Force
     }
 
     # Create the nested VMs if not already created
@@ -184,17 +191,26 @@ if ($Env:flavor -ne "DevOps") {
     Invoke-Command -VMName $SQLvmName -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
     Start-Sleep -Seconds 20
 
-    if ($namingPrefix -ne "ArcBox") {
+    # Rename server if hostname is not as ArcBox-SQL or doesn't match naming prefix
+    $hostname = Invoke-Command -VMName $SQLvmName -ScriptBlock { hostname } -Credential $winCreds
+
+    if ($hostname -ne $SQLvmName) {
 
         Write-Header "Renaming the nested SQL VM"
         Invoke-Command -VMName $SQLvmName -ScriptBlock { Rename-Computer -NewName $using:SQLvmName -Restart} -Credential $winCreds
 
         Get-VM *SQL* | Wait-VM -For IPAddress
 
-        Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 10 seconds"
+        Write-Host "Waiting for the nested Windows SQL VM to come back online...waiting for 30 seconds"
+        Start-Sleep -Seconds 30
 
-        Start-Sleep -Seconds 10
+        # Wait for VM to start again
+        while ((Get-VM -vmName $SQLvmName).State -ne 'Running') {
+            Write-Host "Waiting for VM to start..."
+            Start-Sleep -Seconds 5
+        }
 
+        Write-Host "VM has rebooted successfully!"
     }
 
     # Enable Windows Firewall rule for SQL Server
@@ -240,7 +256,7 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 5)
 
     # Create SQL server extension as policy to auto deployment is disabled
-    Write-Host "Installing SQL Server extension on the Arc-enabled Server."
+    Write-Host "Installing SQL Server extension on the Arc-enabled Server.`n"
     az connectedmachine extension create --machine-name $SQLvmName --name "WindowsAgent.SqlServer" --resource-group $resourceGroup --type "WindowsAgent.SqlServer" --publisher "Microsoft.AzureData" --settings '{\"LicenseType\":\"Paid\", \"SqlManagement\": {\"IsEnabled\":true}}' --tags $resourceTags --location $azureLocation --only-show-errors --no-wait
     Write-Host "SQL Server extension installation on the Arc-enabled Server successful."
 
@@ -250,7 +266,7 @@ if ($Env:flavor -ne "DevOps") {
         $sqlExtension  = Get-AzConnectedMachine -Name $SQLvmName -ResourceGroupName $resourceGroup | Select-Object -ExpandProperty Resource | Where-Object {$PSItem.Name -eq 'WindowsAgent.SqlServer'}
         if ($sqlExtension -and ($sqlExtension.ProvisioningState -eq "Succeeded")) {
             # SQL server extension is installed and ready to run SQL BPA
-            Write-Host "SQL server extension is installed and ready to run SQL BPA."
+            Write-Host "SQL server extension is installed and ready to run SQL BPA.`n"
             break;
         }
         else {
@@ -267,6 +283,7 @@ if ($Env:flavor -ne "DevOps") {
     } while($retryCount -le 10)
 
     # Azure Monitor Agent extension is deployed automatically using Azure Policy. Wait until extension status is Succeded.
+    Write-Host "Installing Azure Monitoring Agent extension.`n"
     az connectedmachine extension create --machine-name $SQLvmName --name AzureMonitorWindowsAgent --publisher Microsoft.Azure.Monitor --type AzureMonitorWindowsAgent --resource-group $resourceGroup --location $azureLocation --only-show-errors --no-wait
 
     $retryCount = 0
@@ -297,15 +314,16 @@ if ($Env:flavor -ne "DevOps") {
     if ($amaExtension.StatusCode -eq 0) {
 
         # Create custom log analytics table for SQL assessment
+        Write-Host "Creating Log Analytis workspace table for SQL best practices assessment.`n"
         az monitor log-analytics workspace table create --resource-group $resourceGroup --workspace-name $Env:workspaceName -n SqlAssessment_CL --columns RawData=string TimeGenerated=datetime --only-show-errors
 
         # Verify if ArcBox SQL resource is created
-        Write-Host "Enabling SQL server best practices assessment"
+        Write-Host "Enabling SQL server best practices assessment.`n"
         $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
         az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
 
         # Run Best practices assessment
-        Write-Host "Execute SQL server best practices assessment"
+        Write-Host "Execute SQL server best practices assessment.`n"
 
         # Wait for a minute to finish everyting and run assessment
         Start-Sleep(60)
@@ -331,6 +349,7 @@ if ($Env:flavor -ne "DevOps") {
     } # End of SQL BPA
 
     # Run SQL Server Azure Migration Assessment
+    Write-Host "Enabling SQL Server Azure Migration Assessment.`n"
     $migrationApiURL = "https://management.azure.com/batch?api-version=2020-06-01"
     $assessmentName = (New-Guid).Guid
 $payLoad = @"
@@ -347,9 +366,11 @@ $payLoad = @"
     }
 
     #Install SQLAdvancedThreatProtection solution
+    Write-Host "Installing SQLAdvancedThreatProtection Log Analytics solution.`n"
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLAdvancedThreatProtection --workspace $Env:workspaceName --only-show-errors
 
     #Install SQLVulnerabilityAssessment solution
+    Write-Host "Install SQLVulnerabilityAssessment Log Analytics solution.`n"
     az monitor log-analytics solution create --resource-group $resourceGroup --solution-type SQLVulnerabilityAssessment --workspace $Env:workspaceName --only-show-errors
 
     # Update Azure Monitor data collection rule template with Log Analytics workspace resource ID
@@ -357,21 +378,29 @@ $payLoad = @"
     (Get-Content -Path $sqlDefenderDcrFile) -replace '{LOGANLYTICS_WORKSPACEID}', $workspaceResourceID | Set-Content -Path $sqlDefenderDcrFile
 
     # Create data collection rules for Defender for SQL
-    Write-Host "Creating Azure Monitor data collection rule"
+    Write-Host "Creating Azure Monitor data collection rule.`n"
     $dcrName = "Jumpstart-DefenderForSQL-DCR"
     az monitor data-collection rule create --resource-group $resourceGroup --location $env:azureLocation --name $dcrName --rule-file $sqlDefenderDcrFile
 
     # Associate DCR with Azure Arc-enabled Server resource
-    Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server"
+    Write-Host "Creating Azure Monitor data collection rule assocation for Arc-enabled server.`n"
     $dcrRuleId = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.Insights/dataCollectionRules/$dcrName"
     az monitor data-collection rule association create --name "$SQLvmName" --rule-id $dcrRuleId --resource $azConnectedMachineId
 
     # Test Defender for SQL
-    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud"
+    Write-Header "Simulating SQL threats to generate alerts from Defender for Cloud.`n"
     $remoteScriptFileFile = "$Env:ArcBoxDir\testDefenderForSQL.ps1"
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\SqlAdvancedThreatProtectionShell.psm1" -DestinationPath "$Env:ArcBoxDir\SqlAdvancedThreatProtectionShell.psm1" -CreateFullPath -FileSource Host -Force
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
+
+    # Enable least privileged access
+    Write-Host "Enabling Arc-enabled SQL server least privileged access.`n"
+    az sql server-arc extension feature-flag set --name LeastPrivilege --enable true --resource-group $resourceGroup --machine-name $SQLvmName
+
+    # Enable automated backups
+    Write-Host "Enabling Arc-enabled SQL server automated backups.`n"
+    az sql server-arc backups-policy set --name $SQLvmName --resource-group $resourceGroup --retention-days 31 --full-backup-days 7 --diff-backup-hours 12 --tlog-backup-mins 5
 
     # Onboard nested Windows and Linux VMs to Azure Arc
     if ($Env:flavor -eq "ITPro") {
@@ -528,7 +557,7 @@ $payLoad = @"
             }
 
             Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
-            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
 
         }
     }
@@ -551,8 +580,8 @@ $payLoad = @"
             Write-Output "SSH already enabled on $($connectedMachine.Name)"
         }
 
-            Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
-            $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$($using:subscriptionId)/resourceGroups/$($using:resourceGroup)/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
+        Write-Output "Triggering Update Manager assessment on $($connectedMachine.Name)"
+        $null = Invoke-AzRestMethod -Method POST -Path "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$($connectedMachine.Name)/assessPatches?api-version=2020-08-15-preview" -Payload '{}'
 
     }
 
@@ -564,7 +593,6 @@ $payLoad = @"
 }
 
 #Changing to Jumpstart ArcBox wallpaper
-
 Write-Header "Changing wallpaper"
 
 # bmp file is required for BGInfo

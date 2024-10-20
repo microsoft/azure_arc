@@ -16,6 +16,7 @@ echo $logAnalyticsWorkspace:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $storageContainerName:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $k3sControlPlane:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:${10}| awk '{print substr($1,2); }' >> vars.sh
 
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export subscriptionId=/' vars.sh
@@ -26,6 +27,7 @@ sed -i '7s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
 sed -i '9s/^/export storageContainerName=/' vars.sh
 sed -i '10s/^/export k3sControlPlane=/' vars.sh
+sed -i '11s/^/export resourceGroup=/' vars.sh
 
 export vmName=$3
 
@@ -42,7 +44,7 @@ chmod +x vars.sh
 . ./vars.sh
 
 # Creating login message of the day (motd)
-sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
@@ -96,13 +98,15 @@ done
 sudo -u $adminUsername az account set --subscription $subscriptionId
 az -v
 
+check_dpkg_lock
+
 if [[ "$k3sControlPlane" == "true" ]]; then
 
     # Installing Azure Arc extensions
     echo ""
     echo "Installing Azure Arc extensions"
     echo ""
-    sudo -u $adminUsername az extension add --name connectedk8s
+    sudo -u $adminUsername az extension add --name connectedk8s --version 1.9.3
     sudo -u $adminUsername az extension add --name k8s-configuration
     sudo -u $adminUsername az extension add --name k8s-extension
 
@@ -164,7 +168,27 @@ if [[ "$k3sControlPlane" == "true" ]]; then
     workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
     echo "Log Analytics workspace id $workspaceResourceId"
 
-    sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
+    max_retries=5
+    retry_count=0
+    success=false
+
+    while [ $retry_count -lt $max_retries ]; do
+        sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location
+        if [ $? -eq 0 ]; then
+            success=true
+            break
+        else
+            echo "Failed to onboard cluster to Azure Arc. Retrying (Attempt $((retry_count+1)))..."
+            retry_count=$((retry_count+1))
+            sleep 10
+        fi
+    done
+
+    if [ "$success" = false ]; then
+        echo "Error: Failed to onboard the cluster to Azure Arc after $max_retries attempts."
+        exit 1
+    fi
+
     echo "Onboarding the k3s cluster to Azure Arc completed"
 
     # Verify if cluster is connected to Azure Arc successfully

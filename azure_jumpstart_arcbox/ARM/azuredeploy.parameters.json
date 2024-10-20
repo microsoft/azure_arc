@@ -25,6 +25,9 @@
         },
         "githubUser": {
             "value": "microsoft"
+        },
+        "sqlServerEdition": {
+            "value": "<Developer|Standard|Enterprise>. Default is Developer edition."
         }
     }
 }

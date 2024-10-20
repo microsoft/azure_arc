@@ -23,7 +23,7 @@
     "AzureStackLCMAdminPassword": {
       "value": "AzureStackLCMAdminAdminPassword-staging"
     },
-    "arbDeploymentAppId": {
+    "arbDeploymentAppID": {
       "value": "arbDeploymentAppId-staging"
     },
     "arbDeploymentAppSecret": {
@@ -44,7 +44,7 @@
     "keyVaultName": {
       "value": "keyVaultName-staging"
     },
-    "ClusterWitnessStorageAccountName": {
+    "clusterWitnessStorageAccountName": {
       "value": "ClusterWitnessStorageAccountName-staging"
     },
     "diagnosticStorageAccountName": {
@@ -148,6 +148,9 @@
     },
     "networkingType": {
       "value": "switchlessMultiServerDeployment"
+    },
+    "enableStorageAutoIp": {
+      "value": true
     },
     "customLocation": {
       "value": "customLocation-staging"

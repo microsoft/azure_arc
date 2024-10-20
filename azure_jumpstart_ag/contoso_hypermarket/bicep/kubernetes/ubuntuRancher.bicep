@@ -2,7 +2,7 @@
 param vmName string = 'Ag-K3s-${namingGuid}'
 
 @description('Username for the Virtual Machine')
-param adminUsername string = 'arcdemo'
+param adminUsername string = 'agora'
 
 @description('RSA public key used for securing SSH access to ArcBox resources. This parameter is only needed when deploying the DataOps or DevOps flavors.')
 @secure()
@@ -44,9 +44,9 @@ var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var k3sControlPlane = 'true' // deploy single-node k3s control plane
 var diskSize = 512
-var numberOfIPAddresses =  8 // The number of IP addresses to create
+var numberOfIPAddresses =  14 // The number of IP addresses to create
 
-// Create multiple public IP addresses if deployBastion is false
+// Create multiple public IP addresses
 resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [for i in range(1, numberOfIPAddresses): {
   name: '${publicIpAddressName}${i}'
   location: azureLocation
@@ -60,7 +60,7 @@ resource publicIpAddresses 'Microsoft.Network/publicIpAddresses@2022-01-01' = [f
   }
 }]
 
-// Create multiple NIC IP configurations and assign the public IP to the IP configuration if deployBastion is false
+// Create multiple NIC IP configurations and assign the public IP to the IP configuration
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: azureLocation
@@ -166,7 +166,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${subscription().subscriptionId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${templateBaseUrl} ${storageContainerName} ${k3sControlPlane} ${resourceGroup().name}'
       fileUris: [
         '${templateBaseUrl}artifacts/kubernetes/K3s/installK3s.sh'
       ]
