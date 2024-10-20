@@ -59,7 +59,7 @@
 
     # PowerShell modules
     PowerShellModules       = @(
-        'Az.ConnectedKubernetes',
+        #'Az.ConnectedKubernetes',
         'Az.KubernetesConfiguration',
         'Az.Kusto',
         'Az.EventGrid',

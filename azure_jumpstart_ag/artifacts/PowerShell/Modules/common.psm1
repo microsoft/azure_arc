@@ -36,11 +36,22 @@ function Deploy-AzPowerShell {
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     Set-AzContext -Subscription $subscriptionId
-    # Install PowerShell modules
+
+    # Making module install dynamic
     if ($AgConfig.PowerShellModules.Count -ne 0) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules" -ForegroundColor Gray
         foreach ($module in $AgConfig.PowerShellModules) {
-            Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+            $moduleName = $module.name
+            $moduleVersion = $module.version
+            if ($moduleVersion -ne "latest" -and $null -ne $moduleVersion) {
+                # Install extension with specific version
+                Install-Module $moduleName -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion $moduleVersion
+                Write-Host "Installed $moduleName version $moduleVersion"
+            } else {
+                # Install extension without specifying a version
+                Install-Module -Name $moduleName -Force
+                Write-Host "Installed $moduleName (latest version)"
+            }
         }
     }
 
@@ -525,12 +536,7 @@ function Deploy-AzContainerRegistry {
 function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.Type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         foreach ($namespace in $AgConfig.Namespaces) {
             Write-Host "[$(Get-Date -Format t)] INFO: Creating namespace $namespace on $clusterName" -ForegroundColor Gray
             kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -544,12 +550,7 @@ function Deploy-ClusterSecrets {
         foreach ($namespace in $AgConfig.Namespaces) {
             if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache" -or $namespace -eq "contoso-hypermarket") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-                if($cluster.Value.Type -eq "k3s"){
-                    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-                    kubectx
-                }else{
-                    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-                }
+                kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
                 kubectl create secret docker-registry acr-secret `
                     --namespace $namespace `
                     --docker-server="$acrName.azurecr.io" `
@@ -627,7 +628,7 @@ function Deploy-AzArcK8sAKSEE {
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
             Install-Module Az.Resources -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
             Install-Module Az.Accounts -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
-            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop
+            Install-Module Az.ConnectedKubernetes -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion 0.10.3
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
@@ -799,7 +800,7 @@ function Deploy-Workbook ($workbookFileName) {
     $updatedContent = $content -replace 'rg-placeholder', $resourceGroup
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxxx/providers/Microsoft.OperationalInsights/workspaces/xxxx', "/subscriptions/$($subscriptionId)/resourceGroups/$($Env:resourceGroup)/providers/Microsoft.OperationalInsights/workspaces/$($Env:workspaceName)"
     $updatedContent = $updatedContent -replace'/subscriptions/00000000-0000-0000-0000-000000000000', "/subscriptions/$($subscriptionId)"
-    
+
     # Write the updated content back to the file
     Set-Content -Path $workbookTemplateFilePath -Value $updatedContent
     # Deploy the workbook
@@ -953,13 +954,7 @@ function Deploy-Prometheus {
     # Deploying Kube Prometheus Stack for stores
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        if ($Env:scenario -eq "contoso_hypermarket") {
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$($_.Value.FriendlyName.ToLower())"
-            kubectx | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
-        else {
-            kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
+        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'
@@ -1196,12 +1191,7 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName
-        }
+        kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
         $retryCount = 0
@@ -1212,21 +1202,11 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        if($cluster.Value.Type -eq "k3s"){
-            az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
-            --kube-context "ag-k3s-$clusterName" `
-            --only-show-errors
-        }else{
-            az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --only-show-errors
-        }
+        az connectedk8s enable-features --name $arcClusterName `
+        --resource-group $resourceGroup `
+        --features cluster-connect custom-locations `
+        --custom-locations-oid $customLocationRPOID `
+        --only-show-errors
 
         Start-Sleep -Seconds 10
 
@@ -1251,12 +1231,7 @@ function Deploy-AIO {
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $retryCount = 0
         $maxRetries = 25
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName
-        }
+        kubectx $clusterName
         do {
             $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
@@ -1328,12 +1303,7 @@ function Set-MQTTIpAddress {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
 
         do {
