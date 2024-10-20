@@ -10,12 +10,7 @@ function Get-K3sConfigFile{
     azcopy copy $sourceFile "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" --check-length=false
     $sourceFile = "https://$stagingStorageAccountName.blob.core.windows.net/$containerName/*"
     azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile "$AgLogsDir\" --include-pattern "*.log"
-    #$kubeconfigpath = $kubeconfigpath + "$Env:USERPROFILE\.kube\ag-k3s-$clusterName" + ";"
   }
-  #$Env:KUBECONFIG = $kubeconfigpath # Set the KUBECONFIG environment variable to the merged kubeconfig path
-  #kubectl config view --merge --flatten > "$Env:USERPROFILE\.kube\config-raw"
-  #$Env:KUBECONFIG = "$Env:USERPROFILE\.kube\config-raw"
-  #kubectx # display available clusters
 }
 
 function Merge-K3sConfigFiles{
