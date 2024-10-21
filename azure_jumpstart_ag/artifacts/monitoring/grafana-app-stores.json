@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 5,
   "links": [],
   "panels": [
     {
@@ -34,14 +34,14 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
             "axisBorderShow": false,
@@ -52,21 +52,21 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -85,16 +85,21 @@
                 "value": null
               },
               {
+                "color": "#EAB839",
+                "value": 5
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 10
               }
             ]
-          }
+          },
+          "unit": "kwatth"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 0,
         "y": 1
@@ -105,7 +110,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -116,7 +121,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -124,7 +129,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -135,9 +140,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -147,13 +152,15 @@
           "mappings": [
             {
               "options": {
-                "1": {
-                  "index": 1,
-                  "text": "On"
-                },
-                "O": {
+                "0": {
+                  "color": "red",
                   "index": 0,
                   "text": "Off"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "On"
                 }
               },
               "type": "value"
@@ -176,7 +183,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 8,
         "y": 1
@@ -204,7 +211,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -212,7 +219,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -223,9 +230,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -283,7 +290,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 16,
         "y": 1
@@ -294,7 +301,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -305,7 +312,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -313,7 +320,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -328,7 +335,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 7
       },
       "id": 5,
       "panels": [],
@@ -337,9 +344,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -356,7 +363,7 @@
             "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
-            "gradientMode": "none",
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -364,12 +371,15 @@
             },
             "insertNulls": false,
             "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -400,38 +410,13 @@
           },
           "unit": "kwatth"
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "refrigerator_power_usage_kwh {__name__=\"refrigerator_power_usage_kwh\", endpoint=\"genie-metrics\", instance=\"10.42.1.25:8001\", job=\"genie-simulator-service\", namespace=\"contoso-hypermarket\", pod=\"genie-simulator-96b57b6ff-g2fp2\", service=\"genie-simulator-service\"}"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 3,
       "options": {
@@ -439,7 +424,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -451,7 +436,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -461,7 +446,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "{{label_name}}",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -472,9 +457,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -515,10 +500,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 8,
-        "y": 7
+        "y": 8
       },
       "id": 1,
       "options": {
@@ -543,7 +528,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -551,7 +536,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "{{service}}",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -562,9 +547,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -590,10 +575,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 8,
         "x": 16,
-        "y": 7
+        "y": 8
       },
       "id": 4,
       "options": {
@@ -616,7 +601,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -624,7 +609,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -638,7 +623,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 14
       },
       "id": 2,
       "title": "HVAC",
@@ -646,14 +631,14 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-RdYlGr",
+            "mode": "continuous-GrYlRd",
             "seriesBy": "last"
           },
           "custom": {
@@ -665,16 +650,16 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -712,10 +697,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 6,
         "x": 0,
-        "y": 13
+        "y": 15
       },
       "id": 6,
       "options": {
@@ -723,7 +708,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -734,7 +719,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -742,7 +727,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -753,9 +738,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -796,10 +781,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 6,
         "x": 6,
-        "y": 13
+        "y": 15
       },
       "id": 7,
       "options": {
@@ -824,7 +809,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -832,7 +817,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -843,9 +828,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -871,10 +856,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 6,
         "x": 12,
-        "y": 13
+        "y": 15
       },
       "id": 8,
       "options": {
@@ -897,7 +882,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -905,7 +890,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -916,9 +901,9 @@
     },
     {
       "datasource": {
-        "default": true,
+        "name": "${datasource}",
         "type": "prometheus",
-        "uid": "de1higv54pog0f"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -944,10 +929,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 6,
         "x": 18,
-        "y": 13
+        "y": 15
       },
       "id": 9,
       "options": {
@@ -970,7 +955,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "de1higv54pog0f"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -979,7 +964,7 @@
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
-          "legendFormat": "{{label_name}}",
+          "legendFormat": "{{device_id}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -993,16 +978,36 @@
   "schemaVersion": 39,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "chicago",
+          "value": "de1higv54pog0f"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Store",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
   },
   "time": {
-    "from": "2024-10-21T02:18:54.942Z",
-    "to": "2024-10-21T02:26:12.630Z"
+    "from": "now-15m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Hypermarket / Stores",
-  "uid": "be1hvn2vct0jkev",
-  "version": 1,
+  "uid": "be1hvn2vct0jke",
+  "version": 65,
   "weekStart": ""
 }
