@@ -248,9 +248,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-glob
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/arc-inventory-workbook.bicep") -OutFile "$AgMonitoringDir\arc-inventory-workbook.bicep"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/arc-osperformance-workbook.bicep") -OutFile "$AgMonitoringDir\arc-osperformance-workbook.bicep"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/prometheus-additional-scrape-config.yaml") -OutFile "$AgMonitoringDir\prometheus-additional-scrape-config.yaml"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-workloads.json") -OutFile "$AgMonitoringDir\grafana-cluster-workloads.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-cluster-pods.json") -OutFile "$AgMonitoringDir\grafana-cluster-pods.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-workloads.json") -OutFile "$AgMonitoringDir\grafana-app-workloads.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full-v2.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full-v2.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-stores.json") -OutFile "$AgMonitoringDir\grafana-app-stores.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/grafana.ico") -OutFile $AgIconsDir\grafana.ico
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.png") -OutFile $AgIconsDir\contoso.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso.svg") -OutFile $AgIconsDir\contoso.svg
