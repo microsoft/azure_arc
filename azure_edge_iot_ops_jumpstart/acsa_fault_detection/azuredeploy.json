@@ -156,7 +156,6 @@
     "variables": {
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/refs/heads/', parameters('githubBranch'), '/azure_edge_iot_ops_jumpstart/acsa_fault_detection/')]",
         "vmName": "[concat(parameters('vmName'))]",
-        "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
