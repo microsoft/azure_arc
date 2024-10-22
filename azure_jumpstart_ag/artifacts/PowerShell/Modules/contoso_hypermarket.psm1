@@ -2,7 +2,6 @@ function Get-K3sConfigFile{
   # Downloading k3s Kubernetes cluster kubeconfig file
   Write-Host "Downloading k3s Kubeconfigs"
   $Env:AZCOPY_AUTO_LOGIN_TYPE="PSCRED"
-  $Env:KUBECONFIG=""
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
     $clusterName = $cluster.Name.ToLower()
     $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
@@ -91,7 +90,7 @@ kubectx chicago="ag-k3s-chicago"
 }
 
 function Set-K3sClusters {
-  Write-Host "Configuring kube-vip on K3s clusterS"
+  Write-Host "Configuring kube-vip on K3s clusters"
   az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
   az account set -s $subscriptionId
   foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
