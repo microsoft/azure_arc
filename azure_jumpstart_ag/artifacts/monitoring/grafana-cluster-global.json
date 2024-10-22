@@ -2714,7 +2714,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "Kubernetes / Cluster / Global",
   "uid": "k8s_views_global",
   "version": 28,

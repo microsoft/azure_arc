@@ -2195,7 +2195,7 @@
       "30d"
     ]
   },
-  "timezone": "utc",
+  "timezone": "browser",
   "title": "Kubernetes / Workload",
   "uid": "3151475894614845ba54456099696738ff",
   "version": 1,
