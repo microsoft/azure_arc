@@ -23284,7 +23284,7 @@
   "schemaVersion": 38,
   "style": "dark",
   "tags": [
-    "linux"
+    "Kubernetes"
   ],
   "templating": {
     "list": [
@@ -23411,7 +23411,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Node Exporter Full",
+  "title": "Kubernetes / Cluster / Node Exporter",
   "uid": "rYdddlPWk",
   "version": 1,
   "weekStart": ""

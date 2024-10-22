@@ -1094,7 +1094,7 @@ function Deploy-Prometheus {
             $dashboardObject = $content | ConvertFrom-Json
 
             # Set Dashboard UID for parent dashboards
-            if ($dashboard -notlike '*cluster-pods*') {
+            if ($dashboard -notlike '*app-pods*') {
                 # Best practice is to generate a random UID, such as a GUID
                 $dashboardObject.uid = [guid]::NewGuid().ToString()
             }

@@ -976,7 +976,9 @@
   ],
   "refresh": "",
   "schemaVersion": 39,
-  "tags": [],
+  "tags": [
+    "stores"
+  ],
   "templating": {
     "list": [
       {
@@ -1006,7 +1008,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Hypermarket / Stores",
+  "title": "Store / Asset",
   "uid": "be1hvn2vct0jke",
   "version": 65,
   "weekStart": ""

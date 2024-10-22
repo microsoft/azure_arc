@@ -2064,8 +2064,7 @@
   "refresh": "1m",
   "schemaVersion": 39,
   "tags": [
-    "jumpstart-agora",
-    "contoso"
+    "workloads"
   ],
   "templating": {
     "list": [
@@ -2197,7 +2196,7 @@
     ]
   },
   "timezone": "utc",
-  "title": "Kubernetes / Workloads",
+  "title": "Kubernetes / Workload",
   "uid": "3151475894614845ba54456099696738ff",
   "version": 1,
   "weekStart": ""
