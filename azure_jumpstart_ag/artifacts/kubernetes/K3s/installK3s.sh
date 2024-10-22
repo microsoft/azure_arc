@@ -64,16 +64,16 @@ check_dpkg_lock
 echo ""
 echo "Downloading azcopy"
 echo ""
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-##wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
-##if [[ $? -ne 0 ]]; then
-##    echo "ERROR: Failed to download azcopy"
-##    exit 1
-##fi
+wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: Failed to download azcopy"
+    exit 1
+fi
 
-##tar -xf azcopy.tar.gz
-##sudo mv azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
-##sudo chmod +x /usr/local/bin/azcopy
+tar -xf azcopy.tar.gz
+sudo mv azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
+sudo chmod +x /usr/local/bin/azcopy
+
 # Authorize azcopy by using a system-wide managed identity
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
 
