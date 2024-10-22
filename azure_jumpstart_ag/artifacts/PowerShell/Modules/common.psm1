@@ -1031,12 +1031,60 @@ function Deploy-Prometheus {
         }
 
         Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        # Add dashboards
+        # Deploying dashboards (one dashboard for each store)
+        if ($Env:scenario -ne "contoso_hypermarket") {
+            foreach ($dashboard in $observabilityDashboardstoImport) {
+                $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
+                # Replace the datasource
+                $replacementParams = @{
+                    "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                }
+                $content = Get-Content $grafanaDBPath
+                foreach ($key in $replacementParams.Keys) {
+                    $content = $content -replace $key, $replacementParams[$key]
+                }
+                # Set dashboard JSON
+                $dashboardObject = $content | ConvertFrom-Json
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+                # Need to set this to null to let Grafana generate a new ID
+                $dashboardObject.id = $null
+                # # Set dashboard title
+                $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+                # Request body with dashboard to add
+                $grafanaDBBody = @{
+                    dashboard = $dashboardObject
+                    overwrite = $true
+                } | ConvertTo-Json -Depth 10
+
+                if ($_.Value.IsProduction) {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+                    $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
+                }
+                else {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+                    $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
+                }
+
+                # Make HTTP request to the API
+                $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
+
+                Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+            }
+        }
+    }
+
+    # Deploying dashboard for Contoso Hypermarket (One dashboard for all stores)
+    if ($Env:scenario -eq "contoso_hypermarket") {
         foreach ($dashboard in $observabilityDashboardstoImport) {
             $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
-                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                "\$\{DS_PROMETHEUS}" = "prometheus"
             }
             $content = Get-Content $grafanaDBPath
             foreach ($key in $replacementParams.Keys) {
@@ -1044,29 +1092,24 @@ function Deploy-Prometheus {
             }
             # Set dashboard JSON
             $dashboardObject = $content | ConvertFrom-Json
-            # Best practice is to generate a random UID, such as a GUID
-            $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+            # Set Dashboard UID for parent dashboards
+            if ($dashboard -notlike '*app-pods*') {
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+            }
 
             # Need to set this to null to let Grafana generate a new ID
             $dashboardObject.id = $null
-            # Set dashboard title
-            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
             # Request body with dashboard to add
             $grafanaDBBody = @{
                 dashboard = $dashboardObject
                 overwrite = $true
-            } | ConvertTo-Json -Depth 8
+            } | ConvertTo-Json -Depth 10
 
-            if ($_.Value.IsProduction) {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-                $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
-            }
-            else {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
-                $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
-            }
+            # Set Grafana Dashboard endpoint
+            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
 
             # Make HTTP request to the API
             $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
@@ -1074,7 +1117,6 @@ function Deploy-Prometheus {
             Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         }
-
     }
     Write-Host
 }
