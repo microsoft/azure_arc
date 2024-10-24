@@ -144,7 +144,7 @@
     # AKS Edge Essentials variables
     SiteConfig              = @{
         Detroit = @{
-            ArcClusterName         = "twt-arck8s-aksee"
+            ArcClusterName         = "Ag-ArcK8s-Detroit"
             NetIPAddress           = "172.20.1.2"
             DefaultGateway         = "172.20.1.1"
             PrefixLength           = "24"
@@ -165,28 +165,28 @@
             clusterLogSize         = "1024"
             AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
-        # Monterrey = @{
-        #     ArcClusterName         = "Ag-ArcK8s-Monterrey"
-        #     NetIPAddress           = "172.20.1.3"
-        #     DefaultGateway         = "172.20.1.1"
-        #     PrefixLength           = "24"
-        #     DNSClientServerAddress = "168.63.129.16"
-        #     ServiceIPRangeStart    = "172.20.1.71"
-        #     ServiceIPRangeSize     = "10"
-        #     ControlPlaneEndpointIp = "172.20.1.61"
-        #     LinuxNodeIp4Address    = "172.20.1.51"
-        #     Subnet                 = "172.20.1.0/24"
-        #     FriendlyName           = "Monterrey"
-        #     IsProduction           = $true
-        #     Type                   = "AKSEE"
-        #     Branch                 = "main"
-        #     HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
-        #     HelmService            = "service/prometheus-kube-prometheus-prometheus"
-        #     GrafanaDataSource      = "monterrey"
-        #     HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-        #     clusterLogSize         = "1024"
-        #     AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
-        # }
+        Monterrey = @{
+            ArcClusterName         = "Ag-ArcK8s-Monterrey"
+            NetIPAddress           = "172.20.1.3"
+            DefaultGateway         = "172.20.1.1"
+            PrefixLength           = "24"
+            DNSClientServerAddress = "168.63.129.16"
+            ServiceIPRangeStart    = "172.20.1.71"
+            ServiceIPRangeSize     = "10"
+            ControlPlaneEndpointIp = "172.20.1.61"
+            LinuxNodeIp4Address    = "172.20.1.51"
+            Subnet                 = "172.20.1.0/24"
+            FriendlyName           = "Monterrey"
+            IsProduction           = $true
+            Type                   = "AKSEE"
+            Branch                 = "main"
+            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+            HelmService            = "service/prometheus-kube-prometheus-prometheus"
+            GrafanaDataSource      = "monterrey"
+            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
+            clusterLogSize         = "1024"
+            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+        }
     }
 
     # Universal resource tag and resource types

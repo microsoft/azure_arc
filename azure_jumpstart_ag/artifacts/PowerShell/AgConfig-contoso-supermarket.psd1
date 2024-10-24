@@ -126,7 +126,7 @@
     # AKS Edge Essentials variables
     SiteConfig              = @{
         Seattle = @{
-            ArcClusterName         = "Ag-ArcK8s-Seattle"
+            ArcClusterName         = "twt-arck8s-aksee"
             NetIPAddress           = "172.20.1.2"
             DefaultGateway         = "172.20.1.1"
             PrefixLength           = "24"
@@ -148,65 +148,65 @@
             IoTDevices             = @("Freezer-1", "Freezer-2")
             AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
         }
-        Chicago = @{
-            ArcClusterName         = "Ag-ArcK8s-Chicago"
-            NetIPAddress           = "172.20.1.3"
-            DefaultGateway         = "172.20.1.1"
-            PrefixLength           = "24"
-            DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart    = "172.20.1.71"
-            ServiceIPRangeSize     = "10"
-            ControlPlaneEndpointIp = "172.20.1.61"
-            LinuxNodeIp4Address    = "172.20.1.51"
-            Subnet                 = "172.20.1.0/24"
-            FriendlyName           = "Chicago"
-            IsProduction           = $true
-            Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
-            Branch                 = "canary"
-            HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
-            HelmService            = "service/prometheus-kube-prometheus-prometheus"
-            GrafanaDataSource      = "chicago"
-            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1", "Freezer-2")
-            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
-        }
-        Dev     = @{
-            ArcClusterName         = "Ag-ArcK8s-Dev"
-            NetIPAddress           = "172.20.1.4"
-            DefaultGateway         = "172.20.1.1"
-            PrefixLength           = "24"
-            DNSClientServerAddress = "168.63.129.16"
-            ServiceIPRangeStart    = "172.20.1.101"
-            ServiceIPRangeSize     = "10"
-            ControlPlaneEndpointIp = "172.20.1.91"
-            LinuxNodeIp4Address    = "172.20.1.81"
-            Subnet                 = "172.20.1.0/24"
-            FriendlyName           = "Dev"
-            IsProduction           = $false
-            Type                   = "AKSEE"
-            posNamespace           = "contoso-supermarket"
-            Branch                 = "main"
-            HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
-            HelmService            = "service/prometheus-grafana"
-            GrafanaDataSource      = "prometheus"
-            HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
-            IoTDevices             = @("Freezer-1", "Freezer-2")
-            AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
-        }
-        Staging = @{
-            ArcClusterName     = "Ag-AKS-Staging"
-            FriendlyName       = "Staging"
-            IsProduction       = $false
-            Type               = "AKS"
-            posNamespace       = "contoso-supermarket"
-            Branch             = "staging"
-            HelmSetValue       = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
-            HelmService        = "service/prometheus-grafana"
-            GrafanaDataSource  = "prometheus"
-            HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
-            IoTDevices          = @("Freezer-1", "Freezer-2")
-        }
+        # Chicago = @{
+        #     ArcClusterName         = "Ag-ArcK8s-Chicago"
+        #     NetIPAddress           = "172.20.1.3"
+        #     DefaultGateway         = "172.20.1.1"
+        #     PrefixLength           = "24"
+        #     DNSClientServerAddress = "168.63.129.16"
+        #     ServiceIPRangeStart    = "172.20.1.71"
+        #     ServiceIPRangeSize     = "10"
+        #     ControlPlaneEndpointIp = "172.20.1.61"
+        #     LinuxNodeIp4Address    = "172.20.1.51"
+        #     Subnet                 = "172.20.1.0/24"
+        #     FriendlyName           = "Chicago"
+        #     IsProduction           = $true
+        #     Type                   = "AKSEE"
+        #     posNamespace           = "contoso-supermarket"
+        #     Branch                 = "canary"
+        #     HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
+        #     HelmService            = "service/prometheus-kube-prometheus-prometheus"
+        #     GrafanaDataSource      = "chicago"
+        #     HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
+        #     IoTDevices             = @("Freezer-1", "Freezer-2")
+        #     AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+        # }
+        # Dev     = @{
+        #     ArcClusterName         = "Ag-ArcK8s-Dev"
+        #     NetIPAddress           = "172.20.1.4"
+        #     DefaultGateway         = "172.20.1.1"
+        #     PrefixLength           = "24"
+        #     DNSClientServerAddress = "168.63.129.16"
+        #     ServiceIPRangeStart    = "172.20.1.101"
+        #     ServiceIPRangeSize     = "10"
+        #     ControlPlaneEndpointIp = "172.20.1.91"
+        #     LinuxNodeIp4Address    = "172.20.1.81"
+        #     Subnet                 = "172.20.1.0/24"
+        #     FriendlyName           = "Dev"
+        #     IsProduction           = $false
+        #     Type                   = "AKSEE"
+        #     posNamespace           = "contoso-supermarket"
+        #     Branch                 = "main"
+        #     HelmSetValue           = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
+        #     HelmService            = "service/prometheus-grafana"
+        #     GrafanaDataSource      = "prometheus"
+        #     HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
+        #     IoTDevices             = @("Freezer-1", "Freezer-2")
+        #     AKSEEReleaseUseLatest  = $true                            # If set to true, the latest AKSEE release will be used. If set to false, the n-1 version will be used
+        # }
+        # Staging = @{
+        #     ArcClusterName     = "Ag-AKS-Staging"
+        #     FriendlyName       = "Staging"
+        #     IsProduction       = $false
+        #     Type               = "AKS"
+        #     posNamespace       = "contoso-supermarket"
+        #     Branch             = "staging"
+        #     HelmSetValue       = "alertmanager.enabled=false,grafana.ingress.enabled=true,grafana.service.type=LoadBalancer,prometheus.service.type=LoadBalancer,grafana.adminPassword=adminPasswordPlaceholder"
+        #     HelmService        = "service/prometheus-grafana"
+        #     GrafanaDataSource  = "prometheus"
+        #     HelmValuesFile     = "prometheus-additional-scrape-config.yaml"
+        #     IoTDevices          = @("Freezer-1", "Freezer-2")
+        # }
     }
 
     # Universal resource tag and resource types
