@@ -34,7 +34,7 @@ param sshRSAPublicKey string
 param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
 param githubBranch string = 'agora_2.0'
@@ -264,5 +264,23 @@ module fabricCapacity 'data/fabric.bicep' = {
   params: {
     fabricCapacityName: fabricCapacityName
     fabricCapacityAdmin: fabricCapacityAdmin
+  }
+}
+
+module azureOpenAI 'ai/aoai.bicep' = {
+  name: 'azureOpenAIDeployment'
+  params: {
+    location: location
+    openAIAccountName: 'openai${namingGuid}'
+    openAIModels: [
+      {
+        name: 'gpt-4o-mini'
+        version: '2024-07-18'
+      }
+      {
+        name: 'gpt-35-turbo'
+        version: '0125'
+      }
+    ]
   }
 }
