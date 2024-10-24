@@ -37,7 +37,7 @@ param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'agora_2.0'
+param githubBranch string = 'agora_hypermarket'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -272,15 +272,5 @@ module azureOpenAI 'ai/aoai.bicep' = {
   params: {
     location: location
     openAIAccountName: 'openai${namingGuid}'
-    openAIModels: [
-      {
-        name: 'gpt-4o-mini'
-        version: '2024-07-18'
-      }
-      {
-        name: 'gpt-35-turbo'
-        version: '0125'
-      }
-    ]
   }
 }

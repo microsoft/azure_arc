@@ -10,18 +10,6 @@ param openAISkuName string = 'S0'
 @description('The type of Cognitive Services account to create')
 param cognitiveSvcType string = 'AIServices'
 
-param openAIModels array = [
-  {
-    name: 'gpt-4o-mini'
-    version: '2024-07-18'
-  }
-  {
-    name: 'gpt-35-turbo'
-    version: '0125'
-  }
-]
-
-
 resource openAIAccount 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
   name: openAIAccountName
   location: location
@@ -34,9 +22,9 @@ resource openAIAccount 'Microsoft.CognitiveServices/accounts@2024-06-01-preview'
   }
 }
 
-resource modelDeployments 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = [for model in openAIModels: {
+resource gpt35ModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
   parent: openAIAccount
-  name: '${openAIAccountName}${model.name}'
+  name: '${openAIAccountName}-gpt-35-deployment'
   sku: {
     name: 'Standard'
     capacity: 10
@@ -44,11 +32,55 @@ resource modelDeployments 'Microsoft.CognitiveServices/accounts/deployments@2024
   properties: {
     model: {
       format: 'OpenAI'
-      name: model.name
-      version: model.version
+      name: 'gpt-35-turbo'
+      version: '0125'
     }
     versionUpgradeOption: 'NoAutoUpgrade'
     currentCapacity: 10
     raiPolicyName: 'Microsoft.Default'
   }
-}]
+}
+
+resource gpt4oModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
+  parent: openAIAccount
+  name: '${openAIAccountName}-gpt-40-deployment'
+  dependsOn: [
+    gpt35ModelDeployment
+  ]
+  sku: {
+    name: 'Standard'
+    capacity: 10
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: 'gpt-4o-mini'
+      version: '2024-07-18'
+    }
+    versionUpgradeOption: 'NoAutoUpgrade'
+    currentCapacity: 10
+    raiPolicyName: 'Microsoft.Default'
+  }
+}
+
+/*resource speechDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
+  parent: openAIAccount
+  name: '${openAIAccountName}-speech-deployment'
+  dependsOn: [
+    gpt35ModelDeployment
+  ]
+  sku: {
+    name: 'Standard'
+    capacity: 10
+  }
+  properties: {
+    model: {
+      format: 'speech'
+      name: 'gpt-4o-mini'
+      version: '2024-07-18'
+    }
+    versionUpgradeOption: 'NoAutoUpgrade'
+    currentCapacity: 10
+    raiPolicyName: 'Microsoft.Default'
+  }
+}*/
