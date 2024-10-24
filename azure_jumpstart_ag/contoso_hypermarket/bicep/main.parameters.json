@@ -28,6 +28,9 @@
     },
     "sshRSAPublicKey": {
       "value": ""
+    },
+    "fabricCapacityAdmin": {
+      "value": ""
     }
   }
 }
