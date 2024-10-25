@@ -22,7 +22,6 @@
 
     # Required URLs
     URLs                    = @{
-        chocoInstallScript      = 'https://chocolatey.org/install.ps1'
         wslUbuntu               = 'https://aka.ms/wslubuntu'
         wslStoreStorage         = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
         docker                  = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
