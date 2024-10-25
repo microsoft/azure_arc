@@ -294,9 +294,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.png") -Out
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-motors.svg") -OutFile $AgIconsDir\contoso-motors.svg
 Invoke-WebRequest ($templateBaseUrl + "artifacts/L1Files/config.json") -OutFile $AgDeploymentFolder\config.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/Winget.ps1") -OutFile "$AgPowerShellDir\Winget.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$AgPowerShellDir\tests\common.tests.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/k8s.tests.ps1") -OutFile "$AgPowerShellDir\tests\k8s.tests.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$AgPowerShellDir\tests\Invoke-Test.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/common.tests.ps1") -OutFile "$AgDirectory\tests\common.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/k8s.tests.ps1") -OutFile "$AgDirectory\tests\k8s.tests.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/Invoke-Test.ps1") -OutFile "$AgDirectory\tests\Invoke-Test.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/tests/ag-bginfo.bgi") -OutFile "$AgDirectory\tests\ag-bginfo.bgi"
 
 if($scenario -eq "contoso_supermarket"){
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-supermarket") -OutFile "$AgToolsDir\Bookmarks"

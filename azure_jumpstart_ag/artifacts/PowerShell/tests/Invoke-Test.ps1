@@ -19,4 +19,4 @@ Write-Header "Adding deployment test results to wallpaper using BGInfo"
 Set-Content "$Env:windir\TEMP\agora-tests-succeeded.txt" $tests_passed
 Set-Content "$Env:windir\TEMP\agora-tests-failed.txt" $tests_failed
 
-bginfo.exe $AgoraTestsDir\agora-bginfo.bgi /timer:0 /NOLICPROMPT
+bginfo.exe $AgoraTestsDir\ag-bginfo.bgi /timer:0 /NOLICPROMPT
