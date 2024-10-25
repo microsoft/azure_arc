@@ -258,7 +258,7 @@ Copy-Item $PsHome\Profile.ps1 -Destination "C:\Program Files\PowerShell\7\"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 
 Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
-$modules = @("Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
+$modules = @("Az", "Az.ConnectedMachine", "Az.ConnectedKubernetes", "Az.CustomLocation", "Azure.Arc.Jumpstart.Common", "Microsoft.PowerShell.SecretManagement", "Pester")
 
 foreach ($module in $modules) {
     Install-PSResource -Name $module -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
@@ -322,30 +322,11 @@ BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$Ag
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
 
-
-##############################################################
-# Install Winget
-##############################################################
-# Installing PowerShell Modules
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module -Name Microsoft.PowerShell.PSResourceGet -Force
-Install-Module -Name Az -Force
-
-##############################################################
-# Install Azure CLI (64-bit not available via Chocolatey)
-##############################################################
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindowsx64 -OutFile .\AzureCLI.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'
-Remove-Item .\AzureCLI.msi
-
 ##############################################################
 # Create Docker Desktop group
 ##############################################################
 New-LocalGroup -Name "docker-users" -Description "docker Users Group"
 Add-LocalGroupMember -Group "docker-users" -Member $adminUsername
-
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 ##############################################################
 # Disable Network Profile prompt
@@ -393,7 +374,6 @@ New-ItemProperty -Path $AgConfig.EdgeSettingRegistryPath -Name $Name -Value $AgC
 ##############################################################
 # Installing Posh-SSH PowerShell Module
 ##############################################################
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name Posh-SSH -Force
 
 $ScheduledTaskExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
