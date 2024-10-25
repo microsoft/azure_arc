@@ -287,8 +287,8 @@ $LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
 $null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
 
 #required to avoid "file is being used by another process" error when compressing the logs
-Copy-Item -Path "$($AgConfig.AgDirectories["LogsDir"])\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
-Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($AgConfig.AgDirectories["LogsDir"])\LogsBundle-$RandomString.zip" -PassThru
+Copy-Item -Path "$($AgConfig.AgDirectories["AgDir"])\Logs\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($AgConfig.AgDirectories["AgDir"])\Logs\LogsBundle-$RandomString.zip" -PassThru
 
 Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
 
@@ -301,7 +301,7 @@ Set-JSDesktopBackground -ImagePath $targetImgPath
 
 Write-Host "Running tests to verify infrastructure"
 
-& "$AgoraTestsDir\Invoke-Test.ps1"
+& "$AgTestsDir\Invoke-Test.ps1"
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
