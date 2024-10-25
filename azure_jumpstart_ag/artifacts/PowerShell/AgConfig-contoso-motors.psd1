@@ -72,6 +72,7 @@
 
     # Winget packages list
     WingetPackagesList  = @(
+        'Microsoft.AzureCLI',
         'Microsoft.PowerShell',
         'Microsoft.Bicep',
         'Kubernetes.kubectl',
@@ -86,6 +87,7 @@
         'Helm.Helm',
         'Microsoft.DotNet.SDK.8',
         'Microsoft.Sysinternals.ZoomIt',
+        'Microsoft.Sysinternals.BGInfo',
         'FireDaemon.OpenSSL',
         'thomasnordquist.MQTT-Explorer',
         'GitHub.cli',
