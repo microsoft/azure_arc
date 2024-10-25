@@ -259,10 +259,10 @@ module eventHub 'data/eventHub.bicep' = {
   }
 }
 
-module fabricCapacity 'data/fabric.bicep' = {
-  name: 'fabricCapacity'
-  params: {
-    fabricCapacityName: fabricCapacityName
-    fabricCapacityAdmin: fabricCapacityAdmin
-  }
-}
+// module fabricCapacity 'data/fabric.bicep' = {
+//   name: 'fabricCapacity'
+//   params: {
+//     fabricCapacityName: fabricCapacityName
+//     fabricCapacityAdmin: fabricCapacityAdmin
+//   }
+// }
