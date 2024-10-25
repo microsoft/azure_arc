@@ -147,7 +147,7 @@
     # Site Kubernetes cluster configurations
     SiteConfig              = @{
         Seattle = @{
-            ArcClusterName         = "Ag-K3s-Seattle"
+            ArcClusterName         = "twt-k3s"
             FriendlyName           = "Seattle"
             GrafanaDataSource      = "seattle"
             Type                   = "k3s"
@@ -157,7 +157,7 @@
             IsProduction           = $true
         }
         Chicago = @{
-            ArcClusterName         = "Ag-K3s-Chicago"
+            ArcClusterName         = "twt-k3s-chicago"
             FriendlyName           = "Chicago"
             GrafanaDataSource      = "chicago"
             Type                   = "k3s"
