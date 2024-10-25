@@ -29,7 +29,8 @@ param (
   [string]$aioStorageAccountName,
   [string]$stcontainerName,
   [string]$k3sArcClusterName,
-  [string]$k3sArcDataClusterName
+  [string]$k3sArcDataClusterName,
+  [string]$vmAutologon
 )
 
 ##############################################################
@@ -104,6 +105,21 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+if ($vmAutologon -eq "true") {
+
+  Write-Host "Configuring VM Autologon"
+
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "1"
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultUserName" $adminUsername
+  Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultPassword" $adminPassword
+  if($flavor -eq "DataOps"){
+      Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "DefaultDomainName" "jumpstart.local"
+  }
+} else {
+
+  Write-Host "Not configuring VM Autologon"
+
+}
 
 ##############################################################
 # Download configuration data file and declaring directories

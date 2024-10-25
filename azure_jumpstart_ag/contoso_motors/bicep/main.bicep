@@ -89,6 +89,9 @@ param acrName string = 'agacr${namingGuid}'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
+@description('Enable automatic logon into Virtual Machine')
+param vmAutologon bool = true
+
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_motors'
 
@@ -146,6 +149,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     scenario: scenario
     aioStorageAccountName: aioStorageAccountName
     stcontainerName: stcontainerName
+    vmAutologon: vmAutologon
   }
 }
 
