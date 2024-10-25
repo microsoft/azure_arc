@@ -125,3 +125,34 @@ function Set-K3sClusters {
           }
       }
 }
+
+function Set-MicrosoftFabric {
+    # Load Agconfi
+    $fabricWorkspacePrefix = $AgConfig.FabricConfig["WorkspacePrefix"]
+    $fabricWorkspaceName = "$fabricWorkspacePrefix-$namingGuid"
+    $fabricFolder = $AgConfig.AgDirectories["AgFabric"]
+    $runFabricSetupAs = $AgConfig.FabricConfig["RunFabricSetupAs"]
+    $fabricConfigFile = "$fabricFolder\fabric-config.json"
+
+    # Get Fabric capacity name from the resource group
+    $fabricCapacityName = (az fabric capacity list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $fabricCapacityName) {
+        Write-Error "Fabric capacity not found in the resource group $Env:resourceGroup"
+        return
+    }
+    
+    $configJson = @"
+    {
+        "tenantID": "$Env:spnTenantId",
+        "runAs": "$runFabricSetupAs",
+        "azureLocation": "$Env:location",
+        "resourceGroup": "$Env:resourceGroup",
+        "fabricCapacityName": "$fabricCapacityName",
+        "templateBaseUrl": "$Env:templateBaseUrl",
+        "fabricWorkspaceName": "$fabricWorkspaceName"
+    }
+"@
+
+    $configJson | Set-Content -Path $fabricConfigFile
+    Write-Host "Fabric config file created at $fabricConfigFile"
+}

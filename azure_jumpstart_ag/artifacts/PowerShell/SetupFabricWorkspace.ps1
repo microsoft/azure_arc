@@ -1,5 +1,5 @@
 param (
-  [string]$fabricConfigFile = "C:\Temp\fabric\FabricConfig.json"            # Used to run the script locally
+  [string]$fabricConfigFile = "fabric-config.json"            # Used to run the script locally
 )
 
 ####################################################################################################
@@ -10,7 +10,7 @@ param (
 # Make sure Create Workpace is enabled in Frabric for service principals. 
 #Access settings using https://app.fabric.microsoft.com/admin-portal/tenantSettings?experience=power-bi
 
-# NOTE: To run locally create a file named FabricConfig.json with the following content
+# NOTE: To run locally create a file named fabric-config.json with the following content
 #
 # {
 #   "tenantID": "",                     # Azure AD tenant ID where Agora Retail 2.0 is deployed

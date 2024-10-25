@@ -15,8 +15,7 @@
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgMonitoringDir   = "C:\Ag\Monitoring"
-        AgAdxDashboards   = "C:\Ag\AdxDashboards"
-        AgDataEmulator    = "C:\Ag\DataEmulator"
+        AgFabric          = "C:\Ag\Fabric"
     }
 
     # Required URLs
@@ -48,7 +47,8 @@
         "Microsoft.DeviceRegistry",
         "Microsoft.EventGrid",
         "Microsoft.IoTOperationsOrchestrator",
-        "Microsoft.IoTOperations"
+        "Microsoft.IoTOperations",
+        "Microsoft.Fabric"
     )
 
     # Az CLI required extensions
@@ -59,7 +59,8 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="0.5.1b1"},
+        @{name="microsoft-fabric"; version="latest"}
     )
 
     # PowerShell modules
@@ -203,6 +204,14 @@
             Namespace = "contoso-motors"
             Order = 1
         }
+    }
+
+    FabricConfig = @{
+        WorkspacePrefix = "contoso-hypermarket"
+        EventHubSharedAccessKeyName = "FabricSharedAccessKey"
+        EventHubName = "contoso-hypermarket"
+        EventHubCG = "fabriccg"
+        RunFabricSetupAs = "user"
     }
 
     # Microsoft Edge startup settings variables
