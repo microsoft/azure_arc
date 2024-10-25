@@ -51,9 +51,6 @@ param subnetNameCloudK3s string = 'Ag-Subnet-K3s'
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloud string = 'Ag-Subnet-Cloud'
 
-@description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'agadx${namingGuid}'
-
 @description('Name of the storage queue')
 param storageQueueName string = 'aioqueue'
 
@@ -63,14 +60,14 @@ param eventHubName string = 'aiohub${namingGuid}'
 @description('Name of the event hub namespace')
 param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 
-@description('Name of the event grid namespace')
-param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
+@description('Name of the Fabric Capacity')
+param fabricCapacityName string = 'agfabric${namingGuid}'
+
+@description('The administrator for the Microsoft Fabric capacity')
+param fabricCapacityAdmin string
 
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
-
-@description('The name of the Azure Data Explorer Event Hub consumer group for assemblybatteries')
-param stagingDataCGName string = 'mqttdataemulator'
 
 @description('The name of ESA container in Storage Account')
 param stcontainerName string = 'esacontainer'
@@ -215,7 +212,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.cloudSubnetId
     acrName: acrName
     rdpPort: rdpPort
-    adxClusterName: adxClusterName
     namingGuid: namingGuid
     scenario: scenario
     customLocationRPOID: customLocationRPOID
@@ -223,16 +219,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     stcontainerName: stcontainerName
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
-  }
-}
-module adx 'data/dataExplorer.bicep' = {
-  name: 'adxDeployment'
-  params: {
-    adxClusterName: adxClusterName
-    location: location
-    eventHubResourceId: eventHub.outputs.eventHubResourceId
-    eventHubName: eventHubName
-    eventHubNamespaceName: eventHubNamespaceName
   }
 }
 
@@ -254,18 +240,6 @@ module keyVault 'data/keyVault.bicep' = {
   }
 }
 
-module eventGrid 'data/eventGrid.bicep' = {
-  name: 'eventGridDeployment'
-  params: {
-    eventGridNamespaceName: eventGridNamespaceName
-    eventHubResourceId: eventHub.outputs.eventHubResourceId
-    queueName: storageQueueName
-    storageAccountResourceId: storageAccount.outputs.storageAccountResourceId
-    namingGuid: namingGuid
-    location: location
-  }
-}
-
 module storageAccount 'storage/storageAccount.bicep' = {
   name: 'aioStorageAccountDeployment'
   params: {
@@ -282,6 +256,13 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
     location: location
-    stagingDataCGName: stagingDataCGName
+  }
+}
+
+module fabricCapacity 'data/fabric.bicep' = {
+  name: 'fabricCapacity'
+  params: {
+    fabricCapacityName: fabricCapacityName
+    fabricCapacityAdmin: fabricCapacityAdmin
   }
 }
