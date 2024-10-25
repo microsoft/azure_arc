@@ -8,6 +8,7 @@
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgIconDir         = "C:\Ag\Icons"
+        AgTestsDir        = "C:\Ag\Tests"        
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"

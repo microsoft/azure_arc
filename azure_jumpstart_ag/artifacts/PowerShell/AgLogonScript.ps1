@@ -14,6 +14,7 @@ $global:configMapDir = $agConfig.AgDirectories["AgConfigMapDir"]
 $global:AgDeploymentFolder = $AgConfig.AgDirectories["AgL1Files"]
 $global:AgPowerShellDir    = $AgConfig.AgDirectories["AgPowerShellDir"]
 $global:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
+$global:AgTestsDir = $AgConfig.AgDirectories["AgTestsDir"]
 $global:scenario = $Env:scenario
 $global:websiteUrls = $AgConfig.URLs
 $global:githubAccount = $Env:githubAccount
@@ -265,43 +266,28 @@ if($scenario -eq "contoso_supermarket"){
 Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
 Unregister-ScheduledTask -TaskName "AgLogonScript" -Confirm:$false
 
-# Executing the deployment logs bundle PowerShell script in a new window
-Write-Host "[$(Get-Date -Format t)] INFO: Uploading Log Bundle." -ForegroundColor Gray
-$Env:AgLogsDir = $AgConfig.AgDirectories["AgLogsDir"]
-Invoke-Expression 'cmd /c start Powershell -Command {
-$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
-Start-Sleep -Seconds 5
-Write-Host "`n"
 Write-Host "Creating deployment logs bundle"
-7z a $Env:AgLogsDir\LogsBundle-"$RandomString".zip $Env:AgLogsDir\*.log
-}'
+
+$RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+$LogsBundleTempDirectory = "$Env:windir\TEMP\LogsBundle-$RandomString"
+$null = New-Item -Path $LogsBundleTempDirectory -ItemType Directory -Force
+
+#required to avoid "file is being used by another process" error when compressing the logs
+Copy-Item -Path "$($AgConfig.AgDirectories["LogsDir"])\*.log" -Destination $LogsBundleTempDirectory -Force -PassThru
+Compress-Archive -Path "$LogsBundleTempDirectory\*.log" -DestinationPath "$($AgConfig.AgDirectories["LogsDir"])\LogsBundle-$RandomString.zip" -PassThru
 
 Write-Host "[$(Get-Date -Format t)] INFO: Changing Wallpaper" -ForegroundColor Gray
+
+# bmp file is required for BGInfo
 $imgPath = $AgConfig.AgDirectories["AgDir"] + "\wallpaper.png"
-$code = @'
-using System.Runtime.InteropServices;
-namespace Win32{
+$targetImgPath = $($imgPath -replace 'png','bmp')
+Convert-JSImageToBitMap -SourceFilePath $imgPath -DestinationFilePath $targetImgPath
 
-    public class Wallpaper{
-        [DllImport("user32.dll", CharSet=CharSet.Auto)]
-        static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+Set-JSDesktopBackground -ImagePath $targetImgPath
 
-        public static void SetWallpaper(string thePath){
-            SystemParametersInfo(20,0,thePath,3);
-        }
-    }
-}
-'@
-Add-Type $code
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+Write-Host "Running tests to verify infrastructure"
 
-# Kill the open PowerShell monitoring kubectl get pods
-# if ($scenario -eq "contoso_motors") {
-#     foreach ($shell in $kubectlMonShells) {
-#         Stop-Process -Id $shell.Id
-#     }
-# }
+& "$AgoraTestsDir\Invoke-Test.ps1"
 
 $endTime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
