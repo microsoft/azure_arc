@@ -1,6 +1,16 @@
 BeforeDiscovery {
 
-    $clusters = @("Ag-K3s-Chicago","Ag-K3s-Seattle")
+    $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"    
+    $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+    
+
+    # Initialize an array to hold the ArcClusterName values
+    $clusters = @()
+
+    # Loop through each SiteConfig and extract the ArcClusterName
+    foreach ($site in $AgConfig.SiteConfig.Values) {
+        $clusters += $site.ArcClusterName
+    }
 
     # Login to Azure PowerShell with service principal provided by user
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
