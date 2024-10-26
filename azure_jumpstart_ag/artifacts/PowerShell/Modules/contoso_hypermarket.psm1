@@ -154,17 +154,20 @@ function Deploy-AIO-Hypermarket {
         # Create the Schema registry for the cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Creating the schema registry on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
-        $schemaId = $(az iot ops schema registry create --name "$arcClusterName-registry" `
+        $schemaName = "${clusterName}schema"
+        $schemaId = $(az iot ops schema registry create --name $schemaName `
         --resource-group $resourceGroup `
-        --registry-namespace "$arcClusterName-$namingGuid" `
+        --registry-namespace "$clusterName-namespace" `
         --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
         --query id -o tsv)
 
+        # Initialize the Azure IoT Operations instance on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Initialize the Azure IoT Operations instance on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
         do {
             az iot ops init --cluster $arcClusterName.toLower() `
             --resource-group $resourceGroup `
             --sr-resource-id $schemaId `
-            --add-insecure-listener `
             --only-show-errors
             #az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
@@ -175,7 +178,37 @@ function Deploy-AIO-Hypermarket {
                 az iot ops init --cluster $arcClusterName.toLower() `
                 --resource-group $resourceGroup `
                 --sr-resource-id $schemaId `
-                --add-insecure-listener `
+                --only-show-errors
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+        $retryCount = 0
+        $maxRetries = 5
+        # Create the Azure IoT Operations instance on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Create the Azure IoT Operations instance on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        do {
+            az iot ops create --name $arcClusterName.toLower() `
+            --cluster $arcClusterName.toLower() `
+            --resource-group $resourceGroup `
+            --add-insecure-listener true `
+            --broker-listener-type LoadBalancer `
+            --only-show-errors
+
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops create --name $arcClusterName.toLower() `
+                --cluster $arcClusterName.toLower() `
+                --resource-group $resourceGroup `
+                --add-insecure-listener true `
+                --broker-listener-type LoadBalancer `
                 --only-show-errors
                 $retryCount++
             }

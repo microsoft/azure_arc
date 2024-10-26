@@ -41,12 +41,12 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
   name: storageQueueName
 }
 
-resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+/*resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
   name: '${storageAccountName}/default/${stcontainerName}'
   dependsOn: [
     storageAccount
   ]
-}
+}*/
 
 // Add role assignment for the SPN: Storage Blob Data Contributor
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {

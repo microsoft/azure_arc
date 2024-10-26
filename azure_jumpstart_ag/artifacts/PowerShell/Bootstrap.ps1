@@ -273,7 +273,7 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipRbac.yml") -OutFile "$AgToolsDir\kubeVipRbac.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipDaemon.yml") -OutFile "$AgToolsDir\kubeVipDaemon.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  #Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-workloads.json") -OutFile "$AgMonitoringDir\grafana-app-workloads.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"
