@@ -93,7 +93,9 @@
         'openssl.light',
         'mqtt-explorer',
         'gh',
-        'python'
+        'python',
+        'sql-server-management-studio',
+        'azure-data-studio'
     )
 
     # Pip packages list
