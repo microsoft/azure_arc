@@ -1,3 +1,6 @@
+.execute database script with (ContinueOnErrors=true)
+<|
+
 // Check if the table exists
 .drop table staging ifexists
 
