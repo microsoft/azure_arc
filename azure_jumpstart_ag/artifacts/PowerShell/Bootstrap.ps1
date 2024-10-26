@@ -105,6 +105,8 @@ if (($rdpPort -ne $null) -and ($rdpPort -ne "") -and ($rdpPort -ne "3389")) {
   Write-Host "RDP port configuration complete."
 }
 
+$adminPassword = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($adminPassword))
+
 if ($vmAutologon -eq "true") {
 
   Write-Host "Configuring VM Autologon"
