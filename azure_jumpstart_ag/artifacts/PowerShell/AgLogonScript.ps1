@@ -51,7 +51,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:stcontainerName = $Env:stcontainerName
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqListenerService = "aio-broker"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName

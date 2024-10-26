@@ -195,7 +195,6 @@ function Deploy-AIO-Hypermarket {
             az iot ops create --name $arcClusterName.toLower() `
             --cluster $arcClusterName.toLower() `
             --resource-group $resourceGroup `
-            --add-insecure-listener true `
             --broker-listener-type LoadBalancer `
             --only-show-errors
 
@@ -207,7 +206,6 @@ function Deploy-AIO-Hypermarket {
                 az iot ops create --name $arcClusterName.toLower() `
                 --cluster $arcClusterName.toLower() `
                 --resource-group $resourceGroup `
-                --add-insecure-listener true `
                 --broker-listener-type LoadBalancer `
                 --only-show-errors
                 $retryCount++
@@ -219,6 +217,11 @@ function Deploy-AIO-Hypermarket {
 
         # Configure the Azure IoT Operations instance for secret synchronization
         $userAssignedMIResourceId = (az identity show -g $resourceGroup -n "aio-$clusterName-identity" --query id -o tsv --only-show-errors)
+        # Enable OIDC issuer and workload identity on the Arc-enabled cluster
+        az connectedk8s update -n $arcClusterName `
+        --resource-group $resourceGroup `
+        --enable-oidc-issuer `
+        --enable-workload-identity
 
         Write-Host "[$(Get-Date -Format t)] INFO: Assigning the user-assigned managed identity to the Azure IoT Operations instance" -ForegroundColor DarkGray
         Write-Host "`n"
