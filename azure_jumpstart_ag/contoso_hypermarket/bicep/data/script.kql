@@ -25,7 +25,7 @@
 .drop table sales ifexists
 
 // Create sales table
-.create table sales (sale_date:datetime, store_id:string, sale_id:string, sale_line_items:dynamic, sale_total:real, payment_method: string, customer_id:string, register_id: string)
+.create table sales (sale_id:string, sale_date:datetime, store_id:string, product_id:string, price: real, discount: discount, quantity:int, item_total:real, profit: real, payment_method: string, customer_id:string, register_id: string)
 
 // Create function to expand sales data
 .create-or-alter function expand_sales_data()
@@ -34,11 +34,15 @@
   | where subject == "topic/sales"
   | extend data = parse_json(event_data) 
   | project 
+  sale_id = tostring(data.sale_id),
   sale_date = todatetime(data.sale_date),
   store_id = tostring(data.store_id),
-  sale_id = tostring(data.sale_id),
-  sale_line_items = data.sale_line_items,
-  sale_total = toreal(data.sale_total),
+  product_id = tostring(data.product_id),
+  price = toreal(data.price),
+  discount = toreal(data.discount)
+  quantity = toint(data.quantity),
+  item_total = toreal(data.item_total),
+  profit = toreal(data.profit)
   payment_method = tostring(data.payment_method),
   customer_id = tostring(data.customer_id),
   register_id = tostring(data.register_id)
