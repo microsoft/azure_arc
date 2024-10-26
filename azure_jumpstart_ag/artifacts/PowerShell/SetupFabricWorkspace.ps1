@@ -178,9 +178,10 @@ else {
 }
 
 # Download dashboard report and Update to use KQL database
-$hyperMarketDashboardReport = "fabric-hypermarket-dashboard.json"
+# Download dashboard report and Update to use KQL database
+$hyperMarketDashboardReport = $templateBaseUrl + "artifacts/adx_dashboards/fabric-hypermarket-dashboard.json"
 Write-Host "INFO: Downloading and preparing dashboard report to import into Fabric workspace."
-$ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/adx_dashboards/$hyperMarketDashboardReport").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
+$ordersDashboardBody = (Invoke-WebRequest -Method Get -Uri $hyperMarketDashboardReport).Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_ID}}', $kqlDatabaseId -replace '{{FABRIC_WORKSPACE_ID}}', $fabricWorkspaceId
 
 # Convert the KQL dashboard report payload to base64
 Write-Host "INFO: Conerting report content into base64 encoded format."
@@ -236,15 +237,15 @@ $eventHubNamespace = $eventHubInfo[0].name
 
 # Make sure Eventhub with name 'orders' exists
 $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
-$eventHubOrders = $eventHubs | Where-Object { $_.name -eq "orders" }
-if ($null -eq $eventHubOrders) {
-  Write-Host "ERROR: Event Hub with name 'orders' not found."
+$eventHubName = $eventHubs[0].name
+if (-not $eventHubName) {
+  Write-Host "ERROR: Event Hubs not found in the EventHub namespace $eventHubInfo[0].name."
   Exit
 }
 
 # Get Event Hub credentials
-Write-Host "INFO: Retrieving Event Hub key for '$authRuleName' Shared Acess Policy."
-$eventHubKey = az eventhubs eventhub authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name $eventHubKeyName --query primaryKey --output tsv
+Write-Host "INFO: Retrieving Event Hub key for '$eventHubKeyName' Shared Acess Policy."
+$eventHubKey = az eventhubs namespace authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --name $eventHubKeyName --query primaryKey --output tsv
 if ($eventHubKey -eq '') {
   Write-Host "ERROR: Failed to retrieve Event Hub key."
   Exit
@@ -256,7 +257,7 @@ Write-Host "INFO: Received Event Hub key."
 $eventHubEndpoint = "$eventHubNamespace.servicebus.windows.net"
 $connectionBody = @"
 {
-  "datasourceName": "Agora_Retail_2_0_EventHub_Connection",
+  "datasourceName": "$fabricWorkspaceName-$eventHubName",
   "datasourceType": "Extension",
   "connectionDetails": "{\"endpoint\":\"$eventHubEndpoint\",\"entityPath\":\"$eventHubName\"}",
   "singleSignOnType": "None",
@@ -275,14 +276,14 @@ $connectionBody = @"
         "name": "entityPath",
         "type": "text",
         "isRequired": true,
-        "value": "orders"
+        "value": "$eventHubName"
       }
     ]
   },
   "referenceDatasource": false,
   "credentialDetails": {
     "credentialType": "Basic",
-    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$authRuleName\"},{\"name\":\"password\",\"value\":\"$eventHubKey\"}]}",
+    "credentials": "{\"credentialData\":[{\"name\":\"username\",\"value\":\"$eventHubKeyName\"},{\"name\":\"password\",\"value\":\"$eventHubKey\"}]}",
     "encryptedConnection": "Any",
     "privacyLevel": "Organizational",
     "skipTestConnection": false,
@@ -346,15 +347,15 @@ $streamBody = @"
   "DataConnectionType": "EventHubDataConnection",
   "DataConnectionProperties": {
     "DatabaseArtifactId": "$kqlDatabaseId",
-    "TableName": "orders",
-    "MappingRuleName": "orders_mapping",
+    "TableName": "staging",
+    "MappingRuleName": "staging_mapping",
     "EventSystemProperties": [],
-    "ConsumerGroup": "fabric",
+    "ConsumerGroup": "fabriccg",
     "Compression": "None",
     "DataFormat": "multijson",
     "DataSourceConnectionId": "$DataSourceConnectionId",
     "DataConnectionType": "EventHubDataConnection",
-    "DataConnectionName": "Contoso-Hypermarket-EventHub-Connection"
+    "DataConnectionName": "$fabricWorkspaceName-$eventHubName"
   }
 }
 "@
@@ -374,7 +375,7 @@ else {
 # Download dashboard report and Update to use KQL database
 $ordersSalesForecastNotebook = "orders-sales-forecast.ipynb"
 Write-Host "INFO: Downloading and preparing nootebook to import into Fabric workspace."
-$ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/notebooks/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
+$ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/notebooks/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
 
 # Convert the KQL dashboard report payload to base64
 Write-Host "INFO: Conerting report content into base64 encoded format."
