@@ -140,19 +140,41 @@ function Set-MicrosoftFabric {
         Write-Error "Fabric capacity not found in the resource group $Env:resourceGroup"
         return
     }
-    
+
+    # Get EventHub namespace created in the resource group
+    $eventHubNS = (az eventhubs namespace list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $eventHubNS) {
+        Write-Error "EventHub namespaces not found in the resource group $Env:resourceGroup"
+        return
+    }
+
+    # Get EventHub name from the eventhub namespace created in the resource group
+    $eventHubName = (az eventhubs eventhub list --namespace $eventHubNS --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $eventHubName) {
+        Write-Error "No Event Hub created in the EventHub namespace $eventHubNS"
+        return
+    }
+
     $configJson = @"
     {
         "tenantID": "$Env:spnTenantId",
         "runAs": "$runFabricSetupAs",
-        "azureLocation": "$Env:location",
+        "azureLocation": "$Env:azureLocation",
         "resourceGroup": "$Env:resourceGroup",
         "fabricCapacityName": "$fabricCapacityName",
         "templateBaseUrl": "$Env:templateBaseUrl",
-        "fabricWorkspaceName": "$fabricWorkspaceName"
+        "fabricWorkspaceName": "$fabricWorkspaceName",
+        "eventHubKeyName": "$AgConfig.FabricConfig["EventHubSharedAccessKeyName"]"
     }
 "@
 
     $configJson | Set-Content -Path $fabricConfigFile
     Write-Host "Fabric config file created at $fabricConfigFile"
+
+    # Download Fabric workspace setup script from GitHuB
+    $scriptFilePath = "$fabricFolder\SetupFabricWorkspace.ps1"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/SetupFabricWorkspace.ps1") -OutFile $scriptFilePath
+    if (-not (Test-Path -Path $scriptFilePath)) {
+        Write-Error "Unable to download script file: 'SetupFabricWorkspace.ps1' from GitHub"
+    }
 }
