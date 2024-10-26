@@ -29,7 +29,9 @@ param (
   [string]$aioStorageAccountName,
   [string]$stcontainerName,
   [string]$k3sArcClusterName,
-  [string]$k3sArcDataClusterName
+  [string]$k3sArcDataClusterName,
+  [string]$openAIEndpoint,
+  [string]$speachToTextEndpoint
 )
 
 ##############################################################
@@ -70,6 +72,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 

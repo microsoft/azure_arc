@@ -84,6 +84,12 @@ param k3sArcDataClusterName string = 'Ag-K3s-Seattle-${namingGuid}'
 @description('The name of the Azure Arc K3s data cluster')
 param k3sArcClusterName string = 'Ag-K3s-Chicago-${namingGuid}'
 
+@description('The URL of the Azure OpenAI endpoint.')
+param openAIEndpoint string
+
+@description('The URL of the Speech-to-text endpoint.')
+param speachToTextEndpoint string
+
 var encodedPassword = base64(windowsAdminPassword)
 var bastionName = 'Ag-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -131,6 +137,9 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: vmName
   location: location
   tags: resourceTags
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     hardwareProfile: {
       vmSize: 'Standard_D32s_v5'
@@ -198,7 +207,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -stcontainerName ${stcontainerName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -stcontainerName ${stcontainerName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint}'
     }
   }
 }

@@ -98,6 +98,18 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
+@description('The array of OpenAI models to deploy')
+param azureOpenAIModels array = [
+  {
+    name: 'gpt-35-turbo'
+    version: '0125'
+  }
+  {
+    name: 'gpt-4o-mini'
+    version: '2024-07-18'
+  }
+]
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
 
@@ -219,6 +231,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     stcontainerName: stcontainerName
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
+    openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
+    speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
 }
 
@@ -272,5 +286,7 @@ module azureOpenAI 'ai/aoai.bicep' = {
   params: {
     location: location
     openAIAccountName: 'openai${namingGuid}'
+    azureOpenAIModels: azureOpenAIModels
+    spnObjectId: spnObjectId
   }
 }

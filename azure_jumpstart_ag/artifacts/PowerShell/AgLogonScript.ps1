@@ -59,6 +59,8 @@ if ($scenario -eq "contoso_supermarket") {
     $global:k3sArcClusterName = $Env:k3sArcClusterName
     $global:spnObjectId = $Env:spnObjectId
     $global:stcontainerName = $Env:stcontainerName
+    $global:openAIEndpoint = $Env:openAIEndpoint
+    $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }
 
 #####################################################################
