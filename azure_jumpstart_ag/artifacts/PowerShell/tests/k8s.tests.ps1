@@ -1,34 +1,23 @@
 BeforeDiscovery {
 
-    $ConfigurationDataFile = "C:\Temp\AgConfig.psd1"    
-    $AgConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-    
-
-    # Initialize an array to hold the ArcClusterName values
-    $clusters = @()
-
-    # Loop through each SiteConfig and extract the ArcClusterName
-    foreach ($site in $AgConfig.SiteConfig.Values) {
-        $clusters += $site.ArcClusterName
-    }
+    $clusters = @("Ag-K3s-Chicago","Ag-K3s-Seattle")
 
     # Login to Azure PowerShell with service principal provided by user
     $spnpassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
     $spncredential = New-Object System.Management.Automation.PSCredential ($env:spnClientId, $spnpassword)
-    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spntenantId -Subscription $env:subscriptionId
+    Connect-AzAccount -ServicePrincipal -Credential $spncredential -Tenant $env:spnTenantId -Subscription $env:subscriptionId
 
 }
 
 Describe "<cluster>" -ForEach $clusters {
     BeforeAll {
         $cluster = $_
+        $connectedCluster = Get-AzConnectedKubernetes -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId | Where-Object Name -like $cluster*
     }
     It "Cluster exists" {
-        $clusterObject = Get-AzConnectedKubernetes -ClusterName $cluster -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
-        $clusterObject | Should -Not -BeNullOrEmpty
+        $connectedCluster  | Should -Not -BeNullOrEmpty
     }
     It "Azure Arc Connected cluster is connected" {
-        $connectedCluster = Get-AzConnectedKubernetes -Name $cluster -ResourceGroupName $env:resourceGroup -SubscriptionId $env:subscriptionId
         $connectedCluster.ConnectivityStatus | Should -Be "Connected"
     }
 }
