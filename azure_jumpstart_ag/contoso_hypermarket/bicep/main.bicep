@@ -261,6 +261,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     location: location
     storageQueueName: storageQueueName
     stcontainerName: stcontainerName
+    spnObjectId: spnObjectId
   }
 }
 
