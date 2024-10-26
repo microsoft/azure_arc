@@ -125,3 +125,82 @@ function Set-K3sClusters {
           }
       }
 }
+
+function Deploy-AIO-Hypermarket {
+    Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
+    Write-Host "`n"
+    $kvIndex = 0
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
+        $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
+        $retryCount = 0
+        $maxRetries = 5
+        $aioStatus = "notDeployed"
+
+        # Enable custom locations on the Arc-enabled cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az connectedk8s enable-features --name $arcClusterName `
+        --resource-group $resourceGroup `
+        --features cluster-connect custom-locations `
+        --custom-locations-oid $customLocationRPOID `
+        --only-show-errors
+
+        # Create the Schema registry for the cluster
+        Write-Host "[$(Get-Date -Format t)] INFO: Creating the schema registry on the Arc-enabled cluster" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $schemaId = $(az iot ops schema registry create --name "$arcClusterName-registry" `
+        --resource-group $resourceGroup `
+        --registry-namespace "$arcClusterName-$namingGuid" `
+        --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
+        --query id -o tsv)
+
+        do {
+            az iot ops init --cluster $arcClusterName.toLower() `
+            --resource-group $resourceGroup `
+            --sr-resource-id $schemaId `
+            --add-insecure-listener `
+            --only-show-errors
+            #az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
+            if ($? -eq $false) {
+                $aioStatus = "notDeployed"
+                Write-Host "`n"
+                Write-Host "[$(Get-Date -Format t)] Error: An error occured while deploying AIO on the cluster...Retrying" -ForegroundColor DarkRed
+                Write-Host "`n"
+                az iot ops init --cluster $arcClusterName.toLower() `
+                --resource-group $resourceGroup `
+                --sr-resource-id $schemaId `
+                --add-insecure-listener `
+                --only-show-errors
+                $retryCount++
+            }
+            else {
+                $aioStatus = "deployed"
+            }
+        } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
+
+        # Configure the Azure IoT Operations instance for secret synchronization
+        $userAssignedMIResourceId = (az identity show -g $resourceGroup -n "aio-$clusterName-identity" --query id -o tsv --only-show-errors)
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Assigning the user-assigned managed identity to the Azure IoT Operations instance" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az iot ops identity assign --name $arcClusterName.toLower() `
+        --resource-group $resourceGroup `
+        --mi-user-assigned $userAssignedMIResourceId
+
+        Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
+        Write-Host "`n"
+        az iot ops secretsync enable --name $arcClusterName.toLower() `
+        --resource-group $resourceGroup `
+        --mi-user-assigned $userAssignedMIResourceId `
+        --kv-resource-id $keyVaultId `
+        --only-show-errors
+
+        $kvIndex++
+    }
+}
