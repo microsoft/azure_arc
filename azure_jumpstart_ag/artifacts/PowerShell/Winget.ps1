@@ -68,4 +68,6 @@ Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 
 #Cleanup
 Unregister-ScheduledTask -TaskName 'WinGetLogonScript' -Confirm:$false
+Unregister-ScheduledTask -TaskName "Restart-Computer-Delayed" -Confirm:$false
+
 Stop-Transcript

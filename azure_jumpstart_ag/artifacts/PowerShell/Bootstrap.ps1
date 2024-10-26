@@ -317,10 +317,12 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
 
+<#
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
+#>
 
 ##############################################################
 # Create Docker Desktop group
@@ -399,6 +401,21 @@ if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
   Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
   Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 }
+
+# Restart machine to initiate VM autologon
+$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-Command "Restart-Computer -Force"'
+$trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddSeconds(10))
+$taskName = "Restart-Computer-Delayed"
+
+# Define the restart action and schedule it to run after 10 seconds
+$action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-Command "Restart-Computer -Force"'
+$trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddSeconds(10))
+
+# Configure the task to run with highest privileges and use the current user's credentials
+$principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskName -Principal $principal -Description "Restart computer after script exits"
+
 
 Stop-Transcript
 
