@@ -113,7 +113,8 @@
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
         'mindaro.mindaro',
-        'github.vscode-pull-request-github'
+        'github.vscode-pull-request-github',
+        'ms-mssql.mssql'
     )
 
     # Git branches
