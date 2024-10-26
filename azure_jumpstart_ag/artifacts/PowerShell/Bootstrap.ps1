@@ -317,12 +317,12 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
 }
 
-<#
+
 BITSRequest -Params @{'Uri' = 'https://aka.ms/wslubuntu'; 'Filename' = "$AgToolsDir\Ubuntu.appx" }
 BITSRequest -Params @{'Uri' = $websiteUrls["wslStoreStorage"]; 'Filename' = "$AgToolsDir\wsl_update_x64.msi" }
 BITSRequest -Params @{'Uri' = $websiteUrls["docker"]; 'Filename' = "$AgToolsDir\DockerDesktopInstaller.exe" }
 BITSRequest -Params @{'Uri' = "https://dl.grafana.com/oss/release/grafana-$latestRelease.windows-amd64.msi"; 'Filename' = "$AgToolsDir\grafana-$latestRelease.windows-amd64.msi" }
-#>
+
 
 ##############################################################
 # Create Docker Desktop group
