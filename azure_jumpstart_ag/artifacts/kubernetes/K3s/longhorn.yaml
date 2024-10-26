@@ -64,8 +64,7 @@ metadata:
     app.kubernetes.io/version: v1.6.0
 data:
   default-setting.yaml: |-
-    default-setting.yaml: |-
-      default-data-path: /work/longhorn
+    priority-class: longhorn-critical
 ---
 # Source: longhorn/templates/storageclass.yaml
 apiVersion: v1
