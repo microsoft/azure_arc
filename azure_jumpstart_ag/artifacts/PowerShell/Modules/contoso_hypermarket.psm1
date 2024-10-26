@@ -133,6 +133,7 @@ function Set-MicrosoftFabric {
     $fabricFolder = $AgConfig.AgDirectories["AgFabric"]
     $runFabricSetupAs = $AgConfig.FabricConfig["RunFabricSetupAs"]
     $fabricConfigFile = "$fabricFolder\fabric-config.json"
+    $eventHubKeyName = $AgConfig.FabricConfig["EventHubSharedAccessKeyName"]
 
     # Get Fabric capacity name from the resource group
     $fabricCapacityName = (az fabric capacity list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
@@ -164,7 +165,7 @@ function Set-MicrosoftFabric {
         "fabricCapacityName": "$fabricCapacityName",
         "templateBaseUrl": "$Env:templateBaseUrl",
         "fabricWorkspaceName": "$fabricWorkspaceName",
-        "eventHubKeyName": "$AgConfig.FabricConfig["EventHubSharedAccessKeyName"]"
+        "eventHubKeyName": "$eventHubKeyName"
     }
 "@
 
