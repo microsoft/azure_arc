@@ -202,12 +202,16 @@ if ($scenario -eq "contoso_supermarket") {
     Deploy-SupermarketConfigs
 }
 
-if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
+if ($scenario -eq "contoso_motors") {
     Update-AzureIoTOpsExtension
     Deploy-AIO
     if($scenario -eq "contoso_motors"){
         Deploy-MotorsConfigs
     }
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}elseif($scenario -eq "contoso_hypermarket"){
+    Deploy-AIO-Hypermarket
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }
