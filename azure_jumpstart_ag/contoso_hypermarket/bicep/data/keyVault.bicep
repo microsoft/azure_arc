@@ -111,7 +111,7 @@ resource roleAssignmentAIOSeattle 'Microsoft.Authorization/roleAssignments@2022-
 
 // Add role assignment for the SPN: Key Vault Secrets Officer
 resource roleAssignmentAIOChicago 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(userAssignedManagedIdentitySeattle.name, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+  name: guid(userAssignedManagedIdentityChicago.name, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
   scope: resourceGroup()
   properties: {
     principalId: userAssignedManagedIdentityChicago.properties.principalId
