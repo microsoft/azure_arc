@@ -333,6 +333,8 @@ function Deploy-AIO-M2 {
         } until ($aioStatus -eq "deployed" -or $retryCount -eq $maxRetries)
 
         # Configure the Azure IoT Operations instance for secret synchronization
+        Write-Host "[$(Get-Date -Format t)] INFO: Configuring the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
+        Write-Host "`n"
         $userAssignedMIResourceId = (az identity show -g $resourceGroup -n "aio-$clusterName-identity" --query id -o tsv --only-show-errors)
         # Enable OIDC issuer and workload identity on the Arc-enabled cluster
         az connectedk8s update -n $arcClusterName `
