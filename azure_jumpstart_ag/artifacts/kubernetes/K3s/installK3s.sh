@@ -50,6 +50,16 @@ curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.s
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s-$vmName.log /home/${adminUsername}/jumpstart_logs/installK3s-$vmName.log; done &
 
+# Function to check if dpkg lock is in place
+check_dpkg_lock() {
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+        echo "Waiting for other package management processes to complete..."
+        sleep 5
+    done
+}
+# Run the lock check before attempting the installation
+check_dpkg_lock
+
 # Downloading azcopy
 echo ""
 echo "Downloading azcopy"
@@ -63,16 +73,9 @@ fi
 tar -xf azcopy.tar.gz
 sudo mv azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
 sudo chmod +x /usr/local/bin/azcopy
+
 # Authorize azcopy by using a system-wide managed identity
 export AZCOPY_AUTO_LOGIN_TYPE=MSI
-
-# Function to check if dpkg lock is in place
-check_dpkg_lock() {
-    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-        echo "Waiting for other package management processes to complete..."
-        sleep 5
-    done
-}
 
 # Run the lock check before attempting the installation
 check_dpkg_lock

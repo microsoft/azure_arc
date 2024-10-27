@@ -59,7 +59,7 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="0.7.0b2"}
     )
 
     # PowerShell modules
@@ -93,7 +93,9 @@
         'openssl.light',
         'mqtt-explorer',
         'gh',
-        'python'
+        'python',
+        'sql-server-management-studio',
+        'azure-data-studio'
     )
 
     # Pip packages list
@@ -111,7 +113,8 @@
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
         'mindaro.mindaro',
-        'github.vscode-pull-request-github'
+        'github.vscode-pull-request-github',
+        'ms-mssql.mssql'
     )
 
     # Git branches
