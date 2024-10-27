@@ -27,7 +27,6 @@ param (
   [string]$scenario,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
-  [string]$stcontainerName,
   [string]$k3sArcClusterName,
   [string]$k3sArcDataClusterName,
   [string]$openAIEndpoint,
@@ -69,7 +68,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('scenario', $scenario, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)

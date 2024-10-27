@@ -37,7 +37,7 @@ param logAnalyticsWorkspaceName string = 'Ag-Workspace-${namingGuid}'
 param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'agora_hypermarket'
+param githubBranch string = 'agora_aio_latest'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -68,9 +68,6 @@ param fabricCapacityAdmin string
 
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
-
-@description('The name of ESA container in Storage Account')
-param stcontainerName string = 'esacontainer'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
@@ -228,7 +225,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     scenario: scenario
     customLocationRPOID: customLocationRPOID
     spnObjectId: spnObjectId
-    stcontainerName: stcontainerName
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
@@ -261,7 +257,6 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    stcontainerName: stcontainerName
     spnObjectId: spnObjectId
   }
 }
