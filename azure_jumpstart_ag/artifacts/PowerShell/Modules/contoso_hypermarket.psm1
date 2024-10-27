@@ -126,7 +126,7 @@ function Set-K3sClusters {
       }
 }
 
-function Deploy-AIO-Hypermarket {
+function Deploy-AIO-M2 {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the clusters" -ForegroundColor DarkGray
     Write-Host "`n"
     $kvIndex = 0
