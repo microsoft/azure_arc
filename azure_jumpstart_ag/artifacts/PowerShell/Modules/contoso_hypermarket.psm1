@@ -153,10 +153,10 @@ function Deploy-AIO-M2 {
         # Create the Schema registry for the cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Creating the schema registry on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
-        $schemaName = "${clusterName}schema"
+        $schemaName = "${clusterName}-${$Env:namingGuid}-schema"
         $schemaId = $(az iot ops schema registry create --name $schemaName `
                 --resource-group $resourceGroup `
-                --registry-namespace "$clusterName-namespace" `
+                --registry-namespace "$clusterName-${$Env:namingGuid}-namespace" `
                 --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
                 --query id -o tsv)
 
