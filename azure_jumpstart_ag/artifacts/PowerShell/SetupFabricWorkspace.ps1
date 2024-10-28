@@ -119,7 +119,7 @@ $headers = @{"Authorization" = "Bearer $fabricAccessToken"; "Content-Type" = "ap
 
 Write-Host "INFO: Creating Eventhouse with name $eventhouseName."
 $eventhouseResp = Invoke-WebRequest -Method Post -Uri $eventhouseApi -Body $apiPayload -Headers $headers
-if (($eventhouseResp.StatusCode -ge 200) -or ($eventhouseResp.StatusCode -le 204)){
+if (($eventhouseResp.StatusCode -ge 200) -and ($eventhouseResp.StatusCode -le 204)){
     Write-Host "INFO: Eventhouse created with name $eventhouseName."
 }
 else {
@@ -137,8 +137,8 @@ $kqlQueryServiceUri = $kqlDatabaseInfo[0].properties.queryServiceUri
 $kqlDatabaseId = $kqlDatabaseInfo[0].id
 $kqlDatabaseName = $kqlDatabaseInfo[0].displayName
 
-# Create KQL database tables to store retail data
-$databaseName = $eventhouseName
+Write-Host "INFO: KQL database details. Database Name: $kqlDatabaseName, Database ID: $kqlDatabaseId, kqlQueryServiceUri: $kqlQueryServiceUri"
+
 
 # Download KQL script from GitHub
 $kqlScriptUrl = $templateBaseUrl + "contoso_hypermarket/bicep/data/script.kql"
@@ -162,18 +162,18 @@ $headers = @{
 }
 
 # Create payload to create KQL database schema and functions
-Write-Host "INFO: Creating KQL script."
+Write-Host "INFO: Executing KQL script."
 $body = @{
-    db = $databaseName
+    db = $kqlDatabaseName
     csl = "$kqlScript"
 } | ConvertTo-Json
 
 $httpResp = Invoke-RestMethod -Method Post -Uri "$kqlQueryServiceUri/v1/rest/mgmt" -Headers $headers -Body $body
-if (($httpResp.StatusCode -ge 200) -or ($httpResp.StatusCode -le 204)){
-  Write-Host "INFO: products table created."
+if ($httpResp.Tables.Count -ge 1){
+  Write-Host "INFO: KQL script execution completed."
 }
 else {
-  Write-Host "ERROR: Failed to create products table."
+  Write-Host "ERROR: Failed to execute KQL script."
   Exit
 }
 
@@ -208,8 +208,8 @@ $body = @"
 $kqlDashboardsApi = "https://api.fabric.microsoft.com/v1/workspaces/$fabricWorkspaceId/kqlDashboards"
 $headers = @{"Authorization" = "Bearer $fabricAccessToken"; "Content-Type" = "application/json"}
 $httpResp = Invoke-RestMethod -Method Post -Uri $kqlDashboardsApi -Headers $headers -Body $body
-if (($httpResp.StatusCode -ge 200) -or ($httpResp.StatusCode -le 204)){
-  Write-Host "INFO: Created KQL dashboard report."
+if ($httpResp.id.Length -gt 0){
+  Write-Host "INFO: Created KQL dashboard report with ID: $($httpResp.id)"
 }
 else {
   Write-Host "ERROR: Failed to create KQL dashboard report."
@@ -234,14 +234,17 @@ if ($eventHubInfo.Count -ne 1) {
 }
 
 $eventHubNamespace = $eventHubInfo[0].name
+Write-Host "INFO: Found EventHub Namespace: $eventHubNamespace"
 
 # Make sure Eventhub with name 'orders' exists
 $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
 $eventHubName = $eventHubs[0].name
 if (-not $eventHubName) {
-  Write-Host "ERROR: Event Hubs not found in the EventHub namespace $eventHubInfo[0].name."
+  Write-Host "ERROR: Event Hubs not found in the EventHub namespace $eventHubNamespace"
   Exit
 }
+
+Write-Host "INFO: Found EventHub: $eventHubName"
 
 # Get Event Hub credentials
 Write-Host "INFO: Retrieving Event Hub key for '$eventHubKeyName' Shared Acess Policy."
@@ -297,8 +300,8 @@ $connectionBody = @"
 # Call API to create Event Hub connection in Power BI
 Write-Host "INFO: Calling API to create EventHub data connection."
 $dataConnectionResp = Invoke-RestMethod -Method Post -Uri $powerBIEndpoint -Body $connectionBody -ContentType "application/json" -Headers @{ Authorization = "Bearer $powerbiAccessToken" }
-if (($dataConnectionResp.StatusCode -ge 200) -or ($dataConnectionResp.StatusCode -le 204)){
-  Write-Host "INFO: Created EventHub data connection."
+if ($dataConnectionResp.id.Length -gt 0){
+  Write-Host "INFO: Created EventHub data connection with Connection ID: $($dataConnectionResp.id)"
 }
 else {
   Write-Host "ERROR: Failed to create EventHub data connection."
@@ -307,6 +310,7 @@ else {
 
 # Get connection id
 $DataSourceConnectionId = $dataConnectionResp.id
+Write-Host "INFO: EventHub DataSourceConnectionId: $DataSourceConnectionId"
 
 # Create header to authorize with Power BI service
 $headers = @{
@@ -330,7 +334,7 @@ $mwcTokenBody = @"
 Write-Host "INFO: Requesting MWC token from Power BI API."
 $mwcTokenApi = "https://wabi-us-central-b-primary-redirect.analysis.windows.net/metadata/v201606/generatemwctokenv2"
 $mwcTokenResp = Invoke-RestMethod -Method Post -Uri $mwcTokenApi -Headers $headers -Body $mwcTokenBody
-if (($mwcTokenResp.StatusCode -ge 200) -or ($mwcTokenResp.StatusCode -le 204)){
+if ($mwcTokenResp.Token.Length -gt 0){
   Write-Host "INFO: Received MWC token."
 }
 else {
@@ -341,7 +345,8 @@ else {
 $mwcToken = $mwcTokenResp.token
 
 # Event Hub connection body
-$streamApi = "https://pbipeastus1-eastus.pbidedicated.windows.net/webapi/capacities/$fabricCapacityId/workloads/Kusto/KustoService/direct/v1/databases/$kqlDatabaseId/dataConnections/$DataSourceConnectionId"
+$uriPrefix = $fabricCapacityId -replace '-', ''
+$streamApi = "https://$uriPrefix.pbidedicated.windows.net/webapi/capacities/$fabricCapacityId/workloads/Kusto/KustoService/direct/v1/databases/$kqlDatabaseId/dataConnections/$DataSourceConnectionId"
 $streamBody = @"
 {
   "DataConnectionType": "EventHubDataConnection",
@@ -355,16 +360,16 @@ $streamBody = @"
     "DataFormat": "multijson",
     "DataSourceConnectionId": "$DataSourceConnectionId",
     "DataConnectionType": "EventHubDataConnection",
-    "DataConnectionName": "$fabricWorkspaceName-$eventHubName"
+    "DataConnectionName": "$fabricWorkspaceName"
   }
 }
 "@
 
 # Use MWC Token to create event data connection
- Write-Host "INFO: Creating eventstream in KQL database to ingest data."
+Write-Host "INFO: Creating eventstream in KQL database to ingest data."
 $dataSourceConnectionId = Invoke-RestMethod -Method Post -Uri $streamApi -Body $streamBody -ContentType "application/json" -Headers @{ Authorization = "MwcToken $mwcToken" }
-if (($mwcTokenResp.StatusCode -ge 200) -or ($mwcTokenResp.StatusCode -le 204)){
-  Write-Host "INFO: Created eventstream in KQL database."
+if ($dataSourceConnectionId.Length -gt 0){
+  Write-Host "INFO: Created eventstream in KQL database with ID: $dataSourceConnectionId"
 }
 else {
   Write-Host "ERROR: Failed to create eventstream in KQL database."
@@ -378,7 +383,7 @@ Write-Host "INFO: Downloading and preparing nootebook to import into Fabric work
 $ordersNotebookBody = (Invoke-WebRequest -Method Get -Uri "$templateBaseUrl/artifacts/notebooks/$ordersSalesForecastNotebook").Content -replace '{{KQL_CLUSTER_URI}}', $kqlQueryServiceUri -replace '{{KQL_DATABASE_NAME}}', $kqlDatabaseName
 
 # Convert the KQL dashboard report payload to base64
-Write-Host "INFO: Conerting report content into base64 encoded format."
+Write-Host "INFO: Converting report content into base64 encoded format."
 $base64Payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($ordersNotebookBody))
 
 # Build KQL dashboard report payload from the report template
@@ -402,14 +407,9 @@ $body = @"
 # Create KQL dashboard report
 $nootebookApi = "https://api.fabric.microsoft.com/v1/workspaces/$fabricWorkspaceId/notebooks"
 $headers = @{"Authorization" = "Bearer $fabricAccessToken"; "Content-Type" = "application/json"}
-$httpResp = Invoke-RestMethod -Method Post -Uri $nootebookApi -Headers $headers -Body $body
-if (($httpResp.StatusCode -ge 200) -or ($httpResp.StatusCode -le 204)){
-  Write-Host "INFO: Created notebook in Fabric workspace."
-}
-else {
-  Write-Host "ERROR: Failed to create notebook."
-  Exit
-}
+$notebookResp = Invoke-RestMethod -Method Post -Uri $nootebookApi -Headers $headers -Body $body
+$notebookResp
+Write-Host "INFO: Created notebook in Fabric workspace."
 
 # Stop logging into the log file
 Stop-Transcript

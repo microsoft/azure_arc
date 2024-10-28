@@ -25,7 +25,7 @@
 .drop table sales ifexists
 
 // Create sales table
-.create table sales (sale_id:string, sale_date:datetime, store_id:string, product_id:string, price:real, discount:real, quantity:int, item_total:real, profit:real, payment_method: string, customer_id:string, register_id: string)
+.create table sales (sale_id: string, sale_date: datetime, store_id: string, store_city:string, product_id: string, product_category:string, product_name:string, price: real, discount: real, quantity: int, item_total: real, profit: real, payment_method: string, customer_id:string, register_id: string)
 
 // Create function to expand sales data
 .create-or-alter function expand_sales_data()
@@ -37,7 +37,10 @@
   sale_id = tostring(data.sale_id),
   sale_date = todatetime(data.sale_date),
   store_id = tostring(data.store_id),
+  store_city = tostring(data.store_city),
   product_id = tostring(data.product_id),
+  product_category = tostring(data.product_category),
+  product_name = tostring(data.product_name),
   price = toreal(data.price),
   discount = toreal(data.discount),
   quantity = toint(data.quantity),
@@ -74,3 +77,29 @@
 
 // Create policy
 .alter table inventory policy update @'[{"Source": "staging", "Query": "expand_inventory_data()", "IsEnabled": "True"}]'
+
+// Create product table
+.drop table products ifexists
+.create table products (product_id:string, name:string, price:real, stock:int, category: string, photo_path:string)
+.ingest inline into table products <|
+  1,Red Apple,0.2,1000,Fruits,static/img/product1.jpg
+  2,Banana,0.2,300,Fruits,static/img/product2.jpg
+  3,Avocado,1.25,1000,Vegetables,static/img/product3.jpg
+  4,Bread,3.0,200,Bakery,static/img/product4.jpg
+  5,Milk,2.5,200,Dairy,static/img/product5.jpg
+  6,Orange Juice,3.25,100,Fruits,static/img/product6.jpg
+  7,Chips,0.25,1000,Snacks,static/img/product7.jpg
+  8,Red Pepper,0.5,800,Vegetables,static/img/product8.jpg
+  9,Lettuce,0.3,2000,Vegetables,static/img/product9.jpg
+  10,Tomato,0.4,5000,Vegetables,static/img/product10.jpg
+  11,Strawberry,2.0,500,Fruits,static/img/product11.jpg
+  12,Eggs,3.0,10000,Poultry,static/img/product12.jpg
+
+// Create stores table
+.drop table stores ifexists
+.create table stores (store_id:string, city:string, state:string, country:string)
+.ingest inline into table stores <|
+  CHI,Chicago,IL,United States
+  SEA,Seattle, WA,United States
+  NYC,New York, NY,United States
+  DAL,Dallas,TX,United States
