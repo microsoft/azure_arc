@@ -184,7 +184,15 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
       adminPassword: windowsAdminPassword
       windowsConfiguration: {
         provisionVMAgent: true
-        enableAutomaticUpdates: false
+        enableAutomaticUpdates: true
+        enableVMAgentPlatformUpdates: true
+        patchSettings: {
+          assessmentMode: 'AutomaticByPlatform'
+          patchMode: 'AutomaticByPlatform'
+          automaticByPlatformSettings: {
+            rebootSetting: 'Never'
+          }
+        }
       }
     }
   }
