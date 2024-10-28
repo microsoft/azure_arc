@@ -136,7 +136,7 @@ function Deploy-AIO-M2 {
         # Create user-assigned identity for AIO secrets management
         Write-Host "Create user-assigned identity for AIO secrets management" -ForegroundColor DarkGray
         Write-Host "`n"
-        $userAssignedManagedIdentityName = "aio-${cluster.Value.ArcClusterName}-${namingGuid}-kv-identity"
+        $userAssignedManagedIdentityName = "aio-${clusterName}-${namingGuid}-kv-identity"
         $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
@@ -158,10 +158,10 @@ function Deploy-AIO-M2 {
         # Create the Schema registry for the cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Creating the schema registry on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
-        $schemaName = "${clusterName}schema"
+        $schemaName = "${clusterName}schema${namingGuid}"
         $schemaId = $(az iot ops schema registry create --name $schemaName `
                 --resource-group $resourceGroup `
-                --registry-namespace "$clusterName-namespace" `
+                --registry-namespace "$clusterName-${namingGuid}-namespace" `
                 --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
                 --query id -o tsv)
 
@@ -240,7 +240,7 @@ function Deploy-AIO-M2 {
         # Create user-assigned identity for AIO secrets management
         Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
         Write-Host "`n"
-        $userAssignedManagedIdentityName = "aio-${cluster.Value.ArcClusterName}-${namingGuid}-cloud-identity"
+        $userAssignedManagedIdentityName = "aio-${clusterName}-${namingGuid}-cloud-identity"
         $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
 
         az iot ops secretsync enable --name $arcClusterName.toLower() `
