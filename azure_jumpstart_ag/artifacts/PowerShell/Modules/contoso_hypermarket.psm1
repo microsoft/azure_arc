@@ -219,6 +219,7 @@ function Deploy-AIO-M2 {
                     --cluster $arcClusterName.toLower() `
                     --resource-group $resourceGroup `
                     --add-insecure-listener `
+                    --enable-rsync `
                     --only-show-errors
                 $retryCount++
             }
