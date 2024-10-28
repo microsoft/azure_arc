@@ -63,7 +63,6 @@
         'Microsoft.PowerShell',
         'Microsoft.Bicep',
         'Kubernetes.kubectl',
-        'vcredist140',
         'Microsoft.Edge',
         'Microsoft.Azure.AZCopy.10',
         'Microsoft.VisualStudioCode',
