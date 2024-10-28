@@ -129,6 +129,7 @@ function Set-K3sClusters {
 function Deploy-AIO-M2 {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the Arc-enabled clusters" -ForegroundColor Gray
     Write-Host "`n"
+    $kvIndex = 0
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
@@ -180,7 +181,6 @@ function Deploy-AIO-M2 {
                 --resource-group $resourceGroup `
                 --sr-resource-id $schemaId `
                 --only-show-errors
-            #az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -242,13 +242,15 @@ function Deploy-AIO-M2 {
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMIKvResourceId
 
+        Start-Sleep -Seconds 60
+
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
 
         az iot ops secretsync enable --name $arcClusterName.toLower() `
+            --kv-resource-id $keyVaultId `
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMICloudResourceId `
-            --kv-resource-id $keyVaultId `
             --only-show-errors
 
         $kvIndex++
