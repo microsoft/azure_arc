@@ -159,17 +159,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
         sku: windowsOSVersion
         version: 'latest'
       }
-      dataDisks: [
-        {
-          diskSizeGB: 1024
-          lun: 0
-          createOption: 'Empty'
-          caching: 'ReadWrite'
-          managedDisk: {
-            storageAccountType: 'Premium_LRS'
-          }
-        }
-      ]
+      dataDisks: []
     }
     networkProfile: {
       networkInterfaces: [
