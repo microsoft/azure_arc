@@ -51,13 +51,8 @@ resource eventHubAuthRule 'Microsoft.EventHub/namespaces/authorizationRules@2023
   }
 }
 
-resource ordersCS 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: 'orderscg'
-  parent: eventHub
-}
-
-resource inventoryCG 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: 'inventorycg'
+resource fabricCG 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: 'fabriccg'
   parent: eventHub
 }
 

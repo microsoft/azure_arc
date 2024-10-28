@@ -15,8 +15,7 @@
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgMonitoringDir   = "C:\Ag\Monitoring"
-        AgAdxDashboards   = "C:\Ag\AdxDashboards"
-        AgDataEmulator    = "C:\Ag\DataEmulator"
+        AgFabric          = "C:\Ag\Fabric"
     }
 
     # Required URLs
@@ -48,7 +47,8 @@
         "Microsoft.DeviceRegistry",
         "Microsoft.EventGrid",
         "Microsoft.IoTOperationsOrchestrator",
-        "Microsoft.IoTOperations"
+        "Microsoft.IoTOperations",
+        "Microsoft.Fabric"
     )
 
     # Az CLI required extensions
@@ -213,4 +213,11 @@
     EdgeSettingValueTrue    = '00000001'
     EdgeSettingValueFalse   = '00000000'
 
+    FabricConfig = @{
+        WorkspacePrefix = "contoso-hypermarket"
+        EventHubSharedAccessKeyName = "FabricSharedAccessKey"
+        EventHubName = "contoso-hypermarket"
+        EventHubCG = "fabriccg"
+        RunFabricSetupAs = "user"
+    }
 }

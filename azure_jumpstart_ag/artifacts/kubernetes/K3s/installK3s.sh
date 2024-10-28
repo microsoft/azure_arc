@@ -81,7 +81,21 @@ export AZCOPY_AUTO_LOGIN_TYPE=MSI
 check_dpkg_lock
 
 # Installing Azure CLI & Azure Arc extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+max_retries=5
+retry_count=0
+success=false
+
+while [ $retry_count -lt $max_retries ]; do
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    if [ $? -eq 0 ]; then
+        success=true
+        break
+    else
+        echo "Failed to install Az CLI. Retrying (Attempt $((retry_count+1)))..."
+        retry_count=$((retry_count+1))
+        sleep 10
+    fi
+done
 
 echo ""
 echo "Log in to Azure"
