@@ -104,7 +104,7 @@ function Set-K3sClusters {
             kubectl apply -f $kubeVipRbac
 
             $kubeVipDaemonset = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
-          (Get-Content -Path $kubeVipDaemonset) -replace 'k3sVIPPlaceholder', "$k3sVIP" | Set-Content -Path $kubeVipDaemonset
+            (Get-Content -Path $kubeVipDaemonset) -replace 'k3sVIPPlaceholder', "$k3sVIP" | Set-Content -Path $kubeVipDaemonset
             kubectl apply -f $kubeVipDaemonset
 
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
@@ -133,6 +133,11 @@ function Deploy-AIO-M2 {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for AIO secrets management" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityName = "aio-${cluster.Value.ArcClusterName}-${namingGuid}-kv-identity"
+        $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
@@ -217,7 +222,7 @@ function Deploy-AIO-M2 {
         # Configure the Azure IoT Operations instance for secret synchronization
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
-        $userAssignedMIResourceId = (az identity show -g $resourceGroup -n "aio-$clusterName-identity" --query id -o tsv --only-show-errors)
+
         # Enable OIDC issuer and workload identity on the Arc-enabled cluster
         az connectedk8s update -n $arcClusterName `
             --resource-group $resourceGroup `
@@ -232,6 +237,12 @@ function Deploy-AIO-M2 {
 
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityName = "aio-${cluster.Value.ArcClusterName}-${namingGuid}-cloud-identity"
+        $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
+
         az iot ops secretsync enable --name $arcClusterName.toLower() `
             --resource-group $resourceGroup `
             --mi-user-assigned $userAssignedMIResourceId `

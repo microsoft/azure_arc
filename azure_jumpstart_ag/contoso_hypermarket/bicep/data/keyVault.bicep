@@ -27,16 +27,6 @@ param resourceTags object = {
   Project: 'Jumpstart_azure_aio'
 }
 
-resource userAssignedManagedIdentitySeattle 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
-  name: 'aio-seattle-identity'
-  location: location
-}
-
-resource userAssignedManagedIdentityChicago 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
-  name: 'aio-chicago-identity'
-  location: location
-}
-
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvNameSite1
   location: location
@@ -96,6 +86,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
+/*
 // Add role assignment for the SPN: Key Vault Secrets Officer
 resource roleAssignmentAIOSeattle 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(userAssignedManagedIdentitySeattle.name, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
@@ -121,3 +112,15 @@ resource roleAssignmentAIOChicago 'Microsoft.Authorization/roleAssignments@2022-
 
   }
 }
+
+
+resource userAssignedManagedIdentitySeattle 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+  name: 'aio-seattle-identity'
+  location: location
+}
+
+resource userAssignedManagedIdentityChicago 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+  name: 'aio-chicago-identity'
+  location: location
+}
+*/
