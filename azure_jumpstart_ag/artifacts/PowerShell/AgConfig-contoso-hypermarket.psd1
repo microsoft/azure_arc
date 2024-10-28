@@ -58,8 +58,7 @@
         @{name="eventgrid"; version="latest"},
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
-        @{name="storage-preview"; version="latest"},
-        @{name="microsoft-fabric"; version="latest"}
+        @{name="storage-preview"; version="latest"}
     )
 
     # PowerShell modules
