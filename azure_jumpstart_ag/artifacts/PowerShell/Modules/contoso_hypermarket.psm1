@@ -194,7 +194,7 @@ function Deploy-AIO-M2 {
             az iot ops create --name $arcClusterName.toLower() `
                 --cluster $arcClusterName.toLower() `
                 --resource-group $resourceGroup `
-                --broker-listener-type LoadBalancer `
+                --add-insecure-listener `
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -205,7 +205,7 @@ function Deploy-AIO-M2 {
                 az iot ops create --name $arcClusterName.toLower() `
                     --cluster $arcClusterName.toLower() `
                     --resource-group $resourceGroup `
-                    --broker-listener-type LoadBalancer `
+                    --add-insecure-listener `
                     --only-show-errors
                 $retryCount++
             }
