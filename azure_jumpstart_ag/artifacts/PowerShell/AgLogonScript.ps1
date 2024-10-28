@@ -48,17 +48,17 @@ if ($scenario -eq "contoso_supermarket") {
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
-    $global:stcontainerName = $Env:stcontainerName
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqListenerService = "aio-broker"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
     $global:spnObjectId = $Env:spnObjectId
-    $global:stcontainerName = $Env:stcontainerName
+    $global:openAIEndpoint = $Env:openAIEndpoint
+    $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }
 
 #####################################################################
@@ -200,15 +200,17 @@ if ($scenario -eq "contoso_supermarket") {
     Deploy-SupermarketConfigs
 }
 
-# if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
-#     Update-AzureIoTOpsExtension
-#     Deploy-AIO
-#     if($scenario -eq "contoso_motors"){
-#         Deploy-MotorsConfigs
-#     }
-#     $mqttIpArray=Set-MQTTIpAddress
-#     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-# }
+if ($scenario -eq "contoso_motors") {
+    Update-AzureIoTOpsExtension
+    Deploy-AIO
+    Deploy-MotorsConfigs
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}elseif($scenario -eq "contoso_hypermarket"){
+    Deploy-AIO-M2
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
@@ -229,6 +231,13 @@ Deploy-Workbook "arc-osperformance-workbook.bicep"
 #####################################################################
 if($scenario -eq "contoso_motors"){
     Deploy-ADXDashboardReports
+}
+
+#####################################################################
+# Deploy Microsoft Fabric
+#####################################################################
+if($scenario -eq "contoso_hypermarket"){
+    Set-MicrosoftFabric
 }
 
 ##############################################################

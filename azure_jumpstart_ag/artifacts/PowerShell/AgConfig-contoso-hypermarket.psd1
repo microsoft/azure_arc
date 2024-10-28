@@ -15,8 +15,7 @@
         AgL1Files         = "C:\Ag\L1Files"
         AgAppsRepo        = "C:\Ag\AppsRepo"
         AgMonitoringDir   = "C:\Ag\Monitoring"
-        AgAdxDashboards   = "C:\Ag\AdxDashboards"
-        AgDataEmulator    = "C:\Ag\DataEmulator"
+        AgFabric          = "C:\Ag\Fabric"
     }
 
     # Required URLs
@@ -48,7 +47,8 @@
         "Microsoft.DeviceRegistry",
         "Microsoft.EventGrid",
         "Microsoft.IoTOperationsOrchestrator",
-        "Microsoft.IoTOperations"
+        "Microsoft.IoTOperations",
+        "Microsoft.Fabric"
     )
 
     # Az CLI required extensions
@@ -59,7 +59,7 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="0.7.0b2"}
     )
 
     # PowerShell modules
@@ -93,7 +93,9 @@
         'openssl.light',
         'mqtt-explorer',
         'gh',
-        'python'
+        'python',
+        'sql-server-management-studio',
+        'azure-data-studio'
     )
 
     # Pip packages list
@@ -111,7 +113,8 @@
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
         'mindaro.mindaro',
-        'github.vscode-pull-request-github'
+        'github.vscode-pull-request-github',
+        'ms-mssql.mssql'
     )
 
     # Git branches
@@ -210,4 +213,11 @@
     EdgeSettingValueTrue    = '00000001'
     EdgeSettingValueFalse   = '00000000'
 
+    FabricConfig = @{
+        WorkspacePrefix = "contoso-hypermarket"
+        EventHubSharedAccessKeyName = "FabricSharedAccessKey"
+        EventHubName = "contoso-hypermarket"
+        EventHubCG = "fabriccg"
+        RunFabricSetupAs = "user"
+    }
 }

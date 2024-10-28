@@ -69,9 +69,6 @@ param fabricCapacityAdmin string
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
-@description('The name of ESA container in Storage Account')
-param stcontainerName string = 'esacontainer'
-
 @description('The custom location RPO ID')
 param customLocationRPOID string
 
@@ -97,6 +94,18 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
+
+@description('The array of OpenAI models to deploy')
+param azureOpenAIModels array = [
+  {
+    name: 'gpt-35-turbo'
+    version: '0125'
+  }
+  {
+    name: 'gpt-4o-mini'
+    version: '2024-07-18'
+  }
+]
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
@@ -216,9 +225,10 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     scenario: scenario
     customLocationRPOID: customLocationRPOID
     spnObjectId: spnObjectId
-    stcontainerName: stcontainerName
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
+    openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
+    speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
 }
 
@@ -237,6 +247,7 @@ module keyVault 'data/keyVault.bicep' = {
     akvNameSite1: akvNameSite1
     akvNameSite2: akvNameSite2
     location: location
+    spnObjectId: spnObjectId
   }
 }
 
@@ -246,7 +257,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    stcontainerName: stcontainerName
+    spnObjectId: spnObjectId
   }
 }
 
@@ -259,10 +270,20 @@ module eventHub 'data/eventHub.bicep' = {
   }
 }
 
-// module fabricCapacity 'data/fabric.bicep' = {
-//   name: 'fabricCapacity'
-//   params: {
-//     fabricCapacityName: fabricCapacityName
-//     fabricCapacityAdmin: fabricCapacityAdmin
-//   }
-// }
+module fabricCapacity 'data/fabric.bicep' = {
+  name: 'fabricCapacity'
+  params: {
+    fabricCapacityName: fabricCapacityName
+    fabricCapacityAdmin: fabricCapacityAdmin
+  }
+}
+
+module azureOpenAI 'ai/aoai.bicep' = {
+  name: 'azureOpenAIDeployment'
+  params: {
+    location: location
+    openAIAccountName: 'openai${namingGuid}'
+    azureOpenAIModels: azureOpenAIModels
+    spnObjectId: spnObjectId
+  }
+}
