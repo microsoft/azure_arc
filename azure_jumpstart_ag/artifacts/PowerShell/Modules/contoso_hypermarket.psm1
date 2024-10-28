@@ -254,7 +254,7 @@ function Deploy-AIO-M2 {
 }
 
 function Set-MicrosoftFabric {
-    # Load Agconfi
+    # Load Agconfig
     $fabricWorkspacePrefix = $AgConfig.FabricConfig["WorkspacePrefix"]
     $fabricWorkspaceName = "$fabricWorkspacePrefix-$namingGuid"
     $fabricFolder = $AgConfig.AgDirectories["AgFabric"]
