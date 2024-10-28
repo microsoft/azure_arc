@@ -41,7 +41,7 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     try {
         foreach ($app in $AgConfig.WingetPackagesList) {
             Write-Host "Installing $app"
-            & $winget install -e --id $app --silent --accept-package-agreements --accept-source-agreements --ignore-warnings --log "$AgLogsDir\winget.log"  > $null 2>&1
+            & $winget install -e --id $app --silent --accept-package-agreements --accept-source-agreements --ignore-warnings
         }
 
         # If the command succeeds, set $success to $true to exit the loop
