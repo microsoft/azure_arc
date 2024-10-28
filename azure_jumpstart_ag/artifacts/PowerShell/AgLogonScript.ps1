@@ -49,17 +49,17 @@ if ($scenario -eq "contoso_supermarket") {
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
-    $global:stcontainerName = $Env:stcontainerName
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-mq-dmqtt-frontend"
+    $global:mqListenerService = "aio-broker"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
     $global:spnObjectId = $Env:spnObjectId
-    $global:stcontainerName = $Env:stcontainerName
+    $global:openAIEndpoint = $Env:openAIEndpoint
+    $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }
 
 #####################################################################
@@ -156,6 +156,7 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 if($scenario -eq "contoso_hypermarket"){
     Get-K3sConfigFile
+    Merge-K3sConfigFiles
     Set-K3sClusters
 }
 
@@ -214,12 +215,14 @@ if ($scenario -eq "contoso_supermarket") {
     Deploy-SupermarketConfigs
 }
 
-if ($scenario -eq "contoso_motors" -or $scenario -eq "contoso_hypermarket") {
+if ($scenario -eq "contoso_motors") {
     Update-AzureIoTOpsExtension
     Deploy-AIO
-    if($scenario -eq "contoso_motors"){
-        Deploy-MotorsConfigs
-    }
+    Deploy-MotorsConfigs
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}elseif($scenario -eq "contoso_hypermarket"){
+    Deploy-AIO-M2
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }
@@ -246,7 +249,7 @@ if($scenario -eq "contoso_motors"){
 }
 
 ##############################################################
-# Creating bookmarks
+# Creating bookmarks and setting merged kubeconfigs
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Creating Microsoft Edge Bookmarks in Favorites Bar (Step 15/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket"){
@@ -262,8 +265,11 @@ if($scenario -eq "contoso_supermarket"){
 ##############################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up scripts and uploading logs (Step 17/17)" -ForegroundColor DarkGreen
 # Creating Hyper-V Manager desktop shortcut
-Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+if($scenario -ne "contoso_hypermarket") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Creating Hyper-V desktop shortcut." -ForegroundColor Gray
+    Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+}
 
 if($scenario -eq "contoso_supermarket"){
     Write-Host "[$(Get-Date -Format t)] INFO: Cleaning up images-cache job" -ForegroundColor Gray

@@ -1,0 +1,69 @@
+// Check if the table exists
+.drop table staging ifexists
+
+// Create new staging table
+.create table staging (source: string, subject: string, event_data: dynamic)
+
+// Create staging ingestion mapping
+.create table staging ingestion json mapping "staging_mapping"
+```
+[
+{"column":"source","path":"$['source']","datatype":"string"},
+{"column":"subject","path":"$['subject']","datatype":"string"},
+{"column":"event_data","path":"$['event_data']","datatype":""}
+]
+```
+
+//  Modify the ingestion batching policy to ingest data frequently
+//  THIS CONFIGURATION SHOULDN'T BE USED IN PRODUCTION:  MaximumBatchingTimeSpan SHOULD BE AT LEAST 1 MINUTE
+.alter table staging policy ingestionbatching "{'MaximumBatchingTimeSpan': '0:01:00', 'MaximumNumberOfItems': 10000}"
+
+// Delete existing table
+.drop table sales ifexists
+
+// Create sales table
+.create table sales (sale_date:datetime, store_id:string, sale_id:string, sale_line_items:dynamic, sale_total:real, payment_method: string, customer_id:string, register_id: string)
+
+// Create function to expand sales data
+.create-or-alter function expand_sales_data()
+{
+  staging
+  | where subject == "topic/sales"
+  | extend data = parse_json(event_data) 
+  | project 
+  sale_date = todatetime(data.sale_date),
+  store_id = tostring(data.store_id),
+  sale_id = tostring(data.sale_id),
+  sale_line_items = data.sale_line_items,
+  sale_total = toreal(data.sale_total),
+  payment_method = tostring(data.payment_method),
+  customer_id = tostring(data.customer_id),
+  register_id = tostring(data.register_id)
+}
+
+// Create policy to update sales table
+.alter table sales policy update @'[{"Source": "staging", "Query": "expand_sales_data()", "IsEnabled": "True"}]'
+
+// Delete existing table
+.drop table inventory ifexists
+
+// Create inventory table
+.create table inventory (updated_on:datetime, store_id:string, product_id:string, stock_level:int, reorder_threshold:int, last_restocked: datetime)
+
+// Create function to expand inventory data
+.create-or-alter function expand_inventory_data()
+{
+  staging
+  | where subject == "topic/inventory"
+  | extend data = parse_json(event_data) 
+  | project 
+  updated_on = todatetime(data.updated_on),
+  store_id = tostring(data.store_id),
+  product_id = tostring(data.product_id),
+  stock_level = toint(data.stock_level),
+  reorder_threshold = toint(data.reorder_threshold),
+  last_restocked = todatetime(data.last_restocked)
+}
+
+// Create policy
+.alter table inventory policy update @'[{"Source": "staging", "Query": "expand_inventory_data()", "IsEnabled": "True"}]'

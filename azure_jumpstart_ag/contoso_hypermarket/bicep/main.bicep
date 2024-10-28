@@ -51,9 +51,6 @@ param subnetNameCloudK3s string = 'Ag-Subnet-K3s'
 @description('Name of the inner-loop AKS subnet in the cloud virtual network')
 param subnetNameCloud string = 'Ag-Subnet-Cloud'
 
-@description('The name of the Azure Data Explorer cluster')
-param adxClusterName string = 'agadx${namingGuid}'
-
 @description('Name of the storage queue')
 param storageQueueName string = 'aioqueue'
 
@@ -63,17 +60,14 @@ param eventHubName string = 'aiohub${namingGuid}'
 @description('Name of the event hub namespace')
 param eventHubNamespaceName string = 'aiohubns${namingGuid}'
 
-@description('Name of the event grid namespace')
-param eventGridNamespaceName string = 'aioeventgridns${namingGuid}'
+@description('Name of the Fabric Capacity')
+param fabricCapacityName string = 'agfabric${namingGuid}'
+
+@description('The administrator for the Microsoft Fabric capacity')
+param fabricCapacityAdmin string
 
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
-
-@description('The name of the Azure Data Explorer Event Hub consumer group for assemblybatteries')
-param stagingDataCGName string = 'mqttdataemulator'
-
-@description('The name of ESA container in Storage Account')
-param stcontainerName string = 'esacontainer'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
@@ -103,6 +97,18 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
+
+@description('The array of OpenAI models to deploy')
+param azureOpenAIModels array = [
+  {
+    name: 'gpt-35-turbo'
+    version: '0125'
+  }
+  {
+    name: 'gpt-4o-mini'
+    version: '2024-07-18'
+  }
+]
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_ag/'
 var k3sClusterNodesCount = 2 // Number of nodes to deploy in the K3s cluster
@@ -218,12 +224,10 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: networkDeployment.outputs.cloudSubnetId
     acrName: acrName
     rdpPort: rdpPort
-    adxClusterName: adxClusterName
     namingGuid: namingGuid
     scenario: scenario
     customLocationRPOID: customLocationRPOID
     spnObjectId: spnObjectId
-    stcontainerName: stcontainerName
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
     vmAutologon: vmAutologon
@@ -237,6 +241,8 @@ module adx 'data/dataExplorer.bicep' = {
     eventHubResourceId: eventHub.outputs.eventHubResourceId
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
+    openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
+    speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
 }
 
@@ -255,18 +261,7 @@ module keyVault 'data/keyVault.bicep' = {
     akvNameSite1: akvNameSite1
     akvNameSite2: akvNameSite2
     location: location
-  }
-}
-
-module eventGrid 'data/eventGrid.bicep' = {
-  name: 'eventGridDeployment'
-  params: {
-    eventGridNamespaceName: eventGridNamespaceName
-    eventHubResourceId: eventHub.outputs.eventHubResourceId
-    queueName: storageQueueName
-    storageAccountResourceId: storageAccount.outputs.storageAccountResourceId
-    namingGuid: namingGuid
-    location: location
+    spnObjectId: spnObjectId
   }
 }
 
@@ -276,7 +271,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    stcontainerName: stcontainerName
+    spnObjectId: spnObjectId
   }
 }
 
@@ -286,6 +281,23 @@ module eventHub 'data/eventHub.bicep' = {
     eventHubName: eventHubName
     eventHubNamespaceName: eventHubNamespaceName
     location: location
-    stagingDataCGName: stagingDataCGName
+  }
+}
+
+module fabricCapacity 'data/fabric.bicep' = {
+  name: 'fabricCapacity'
+  params: {
+    fabricCapacityName: fabricCapacityName
+    fabricCapacityAdmin: fabricCapacityAdmin
+  }
+}
+
+module azureOpenAI 'ai/aoai.bicep' = {
+  name: 'azureOpenAIDeployment'
+  params: {
+    location: location
+    openAIAccountName: 'openai${namingGuid}'
+    azureOpenAIModels: azureOpenAIModels
+    spnObjectId: spnObjectId
   }
 }

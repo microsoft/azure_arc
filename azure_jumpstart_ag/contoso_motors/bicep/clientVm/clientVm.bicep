@@ -56,9 +56,6 @@ param deployBastion bool = false
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
 
-@description('The name of ESA container in Storage Account')
-param stcontainerName string
-
 @description('The login server name of the Azure Container Registry')
 param acrName string
 

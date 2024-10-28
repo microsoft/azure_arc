@@ -72,9 +72,6 @@ param stagingDataCGName string = 'mqttdataemulator'
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
-@description('The name of ESA container in Storage Account')
-param stcontainerName string = 'esacontainer'
-
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
@@ -169,7 +166,6 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    stcontainerName: stcontainerName
   }
 }
 

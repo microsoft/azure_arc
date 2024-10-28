@@ -1,0 +1,225 @@
+{
+  "schema_version": "53",
+  "title": "Agora Retail 2.0 - Contoso Hypermarket",
+  "tiles": [
+    {
+      "id": "bf1564b8-c635-4dd4-b82c-7859783c06ff",
+      "title": "Store Orders",
+      "visualType": "column",
+      "pageId": "9fb7339e-3f60-4f8e-b96d-923c278b671c",
+      "layout": {
+        "x": 9,
+        "y": 2,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "cdbf9c2a-a0bf-41ec-84e2-e6e4b1bbb38d"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "Orders",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": true,
+        "legendLocation": "bottom",
+        "xColumnTitle": "Order Date",
+        "xColumn": null,
+        "yColumns": null,
+        "seriesColumns": null,
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "e56a7a19-a204-4819-843b-28ab6471337f",
+      "title": "Orders by Product",
+      "visualType": "pie",
+      "pageId": "9fb7339e-3f60-4f8e-b96d-923c278b671c",
+      "layout": {
+        "x": 0,
+        "y": 2,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "59491618-8a0e-4e5b-938d-554bbc38f56e"
+      },
+      "visualOptions": {
+        "hideLegend": false,
+        "legendLocation": "right",
+        "xColumn": null,
+        "yColumns": null,
+        "seriesColumns": null,
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "labelDisabled": false,
+        "pie__label": [
+          "name",
+          "percentage"
+        ],
+        "tooltipDisabled": false,
+        "pie__tooltip": [
+          "name",
+          "percentage",
+          "value"
+        ],
+        "pie__orderBy": "size",
+        "pie__kind": "pie",
+        "pie__topNSlices": null,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    },
+    {
+      "id": "9f9c926a-833b-469e-90e8-8bddc9387d12",
+      "title": "",
+      "visualType": "markdownCard",
+      "pageId": "9fb7339e-3f60-4f8e-b96d-923c278b671c",
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "width": 18,
+        "height": 2
+      },
+      "markdownText": "# Agora Retail 2.0 - Hypermart Dashboard Reports",
+      "visualOptions": {}
+    },
+    {
+      "id": "14872fbe-c900-4b12-a503-17535c8b6508",
+      "title": "Product Inventory",
+      "visualType": "line",
+      "pageId": "9fb7339e-3f60-4f8e-b96d-923c278b671c",
+      "layout": {
+        "x": 0,
+        "y": 9,
+        "width": 9,
+        "height": 7
+      },
+      "queryRef": {
+        "kind": "query",
+        "queryId": "8f13c521-66ac-47af-8637-263824635c7f"
+      },
+      "visualOptions": {
+        "multipleYAxes": {
+          "base": {
+            "id": "-1",
+            "label": "Quantity in Stock",
+            "columns": [],
+            "yAxisMaximumValue": null,
+            "yAxisMinimumValue": null,
+            "yAxisScale": "linear",
+            "horizontalLines": []
+          },
+          "additional": [],
+          "showMultiplePanels": false
+        },
+        "hideLegend": false,
+        "legendLocation": "right",
+        "xColumnTitle": "Date",
+        "xColumn": "date_time",
+        "yColumns": [
+          "in_stock"
+        ],
+        "seriesColumns": [
+          "product_id"
+        ],
+        "xAxisScale": "linear",
+        "verticalLine": "",
+        "crossFilterDisabled": false,
+        "drillthroughDisabled": false,
+        "crossFilter": [],
+        "drillthrough": []
+      }
+    }
+  ],
+  "baseQueries": [],
+  "parameters": [
+    {
+      "kind": "duration",
+      "id": "a68b53ea-f5e6-45f3-9197-55a36e7d0d1a",
+      "displayName": "Time range",
+      "description": "",
+      "beginVariableName": "_startTime",
+      "endVariableName": "_endTime",
+      "defaultValue": {
+        "kind": "dynamic",
+        "count": 1,
+        "unit": "hours"
+      },
+      "showOnPages": {
+        "kind": "all"
+      }
+    }
+  ],
+  "dataSources": [
+    {
+      "kind": "kusto-trident",
+      "scopeId": "kusto-trident",
+      "clusterUri": "{{KQL_CLUSTER_URI}}",
+      "database": "{{KQL_DATABASE_ID}}",
+      "name": "contosohypermarket",
+      "id": "0d698e85-cad2-4c2c-9791-0bb4de278f5f",
+      "workspace": "{{FABRIC_WORKSPACE_ID}}"
+    }
+  ],
+  "pages": [
+    {
+      "name": "Sales dashboard",
+      "id": "9fb7339e-3f60-4f8e-b96d-923c278b671c"
+    }
+  ],
+  "queries": [
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0d698e85-cad2-4c2c-9791-0bb4de278f5f"
+      },
+      "text": "orders\n| project order_date, d=parse_json(tostring(line_items))\n| mv-expand bagexpansion=array d\n| project order_date, itemid=d.id, name=tostring(d.name), price=todecimal(d.price)\n| where order_date != \"\"\n| where order_date between (_startTime.._endTime)| summarize OrderCount = count() by bin(order_date, 1h), name| render linechart",
+      "id": "cdbf9c2a-a0bf-41ec-84e2-e6e4b1bbb38d",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0d698e85-cad2-4c2c-9791-0bb4de278f5f"
+      },
+      "text": "orders\n| project order_date, order_total, d=parse_json(tostring(line_items))\n| mv-expand bagexpansion=array d\n| project order_date, product_id=toint(d.product_id), store_id=tostring(d.store_id), price=todecimal(d.price), item_total = d.item_total, order_total\n| join kind=inner (\n    products\n    | project product_id, name\n) on product_id\n| where order_date != \"\"\n| where order_date between (_startTime.._endTime)\n| summarize OrderCount = count() by name| render piechart",
+      "id": "59491618-8a0e-4e5b-938d-554bbc38f56e",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"
+      ]
+    },
+    {
+      "dataSource": {
+        "kind": "inline",
+        "dataSourceId": "0d698e85-cad2-4c2c-9791-0bb4de278f5f"
+      },
+      "text": "inventory\n| where date_time between (_startTime.._endTime)\n| summarize arg_max(in_stock, *) by product_id, bin(date_time, 3h)\n| project date_time, product_id, in_stock\n| order by date_time asc\n|order by  product_id, in_stock\n",
+      "id": "8f13c521-66ac-47af-8637-263824635c7f",
+      "usedVariables": [
+        "_endTime",
+        "_startTime"
+      ]
+    }
+  ]
+}

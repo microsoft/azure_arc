@@ -59,17 +59,18 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.5.1b1"}
+        @{name="azure-iot-ops"; version="0.7.0b2"}
     )
 
     # PowerShell modules
     PowerShellModules       = @(
-        'Az.ConnectedKubernetes',
-        'Az.KubernetesConfiguration',
-        'Az.Kusto',
-        'Az.EventGrid',
-        'Az.Storage',
-        'Az.EventHub'
+        @{name='Az.ConnectedKubernetes'; version="0.10.3"},
+        @{name='Az.KubernetesConfiguration'; version="latest"},
+        @{name='Az.Kusto'; version="latest"},
+        @{name='Az.EventGrid'; version="latest"},
+        @{name='Az.Storage'; version="latest"},
+        @{name='Az.EventHub'; version="latest"},
+        @{name='powershell-yaml'; version="latest"}
     )
 
     # Winget packages list
@@ -111,7 +112,8 @@
         'esbenp.prettier-vscode',
         'ms-kubernetes-tools.vscode-kubernetes-tools',
         'mindaro.mindaro',
-        'github.vscode-pull-request-github'
+        'github.vscode-pull-request-github',
+        'ms-mssql.mssql'
     )
 
     # Git branches
@@ -185,13 +187,14 @@
         ProdURL    = "http://localhost:3000"
         Dashboards = @{
             "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
-            "custom"      = @('node-exporter-full','cluster-global') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
+            "custom"      = @('node-exporter-full-v2','cluster-global', 'app-workloads', 'app-pods', 'app-stores') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
         }
     }
 
     Namespaces              = @(
         "observability"
         "images-cache"
+        "contoso-hypermarket"
     )
 
     AppConfig = @{

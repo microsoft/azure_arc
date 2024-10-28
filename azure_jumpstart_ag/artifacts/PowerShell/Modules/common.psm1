@@ -36,11 +36,22 @@ function Deploy-AzPowerShell {
     $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
     Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
     Set-AzContext -Subscription $subscriptionId
-    # Install PowerShell modules
+
+    # Making module install dynamic
     if ($AgConfig.PowerShellModules.Count -ne 0) {
-        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules: " ($AgConfig.PowerShellModules -join ', ') -ForegroundColor Gray
+        Write-Host "[$(Get-Date -Format t)] INFO: Installing PowerShell modules" -ForegroundColor Gray
         foreach ($module in $AgConfig.PowerShellModules) {
-            Install-Module -Name $module -Force | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+            $moduleName = $module.name
+            $moduleVersion = $module.version
+            if ($moduleVersion -ne "latest" -and $null -ne $moduleVersion) {
+                # Install extension with specific version
+                Install-Module $moduleName -Repository PSGallery -Force -AllowClobber -ErrorAction Stop -RequiredVersion $moduleVersion
+                Write-Host "Installed $moduleName version $moduleVersion"
+            } else {
+                # Install extension without specifying a version
+                Install-Module -Name $moduleName -Force
+                Write-Host "Installed $moduleName (latest version)"
+            }
         }
     }
 
@@ -489,10 +500,10 @@ function Deploy-VirtualizationInfrastructure {
     #####################################################################
     Write-Host "[$(Get-Date -Format t)] INFO: All three kubeconfig files are present. Merging kubeconfig files for use with kubectx." -ForegroundColor Gray
     $kubeconfigpath = ""
-    foreach ($VMName in $VMNames) {
+    foreach ($VMName in $VMNames) { # Create a kubeconfig path for each VM
         $kubeconfigpath = $kubeconfigpath + "$Env:USERPROFILE\.kube\config-" + $VMName.ToLower() + ";"
     }
-    $Env:KUBECONFIG = $kubeconfigpath
+    $Env:KUBECONFIG = $kubeconfigpath # Set the KUBECONFIG environment variable to the merged kubeconfig path
     kubectl config view --merge --flatten > "$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
     kubectl config get-clusters --kubeconfig="$Env:USERPROFILE\.kube\config-raw" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\L1AKSInfra.log")
     Rename-Item -Path "$Env:USERPROFILE\.kube\config-raw" -NewName "$Env:USERPROFILE\.kube\config"
@@ -525,12 +536,7 @@ function Deploy-AzContainerRegistry {
 function Deploy-ClusterNamespaces {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.Type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         foreach ($namespace in $AgConfig.Namespaces) {
             Write-Host "[$(Get-Date -Format t)] INFO: Creating namespace $namespace on $clusterName" -ForegroundColor Gray
             kubectl create namespace $namespace | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -542,14 +548,9 @@ function Deploy-ClusterSecrets {
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         foreach ($namespace in $AgConfig.Namespaces) {
-            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache") {
+            if ($namespace -eq "contoso-supermarket" -or $namespace -eq "images-cache" -or $namespace -eq "contoso-hypermarket") {
                 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure Container registry on $clusterName"
-                if($cluster.Value.Type -eq "k3s"){
-                    $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-                    kubectx
-                }else{
-                    kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-                }
+                kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
                 kubectl create secret docker-registry acr-secret `
                     --namespace $namespace `
                     --docker-server="$acrName.azurecr.io" `
@@ -953,13 +954,7 @@ function Deploy-Prometheus {
     # Deploying Kube Prometheus Stack for stores
     $AgConfig.SiteConfig.GetEnumerator() | ForEach-Object {
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying Kube Prometheus Stack for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        if ($Env:scenario -eq "contoso_hypermarket") {
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$($_.Value.FriendlyName.ToLower())"
-            kubectx | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
-        else {
-            kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
-        }
+        kubectx $_.Value.FriendlyName.ToLower() | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
         # Wait for Kubernetes API server to become available
         $apiServer = kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
         $apiServerAddress = $apiServer -replace '.*https://| .*$'
@@ -1036,12 +1031,60 @@ function Deploy-Prometheus {
         }
 
         Write-Host "[$(Get-Date -Format t)] INFO: Importing dashboards for $($_.Value.FriendlyName) environment" -ForegroundColor Gray
-        # Add dashboards
+        # Deploying dashboards (one dashboard for each store)
+        if ($Env:scenario -ne "contoso_hypermarket") {
+            foreach ($dashboard in $observabilityDashboardstoImport) {
+                $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
+                # Replace the datasource
+                $replacementParams = @{
+                    "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                }
+                $content = Get-Content $grafanaDBPath
+                foreach ($key in $replacementParams.Keys) {
+                    $content = $content -replace $key, $replacementParams[$key]
+                }
+                # Set dashboard JSON
+                $dashboardObject = $content | ConvertFrom-Json
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+                # Need to set this to null to let Grafana generate a new ID
+                $dashboardObject.id = $null
+                # # Set dashboard title
+                $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
+                # Request body with dashboard to add
+                $grafanaDBBody = @{
+                    dashboard = $dashboardObject
+                    overwrite = $true
+                } | ConvertTo-Json -Depth 10
+
+                if ($_.Value.IsProduction) {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+                    $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
+                }
+                else {
+                    # Set Grafana Dashboard endpoint
+                    $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
+                    $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
+                }
+
+                # Make HTTP request to the API
+                $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
+
+                Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
+
+            }
+        }
+    }
+
+    # Deploying dashboard for Contoso Hypermarket (One dashboard for all stores)
+    if ($Env:scenario -eq "contoso_hypermarket") {
         foreach ($dashboard in $observabilityDashboardstoImport) {
             $grafanaDBPath = "$AgMonitoringDir\grafana-$dashboard.json"
             # Replace the datasource
             $replacementParams = @{
-                "\$\{DS_PROMETHEUS}" = $_.Value.GrafanaDataSource
+                "\$\{DS_PROMETHEUS}" = "prometheus"
             }
             $content = Get-Content $grafanaDBPath
             foreach ($key in $replacementParams.Keys) {
@@ -1049,29 +1092,24 @@ function Deploy-Prometheus {
             }
             # Set dashboard JSON
             $dashboardObject = $content | ConvertFrom-Json
-            # Best practice is to generate a random UID, such as a GUID
-            $dashboardObject.uid = [guid]::NewGuid().ToString()
+
+            # Set Dashboard UID for parent dashboards
+            if ($dashboard -notlike '*app-pods*') {
+                # Best practice is to generate a random UID, such as a GUID
+                $dashboardObject.uid = [guid]::NewGuid().ToString()
+            }
 
             # Need to set this to null to let Grafana generate a new ID
             $dashboardObject.id = $null
-            # Set dashboard title
-            $dashboardObject.title = $_.Value.FriendlyName + ' - ' + $dashboardObject.title
             # Request body with dashboard to add
             $grafanaDBBody = @{
                 dashboard = $dashboardObject
                 overwrite = $true
-            } | ConvertTo-Json -Depth 8
+            } | ConvertTo-Json -Depth 10
 
-            if ($_.Value.IsProduction) {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
-                $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
-            }
-            else {
-                # Set Grafana Dashboard endpoint
-                $grafanaDBURI = "http://$monitorLBIP/api/dashboards/db"
-                $grafanaDBStarURI = "http://$monitorLBIP/api/user/stars/dashboard"
-            }
+            # Set Grafana Dashboard endpoint
+            $grafanaDBURI = $AgConfig.Monitoring["ProdURL"] + "/api/dashboards/db"
+            $grafanaDBStarURI = $AgConfig.Monitoring["ProdURL"] + "/api/user/stars/dashboard"
 
             # Make HTTP request to the API
             $dashboardID = (Invoke-RestMethod -Method Post -Uri $grafanaDBURI -Headers $adminHeaders -Body $grafanaDBBody).id
@@ -1079,7 +1117,6 @@ function Deploy-Prometheus {
             Invoke-RestMethod -Method Post -Uri "$grafanaDBStarURI/$dashboardID" -Headers $userHeaders | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Observability.log")
 
         }
-
     }
     Write-Host
 }
@@ -1196,12 +1233,7 @@ function Deploy-AIO {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName
-        }
+        kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
         $retryCount = 0
@@ -1212,21 +1244,11 @@ function Deploy-AIO {
         Write-Host "[$(Get-Date -Format t)] INFO: Enabling custom locations on the Arc-enabled cluster" -ForegroundColor DarkGray
         Write-Host "`n"
         az config set extension.use_dynamic_install=yes_without_prompt
-        if($cluster.Value.Type -eq "k3s"){
-            az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --kube-config "C:\Users\$adminUsername\.kube\ag-k3s-$clusterName" `
-            --kube-context "ag-k3s-$clusterName" `
-            --only-show-errors
-        }else{
-            az connectedk8s enable-features --name $arcClusterName `
-            --resource-group $resourceGroup `
-            --features cluster-connect custom-locations `
-            --custom-locations-oid $customLocationRPOID `
-            --only-show-errors
-        }
+        az connectedk8s enable-features --name $arcClusterName `
+        --resource-group $resourceGroup `
+        --features cluster-connect custom-locations `
+        --custom-locations-oid $customLocationRPOID `
+        --only-show-errors
 
         Start-Sleep -Seconds 10
 
@@ -1251,12 +1273,7 @@ function Deploy-AIO {
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $retryCount = 0
         $maxRetries = 25
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName
-        }
+        kubectx $clusterName
         do {
             $output = az iot ops check --as-object --only-show-errors
             $output = $output | ConvertFrom-Json
@@ -1328,20 +1345,23 @@ function Set-MQTTIpAddress {
     $clusters = $AgConfig.SiteConfig.GetEnumerator()
     foreach ($cluster in $clusters) {
         $clusterName = $cluster.Name.ToLower()
-        if($cluster.Value.type -eq "k3s"){
-            $Env:KUBECONFIG="C:\Users\$adminUsername\.kube\ag-k3s-$clusterName"
-            kubectx
-        }else{
-            kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
-        }
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
         Write-Host "[$(Get-Date -Format t)] INFO: Getting MQ IP address" -ForegroundColor DarkGray
 
         do {
             $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
             $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-            $matchingServices = $services.items | Where-Object {
-                $_.metadata.name -match "aio-mq-dmqtt" -and
-                $_.status.phase -notmatch "running"
+            if($scenario -ne 'contoso_hypermarket'){
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-mq-dmqtt" -and
+                    $_.status.phase -notmatch "running"
+                }
+            }
+            else{
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-operator" -and
+                    $_.status.phase -notmatch "Running"
+                }
             }
             Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
             Start-Sleep -Seconds 20

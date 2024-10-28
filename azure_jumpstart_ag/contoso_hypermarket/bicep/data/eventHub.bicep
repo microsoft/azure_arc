@@ -1,8 +1,8 @@
 @description('The name of the EventHub namespace')
 param eventHubNamespaceName string = 'aiohubns${uniqueString(resourceGroup().id)}'
 
-@description('The name of the EventHub')
-param eventHubName string = 'aioEventHub'
+@description('The name of the Orders EventHub')
+param eventHubName string
 
 @description('EventHub Sku')
 param eventHubSku string = 'Standard'
@@ -20,9 +20,6 @@ param resourceTags object = {
 
 @description('The location of the Azure Data Explorer cluster')
 param location string = resourceGroup().location
-
-@description('The name of the Azure Data Explorer Event Hub consumer group for mqttdataemulator')
-param stagingDataCGName string = 'mqttdataemulator'
 
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
@@ -44,17 +41,23 @@ resource eventHub 'Microsoft.EventHub/namespaces/eventhubs@2023-01-01-preview' =
 }
 
 resource eventHubAuthRule 'Microsoft.EventHub/namespaces/authorizationRules@2023-01-01-preview' = {
-  name: 'eventHubAuthRule'
+  name: 'FabricSharedAccessKey'
   parent: eventHubNamespace
   properties: {
     rights: [
       'Listen'
+      'Send'
     ]
   }
 }
 
-resource weldingrobotCG 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
-  name: stagingDataCGName
+resource ordersCS 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: 'orderscg'
+  parent: eventHub
+}
+
+resource inventoryCG 'Microsoft.EventHub/namespaces/eventhubs/consumergroups@2023-01-01-preview' = {
+  name: 'inventorycg'
   parent: eventHub
 }
 

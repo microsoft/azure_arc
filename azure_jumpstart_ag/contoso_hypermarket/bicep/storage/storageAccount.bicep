@@ -12,8 +12,8 @@ param skuName string = 'Standard_LRS'
 
 param storageQueueName string = 'aioQueue'
 
-@description('The name of ESA container in Storage Account')
-param stcontainerName string
+@description('Azure service principal object id')
+param spnObjectId string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
@@ -24,6 +24,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
   properties: {
     supportsHttpsTrafficOnly: true
+    isHnsEnabled: true
   }
 }
 
@@ -37,11 +38,17 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
   name: storageQueueName
 }
 
-resource storageAccountName_default_container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
-  name: '${storageAccountName}/default/${stcontainerName}'
-  dependsOn: [
-    storageAccount
-  ]
+// Add role assignment for the SPN: Storage Blob Data Contributor
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(spnObjectId, resourceGroup().id, 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+  scope: resourceGroup()
+  properties: {
+    principalId: spnObjectId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+    description: 'Storage Blob Data Contributor'
+
+  }
 }
 
 output queueName string = storageQueueName
