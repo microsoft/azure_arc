@@ -192,25 +192,25 @@ if ($scenario -eq "contoso_supermarket") {
         --namespace $AgConfig.nginx.Namespace `
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 }
-# #####################################################################
-# # Configuring applications on the clusters using GitOps
-# #####################################################################
-# if ($scenario -eq "contoso_supermarket") {
-#     Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
-#     Deploy-SupermarketConfigs
-# }
+#####################################################################
+# Configuring applications on the clusters using GitOps
+#####################################################################
+if ($scenario -eq "contoso_supermarket") {
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring GitOps (Step 13/17)" -ForegroundColor DarkGreen
+    Deploy-SupermarketConfigs
+}
 
-# if ($scenario -eq "contoso_motors") {
-#     Update-AzureIoTOpsExtension
-#     Deploy-AIO
-#     Deploy-MotorsConfigs
-#     $mqttIpArray=Set-MQTTIpAddress
-#     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-# }elseif($scenario -eq "contoso_hypermarket"){
-#     Deploy-AIO-M2
-#     $mqttIpArray=Set-MQTTIpAddress
-#     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-# }
+if ($scenario -eq "contoso_motors") {
+    Update-AzureIoTOpsExtension
+    Deploy-AIO
+    Deploy-MotorsConfigs
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}elseif($scenario -eq "contoso_hypermarket"){
+    Deploy-AIO-M2
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
