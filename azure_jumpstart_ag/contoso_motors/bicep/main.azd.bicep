@@ -81,9 +81,6 @@ param akvNameSite2 string = 'agakv2${namingGuid}'
 @description('Name of the storage account')
 param aioStorageAccountName string = 'aiostg${namingGuid}'
 
-@description('The name of ESA container in Storage Account')
-param stcontainerName string = 'esacontainer'
-
 @description('The name of the Azure Data Explorer cluster')
 param adxClusterName string = 'agadx${namingGuid}'
 
@@ -157,7 +154,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     adxClusterName: adxClusterName
     customLocationRPOID: customLocationRPOID
     scenario: scenario
-    stcontainerName: stcontainerName
   }
 }
 
@@ -178,7 +174,6 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    stcontainerName: stcontainerName
   }
 }
 
