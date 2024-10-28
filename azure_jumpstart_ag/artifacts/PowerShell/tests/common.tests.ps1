@@ -10,8 +10,8 @@ Describe "ArcBox resource group" {
     BeforeAll {
         $ResourceGroupName = $env:resourceGroup
     }
-    It "should have 27 resources or more" {
-        (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 27
+    It "should have 79 resources or more" {
+        (Get-AzResource -ResourceGroupName $ResourceGroupName).count | Should -BeGreaterOrEqual 79
     }
 }
 
