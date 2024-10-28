@@ -231,16 +231,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
     vmAutologon: vmAutologon
-  }
-}
-module adx 'data/dataExplorer.bicep' = {
-  name: 'adxDeployment'
-  params: {
-    adxClusterName: adxClusterName
-    location: location
-    eventHubResourceId: eventHub.outputs.eventHubResourceId
-    eventHubName: eventHubName
-    eventHubNamespaceName: eventHubNamespaceName
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
