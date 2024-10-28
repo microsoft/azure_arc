@@ -136,8 +136,15 @@ function Deploy-AIO-M2 {
         # Create user-assigned identity for AIO secrets management
         Write-Host "Create user-assigned identity for AIO secrets management" -ForegroundColor DarkGray
         Write-Host "`n"
-        $userAssignedManagedIdentityName = "aio-${clusterName}-${namingGuid}-kv-identity"
-        $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
+        $userAssignedManagedIdentityKvName = "aio-${clusterName}-${namingGuid}-kv-identity"
+        $userAssignedMIKvResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityKvName -o tsv --query id)
+
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityCloudName = "aio-${clusterName}-${namingGuid}-cloud-identity"
+        $userAssignedMICloudResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityCloudName -o tsv --query id)
+
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
@@ -200,6 +207,7 @@ function Deploy-AIO-M2 {
                 --cluster $arcClusterName.toLower() `
                 --resource-group $resourceGroup `
                 --add-insecure-listener `
+                --enable-rsync `
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -233,19 +241,14 @@ function Deploy-AIO-M2 {
         Write-Host "`n"
         az iot ops identity assign --name $arcClusterName.toLower() `
             --resource-group $resourceGroup `
-            --mi-user-assigned $userAssignedMIResourceId
+            --mi-user-assigned $userAssignedMIKvResourceId
 
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
-        # Create user-assigned identity for AIO secrets management
-        Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
-        Write-Host "`n"
-        $userAssignedManagedIdentityName = "aio-${clusterName}-${namingGuid}-cloud-identity"
-        $userAssignedMIResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityName -o tsv --query id)
 
         az iot ops secretsync enable --name $arcClusterName.toLower() `
             --resource-group $resourceGroup `
-            --mi-user-assigned $userAssignedMIResourceId `
+            --mi-user-assigned $userAssignedMICloudResourceId `
             --kv-resource-id $keyVaultId `
             --only-show-errors
 
