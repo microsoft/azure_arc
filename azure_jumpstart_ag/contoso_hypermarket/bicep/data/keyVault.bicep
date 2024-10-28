@@ -13,6 +13,9 @@ param akvSku string = 'standard'
 @description('Azure Key Vault tenant ID')
 param tenantId string = subscription().tenantId
 
+@description('Azure service principal object id')
+param spnObjectId string
+
 @description('Secret name')
 param aioPlaceHolder string = 'azure-iot-operations'
 
@@ -24,6 +27,16 @@ param resourceTags object = {
   Project: 'Jumpstart_azure_aio'
 }
 
+resource userAssignedManagedIdentitySeattle 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+  name: 'aio-seattle-identity'
+  location: location
+}
+
+resource userAssignedManagedIdentityChicago 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+  name: 'aio-chicago-identity'
+  location: location
+}
+
 resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: akvNameSite1
   location: location
@@ -33,7 +46,7 @@ resource akv 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
-    accessPolicies: []
+    enableRbacAuthorization: true
     enableSoftDelete: false
     tenantId: tenantId
   }
@@ -56,7 +69,7 @@ resource akv2 'Microsoft.KeyVault/vaults@2023-02-01' = {
       name: akvSku
       family: 'A'
     }
-    accessPolicies: []
+    enableRbacAuthorization: true
     enableSoftDelete: false
     tenantId: tenantId
   }
@@ -67,5 +80,44 @@ resource aioSecretPlaceholder2 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = 
   parent: akv2
   properties: {
     value: aioPlaceHolderValue
+  }
+}
+
+// Add role assignment for the SPN: Key Vault Secrets Officer
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(spnObjectId, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+  scope: resourceGroup()
+  properties: {
+    principalId: spnObjectId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+    principalType: 'ServicePrincipal'
+    description: 'Key Vault Secrets Officer'
+
+  }
+}
+
+// Add role assignment for the SPN: Key Vault Secrets Officer
+resource roleAssignmentAIOSeattle 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(userAssignedManagedIdentitySeattle.name, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+  scope: resourceGroup()
+  properties: {
+    principalId: userAssignedManagedIdentitySeattle.properties.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+    principalType: 'ServicePrincipal'
+    description: 'Key Vault Secrets Officer'
+
+  }
+}
+
+// Add role assignment for the SPN: Key Vault Secrets Officer
+resource roleAssignmentAIOChicago 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(userAssignedManagedIdentityChicago.name, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+  scope: resourceGroup()
+  properties: {
+    principalId: userAssignedManagedIdentityChicago.properties.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+    principalType: 'ServicePrincipal'
+    description: 'Key Vault Secrets Officer'
+
   }
 }

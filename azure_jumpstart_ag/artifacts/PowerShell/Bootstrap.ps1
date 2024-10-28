@@ -27,9 +27,10 @@ param (
   [string]$scenario,
   [string]$customLocationRPOID,
   [string]$aioStorageAccountName,
-  [string]$stcontainerName,
   [string]$k3sArcClusterName,
-  [string]$k3sArcDataClusterName
+  [string]$k3sArcDataClusterName,
+  [string]$openAIEndpoint,
+  [string]$speachToTextEndpoint
 )
 
 ##############################################################
@@ -67,9 +68,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('scenario', $scenario, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('customLocationRPOID', $customLocationRPOID, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aioStorageAccountName', $aioStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stcontainerName', $stcontainerName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcDataClusterName', $k3sArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('openAIEndpoint', $openAIEndpoint, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('speachToTextEndpoint', $speachToTextEndpoint, [System.EnvironmentVariableTarget]::Machine)
 
 $ErrorActionPreference = 'Continue'
 
@@ -269,7 +271,7 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipRbac.yml") -OutFile "$AgToolsDir\kubeVipRbac.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/kubernetes/K3s/kubeVipDaemon.yml") -OutFile "$AgToolsDir\kubeVipDaemon.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/Bookmarks-contoso-hypermarket") -OutFile "$AgToolsDir\Bookmarks"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
+  #Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mq_cloudConnector.yml") -OutFile "$AgToolsDir\mq_cloudConnector.yml"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/settings/mqtt_explorer_settings.json") -OutFile "$AgToolsDir\mqtt_explorer_settings.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-workloads.json") -OutFile "$AgMonitoringDir\grafana-app-workloads.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"

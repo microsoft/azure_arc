@@ -1351,9 +1351,17 @@ function Set-MQTTIpAddress {
         do {
             $mqttIp = kubectl get service $mqListenerService -n $aioNamespace -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
             $services = kubectl get pods -n $aioNamespace -o json | ConvertFrom-Json
-            $matchingServices = $services.items | Where-Object {
-                $_.metadata.name -match "aio-mq-dmqtt" -and
-                $_.status.phase -notmatch "running"
+            if($scenario -ne 'contoso_hypermarket'){
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-mq-dmqtt" -and
+                    $_.status.phase -notmatch "running"
+                }
+            }
+            else{
+                $matchingServices = $services.items | Where-Object {
+                    $_.metadata.name -match "aio-operator" -and
+                    $_.status.phase -notmatch "Running"
+                }
             }
             Write-Host "[$(Get-Date -Format t)] INFO: Waiting for MQTT services to initialize and the service Ip address to be assigned...Waiting for 20 seconds" -ForegroundColor DarkGray
             Start-Sleep -Seconds 20
