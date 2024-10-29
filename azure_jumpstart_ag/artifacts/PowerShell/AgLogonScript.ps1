@@ -51,7 +51,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:spnObjectId = $Env:spnObjectId
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:aioNamespace = "azure-iot-operations"
-    $global:mqListenerService = "aio-broker"
+    $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
     $global:stagingStorageAccountName = $Env:stagingStorageAccountName
     $global:aioStorageAccountName = $Env:aioStorageAccountName
@@ -246,6 +246,13 @@ Deploy-Workbook "arc-osperformance-workbook.bicep"
 #####################################################################
 if($scenario -eq "contoso_motors"){
     Deploy-ADXDashboardReports
+}
+
+#####################################################################
+# Deploy Microsoft Fabric
+#####################################################################
+if($scenario -eq "contoso_hypermarket"){
+    Set-MicrosoftFabric
 }
 
 ##############################################################

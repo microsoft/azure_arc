@@ -104,7 +104,7 @@ function Set-K3sClusters {
             kubectl apply -f $kubeVipRbac
 
             $kubeVipDaemonset = "$($Agconfig.AgDirectories.AgToolsDir)\kubeVipDaemon.yml"
-          (Get-Content -Path $kubeVipDaemonset) -replace 'k3sVIPPlaceholder', "$k3sVIP" | Set-Content -Path $kubeVipDaemonset
+            (Get-Content -Path $kubeVipDaemonset) -replace 'k3sVIPPlaceholder', "$k3sVIP" | Set-Content -Path $kubeVipDaemonset
             kubectl apply -f $kubeVipDaemonset
 
             Write-Host "Deploying Kube vip cloud controller on k3s cluster"
@@ -134,6 +134,18 @@ function Deploy-AIO-M2 {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for AIO secrets management" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityKvName = "aio-${clusterName}-${namingGuid}-kv-identity"
+        $userAssignedMIKvResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityKvName -o tsv --query id)
+
+        # Create user-assigned identity for AIO secrets management
+        Write-Host "Create user-assigned identity for cloud connections" -ForegroundColor DarkGray
+        Write-Host "`n"
+        $userAssignedManagedIdentityCloudName = "aio-${clusterName}-${namingGuid}-cloud-identity"
+        $userAssignedMICloudResourceId = $(az identity create -g $resourceGroup -n $userAssignedManagedIdentityCloudName -o tsv --query id)
+
         kubectx $clusterName
         $arcClusterName = $AgConfig.SiteConfig[$clusterName].ArcClusterName + "-$namingGuid"
         $keyVaultId = (az keyvault list -g $resourceGroup --resource-type vault --query "[$kvIndex].id" -o tsv)
@@ -169,7 +181,6 @@ function Deploy-AIO-M2 {
                 --resource-group $resourceGroup `
                 --sr-resource-id $schemaId `
                 --only-show-errors
-            #az iot ops init --cluster $arcClusterName.toLower() -g $resourceGroup --kv-id $keyVaultId --sp-app-id $spnClientId --sp-secret $spnClientSecret --sp-object-id $spnObjectId --mq-service-type loadBalancer --mq-insecure true --simulate-plc false --no-block --only-show-errors
             if ($? -eq $false) {
                 $aioStatus = "notDeployed"
                 Write-Host "`n"
@@ -195,7 +206,7 @@ function Deploy-AIO-M2 {
             az iot ops create --name $arcClusterName.toLower() `
                 --cluster $arcClusterName.toLower() `
                 --resource-group $resourceGroup `
-                --broker-listener-type LoadBalancer `
+                --add-insecure-listener `
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -206,7 +217,7 @@ function Deploy-AIO-M2 {
                 az iot ops create --name $arcClusterName.toLower() `
                     --cluster $arcClusterName.toLower() `
                     --resource-group $resourceGroup `
-                    --broker-listener-type LoadBalancer `
+                    --add-insecure-listener `
                     --only-show-errors
                 $retryCount++
             }
@@ -218,7 +229,7 @@ function Deploy-AIO-M2 {
         # Configure the Azure IoT Operations instance for secret synchronization
         Write-Host "[$(Get-Date -Format t)] INFO: Configuring the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
-        $userAssignedMIResourceId = (az identity show -g $resourceGroup -n "aio-$clusterName-identity" --query id -o tsv --only-show-errors)
+
         # Enable OIDC issuer and workload identity on the Arc-enabled cluster
         az connectedk8s update -n $arcClusterName `
             --resource-group $resourceGroup `
@@ -229,16 +240,73 @@ function Deploy-AIO-M2 {
         Write-Host "`n"
         az iot ops identity assign --name $arcClusterName.toLower() `
             --resource-group $resourceGroup `
-            --mi-user-assigned $userAssignedMIResourceId
+            --mi-user-assigned $userAssignedMIKvResourceId
+
+        Start-Sleep -Seconds 60
 
         Write-Host "[$(Get-Date -Format t)] INFO: Configure the Azure IoT Operations instance for secret synchronization" -ForegroundColor DarkGray
         Write-Host "`n"
+
         az iot ops secretsync enable --name $arcClusterName.toLower() `
-            --resource-group $resourceGroup `
-            --mi-user-assigned $userAssignedMIResourceId `
             --kv-resource-id $keyVaultId `
+            --resource-group $resourceGroup `
+            --mi-user-assigned $userAssignedMICloudResourceId `
             --only-show-errors
 
         $kvIndex++
+    }
+}
+
+function Set-MicrosoftFabric {
+    # Load Agconfig
+    $fabricWorkspacePrefix = $AgConfig.FabricConfig["WorkspacePrefix"]
+    $fabricWorkspaceName = "$fabricWorkspacePrefix-$namingGuid"
+    $fabricFolder = $AgConfig.AgDirectories["AgFabric"]
+    $runFabricSetupAs = $AgConfig.FabricConfig["RunFabricSetupAs"]
+    $fabricConfigFile = "$fabricFolder\fabric-config.json"
+    $eventHubKeyName = $AgConfig.FabricConfig["EventHubSharedAccessKeyName"]
+
+    # Get Fabric capacity name from the resource group
+    $fabricCapacityName = (az fabric capacity list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $fabricCapacityName) {
+        Write-Error "Fabric capacity not found in the resource group $Env:resourceGroup"
+        return
+    }
+
+    # Get EventHub namespace created in the resource group
+    $eventHubNS = (az eventhubs namespace list --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $eventHubNS) {
+        Write-Error "EventHub namespaces not found in the resource group $Env:resourceGroup"
+        return
+    }
+
+    # Get EventHub name from the eventhub namespace created in the resource group
+    $eventHubName = (az eventhubs eventhub list --namespace $eventHubNS --resource-group $Env:resourceGroup --query "[0].name" -o tsv)
+    if (-not $eventHubName) {
+        Write-Error "No Event Hub created in the EventHub namespace $eventHubNS"
+        return
+    }
+
+    $configJson = @"
+    {
+        "tenantID": "$Env:spnTenantId",
+        "runAs": "$runFabricSetupAs",
+        "azureLocation": "$Env:azureLocation",
+        "resourceGroup": "$Env:resourceGroup",
+        "fabricCapacityName": "$fabricCapacityName",
+        "templateBaseUrl": "$Env:templateBaseUrl",
+        "fabricWorkspaceName": "$fabricWorkspaceName",
+        "eventHubKeyName": "$eventHubKeyName"
+    }
+"@
+
+    $configJson | Set-Content -Path $fabricConfigFile
+    Write-Host "Fabric config file created at $fabricConfigFile"
+
+    # Download Fabric workspace setup script from GitHuB
+    $scriptFilePath = "$fabricFolder\SetupFabricWorkspace.ps1"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/PowerShell/SetupFabricWorkspace.ps1") -OutFile $scriptFilePath
+    if (-not (Test-Path -Path $scriptFilePath)) {
+        Write-Error "Unable to download script file: 'SetupFabricWorkspace.ps1' from GitHub"
     }
 }
