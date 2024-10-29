@@ -288,6 +288,26 @@ if($scenario -eq "contoso_supermarket"){
     Get-Job -name images-cache-cleanup | Remove-Job
 }
 
+# Create desktop shortcut for Logs-folder
+$WshShell = New-Object -comObject WScript.Shell
+$LogsPath = "C:\Ag\Logs"
+$Shortcut = $WshShell.CreateShortcut("$Env:USERPROFILE\Desktop\Logs.lnk")
+$Shortcut.TargetPath = $LogsPath
+$shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Configure Windows Terminal as the default terminal application
+$registryPath = "HKCU:\Console\%%Startup"
+
+if (Test-Path $registryPath) {
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+} else {
+    New-Item -Path $registryPath -Force | Out-Null
+    Set-ItemProperty -Path $registryPath -Name "DelegationConsole" -Value "{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+    Set-ItemProperty -Path $registryPath -Name "DelegationTerminal" -Value "{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+}
+
 
 # Removing the LogonScript Scheduled Task
 Write-Host "[$(Get-Date -Format t)] INFO: Removing scheduled logon task so it won't run on next login." -ForegroundColor Gray
