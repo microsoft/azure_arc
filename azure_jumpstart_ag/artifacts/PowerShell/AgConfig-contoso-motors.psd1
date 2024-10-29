@@ -8,6 +8,7 @@
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgIconDir         = "C:\Ag\Icons"
+        AgTestsDir        = "C:\Ag\Tests"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"
@@ -21,7 +22,6 @@
 
     # Required URLs
     URLs                    = @{
-        chocoInstallScript      = 'https://chocolatey.org/install.ps1'
         wslUbuntu               = 'https://aka.ms/wslubuntu'
         wslStoreStorage         = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
         docker                  = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
@@ -70,27 +70,29 @@
         @{name='Az.EventHub'; version="latest"}
     )
 
-    # Chocolatey packages list
-    ChocolateyPackagesList  = @(
-        'az.powershell',
-        'powershell-core',
-        'bicep',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnet-sdk',
-        'zoomit',
-        'openssl.light',
-        'mqtt-explorer',
-        'gh',
-        'python'
+    # Winget packages list
+    WingetPackagesList  = @(
+        'Microsoft.AzureCLI',
+        'Microsoft.PowerShell',
+        'Microsoft.Bicep',
+        'Kubernetes.kubectl',
+        'Microsoft.Edge',
+        'Microsoft.Azure.AZCopy.10',
+        'Microsoft.AzureDataStudio',
+        'Microsoft.VisualStudioCode',
+        'Microsoft.SQLServerManagementStudio',
+        'Git.Git',
+        '7zip.7zip',
+        'ahmetb.kubectx',
+        'PuTTY.PuTTY',
+        'Helm.Helm',
+        'Microsoft.DotNet.SDK.8',
+        'Microsoft.Sysinternals.ZoomIt',
+        'Microsoft.Sysinternals.BGInfo',
+        'FireDaemon.OpenSSL',
+        'thomasnordquist.MQTT-Explorer',
+        'GitHub.cli',
+        'Python.Python.3.12'
     )
 
     # Pip packages list
