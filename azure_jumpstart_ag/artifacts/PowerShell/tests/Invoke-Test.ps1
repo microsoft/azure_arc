@@ -25,18 +25,7 @@ $DeploymentStatusPath = "C:\Ag\Logs\DeploymentStatus.log"
 
 Write-Header "Exporting deployment test results to $DeploymentStatusPath"
 
-Write-Output "`n" | Out-File -FilePath $DeploymentStatusPath
-
-$asciiArt = @"
-██████╗ ███████╗██████╗ ██╗      ██████╗ ██╗   ██╗███╗   ███╗███████╗███╗   ██╗████████╗    ███████╗████████╗ █████╗ ████████╗██╗   ██╗███████╗
-██╔══██╗██╔════╝██╔══██╗██║     ██╔═══██╗╚██╗ ██╔╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██║   ██║██╔════╝
-██║  ██║█████╗  ██████╔╝██║     ██║   ██║ ╚████╔╝ ██╔████╔██║█████╗  ██╔██╗ ██║   ██║       ███████╗   ██║   ███████║   ██║   ██║   ██║███████╗
-██║  ██║██╔══╝  ██╔═══╝ ██║     ██║   ██║  ╚██╔╝  ██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║       ╚════██║   ██║   ██╔══██║   ██║   ██║   ██║╚════██║
-██████╔╝███████╗██║     ███████╗╚██████╔╝   ██║   ██║ ╚═╝ ██║███████╗██║ ╚████║   ██║       ███████║   ██║   ██║  ██║   ██║   ╚██████╔╝███████║
-╚═════╝ ╚══════╝╚═╝     ╚══════╝ ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
-"@
-
-Write-Output $asciiArt | Out-File -FilePath $DeploymentStatusPath -Append
+Write-Output "Deployment Status" | Out-File -FilePath $DeploymentStatusPath
 
 Write-Output "`nTests succeeded: $tests_passed" | Out-File -FilePath $DeploymentStatusPath -Append
 Write-Output "Tests failed: $tests_failed`n" | Out-File -FilePath $DeploymentStatusPath -Append
