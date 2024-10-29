@@ -62,12 +62,12 @@
 
     # PowerShell modules
     PowerShellModules       = @(
-        'Az.ConnectedKubernetes',
-        'Az.KubernetesConfiguration',
-        'Az.Kusto',
-        'Az.EventGrid',
-        'Az.Storage',
-        'Az.EventHub'
+        @{name='Az.ConnectedKubernetes'; version="0.10.3"},
+        @{name='Az.KubernetesConfiguration'; version="latest"},
+        @{name='Az.Kusto'; version="latest"},
+        @{name='Az.EventGrid'; version="latest"},
+        @{name='Az.Storage'; version="latest"},
+        @{name='Az.EventHub'; version="latest"}
     )
 
     # Chocolatey packages list
