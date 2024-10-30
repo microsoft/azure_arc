@@ -34,7 +34,7 @@ Describe "<cluster>" -ForEach $ArcClusterNames {
     It "Azure Arc Connected cluster is connected" {
         $connectedCluster.ConnectivityStatus | Should -Be "Connected"
     }
-    It "Azure IOT Operations targets should be successfully deployed" {
+    It "Azure IoT Operations targets should be successfully deployed" {
         foreach ($target in $aioStatus.postDeployment.targets.psobject.Properties) {
             $target.Value._all_.status | Should -BeIn @("success", "warning") -Because "Target $($target.Name) should have a successful or warning deployment status"
         }
