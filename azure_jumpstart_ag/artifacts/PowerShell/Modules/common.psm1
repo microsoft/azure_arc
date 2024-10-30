@@ -864,11 +864,11 @@ function Deploy-Prometheus {
     }
     elseif ($Env:scenario -eq "contoso_hypermarket") {
         # Update Grafana Icons
-        Copy-Item -Path $AgIconsDir\contoso-motors.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
-        Copy-Item -Path $AgIconsDir\contoso-motors.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
+        Copy-Item -Path $AgIconsDir\contoso-hypermarket.png -Destination "C:\Program Files\GrafanaLabs\grafana\public\img"
+        Copy-Item -Path $AgIconsDir\contoso-hypermarket.svg -Destination "C:\Program Files\GrafanaLabs\grafana\public\img\grafana_icon.svg"
 
         Get-ChildItem -Path 'C:\Program Files\GrafanaLabs\grafana\public\build\*.js' -Recurse -File | ForEach-Object {
-        (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso-motors.png"' | Set-Content $_.FullName
+        (Get-Content $_.FullName) -replace 'className:u,src:"public/img/grafana_icon.svg"', 'className:u,src:"public/img/contoso-hypermarket.png"' | Set-Content $_.FullName
         }
 
         # Reset Grafana UI

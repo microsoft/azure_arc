@@ -323,6 +323,8 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full-v2.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full-v2.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-stores.json") -OutFile "$AgMonitoringDir\grafana-app-stores.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.png") -OutFile $AgIconsDir\contoso-hypermarket.png
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.svg") -OutFile $AgIconsDir\contoso-hypermarket.svg
 }
 
 
