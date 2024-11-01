@@ -16,7 +16,9 @@ Install-PSResource -Name HyperVDsc -Scope AllUsers -Quiet -AcceptLicense -TrustR
 Install-PSResource -Name NetworkingDsc -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
 # Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers
+$null = Repair-WinGetPackageManager -AllUsers -Force -Latest
+
+Get-WinGetVersion
 
 Write-Output 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
