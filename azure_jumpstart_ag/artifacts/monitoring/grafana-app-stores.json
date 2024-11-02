@@ -923,7 +923,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "be2drih2vhlvkd"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1014,6 +1014,10 @@
       "pluginVersion": "11.3.0",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
           "editorMode": "code",
           "exemplar": false,
           "expr": "sum(pos_total_amount_usd_total)",
@@ -1025,7 +1029,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "be2drih2vhlvkd"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1055,7 +1059,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "be2drih2vhlvkd"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1181,6 +1185,10 @@
       "pluginVersion": "11.3.0",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
           "editorMode": "code",
           "exemplar": false,
           "expr": "sum(pos_total_amount_usd_total)",
@@ -1193,7 +1201,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "be2drih2vhlvkd"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "sum(auto_checkout_total_amount_usd_total)",
@@ -1230,8 +1238,8 @@
     "list": [
       {
         "current": {
-          "text": "seattle",
-          "value": "be2drih2vhlvkd"
+          "text": "chicago",
+          "value": "ae2dreulofdvke"
         },
         "includeAll": false,
         "label": "Store",
@@ -1245,13 +1253,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Store / Asset",
   "uid": "ed387aa7-6eac-4c48-8891-4834666ac7ce",
-  "version": 50,
+  "version": 51,
   "weekStart": ""
 }
