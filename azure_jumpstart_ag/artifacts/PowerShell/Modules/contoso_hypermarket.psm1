@@ -282,7 +282,7 @@ function Deploy-AIO-M3 {
     }
 
     # Download the bicep template
-    $dataflowBicepTemplatePath = "$($AgConfig.AgDirectories.AgTempDir)\iotDataFlows.bicep"
+    $dataflowBicepTemplatePath = "$($AgConfig.AgDirectories.AgTempDir)\dataflows.bicep"
     Invoke-WebRequest ($templateBaseUrl + "contoso_hypermarket/bicep/data/dataflows.bicep") -OutFile $dataflowBicepTemplatePath
     if (-not (Test-Path -Path $dataflowBicepTemplatePath)) {
         Write-Host "[$(Get-Date -Format t)] ERROR: $dataflowBicepTemplatePath file not found." -ForegroundColor DarkRed
@@ -435,6 +435,9 @@ function Deploy-AIO-M3 {
         # Deploy IoT DataFlows using bicep template
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying IoT DataFlows using bicep template" -ForegroundColor DarkGray
         $deploymentName = "$arcClusterName" + "-iot-dataflow"
+        $iotInstanceName = $arcClusterName.toLower()
+
+        Write-Host "[$(Get-Date -Format t)] INFO:  az deployment group create --name $deploymentName  --resource-group $resourceGroup --template-file $dataflowBicepTemplatePath --parameters aioInstanceName=$iotInstanceName evenHubNamespaceHost=$evenHubNamespaceHost eventHubName=$eventHubName customLocationName=$customLocationName"
         az deployment group create --name $deploymentName  --resource-group $resourceGroup --template-file $dataflowBicepTemplatePath `
             --parameters aioInstanceName=$iotInstanceName evenHubNamespaceHost=$evenHubNamespaceHost eventHubName=$eventHubName `
             customLocationName=$customLocationName 

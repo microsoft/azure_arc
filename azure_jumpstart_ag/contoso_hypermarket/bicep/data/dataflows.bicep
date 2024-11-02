@@ -82,7 +82,7 @@ resource iotDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflo
         sourceSettings: {
           endpointRef: defaultDataflowEndpointName
           dataSources: [
-            'iot/devices+'
+            'iot'
           ]
         }
       }
@@ -120,7 +120,7 @@ resource commercialDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/
         sourceSettings: {
           endpointRef: defaultDataflowEndpointName
           dataSources: [
-            'iot/devices'
+            'topic/commercial'
           ]
         }
       }
