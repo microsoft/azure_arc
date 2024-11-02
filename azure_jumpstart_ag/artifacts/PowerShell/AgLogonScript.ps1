@@ -215,17 +215,17 @@ if ($scenario -eq "contoso_supermarket") {
     Deploy-SupermarketConfigs
 }
 
-# if ($scenario -eq "contoso_motors") {
-#     Update-AzureIoTOpsExtension
-#     Deploy-AIO
-#     Deploy-MotorsConfigs
-#     $mqttIpArray=Set-MQTTIpAddress
-#     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-# }elseif($scenario -eq "contoso_hypermarket"){
-#     Deploy-AIO-M2
-#     $mqttIpArray=Set-MQTTIpAddress
-#     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-# }
+if ($scenario -eq "contoso_motors") {
+    Update-AzureIoTOpsExtension
+    Deploy-AIO
+    Deploy-MotorsConfigs
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}elseif($scenario -eq "contoso_hypermarket"){
+    Deploy-AIO-M2
+    $mqttIpArray=Set-MQTTIpAddress
+    Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+}
 
 ##############################################################
 # Deploy Kubernetes Prometheus Stack for Observability
