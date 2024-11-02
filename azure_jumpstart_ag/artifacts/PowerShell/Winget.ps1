@@ -12,7 +12,7 @@ Start-Transcript -Path $logFilePath -Force -ErrorAction SilentlyContinue
 Install-PSResource -Name Microsoft.WinGet.Client -Scope AllUsers -Quiet -AcceptLicense -TrustRepository
 
 # Install WinGet CLI
-$null = Repair-WinGetPackageManager -AllUsers
+$null = Repair-WinGetPackageManager -AllUsers -Force -Latest
 
 Write-Header 'Installing WinGet packages and DSC configurations'
 $winget = Join-Path -Path $env:LOCALAPPDATA -ChildPath Microsoft\WindowsApps\winget.exe
