@@ -141,7 +141,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 }
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
-  name: 'ubuntuRancherK3sDataSvcDeployment'
+  name: 'ubuntuRancherK3s2Deployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
     stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
@@ -189,7 +189,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
 }]
 
 module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
-  name: 'ubuntuRancherK3sNodesDeployment-${i}'
+  name: 'ubuntuRancherK3sNodes2Deployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
     stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
