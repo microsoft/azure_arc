@@ -333,13 +333,7 @@ function Deploy-AIO-M3 {
                 --sa-resource-id $(az storage account show --name $aioStorageAccountName --resource-group $resourceGroup -o tsv --query id) `
                 --query id -o tsv)
 
-        $customLocationName = (az resource list --resource-group $resourceGroup --resource-type "Microsoft.ExtendedLocation/customLocations" --query "[?contains(name, '$($arcClusterName.toLower())')].[name]" -o tsv)
-        if (-not $customLocationName) {
-            Write-Host "[$(Get-Date -Format t)] ERROR: Custom locaton not found for cluster $arcClusterName" -ForegroundColor DarkRed
-            return
-        }
-
-        Write-Host "[$(Get-Date -Format t)] INFO: Custom locaton '$customLocationName' found for the cluster '$arcClusterName'" -ForegroundColor DarkGray
+        $customLocationName = $arcClusterName.toLower() + "-cl"
 
         # Initialize the Azure IoT Operations instance on the Arc-enabled cluster
         Write-Host "[$(Get-Date -Format t)] INFO: Initialize the Azure IoT Operations instance on the Arc-enabled cluster" -ForegroundColor DarkGray
