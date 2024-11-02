@@ -189,7 +189,7 @@
         ProdURL    = "http://localhost:3000"
         Dashboards = @{
             "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
-            "custom"      = @('node-exporter-full-v2','cluster-global', 'app-workloads', 'app-pods', 'app-stores') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
+            "custom"      = @('node-exporter-full-v2','cluster-global', 'app-workloads', 'app-pods', 'app-stores', 'app-stores-shoppers') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
         }
     }
 
