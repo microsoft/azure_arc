@@ -322,8 +322,9 @@ elseif ($scenario -eq "contoso_hypermarket") {
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-workloads.json") -OutFile "$AgMonitoringDir\grafana-app-workloads.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-pods.json") -OutFile "$AgMonitoringDir\grafana-app-pods.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-node-exporter-full-v2.json") -OutFile "$AgMonitoringDir\grafana-node-exporter-full-v2.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-stores.json") -OutFile "$AgMonitoringDir\grafana-app-stores.json"
-  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-stores-shoppers.json") -OutFile "$AgMonitoringDir\grafana-app-stores-shoppers.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-asset.json") -OutFile "$AgMonitoringDir\grafana-app-store-asset.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-shoppers.json") -OutFile "$AgMonitoringDir\grafana-app-store-shoppers.json"
+  Invoke-WebRequest ($templateBaseUrl + "artifacts/monitoring/grafana-app-store-pos.json") -OutFile "$AgMonitoringDir\grafana-app-store-pos.json"
   Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.png") -OutFile $AgIconsDir\contoso-hypermarket.png
   Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/contoso-hypermarket.svg") -OutFile $AgIconsDir\contoso-hypermarket.svg
 }
