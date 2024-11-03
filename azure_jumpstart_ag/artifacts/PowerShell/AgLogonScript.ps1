@@ -249,12 +249,12 @@ if($scenario -eq "contoso_motors"){
     Deploy-ADXDashboardReports
 }
 
-# #####################################################################
-# # Deploy Microsoft Fabric
-# #####################################################################
-# if($scenario -eq "contoso_hypermarket"){
-#     Set-MicrosoftFabric
-# }
+#####################################################################
+# Deploy Microsoft Fabric
+#####################################################################
+if($scenario -eq "contoso_hypermarket"){
+    Set-MicrosoftFabric
+}
 
 ##############################################################
 # Creating bookmarks and setting merged kubeconfigs
