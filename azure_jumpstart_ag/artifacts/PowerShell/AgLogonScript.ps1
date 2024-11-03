@@ -222,7 +222,8 @@ if ($scenario -eq "contoso_motors") {
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }elseif($scenario -eq "contoso_hypermarket"){
-    Deploy-AIO-M2
+    #Deploy-AIO-M2
+    Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }
