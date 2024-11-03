@@ -8,6 +8,7 @@
         AgLogsDir         = "C:\Ag\Logs"
         AgVMDir           = "C:\Ag\Virtual Machines"
         AgIconDir         = "C:\Ag\Icons"
+        AgTestsDir        = "C:\Ag\Tests"
         AgToolsDir        = "C:\Tools"
         AgTempDir         = "C:\Temp"
         AgVHDXDir         = "V:\VMs"
@@ -20,7 +21,6 @@
 
     # Required URLs
     URLs                    = @{
-        chocoInstallScript      = 'https://chocolatey.org/install.ps1'
         wslUbuntu               = 'https://aka.ms/wslubuntu'
         wslStoreStorage         = 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi'
         docker                  = 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe'
@@ -59,7 +59,7 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="0.7.0b2"}
+        @{name="azure-iot-ops"; version="latest"}
     )
 
     # PowerShell modules
@@ -73,29 +73,30 @@
         @{name='powershell-yaml'; version="latest"}
     )
 
-    # Chocolatey packages list
-    ChocolateyPackagesList  = @(
-        'az.powershell',
-        'powershell-core',
-        'bicep',
-        'kubernetes-cli',
-        'vcredist140',
-        'microsoft-edge',
-        'azcopy10',
-        'vscode',
-        'git',
-        '7zip',
-        'kubectx',
-        'putty.install',
-        'kubernetes-helm',
-        'dotnet-sdk',
-        'zoomit',
-        'openssl.light',
-        'mqtt-explorer',
-        'gh',
-        'python',
-        'sql-server-management-studio',
-        'azure-data-studio'
+    # Winget packages list
+    WingetPackagesList  = @(
+        'Microsoft.AzureCLI',
+        'Microsoft.PowerShell',
+        'Microsoft.Bicep',
+        'Kubernetes.kubectl',
+        'Microsoft.Edge',
+        'Microsoft.Azure.AZCopy.10',
+        'Microsoft.VisualStudioCode',
+        'Microsoft.AzureDataStudio',
+        'Microsoft.VisualStudioCode',
+        'Microsoft.SQLServerManagementStudio',
+        'Git.Git',
+        '7zip.7zip',
+        'ahmetb.kubectx',
+        'PuTTY.PuTTY',
+        'Helm.Helm',
+        'Microsoft.DotNet.SDK.8',
+        'Microsoft.Sysinternals.ZoomIt',
+        'Microsoft.Sysinternals.BGInfo',
+        'FireDaemon.OpenSSL',
+        'thomasnordquist.MQTT-Explorer',
+        'GitHub.cli',
+        'Python.Python.3.12'
     )
 
     # Pip packages list
@@ -188,7 +189,7 @@
         ProdURL    = "http://localhost:3000"
         Dashboards = @{
             "grafana.com" = @() # Dashboards from https://grafana.com/grafana/dashboards
-            "custom"      = @('node-exporter-full-v2','cluster-global', 'app-workloads', 'app-pods', 'app-stores') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
+            "custom"      = @('node-exporter-full-v2','cluster-global', 'app-workloads', 'app-pods', 'app-store-asset', 'app-store-shoppers', 'app-store-pos') # Dashboards from https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_ag/artifacts/monitoring
         }
     }
 

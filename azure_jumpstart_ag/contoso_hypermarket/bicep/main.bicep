@@ -80,6 +80,9 @@ param acrName string = 'agacr${namingGuid}'
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
 
+@description('Enable automatic logon into Virtual Machine')
+param vmAutologon bool = true
+
 @description('The agora scenario to be deployed')
 param scenario string = 'contoso_hypermarket'
 
@@ -138,7 +141,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
 }
 
 module ubuntuRancherK3sDataSvcDeployment 'kubernetes/ubuntuRancher.bicep' = {
-  name: 'ubuntuRancherK3sDataSvcDeployment'
+  name: 'ubuntuRancherK3s2Deployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
     stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
@@ -168,7 +171,7 @@ module ubuntuRancherK3sDeployment 'kubernetes/ubuntuRancher.bicep' = {
 }
 
 module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
-  name: 'ubuntuRancherK3sDataSvcNodesDeployment-${i}'
+  name: 'ubuntuRancherK3sNodesDeployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
     stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
@@ -186,7 +189,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
 }]
 
 module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [for i in range(0, k3sClusterNodesCount): {
-  name: 'ubuntuRancherK3sNodesDeployment-${i}'
+  name: 'ubuntuRancherK3sNodes2Deployment-${i}'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
     stagingStorageAccountName: toLower(storageAccountDeployment.outputs.storageAccountName)
@@ -227,6 +230,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnObjectId: spnObjectId
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
+    vmAutologon: vmAutologon
     openAIEndpoint: azureOpenAI.outputs.openAIEndpoint
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
