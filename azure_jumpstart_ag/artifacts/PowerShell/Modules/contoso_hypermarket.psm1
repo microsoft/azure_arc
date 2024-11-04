@@ -242,7 +242,7 @@ function Deploy-AIO-M3 {
                 --custom-location $customLocationName `
                 --sr-resource-id $schemaId `
                 --enable-rsync true `
-                --add-insecure-listener true`
+                --add-insecure-listener true `
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -257,7 +257,7 @@ function Deploy-AIO-M3 {
                     --custom-location $customLocationName `
                     --sr-resource-id $schemaId `
                     --enable-rsync true `
-                    --add-insecure-listener true`
+                    --add-insecure-listener true `
                     --only-show-errors
 
                 $retryCount++
@@ -318,7 +318,8 @@ function Deploy-AIO-M3 {
         $deploymentStatus = az deployment group show --name $deploymentName --resource-group $resourceGroup --query properties.provisioningState -o tsv
         if ($deploymentStatus -eq "Succeeded") {
             Write-Host "[$(Get-Date -Format t)] INFO: Deployment succeeded for $deploymentName" -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host "[$(Get-Date -Format t)] ERROR: Deployment failed for $deploymentName" -ForegroundColor Red
         }
     }
@@ -491,14 +492,51 @@ function Deploy-HypermarketConfigs {
             }
         }
     }
+}
 
 function Set-AzureOpenAISecrets {
-    $openAIAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
-    $openAIEndpoint = $(az cognitiveservices account show --name $openAIAccountName --resource-group $resourceGroup --query properties.endpoint -o tsv)
-    $openAIKey = $(az cognitiveservices account keys list --name $openAIAccountName  --resource-group $resourceGroup --query key1 -o tsv)
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying AI services Secret to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
+        $openAIEndpoint = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoint -o tsv)
+        $openAIKey = $(az cognitiveservices account keys list --name $AIServiceAccountName  --resource-group $resourceGroup --query key1 -o tsv)
+        kubectx $clusterName
+        kubectl create secret generic azure-openai-secret `
+            --namespace=contoso-hypermarket `
+            --from-literal=azure-openai-endpoint=$openAIEndpoint `
+            --from-literal=azure-openai-api-key=$openAIKey
+    }
+}
 
-    kubectl create secret generic azure-openai-secret `
+function Set-EventHubSecrets {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying EventHub Secret to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        $eventHubNamespace = $(az eventhubs namespace list -g $resourceGroup --query [].name -o tsv)
+        $eventHubName = $(az eventhubs eventhub list -g $resourceGroup --namespace-name $eventHubNamespace --query [].name -o tsv)
+        $eventHubConnectionString = $(az eventhubs authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name RootManageSharedAccessKey --query primaryConnectionString -o tsv)
+        kubectx $clusterName
+        kubectl create secret generic azure-eventhub-secret `
         --namespace=contoso-hypermarket `
-        --from-literal=azure-openai-endpoint=$openAIEndpoint `
-        --from-literal=azure-openai-api-key=$openAIKey
+        --from-literal=azure-eventhub-connection-string=$eventHubConnectionString
+    }
+}
+
+function Set-SQLSecret {
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        Write-Host "[$(Get-Date -Format t)] INFO: Deploying SQL Secret to the $clusterName cluster" -ForegroundColor Gray
+        Write-Host "`n"
+        kubectx $clusterName
+        kubectl create secret generic azure-sqlpassword-secret `
+        --namespace=contoso-hypermarket `
+        --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+    }
+}
+
+function Set-SpeechTotextConnectionString {
+
 }
