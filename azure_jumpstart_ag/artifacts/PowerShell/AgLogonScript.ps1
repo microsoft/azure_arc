@@ -31,9 +31,9 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
-$global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
 if ($scenario -eq "contoso_supermarket") {
+    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
     $global:cosmosDBName = $Env:cosmosDBName
@@ -42,6 +42,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 }elseif ($scenario -eq "contoso_motors") {
+    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -49,6 +50,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
 }elseif ($scenario -eq "contoso_hypermarket"){
+    $global:appUpstreamRepo = "https://github.com/Azure/jumpstart-apps"
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]

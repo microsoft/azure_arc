@@ -1,15 +1,16 @@
-@description('Azure service principal client id')
+/*@description('Azure service principal client id')
 param spnClientId string
 
 @description('Azure service principal client secret')
 @secure()
 param spnClientSecret string
 
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
-
 @description('Azure service principal object id')
 param spnObjectId string
+*/
+
+@description('Azure AD tenant id for your service principal')
+param tenantId string
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -71,11 +72,6 @@ param aioStorageAccountName string = 'aiostg${namingGuid}'
 
 @description('The custom location RPO ID')
 param customLocationRPOID string
-
-@minLength(5)
-@maxLength(50)
-@description('Name of the Azure Container Registry')
-param acrName string = 'agacr${namingGuid}'
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -139,7 +135,7 @@ module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'storageAccountDeployment'
   params: {
     location: location
-    spnObjectId: spnObjectId
+    //spnObjectId: spnObjectId
   }
 }
 
@@ -216,9 +212,9 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   params: {
     windowsAdminUsername: windowsAdminUsername
     windowsAdminPassword: windowsAdminPassword
-    spnClientId: spnClientId
-    spnClientSecret: spnClientSecret
-    spnTenantId: spnTenantId
+    //spnClientId: spnClientId
+    //spnClientSecret: spnClientSecret
+    tenantId: tenantId
     workspaceName: logAnalyticsWorkspaceName
     storageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
@@ -231,7 +227,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     namingGuid: namingGuid
     scenario: scenario
     customLocationRPOID: customLocationRPOID
-    spnObjectId: spnObjectId
+    //spnObjectId: spnObjectId
     k3sArcClusterName: k3sArcClusterName
     k3sArcDataClusterName: k3sArcDataClusterName
     vmAutologon: vmAutologon
@@ -242,11 +238,11 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
 module keyVault 'data/keyVault.bicep' = {
   name: 'keyVaultDeployment'
   params: {
-    tenantId: spnTenantId
+    tenantId: tenantId
     akvNameSite1: akvNameSite1
     akvNameSite2: akvNameSite2
     location: location
-    spnObjectId: spnObjectId
+    //spnObjectId: spnObjectId
   }
 }
 
@@ -256,7 +252,7 @@ module storageAccount 'storage/storageAccount.bicep' = {
     storageAccountName: aioStorageAccountName
     location: location
     storageQueueName: storageQueueName
-    spnObjectId: spnObjectId
+    //spnObjectId: spnObjectId
   }
 }
 
@@ -283,6 +279,6 @@ module azureOpenAI 'ai/aoai.bicep' = {
     location: location
     openAIAccountName: 'openai${namingGuid}'
     azureOpenAIModels: azureOpenAIModels
-    spnObjectId: spnObjectId
+    //spnObjectId: spnObjectId
   }
 }

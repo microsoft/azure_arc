@@ -30,7 +30,7 @@ param resourceTags object = {
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Client id of the service principal')
+/*@description('Client id of the service principal')
 param spnClientId string
 
 @description('Azure service principal object id')
@@ -40,9 +40,10 @@ param spnObjectId string
 @secure()
 param spnClientSecret string
 param spnAuthority string = environment().authentication.loginEndpoint
+*/
 
 @description('Tenant id of the service principal')
-param spnTenantId string
+param tenantId string
 
 @description('Name for the environment Azure Log Analytics workspace')
 param workspaceName string
@@ -201,7 +202,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon}'
     }
   }
 }
