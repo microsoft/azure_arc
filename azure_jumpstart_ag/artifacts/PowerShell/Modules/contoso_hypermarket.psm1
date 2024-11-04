@@ -494,7 +494,7 @@ function Deploy-HypermarketConfigs {
     }
 }
 
-function Set-AzureAISecrets {
+function Set-AIServiceSecrets {
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -539,8 +539,4 @@ function Set-SQLSecret {
         --namespace=contoso-hypermarket `
         --from-literal=azure-sqlpassword-secret=$Env:adminPassword
     }
-}
-
-function Set-SpeechTotextConnectionString {
-
 }

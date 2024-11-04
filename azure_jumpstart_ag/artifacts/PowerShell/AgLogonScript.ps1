@@ -233,7 +233,9 @@ if ($scenario -eq "contoso_motors") {
     Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-    Set-AzureOpenAISecrets
+    Set-AIServiceSecrets
+    Set-EventHubSecrets
+    Set-SQLSecret
 }
 
 ##############################################################
