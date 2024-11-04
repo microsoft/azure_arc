@@ -3,7 +3,7 @@
 # data pipeline integration and dashboards 
 
 # Access rights deploy Microsoft Fabric items used in Contoso Hypermarket scenario.
-# Make sure Create Workpace is enabled in Frabric for service principals. 
+# Make sure Create Workspace is enabled in Frabric for service principals. 
 #Access settings using https://app.fabric.microsoft.com/admin-portal/tenantSettings?experience=power-bi
 
 # NOTE: To run locally create a file named fabric-config.json with the following content
