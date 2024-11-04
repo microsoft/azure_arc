@@ -242,7 +242,7 @@ function Deploy-AIO-M3 {
                 --custom-location $customLocationName `
                 --sr-resource-id $schemaId `
                 --enable-rsync true `
-                --add-insecure-listener true`
+                --add-insecure-listener true `
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -257,7 +257,7 @@ function Deploy-AIO-M3 {
                     --custom-location $customLocationName `
                     --sr-resource-id $schemaId `
                     --enable-rsync true `
-                    --add-insecure-listener true`
+                    --add-insecure-listener true `
                     --only-show-errors
 
                 $retryCount++
@@ -491,6 +491,7 @@ function Deploy-HypermarketConfigs {
             }
         }
     }
+}
 
 function Set-AzureOpenAISecrets {
     $openAIAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
