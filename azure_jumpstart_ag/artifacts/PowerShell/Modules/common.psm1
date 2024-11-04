@@ -33,7 +33,7 @@ function Deploy-AzCLI {
 
 function Deploy-AzPowerShell {
     if($scenario -eq "contoso_hypermarket"){
-        Connect-AzAccount -Identity -Tenant $Env:spnTenantId -Subscription $subscriptionId
+        Connect-AzAccount -Identity -Tenant $Env:tenantId -Subscription $subscriptionId
     }
     else {
         $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force

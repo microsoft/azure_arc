@@ -51,6 +51,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:spnObjectId = $Env:spnObjectId
 }elseif ($scenario -eq "contoso_hypermarket"){
     $global:appUpstreamRepo = "https://github.com/Azure/jumpstart-apps"
+    $global:tenantId = $Env:tenantId
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -58,7 +59,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
-    $global:spnObjectId = $Env:spnObjectId
+    #$global:spnObjectId = $Env:spnObjectId
     $global:openAIEndpoint = $Env:openAIEndpoint
     $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }
