@@ -175,8 +175,8 @@ Deploy-ClusterNamespaces
 #####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
 if($scenario -ne "contoso_hypermarket"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
     Deploy-ClusterSecrets
 }
 
@@ -190,8 +190,8 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
     Deploy-AzArcK8sAKSEE
 }
 
