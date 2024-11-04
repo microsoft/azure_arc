@@ -1,7 +1,3 @@
-param (
-  [string]$fabricConfigFile = "c:\temp\fabric-config.json"            # Used to run the script locally
-)
-
 ####################################################################################################
 # This PS script create all necessary Microsoft Fabric items to support Contoso Hypermarket 
 # data pipeline integration and dashboards 
@@ -21,6 +17,8 @@ param (
 ####################################################################################################
 $ProgressPreference = "SilentlyContinue"
 Set-PSDebug -Strict
+
+$fabricConfigFile = (Get-Location).Path + "\fabric-config.json" 
 
 #####################################################################
 # Initialize the environment
@@ -46,6 +44,8 @@ else {
 $fabricResource = "https://api.fabric.microsoft.com"          # Fabric API resource to get access tokens for authorization to Fabric
 $kustoResource = "https://api.kusto.windows.net"              # Kusto API resource to get access tokens for authorization KQL database
 $powerbiResource = "https://analysis.windows.net/powerbi/api" # Power BI API resource to get access token for authorization to Power BI 
+$script:apiUrl = "https://api.fabric.microsoft.com/v1"
+
 $global:workspaceId = ""
 $global:kqlClusterUri = ""
 
@@ -66,6 +66,13 @@ else {
 
 # Set the Azure subscription
 az account set --subscription $subscriptionID
+
+# Get access token to authorize access to Fabric APIs
+$fabricAccessToken = (az account get-access-token --resource $fabricResource --query accessToken --output tsv)  
+if ($fabricAccessToken -eq '') {
+  write-host "ERROR: Failed to get access token using managed identity."
+  return
+}
 
 function Set-Fabric-Workspace {
 
@@ -97,13 +104,6 @@ function Set-Fabric-Workspace {
 
   # Assign fabric capacity id
   $fabricCapacityId = $fabricCapacity.id
-
-  # Get access token to authorize access to Fabric APIs
-  $fabricAccessToken = (az account get-access-token --resource $fabricResource --query accessToken --output tsv)  
-  if ($fabricAccessToken -eq '') {
-    write-host "ERROR: Failed to get access token using managed identity."
-    return
-  }
 
   # Create Fabric Workspace
   $fabricWorkspacesApi = "https://api.fabric.microsoft.com/v1/workspaces"
@@ -429,6 +429,251 @@ function Set-Fabric-Workspace {
   Write-Host "INFO: Created notebook in Fabric workspace."
 }
 
+Function Invoke-FabricAPIRequest {
+  param(									
+      [Parameter(Mandatory = $false)] [string] $authToken,
+      [Parameter(Mandatory = $true)] [string] $uri,
+      [Parameter(Mandatory = $false)] [ValidateSet('Get', 'Post', 'Delete', 'Put', 'Patch')] [string] $method = "Get",
+      [Parameter(Mandatory = $false)] $body,        
+      [Parameter(Mandatory = $false)] [string] $contentType = "application/json; charset=utf-8",
+      [Parameter(Mandatory = $false)] [int] $timeoutSec = 240,        
+      [Parameter(Mandatory = $false)] [int] $retryCount = 0
+  )
+
+  $fabricHeaders = @{
+      'Content-Type'  = $contentType
+      'Authorization' = "Bearer {0}" -f $fabricAccessToken
+  }
+
+  try {
+      
+      $requestUrl = "$($script:apiUrl)/$uri"
+      Write-Verbose "Calling $requestUrl"
+      
+      $response = Invoke-WebRequest -Headers $fabricHeaders -Method $method -Uri $requestUrl -Body $body  -TimeoutSec $timeoutSec     
+      $lroFailOrNoResultFlag = $false
+      if ($response.StatusCode -eq 202) {
+          do {                
+              $asyncUrl = [string]$response.Headers.Location
+              Write-Host "Waiting for request to complete. Sleeping..."
+
+              Start-Sleep -Seconds 5
+              $response = Invoke-WebRequest -Headers $fabricHeaders -Method Get -Uri $asyncUrl
+              $lroStatusContent = $response.Content | ConvertFrom-Json
+          }
+          while ($lroStatusContent.status -ine "succeeded" -and $lroStatusContent.status -ine "failed")
+
+          if ($lroStatusContent.status -ieq "succeeded") {
+              $resultUrl = [string]$response.Headers.Location
+              if ($resultUrl) {
+                  $response = Invoke-WebRequest -Headers $fabricHeaders -Method Get -Uri $resultUrl    
+              }
+              else {
+                  $lroFailOrNoResultFlag = $true
+              }
+          }
+          else {
+              $lroFailOrNoResultFlag = $true
+              if ($lroStatusContent.error) {
+                  throw "LRO API Error: '$($lroStatusContent.error.errorCode)' - $($lroStatusContent.error.message)"
+              }
+          }
+      }
+
+      #if ($response.StatusCode -in @(200,201) -and $response.Content)        
+      if (!$lroFailOrNoResultFlag -and $response.Content) {            
+          $contentBytes = $response.RawContentStream.ToArray()
+
+          # Test for BOM
+          if ($contentBytes[0] -eq 0xef -and $contentBytes[1] -eq 0xbb -and $contentBytes[2] -eq 0xbf) {
+              $contentText = [System.Text.Encoding]::UTF8.GetString($contentBytes[3..$contentBytes.Length])                
+          }
+          else {
+              $contentText = $response.Content
+          }
+
+          $jsonResult = $contentText | ConvertFrom-Json
+          if ($jsonResult.value) {
+              $jsonResult = $jsonResult.value
+          }
+
+          Write-Output $jsonResult -NoEnumerate
+      }        
+  }
+  catch {
+      $response = $_.Exception.Response
+  }
+}
+
+
+Function Import-FabricItem {
+  param
+  (
+      [Parameter(Mandatory)]
+      [string]$path,
+
+      [Parameter(Mandatory)]
+      [string]$workspaceId,
+      
+      [hashtable]$itemProperties,
+      [switch]$skipIfExists
+  )
+
+  # Search for folders with .pbir and .pbism in it
+  $itemsInFolder = Get-ChildItem -LiteralPath $path | ? { @(".pbism", ".pbir") -contains $_.Extension }
+
+  if ($itemsInFolder.Count -eq 0) {
+      Write-Host "Cannot find valid item definitions (*.pbir; *.pbism) in the '$path'"
+      return
+  }    
+
+  if ($itemsInFolder | ? { $_.Extension -ieq ".pbir" }) {
+      $itemType = "Report"
+  }
+  elseif ($itemsInFolder | ? { $_.Extension -ieq ".pbism" }) {
+      $itemType = "SemanticModel"
+  }
+  else {
+      throw "Cannot determine the itemType."
+  }
+  
+  # Get existing items of the workspace
+  $items = Invoke-FabricAPIRequest -Uri "workspaces/$workspaceId/items" -Method Get
+
+  Write-Host "Existing items in the workspace: $($items.Count)"
+  $files = Get-ChildItem -LiteralPath $path -Recurse -Attributes !Directory
+
+  # Remove files not required for the API: item.*.json; cache.abf; .pbi folder
+  $files = $files | ? { $_.Name -notlike "item.*.json" -and $_.Name -notlike "*.abf" -and $_.Directory.Name -notlike ".pbi" }        
+
+  # Prioritizes reading the displayName and type from itemProperties parameter    
+  $displayName = $null
+  if ($itemProperties -ne $null) {            
+      $displayName = $itemProperties.displayName         
+  }
+
+  # Try to read the item properties from the .platform file if not found in itemProperties
+  if ((!$itemType -or !$displayName) -and (Test-Path -LiteralPath "$path\.platform")) {            
+      $itemMetadataStr = Get-Content -LiteralPath "$path\.platform"
+
+      $itemMetadata = $itemMetadataStr | ConvertFrom-Json
+      $itemType = $itemMetadata.metadata.type
+      $displayName = $itemMetadata.metadata.displayName
+  }
+
+  if (!$itemType -or !$displayName) {
+      throw "Cannot import item if any of the following properties is missing: itemType, displayName"
+  }
+
+  $itemPathAbs = Resolve-Path -LiteralPath $path
+  $parts = $files |% {
+      $filePath = $_.FullName
+      if ($filePath -like "*.pbir") {
+          $fileContentText = Get-Content -LiteralPath $filePath
+          $pbirJson = $fileContentText | ConvertFrom-Json
+
+          $datasetId = $itemProperties.semanticModelId
+          if ($datasetId -or ($pbirJson.datasetReference.byPath -and $pbirJson.datasetReference.byPath.path)) {
+              if (!$datasetId) {
+                  throw "Cannot import directly a report using byPath connection. You must first resolve the semantic model id and pass it through the 'itemProperties.semanticModelId' parameter."
+              }
+              else {
+                  Write-Host "Binding to semantic model: $datasetId"
+              }
+
+              $pbirJson.datasetReference.byPath = $null
+              $pbirJson.datasetReference.byConnection = @{
+                  "connectionString"          = $null                
+                  "pbiServiceModelId"         = $null
+                  "pbiModelVirtualServerName" = "sobe_wowvirtualserver"
+                  "pbiModelDatabaseName"      = "$datasetId"                
+                  "name"                      = "EntityDataSource"
+                  "connectionType"            = "pbiServiceXmlaStyleLive"
+              }
+
+              $newPBIR = $pbirJson | ConvertTo-Json            
+              $fileContent = [system.Text.Encoding]::UTF8.GetBytes($newPBIR)
+          }
+          # if its byConnection then just send original
+          else {
+              $fileContent = [system.Text.Encoding]::UTF8.GetBytes($fileContentText)
+          }
+      }
+      else {
+          $fileContent = Get-Content -LiteralPath $filePath -AsByteStream -Raw
+      }
+      
+      $partPath = $filePath.Replace($itemPathAbs, "").TrimStart("\").Replace("\", "/")
+      $fileEncodedContent = ($fileContent) ? [Convert]::ToBase64String($fileContent) : ""
+      
+      Write-Output @{
+          Path        = $partPath
+          Payload     = $fileEncodedContent
+          PayloadType = "InlineBase64"
+      }
+  }
+
+  Write-Host "Payload parts:"        
+
+  $parts | % { Write-Host "part: $($_.Path)" }
+  $itemId = $null
+
+  # Check if there is already an item with same displayName and type
+  $foundItem = $items | ? { $_.type -ieq $itemType -and $_.displayName -ieq $displayName }
+  if ($foundItem) {
+      if ($foundItem.Count -gt 1) {
+          throw "Found more than one item for displayName '$displayName'"
+      }
+
+      Write-Host "Item '$displayName' of type '$itemType' already exists." -ForegroundColor Yellow
+      $itemId = $foundItem.id
+  }
+
+  if ($itemId -eq $null) {
+      write-host "Creating a new item"
+      # Prepare the request                    
+      $itemRequest = @{ 
+          displayName = $displayName
+          type        = $itemType    
+          definition  = @{
+              Parts = $parts
+          }
+      } | ConvertTo-Json -Depth 3		
+
+      $createItemResult = Invoke-FabricAPIRequest -uri "workspaces/$workspaceId/items"  -method Post -body $itemRequest
+      $itemId = $createItemResult.id
+
+      write-host "Created a new item with ID '$itemId' $([datetime]::Now.ToString("s"))" -ForegroundColor Green
+      Write-Output @{
+          "id"          = $itemId
+          "displayName" = $displayName
+          "type"        = $itemType 
+      }
+  }
+  else {
+      if ($skipIfExists) {
+          write-host "Item '$displayName' of type '$itemType' already exists. Skipping." -ForegroundColor Yellow
+      }
+      else {
+          write-host "Updating item definition"
+          $itemRequest = @{ 
+              definition = @{
+                  Parts = $parts
+              }			
+          } | ConvertTo-Json -Depth 3		
+          
+          Invoke-FabricAPIRequest -Uri "workspaces/$workspaceId/items/$itemId/updateDefinition" -Method Post -Body $itemRequest
+          write-host "Updated item with ID '$itemId' $([datetime]::Now.ToString("s"))" -ForegroundColor Green
+      }
+
+      Write-Output @{
+          "id"          = $itemId
+          "displayName" = $displayName
+          "type"        = $itemType 
+      }
+  }
+}
+
 # Function to import Power BI reports into Fabric workspace
 function Set-PowerBI-Project {
   # Parameters 
@@ -437,24 +682,13 @@ function Set-PowerBI-Project {
   # Download PowerBI report zip file
   $localFilePath = "$pbipFolder\Contoso-Hypermarket.zip"
   Write-Host "INFO: Downloading Power BI report zip file."
-  Invoke-WebRequest -Uri "$templateBaseUrl" + "artifacts/fabric/Contoso-Hypermarket.zip" -OutFile $localFilePath
+  Invoke-WebRequest -Uri "$templateBaseUrl/artifacts/fabric/Contoso-Hypermarket.zip" -OutFile $localFilePath
 
   Write-Host "INFO: Unzipping Power BI report zip file."
   Expand-Archive -Path $localFilePath -DestinationPath $pbipFolder -Force
 
   $pbipSemanticModelPath = "$pbipFolder\Contoso-Hypermarket.SemanticModel"
   $pbipReportPath = "$pbipFolder\Contoso-Hypermarket.Report"
-
-  # Download modules and install
-  New-Item -ItemType Directory -Path ".\modules" -ErrorAction SilentlyContinue | Out-Null
-  @("https://raw.githubusercontent.com/microsoft/Analysis-Services/master/pbidevmode/fabricps-pbip/FabricPS-PBIP.psm1"
-  , "https://raw.githubusercontent.com/microsoft/Analysis-Services/master/pbidevmode/fabricps-pbip/FabricPS-PBIP.psd1") |% {
-      Invoke-WebRequest -Uri $_ -OutFile ".\modules\$(Split-Path $_ -Leaf)"
-  }
-  if(-not (Get-Module Az.Accounts -ListAvailable)) { 
-      Install-Module Az.Accounts -Scope CurrentUser -Force
-  }
-  Import-Module ".\modules\FabricPS-PBIP" -Force
 
   # Update KQL endpoint 
   $modelFilePath = "$pbipSemanticModelPath\model.bim"
@@ -463,9 +697,6 @@ function Set-PowerBI-Project {
   Write-Host "INFO: Replace KQL cluster URI in the semantic model."
   (Get-Content -Path $modelFilePath) -replace '{{FABRIC_KQL_CLUSTER_URI}}', $global:kqlClusterUri | Set-Content -Path $modelFilePath
 
-  # Authenticate to fabric
-  Set-FabricAuthToken -reset
-
   # Import the semantic model and save the item id
   Write-Host "INFO: Import the semantic model and save the item id."
   $semanticModelImport = Import-FabricItem -workspaceId $global:workspaceId -path $pbipSemanticModelPath
@@ -473,7 +704,7 @@ function Set-PowerBI-Project {
 
   # Import the report and ensure its binded to the previous imported report
   Write-Host "INFO: Import the PowerBI report and save the item id."
-  $reportImport = Import-FabricItem -workspaceId $fabricWorkspaceId -path $pbipReportPath -itemProperties @{"semanticModelId" = $semanticModelImport.Id}
+  $reportImport = Import-FabricItem -workspaceId $global:workspaceId -path $pbipReportPath -itemProperties @{"semanticModelId" = $semanticModelImport.Id}
   Write-Host "INFO: Imported PowerBI report with the item id $($reportImport.id)"
 }
 
