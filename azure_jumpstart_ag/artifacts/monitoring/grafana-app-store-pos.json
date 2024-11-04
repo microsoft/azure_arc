@@ -117,6 +117,13 @@
             "regex": "(.*)_(.*)",
             "renamePattern": "$1 $2"
           }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
         }
       ],
       "type": "bargauge"
@@ -202,6 +209,22 @@
         }
       ],
       "title": "PoS Errors (by failure type)",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
       "type": "bargauge"
     },
     {
@@ -1078,6 +1101,6 @@
   "timezone": "browser",
   "title": "Store / Point-of-Sale (PoS) Assets Health",
   "uid": "49b00f42-7d2d-47bb-b654-3d61ca9f8d6d",
-  "version": 7,
+  "version": 9,
   "weekStart": ""
 }
