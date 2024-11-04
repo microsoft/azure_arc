@@ -91,7 +91,8 @@ function Merge-K3sConfigFiles {
 
 function Set-K3sClusters {
     Write-Host "Configuring kube-vip on K3s clusters"
-    az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+    #az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+    az login --identity
     az account set -s $subscriptionId
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         if ($cluster.Value.Type -eq "k3s") {
@@ -261,7 +262,7 @@ function Deploy-AIO-M3 {
     Write-Host "[$(Get-Date -Format t)] INFO: Deploying AIO to the Arc-enabled clusters" -ForegroundColor Gray
     Write-Host "`n"
 
-    # Get Event Hub details from the resource group to assign role permissions to IoT Operations extension managed 
+    # Get Event Hub details from the resource group to assign role permissions to IoT Operations extension managed
     $eventHubInfo = (az resource list --resource-group $resourceGroup --resource-type "Microsoft.EventHub/namespaces" | ConvertFrom-Json)
     if ($eventHubInfo.Count -ne 1) {
         Write-Host "ERROR: Resource group contains no Eventhub namespaces or more than one. Make sure to have only one EventHub namesapce in the resource group." -ForegroundColor DarkRed
@@ -272,7 +273,7 @@ function Deploy-AIO-M3 {
     $evenHubNamespaceHost = "$($eventHubInfo[0].name).servicebus.windows.net:9093"
 
     Write-Host "INFO: Found EventHub Namespace with Resource ID: $eventHubNamespaceId" -ForegroundColor DarkGray
-    
+
     # Get Event Hub from the Event Hub namespace
     $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
     $eventHubName = $eventHubs[0].name

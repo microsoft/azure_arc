@@ -209,5 +209,50 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
   }
 }
 
+// Add role assignment for the VM: Azure Key Vault Secret Officer role
+resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Administrator')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
+    principalType: 'ServicePrincipal'
+
+  }
+}
+
+// Add role assignment for the VM: Owner role
+resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add role assignment for the VM: Storage Blob Data Contributor
+resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add role assignment for the VM: Cognitive Services OpenAI Contributor
+resource vmRoleAssignment_OpenAI 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Cognitive Services OpenAI Contributor')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'a001fd3d-188f-4b5d-821b-7da978bf7442')
+    principalType: 'ServicePrincipal'
+  }
+}
+
 output adminUsername string = windowsAdminUsername
 output publicIP string = deployBastion == false ? concat(publicIpAddress.properties.ipAddress) : ''

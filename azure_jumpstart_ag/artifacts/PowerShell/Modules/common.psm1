@@ -32,9 +32,15 @@ function Deploy-AzCLI {
 }
 
 function Deploy-AzPowerShell {
-    $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-    $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-    Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+    if($scenario -eq "contoso_hypermarket"){
+        Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+    }
+    else {
+        $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+        $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+        Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal -Subscription $subscriptionId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
+    }
+
     Set-AzContext -Subscription $subscriptionId
 
     # Making module install dynamic
@@ -523,7 +529,12 @@ function Deploy-VirtualizationInfrastructure {
 }
 
 function Deploy-AzContainerRegistry {
-    az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+    if($scenario -eq "contoso_hypermarket"){
+        az login --identity
+    }
+    else {
+        az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+    }
     az account set -s $Env:subscriptionId
     az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksStagingClusterName --admin | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
     kubectx staging="$Env:aksStagingClusterName-admin" | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\ClusterSecrets.log")
@@ -619,6 +630,7 @@ function Deploy-AzArcK8sAKSEE {
         $tenantId = $Env:spnTenantId
         $location = $Env:azureLocation
         $resourceGroup = $Env:resourceGroup
+        $subscriptionId = $Env:subscriptionId
 
         Invoke-Command -VMName $VM -Credential $Credentials -ScriptBlock {
             # Install prerequisites
@@ -632,9 +644,13 @@ function Deploy-AzArcK8sAKSEE {
             Install-Module Az.ConnectedMachine -Force -AllowClobber -ErrorAction Stop
 
             # Connect servers to Arc
-            $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
-            $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
-            Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
+            if($scenario -eq "contoso_hypermarket"){
+                Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+            }else{
+                $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
+                $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)
+                Connect-AzAccount -Credential $psCred -TenantId $using:tenantId -ServicePrincipal -Subscription $using:subscriptionId
+            }
             Write-Host "[$(Get-Date -Format t)] INFO: Arc-enabling $hostname server." -ForegroundColor Gray
             Redo-Command -ScriptBlock { Connect-AzConnectedMachine -ResourceGroupName $using:resourceGroup -Name "Ag-$hostname-Host" -Location $using:location }
 
@@ -738,7 +754,12 @@ function Deploy-ClusterFluxExtension {
                 }
             }
 
-            az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+            if($scenario -eq "contoso_hypermarket"){
+                az login --identity
+            }
+            else {
+                az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId
+            }
             az account set -s $Env:subscriptionId
             $extension = az k8s-extension list --cluster-name $resourceName --resource-group $Env:resourceGroup --cluster-type $ClusterType --output json | ConvertFrom-Json
             $extension = $extension | Where-Object extensionType -eq 'microsoft.flux'
