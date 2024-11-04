@@ -145,7 +145,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     customLocationRPOID: customLocationRPOID
     scenario: scenario
     aioStorageAccountName: aioStorageAccountName
-    stcontainerName: stcontainerName
     vmAutologon: vmAutologon
   }
 }
