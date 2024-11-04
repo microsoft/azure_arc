@@ -72,5 +72,3 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 output openAIEndpoint string = filter(items(openAIAccount.properties.endpoints), endpoint => endpoint.key == 'OpenAI Language Model Instance API')[0].value
 output speechToTextEndpoint string = filter(items(openAIAccount.properties.endpoints), endpoint => endpoint.key == 'Speech Services Speech to Text')[0].value
-
-
