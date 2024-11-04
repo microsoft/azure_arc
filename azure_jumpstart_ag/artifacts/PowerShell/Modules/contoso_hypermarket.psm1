@@ -371,7 +371,8 @@ function Deploy-AIO-M3 {
                 --subscription $subscriptionId `
                 --custom-location $customLocationName `
                 --sr-resource-id $schemaId `
-                --add-insecure-listener `
+                --enable-rsync true `
+                --add-insecure-listener true`
                 --only-show-errors
 
             if ($? -eq $false) {
@@ -385,7 +386,8 @@ function Deploy-AIO-M3 {
                     --subscription $subscriptionId `
                     --custom-location $customLocationName `
                     --sr-resource-id $schemaId `
-                    --add-insecure-listener `
+                    --enable-rsync true `
+                    --add-insecure-listener true`
                     --only-show-errors
 
                 $retryCount++
