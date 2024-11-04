@@ -221,7 +221,11 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           sourceAddressPrefix: '*'
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
-          destinationPortRange: '5000-5003,8001,3000'
+          destinationPortRanges: [
+            '5000-5003'
+            '8001'
+            '3000'
+          ]
         }
       }
     ]
