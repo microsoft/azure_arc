@@ -754,7 +754,7 @@ function Deploy-ClusterFluxExtension {
                 }
             }
 
-            if($scenario -eq "contoso_hypermarket"){
+            if($using:scenario -eq "contoso_hypermarket"){
                 az login --identity
             }
             else {
