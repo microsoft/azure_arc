@@ -10,7 +10,7 @@
 #
 # {
 #   "runAs": "user",                    # Indicates whether to run under regular user account or managed identity
-#   "resourceGroup": "rg-fabric",       # Resource group where Contoso Hypermaerket is deployed
+#   "resourceGroup": "rg-fabric",       # Resource group where Contoso Hypermarket is deployed
 #   "templateBaseUrl": "https://raw.githubusercontent.com/main/azure_arc/main/azure_arc_data/azure_jumpstart_ag/artifacts"
 # }
 #
