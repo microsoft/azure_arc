@@ -485,6 +485,7 @@ function Set-MicrosoftFabric {
     $configJson = @"
     {
         "tenantID": "$Env:spnTenantId",
+        "subscriptionID": "$Env:subscriptionId",
         "runAs": "$runFabricSetupAs",
         "azureLocation": "$Env:azureLocation",
         "resourceGroup": "$Env:resourceGroup",
