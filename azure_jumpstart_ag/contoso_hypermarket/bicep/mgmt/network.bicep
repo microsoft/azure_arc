@@ -393,7 +393,7 @@ resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
 }
 
 resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
-  name: 'Ag-LoadBalancer-}'
+  name: 'Ag-LoadBalancer'
   location: location
   sku: {
     name: 'Standard'
