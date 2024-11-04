@@ -62,7 +62,7 @@ function Deploy-AzPowerShell {
     }
 
     # Register Azure providers
-    if ($AgConfig.AzureProviders.Count -ne 0) {
+    if ($AgConfig.AzureProviders.Count -ne 0 -and $scenario -ne "contoso_hypermarket") {
         Write-Host "[$(Get-Date -Format t)] INFO: Registering Azure providers in the current subscription: " ($AgConfig.AzureProviders -join ', ') -ForegroundColor Gray
         foreach ($provider in $AgConfig.AzureProviders) {
             Register-AzResourceProvider -ProviderNamespace $provider | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzPowerShell.log")
