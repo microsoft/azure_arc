@@ -135,7 +135,7 @@ LAX,Los Angeles,CA,United States
   store_id = tostring(data.store_id),
   device_id = tostring(data.device_id),
   equipment_type = tostring(data.equipment_type),
-  data = data.data,
+  data = data.data
 }
 
 // Create policy

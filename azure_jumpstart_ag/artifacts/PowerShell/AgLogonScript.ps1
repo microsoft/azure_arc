@@ -224,9 +224,9 @@ if ($scenario -eq "contoso_motors") {
 }elseif($scenario -eq "contoso_hypermarket"){
     #Deploy-AIO-M2
     Deploy-AIO-M3
-    Deploy-HypermarketConfigs
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    Set-AzureOpenAISecrets
 }
 
 ##############################################################

@@ -272,7 +272,7 @@ function Deploy-AIO-M3 {
     $evenHubNamespaceHost = "$($eventHubInfo[0].name).servicebus.windows.net:9093"
 
     Write-Host "INFO: Found EventHub Namespace with Resource ID: $eventHubNamespaceId" -ForegroundColor DarkGray
-    
+
     # Get Event Hub from the Event Hub namespace
     $eventHubs = az eventhubs eventhub list --namespace-name $eventHubInfo[0].name --resource-group $resourceGroup | ConvertFrom-Json
     $eventHubName = $eventHubs[0].name
@@ -485,6 +485,7 @@ function Set-MicrosoftFabric {
     $configJson = @"
     {
         "tenantID": "$Env:spnTenantId",
+        "subscriptionID": "$Env:subscriptionId",
         "runAs": "$runFabricSetupAs",
         "azureLocation": "$Env:azureLocation",
         "resourceGroup": "$Env:resourceGroup",
@@ -505,6 +506,7 @@ function Set-MicrosoftFabric {
         Write-Error "Unable to download script file: 'SetupFabricWorkspace.ps1' from GitHub"
     }
 }
+
 function Deploy-HypermarketConfigs {
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-hypermarket.psd
@@ -618,13 +620,13 @@ function Deploy-HypermarketConfigs {
         }
     }
 
-    while ($(Get-Job -Name gitops).State -eq 'Running') {
-        #Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
-        Receive-Job -Name gitops -WarningAction SilentlyContinue
-        Start-Sleep -Seconds 60
-    }
+function Set-AzureOpenAISecrets {
+    $openAIAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
+    $openAIEndpoint = $(az cognitiveservices account show --name $openAIAccountName --resource-group $resourceGroup --query properties.endpoint -o tsv)
+    $openAIKey = $(az cognitiveservices account keys list --name $openAIAccountName  --resource-group $resourceGroup --query key1 -o tsv)
 
-    Get-Job -name gitops | Remove-Job
-    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
-    Write-Host
+    kubectl create secret generic azure-openai-secret `
+        --namespace=contoso-hypermarket `
+        --from-literal=azure-openai-endpoint=$openAIEndpoint `
+        --from-literal=azure-openai-api-key=$openAIKey
 }
