@@ -33,7 +33,7 @@ function Deploy-AzCLI {
 
 function Deploy-AzPowerShell {
     if($scenario -eq "contoso_hypermarket"){
-        Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+        Connect-AzAccount -Identity -Tenant $Env:spnTenantId -Subscription $subscriptionId
     }
     else {
         $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
@@ -645,7 +645,7 @@ function Deploy-AzArcK8sAKSEE {
 
             # Connect servers to Arc
             if($scenario -eq "contoso_hypermarket"){
-                Connect-AzAccount -Identity -Tenant $tenantId -Subscription $subscriptionId
+                Connect-AzAccount -Identity -Tenant $using:tenantId-Subscription $subscriptionId
             }else{
                 $azurePassword = ConvertTo-SecureString $using:secret -AsPlainText -Force
                 $psCred = New-Object System.Management.Automation.PSCredential($using:clientId, $azurePassword)

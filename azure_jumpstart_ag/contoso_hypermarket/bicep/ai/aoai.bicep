@@ -17,7 +17,7 @@ param spnObjectId string
 param azureOpenAIModels array = [
   {
     name: 'gpt-35-turbo'
-    version: '0125'
+    version: '0301'
   }
   {
     name: 'gpt-4o-mini'
@@ -42,8 +42,8 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
   parent: openAIAccount
   name: '${openAIAccountName}-${model.name}-deployment'
   sku: {
-    name: 'Standard'
-    capacity: 10
+    name: 'GlobalStandard'
+    capacity: 50
   }
   properties: {
     model: {
@@ -52,7 +52,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
       version: model.version
     }
     versionUpgradeOption: 'NoAutoUpgrade'
-    currentCapacity: 10
+    currentCapacity: 50
     raiPolicyName: 'Microsoft.Default'
   }
 }]
