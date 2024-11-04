@@ -219,10 +219,10 @@
 
     AppConfig = @{
         inferencing_deployment = @{
-            GitOpsConfigName = "contoso-motors"
-            KustomizationName = "contoso-motors"
-            KustomizationPath="./contoso_manufacturing/operations"
-            Namespace = "contoso-motors"
+            GitOpsConfigName = "contoso-hypermarket"
+            KustomizationName = "contoso-hypermarket"
+            KustomizationPath="./agora/contoso_hypermarket"
+            Namespace = "contoso-hypermarket"
             Order = 1
         }
     }
