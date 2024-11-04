@@ -433,6 +433,15 @@ function Set-Fabric-Workspace {
 function Set-PowerBI-Project {
   # Parameters 
   $pbipFolder = Get-Location  # Path to the folder containing Power BI project files, default to current directory
+
+  # Download PowerBI report zip file
+  $localFilePath = "$pbipFolder\Contoso-Hypermarket.zip"
+  Write-Host "INFO: Downloading Power BI report zip file."
+  Invoke-WebRequest -Uri "$templateBaseUrl" + "artifacts/fabric/Contoso-Hypermarket.zip" -OutFile $localFilePath
+
+  Write-Host "INFO: Unzipping Power BI report zip file."
+  Expand-Archive -Path $localFilePath -DestinationPath $pbipFolder -Force
+
   $pbipSemanticModelPath = "$pbipFolder\Contoso-Hypermarket.SemanticModel"
   $pbipReportPath = "$pbipFolder\Contoso-Hypermarket.Report"
 
