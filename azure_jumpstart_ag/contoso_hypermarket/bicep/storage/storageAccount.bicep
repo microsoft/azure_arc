@@ -12,8 +12,8 @@ param skuName string = 'Standard_LRS'
 
 param storageQueueName string = 'aioQueue'
 
-@description('Azure service principal object id')
-param spnObjectId string
+//@description('Azure service principal object id')
+//param spnObjectId string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
@@ -39,7 +39,7 @@ resource storageQueue 'Microsoft.Storage/storageAccounts/queueServices/queues@20
 }
 
 // Add role assignment for the SPN: Storage Blob Data Contributor
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+/*resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(spnObjectId, resourceGroup().id, 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
   scope: resourceGroup()
   properties: {
@@ -49,7 +49,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
     description: 'Storage Blob Data Contributor'
 
   }
-}
+}*/
 
 output queueName string = storageQueueName
 output storageAccountResourceId string = storageAccount.id

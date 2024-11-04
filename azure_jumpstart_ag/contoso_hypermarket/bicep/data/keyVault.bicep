@@ -13,8 +13,8 @@ param akvSku string = 'standard'
 @description('Azure Key Vault tenant ID')
 param tenantId string = subscription().tenantId
 
-@description('Azure service principal object id')
-param spnObjectId string
+//@description('Azure service principal object id')
+//param spnObjectId string
 
 @description('Secret name')
 param aioPlaceHolder string = 'azure-iot-operations'
@@ -74,7 +74,7 @@ resource aioSecretPlaceholder2 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = 
 }
 
 // Add role assignment for the SPN: Key Vault Secrets Officer
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+/*resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(spnObjectId, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
   scope: resourceGroup()
   properties: {
@@ -84,7 +84,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
     description: 'Key Vault Secrets Officer'
 
   }
-}
+}*/
 
 /*
 // Add role assignment for the SPN: Key Vault Secrets Officer
