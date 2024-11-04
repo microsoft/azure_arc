@@ -30,7 +30,7 @@ param resourceTags object = {
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Client id of the service principal')
+/*@description('Client id of the service principal')
 param spnClientId string
 
 @description('Azure service principal object id')
@@ -40,9 +40,10 @@ param spnObjectId string
 @secure()
 param spnClientSecret string
 param spnAuthority string = environment().authentication.loginEndpoint
+*/
 
 @description('Tenant id of the service principal')
-param spnTenantId string
+param tenantId string
 
 @description('Name for the environment Azure Log Analytics workspace')
 param workspaceName string
@@ -55,9 +56,6 @@ param deployBastion bool = false
 
 @description('Storage account used for staging file artifacts')
 param storageAccountName string
-
-@description('The login server name of the Azure Container Registry')
-param acrName string
 
 @description('Override default RDP port using this parameter. Default is 3389. No changes will be made to the client VM.')
 param rdpPort string = '3389'
@@ -204,8 +202,53 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-11-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/PowerShell/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnObjectId ${spnObjectId} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -acrName ${acrName} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -adminPassword ${encodedPassword} -tenantId ${tenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${storageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -rdpPort ${rdpPort} -githubAccount ${githubAccount} -githubBranch ${githubBranch} -namingGuid ${namingGuid} -customLocationRPOID ${customLocationRPOID} -scenario ${scenario} -aioStorageAccountName ${aioStorageAccountName} -k3sArcClusterName ${k3sArcClusterName} -k3sArcDataClusterName ${k3sArcDataClusterName} -openAIEndpoint ${openAIEndpoint} -speachToTextEndpoint ${speachToTextEndpoint} -vmAutologon ${vmAutologon}'
     }
+  }
+}
+
+// Add role assignment for the VM: Azure Key Vault Secret Officer role
+resource vmRoleAssignment_KeyVaultAdministrator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Administrator')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')
+    principalType: 'ServicePrincipal'
+
+  }
+}
+
+// Add role assignment for the VM: Owner role
+resource vmRoleAssignment_Owner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Owner')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add role assignment for the VM: Storage Blob Data Contributor
+resource vmRoleAssignment_Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Storage Blob Data Contributor')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add role assignment for the VM: Cognitive Services OpenAI Contributor
+resource vmRoleAssignment_OpenAI 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vm.id, 'Microsoft.Authorization/roleAssignments', 'Cognitive Services OpenAI Contributor')
+  scope: resourceGroup()
+  properties: {
+    principalId: vm.identity.principalId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'a001fd3d-188f-4b5d-821b-7da978bf7442')
+    principalType: 'ServicePrincipal'
   }
 }
 
