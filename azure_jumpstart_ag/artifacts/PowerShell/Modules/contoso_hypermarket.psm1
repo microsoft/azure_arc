@@ -505,7 +505,7 @@ function Set-MicrosoftFabric {
         Write-Error "Unable to download script file: 'SetupFabricWorkspace.ps1' from GitHub"
     }
 }
-function Deploy-MotorsConfigs {
+function Deploy-HypermarketConfigs {
 
     # Loop through the clusters and deploy the configs in AppConfig hashtable in AgConfig-contoso-hypermarket.psd
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
