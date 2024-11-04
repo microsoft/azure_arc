@@ -177,7 +177,7 @@ Deploy-ClusterNamespaces
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
 if($scenario -ne "contoso_hypermarket"){
-    Deploy-ClusterPullSecrets
+    Deploy-ClusterSecrets
 }
 
 #####################################################################
