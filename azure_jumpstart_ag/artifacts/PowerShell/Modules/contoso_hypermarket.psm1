@@ -406,23 +406,6 @@ function Deploy-HypermarketConfigs {
                 Write-Host "[$(Get-Date -Format t)] INFO: Creating GitOps config for $configName on $($cluster.Value.ArcClusterName+"-$namingGuid")" -ForegroundColor Gray
                 $type = "connectedClusters"
 
-                # Wait for Kubernetes API server to become available
-                $apiServer = kubectl config view --context $cluster.Name.ToLower() --minify -o jsonpath='{.clusters[0].cluster.server}'
-                $apiServerAddress = $apiServer -replace '.*https://| .*$'
-                $apiServerFqdn = ($apiServerAddress -split ":")[0]
-                $apiServerPort = ($apiServerAddress -split ":")[1]
-
-                do {
-                    $result = Test-NetConnection -ComputerName $apiServerFqdn -Port $apiServerPort -WarningAction SilentlyContinue
-                    if ($result.TcpTestSucceeded) {
-                        break
-                    }
-                    else {
-                        Start-Sleep -Seconds 5
-                    }
-                } while ($true)
-
-
                 az k8s-configuration flux create `
                     --cluster-name $clusterName `
                     --resource-group $resourceGroup `
@@ -492,6 +475,15 @@ function Deploy-HypermarketConfigs {
             }
         }
     }
+    while ($(Get-Job -Name gitops).State -eq 'Running') {
+        Write-Host "[$(Get-Date -Format t)] INFO: Waiting for GitOps configuration to complete on all clusters...waiting 60 seconds" -ForegroundColor Gray
+        Receive-Job -Name gitops -WarningAction SilentlyContinue
+        Start-Sleep -Seconds 60
+    }
+
+    Get-Job -name gitops | Remove-Job
+    Write-Host "[$(Get-Date -Format t)] INFO: GitOps configuration complete." -ForegroundColor Green
+    Write-Host
 }
 
 function Set-AIServiceSecrets {
@@ -521,7 +513,7 @@ function Set-EventHubSecrets {
         Write-Host "`n"
         $eventHubNamespace = $(az eventhubs namespace list -g $resourceGroup --query [].name -o tsv)
         $eventHubName = $(az eventhubs eventhub list -g $resourceGroup --namespace-name $eventHubNamespace --query [].name -o tsv)
-        $eventHubConnectionString = $(az eventhubs authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name RootManageSharedAccessKey --query primaryConnectionString -o tsv)
+        $eventHubConnectionString = $(az eventhubs eventhub authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name RootManageSharedAccessKey --query primaryConnectionString -o tsv)
         kubectx $clusterName
         kubectl create secret generic azure-eventhub-secret `
         --namespace=contoso-hypermarket `

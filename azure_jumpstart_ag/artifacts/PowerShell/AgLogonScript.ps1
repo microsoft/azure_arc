@@ -231,9 +231,9 @@ if ($scenario -eq "contoso_motors") {
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }elseif($scenario -eq "contoso_hypermarket"){
     Deploy-AIO-M3
-    Deploy-HypermarketConfigs
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
+    Deploy-HypermarketConfigs
     Set-AIServiceSecrets
     Set-EventHubSecrets
     Set-SQLSecret
