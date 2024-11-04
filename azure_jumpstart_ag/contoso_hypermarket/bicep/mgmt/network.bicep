@@ -211,6 +211,19 @@ resource networkSecurityGroupCloud 'Microsoft.Network/networkSecurityGroups@2023
           destinationPortRange: '32323'
         }
       }
+      {
+        name: 'allow_external_agora_traffic'
+        properties: {
+          priority: 1080
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '5000-5003,8001,3000'
+        }
+      }
     ]
   }
 }
@@ -355,6 +368,39 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
           }
           subnet: {
             id: bastionSubnetRef
+          }
+        }
+      }
+    ]
+  }
+}
+
+resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
+  name: 'Ag-LB-Public-IP'
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
+  name: 'Ag-LoadBalancer-}'
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    frontendIPConfigurations: [
+      {
+        name: 'Ag-LB-Frontend'
+        properties: {
+          publicIPAddress: {
+            id: loadBalancerPip.id
           }
         }
       }
