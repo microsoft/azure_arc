@@ -98,6 +98,9 @@ param akvNameSite1 string = 'agakv1${namingGuid}'
 @description('The name of the Key Vault for site 2')
 param akvNameSite2 string = 'agakv2${namingGuid}'
 
+@description('Option to deploy GPU-enabled nodes for the K3s Worker nodes.')
+param deployGPUNodes bool = false
+
 @description('The array of OpenAI models to deploy')
 param azureOpenAIModels array = [
   {
@@ -182,6 +185,7 @@ module ubuntuRancherK3sDataSvcNodesDeployment 'kubernetes/ubuntuRancherNodes.bic
     vmName : '${k3sArcDataClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcDataClusterName)
     namingGuid: namingGuid
+    deployGPUNodes: deployGPUNodes
   }
   dependsOn: [
     ubuntuRancherK3sDataSvcDeployment
@@ -200,6 +204,7 @@ module ubuntuRancherK3sNodesDeployment 'kubernetes/ubuntuRancherNodes.bicep' = [
     vmName : '${k3sArcClusterName}-Node-0${i}'
     storageContainerName: toLower(k3sArcClusterName)
     namingGuid: namingGuid
+    deployGPUNodes: deployGPUNodes
   }
   dependsOn: [
     ubuntuRancherK3sDeployment
@@ -222,7 +227,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubBranch: githubBranch
     location: location
     subnetId: networkDeployment.outputs.cloudSubnetId
-    acrName: acrName
     rdpPort: rdpPort
     namingGuid: namingGuid
     scenario: scenario
@@ -235,15 +239,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     speachToTextEndpoint: azureOpenAI.outputs.speechToTextEndpoint
   }
 }
-
-module acr 'kubernetes/acr.bicep' = {
-  name: 'acrDeployment'
-  params: {
-    acrName: acrName
-    location: location
-  }
-}
-
 module keyVault 'data/keyVault.bicep' = {
   name: 'keyVaultDeployment'
   params: {

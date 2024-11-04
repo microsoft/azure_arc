@@ -494,19 +494,23 @@ function Deploy-HypermarketConfigs {
     }
 }
 
-function Set-AzureOpenAISecrets {
+function Set-AzureAISecrets {
+    $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
+    $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
+    $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
+    $openAIEndpoint = $AIServicesEndpoints['OpenAI Language Model Instance API']
+    $AIServicesKey = $(az cognitiveservices account keys list --name $AIServiceAccountName  --resource-group $resourceGroup --query key1 -o tsv)
+
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
         Write-Host "[$(Get-Date -Format t)] INFO: Deploying AI services Secret to the $clusterName cluster" -ForegroundColor Gray
         Write-Host "`n"
-        $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
-        $openAIEndpoint = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoint -o tsv)
-        $openAIKey = $(az cognitiveservices account keys list --name $AIServiceAccountName  --resource-group $resourceGroup --query key1 -o tsv)
         kubectx $clusterName
         kubectl create secret generic azure-openai-secret `
             --namespace=contoso-hypermarket `
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
-            --from-literal=azure-openai-api-key=$openAIKey
+            --from-literal=azure-openai-key=$AIServicesKey `
+            --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint
     }
 }
 

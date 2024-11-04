@@ -36,7 +36,6 @@ $global:appsRepo = "jumpstart-agora-apps"
 if ($scenario -eq "contoso_supermarket") {
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
-    $global:acrName = $Env:acrName.ToLower()
     $global:cosmosDBName = $Env:cosmosDBName
     $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
@@ -174,7 +173,9 @@ Deploy-ClusterNamespaces
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
-Deploy-ClusterSecrets
+if($scenario -ne "contoso_hypermarket"){
+    Deploy-ClusterPullSecrets
+}
 
 #####################################################################
 # Cache contoso-supermarket images on all clusters
