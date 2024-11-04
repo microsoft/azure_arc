@@ -621,6 +621,7 @@ function Deploy-HypermarketConfigs {
             }
         }
     }
+}
 
 function Set-AzureOpenAISecrets {
     $openAIAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
