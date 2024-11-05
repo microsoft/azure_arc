@@ -243,6 +243,7 @@ if ($scenario -eq "contoso_motors") {
     Set-AIServiceSecrets
     Set-EventHubSecrets
     Set-SQLSecret
+    Set-LoadBalancerBackendPools
 }
 
 #####################################################################

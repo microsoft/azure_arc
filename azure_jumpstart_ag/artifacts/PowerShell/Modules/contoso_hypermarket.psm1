@@ -516,8 +516,8 @@ function Set-EventHubSecrets {
         $eventHubConnectionString = $(az eventhubs eventhub authorization-rule keys list --resource-group $resourceGroup --namespace-name $eventHubNamespace --eventhub-name $eventHubName --name RootManageSharedAccessKey --query primaryConnectionString -o tsv)
         kubectx $clusterName
         kubectl create secret generic azure-eventhub-secret `
-        --namespace=contoso-hypermarket `
-        --from-literal=azure-eventhub-connection-string=$eventHubConnectionString
+            --namespace=contoso-hypermarket `
+            --from-literal=azure-eventhub-connection-string=$eventHubConnectionString
     }
 }
 
@@ -528,7 +528,82 @@ function Set-SQLSecret {
         Write-Host "`n"
         kubectx $clusterName
         kubectl create secret generic azure-sqlpassword-secret `
-        --namespace=contoso-hypermarket `
-        --from-literal=azure-sqlpassword-secret=$Env:adminPassword
+            --namespace=contoso-hypermarket `
+            --from-literal=azure-sqlpassword-secret=$Env:adminPassword
     }
+}
+
+function Set-LoadBalancerBackendPools {
+
+    $loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
+    $loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
+    $lbIndex = 0
+
+    foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
+        $clusterName = $cluster.Name.ToLower()
+        kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
+        $services = kubectl get services -n contoso-hypermarket -o json | ConvertFrom-Json
+        $services.items | ForEach-Object {
+            $service = $_
+            $serviceName = $service.metadata.name
+            $servicePort = $service.spec.ports.port
+            $serviceIp = $service.status.loadBalancer.ingress.ip
+
+            if ($null -ne $serviceIp) {
+                az network lb address-pool create -g $resourceGroup `
+                    --lb-name $loadBalancerName[$lbIndex] `
+                    --name "$serviceName-pool" `
+                    --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
+                    --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
+                    --only-show-errors
+
+                az network lb inbound-nat-rule create -g $resourceGroup `
+                    --lb-name $loadBalancerName[$lbIndex] `
+                    --name "$serviceName-NATRule" `
+                    --protocol Tcp `
+                    --frontend-port-range-start $servicePort `
+                    --frontend-port-range-end $servicePort `
+                    --frontend-ip $loadBalancerPublicIp[$lbIndex] `
+                    --backend-address-pool "$serviceName-pool" `
+                    --backend-port $servicePort `
+                    --only-show-errors
+            }
+        }
+
+        # Grafana backend pool creation
+        $grafanaPublicIpName = "Ag-VM-Client-PIP"
+        $serviceName = "Grafana"
+        $servicePort = "3000"
+        $clientVMPIP = $(az network public-ip show -g $resourceGroup -n $grafanaPublicIpName --query ipAddress -o tsv)
+
+        az network lb address-pool create -g $resourceGroup `
+            --lb-name $loadBalancerName[$lbIndex] `
+            --name "$serviceName-pool" `
+            --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
+            --backend-addresses "[{name:Grafana,ip-address:${clientVMPIP}}]" `
+            --only-show-errors
+
+        az network lb inbound-nat-rule create -g $resourceGroup `
+            --lb-name $loadBalancerName[$lbIndex] `
+            --name "$serviceName-NATRule" `
+            --protocol Tcp `
+            --frontend-port-range-start $servicePort `
+            --frontend-port-range-end $servicePort `
+            --frontend-ip $loadBalancerPublicIp[$lbIndex] `
+            --backend-address-pool "$serviceName-pool" `
+            --backend-port $servicePort `
+            --only-show-errors
+
+        az network lb outbound-rule create --address-pool "$serviceName-pool"`
+            --lb-name $loadBalancerName[0] `
+            --name "Grafana-outbound" `
+            --outbound-ports 10000 `
+            --protocol All `
+            --frontend-ip-configs $loadBalancerPublicIp[$lbIndex] `
+            --resource-group $resourceGroup `
+            --only-show-errors
+
+        $lbIndex++
+    }
+
 }

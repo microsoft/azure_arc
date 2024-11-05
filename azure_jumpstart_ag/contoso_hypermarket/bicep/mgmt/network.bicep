@@ -33,7 +33,6 @@ var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
-
 var bastionSubnet = [
   {
     name: 'AzureBastionSubnet'
@@ -83,7 +82,9 @@ resource cloudVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-07-01' = {
         addressPrefixCloud
       ]
     }
-    subnets: (deployBastion == false) ? union (cloudK3sSubnet,cloudSubnet) : union(cloudK3sSubnet,cloudSubnet,bastionSubnet)
+    subnets: (deployBastion == false)
+      ? union(cloudK3sSubnet, cloudSubnet)
+      : union(cloudK3sSubnet, cloudSubnet, bastionSubnet)
   }
 }
 
@@ -379,8 +380,8 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
   }
 }
 
-resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
-  name: 'Ag-LB-Public-IP'
+resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for (loadbalancer, i) in range(0,1): {
+  name: 'Ag-LB-Public-IP-${i}'
   location: location
   properties: {
     publicIPAllocationMethod: 'Static'
@@ -390,10 +391,10 @@ resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = {
   sku: {
     name: 'Standard'
   }
-}
+}]
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
-  name: 'Ag-LoadBalancer'
+resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (loadbalancer, i) in range(0,1): {
+  name: 'Ag-LoadBalancer-${i}'
   location: location
   sku: {
     name: 'Standard'
@@ -401,16 +402,17 @@ resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' = {
   properties: {
     frontendIPConfigurations: [
       {
-        name: 'Ag-LB-Frontend'
+        name: 'Ag-LB-Frontend-${i}'
         properties: {
           publicIPAddress: {
-            id: loadBalancerPip.id
+            id: loadBalancerPip[i].id
           }
         }
       }
     ]
   }
-}
+}]
+
 
 output vnetId string = cloudVirtualNetwork.id
 output k3sSubnetId string = cloudVirtualNetwork.properties.subnets[0].id
