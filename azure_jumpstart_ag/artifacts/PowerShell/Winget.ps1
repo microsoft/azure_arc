@@ -80,6 +80,16 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Create VSCode desktop shortcut
+Write-Header "Creating Visual Studio Code Desktop Shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Microsoft VS Code\Code.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\VSCode.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
 # Start remaining logon scripts
 Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 
