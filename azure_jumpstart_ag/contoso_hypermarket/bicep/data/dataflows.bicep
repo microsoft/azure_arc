@@ -90,7 +90,7 @@ resource iotDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflo
         operationType: 'Destination'
         destinationSettings: {
           endpointRef: eventHubDataflowEndpointName
-          dataDestination: eventHubName // See section on configuring data destination
+          dataDestination: eventHubName 
         }
       }
     ]
