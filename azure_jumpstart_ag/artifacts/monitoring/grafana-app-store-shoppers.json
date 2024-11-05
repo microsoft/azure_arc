@@ -92,7 +92,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Current Shoppers in the store"
+                "value": "Current shoppers in the store"
               }
             ]
           },
@@ -104,7 +104,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total Shoppers today"
+                "value": "Total shoppers today"
               }
             ]
           }
@@ -164,7 +164,7 @@
           "refId": "B"
         }
       ],
-      "title": "Current / Total Shoppers",
+      "title": "",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -359,7 +359,7 @@
           "refId": "E"
         }
       ],
-      "title": "Shoppers",
+      "title": "",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -667,7 +667,7 @@
           "refId": "A"
         }
       ],
-      "title": "Detected Total Persons",
+      "title": "",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -880,7 +880,7 @@
           "refId": "A"
         }
       ],
-      "title": "Detected Total Persons",
+      "title": "",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -1073,6 +1073,6 @@
   "timezone": "browser",
   "title": "Store / Shopper Insights",
   "uid": "7a9d9181-fc1c-43ac-b55d-a0da4d93b8cb",
-  "version": 9,
+  "version": 12,
   "weekStart": ""
 }
