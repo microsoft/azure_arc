@@ -31,18 +31,18 @@ $global:adxClusterName = $Env:adxClusterName
 $global:namingGuid = $Env:namingGuid
 $global:adminPassword = $Env:adminPassword
 $global:customLocationRPOID = $Env:customLocationRPOID
-$global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
 $global:appsRepo = "jumpstart-agora-apps"
 if ($scenario -eq "contoso_supermarket") {
+    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
     $global:githubUser = $Env:githubUser
     $global:githubPat = $Env:GITHUB_TOKEN
-    $global:acrName = $Env:acrName.ToLower()
     $global:cosmosDBName = $Env:cosmosDBName
     $global:cosmosDBEndpoint = $Env:cosmosDBEndpoint
     $global:gitHubAPIBaseUri = $websiteUrls["githubAPI"]
     $global:workflowStatus = ""
     $global:appClonedRepo = "https://github.com/$githubUser/jumpstart-agora-apps"
 }elseif ($scenario -eq "contoso_motors") {
+    $global:appUpstreamRepo = "https://github.com/microsoft/jumpstart-agora-apps"
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-mq-dmqtt-frontend"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -50,6 +50,8 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:spnObjectId = $Env:spnObjectId
 }elseif ($scenario -eq "contoso_hypermarket"){
+    $global:appUpstreamRepo = "https://github.com/Azure/jumpstart-apps"
+    $global:tenantId = $Env:tenantId
     $global:aioNamespace = "azure-iot-operations"
     $global:mqListenerService = "aio-broker-insecure"
     $global:mqttExplorerReleasesUrl = $websiteUrls["mqttExplorerReleases"]
@@ -57,7 +59,7 @@ if ($scenario -eq "contoso_supermarket") {
     $global:aioStorageAccountName = $Env:aioStorageAccountName
     $global:k3sArcDataClusterName = $Env:k3sArcDataClusterName
     $global:k3sArcClusterName = $Env:k3sArcClusterName
-    $global:spnObjectId = $Env:spnObjectId
+    #$global:spnObjectId = $Env:spnObjectId
     $global:openAIEndpoint = $Env:openAIEndpoint
     $global:speachToTextEndpoint = $Env:speachToTextEndpoint
 }
@@ -102,7 +104,11 @@ $global:Credentials = New-Object System.Management.Automation.PSCredential($AgCo
 #####################################################################
 Write-Host "[$(Get-Date -Format t)] INFO: Configuring Azure CLI (Step 1/17)" -ForegroundColor DarkGreen
 Write-Host "[$(Get-Date -Format t)] INFO: Logging into Az CLI using the service principal and secret provided at deployment" -ForegroundColor Gray
-az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+if($scenario -eq "contoso_hypermarket"){
+    az login --identity | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+}else{
+    az login --service-principal --username $Env:spnClientID --password=$Env:spnClientSecret --tenant $Env:spnTenantId | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\AzCLI.log")
+}
 az account set -s $subscriptionId
 Deploy-AzCLI
 
@@ -169,8 +175,10 @@ Deploy-ClusterNamespaces
 #####################################################################
 # Setup Azure Container registry pull secret on clusters
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
-Deploy-ClusterSecrets
+if($scenario -ne "contoso_hypermarket"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Configuring secrets on clusters (Step 9/17)" -ForegroundColor DarkGreen
+    Deploy-ClusterSecrets
+}
 
 #####################################################################
 # Cache contoso-supermarket images on all clusters
@@ -182,8 +190,8 @@ if ($scenario -eq "contoso_supermarket") {
 #####################################################################
 # Connect the AKS Edge Essentials clusters and hosts to Azure Arc
 #####################################################################
-Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
 if($scenario -eq "contoso_supermarket" -or $scenario -eq "contoso_motors"){
+    Write-Host "[$(Get-Date -Format t)] INFO: Connecting AKS Edge clusters to Azure with Azure Arc (Step 10/17)" -ForegroundColor DarkGreen
     Deploy-AzArcK8sAKSEE
 }
 
@@ -207,6 +215,12 @@ if ($scenario -eq "contoso_supermarket") {
         --namespace $AgConfig.nginx.Namespace `
         --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Nginx.log")
 }
+
+##############################################################
+# Deploy Kubernetes Prometheus Stack for Observability
+##############################################################
+Deploy-Prometheus -AgConfig $AgConfig
+
 #####################################################################
 # Configuring applications on the clusters using GitOps
 #####################################################################
@@ -222,17 +236,14 @@ if ($scenario -eq "contoso_motors") {
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
 }elseif($scenario -eq "contoso_hypermarket"){
-    #Deploy-AIO-M2
     Deploy-AIO-M3
     $mqttIpArray=Set-MQTTIpAddress
     Deploy-MQTTExplorer -mqttIpArray $mqttIpArray
-    Set-AzureOpenAISecrets
+    Deploy-HypermarketConfigs
+    Set-AIServiceSecrets
+    Set-EventHubSecrets
+    Set-SQLSecret
 }
-
-##############################################################
-# Deploy Kubernetes Prometheus Stack for Observability
-##############################################################
-Deploy-Prometheus -AgConfig $AgConfig
 
 #####################################################################
 # Deploy Azure Workbook for Infrastructure Observability

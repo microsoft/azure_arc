@@ -155,6 +155,7 @@
             FriendlyName           = "Seattle"
             GrafanaDataSource      = "seattle"
             Type                   = "k3s"
+            Branch                 = "main"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -165,6 +166,7 @@
             FriendlyName           = "Chicago"
             GrafanaDataSource      = "chicago"
             Type                   = "k3s"
+            Branch                 = "main"
             HelmValuesFile         = "prometheus-additional-scrape-config.yaml"
             HelmSetValue           = "alertmanager.enabled=false,grafana.enabled=false,prometheus.service.type=LoadBalancer"
             HelmService            = "service/prometheus-kube-prometheus-prometheus"
@@ -201,10 +203,10 @@
 
     AppConfig = @{
         inferencing_deployment = @{
-            GitOpsConfigName = "contoso-motors"
-            KustomizationName = "contoso-motors"
-            KustomizationPath="./contoso_manufacturing/operations"
-            Namespace = "contoso-motors"
+            GitOpsConfigName = "contoso-hypermarket"
+            KustomizationName = "contoso-hypermarket"
+            KustomizationPath="./agora/contoso_hypermarket"
+            Namespace = "contoso-hypermarket"
             Order = 1
         }
     }

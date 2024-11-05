@@ -6,6 +6,7 @@ param (
   [string]$spnObjectId,
   [string]$spnTenantId,
   [string]$spnAuthority,
+  [string]$tenantId,
   [string]$subscriptionId,
   [string]$resourceGroup,
   [string]$azureLocation,
@@ -13,7 +14,6 @@ param (
   [string]$workspaceName,
   [string]$aksStagingClusterName,
   [string]$iotHubHostName,
-  [string]$acrName,
   [string]$cosmosDBName,
   [string]$cosmosDBEndpoint,
   [string]$templateBaseUrl,
@@ -47,6 +47,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
@@ -55,7 +56,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('aksStagingClusterName', $aksStagingClusterName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('iotHubHostName', $iotHubHostName, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('acrName', $acrName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBName', $cosmosDBName, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('cosmosDBEndpoint', $cosmosDBEndpoint, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
