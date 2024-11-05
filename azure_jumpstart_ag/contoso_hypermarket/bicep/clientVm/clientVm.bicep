@@ -30,18 +30,6 @@ param resourceTags object = {
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-/*@description('Client id of the service principal')
-param spnClientId string
-
-@description('Azure service principal object id')
-param spnObjectId string
-
-@description('Client secret of the service principal')
-@secure()
-param spnClientSecret string
-param spnAuthority string = environment().authentication.loginEndpoint
-*/
-
 @description('Tenant id of the service principal')
 param tenantId string
 
