@@ -40,7 +40,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
   name: '${openAIAccountName}-${model.name}-deployment'
   sku: {
     name: 'Standard'
-    capacity: 50
+    capacity: 10
   }
   properties: {
     model: {
@@ -49,7 +49,7 @@ resource openAIModelsDeployment 'Microsoft.CognitiveServices/accounts/deployment
       version: model.version
     }
     versionUpgradeOption: 'NoAutoUpgrade'
-    currentCapacity: 50
+    currentCapacity: 10
     raiPolicyName: 'Microsoft.Default'
   }
 }]
