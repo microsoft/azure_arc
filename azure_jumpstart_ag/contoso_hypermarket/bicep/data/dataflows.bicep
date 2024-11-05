@@ -18,7 +18,7 @@ param commercialDataFlowName string = 'commercial-mqtt-to-eventhub'
 param defaultDataflowEndpointName string = 'default'
 param eventHubDataflowEndpointName string = 'eventhub-endpoint'
 
-resource aioInstance 'Microsoft.IoTOperations/instances@2024-08-15-preview' existing = {
+resource aioInstance 'Microsoft.IoTOperations/instances@2024-09-15-preview' existing = {
   name: aioInstanceName
 }
 
@@ -26,7 +26,7 @@ resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-31-p
   name: customLocationName
 }
 
-resource eventhubEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2024-08-15-preview' = {
+resource eventhubEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2024-09-15-preview' = {
   parent: aioInstance
   name: eventHubDataflowEndpointName
   extendedLocation: {
@@ -60,12 +60,12 @@ resource eventhubEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2
 }
 
 // Pointer to the default dataflow profile
-resource defaultDataflowProfile 'Microsoft.IoTOperations/instances/dataflowProfiles@2024-08-15-preview' existing = {
+resource defaultDataflowProfile 'Microsoft.IoTOperations/instances/dataflowProfiles@2024-09-15-preview' existing = {
   parent: aioInstance
   name: 'default'
 }
 
-resource iotDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflows@2024-08-15-preview' = {
+resource iotDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflows@2024-09-15-preview' = {
   // Reference to the parent dataflow profile, the default profile in this case
   // Same usage as profileRef in Kubernetes YAML
   parent: defaultDataflowProfile
@@ -103,7 +103,7 @@ resource iotDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflo
   }
 }
 
-resource commercialDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflows@2024-08-15-preview' = {
+resource commercialDataFlow 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflows@2024-09-15-preview' = {
   // Reference to the parent dataflow profile, the default profile in this case
   // Same usage as profileRef in Kubernetes YAML
   parent: defaultDataflowProfile
