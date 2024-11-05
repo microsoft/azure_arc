@@ -57,6 +57,29 @@ while (-not $success -and $retryCount -lt $maxRetries) {
     }
 }
 
+# Create Desktop shortcuts
+
+# Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
+Write-Host "`n"
+Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 20\Common7\IDE\ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Create Azure Data Studio desktop shortcut
+Write-Header "Creating Azure Data Studio Desktop Shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Users\$Env:adminUsername\AppData\Local\Programs\Azure Data Studio\azuredatastudio.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
 # Start remaining logon scripts
 Get-ScheduledTask *LogonScript* | Start-ScheduledTask
 
