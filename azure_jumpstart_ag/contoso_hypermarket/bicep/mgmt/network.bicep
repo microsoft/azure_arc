@@ -32,6 +32,10 @@ var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${cloudVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'Ag-Bastion'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
+var sites = [
+  'Chicago'
+  'Seattle'
+]
 
 var bastionSubnet = [
   {
@@ -380,8 +384,8 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-02-01' = if (deployBas
   }
 }
 
-resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for (loadbalancer, i) in range(0,1): {
-  name: 'Ag-LB-Public-IP-${i}'
+resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for (site, i) in sites: {
+  name: 'Ag-LB-Public-IP-${site}'
   location: location
   properties: {
     publicIPAllocationMethod: 'Static'
@@ -393,8 +397,8 @@ resource loadBalancerPip 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for
   }
 }]
 
-resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (loadbalancer, i) in range(0,1): {
-  name: 'Ag-LoadBalancer-${i}'
+resource loadBalancer 'Microsoft.Network/loadBalancers@2024-01-01' =  [for (site, i) in sites: {
+  name: 'Ag-LoadBalancer-${site}'
   location: location
   sku: {
     name: 'Standard'

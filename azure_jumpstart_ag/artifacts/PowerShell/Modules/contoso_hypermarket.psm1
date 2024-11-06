@@ -535,12 +535,14 @@ function Set-SQLSecret {
 
 function Set-LoadBalancerBackendPools {
 
-    $loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
-    $loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
-    $lbIndex = 0
+    #$loadBalancerName = $(az network lb list -g $resourceGroup --query [].name -o tsv)
+    #$loadBalancerPublicIp = $(az network lb frontend-ip list -g $resourceGroup --lb-name $loadBalancerName --query [].name -o tsv)
+    #$lbIndex = 0
 
     foreach ($cluster in $AgConfig.SiteConfig.GetEnumerator()) {
         $clusterName = $cluster.Name.ToLower()
+        $loadBalancerName = "Ag-LoadBalancer-${clusterName}"
+        $loadBalancerPublicIp = "Ag-LB-Public-IP-${clusterName}"
         kubectx $clusterName | Out-File -Append -FilePath ($AgConfig.AgDirectories["AgLogsDir"] + "\Bookmarks.log")
         $services = kubectl get services -n contoso-hypermarket -o json | ConvertFrom-Json
         $services.items | ForEach-Object {
@@ -551,19 +553,19 @@ function Set-LoadBalancerBackendPools {
 
             if ($null -ne $serviceIp) {
                 az network lb address-pool create -g $resourceGroup `
-                    --lb-name $loadBalancerName[$lbIndex] `
+                    --lb-name $loadBalancerName `
                     --name "$serviceName-pool" `
                     --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
                     --backend-addresses "[{name:${serviceName},ip-address:${serviceIp}}]" `
                     --only-show-errors
 
                 az network lb inbound-nat-rule create -g $resourceGroup `
-                    --lb-name $loadBalancerName[$lbIndex] `
+                    --lb-name $loadBalancerName `
                     --name "$serviceName-NATRule" `
                     --protocol Tcp `
                     --frontend-port-range-start $servicePort `
                     --frontend-port-range-end $servicePort `
-                    --frontend-ip $loadBalancerPublicIp[$lbIndex] `
+                    --frontend-ip $loadBalancerPublicIp `
                     --backend-address-pool "$serviceName-pool" `
                     --backend-port $servicePort `
                     --only-show-errors
@@ -577,33 +579,33 @@ function Set-LoadBalancerBackendPools {
         $clientVMPIP = $(az network public-ip show -g $resourceGroup -n $grafanaPublicIpName --query ipAddress -o tsv)
 
         az network lb address-pool create -g $resourceGroup `
-            --lb-name $loadBalancerName[$lbIndex] `
+            --lb-name $loadBalancerName `
             --name "$serviceName-pool" `
             --vnet '/subscriptions/2d68328e-bde2-4aeb-a5b4-1a11b4328961/resourceGroups/JumpstartAgora-ContosoHypermarket/providers/Microsoft.Network/virtualNetworks/Ag-Vnet-Prod' `
             --backend-addresses "[{name:Grafana,ip-address:${clientVMPIP}}]" `
             --only-show-errors
 
         az network lb inbound-nat-rule create -g $resourceGroup `
-            --lb-name $loadBalancerName[$lbIndex] `
+            --lb-name $loadBalancerName `
             --name "$serviceName-NATRule" `
             --protocol Tcp `
             --frontend-port-range-start $servicePort `
             --frontend-port-range-end $servicePort `
-            --frontend-ip $loadBalancerPublicIp[$lbIndex] `
+            --frontend-ip $loadBalancerPublicIp `
             --backend-address-pool "$serviceName-pool" `
             --backend-port $servicePort `
             --only-show-errors
 
         az network lb outbound-rule create --address-pool "$serviceName-pool"`
-            --lb-name $loadBalancerName[0] `
+            --lb-name $loadBalancerName `
             --name "Grafana-outbound" `
             --outbound-ports 10000 `
             --protocol All `
-            --frontend-ip-configs $loadBalancerPublicIp[$lbIndex] `
+            --frontend-ip-configs $loadBalancerPublicIp `
             --resource-group $resourceGroup `
             --only-show-errors
 
-        $lbIndex++
+        #$lbIndex++
     }
 
 }
