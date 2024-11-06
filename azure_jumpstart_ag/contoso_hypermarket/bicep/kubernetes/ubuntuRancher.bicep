@@ -18,7 +18,7 @@ param ubuntuOSVersion string = '22_04-lts-gen2'
 param azureLocation string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_B4ms'
+param vmSize string = 'Standard_D4a_v4'
 
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
