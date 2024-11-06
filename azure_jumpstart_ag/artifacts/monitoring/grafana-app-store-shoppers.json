@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 8,
+  "id": 12,
   "links": [],
   "panels": [
     {
@@ -52,7 +52,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "<div style=\"font-size: 30px; color: black; background-color: green; text-align: center;\">\n  Aisle Zone\n</div>\n",
+        "content": "<div style=\"font-size: 30px; color: black; background-color: #2E8B57; text-align: center;\">\n  Aisle Zone\n</div>\n",
         "mode": "html"
       },
       "pluginVersion": "11.3.0",
@@ -87,38 +87,26 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "current_shoppers"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Current shoppers in the store"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "total_shoppers"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total shoppers today"
+                "value": "Shoppers in the store"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 7,
+        "h": 8,
+        "w": 4,
         "x": 0,
         "y": 3
       },
-      "id": 43,
+      "id": 57,
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
@@ -143,37 +131,15 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "current_shoppers{camera=~\".*stream.*\"}",
+          "expr": "total_shoppers{camera=\"Aisle Camera\"}",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "total_shoppers{camera=~\".*stream.*\"}",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "B"
         }
       ],
       "title": "",
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "(.*)_(.*)",
-            "renamePattern": "$1 $2"
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -203,19 +169,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_10"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Shoppers Age 10"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "shoppers_age_20"
+              "options": "shoppers_age_20_Aisle_Camera"
             },
             "properties": [
               {
@@ -227,7 +181,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_30"
+              "options": "shoppers_age_30_Aisle_Camera"
             },
             "properties": [
               {
@@ -239,7 +193,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_40"
+              "options": "{__name__=\"shoppers_age_40_Aisle Camera\", camera=\"Aisle Camera\", container=\"shopper-insights-api\", endpoint=\"shopper-insights-metrics\", instance=\"10.42.1.75:5001\", job=\"shopper-insights-api\", namespace=\"contoso-hypermarket\", pod=\"shopper-insights-api-7bf8cc6578-6gdth\", service=\"shopper-insights-api\"}"
             },
             "properties": [
               {
@@ -251,7 +205,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_50"
+              "options": "{__name__=\"shoppers_age_50_Aisle Camera\", camera=\"Aisle Camera\", container=\"shopper-insights-api\", endpoint=\"shopper-insights-metrics\", instance=\"10.42.1.75:5001\", job=\"shopper-insights-api\", namespace=\"contoso-hypermarket\", pod=\"shopper-insights-api-7bf8cc6578-6gdth\", service=\"shopper-insights-api\"}"
             },
             "properties": [
               {
@@ -263,9 +217,9 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 7,
-        "x": 7,
+        "x": 4,
         "y": 3
       },
       "id": 42,
@@ -295,7 +249,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_10",
+          "expr": "shoppers_age_20_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -309,7 +263,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_20",
+          "expr": "shoppers_age_30_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -323,7 +277,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_30",
+          "expr": "shoppers_age_40_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -337,26 +291,12 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "shoppers_age_40",
+          "expr": "shoppers_age_50_Aisle_Camera",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
           "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "shoppers_age_50",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "E"
         }
       ],
       "title": "",
@@ -430,19 +370,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_10"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Shoppers Age 10"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "shoppers_age_20"
+              "options": "shoppers_age_20_Aisle_Camera"
             },
             "properties": [
               {
@@ -454,7 +382,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_30"
+              "options": "shoppers_age_30_Aisle_Camera"
             },
             "properties": [
               {
@@ -466,7 +394,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_40"
+              "options": "shoppers_age_40_Aisle_Camera"
             },
             "properties": [
               {
@@ -478,7 +406,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "shoppers_age_50"
+              "options": "shoppers_age_50_Aisle_Camera"
             },
             "properties": [
               {
@@ -490,9 +418,9 @@
         ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 10,
-        "x": 14,
+        "h": 8,
+        "w": 13,
+        "x": 11,
         "y": 3
       },
       "id": 26,
@@ -516,7 +444,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_10",
+          "expr": "shoppers_age_20_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -529,7 +457,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_20",
+          "expr": "shoppers_age_30_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -542,7 +470,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_30",
+          "expr": "shoppers_age_40_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -555,25 +483,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "shoppers_age_40",
+          "expr": "shoppers_age_50_Aisle_Camera",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "shoppers_age_50",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "E"
         }
       ],
       "title": "Shoppers (by Age)",
@@ -620,21 +535,21 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total Persons"
+                "value": "Shoppers detected"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 5,
+        "h": 8,
+        "w": 4,
         "x": 0,
-        "y": 13
+        "y": 11
       },
       "id": 45,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -659,7 +574,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detected_total_persons",
+          "expr": "detected_total_persons{camera=~\"Aisle Camera\"}",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -747,17 +662,17 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Detected Total Persons"
+                "value": "Detected Shoppers"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 8,
         "w": 7,
-        "x": 5,
-        "y": 13
+        "x": 4,
+        "y": 11
       },
       "id": 44,
       "options": {
@@ -765,7 +680,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "mode": "single",
@@ -781,7 +696,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detected_total_persons",
+          "expr": "detected_total_persons{camera=~\"Aisle Camera\"}",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -789,7 +704,7 @@
           "refId": "A"
         }
       ],
-      "title": "Detected Total Persons",
+      "title": "Shoppers detected",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -840,14 +755,14 @@
         ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 5,
-        "x": 12,
-        "y": 13
+        "h": 8,
+        "w": 4,
+        "x": 11,
+        "y": 11
       },
       "id": 50,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -872,7 +787,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detection_fps",
+          "expr": "detection_fps{camera=~\"Aisle Camera\"}",
           "hide": false,
           "instant": true,
           "legendFormat": "__auto",
@@ -967,10 +882,10 @@
         ]
       },
       "gridPos": {
-        "h": 10,
-        "w": 7,
-        "x": 17,
-        "y": 13
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 11
       },
       "id": 49,
       "options": {
@@ -994,7 +909,813 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "detection_fps",
+          "expr": "detection_fps{camera=~\"Aisle Camera\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Detection frame per seconds",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 51,
+      "panels": [],
+      "title": "Produce Zone",
+      "type": "row"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 52,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"font-size: 30px; color: black; background-color: #4169E1; text-align: center;\">\n  Produce Zone\n</div>\n",
+        "mode": "html"
+      },
+      "pluginVersion": "11.3.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total_shoppers"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers in the store"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 22
+      },
+      "id": 61,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "total_shoppers{camera=\"Produce Camera\"}",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#57a1f2",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_20_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 20"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_30_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 30"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 4,
+        "y": 22
+      },
+      "id": 62,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_20_Produce_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "shoppers_age_30_Produce_Camera",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "B"
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_20_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 20"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shoppers_age_30_Produce_Camera"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers Age 30"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 13,
+        "x": 11,
+        "y": 22
+      },
+      "id": 63,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_20_Produce_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "shoppers_age_30_Produce_Camera",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Shoppers (by Age)",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detected_total_persons"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shoppers detected"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 30
+      },
+      "id": 64,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "detected_total_persons{camera=~\"Produce Camera\"}",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detected_total_persons"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Detected Shoppers"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 4,
+        "y": 30
+      },
+      "id": 65,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "detected_total_persons{camera=~\"Produce Camera\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Shoppers detected",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detection_fps"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Detection fps"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 11,
+        "y": 30
+      },
+      "id": 66,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "detection_fps{camera=~\"Produce Camera\"}",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "(.*)_(.*)",
+            "renamePattern": "$1 $2"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detection_fps"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Detection fps"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 15,
+        "y": 30
+      },
+      "id": 67,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "detection_fps{camera=~\"Produce Camera\"}",
           "hide": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -1023,9 +1744,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 38
       },
-      "id": 22,
+      "id": 60,
       "options": {
         "code": {
           "language": "plaintext",
@@ -1051,8 +1772,8 @@
     "list": [
       {
         "current": {
-          "text": "seattle",
-          "value": "de2u8l2s3t7uoa"
+          "text": "chicago",
+          "value": "ce2zptqpjpibkd"
         },
         "includeAll": false,
         "label": "Store",
@@ -1066,13 +1787,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2024-11-05T21:30:03.000Z",
+    "to": "2024-11-05T22:30:03.000Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Store / Shopper Insights",
-  "uid": "7a9d9181-fc1c-43ac-b55d-a0da4d93b8cb",
-  "version": 12,
+  "uid": "5d29f483-58a9-4d52-bd94-87d00d223aad",
+  "version": 2,
   "weekStart": ""
 }
