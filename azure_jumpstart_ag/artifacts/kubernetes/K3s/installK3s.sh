@@ -300,6 +300,7 @@ if [[ "$deployGPUNodes" == "true" && "$k3sControlPlane" == "false"]]; then
     # Configure K3s to use nvidia-ctk
     sudo nvidia-ctk runtime configure --runtime=containerd
     sudo systemctl restart k3s
+fi
 
     if [[ $? -ne 0 ]]; then
         echo "ERROR: Failed to install NVIDIA GPU drivers"
