@@ -42,7 +42,7 @@ param deployGPUNodes bool = false
 
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var vmSize = deployGPUNodes ? 'Standard_NV4as_v4' : 'Standard_D8s_v5'
+var vmSize = deployGPUNodes ? 'Standard_NV6' : 'Standard_D8s_v5'
 var diskSize = 512
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
