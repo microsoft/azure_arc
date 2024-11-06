@@ -487,6 +487,7 @@ function Deploy-HypermarketConfigs {
 }
 
 function Set-AIServiceSecrets {
+    $location = $global:azureLocation
     $AIServiceAccountName = $(az cognitiveservices account list -g $resourceGroup --query [].name -o tsv)
     $AIServicesEndpoints = $(az cognitiveservices account show --name $AIServiceAccountName --resource-group $resourceGroup --query properties.endpoints) | ConvertFrom-Json -AsHashtable
     $speechToTextEndpoint = $AIServicesEndpoints['Speech Services Speech to Text (Standard)']
@@ -502,7 +503,8 @@ function Set-AIServiceSecrets {
             --namespace=contoso-hypermarket `
             --from-literal=azure-openai-endpoint=$openAIEndpoint `
             --from-literal=azure-openai-key=$AIServicesKey `
-            --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint
+            --from-literal=azure-speech-to-text-endpoint=$speechToTextEndpoint `
+            --from-literal=region=$location
     }
 }
 
