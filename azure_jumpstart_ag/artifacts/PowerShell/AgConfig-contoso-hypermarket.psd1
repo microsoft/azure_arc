@@ -59,7 +59,8 @@
         @{name="customlocation"; version="latest"},
         @{name="kusto"; version="latest"},
         @{name="storage-preview"; version="latest"},
-        @{name="azure-iot-ops"; version="latest"}
+        @{name="azure-iot-ops"; version="latest"},
+        @{name="microsoft-fabric"; version="latest"}
     )
 
     # PowerShell modules
